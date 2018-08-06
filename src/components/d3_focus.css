@@ -1,0 +1,20 @@
+.focus-main .line {
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+.focus-main .mark-line {
+  fill: steelblue;
+}
+
+.focus-main .x-grid .tick line {
+  opacity: 0.6;
+  shape-rendering: crispEdges;
+  stroke: #bbbbbb;
+}
+
+.focus-main .y-grid .tick line {
+  opacity: 0.6;
+  shape-rendering: crispEdges;
+  stroke: #bbbbbb;
+}

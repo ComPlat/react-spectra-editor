@@ -1,0 +1,86 @@
+const MountPath = (target) => {
+  const path = target.root.append('g')
+    .attr('class', 'line-clip')
+    .attr('clip-path', 'url(#clip)')
+    .append('path')
+    .attr('class', 'line')
+    .attr('fill', 'none');
+  return path;
+};
+
+const MountGrid = (target) => {
+  const gridTrans = `translate(0, ${target.h})`;
+  const xGrid = target.root.append('g')
+    .attr('class', 'x-grid')
+    .attr('transform', gridTrans);
+  const yGrid = target.root.append('g')
+    .attr('class', 'y-grid');
+  return { x: xGrid, y: yGrid };
+};
+
+const MountAxis = (target) => {
+  const xAxisTrans = `translate(0, ${target.h})`;
+  const xAxis = target.root.append('g')
+    .attr('class', 'x-axis')
+    .attr('transform', xAxisTrans);
+  const yAxis = target.root.append('g')
+    .attr('class', 'y-axis');
+  return { x: xAxis, y: yAxis };
+};
+
+const MountAxisLabelX = (target) => {
+  const xTrans = `translate(${target.w / 2}, ${target.h + 40})`;
+  target.root.append('text')
+    .attr('text-anchor', 'middle')
+    .attr('transform', xTrans)
+    .attr('class', 'xLabel');
+};
+
+const MountAxisLabelY = (target) => {
+  const yR = 'rotate(-90)';
+  const yTrans = `translate(${30 - target.margin.l}, ${target.h / 2}) ${yR}`;
+  target.root.append('text')
+    .attr('text-anchor', 'middle')
+    .attr('transform', yTrans)
+    .attr('class', 'yLabel');
+};
+
+const MountMarker = (target) => {
+  const tTrans = `translate(${target.w - 100}, 30)`;
+  const lTrans = `translate(${target.w - 220}, 25)`;
+  target.root.append('text')
+    .attr('text-anchor', 'middle')
+    .attr('transform', tTrans)
+    .attr('class', 'mark-text');
+
+  target.root.append('rect')
+    .attr('transform', lTrans)
+    .attr('width', 30)
+    .attr('height', 3)
+    .attr('class', 'mark-line');
+};
+
+const MountClip = (target) => {
+  target.svg.append('defs')
+    .append('clipPath')
+    .attr('id', 'clip')
+    .append('rect')
+    .attr('width', target.w)
+    .attr('height', target.h)
+    .attr('x', 0)
+    .attr('y', 0);
+};
+
+const MountMainFrame = (target, name) => {
+  const transFrame = `translate(${target.margin.l}, ${target.margin.t})`;
+  const clsName = `${name}-main`;
+
+  target.svg.append('g')
+    .attr('class', clsName)
+    .attr('transform', transFrame);
+};
+
+export {
+  MountPath, MountGrid, MountAxis, MountAxisLabelX, MountAxisLabelY,
+  MountMarker, MountClip, MountMainFrame,
+};
