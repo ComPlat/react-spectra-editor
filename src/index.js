@@ -9,7 +9,7 @@ import App from './components/app';
 const store = createStore(reducers);
 
 const SpectraViewer = ({
-  input, cLabel, xLabel, yLabel, width, height,
+  input, cLabel, xLabel, yLabel,
 }) => (
   <Provider store={store}>
     <App
@@ -17,8 +17,6 @@ const SpectraViewer = ({
       cLabel={cLabel}
       xLabel={xLabel}
       yLabel={yLabel}
-      width={width}
-      height={height}
     />
   </Provider>
 );
@@ -28,8 +26,6 @@ SpectraViewer.propTypes = {
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
-  width: PropTypes.number.isRequired,
-  height: PropTypes.number.isRequired,
 };
 
 export default SpectraViewer;

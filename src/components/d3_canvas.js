@@ -4,13 +4,14 @@ import D3Context from './d3_context';
 import MountZoom from '../helpers/zoom';
 import MountBrush from '../helpers/brush';
 
+const W = 600;
+const H = 500;
+
 class D3Canvas {
-  constructor(props) {
-    const { W, H } = props;
+  constructor() {
     this.focus = new D3Focus({ W, H });
     this.context = new D3Context({ W, H });
 
-    this.full = { W, H };
     this.svg = null;
     this.zoom = d3.zoom();
     this.brush = d3.brushX();
@@ -24,8 +25,8 @@ class D3Canvas {
   drawMain(el) {
     const svg = d3.select(el).append('svg')
       .attr('class', 'main')
-      .attr('width', this.full.W)
-      .attr('height', this.full.H);
+      .attr('preserveAspectRatio', 'xMinYMin meet')
+      .attr('viewBox', `0 0 ${W} ${H}`);
     this.svg = svg;
   }
 

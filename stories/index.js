@@ -47,7 +47,7 @@ class Demo extends React.Component {
     const yLabel = `Y(${sel.value.yUnit})`;
 
     return (
-      <div>
+      <div style={{ width: '800px' }}>
         <Select
           value={selectedOption}
           onChange={this.onChange}
@@ -58,8 +58,6 @@ class Demo extends React.Component {
           cLabel={cLabel}
           xLabel={xLabel}
           yLabel={yLabel}
-          width={900}
-          height={500}
         />
       </div>
     );

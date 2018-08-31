@@ -11,8 +11,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
 
-    const { width, height } = props;
-    this.canvas = new D3Canvas({ W: width, H: height });
+    this.canvas = new D3Canvas();
 
     this.seSeedChange = this.seSeedChange.bind(this);
   }
@@ -104,8 +103,6 @@ App.propTypes = {
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
-  width: PropTypes.number.isRequired,
-  height: PropTypes.number.isRequired,
   borderSt: PropTypes.array.isRequired,
   updateBorderAct: PropTypes.func.isRequired,
   resetBorderAct: PropTypes.func.isRequired,
