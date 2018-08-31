@@ -31,16 +31,18 @@ class D3Canvas {
   }
 
   drawLabel(el, cLabel, xLabel, yLabel) {
-    d3.select(el).selectAll('.mark-text').text(cLabel);
     d3.select(el).selectAll('.xLabel').text(xLabel);
     d3.select(el).selectAll('.yLabel').text(yLabel);
+    if (cLabel) {
+      d3.select(el).selectAll('.mark-text').text(cLabel);
+    }
   }
 
   create(el, seed, data, cLabel, xLabel, yLabel, updateBorder) {
     this.drawMain(el);
 
     this.context.create(el, this.svg, seed, updateBorder);
-    this.focus.create(el, this.svg, data);
+    this.focus.create(el, this.svg, data, cLabel);
     this.drawLabel(el, cLabel, xLabel, yLabel);
 
     MountBrush(this);

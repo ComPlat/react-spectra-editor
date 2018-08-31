@@ -43,8 +43,8 @@ class Demo extends React.Component {
     const sel = selectedOption;
     const input = Convert(sel.value.data[0]);
     const cLabel = sel.value.typ;
-    const xLabel = `X(${sel.value.xUnit})`;
-    const yLabel = `Y(${sel.value.yUnit})`;
+    const xLabel = `X (${sel.value.xUnit})`;
+    const yLabel = `Y (${sel.value.yUnit})`;
 
     return (
       <div style={{ width: '800px' }}>

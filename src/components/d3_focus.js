@@ -9,8 +9,8 @@ class D3Focus {
   constructor(props) {
     const { W, H } = props;
     this.margin = {
-      t: 20,
-      b: 50 + Math.round((H - 90) * 0.2) + 20,
+      t: 30,
+      b: 70 + Math.round((H - 90) * 0.2) + 20,
       l: 80,
       r: 20,
     };
@@ -78,7 +78,7 @@ class D3Focus {
       .attr('fill', 'none');
   }
 
-  create(el, svg, data) {
+  create(el, svg, data, cLabel) {
     this.setSvg(svg);
 
     MountMainFrame(this, 'focus');
@@ -91,7 +91,9 @@ class D3Focus {
     this.path = MountPath(this, 'steelblue');
     this.grid = MountGrid(this);
     MountAxisLabelY(this);
-    MountMarker(this, 'steelblue');
+    if (cLabel) {
+      MountMarker(this, 'steelblue');
+    }
 
     if (this.data) {
       this.drawLine();

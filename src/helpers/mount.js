@@ -48,8 +48,8 @@ const MountAxisLabelY = (target) => {
 };
 
 const MountMarker = (target, color) => {
-  const tTrans = `translate(${target.w - 100}, 30)`;
-  const lTrans = `translate(${target.w - 220}, 25)`;
+  const tTrans = `translate(${target.w - 80}, -10)`;
+  const lTrans = `translate(${target.w - 200}, -18)`;
   target.root.append('text')
     .attr('text-anchor', 'middle')
     .attr('transform', tTrans)
