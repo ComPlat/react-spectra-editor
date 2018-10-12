@@ -4,8 +4,6 @@ import {
   MountPath, MountAxis, MountMainFrame, MountAxisLabelX,
 } from '../helpers/mount';
 
-import './d3_context.css';
-
 class D3Context {
   constructor(props) {
     const { W, H } = props;
@@ -77,7 +75,7 @@ class D3Context {
     this.setData(data);
 
     this.axis = MountAxis(this);
-    this.path = MountPath(this);
+    this.path = MountPath(this, '#80013f');
     MountAxisLabelX(this);
 
     if (this.data) {

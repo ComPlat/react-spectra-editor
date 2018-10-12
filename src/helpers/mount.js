@@ -1,10 +1,12 @@
-const MountPath = (target) => {
+const MountPath = (target, color) => {
   const path = target.root.append('g')
     .attr('class', 'line-clip')
     .attr('clip-path', 'url(#clip)')
     .append('path')
     .attr('class', 'line')
-    .attr('fill', 'none');
+    .style('fill', 'none')
+    .style('stroke', color)
+    .style('stroke-width', 2);
   return path;
 };
 
@@ -45,7 +47,7 @@ const MountAxisLabelY = (target) => {
     .attr('class', 'yLabel');
 };
 
-const MountMarker = (target) => {
+const MountMarker = (target, color) => {
   const tTrans = `translate(${target.w - 100}, 30)`;
   const lTrans = `translate(${target.w - 220}, 25)`;
   target.root.append('text')
@@ -56,8 +58,9 @@ const MountMarker = (target) => {
   target.root.append('rect')
     .attr('transform', lTrans)
     .attr('width', 30)
-    .attr('height', 3)
-    .attr('class', 'mark-line');
+    .attr('height', 5)
+    .attr('class', 'mark-line')
+    .style('fill', color);
 };
 
 const MountClip = (target) => {

@@ -5,8 +5,6 @@ import {
   MountClip, MountMainFrame,
 } from '../helpers/mount';
 
-import './d3_focus.css';
-
 class D3Focus {
   constructor(props) {
     const { W, H } = props;
@@ -67,9 +65,17 @@ class D3Focus {
 
     // Grid Calculate
     this.grid.x.call(this.axisCall.x
-      .tickSize(-this.h, 0, 0));
+      .tickSize(-this.h, 0, 0))
+      .selectAll('line')
+      .attr('stroke', '#bbbbbb')
+      .attr('stroke-opacity', 0.6)
+      .attr('fill', 'none');
     this.grid.y.call(this.axisCall.y
-      .tickSize(-this.w, 0, 0));
+      .tickSize(-this.w, 0, 0))
+      .selectAll('line')
+      .attr('stroke', '#bbbbbb')
+      .attr('stroke-opacity', 0.6)
+      .attr('fill', 'none');
   }
 
   create(el, svg, data) {
@@ -82,10 +88,10 @@ class D3Focus {
     this.setData(data);
 
     this.axis = MountAxis(this);
-    this.path = MountPath(this);
+    this.path = MountPath(this, 'steelblue');
     this.grid = MountGrid(this);
     MountAxisLabelY(this);
-    MountMarker(this);
+    MountMarker(this, 'steelblue');
 
     if (this.data) {
       this.drawLine();

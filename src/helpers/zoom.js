@@ -18,9 +18,17 @@ const zoomed = (target) => {
 
   // Grid Re-Calculate
   focus.grid.x.call(focus.axisCall.x
-    .tickSize(-focus.h, 0, 0));
+    .tickSize(-focus.h, 0, 0))
+    .selectAll('line')
+    .attr('stroke', '#bbbbbb')
+    .attr('stroke-opacity', 0.6)
+    .attr('fill', 'none');
   focus.grid.y.call(focus.axisCall.y
-    .tickSize(-focus.w, 0, 0));
+    .tickSize(-focus.w, 0, 0))
+    .selectAll('line')
+    .attr('stroke', '#bbbbbb')
+    .attr('stroke-opacity', 0.6)
+    .attr('fill', 'none');
 };
 
 const resetZoom = (target) => {
