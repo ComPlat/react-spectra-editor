@@ -3,23 +3,24 @@ import { storiesOf } from '@storybook/react';
 import Select from 'react-select';
 
 import SpectraViewer from '../src/index';
-import { Extract, Convert } from './source/chem';
+import { Extract } from '../src/helpers/chem';
 import oneH from './source/1H';
 import IR from './source/IR';
 import TTC from './source/13C';
 import NTF from './source/NTF';
 
 const files = [
-  ...Extract(oneH),
-  ...Extract(IR),
-  ...Extract(TTC),
-  ...Extract(NTF),
+  Extract(oneH),
+  Extract(IR),
+  Extract(TTC),
+  // Extract(NTF),
 ];
 
 const options = files.map(f => (
   {
-    value: f,
-    label: f.typ,
+    value: f.spectrum,
+    label: f.spectrum.typ,
+    peakObjs: f.peakObjs,
   }
 ));
 
@@ -41,10 +42,11 @@ class Demo extends React.Component {
   render() {
     const { selectedOption } = this.state;
     const sel = selectedOption;
-    const input = Convert(sel.value.data[0]);
+    const input = sel.value.data[0];
     const cLabel = sel.value.typ;
     const xLabel = `X (${sel.value.xUnit})`;
     const yLabel = `Y (${sel.value.yUnit})`;
+    const peakObj = sel.peakObjs ? sel.peakObjs[0] : {};
 
     return (
       <div style={{ width: '800px' }}>
@@ -58,6 +60,7 @@ class Demo extends React.Component {
           cLabel={cLabel}
           xLabel={xLabel}
           yLabel={yLabel}
+          peakObj={peakObj}
         />
       </div>
     );
