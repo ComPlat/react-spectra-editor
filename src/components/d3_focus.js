@@ -1,8 +1,10 @@
 import * as d3 from 'd3';
-import { InitScale, InitAxisCall, InitPathCall } from '../helpers/init';
+import {
+  InitScale, InitAxisCall, InitPathCall,
+} from '../helpers/init';
 import {
   MountPath, MountGrid, MountAxis, MountAxisLabelY, MountMarker,
-  MountClip, MountMainFrame,
+  MountClip, MountMainFrame, MountCircles,
 } from '../helpers/mount';
 
 class D3Focus {
@@ -20,7 +22,10 @@ class D3Focus {
     this.axis = null;
     this.path = null;
     this.grid = null;
-    this.data = {};
+    this.circles = null;
+    this.ccPattern = null;
+    this.data = [];
+    this.dataPks = [];
     this.root = null;
     this.svg = null;
     this.scales = InitScale(this);
@@ -29,9 +34,11 @@ class D3Focus {
 
     this.setSvg = this.setSvg.bind(this);
     this.setRoot = this.setRoot.bind(this);
+    this.setTrans = this.setTrans.bind(this);
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
     this.drawLine = this.drawLine.bind(this);
+    this.drawPeaks = this.drawPeaks.bind(this);
   }
 
   setSvg(svg) {
@@ -44,6 +51,14 @@ class D3Focus {
 
   setData(data) {
     this.data = [...data];
+  }
+
+  setDataPks(peaks) {
+    this.dataPks = [...peaks];
+  }
+
+  setTrans() {
+    this.trans = d3.transition().duration(500);
   }
 
   drawLine() {
@@ -78,18 +93,38 @@ class D3Focus {
       .attr('fill', 'none');
   }
 
-  create(el, svg, data, cLabel) {
+  drawPeaks(scales) {
+    const ccp = this.circles.selectAll('circle')
+      .data(this.dataPks);
+
+    ccp.exit()
+      .attr('class', 'exit')
+      .remove();
+
+    ccp.enter()
+      .append('circle')
+      .attr('class', 'enter')
+      .attr('fill', 'pink')
+      .merge(ccp)
+      .attr('cx', d => scales.x(d.x))
+      .attr('cy', d => scales.y(d.y))
+      .attr('r', 3);
+  }
+
+  create(el, svg, filterSeed, filterPeak, cLabel) {
     this.setSvg(svg);
 
     MountMainFrame(this, 'focus');
     MountClip(this);
 
     this.setRoot(el);
-    this.setData(data);
+    this.setData(filterSeed);
+    this.setDataPks(filterPeak);
 
     this.axis = MountAxis(this);
     this.path = MountPath(this, 'steelblue');
     this.grid = MountGrid(this);
+    this.circles = MountCircles(this);
     MountAxisLabelY(this);
     if (cLabel) {
       MountMarker(this, 'steelblue');
@@ -97,15 +132,18 @@ class D3Focus {
 
     if (this.data) {
       this.drawLine();
+      this.drawPeaks(this.scales);
     }
   }
 
-  update(el, svg, data) {
+  update(el, svg, filterSeed, filterPeak) {
     this.setRoot(el);
-    this.setData(data);
+    this.setData(filterSeed);
+    this.setDataPks(filterPeak);
 
     if (this.data) {
       this.drawLine();
+      this.drawPeaks(this.scales);
     }
   }
 }

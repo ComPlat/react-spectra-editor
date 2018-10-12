@@ -29,6 +29,9 @@ const zoomed = (target) => {
     .attr('stroke', '#bbbbbb')
     .attr('stroke-opacity', 0.6)
     .attr('fill', 'none');
+
+  // ccPattern Re-Calculate
+  focus.drawPeaks({ x: updScaleX, y: updScaleY });
 };
 
 const resetZoom = (target) => {

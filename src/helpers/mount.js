@@ -1,3 +1,10 @@
+const MountCircles = (target) => {
+  const circles = target.root.append('g')
+    .attr('class', 'circles-clip')
+    .attr('clip-path', 'url(#clip)');
+  return circles;
+};
+
 const MountPath = (target, color) => {
   const path = target.root.append('g')
     .attr('class', 'line-clip')
@@ -84,6 +91,7 @@ const MountMainFrame = (target, name) => {
 };
 
 export {
-  MountPath, MountGrid, MountAxis, MountAxisLabelX, MountAxisLabelY,
+  MountCircles, MountPath, MountGrid, MountAxis,
+  MountAxisLabelX, MountAxisLabelY,
   MountMarker, MountClip, MountMainFrame,
 };

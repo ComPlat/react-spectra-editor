@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 
+import { Spectrum2Seed, Spectrum2Peak } from '../helpers/chem';
 import { updateBorder, resetBorder } from '../actions/border';
 import D3Canvas from './d3_canvas';
 
@@ -18,15 +19,17 @@ class App extends React.Component {
 
   componentDidMount() {
     const {
-      seed, cLabel, xLabel, yLabel, borderSt, updateBorderAct,
+      seed, peak, cLabel, xLabel, yLabel, borderSt, updateBorderAct,
     } = this.props;
 
-    const data = this.brushFilter(borderSt, seed);
+    const { filterSeed, filterPeak } = this.brushFilter(borderSt, seed, peak);
     const node = ReactDOM.findDOMNode(this);
     this.chart = this.canvas.create(
       node,
       seed,
-      data,
+      peak,
+      filterSeed,
+      filterPeak,
       cLabel,
       xLabel,
       yLabel,
@@ -36,17 +39,19 @@ class App extends React.Component {
 
   componentDidUpdate(prevProps) {
     const {
-      seed, cLabel, xLabel, yLabel, borderSt,
+      seed, peak, cLabel, xLabel, yLabel, borderSt,
     } = this.props;
 
     this.seSeedChange(prevProps);
 
-    const data = this.brushFilter(borderSt, seed);
+    const { filterSeed, filterPeak } = this.brushFilter(borderSt, seed, peak);
     const node = ReactDOM.findDOMNode(this);
     this.canvas.update(
       node,
       seed,
-      data,
+      peak,
+      filterSeed,
+      filterPeak,
       cLabel,
       xLabel,
       yLabel,
@@ -66,16 +71,22 @@ class App extends React.Component {
     }
   }
 
-  brushFilter(border, inp) {
+  brushFilter(border, seed, peak) {
     const xL = border[0];
     const xU = border[1];
-    let data = [...inp];
+    let fltSeed = [...seed];
     if (xL && xU) {
-      data = data.filter(
+      fltSeed = fltSeed.filter(
         d => xL <= d.x && d.x <= xU,
       );
     }
-    return data;
+    let fltPeak = [...peak];
+    if (xL && xU) {
+      fltPeak = fltPeak.filter(
+        d => xL <= d.x && d.x <= xU,
+      );
+    }
+    return { filterSeed: fltSeed, filterPeak: fltPeak };
   }
 
   render() {
@@ -85,9 +96,11 @@ class App extends React.Component {
   }
 }
 
-const mapStateToProps = state => (
+const mapStateToProps = (state, props) => (
   {
     borderSt: state.border,
+    seed: Spectrum2Seed(state, props),
+    peak: Spectrum2Peak(state, props),
   }
 );
 
@@ -99,10 +112,13 @@ const mapDispatchToProps = dispatch => (
 );
 
 App.propTypes = {
+  input: PropTypes.object.isRequired,
   seed: PropTypes.array.isRequired,
+  peak: PropTypes.array.isRequired,
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
+  peakObj: PropTypes.object.isRequired,
   borderSt: PropTypes.array.isRequired,
   updateBorderAct: PropTypes.func.isRequired,
   resetBorderAct: PropTypes.func.isRequired,

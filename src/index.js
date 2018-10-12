@@ -9,23 +9,25 @@ import App from './components/app';
 const store = createStore(reducers);
 
 const SpectraViewer = ({
-  input, cLabel, xLabel, yLabel,
+  input, cLabel, xLabel, yLabel, peakObj,
 }) => (
   <Provider store={store}>
     <App
-      seed={input}
+      input={input}
       cLabel={cLabel}
       xLabel={xLabel}
       yLabel={yLabel}
+      peakObj={peakObj}
     />
   </Provider>
 );
 
 SpectraViewer.propTypes = {
-  input: PropTypes.array.isRequired,
+  input: PropTypes.object.isRequired,
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
+  peakObj: PropTypes.object.isRequired,
 };
 
 export default SpectraViewer;
