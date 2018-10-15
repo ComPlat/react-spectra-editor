@@ -13,7 +13,7 @@ const MountPath = (target, color) => {
     .attr('class', 'line')
     .style('fill', 'none')
     .style('stroke', color)
-    .style('stroke-width', 2);
+    .style('stroke-width', 1);
   return path;
 };
 
