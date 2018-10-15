@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
@@ -13,6 +12,7 @@ class App extends React.Component {
     super(props);
 
     this.canvas = new D3Canvas();
+    this.d3Ref = React.createRef();
 
     this.seSeedChange = this.seSeedChange.bind(this);
   }
@@ -23,7 +23,7 @@ class App extends React.Component {
     } = this.props;
 
     const { filterSeed, filterPeak } = this.brushFilter(borderSt, seed, peak);
-    const node = ReactDOM.findDOMNode(this);
+    const node = this.d3Ref.current;
     this.chart = this.canvas.create(
       node,
       seed,
@@ -45,7 +45,7 @@ class App extends React.Component {
     this.seSeedChange(prevProps);
 
     const { filterSeed, filterPeak } = this.brushFilter(borderSt, seed, peak);
-    const node = ReactDOM.findDOMNode(this);
+    const node = this.d3Ref.current;
     this.canvas.update(
       node,
       seed,
@@ -59,7 +59,7 @@ class App extends React.Component {
   }
 
   componentWillUnmount() {
-    const node = ReactDOM.findDOMNode(this);
+    const node = this.d3Ref.current;
     this.canvas.destroy(node);
   }
 
@@ -91,7 +91,10 @@ class App extends React.Component {
 
   render() {
     return (
-      <div className="d3-container" />
+      <div
+        className="d3-container"
+        ref={this.d3Ref}
+      />
     );
   }
 }
