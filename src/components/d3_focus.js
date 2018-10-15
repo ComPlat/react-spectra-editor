@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 import {
-  InitScale, InitAxisCall, InitPathCall,
+  InitScale, InitAxisCall, InitPathCall, InitTip,
 } from '../helpers/init';
 import {
   MountPath, MountGrid, MountAxis, MountAxisLabelY, MountMarker,
@@ -31,9 +31,11 @@ class D3Focus {
     this.scales = InitScale(this);
     this.axisCall = InitAxisCall(5);
     this.pathCall = InitPathCall(this);
+    this.tip = InitTip(this);
 
     this.setSvg = this.setSvg.bind(this);
     this.setRoot = this.setRoot.bind(this);
+    this.setTip = this.setTip.bind(this);
     this.setTrans = this.setTrans.bind(this);
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
@@ -47,6 +49,10 @@ class D3Focus {
 
   setRoot(el) {
     this.root = d3.select(el).selectAll('.focus-main');
+  }
+
+  setTip() {
+    this.root.call(this.tip);
   }
 
   setData(data) {
@@ -105,6 +111,8 @@ class D3Focus {
       .append('circle')
       .attr('class', 'enter')
       .attr('fill', 'pink')
+      .on('mouseover', this.tip.show)
+      .on('mouseout', this.tip.hide)
       .merge(ccp)
       .attr('cx', d => scales.x(d.x))
       .attr('cy', d => scales.y(d.y))
@@ -118,6 +126,7 @@ class D3Focus {
     MountClip(this);
 
     this.setRoot(el);
+    this.setTip();
     this.setData(filterSeed);
     this.setDataPks(filterPeak);
 

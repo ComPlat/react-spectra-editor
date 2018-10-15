@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import d3Tip from 'd3-tip';
 
 const InitScale = (target) => {
   const x = d3.scaleLinear()
@@ -25,6 +26,17 @@ const InitPathCall = (target) => {
   return line;
 };
 
+const InitTip = () => {
+  const tip = d3Tip()
+    .attr('class', 'd3-tip')
+    .html((d) => {
+      let text = `<strong>X: </strong> <span style='color:red'>${d3.format('.3~s')(d.x)}</span><br>`;
+      text += `<strong>Y: </strong> <span style='color:red'>${d3.format('.2~e')(d.y)}</span><br>`;
+      return text;
+    });
+  return tip;
+};
+
 export {
-  InitScale, InitAxisCall, InitPathCall,
+  InitScale, InitAxisCall, InitPathCall, InitTip,
 };
