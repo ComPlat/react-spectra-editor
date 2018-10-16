@@ -38,7 +38,7 @@ const Spectrum2Peak = createSelector(
   convertPeak,
 );
 
-const Extract = (input) => {
+const ExtractJcamp = (input) => {
   const jcamp = Jcampconverter.convert(input, { xy: true });
   const subTyp = jcamp.xType ? ` - ${jcamp.xType}` : '';
 
@@ -61,4 +61,4 @@ const Extract = (input) => {
   return { spectrum, peakObjs };
 };
 
-export { Extract, Spectrum2Seed, Spectrum2Peak };
+export { ExtractJcamp, Spectrum2Seed, Spectrum2Peak };

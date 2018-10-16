@@ -2,18 +2,17 @@ import React from 'react';
 import { storiesOf } from '@storybook/react';
 import Select from 'react-select';
 
-import SpectraViewer from '../src/index';
-import { Extract } from '../src/helpers/chem';
+import { SpectraViewer, ExtractJcamp } from '../src/index';
 import oneH from './source/1H';
 import IR from './source/IR';
 import TTC from './source/13C';
 import NTF from './source/NTF';
 
 const files = [
-  Extract(oneH),
-  Extract(IR),
-  Extract(TTC),
-  // Extract(NTF),
+  ExtractJcamp(oneH),
+  ExtractJcamp(IR),
+  ExtractJcamp(TTC),
+  // ExtractJcamp(NTF),
 ];
 
 const options = files.map(f => (

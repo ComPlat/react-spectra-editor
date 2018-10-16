@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 
 import reducers from './reducers/index';
 import App from './components/app';
+import { ExtractJcamp } from './helpers/chem';
 
 const store = createStore(reducers);
 
@@ -30,4 +31,4 @@ SpectraViewer.propTypes = {
   peakObj: PropTypes.object.isRequired,
 };
 
-export default SpectraViewer;
+export { SpectraViewer, ExtractJcamp };
