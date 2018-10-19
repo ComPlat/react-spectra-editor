@@ -42,7 +42,6 @@ class Demo extends React.Component {
     const { selectedOption } = this.state;
     const { value, peakObjs } = selectedOption;
     const input = value.data[0];
-    const cLabel = value.typ;
     const xLabel = `X (${value.xUnit})`;
     const yLabel = `Y (${value.yUnit})`;
     const peakObj = peakObjs && peakObjs[0] ? peakObjs[0] : {};
@@ -56,7 +55,6 @@ class Demo extends React.Component {
         />
         <SpectraViewer
           input={input}
-          cLabel={cLabel}
           xLabel={xLabel}
           yLabel={yLabel}
           peakObj={peakObj}

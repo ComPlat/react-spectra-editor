@@ -3,7 +3,7 @@ import {
   InitScale, InitAxisCall, InitPathCall, InitTip,
 } from '../helpers/init';
 import {
-  MountPath, MountGrid, MountAxis, MountAxisLabelY, MountMarker,
+  MountPath, MountGrid, MountAxis, MountAxisLabelY,
   MountClip, MountMainFrame, MountCircles, MountThresLine,
 } from '../helpers/mount';
 
@@ -11,8 +11,8 @@ class D3Focus {
   constructor(props) {
     const { W, H } = props;
     this.margin = {
-      t: 30,
-      b: 70 + Math.round((H - 90) * 0.2) + 20,
+      t: 10,
+      b: 60 + Math.round((H - 90) * 0.2) + 20,
       l: 80,
       r: 20,
     };
@@ -128,7 +128,7 @@ class D3Focus {
       .attr('r', 3);
   }
 
-  create(el, svg, filterSeed, filterPeak, tEndPts, cLabel) {
+  create(el, svg, filterSeed, filterPeak, tEndPts) {
     this.setSvg(svg);
 
     MountMainFrame(this, 'focus');
@@ -144,9 +144,9 @@ class D3Focus {
     this.grid = MountGrid(this);
     this.circles = MountCircles(this);
     MountAxisLabelY(this);
-    if (cLabel) {
-      MountMarker(this, 'steelblue');
-    }
+    // if (cLabel) {
+    //   MountMarker(this, 'steelblue');
+    // }
 
     if (this.data) {
       this.drawLine();

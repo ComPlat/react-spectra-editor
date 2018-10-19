@@ -25,10 +25,14 @@ const SpectraViewer = ({
 
 SpectraViewer.propTypes = {
   input: PropTypes.object.isRequired,
-  cLabel: PropTypes.string.isRequired,
+  cLabel: PropTypes.string,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
   peakObj: PropTypes.object.isRequired,
+};
+
+SpectraViewer.defaultProps = {
+  cLabel: '',
 };
 
 export { SpectraViewer, ExtractJcamp };

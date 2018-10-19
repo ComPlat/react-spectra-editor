@@ -4,7 +4,7 @@ import D3Context from './d3_context';
 import MountZoom from '../helpers/zoom';
 import MountBrush from '../helpers/brush';
 
-const W = 600;
+const W = 700;
 const H = 500;
 
 class D3Canvas {
