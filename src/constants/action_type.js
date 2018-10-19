@@ -3,4 +3,9 @@ const BORDER = {
   RESET: 'RESET_BORDER',
 };
 
-export { BORDER }; // eslint-disable-line
+const THRESHOLD = {
+  UPDATE: 'UPDATE_THRESHOLD',
+  RESET: 'RESET_THRESHOLD',
+};
+
+export { BORDER, THRESHOLD };
