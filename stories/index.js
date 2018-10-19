@@ -40,15 +40,15 @@ class Demo extends React.Component {
 
   render() {
     const { selectedOption } = this.state;
-    const sel = selectedOption;
-    const input = sel.value.data[0];
-    const cLabel = sel.value.typ;
-    const xLabel = `X (${sel.value.xUnit})`;
-    const yLabel = `Y (${sel.value.yUnit})`;
-    const peakObj = sel.peakObjs ? sel.peakObjs[0] : {};
+    const { value, peakObjs } = selectedOption;
+    const input = value.data[0];
+    const cLabel = value.typ;
+    const xLabel = `X (${value.xUnit})`;
+    const yLabel = `Y (${value.yUnit})`;
+    const peakObj = peakObjs && peakObjs[0] ? peakObjs[0] : {};
 
     return (
-      <div style={{ width: '800px' }}>
+      <div style={{ width: '1200px' }}>
         <Select
           value={selectedOption}
           onChange={this.onChange}
