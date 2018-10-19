@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 
-import { Spectrum2Seed, Spectrum2Peak } from '../helpers/chem';
+import { Spectrum2Seed, Spectrum2Peak, ToThresEndPts } from '../helpers/chem';
 import { updateBorder, resetBorder } from '../actions/border';
 import D3Canvas from './d3_canvas';
 
@@ -19,7 +19,8 @@ class App extends React.Component {
 
   componentDidMount() {
     const {
-      seed, peak, cLabel, xLabel, yLabel, borderSt, updateBorderAct,
+      seed, peak, cLabel, xLabel, yLabel,
+      borderSt, tEndPts, updateBorderAct,
     } = this.props;
 
     const { filterSeed, filterPeak } = this.brushFilter(borderSt, seed, peak);
@@ -28,6 +29,7 @@ class App extends React.Component {
       node,
       seed,
       peak,
+      tEndPts,
       filterSeed,
       filterPeak,
       cLabel,
@@ -39,7 +41,7 @@ class App extends React.Component {
 
   componentDidUpdate(prevProps) {
     const {
-      seed, peak, cLabel, xLabel, yLabel, borderSt,
+      seed, peak, cLabel, xLabel, yLabel, borderSt, tEndPts,
     } = this.props;
 
     this.seSeedChange(prevProps);
@@ -50,6 +52,7 @@ class App extends React.Component {
       node,
       seed,
       peak,
+      tEndPts,
       filterSeed,
       filterPeak,
       cLabel,
@@ -81,7 +84,7 @@ class App extends React.Component {
       );
     }
     let fltPeak = [...peak];
-    if (xL && xU) {
+    if (peak && xL && xU) {
       fltPeak = fltPeak.filter(
         d => xL <= d.x && d.x <= xU,
       );
@@ -104,6 +107,7 @@ const mapStateToProps = (state, props) => (
     borderSt: state.border,
     seed: Spectrum2Seed(state, props),
     peak: Spectrum2Peak(state, props),
+    tEndPts: ToThresEndPts(state, props),
   }
 );
 
@@ -115,14 +119,13 @@ const mapDispatchToProps = dispatch => (
 );
 
 App.propTypes = {
-  input: PropTypes.object.isRequired,
   seed: PropTypes.array.isRequired,
   peak: PropTypes.array.isRequired,
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
-  peakObj: PropTypes.object.isRequired,
   borderSt: PropTypes.array.isRequired,
+  tEndPts: PropTypes.array.isRequired,
   updateBorderAct: PropTypes.func.isRequired,
   resetBorderAct: PropTypes.func.isRequired,
 };

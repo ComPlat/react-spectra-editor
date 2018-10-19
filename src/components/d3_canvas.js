@@ -38,20 +38,20 @@ class D3Canvas {
     }
   }
 
-  create(el, seed, peaks, filterSeed, filterPeak, cLabel, xLabel, yLabel, updateBorder) {
+  create(el, seed, peaks, tEndPts, filterSeed, filterPeak, cLabel, xLabel, yLabel, updateBorder) {
     this.drawMain(el);
 
     this.context.create(el, this.svg, seed, updateBorder);
-    this.focus.create(el, this.svg, filterSeed, filterPeak, cLabel);
+    this.focus.create(el, this.svg, filterSeed, filterPeak, tEndPts, cLabel);
     this.drawLabel(el, cLabel, xLabel, yLabel);
 
     MountBrush(this);
     MountZoom(this);
   }
 
-  update(el, seed, peaks, filterSeed, filterPeak, cLabel, xLabel, yLabel) {
+  update(el, seed, peaks, tEndPts, filterSeed, filterPeak, cLabel, xLabel, yLabel) {
     this.context.update(el, this.svg, seed);
-    this.focus.update(el, this.svg, filterSeed, filterPeak, null);
+    this.focus.update(el, this.svg, filterSeed, filterPeak, tEndPts, null);
     this.drawLabel(el, cLabel, xLabel, yLabel);
   }
 

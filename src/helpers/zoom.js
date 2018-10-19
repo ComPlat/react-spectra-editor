@@ -16,6 +16,14 @@ const zoomed = (target) => {
   // Path Re-Calculate
   focus.path.attr('d', line(focus.data));
 
+  // Threshold
+  if (focus.tEndPts.length > 0) {
+    focus.thresLine.attr('d', line(focus.tEndPts));
+    focus.thresLine.attr('visibility', 'visible');
+  } else {
+    focus.thresLine.attr('visibility', 'hidden');
+  }
+
   // Grid Re-Calculate
   focus.grid.x.call(focus.axisCall.x
     .tickSize(-focus.h, 0, 0))

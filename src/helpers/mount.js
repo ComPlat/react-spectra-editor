@@ -17,6 +17,19 @@ const MountPath = (target, color) => {
   return path;
 };
 
+const MountThresLine = (target, color) => {
+  const thresLine = target.root.append('g')
+    .attr('class', 'line-clip')
+    .attr('clip-path', 'url(#clip)')
+    .append('path')
+    .attr('class', 'threshold')
+    .style('stroke-dasharray', ('3, 3'))
+    .style('fill', 'none')
+    .style('stroke', color)
+    .style('stroke-width', 1);
+  return thresLine;
+};
+
 const MountGrid = (target) => {
   const gridTrans = `translate(0, ${target.h})`;
   const xGrid = target.root.append('g')
@@ -91,7 +104,7 @@ const MountMainFrame = (target, name) => {
 };
 
 export {
-  MountCircles, MountPath, MountGrid, MountAxis,
+  MountCircles, MountPath, MountThresLine, MountGrid, MountAxis,
   MountAxisLabelX, MountAxisLabelY,
   MountMarker, MountClip, MountMainFrame,
 };

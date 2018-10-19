@@ -4,7 +4,7 @@ import {
 } from '../helpers/init';
 import {
   MountPath, MountGrid, MountAxis, MountAxisLabelY, MountMarker,
-  MountClip, MountMainFrame, MountCircles,
+  MountClip, MountMainFrame, MountCircles, MountThresLine,
 } from '../helpers/mount';
 
 class D3Focus {
@@ -21,11 +21,13 @@ class D3Focus {
 
     this.axis = null;
     this.path = null;
+    this.thresLine = null;
     this.grid = null;
     this.circles = null;
     this.ccPattern = null;
     this.data = [];
     this.dataPks = [];
+    this.tEndPts = null;
     this.root = null;
     this.svg = null;
     this.scales = InitScale(this);
@@ -37,6 +39,7 @@ class D3Focus {
     this.setRoot = this.setRoot.bind(this);
     this.setTip = this.setTip.bind(this);
     this.setTrans = this.setTrans.bind(this);
+    this.setDataParams = this.setDataParams.bind(this);
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
     this.drawLine = this.drawLine.bind(this);
@@ -55,12 +58,10 @@ class D3Focus {
     this.root.call(this.tip);
   }
 
-  setData(data) {
+  setDataParams(data, peaks, tEndPts) {
     this.data = [...data];
-  }
-
-  setDataPks(peaks) {
     this.dataPks = [...peaks];
+    this.tEndPts = tEndPts;
   }
 
   setTrans() {
@@ -83,6 +84,14 @@ class D3Focus {
 
     // Path Calculate
     this.path.attr('d', this.pathCall(this.data));
+
+    // Threshold
+    if (this.tEndPts.length > 0) {
+      this.thresLine.attr('d', this.pathCall(this.tEndPts));
+      this.thresLine.attr('visibility', 'visible');
+    } else {
+      this.thresLine.attr('visibility', 'hidden');
+    }
 
     // Grid Calculate
     this.grid.x.call(this.axisCall.x
@@ -119,7 +128,7 @@ class D3Focus {
       .attr('r', 3);
   }
 
-  create(el, svg, filterSeed, filterPeak, cLabel) {
+  create(el, svg, filterSeed, filterPeak, tEndPts, cLabel) {
     this.setSvg(svg);
 
     MountMainFrame(this, 'focus');
@@ -127,11 +136,11 @@ class D3Focus {
 
     this.setRoot(el);
     this.setTip();
-    this.setData(filterSeed);
-    this.setDataPks(filterPeak);
+    this.setDataParams(filterSeed, filterPeak, tEndPts);
 
     this.axis = MountAxis(this);
     this.path = MountPath(this, 'steelblue');
+    this.thresLine = MountThresLine(this, 'green');
     this.grid = MountGrid(this);
     this.circles = MountCircles(this);
     MountAxisLabelY(this);
@@ -145,10 +154,9 @@ class D3Focus {
     }
   }
 
-  update(el, svg, filterSeed, filterPeak) {
+  update(el, svg, filterSeed, filterPeak, tEndPts) {
     this.setRoot(el);
-    this.setData(filterSeed);
-    this.setDataPks(filterPeak);
+    this.setDataParams(filterSeed, filterPeak, tEndPts);
 
     if (this.data) {
       this.drawLine();
