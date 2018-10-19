@@ -4,7 +4,7 @@ import { createStore } from 'redux';
 import PropTypes from 'prop-types';
 
 import reducers from './reducers/index';
-import App from './components/app';
+import Frame from './frame';
 import { ExtractJcamp } from './helpers/chem';
 
 const store = createStore(reducers);
@@ -13,7 +13,7 @@ const SpectraViewer = ({
   input, cLabel, xLabel, yLabel, peakObj,
 }) => (
   <Provider store={store}>
-    <App
+    <Frame
       input={input}
       cLabel={cLabel}
       xLabel={xLabel}
