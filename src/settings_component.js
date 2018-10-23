@@ -19,6 +19,21 @@ const Styles = () => ({
   },
 });
 
+const txtInputLabel = () => (
+  <span className="txt-input-label">
+    Peak Picking Threshold
+  </span>
+);
+
+const txtPercent = () => (
+  <InputAdornment position="end">
+    <span className="txt-percent">
+      %
+    </span>
+  </InputAdornment>
+);
+
+
 const SetThreshold = (
   classes, thresSt, enThresInput, onRefreshClick, updateThresholdAct,
 ) => {
@@ -41,14 +56,15 @@ const SetThreshold = (
         <TextField
           disabled={!enThresInput}
           id="outlined-name"
-          label="Peak Picking Threshold"
+          label={txtInputLabel()}
           placeholder="N.A."
           type="number"
           value={thresSt}
           margin="normal"
           variant="outlined"
           InputProps={{
-            endAdornment: <InputAdornment position="end">%</InputAdornment>,
+            endAdornment: txtPercent(),
+            className: 'txt-input',
           }}
           onChange={onChange}
           onBlur={onBlur}
@@ -87,6 +103,12 @@ const SetContent = (
   );
 };
 
+const txtTab = () => (
+  <span className="txt-tab">
+    Setting
+  </span>
+);
+
 const SettingsComp = ({
   classes, item, thresSt, enThresInput,
   onItemChange, onRefreshClick, updateThresholdAct,
@@ -101,7 +123,7 @@ const SettingsComp = ({
         scrollButtons="auto"
         // scrollable
       >
-        <Tab label="Setting" />
+        <Tab label={txtTab()} />
       </Tabs>
     </AppBar>
     <div className={classNames(classes.tabContainer)}>

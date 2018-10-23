@@ -34,10 +34,16 @@ const SpectrumViewer = (input, cLabel, xLabel, yLabel, peakObj) => (
   />
 );
 
+const txtBtnSave = () => (
+  <span className="txt-btn-save">
+    Save to file
+  </span>
+);
+
 const Frame = ({
   input, cLabel, xLabel, yLabel, peakObj, classes,
 }) => (
-  <div>
+  <div className="react-spectrum-viewer">
     <Grid container>
       <Grid item xs={9}>
         { SpectrumViewer(input, cLabel, xLabel, yLabel, peakObj) }
@@ -57,7 +63,7 @@ const Frame = ({
           color="primary"
           className={classNames(classes.btnSave)}
         >
-          Save to File
+          {txtBtnSave()}
           <SaveIcon className={classes.icon} />
         </Button>
       </Grid>
