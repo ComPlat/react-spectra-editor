@@ -109,23 +109,24 @@ class D3Focus {
   }
 
   drawPeaks(scales) {
-    const ccp = this.circles.selectAll('circle')
+    const ccp = this.circles.selectAll('path')
       .data(this.dataPks);
 
     ccp.exit()
       .attr('class', 'exit')
       .remove();
 
+    const symbol = d3.symbol().size([15]);
+
     ccp.enter()
-      .append('circle')
+      .append('path')
+      .attr('d', symbol.type(d3.symbolDiamond))
       .attr('class', 'enter')
-      .attr('fill', 'pink')
+      .attr('fill', 'red')
       .on('mouseover', this.tip.show)
       .on('mouseout', this.tip.hide)
       .merge(ccp)
-      .attr('cx', d => scales.x(d.x))
-      .attr('cy', d => scales.y(d.y))
-      .attr('r', 3);
+      .attr('transform', d => `translate(${scales.x(d.x)}, ${scales.y(d.y)})`);
   }
 
   create(el, svg, filterSeed, filterPeak, tEndPts) {

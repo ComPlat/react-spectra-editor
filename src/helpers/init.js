@@ -26,14 +26,37 @@ const InitPathCall = (target) => {
   return line;
 };
 
+const tpStyle = () => {
+  const stBorder = ' border: 2px solid #aaa;';
+  const stBorderRadius = ' border-radius: 5px;';
+  const stBackground = ' background: #555;';
+  const stColor = ' color: #fff;';
+  const stPadding = ' padding: 8px;';
+  const stOpacity = ' opacity: 0.9; ';
+  const stZindex = ' z-index: 1999;';
+  const style = stBorder + stBorderRadius + stBackground + stColor
+    + stPadding + stOpacity + stPadding + stZindex;
+
+  return style;
+};
+
+const tpDiv = d => (
+  `
+  <div
+    class="peak-tp"
+    style="${tpStyle()}"
+  >
+    <span> x: ${d3.format('.3~s')(d.x)}</span>
+    <br/>
+    <span> y: ${d3.format('.2~e')(d.y)}</span>
+  <div>
+  `
+);
+
 const InitTip = () => {
   const tip = d3Tip()
     .attr('class', 'd3-tip')
-    .html((d) => {
-      let text = `<strong>X: </strong> <span style='color:red'>${d3.format('.3~s')(d.x)}</span><br>`;
-      text += `<strong>Y: </strong> <span style='color:red'>${d3.format('.2~e')(d.y)}</span><br>`;
-      return text;
-    });
+    .html(d => tpDiv(d));
   return tip;
 };
 
