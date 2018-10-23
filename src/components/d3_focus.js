@@ -148,7 +148,7 @@ class D3Focus {
     //   MountMarker(this, 'steelblue');
     // }
 
-    if (this.data) {
+    if (this.data && this.data.length > 0) {
       this.drawLine();
       this.drawPeaks(this.scales);
     }
@@ -158,7 +158,7 @@ class D3Focus {
     this.setRoot(el);
     this.setDataParams(filterSeed, filterPeak, tEndPts);
 
-    if (this.data) {
+    if (this.data && this.data.length > 0) {
       this.drawLine();
       this.drawPeaks(this.scales);
     }

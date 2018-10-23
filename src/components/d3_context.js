@@ -78,7 +78,7 @@ class D3Context {
     this.path = MountPath(this, '#80013f');
     MountAxisLabelX(this);
 
-    if (this.data) {
+    if (this.data && this.data.length > 0) {
       this.drawTime();
     }
   }
@@ -87,7 +87,7 @@ class D3Context {
     this.setRoot(el);
     this.setData(data);
 
-    if (this.data) {
+    if (this.data && this.data.length > 0) {
       this.drawTime();
     }
   }
