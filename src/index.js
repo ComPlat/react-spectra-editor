@@ -10,7 +10,7 @@ import { ExtractJcamp } from './helpers/chem';
 const store = createStore(reducers);
 
 const SpectraViewer = ({
-  input, cLabel, xLabel, yLabel, peakObj,
+  input, cLabel, xLabel, yLabel, peakObj, writePeaks,
 }) => (
   <Provider store={store}>
     <Frame
@@ -19,6 +19,7 @@ const SpectraViewer = ({
       xLabel={xLabel}
       yLabel={yLabel}
       peakObj={peakObj}
+      writePeaks={writePeaks}
     />
   </Provider>
 );
@@ -29,10 +30,18 @@ SpectraViewer.propTypes = {
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
   peakObj: PropTypes.object.isRequired,
+  writePeaks: PropTypes.oneOfType(
+    [
+      PropTypes.func,
+      PropTypes.bool,
+    ],
+  ),
 };
+
 
 SpectraViewer.defaultProps = {
   cLabel: '',
+  writePeaks: false,
 };
 
 export { SpectraViewer, ExtractJcamp };
