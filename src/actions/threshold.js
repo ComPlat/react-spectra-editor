@@ -9,8 +9,8 @@ const updateThreshold = payload => (
 
 const resetThreshold = () => (
   {
-    type: THRESHOLD.UPDATE,
-    payload: [],
+    type: THRESHOLD.RESET,
+    payload: false,
   }
 );
 
