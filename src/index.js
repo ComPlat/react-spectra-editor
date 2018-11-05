@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import reducers from './reducers/index';
 import Frame from './frame';
 import { ExtractJcamp } from './helpers/chem';
+import { ToXY } from './helpers/converter';
 
 const store = createStore(reducers);
 
@@ -44,4 +45,4 @@ SpectraViewer.defaultProps = {
   writePeaks: false,
 };
 
-export { SpectraViewer, ExtractJcamp };
+export { SpectraViewer, ExtractJcamp, ToXY };

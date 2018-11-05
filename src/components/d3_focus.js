@@ -7,7 +7,7 @@ import {
   MountClip, MountMainFrame, MountCircles, MountThresLine,
 } from '../helpers/mount';
 
-import { pksRmNeg, pksAddPos } from '../helpers/converter';
+import { PksEdit } from '../helpers/converter';
 
 class D3Focus {
   constructor(props) {
@@ -142,8 +142,7 @@ class D3Focus {
 
   mergedPeaks(editPeakSt) {
     if (!editPeakSt) return this.dataPks;
-    this.dataPks = pksAddPos(this.dataPks, editPeakSt);
-    this.dataPks = pksRmNeg(this.dataPks, editPeakSt);
+    this.dataPks = PksEdit(this.dataPks, editPeakSt);
     return this.dataPks;
   }
 

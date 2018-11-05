@@ -65,7 +65,7 @@ const getThreshold = state => (
   state.threshold ? state.threshold / 100.0 : false
 );
 
-const convertPeak = (peakObj, threshold) => {
+const Convert2Peak = (peakObj, threshold) => {
   const peak = [];
   if (!peakObj || !peakObj.data) return peak;
   const data = peakObj.data[0];
@@ -85,7 +85,7 @@ const convertPeak = (peakObj, threshold) => {
 const Spectrum2Peak = createSelector(
   getPeakObj,
   getThreshold,
-  convertPeak,
+  Convert2Peak,
 );
 
 const convertThresEndPts = (peakObj, threshold) => {
@@ -180,5 +180,5 @@ const ExtractJcamp = (input) => {
 };
 
 export {
-  ExtractJcamp, Spectrum2Seed, Spectrum2Peak, ToThresEndPts,
+  ExtractJcamp, Spectrum2Seed, Spectrum2Peak, ToThresEndPts, Convert2Peak,
 };

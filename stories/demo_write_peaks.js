@@ -1,11 +1,9 @@
 import React from 'react';
 
 import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
-import AddIcon from '@material-ui/icons/Add';
 import Grid from '@material-ui/core/Grid';
 
-import { SpectraViewer, ExtractJcamp } from '../src/index';
+import { SpectraViewer, ExtractJcamp, ToXY } from '../src/index';
 import TTC from './source/13C';
 
 const file = ExtractJcamp(TTC);
@@ -21,9 +19,14 @@ class DemoWritePeaks extends React.Component {
     this.writePeaks = this.writePeaks.bind(this);
   }
 
-  writePeaks(val) {
-    const { desc } = this.state;
-    this.setState({ desc: desc + val });
+  writePeaks(peaks) {
+    const peaksXY = ToXY(peaks);
+    const desc = peaksXY.map((p) => {
+      const valX = Math.round(parseFloat(p[0]) * 10) / 10;
+      const valY = (Math.round(parseFloat(p[1]) * 10) / 10).toExponential(1);
+      return `${valX}, ${valY};`;
+    });
+    this.setState({ desc });
   }
 
   render() {

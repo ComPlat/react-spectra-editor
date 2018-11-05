@@ -1,13 +1,10 @@
-const toXY = (peakObj) => {
-  const length = peakObj.data && peakObj.data[0] ? peakObj.data[0].x.length : 0;
+const ToXY = (data) => {
+  const length = data ? data.length : 0;
   if (length === 0) return [];
-  const xs = peakObj.data[0].x;
-  const ys = peakObj.data[0].y;
   let peaks = [];
   let i = 0;
   for (i = 0; i < length; i += 1) {
-    const x = xs[i];
-    const y = ys[i];
+    const { x, y } = data[i];
     peaks = [...peaks, [x, y]];
   }
   return peaks;
@@ -34,6 +31,12 @@ const pksAddPos = (dataPks, editPeakSt) => {
   return result;
 };
 
+const PksEdit = (dataPks, editPeakSt) => {
+  let modDataPks = pksAddPos(dataPks, editPeakSt);
+  modDataPks = pksRmNeg(modDataPks, editPeakSt);
+  return modDataPks;
+};
+
 export {
-  toXY, pksRmNeg, pksAddPos,
+  ToXY, PksEdit,
 };

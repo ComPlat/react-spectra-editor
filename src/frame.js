@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import { connect } from 'react-redux';
 
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
@@ -13,7 +14,8 @@ import {
 import App from './components/app';
 import SettingsPanel from './panel_settings';
 import { AddPeakPanel, RmPeakPanel } from './panel_peaks';
-import { toXY } from './helpers/converter';
+import { PksEdit } from './helpers/converter';
+import { Convert2Peak } from './helpers/chem';
 
 const theme = createMuiTheme({
   typography: {
@@ -58,17 +60,13 @@ const txtBtnWrite = () => (
   </span>
 );
 
-const onWriteClick = (write, peakObj) => {
-  const peaks = toXY(peakObj);
-  const result = peaks.map((p) => {
-    const valX = Math.round(parseFloat(p[0]) * 10) / 10;
-    const valY = (Math.round(parseFloat(p[1]) * 10) / 10).toExponential(1);
-    return `${valX}, ${valY};`;
-  });
-  return () => write(result.join(' '));
+const onWriteClick = (write, peakObj, editPeakSt, thresSt) => {
+  const peaks = Convert2Peak(peakObj, thresSt * 0.01);
+  const peaksEdit = PksEdit(peaks, editPeakSt);
+  return () => write(peaksEdit);
 };
 
-const btnWrite = (writePeaks, peakObj, classes) => (
+const btnWrite = (writePeaks, peakObj, editPeakSt, thresSt, classes) => (
   !writePeaks
     ? null
     : (
@@ -77,7 +75,7 @@ const btnWrite = (writePeaks, peakObj, classes) => (
           variant="contained"
           color="primary"
           className={classNames(classes.btnWrite)}
-          onClick={onWriteClick(writePeaks, peakObj)}
+          onClick={onWriteClick(writePeaks, peakObj, editPeakSt, thresSt)}
         >
           {txtBtnWrite()}
           <EditIcon className={classes.icon} />
@@ -100,7 +98,8 @@ const btnSave = classes => (
 );
 
 const Frame = ({
-  input, cLabel, xLabel, yLabel, peakObj, writePeaks, classes,
+  input, cLabel, xLabel, yLabel, peakObj, writePeaks,
+  editPeakSt, thresSt, classes,
 }) => (
   <div className="react-spectrum-viewer">
     <Grid container>
@@ -118,11 +117,18 @@ const Frame = ({
           <AddPeakPanel />
           <RmPeakPanel />
         </MuiThemeProvider>
-        { btnWrite(writePeaks, peakObj, classes) }
+        { btnWrite(writePeaks, peakObj, editPeakSt, thresSt, classes) }
         { btnSave(classes) }
       </Grid>
     </Grid>
   </div>
+);
+
+const mapStateToProps = (state, props) => ( // eslint-disable-line
+  {
+    editPeakSt: state.editPeak,
+    thresSt: state.threshold,
+  }
 );
 
 Frame.propTypes = {
@@ -137,7 +143,15 @@ Frame.propTypes = {
       PropTypes.bool,
     ],
   ).isRequired,
+  editPeakSt: PropTypes.object.isRequired,
+  thresSt: PropTypes.oneOfType(
+    [
+      PropTypes.string,
+      PropTypes.number,
+      PropTypes.bool,
+    ],
+  ).isRequired,
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(Styles)(Frame);
+export default connect(mapStateToProps)(withStyles(Styles)(Frame));
