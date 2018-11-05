@@ -1,9 +1,9 @@
 import * as d3 from 'd3';
 
-const zoomed = (target) => {
+const zoomed = (canvas) => {
   if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'brush') return;
   const tf = d3.event.transform;
-  const { focus } = target;
+  const { focus } = canvas;
   // Axis Re-Calculate
   const updScaleX = tf.rescaleX(focus.scales.x);
   const updScaleY = tf.rescaleY(focus.scales.y);
@@ -42,17 +42,17 @@ const zoomed = (target) => {
   focus.drawPeaks({ x: updScaleX, y: updScaleY });
 };
 
-const resetZoom = (target) => {
-  target.svg.call(target.zoom.transform, d3.zoomIdentity);
-  target.svg.selectAll('.brush').call(target.brush.move, null);
+const resetZoom = (canvas) => {
+  canvas.svg.call(canvas.zoom.transform, d3.zoomIdentity);
+  canvas.svg.selectAll('.brush').call(canvas.brush.move, null);
 };
 
-const MountZoom = (target) => {
-  const zoomedCb = () => zoomed(target);
-  const resetZoomCb = () => resetZoom(target);
+const MountZoom = (canvas) => {
+  const zoomedCb = () => zoomed(canvas);
+  const resetZoomCb = () => resetZoom(canvas);
 
-  target.zoom.on('zoom', zoomedCb);
-  target.svg.call(target.zoom)
+  canvas.zoom.on('zoom', zoomedCb);
+  canvas.svg.call(canvas.zoom)
     .on('dblclick.zoom', resetZoomCb);
 };
 
