@@ -3,19 +3,27 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import Grid from '@material-ui/core/Grid';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
+
 import SaveIcon from '@material-ui/icons/Save';
 import EditIcon from '@material-ui/icons/Edit';
-import { withStyles } from '@material-ui/core/styles';
-
-import Settings from './settings';
+import {
+  withStyles, createMuiTheme, MuiThemeProvider,
+} from '@material-ui/core/styles';
 import App from './components/app';
+import SettingsPanel from './panel_settings';
+import { AddPeakPanel, RmPeakPanel } from './panel_peaks';
+import { toXY } from './helpers/converter';
+
+const theme = createMuiTheme({
+  typography: {
+    useNextVariants: true,
+  },
+});
 
 const Styles = () => ({
-  settingCard: {
-    margin: '10px 0 0 0',
+  panels: {
+    padding: '10px 0 0 0',
   },
   icon: {
     margin: '0 0 0 20px',
@@ -51,17 +59,13 @@ const txtBtnWrite = () => (
 );
 
 const onWriteClick = (write, peakObj) => {
-  if (!peakObj.data) return null;
-  const data = peakObj.data[0];
-  const { length } = data.x;
-  let i;
-  let peaks = '';
-  for (i = 0; i < length; i += 1) {
-    const valX = Math.round(parseFloat(data.x[i]) * 10) / 10;
-    const valY = (Math.round(parseFloat(data.y[i]) * 10) / 10).toExponential(1);
-    peaks += `${valX}, ${valY}; `;
-  }
-  return () => write(peaks);
+  const peaks = toXY(peakObj);
+  const result = peaks.map((p) => {
+    const valX = Math.round(parseFloat(p[0]) * 10) / 10;
+    const valY = (Math.round(parseFloat(p[1]) * 10) / 10).toExponential(1);
+    return `${valX}, ${valY};`;
+  });
+  return () => write(result.join(' '));
 };
 
 const btnWrite = (writePeaks, peakObj, classes) => (
@@ -82,6 +86,19 @@ const btnWrite = (writePeaks, peakObj, classes) => (
     )
 );
 
+const btnSave = classes => (
+  <div>
+    <Button
+      variant="contained"
+      color="primary"
+      className={classNames(classes.btnSave)}
+    >
+      {txtBtnSave()}
+      <SaveIcon className={classes.icon} />
+    </Button>
+  </div>
+);
+
 const Frame = ({
   input, cLabel, xLabel, yLabel, peakObj, writePeaks, classes,
 }) => (
@@ -94,23 +111,15 @@ const Frame = ({
         item
         align="center"
         xs={3}
+        className={classes.panels}
       >
-        <Card className={classNames(classes.settingCard)}>
-          <CardContent>
-            <Settings peakObj={peakObj} />
-          </CardContent>
-        </Card>
+        <MuiThemeProvider theme={theme}>
+          <SettingsPanel peakObj={peakObj} />
+          <AddPeakPanel />
+          <RmPeakPanel />
+        </MuiThemeProvider>
         { btnWrite(writePeaks, peakObj, classes) }
-        <div>
-          <Button
-            variant="contained"
-            color="primary"
-            className={classNames(classes.btnSave)}
-          >
-            {txtBtnSave()}
-            <SaveIcon className={classes.icon} />
-          </Button>
-        </div>
+        { btnSave(classes) }
       </Grid>
     </Grid>
   </div>
