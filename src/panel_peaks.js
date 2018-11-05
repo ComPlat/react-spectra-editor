@@ -33,7 +33,11 @@ const CenterBadge = withStyles({
 
 const negPeakList = (negPeaks, rmFromNegListAct, classes) => (
   negPeaks.length === 0
-    ? <Typography><i>No peak deleted!</i></Typography>
+    ? (
+      <Typography className="txt-panel-content">
+        <i>No peak deleted!</i>
+      </Typography>
+    )
     : (
       <div>
         {
@@ -42,7 +46,7 @@ const negPeakList = (negPeaks, rmFromNegListAct, classes) => (
             return (
               <div key={np.x}>
                 <Chip
-                  className={classNames(classes.chip)}
+                  className={classNames(classes.chip, 'txt-panel-content')}
                   label={np.x}
                   onDelete={onDelete}
                 />
@@ -56,7 +60,11 @@ const negPeakList = (negPeaks, rmFromNegListAct, classes) => (
 
 const posPeakList = (posPeaks, rmFromPosListAct, classes) => (
   posPeaks.length === 0
-    ? <Typography><i>No peak created!</i></Typography>
+    ? (
+      <Typography className="txt-panel-content">
+        <i>No peak created!</i>
+      </Typography>
+    )
     : (
       <div>
         {
@@ -65,7 +73,7 @@ const posPeakList = (posPeaks, rmFromPosListAct, classes) => (
             return (
               <div key={pp.x}>
                 <Chip
-                  className={classNames(classes.chip)}
+                  className={classNames(classes.chip, 'txt-panel-content')}
                   label={pp.x}
                   onDelete={onDelete}
                 />
@@ -91,10 +99,12 @@ const AddPanel = ({
       >
         <CenterBadge
           color="primary"
-          className={classNames(classes.badge)}
+          className={classNames(classes.badge, 'txt-panel-badge')}
           badgeContent={posLength}
         >
-          <Typography>Create Peaks</Typography>
+          <Typography className="txt-panel-header">
+            Create Peaks
+          </Typography>
         </CenterBadge>
       </ExpansionPanelSummary>
       <ExpansionPanelDetails>
@@ -118,10 +128,12 @@ const RmPanel = ({
       >
         <CenterBadge
           color="secondary"
-          className={classNames(classes.badge)}
+          className={classNames(classes.badge, 'txt-panel-badge')}
           badgeContent={negLength}
         >
-          <Typography>Delete Peaks</Typography>
+          <Typography className="txt-panel-header">
+            Delete Peaks
+          </Typography>
         </CenterBadge>
       </ExpansionPanelSummary>
       <ExpansionPanelDetails>

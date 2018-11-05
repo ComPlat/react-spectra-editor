@@ -106,7 +106,9 @@ const SettingsPanel = ({
         expandIcon={<ExpandMoreIcon />}
         className={classNames(classes.panelSummary)}
       >
-        <Typography>Settings</Typography>
+        <Typography className="txt-panel-header">
+          Settings
+        </Typography>
       </ExpansionPanelSummary>
       <ExpansionPanelDetails>
         {
