@@ -5,13 +5,15 @@ import PropTypes from 'prop-types';
 
 import { Spectrum2Seed, Spectrum2Peak, ToThresEndPts } from '../helpers/chem';
 import { updateBorder, resetBorder } from '../actions/border';
+import { addToPosList, addToNegList } from '../actions/edit_peak';
 import D3Canvas from './d3_canvas';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
 
-    this.canvas = new D3Canvas();
+    const { addToPosListAct, addToNegListAct } = props;
+    this.canvas = new D3Canvas({ addToPosListAct, addToNegListAct });
     this.d3Ref = React.createRef();
 
     this.seSeedChange = this.seSeedChange.bind(this);
@@ -20,7 +22,7 @@ class App extends React.Component {
   componentDidMount() {
     const {
       seed, peak, cLabel, xLabel, yLabel,
-      borderSt, tEndPts, updateBorderAct,
+      borderSt, tEndPts, editPeakSt, updateBorderAct,
     } = this.props;
 
     const { filterSeed, filterPeak } = this.brushFilter(borderSt, seed, peak);
@@ -30,6 +32,7 @@ class App extends React.Component {
       seed,
       peak,
       tEndPts,
+      editPeakSt,
       filterSeed,
       filterPeak,
       cLabel,
@@ -41,7 +44,7 @@ class App extends React.Component {
 
   componentDidUpdate(prevProps) {
     const {
-      seed, peak, cLabel, xLabel, yLabel, borderSt, tEndPts,
+      seed, peak, cLabel, xLabel, yLabel, borderSt, tEndPts, editPeakSt,
     } = this.props;
 
     this.seSeedChange(prevProps);
@@ -53,6 +56,7 @@ class App extends React.Component {
       seed,
       peak,
       tEndPts,
+      editPeakSt,
       filterSeed,
       filterPeak,
       cLabel,
@@ -108,6 +112,7 @@ const mapStateToProps = (state, props) => (
     seed: Spectrum2Seed(state, props),
     peak: Spectrum2Peak(state, props),
     tEndPts: ToThresEndPts(state, props),
+    editPeakSt: state.editPeak,
   }
 );
 
@@ -115,6 +120,8 @@ const mapDispatchToProps = dispatch => (
   bindActionCreators({
     updateBorderAct: updateBorder,
     resetBorderAct: resetBorder,
+    addToPosListAct: addToPosList,
+    addToNegListAct: addToNegList,
   }, dispatch)
 );
 
@@ -126,8 +133,11 @@ App.propTypes = {
   yLabel: PropTypes.string.isRequired,
   borderSt: PropTypes.array.isRequired,
   tEndPts: PropTypes.array.isRequired,
+  editPeakSt: PropTypes.object.isRequired,
   updateBorderAct: PropTypes.func.isRequired,
   resetBorderAct: PropTypes.func.isRequired,
+  addToPosListAct: PropTypes.func.isRequired,
+  addToNegListAct: PropTypes.func.isRequired,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

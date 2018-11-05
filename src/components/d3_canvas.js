@@ -3,13 +3,17 @@ import D3Focus from './d3_focus';
 import D3Context from './d3_context';
 import MountZoom from '../helpers/zoom';
 import MountBrush from '../helpers/brush';
+import MountCompass from '../helpers/compass';
 
 const W = 700;
 const H = 500;
 
 class D3Canvas {
-  constructor() {
-    this.focus = new D3Focus({ W, H });
+  constructor(props) {
+    const { addToPosListAct, addToNegListAct } = props;
+    this.focus = new D3Focus({
+      W, H, addToPosListAct, addToNegListAct,
+    });
     this.context = new D3Context({ W, H });
 
     this.svg = null;
@@ -24,7 +28,7 @@ class D3Canvas {
 
   drawMain(el) {
     const svg = d3.select(el).append('svg')
-      .attr('class', 'main')
+      .attr('class', 'canvas-main')
       .attr('preserveAspectRatio', 'xMinYMin meet')
       .attr('viewBox', `0 0 ${W} ${H}`);
     this.svg = svg;
@@ -38,20 +42,32 @@ class D3Canvas {
     }
   }
 
-  create(el, seed, peaks, tEndPts, filterSeed, filterPeak, cLabel, xLabel, yLabel, updateBorder) {
+  create(
+    el, seed, peaks, tEndPts, editPeakSt,
+    filterSeed, filterPeak, cLabel, xLabel, yLabel,
+    updateBorder,
+  ) {
     this.drawMain(el);
 
     this.context.create(el, this.svg, seed, updateBorder);
-    this.focus.create(el, this.svg, filterSeed, filterPeak, tEndPts, cLabel);
+    this.focus.create(
+      el, this.svg, filterSeed, filterPeak, tEndPts, editPeakSt, cLabel,
+    );
     this.drawLabel(el, cLabel, xLabel, yLabel);
 
     MountBrush(this);
     MountZoom(this);
+    MountCompass(this);
   }
 
-  update(el, seed, peaks, tEndPts, filterSeed, filterPeak, cLabel, xLabel, yLabel) {
+  update(
+    el, seed, peaks, tEndPts, editPeakSt,
+    filterSeed, filterPeak, cLabel, xLabel, yLabel,
+  ) {
     this.context.update(el, this.svg, seed);
-    this.focus.update(el, this.svg, filterSeed, filterPeak, tEndPts, null);
+    this.focus.update(
+      el, this.svg, filterSeed, filterPeak, tEndPts, editPeakSt, null,
+    );
     this.drawLabel(el, cLabel, xLabel, yLabel);
   }
 

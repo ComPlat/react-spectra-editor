@@ -89,11 +89,12 @@ const Spectrum2Peak = createSelector(
 );
 
 const convertThresEndPts = (peakObj, threshold) => {
-  if (!peakObj.data || !threshold) return [];
   const {
-    maxY, maxX, minX,
+    maxY, maxX, minX, thresRef,
   } = peakObj;
-  const yThres = threshold * maxY;
+  const thresVal = threshold || thresRef;
+  if (!thresVal || !peakObj.data) return [];
+  const yThres = thresVal * maxY;
   const endPts = [{ x: minX, y: yThres }, { x: maxX, y: yThres }];
   return endPts;
 };

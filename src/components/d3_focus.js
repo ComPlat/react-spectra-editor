@@ -7,9 +7,13 @@ import {
   MountClip, MountMainFrame, MountCircles, MountThresLine,
 } from '../helpers/mount';
 
+import { pksRmNeg, pksAddPos } from '../helpers/converter';
+
 class D3Focus {
   constructor(props) {
-    const { W, H } = props;
+    const {
+      W, H, addToPosListAct, addToNegListAct,
+    } = props;
     this.margin = {
       t: 10,
       b: 60 + Math.round((H - 90) * 0.2) + 20,
@@ -18,6 +22,8 @@ class D3Focus {
     };
     this.w = W - this.margin.l - this.margin.r;
     this.h = H - this.margin.t - this.margin.b;
+    this.addToPosListAct = addToPosListAct;
+    this.addToNegListAct = addToNegListAct;
 
     this.axis = null;
     this.path = null;
@@ -30,6 +36,8 @@ class D3Focus {
     this.tEndPts = null;
     this.root = null;
     this.svg = null;
+    this.overlay = null;
+    this.compass = null;
     this.scales = InitScale(this);
     this.axisCall = InitAxisCall(5);
     this.pathCall = InitPathCall(this);
@@ -40,10 +48,14 @@ class D3Focus {
     this.setTip = this.setTip.bind(this);
     this.setTrans = this.setTrans.bind(this);
     this.setDataParams = this.setDataParams.bind(this);
+    this.setOverlay = this.setOverlay.bind(this);
+    this.setCompass = this.setCompass.bind(this);
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
     this.drawLine = this.drawLine.bind(this);
     this.drawPeaks = this.drawPeaks.bind(this);
+    this.onClickPeak = this.onClickPeak.bind(this);
+    this.mergedPeaks = this.mergedPeaks.bind(this);
   }
 
   setSvg(svg) {
@@ -66,6 +78,20 @@ class D3Focus {
 
   setTrans() {
     this.trans = d3.transition().duration(500);
+  }
+
+  setOverlay() {
+    this.overlay = this.root.append('rect')
+      .attr('class', 'overlay')
+      .attr('width', this.w)
+      .attr('height', this.h)
+      .attr('opacity', 0.0);
+  }
+
+  setCompass() {
+    this.compass = this.root.append('g')
+      .attr('class', 'compass')
+      .attr('display', 'none');
   }
 
   drawLine() {
@@ -108,9 +134,22 @@ class D3Focus {
       .attr('fill', 'none');
   }
 
-  drawPeaks(scales) {
+  onClickPeak(data) {
+    d3.event.stopPropagation();
+    this.tip.hide();
+    this.addToNegListAct(data);
+  }
+
+  mergedPeaks(editPeakSt) {
+    if (!editPeakSt) return this.dataPks;
+    this.dataPks = pksAddPos(this.dataPks, editPeakSt);
+    this.dataPks = pksRmNeg(this.dataPks, editPeakSt);
+    return this.dataPks;
+  }
+
+  drawPeaks(scales, editPeakSt) {
     const ccp = this.circles.selectAll('path')
-      .data(this.dataPks);
+      .data(this.mergedPeaks(editPeakSt));
 
     ccp.exit()
       .attr('class', 'exit')
@@ -123,13 +162,17 @@ class D3Focus {
       .attr('d', symbol.type(d3.symbolDiamond))
       .attr('class', 'enter')
       .attr('fill', 'red')
+      .attr('stroke', 'blue')
+      .attr('stroke-width', 3)
+      .attr('stroke-opacity', 0.0)
       .on('mouseover', this.tip.show)
       .on('mouseout', this.tip.hide)
       .merge(ccp)
-      .attr('transform', d => `translate(${scales.x(d.x)}, ${scales.y(d.y)})`);
+      .attr('transform', d => `translate(${scales.x(d.x)}, ${scales.y(d.y)})`)
+      .on('click', d => this.onClickPeak(d));
   }
 
-  create(el, svg, filterSeed, filterPeak, tEndPts) {
+  create(el, svg, filterSeed, filterPeak, tEndPts, editPeakSt) {
     this.setSvg(svg);
 
     MountMainFrame(this, 'focus');
@@ -138,6 +181,8 @@ class D3Focus {
     this.setRoot(el);
     this.setTip();
     this.setDataParams(filterSeed, filterPeak, tEndPts);
+    this.setOverlay();
+    this.setCompass();
 
     this.axis = MountAxis(this);
     this.path = MountPath(this, 'steelblue');
@@ -151,17 +196,17 @@ class D3Focus {
 
     if (this.data && this.data.length > 0) {
       this.drawLine();
-      this.drawPeaks(this.scales);
+      this.drawPeaks(this.scales, editPeakSt);
     }
   }
 
-  update(el, svg, filterSeed, filterPeak, tEndPts) {
+  update(el, svg, filterSeed, filterPeak, tEndPts, editPeakSt) {
     this.setRoot(el);
     this.setDataParams(filterSeed, filterPeak, tEndPts);
 
     if (this.data && this.data.length > 0) {
       this.drawLine();
-      this.drawPeaks(this.scales);
+      this.drawPeaks(this.scales, editPeakSt);
     }
   }
 }
