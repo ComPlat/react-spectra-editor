@@ -11,7 +11,7 @@ import { ToXY } from './helpers/converter';
 const store = createStore(reducers);
 
 const SpectraViewer = ({
-  input, cLabel, xLabel, yLabel, peakObj, writePeaks,
+  input, cLabel, xLabel, yLabel, peakObj, writePeaks, savePeaks,
 }) => (
   <Provider store={store}>
     <Frame
@@ -21,6 +21,7 @@ const SpectraViewer = ({
       yLabel={yLabel}
       peakObj={peakObj}
       writePeaks={writePeaks}
+      savePeaks={savePeaks}
     />
   </Provider>
 );
@@ -37,12 +38,19 @@ SpectraViewer.propTypes = {
       PropTypes.bool,
     ],
   ),
+  savePeaks: PropTypes.oneOfType(
+    [
+      PropTypes.func,
+      PropTypes.bool,
+    ],
+  ),
 };
 
 
 SpectraViewer.defaultProps = {
   cLabel: '',
   writePeaks: false,
+  savePeaks: false,
 };
 
 export { SpectraViewer, ExtractJcamp, ToXY };

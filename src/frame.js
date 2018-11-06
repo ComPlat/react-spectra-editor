@@ -30,13 +30,15 @@ const Styles = () => ({
   icon: {
     margin: '0 0 0 20px',
   },
-  btnSave: {
-    margin: '20px 0 0 0',
-  },
-  btnWrite: {
+  btn: {
     margin: '20px 0 0 0',
   },
 });
+
+const BTN = {
+  WRITE: 'WRITE_PEAKS',
+  SAVE: 'SAVE_TO_FILE',
+};
 
 const SpectrumViewer = (input, cLabel, xLabel, yLabel, peakObj) => (
   <App
@@ -48,57 +50,64 @@ const SpectrumViewer = (input, cLabel, xLabel, yLabel, peakObj) => (
   />
 );
 
-const txtBtnSave = () => (
-  <span className="txt-btn-save">
-    Save to file
-  </span>
-);
-
-const txtBtnWrite = () => (
-  <span className="txt-btn-write">
-    Write Peaks
-  </span>
-);
-
-const onWriteClick = (write, peakObj, editPeakSt, thresSt) => {
-  const peaks = Convert2Peak(peakObj, thresSt * 0.01);
-  const peaksEdit = PksEdit(peaks, editPeakSt);
-  return () => write(peaksEdit);
+const btnContent = (content) => {
+  switch (content) {
+    case BTN.WRITE:
+      return (
+        <span className="txt-btn-write">
+          WRITE PEAKS
+        </span>
+      );
+    case BTN.SAVE:
+    default:
+      return (
+        <span className="txt-btn-save">
+          SAVE TO FILE
+        </span>
+      );
+  }
 };
 
-const btnWrite = (writePeaks, peakObj, editPeakSt, thresSt, classes) => (
-  !writePeaks
+const btnIcon = (content, classes) => {
+  switch (content) {
+    case BTN.WRITE:
+      return (
+        <EditIcon className={classes.icon} />
+      );
+    case BTN.SAVE:
+    default:
+      return (
+        <SaveIcon className={classes.icon} />
+      );
+  }
+};
+
+const onClick = (cbFunc, peakObj, editPeakSt, thresSt) => {
+  const peaks = Convert2Peak(peakObj, thresSt * 0.01);
+  const peaksEdit = PksEdit(peaks, editPeakSt);
+  return () => cbFunc(peaksEdit);
+};
+
+const btn = (cbFunc, peakObj, editPeakSt, thresSt, content, classes) => (
+  !cbFunc
     ? null
     : (
       <div>
         <Button
           variant="contained"
           color="primary"
-          className={classNames(classes.btnWrite)}
-          onClick={onWriteClick(writePeaks, peakObj, editPeakSt, thresSt)}
+          className={classNames(classes.btn)}
+          onClick={onClick(cbFunc, peakObj, editPeakSt, thresSt)}
         >
-          {txtBtnWrite()}
-          <EditIcon className={classes.icon} />
+          {btnContent(content)}
+          {btnIcon(content, classes)}
         </Button>
       </div>
     )
 );
 
-const btnSave = classes => (
-  <div>
-    <Button
-      variant="contained"
-      color="primary"
-      className={classNames(classes.btnSave)}
-    >
-      {txtBtnSave()}
-      <SaveIcon className={classes.icon} />
-    </Button>
-  </div>
-);
-
 const Frame = ({
-  input, cLabel, xLabel, yLabel, peakObj, writePeaks,
+  input, cLabel, xLabel, yLabel, peakObj, writePeaks, savePeaks,
   editPeakSt, thresSt, classes,
 }) => (
   <div className="react-spectrum-viewer">
@@ -117,8 +126,12 @@ const Frame = ({
           <AddPeakPanel />
           <RmPeakPanel />
         </MuiThemeProvider>
-        { btnWrite(writePeaks, peakObj, editPeakSt, thresSt, classes) }
-        { btnSave(classes) }
+        {
+          btn(writePeaks, peakObj, editPeakSt, thresSt, BTN.WRITE, classes)
+        }
+        {
+          btn(savePeaks, peakObj, editPeakSt, thresSt, BTN.SAVE, classes)
+        }
       </Grid>
     </Grid>
   </div>
@@ -138,6 +151,12 @@ Frame.propTypes = {
   yLabel: PropTypes.string.isRequired,
   peakObj: PropTypes.object.isRequired,
   writePeaks: PropTypes.oneOfType(
+    [
+      PropTypes.func,
+      PropTypes.bool,
+    ],
+  ).isRequired,
+  savePeaks: PropTypes.oneOfType(
     [
       PropTypes.func,
       PropTypes.bool,

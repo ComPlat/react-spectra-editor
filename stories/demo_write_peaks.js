@@ -17,16 +17,28 @@ class DemoWritePeaks extends React.Component {
     };
 
     this.writePeaks = this.writePeaks.bind(this);
+    this.savePeaks = this.savePeaks.bind(this);
   }
 
-  writePeaks(peaks) {
-    const peaksXY = ToXY(peaks);
-    const desc = peaksXY.map((p) => {
+  peaksXYToStr(peaksXY) {
+    const result = peaksXY.map((p) => {
       const valX = Math.round(parseFloat(p[0]) * 10) / 10;
       const valY = (Math.round(parseFloat(p[1]) * 10) / 10).toExponential(1);
       return `${valX}, ${valY};`;
     });
+    return result;
+  }
+
+  writePeaks(peaks) {
+    const peaksXY = ToXY(peaks);
+    const desc = this.peaksXYToStr(peaksXY);
     this.setState({ desc });
+  }
+
+  savePeaks(peaks) {
+    const peaksXY = ToXY(peaks);
+    const desc = this.peaksXYToStr(peaksXY);
+    alert(`Peaks are: ${desc}`); // eslint-disable-line
   }
 
   render() {
@@ -45,6 +57,7 @@ class DemoWritePeaks extends React.Component {
           yLabel={yLabel}
           peakObj={peakObj}
           writePeaks={this.writePeaks}
+          savePeaks={this.savePeaks}
         />
         <Grid container>
           <Grid item xs={6}>
