@@ -1,4 +1,4 @@
-import { EDITPEAK } from '../constants/action_type';
+import { EDITPEAK, MANAGER } from '../constants/action_type';
 
 const initialState = {
   pos: [],
@@ -73,6 +73,8 @@ const editPeakReducer = (state = initialState, action) => {
       return addToNeg(state, action);
     case EDITPEAK.RMNEGATIVE:
       return rmFromNeg(state, action);
+    case MANAGER.RESETALL:
+      return initialState;
     default:
       return state;
   }

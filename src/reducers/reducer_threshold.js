@@ -1,4 +1,4 @@
-import { THRESHOLD } from '../constants/action_type';
+import { THRESHOLD, MANAGER } from '../constants/action_type';
 
 const initialState = false;
 
@@ -8,6 +8,8 @@ const thresholdReducer = (state = initialState, action) => {
       return action.payload;
     case THRESHOLD.RESET:
       return action.payload;
+    case MANAGER.RESETALL:
+      return initialState;
     default:
       return state;
   }

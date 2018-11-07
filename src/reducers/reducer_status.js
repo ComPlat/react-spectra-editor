@@ -1,4 +1,6 @@
-import { STATUS, EDITPEAK, THRESHOLD } from '../constants/action_type';
+import {
+  STATUS, EDITPEAK, THRESHOLD, MANAGER,
+} from '../constants/action_type';
 
 const initialState = {
   btnSave: false,
@@ -28,6 +30,8 @@ const statusReducer = (state = initialState, action) => {
         state,
         { btnWrite: false, btnSave: false },
       );
+    case MANAGER.RESETALL:
+      return initialState;
     default:
       return state;
   }
