@@ -11,7 +11,7 @@ import { ToXY } from './helpers/converter';
 const store = createStore(reducers);
 
 const SpectraViewer = ({
-  input, cLabel, xLabel, yLabel, peakObj, writePeaks, savePeaks,
+  input, cLabel, xLabel, yLabel, peakObjs, writePeaks, savePeaks,
 }) => (
   <Provider store={store}>
     <Frame
@@ -19,7 +19,7 @@ const SpectraViewer = ({
       cLabel={cLabel}
       xLabel={xLabel}
       yLabel={yLabel}
-      peakObj={peakObj}
+      peakObjs={peakObjs}
       writePeaks={writePeaks}
       savePeaks={savePeaks}
     />
@@ -31,7 +31,7 @@ SpectraViewer.propTypes = {
   cLabel: PropTypes.string,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
-  peakObj: PropTypes.object.isRequired,
+  peakObjs: PropTypes.array.isRequired,
   writePeaks: PropTypes.oneOfType(
     [
       PropTypes.func,

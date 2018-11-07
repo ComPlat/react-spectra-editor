@@ -147,51 +147,68 @@ const btn = (
   );
 };
 
-const Frame = ({
-  input, cLabel, xLabel, yLabel, peakObj, writePeaks, savePeaks,
-  editPeakSt, thresSt, statusSt, classes,
-  toggleSaveBtnAct, toggleWriteBtnAct,
-}) => (
-  <div className="react-spectrum-viewer">
-    <Grid container>
-      <Grid item xs={9}>
-        { SpectrumViewer(input, cLabel, xLabel, yLabel, peakObj) }
-      </Grid>
-      <Grid
-        item
-        align="center"
-        xs={3}
-        className={classes.panels}
-      >
-        <MuiThemeProvider theme={theme}>
-          <SettingsPanel peakObj={peakObj} />
-          <AddPeakPanel />
-          <RmPeakPanel />
-        </MuiThemeProvider>
-        {
-          btn(
-            writePeaks, peakObj, editPeakSt, thresSt, statusSt,
-            toggleSaveBtnAct, toggleWriteBtnAct,
-            BTN.WRITE, classes,
-          )
-        }
-        {
-          btn(
-            savePeaks, peakObj, editPeakSt, thresSt, statusSt,
-            toggleSaveBtnAct, toggleWriteBtnAct,
-            BTN.SAVE, classes,
-          )
-        }
-      </Grid>
-    </Grid>
+const notAvailable = () => (
+  <div>
+    <span>There is something wrong in the Jcamp file.</span>
   </div>
 );
+
+const Frame = ({
+  input, cLabel, xLabel, yLabel, peakObjs, writePeaks, savePeaks,
+  editPeakSt, thresSt, statusSt, managerSt, classes,
+  toggleSaveBtnAct, toggleWriteBtnAct,
+}) => {
+  const [peakAll, peakEdit] = peakObjs;
+  const hasEdit = peakEdit && peakEdit.data
+    ? peakEdit.data[0].x.length > 0
+    : false;
+
+  const peakObj = hasEdit && managerSt.isEdit ? peakEdit : peakAll;
+  if (!peakObj) return notAvailable();
+
+  return (
+    <div className="react-spectrum-viewer">
+      <Grid container>
+        <Grid item xs={9}>
+          { SpectrumViewer(input, cLabel, xLabel, yLabel, peakObj) }
+        </Grid>
+        <Grid
+          item
+          align="center"
+          xs={3}
+          className={classes.panels}
+        >
+          <MuiThemeProvider theme={theme}>
+            <SettingsPanel peakObj={peakObj} hasEdit={hasEdit} />
+            <AddPeakPanel />
+            <RmPeakPanel />
+          </MuiThemeProvider>
+          {
+            btn(
+              writePeaks, peakObj, editPeakSt, thresSt, statusSt,
+              toggleSaveBtnAct, toggleWriteBtnAct,
+              BTN.WRITE, classes,
+            )
+          }
+          {
+            btn(
+              savePeaks, peakObj, editPeakSt, thresSt, statusSt,
+              toggleSaveBtnAct, toggleWriteBtnAct,
+              BTN.SAVE, classes,
+            )
+          }
+        </Grid>
+      </Grid>
+    </div>
+  );
+};
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     editPeakSt: state.editPeak,
     thresSt: state.threshold,
     statusSt: state.status,
+    managerSt: state.manager,
   }
 );
 
@@ -207,7 +224,7 @@ Frame.propTypes = {
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
-  peakObj: PropTypes.object.isRequired,
+  peakObjs: PropTypes.array.isRequired,
   writePeaks: PropTypes.oneOfType(
     [
       PropTypes.func,
@@ -229,6 +246,7 @@ Frame.propTypes = {
       PropTypes.bool,
     ],
   ).isRequired,
+  managerSt: PropTypes.object.isRequired,
   classes: PropTypes.object.isRequired,
   toggleSaveBtnAct: PropTypes.func.isRequired,
   toggleWriteBtnAct: PropTypes.func.isRequired,
