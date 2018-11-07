@@ -7,4 +7,11 @@ const resetAll = payload => (
   }
 );
 
-export { resetAll }; // eslint-disable-line
+const toggleIsEdit = payload => (
+  {
+    type: MANAGER.TOGGLEISEDIT,
+    payload,
+  }
+);
+
+export { resetAll, toggleIsEdit }; // eslint-disable-line

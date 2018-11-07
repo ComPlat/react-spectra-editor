@@ -23,6 +23,7 @@ const STATUS = {
 
 const MANAGER = {
   RESETALL: 'RESET_ALL',
+  TOGGLEISEDIT: 'TOGGLE_IS_EDIT',
 };
 
 export {

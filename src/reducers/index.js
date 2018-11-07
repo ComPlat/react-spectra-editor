@@ -3,12 +3,14 @@ import borderReducer from './reducer_border';
 import thresholdReducer from './reducer_threshold';
 import editPeakReducer from './reducer_edit_peak';
 import statusReducer from './reducer_status';
+import managerReducer from './reducer_manager';
 
 const rootReducer = combineReducers({
   border: borderReducer,
   threshold: thresholdReducer,
   editPeak: editPeakReducer,
   status: statusReducer,
+  manager: managerReducer,
 });
 
 export default rootReducer;
