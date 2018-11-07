@@ -45,7 +45,6 @@ class DemoSelect extends React.Component {
     const input = value.data[0];
     const xLabel = `X (${value.xUnit})`;
     const yLabel = `Y (${value.yUnit})`;
-    const peakObj = peakObjs && peakObjs[0] ? peakObjs[0] : {};
 
     return (
       <div style={{ width: '1200px' }}>
@@ -58,7 +57,7 @@ class DemoSelect extends React.Component {
           input={input}
           xLabel={xLabel}
           yLabel={yLabel}
-          peakObj={peakObj}
+          peakObjs={peakObjs}
         />
       </div>
     );
