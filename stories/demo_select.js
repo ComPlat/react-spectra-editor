@@ -15,12 +15,14 @@ const files = [
 ];
 
 const options = files.map(f => (
-  {
-    value: f.spectrum,
-    label: f.spectrum.typ,
-    peakObjs: f.peakObjs,
-  }
-));
+  f.spectrum
+    ? {
+      value: f.spectrum,
+      label: f.spectrum.typ,
+      peakObjs: f.peakObjs,
+    }
+    : null
+)).filter(r => r != null);
 
 class DemoSelect extends React.Component {
   constructor(props) {
