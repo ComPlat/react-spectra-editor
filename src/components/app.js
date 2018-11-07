@@ -4,7 +4,8 @@ import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 
 import { Spectrum2Seed, Spectrum2Peak, ToThresEndPts } from '../helpers/chem';
-import { updateBorder, resetBorder } from '../actions/border';
+import { updateBorder } from '../actions/border';
+import { resetAll } from '../actions/manager';
 import { addToPosList, addToNegList } from '../actions/edit_peak';
 import D3Canvas from './d3_canvas';
 
@@ -71,10 +72,10 @@ class App extends React.Component {
   }
 
   seSeedChange(prevProps) {
-    const { seed, resetBorderAct } = this.props;
+    const { seed, resetAllAct } = this.props;
     const oldSeed = prevProps.seed;
     if (oldSeed !== seed) {
-      resetBorderAct();
+      resetAllAct();
     }
   }
 
@@ -119,7 +120,7 @@ const mapStateToProps = (state, props) => (
 const mapDispatchToProps = dispatch => (
   bindActionCreators({
     updateBorderAct: updateBorder,
-    resetBorderAct: resetBorder,
+    resetAllAct: resetAll,
     addToPosListAct: addToPosList,
     addToNegListAct: addToNegList,
   }, dispatch)
@@ -135,7 +136,7 @@ App.propTypes = {
   tEndPts: PropTypes.array.isRequired,
   editPeakSt: PropTypes.object.isRequired,
   updateBorderAct: PropTypes.func.isRequired,
-  resetBorderAct: PropTypes.func.isRequired,
+  resetAllAct: PropTypes.func.isRequired,
   addToPosListAct: PropTypes.func.isRequired,
   addToNegListAct: PropTypes.func.isRequired,
 };

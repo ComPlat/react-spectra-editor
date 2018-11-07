@@ -69,8 +69,8 @@ const Convert2Peak = (peakObj, threshold) => {
   const peak = [];
   if (!peakObj || !peakObj.data) return peak;
   const data = peakObj.data[0];
-  const { maxY, peakUp } = peakObj;
-  const yThres = threshold * maxY;
+  const { maxY, peakUp, thresRef } = peakObj;
+  const yThres = threshold ? (threshold * maxY) : (thresRef * maxY / 100.0);
   for (let i = 0; i < data.y.length; i += 1) {
     const y = data.y[i];
     const overThres = (peakUp && y >= yThres) || (!peakUp && y <= yThres);
