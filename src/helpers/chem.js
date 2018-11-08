@@ -48,9 +48,12 @@ const dsWithRef = (spectrum, dsRef, peakUp) => {
 };
 
 const convertSpectrum = (spectrum, peakObj) => {
-  const { dsRef, peakUp } = downSample(spectrum, peakObj);
-  const sp = dsRef
-    ? dsWithRef(spectrum, dsRef, peakUp)
+  let ds = { dsRef: false, peakUp: false };
+  if (peakObj.thresRef) {
+    ds = downSample(spectrum, peakObj);
+  }
+  const sp = ds.dsRef
+    ? dsWithRef(spectrum, ds.dsRef, ds.peakUp)
     : dsWithoutRef(spectrum);
   return sp;
 };
@@ -89,6 +92,7 @@ const Spectrum2Peak = createSelector(
 );
 
 const convertThresEndPts = (peakObj, threshold) => {
+  if (!peakObj.thresRef) return [{ x: false, y: false }, { x: false, y: false }];
   const {
     maxY, maxX, minX, thresRef,
   } = peakObj;

@@ -1,12 +1,12 @@
 import * as d3 from 'd3';
 import {
-  InitScale, InitAxisCall, InitPathCall, InitTip,
+  InitScale, InitAxisCall, InitTip,
 } from '../helpers/init';
 import {
   MountPath, MountGrid, MountAxis, MountAxisLabelY,
   MountClip, MountMainFrame, MountCircles, MountThresLine,
 } from '../helpers/mount';
-
+import { TfRescale } from '../helpers/compass';
 import { PksEdit } from '../helpers/converter';
 
 class D3Focus {
@@ -40,7 +40,7 @@ class D3Focus {
     this.compass = null;
     this.scales = InitScale(this);
     this.axisCall = InitAxisCall(5);
-    this.pathCall = InitPathCall(this);
+    this.pathCall = null;
     this.tip = InitTip(this);
 
     this.setSvg = this.setSvg.bind(this);
@@ -56,6 +56,7 @@ class D3Focus {
     this.drawPeaks = this.drawPeaks.bind(this);
     this.onClickPeak = this.onClickPeak.bind(this);
     this.mergedPeaks = this.mergedPeaks.bind(this);
+    this.updatePathCall = this.updatePathCall.bind(this);
   }
 
   setSvg(svg) {
@@ -94,6 +95,12 @@ class D3Focus {
       .attr('display', 'none');
   }
 
+  updatePathCall(xt, yt) {
+    this.pathCall = d3.line()
+      .x(d => xt(d.x))
+      .y(d => yt(d.y));
+  }
+
   drawLine() {
     // Domain Calculate
     const factor = 1.05;
@@ -104,11 +111,16 @@ class D3Focus {
     ];
     this.scales.x.domain(xExtent);
     this.scales.y.domain(yExtent);
+
+    // rescale for zoom
+    const { xt, yt } = TfRescale(this);
+
     // Axis Call
-    this.axisCall.x.scale(this.scales.x);
-    this.axisCall.y.scale(this.scales.y);
+    this.axisCall.x.scale(xt);
+    this.axisCall.y.scale(yt);
 
     // Path Calculate
+    this.updatePathCall(xt, yt);
     this.path.attr('d', this.pathCall(this.data));
 
     // Threshold
@@ -146,7 +158,10 @@ class D3Focus {
     return this.dataPks;
   }
 
-  drawPeaks(scales, editPeakSt) {
+  drawPeaks(editPeakSt) {
+    // rescale for zoom
+    const { xt, yt } = TfRescale(this);
+
     const ccp = this.circles.selectAll('path')
       .data(this.mergedPeaks(editPeakSt));
 
@@ -167,7 +182,7 @@ class D3Focus {
       .on('mouseover', this.tip.show)
       .on('mouseout', this.tip.hide)
       .merge(ccp)
-      .attr('transform', d => `translate(${scales.x(d.x)}, ${scales.y(d.y)})`)
+      .attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y)})`)
       .on('click', d => this.onClickPeak(d));
   }
 
@@ -195,7 +210,7 @@ class D3Focus {
 
     if (this.data && this.data.length > 0) {
       this.drawLine();
-      this.drawPeaks(this.scales, editPeakSt);
+      this.drawPeaks(editPeakSt);
     }
   }
 
@@ -205,7 +220,7 @@ class D3Focus {
 
     if (this.data && this.data.length > 0) {
       this.drawLine();
-      this.drawPeaks(this.scales, editPeakSt);
+      this.drawPeaks(editPeakSt);
     }
   }
 }

@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 
-const tfRescale = (focus) => {
+const TfRescale = (focus) => {
   const tf = d3.zoomTransform(d3.select('.canvas-main').node());
   const xt = tf.rescaleX(focus.scales.x);
   const yt = tf.rescaleY(focus.scales.y);
@@ -18,11 +18,11 @@ const fetchPt = (focus, xt) => {
 };
 
 const mouseMove = (focus) => {
-  const transf = tfRescale(focus);
-  const pt = fetchPt(focus, transf.xt);
+  const { xt, yt } = TfRescale(focus);
+  const pt = fetchPt(focus, xt);
   if (pt) {
-    const tx = transf.xt(pt.x);
-    const ty = transf.yt(pt.y);
+    const tx = xt(pt.x);
+    const ty = yt(pt.y);
     focus.compass.attr('transform', `translate(${tx},${ty})`);
     focus.compass.select('.x-hover-line')
       .attr('y1', 0 - ty)
@@ -32,8 +32,8 @@ const mouseMove = (focus) => {
 
 const rightClick = (focus) => {
   d3.event.preventDefault();
-  const transf = tfRescale(focus);
-  const pt = fetchPt(focus, transf.xt);
+  const { xt } = TfRescale(focus);
+  const pt = fetchPt(focus, xt);
   focus.addToPosListAct(pt);
 };
 
@@ -60,4 +60,4 @@ const MountCompass = (canvas) => {
     .on('contextmenu', () => rightClick(focus));
 };
 
-export default MountCompass;
+export { MountCompass, TfRescale };

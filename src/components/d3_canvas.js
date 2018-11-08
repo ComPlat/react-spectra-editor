@@ -3,7 +3,7 @@ import D3Focus from './d3_focus';
 import D3Context from './d3_context';
 import MountZoom from '../helpers/zoom';
 import MountBrush from '../helpers/brush';
-import MountCompass from '../helpers/compass';
+import { MountCompass } from '../helpers/compass';
 
 const W = 700;
 const H = 500;

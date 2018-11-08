@@ -147,11 +147,11 @@ const btn = (
   );
 };
 
-const notAvailable = () => (
-  <div>
-    <span>There is something wrong in the Jcamp file.</span>
-  </div>
-);
+// const notAvailable = () => (
+//   <div>
+//     <span>There is something wrong in the Jcamp file.</span>
+//   </div>
+// );
 
 const Frame = ({
   input, cLabel, xLabel, yLabel, peakObjs, writePeaks, savePeaks,
@@ -163,8 +163,10 @@ const Frame = ({
     ? peakEdit.data[0].x.length > 0
     : false;
 
-  const peakObj = hasEdit && managerSt.isEdit ? peakEdit : peakAll;
-  if (!peakObj) return notAvailable();
+  let peakObj = hasEdit && managerSt.isEdit ? peakEdit : peakAll;
+  if (!peakObj) {
+    peakObj = { thresRef: false };
+  }
 
   return (
     <div className="react-spectrum-viewer">

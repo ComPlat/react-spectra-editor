@@ -3,8 +3,7 @@ import * as d3 from 'd3';
 const brushed = (canvas) => {
   if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'zoom') return;
   const { context } = canvas;
-  const selection = d3.event.selection
-    && d3.event.selection.reverse()
+  const selection = (d3.event.selection && d3.event.selection.reverse())
     || context.scales.x.range();
   const selectX = selection.map(context.scales.x.invert);
   context.updateBorder(selectX);
