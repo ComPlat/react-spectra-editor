@@ -1,3 +1,4 @@
+const H1 = `
 ##TITLE=1H_ns16 DMSO /opt/topspin3.5pl6/data/complat/nmr PH 44
 ##JCAMPDX= 6.0         $$ Bruker NMR compound JCAMP-DX V2.0
 ##DATA TYPE= LINK
@@ -32,8 +33,8 @@ $$ $$ /opt/topspin3.5pl6/data/complat/nmr/data/PH/nmr/PH-771/30/audita.txt
 $$ ##AUDIT TRAIL=  $$ (NUMBER, WHEN, WHO, WHERE, PROCESS, VERSION, WHAT)
 (   1,<2018-07-09 18:34:42.776 +0200>,<nmr>,<ibg-4-babsi>,<go4>,<TopSpin 3.5.6>,
       <created by zg
-	started at 2018-07-09 18:33:07.982 +0200,
-	POWCHK enabled, PULCHK disabled,
+  started at 2018-07-09 18:33:07.982 +0200,
+  POWCHK enabled, PULCHK disabled,
        configuration hash MD5:
        40 53 6C 46 18 DA EE D3 1B 86 22 DD 91 B5 2B 72
        data hash MD5: 64K
@@ -56,56 +57,56 @@ $$ ED_ENTRY        ACQU
 $$ ORDER           FILE
 $$
 $$
-$$ HEADER		"F2 - Acquisition Parameters"
-$$ T_NAME		Date_
-$$ 		TYPE	R64
-$$ 		CLASS	ACQU
-$$ 		SUBRANGE 0.0 50000000
-$$ 		REL	"Date_=itodate(DATE)"
-$$ 		INV_REL	"DATE=datetoi(Date_,DATE)"
-$$ 		FORMAT	"%14.0f"
-$$ 		TEXT	" "
+$$ HEADER   "F2 - Acquisition Parameters"
+$$ T_NAME   Date_
+$$    TYPE  R64
+$$    CLASS ACQU
+$$    SUBRANGE 0.0 50000000
+$$    REL "Date_=itodate(DATE)"
+$$    INV_REL "DATE=datetoi(Date_,DATE)"
+$$    FORMAT  "%14.0f"
+$$    TEXT  " "
 $$ END
-$$ T_NAME		Time
-$$ 		TYPE	R32
-$$ 		CLASS	ACQU
-$$ 		SUBRANGE 0.0 1000000
-$$ 		REL	"Time=itotime(DATE)"
-$$ 		INV_REL	"DATE=timetoi(Time,DATE)"
-$$ 		FORMAT	"%14.2f h"
-$$ 		TEXT	" "
+$$ T_NAME   Time
+$$    TYPE  R32
+$$    CLASS ACQU
+$$    SUBRANGE 0.0 1000000
+$$    REL "Time=itotime(DATE)"
+$$    INV_REL "DATE=timetoi(Time,DATE)"
+$$    FORMAT  "%14.2f h"
+$$    TEXT  " "
 $$ END
-$$ NAME		INSTRUM
-$$ 		TEXT	" "
+$$ NAME   INSTRUM
+$$    TEXT  " "
 $$ END
-$$ NAME		PROBHD
-$$ 		FORMAT	"%14.14s"
-$$ 		TEXT	" "
+$$ NAME   PROBHD
+$$    FORMAT  "%14.14s"
+$$    TEXT  " "
 $$ END
-$$ NAME		PULPROG
-$$ 		TEXT	" "
+$$ NAME   PULPROG
+$$    TEXT  " "
 $$ END
-$$ NAME		TD
-$$ 		TEXT	" "
+$$ NAME   TD
+$$    TEXT  " "
 $$ END
-$$ NAME		SOLVENT
-$$ 		TEXT	" "
+$$ NAME   SOLVENT
+$$    TEXT  " "
 $$ END
-$$ NAME		NS
-$$ 		TEXT	" "
+$$ NAME   NS
+$$    TEXT  " "
 $$ END
-$$ NAME		DS
-$$ 		TEXT	" "
+$$ NAME   DS
+$$    TEXT  " "
 $$ END
-$$ T_NAME		SWH
-$$ 		TYPE	R32
-$$ 		CLASS	ACQU
-$$ 		SUBRANGE 0.0 1e8
-$$ 		REL	"SWH=SW*SFO1"
-$$ 		INV_REL "SW=SWH/SFO1"
-$$ 		UNIT	"Hz"
-$$ 		FORMAT	"%14.3f Hz"
-$$ 		TEXT	" "
+$$ T_NAME   SWH
+$$    TYPE  R32
+$$    CLASS ACQU
+$$    SUBRANGE 0.0 1e8
+$$    REL "SWH=SW*SFO1"
+$$    INV_REL "SW=SWH/SFO1"
+$$    UNIT  "Hz"
+$$    FORMAT  "%14.3f Hz"
+$$    TEXT  " "
 $$ END
 $$ T_NAME          FIDRES
 $$                 TYPE    R32
@@ -113,80 +114,80 @@ $$                 CLASS   ACQU
 $$                 SUBRANGE 0.0 100000
 $$                 REL     "FIDRES=2*SW*SFO1/TD"
 $$                 INV_REL "TD = nextpow(2*SW*SFO1/FIDRES)"
-$$ 		UNIT	"Hz"
-$$ 		FORMAT	"%14.6f Hz"
-$$ 		TEXT	" "
+$$    UNIT  "Hz"
+$$    FORMAT  "%14.6f Hz"
+$$    TEXT  " "
 $$ END
 $$ T_NAME          AQ
-$$ 		TYPE	R32
-$$ 		CLASS	ACQU
-$$ 		SUBRANGE 0.0 1000
-$$ 		REL	"AQ=aqcalc(SW,SFO1,TD,DIGTYP)"
-$$ 		INV_REL	"TD=tdcalc(SW,SFO1,1.0e6*AQ,DIGTYP)"
-$$ 		UNIT	"sec"
-$$ 		FORMAT	"%14.7f sec"
-$$ 		TEXT	" "
+$$    TYPE  R32
+$$    CLASS ACQU
+$$    SUBRANGE 0.0 1000
+$$    REL "AQ=aqcalc(SW,SFO1,TD,DIGTYP)"
+$$    INV_REL "TD=tdcalc(SW,SFO1,1.0e6*AQ,DIGTYP)"
+$$    UNIT  "sec"
+$$    FORMAT  "%14.7f sec"
+$$    TEXT  " "
 $$ END
-$$ NAME		RG
-$$ 		TEXT	" "
+$$ NAME   RG
+$$    TEXT  " "
 $$ END
 $$ T_NAME          DW
-$$ 		TYPE	R32
-$$ 		CLASS	ACQU
-$$ 		SUBRANGE 0.0 1000000
-$$ 		REL	"DW=1/(2*SW*SFO1)"
-$$ 		INV_REL	"SW=1000000/(2*(0.005+DW)*SFO1)"
-$$ 		UNIT	"usec"
-$$ 		FORMAT	"%14.3lf usec"
-$$ 		TEXT	" "
+$$    TYPE  R32
+$$    CLASS ACQU
+$$    SUBRANGE 0.0 1000000
+$$    REL "DW=1/(2*SW*SFO1)"
+$$    INV_REL "SW=1000000/(2*(0.005+DW)*SFO1)"
+$$    UNIT  "usec"
+$$    FORMAT  "%14.3lf usec"
+$$    TEXT  " "
 $$ END
-$$ NAME		DE
-$$ 		FORMAT	"%14.2f usec"
-$$ 		TEXT	" "
+$$ NAME   DE
+$$    FORMAT  "%14.2f usec"
+$$    TEXT  " "
 $$ END
-$$ NAME		TE
-$$ 		FORMAT	"%14.1f K"
-$$ 		TEXT	" "
+$$ NAME   TE
+$$    FORMAT  "%14.1f K"
+$$    TEXT  " "
 $$ END
-$$ T_NAME		D1
-$$ 		TYPE	R32
-$$ 		CLASS	ACQU
-$$ 		SUBRANGE 0.0 1e38
-$$ 		REL	"D1=D[1]"
-$$ 		INV_REL	"D[1]=D1"
-$$ 		UNIT	"sec"
-$$ 		FORMAT	"%14.8f sec"
-$$ 		TEXT	" "
+$$ T_NAME   D1
+$$    TYPE  R32
+$$    CLASS ACQU
+$$    SUBRANGE 0.0 1e38
+$$    REL "D1=D[1]"
+$$    INV_REL "D[1]=D1"
+$$    UNIT  "sec"
+$$    FORMAT  "%14.8f sec"
+$$    TEXT  " "
 $$ END
-$$ NAME		TD0
-$$ 		TEXT	" "
+$$ NAME   TD0
+$$    TEXT  " "
 $$ END
-$$ NAME		SFO1
-$$ 		FORMAT	"%14.7f MHz"
-$$ 		TEXT	" "
+$$ NAME   SFO1
+$$    FORMAT  "%14.7f MHz"
+$$    TEXT  " "
 $$ END
-$$ NAME		NUC1
-$$ 		NONEDIT
-$$ 		TEXT	" "
+$$ NAME   NUC1
+$$    NONEDIT
+$$    TEXT  " "
 $$ END
-$$ T_NAME		P1
-$$ 		TYPE	R32
-$$ 		CLASS	ACQU
-$$ 		SUBRANGE 0.0 1.0e10
-$$ 		REL	"P1=P[1]"
-$$ 		INV_REL	"P[1]=P1"
-$$ 		UNIT	"usec"
-$$ 		FORMAT	"%14.2f usec"
-$$ 		TEXT	" "
+$$ T_NAME   P1
+$$    TYPE  R32
+$$    CLASS ACQU
+$$    SUBRANGE 0.0 1.0e10
+$$    REL "P1=P[1]"
+$$    INV_REL "P[1]=P1"
+$$    UNIT  "usec"
+$$    FORMAT  "%14.2f usec"
+$$    TEXT  " "
 $$ END
-$$ T_NAME		PLW1
-$$ 		TYPE	R32
-$$ 		CLASS	ACQU
-$$ 		REL	"PLW1=PLW[1]"
-$$ 		INV_REL	"PLW[1]=PLW1"
-$$ 		UNIT	"W"
-$$ 		FORMAT	"%14.8f W"
-$$ 		TEXT	"power PLW1 "
+$$ T_NAME   PLW1
+$$    TYPE  R32
+$$    CLASS ACQU
+$$    REL "PLW1=PLW[1]"
+$$    INV_REL "PLW[1]=PLW1"
+$$    UNIT  "W"
+$$    FORMAT  "%14.8f W"
+$$    TEXT  "power PLW1 "
 $$ END
 ##$RELAX=
 ##$BRUKER FILE EXP=fq1list
@@ -708,7 +709,7 @@ $$  2000000
 $$ ##TITLE= Parameter file, TopSpin 3.5 pl 6
 $$ ##JCAMPDX= 5.0
 $$ ##DATATYPE= Parameter Values
-$$ ##NPOINTS= 1	$$ modification sequence number
+$$ ##NPOINTS= 1 $$ modification sequence number
 $$ ##ORIGIN= Bruker BioSpin GmbH
 $$ ##OWNER= nmr
 $$ $$ 2018-07-09 18:33:07.958 +0200  nmr@ibg-4-babsi
@@ -813,54 +814,54 @@ $$ #$$SHIMID=292722
 $$ #
 $$ # Active Shim Gradients
 $$ #
-$$ Z           		-10343
-$$ Z2          		2172
-$$ Z3          		-308
-$$ Z4          		-1701
-$$ Z5          		528
-$$ Z6          		2192
-$$ Z7          		-2289
-$$ Z8          		-117
-$$ X           		3251
-$$ XZ          		-698
-$$ XZ2         		2438
-$$ XZ3         		-169
-$$ XZ4         		-555
-$$ XZ5         		1731
-$$ Y           		420
-$$ YZ          		-1082
-$$ YZ2         		-180
-$$ YZ3         		-929
-$$ YZ4         		233
-$$ YZ5         		3803
-$$ XY          		-1633
-$$ XYZ         		1468
-$$ XYZ2        		-417
-$$ XYZ3        		494
-$$ XYZ4        		263
-$$ XYZ5        		0
-$$ (X2-Y2)     		-1669
-$$ (X2-Y2)Z    		-1275
-$$ (X2-Y2)Z2   		976
-$$ (X2-Y2)Z3   		361
-$$ (X2-Y2)Z4   		-678
-$$ (X2-Y2)Z5   		0
-$$ X3          		2782
-$$ X3Z         		-52
-$$ Y3          		-133
-$$ Y3Z         		647
+$$ Z              -10343
+$$ Z2             2172
+$$ Z3             -308
+$$ Z4             -1701
+$$ Z5             528
+$$ Z6             2192
+$$ Z7             -2289
+$$ Z8             -117
+$$ X              3251
+$$ XZ             -698
+$$ XZ2            2438
+$$ XZ3            -169
+$$ XZ4            -555
+$$ XZ5            1731
+$$ Y              420
+$$ YZ             -1082
+$$ YZ2            -180
+$$ YZ3            -929
+$$ YZ4            233
+$$ YZ5            3803
+$$ XY             -1633
+$$ XYZ            1468
+$$ XYZ2           -417
+$$ XYZ3           494
+$$ XYZ4           263
+$$ XYZ5           0
+$$ (X2-Y2)        -1669
+$$ (X2-Y2)Z       -1275
+$$ (X2-Y2)Z2      976
+$$ (X2-Y2)Z3      361
+$$ (X2-Y2)Z4      -678
+$$ (X2-Y2)Z5      0
+$$ X3             2782
+$$ X3Z            -52
+$$ Y3             -133
+$$ Y3Z            647
 $$ #
 $$ # Lock Parameter
 $$ #
-$$ FIELD		4932.190
-$$ LOCKPHASE		103.600
-$$ LOCKPOWER		-20.000
-$$ LOCKGAIN		101.347
-$$ LOCKDC		-75.000
-$$ LOCKSHIFT		2.490
-$$ LOOPGAIN		5.000
-$$ LOOPTIME		0.250
-$$ LOOPFILTER		500.000
+$$ FIELD    4932.190
+$$ LOCKPHASE    103.600
+$$ LOCKPOWER    -20.000
+$$ LOCKGAIN   101.347
+$$ LOCKDC   -75.000
+$$ LOCKSHIFT    2.490
+$$ LOOPGAIN   5.000
+$$ LOOPTIME   0.250
+$$ LOOPFILTER   500.000
 $$ #
 $$ IEEE64_VERSION_CODE 1
 $$ #
@@ -911,7 +912,7 @@ $$ SHIM_SETTING [40]  0.00000000
 $$ ##TITLE= Parameter file, TopSpin 3.5 pl 6
 $$ ##JCAMPDX= 5.0
 $$ ##DATATYPE= Parameter Values
-$$ ##NPOINTS= 33	$$ modification sequence number
+$$ ##NPOINTS= 33  $$ modification sequence number
 $$ ##ORIGIN= Bruker BioSpin GmbH
 $$ ##OWNER= nmrsu
 $$ $$ 2017-08-18 15:18:49.179 +0200  nmr@ibg-4-babsi
@@ -2354,7 +2355,7 @@ $$ --------------------------
 ##$XDIM= 0
 ##$YMAX_p= 0
 ##$YMIN_p= 0
-##$CURPLOT= < ±*	Ô±*	à±*	>
+##$CURPLOT= <*  * * >
 ##$CURPRIN= <$1#1#0#1#1#1#1#1#0#-1#-1#1#-1>
 ##$DFORMAT= <normdp>
 ##$LAYOUT= <+/1D_H.xwp>
@@ -6534,8 +6535,8 @@ $$ $$ /opt/topspin3.5pl6/data/complat/nmr/data/PH/nmr/PH-771/30/pdata/1/auditp.t
 $$ ##AUDIT TRAIL=  $$ (NUMBER, WHEN, WHO, WHERE, PROCESS, VERSION, WHAT)
 (   1,<2018-07-09 18:34:42.776 +0200>,<nmr>,<ibg-4-babsi>,<go4>,<TopSpin 3.5.6>,
       <created by zg
-	started at 2018-07-09 18:33:07.982 +0200,
-	POWCHK enabled, PULCHK disabled,
+  started at 2018-07-09 18:33:07.982 +0200,
+  POWCHK enabled, PULCHK disabled,
        configuration hash MD5:
        40 53 6C 46 18 DA EE D3 1B 86 22 DD 91 B5 2B 72
        data hash MD5: 64K
@@ -6571,56 +6572,56 @@ $$ ED_ENTRY        ACQU
 $$ ORDER           FILE
 $$
 $$
-$$ HEADER		"F2 - Acquisition Parameters"
-$$ T_NAME		Date_
-$$ 		TYPE	R64
-$$ 		CLASS	ACQU
-$$ 		SUBRANGE 0.0 50000000
-$$ 		REL	"Date_=itodate(DATE)"
-$$ 		INV_REL	"DATE=datetoi(Date_,DATE)"
-$$ 		FORMAT	"%14.0f"
-$$ 		TEXT	" "
+$$ HEADER   "F2 - Acquisition Parameters"
+$$ T_NAME   Date_
+$$    TYPE  R64
+$$    CLASS ACQU
+$$    SUBRANGE 0.0 50000000
+$$    REL "Date_=itodate(DATE)"
+$$    INV_REL "DATE=datetoi(Date_,DATE)"
+$$    FORMAT  "%14.0f"
+$$    TEXT  " "
 $$ END
-$$ T_NAME		Time
-$$ 		TYPE	R32
-$$ 		CLASS	ACQU
-$$ 		SUBRANGE 0.0 1000000
-$$ 		REL	"Time=itotime(DATE)"
-$$ 		INV_REL	"DATE=timetoi(Time,DATE)"
-$$ 		FORMAT	"%14.2f h"
-$$ 		TEXT	" "
+$$ T_NAME   Time
+$$    TYPE  R32
+$$    CLASS ACQU
+$$    SUBRANGE 0.0 1000000
+$$    REL "Time=itotime(DATE)"
+$$    INV_REL "DATE=timetoi(Time,DATE)"
+$$    FORMAT  "%14.2f h"
+$$    TEXT  " "
 $$ END
-$$ NAME		INSTRUM
-$$ 		TEXT	" "
+$$ NAME   INSTRUM
+$$    TEXT  " "
 $$ END
-$$ NAME		PROBHD
-$$ 		FORMAT	"%14.14s"
-$$ 		TEXT	" "
+$$ NAME   PROBHD
+$$    FORMAT  "%14.14s"
+$$    TEXT  " "
 $$ END
-$$ NAME		PULPROG
-$$ 		TEXT	" "
+$$ NAME   PULPROG
+$$    TEXT  " "
 $$ END
-$$ NAME		TD
-$$ 		TEXT	" "
+$$ NAME   TD
+$$    TEXT  " "
 $$ END
-$$ NAME		SOLVENT
-$$ 		TEXT	" "
+$$ NAME   SOLVENT
+$$    TEXT  " "
 $$ END
-$$ NAME		NS
-$$ 		TEXT	" "
+$$ NAME   NS
+$$    TEXT  " "
 $$ END
-$$ NAME		DS
-$$ 		TEXT	" "
+$$ NAME   DS
+$$    TEXT  " "
 $$ END
-$$ T_NAME		SWH
-$$ 		TYPE	R32
-$$ 		CLASS	ACQU
-$$ 		SUBRANGE 0.0 1e8
-$$ 		REL	"SWH=SW*SFO1"
-$$ 		INV_REL "SW=SWH/SFO1"
-$$ 		UNIT	"Hz"
-$$ 		FORMAT	"%14.3f Hz"
-$$ 		TEXT	" "
+$$ T_NAME   SWH
+$$    TYPE  R32
+$$    CLASS ACQU
+$$    SUBRANGE 0.0 1e8
+$$    REL "SWH=SW*SFO1"
+$$    INV_REL "SW=SWH/SFO1"
+$$    UNIT  "Hz"
+$$    FORMAT  "%14.3f Hz"
+$$    TEXT  " "
 $$ END
 $$ T_NAME          FIDRES
 $$                 TYPE    R32
@@ -6628,80 +6629,80 @@ $$                 CLASS   ACQU
 $$                 SUBRANGE 0.0 100000
 $$                 REL     "FIDRES=2*SW*SFO1/TD"
 $$                 INV_REL "TD = nextpow(2*SW*SFO1/FIDRES)"
-$$ 		UNIT	"Hz"
-$$ 		FORMAT	"%14.6f Hz"
-$$ 		TEXT	" "
+$$    UNIT  "Hz"
+$$    FORMAT  "%14.6f Hz"
+$$    TEXT  " "
 $$ END
 $$ T_NAME          AQ
-$$ 		TYPE	R32
-$$ 		CLASS	ACQU
-$$ 		SUBRANGE 0.0 1000
-$$ 		REL	"AQ=aqcalc(SW,SFO1,TD,DIGTYP)"
-$$ 		INV_REL	"TD=tdcalc(SW,SFO1,1.0e6*AQ,DIGTYP)"
-$$ 		UNIT	"sec"
-$$ 		FORMAT	"%14.7f sec"
-$$ 		TEXT	" "
+$$    TYPE  R32
+$$    CLASS ACQU
+$$    SUBRANGE 0.0 1000
+$$    REL "AQ=aqcalc(SW,SFO1,TD,DIGTYP)"
+$$    INV_REL "TD=tdcalc(SW,SFO1,1.0e6*AQ,DIGTYP)"
+$$    UNIT  "sec"
+$$    FORMAT  "%14.7f sec"
+$$    TEXT  " "
 $$ END
-$$ NAME		RG
-$$ 		TEXT	" "
+$$ NAME   RG
+$$    TEXT  " "
 $$ END
 $$ T_NAME          DW
-$$ 		TYPE	R32
-$$ 		CLASS	ACQU
-$$ 		SUBRANGE 0.0 1000000
-$$ 		REL	"DW=1/(2*SW*SFO1)"
-$$ 		INV_REL	"SW=1000000/(2*(0.005+DW)*SFO1)"
-$$ 		UNIT	"usec"
-$$ 		FORMAT	"%14.3lf usec"
-$$ 		TEXT	" "
+$$    TYPE  R32
+$$    CLASS ACQU
+$$    SUBRANGE 0.0 1000000
+$$    REL "DW=1/(2*SW*SFO1)"
+$$    INV_REL "SW=1000000/(2*(0.005+DW)*SFO1)"
+$$    UNIT  "usec"
+$$    FORMAT  "%14.3lf usec"
+$$    TEXT  " "
 $$ END
-$$ NAME		DE
-$$ 		FORMAT	"%14.2f usec"
-$$ 		TEXT	" "
+$$ NAME   DE
+$$    FORMAT  "%14.2f usec"
+$$    TEXT  " "
 $$ END
-$$ NAME		TE
-$$ 		FORMAT	"%14.1f K"
-$$ 		TEXT	" "
+$$ NAME   TE
+$$    FORMAT  "%14.1f K"
+$$    TEXT  " "
 $$ END
-$$ T_NAME		D1
-$$ 		TYPE	R32
-$$ 		CLASS	ACQU
-$$ 		SUBRANGE 0.0 1e38
-$$ 		REL	"D1=D[1]"
-$$ 		INV_REL	"D[1]=D1"
-$$ 		UNIT	"sec"
-$$ 		FORMAT	"%14.8f sec"
-$$ 		TEXT	" "
+$$ T_NAME   D1
+$$    TYPE  R32
+$$    CLASS ACQU
+$$    SUBRANGE 0.0 1e38
+$$    REL "D1=D[1]"
+$$    INV_REL "D[1]=D1"
+$$    UNIT  "sec"
+$$    FORMAT  "%14.8f sec"
+$$    TEXT  " "
 $$ END
-$$ NAME		TD0
-$$ 		TEXT	" "
+$$ NAME   TD0
+$$    TEXT  " "
 $$ END
-$$ NAME		SFO1
-$$ 		FORMAT	"%14.7f MHz"
-$$ 		TEXT	" "
+$$ NAME   SFO1
+$$    FORMAT  "%14.7f MHz"
+$$    TEXT  " "
 $$ END
-$$ NAME		NUC1
-$$ 		NONEDIT
-$$ 		TEXT	" "
+$$ NAME   NUC1
+$$    NONEDIT
+$$    TEXT  " "
 $$ END
-$$ T_NAME		P1
-$$ 		TYPE	R32
-$$ 		CLASS	ACQU
-$$ 		SUBRANGE 0.0 1.0e10
-$$ 		REL	"P1=P[1]"
-$$ 		INV_REL	"P[1]=P1"
-$$ 		UNIT	"usec"
-$$ 		FORMAT	"%14.2f usec"
-$$ 		TEXT	" "
+$$ T_NAME   P1
+$$    TYPE  R32
+$$    CLASS ACQU
+$$    SUBRANGE 0.0 1.0e10
+$$    REL "P1=P[1]"
+$$    INV_REL "P[1]=P1"
+$$    UNIT  "usec"
+$$    FORMAT  "%14.2f usec"
+$$    TEXT  " "
 $$ END
-$$ T_NAME		PLW1
-$$ 		TYPE	R32
-$$ 		CLASS	ACQU
-$$ 		REL	"PLW1=PLW[1]"
-$$ 		INV_REL	"PLW[1]=PLW1"
-$$ 		UNIT	"W"
-$$ 		FORMAT	"%14.8f W"
-$$ 		TEXT	"power PLW1 "
+$$ T_NAME   PLW1
+$$    TYPE  R32
+$$    CLASS ACQU
+$$    REL "PLW1=PLW[1]"
+$$    INV_REL "PLW[1]=PLW1"
+$$    UNIT  "W"
+$$    FORMAT  "%14.8f W"
+$$    TEXT  "power PLW1 "
 $$ END
 ##$RELAX=
 ##$BRUKER FILE EXP=fq1list
@@ -7223,7 +7224,7 @@ $$  2000000
 $$ ##TITLE= Parameter file, TopSpin 3.5 pl 6
 $$ ##JCAMPDX= 5.0
 $$ ##DATATYPE= Parameter Values
-$$ ##NPOINTS= 1	$$ modification sequence number
+$$ ##NPOINTS= 1 $$ modification sequence number
 $$ ##ORIGIN= Bruker BioSpin GmbH
 $$ ##OWNER= nmr
 $$ $$ 2018-07-09 18:33:07.958 +0200  nmr@ibg-4-babsi
@@ -7328,54 +7329,54 @@ $$ #$$SHIMID=292722
 $$ #
 $$ # Active Shim Gradients
 $$ #
-$$ Z           		-10343
-$$ Z2          		2172
-$$ Z3          		-308
-$$ Z4          		-1701
-$$ Z5          		528
-$$ Z6          		2192
-$$ Z7          		-2289
-$$ Z8          		-117
-$$ X           		3251
-$$ XZ          		-698
-$$ XZ2         		2438
-$$ XZ3         		-169
-$$ XZ4         		-555
-$$ XZ5         		1731
-$$ Y           		420
-$$ YZ          		-1082
-$$ YZ2         		-180
-$$ YZ3         		-929
-$$ YZ4         		233
-$$ YZ5         		3803
-$$ XY          		-1633
-$$ XYZ         		1468
-$$ XYZ2        		-417
-$$ XYZ3        		494
-$$ XYZ4        		263
-$$ XYZ5        		0
-$$ (X2-Y2)     		-1669
-$$ (X2-Y2)Z    		-1275
-$$ (X2-Y2)Z2   		976
-$$ (X2-Y2)Z3   		361
-$$ (X2-Y2)Z4   		-678
-$$ (X2-Y2)Z5   		0
-$$ X3          		2782
-$$ X3Z         		-52
-$$ Y3          		-133
-$$ Y3Z         		647
+$$ Z              -10343
+$$ Z2             2172
+$$ Z3             -308
+$$ Z4             -1701
+$$ Z5             528
+$$ Z6             2192
+$$ Z7             -2289
+$$ Z8             -117
+$$ X              3251
+$$ XZ             -698
+$$ XZ2            2438
+$$ XZ3            -169
+$$ XZ4            -555
+$$ XZ5            1731
+$$ Y              420
+$$ YZ             -1082
+$$ YZ2            -180
+$$ YZ3            -929
+$$ YZ4            233
+$$ YZ5            3803
+$$ XY             -1633
+$$ XYZ            1468
+$$ XYZ2           -417
+$$ XYZ3           494
+$$ XYZ4           263
+$$ XYZ5           0
+$$ (X2-Y2)        -1669
+$$ (X2-Y2)Z       -1275
+$$ (X2-Y2)Z2      976
+$$ (X2-Y2)Z3      361
+$$ (X2-Y2)Z4      -678
+$$ (X2-Y2)Z5      0
+$$ X3             2782
+$$ X3Z            -52
+$$ Y3             -133
+$$ Y3Z            647
 $$ #
 $$ # Lock Parameter
 $$ #
-$$ FIELD		4932.190
-$$ LOCKPHASE		103.600
-$$ LOCKPOWER		-20.000
-$$ LOCKGAIN		101.347
-$$ LOCKDC		-75.000
-$$ LOCKSHIFT		2.490
-$$ LOOPGAIN		5.000
-$$ LOOPTIME		0.250
-$$ LOOPFILTER		500.000
+$$ FIELD    4932.190
+$$ LOCKPHASE    103.600
+$$ LOCKPOWER    -20.000
+$$ LOCKGAIN   101.347
+$$ LOCKDC   -75.000
+$$ LOCKSHIFT    2.490
+$$ LOOPGAIN   5.000
+$$ LOOPTIME   0.250
+$$ LOOPFILTER   500.000
 $$ #
 $$ IEEE64_VERSION_CODE 1
 $$ #
@@ -7426,7 +7427,7 @@ $$ SHIM_SETTING [40]  0.00000000
 $$ ##TITLE= Parameter file, TopSpin 3.5 pl 6
 $$ ##JCAMPDX= 5.0
 $$ ##DATATYPE= Parameter Values
-$$ ##NPOINTS= 33	$$ modification sequence number
+$$ ##NPOINTS= 33  $$ modification sequence number
 $$ ##ORIGIN= Bruker BioSpin GmbH
 $$ ##OWNER= nmrsu
 $$ $$ 2017-08-18 15:18:49.179 +0200  nmr@ibg-4-babsi
@@ -8867,7 +8868,7 @@ $$ --------------------------
 ##$XDIM= 65536
 ##$YMAX_p= 370323795
 ##$YMIN_p= -18850
-##$CURPLOT= < ±*	Ô±*	à±*	>
+##$CURPLOT= <*  * * >
 ##$CURPRIN= <$1#1#0#1#1#1#1#1#0#-1#-1#1#-1>
 ##$DFORMAT= <normdp>
 ##$LAYOUT= <+/1D_H.xwp>
@@ -17310,4 +17311,91 @@ $$ Imaginary data points
 $$
 $$ end of block 2
 $$
+
+$$ === CHEMSPECTRA PEAK ASSIGNMENTS ALL ===
+##TITLE=1H_ns16 DMSO /opt/topspin3.5pl6/data/complat/nmr PH 44_PEAK_ASSIGNMENTS
+##JCAMP-DX=5.00
+##DATA TYPE=PEAK ASSIGNMENTS
+##DATA CLASS=ASSIGNMENTS
+##NPOINTS=40
+##THRESHOLD=0.02
+##MAXX=16.01277
+##MAXY=370323795.0
+##MINX=-4.012347264342772
+##MINY=-18850.0
+##PEAK ASSIGNMENTS=(XYA)
+(11.044304192138346, 16276328.0, <1>)
+(7.536738447461598, 26450300.0, <2>)
+(7.516571243075443, 28797799.0, <3>)
+(7.394651325650056, 34032080.0, <4>)
+(7.376317503480825, 24725861.0, <5>)
+(7.374178557561082, 40013064.0, <6>)
+(7.286481774851593, 37931375.0, <7>)
+(7.280370500795183, 38611682.0, <8>)
+(7.124533012356716, 14764010.0, <9>)
+(7.121477375328512, 15806310.0, <10>)
+(7.106810317593126, 22918651.0, <11>)
+(7.1040602442677425, 31715857.0, <12>)
+(7.101615734645177, 16826172.0, <13>)
+(7.086643113206973, 19172963.0, <14>)
+(7.083893039881588, 18223303.0, <15>)
+(7.0200302259921, 22430714.0, <16>)
+(7.017280152666714, 23442176.0, <17>)
+(7.002307531228508, 20719046.0, <18>)
+(6.999863021605945, 35864429.0, <19>)
+(6.997724075686202, 25142012.0, <20>)
+(6.982445890545176, 21471144.0, <21>)
+(6.9800013809226105, 20265527.0, <22>)
+(6.975417925380304, 11617374.0, <23>)
+(6.970223342432355, 18641430.0, <24>)
+(6.964112068375943, 15387110.0, <25>)
+(6.958306358022353, 19811338.0, <26>)
+(6.9531117750744045, 11064496.0, <27>)
+(4.153231566129982, 36205051.0, <28>)
+(4.147425855776392, 43518023.0, <29>)
+(4.14620360096511, 43860195.0, <30>)
+(4.144064655045366, 39551161.0, <31>)
+(4.140703454314341, 37670645.0, <32>)
+(4.139175635800237, 34645902.0, <33>)
+(3.3657939039615012, 370323795.0, <34>)
+(2.5187713197430206, 20286604.0, <35>)
+(2.5141878642007125, 44041878.0, <36>)
+(2.5096044086584044, 61276677.0, <37>)
+(2.505020953116098, 44393311.0, <38>)
+(2.5007430612766104, 21143741.0, <39>)
+(1.40743613258479, 9729036.0, <40>)
 ##END=
+
+
+$$ === CHEMSPECTRA PEAK ASSIGNMENTS EDIT ===
+##TITLE=1H_ns16 DMSO /opt/topspin3.5pl6/data/complat/nmr PH 44_PEAK_ASSIGNMENTS
+##JCAMP-DX=5.00
+##DATA TYPE=PEAK ASSIGNMENTS
+##DATA CLASS=ASSIGNMENTS
+##THRESHOLD=0.02
+##MAXX=16.01277
+##MAXY=370323795.0
+##MINX=-4.012347264342772
+##MINY=-18850.0
+$$ --- CHEMSPECTRA EDIT CONTENT ---
+##PEAK ASSIGNMENTS=(XYA)
+(4.147425855776392, 43518023, <1>)
+(4.14620360096511, 43860195, <2>)
+(4.140703454314341, 37670645, <3>)
+(3.3657939039615012, 370323795, <4>)
+(2.5141878642007125, 44041878, <5>)
+(2.5096044086584044, 61276677, <6>)
+(2.505020953116098, 44393311, <7>)
+(4.153231566133794, 36205051, <8>)
+##NPOINTS=8
+$$ --- CHEMSPECTRA EDIT CONTENT ---
+##END=
+
+##END=
+
+##END=
+
+
+`
+
+export default H1;
