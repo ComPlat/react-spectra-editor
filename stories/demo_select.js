@@ -2,16 +2,18 @@ import React from 'react';
 import Select from 'react-select';
 
 import { SpectraViewer, ExtractJcamp } from '../src/index';
-import oneH from './source/1H';
+import H1 from './source/H1';
 import IR from './source/IR';
-import TTC from './source/13C';
-import NTF from './source/NTF';
+import C13_CPD from './source/C13_CPD';
+import C13_DEPT135 from './source/C13_DEPT135';
+import F19 from './source/F19';
 
 const files = [
-  ExtractJcamp(oneH),
+  ExtractJcamp(H1),
   ExtractJcamp(IR),
-  ExtractJcamp(TTC),
-  ExtractJcamp(NTF),
+  ExtractJcamp(C13_CPD),
+  ExtractJcamp(C13_DEPT135),
+  ExtractJcamp(F19),
 ];
 
 const options = files.map(f => (

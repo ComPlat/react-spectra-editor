@@ -4,9 +4,9 @@ import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 
 import { SpectraViewer, ExtractJcamp, ToXY } from '../src/index';
-import TTC from './source/13C';
+import C13_CPD from './source/C13_CPD';
 
-const file = ExtractJcamp(TTC);
+const file = ExtractJcamp(C13_CPD);
 
 const noDataAvailable = () => (
   <div>
