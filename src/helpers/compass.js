@@ -30,7 +30,7 @@ const mouseMove = (focus) => {
   }
 };
 
-const rightClick = (focus) => {
+const RightClick = (focus) => {
   d3.event.preventDefault();
   const { xt } = TfRescale(focus);
   const pt = fetchPt(focus, xt);
@@ -57,7 +57,7 @@ const MountCompass = (canvas) => {
     .on('mouseover', () => compass.attr('display', null))
     .on('mouseout', () => compass.attr('display', 'none'))
     .on('mousemove', () => mouseMove(focus))
-    .on('contextmenu', () => rightClick(focus));
+    .on('contextmenu', () => RightClick(focus));
 };
 
-export { MountCompass, TfRescale };
+export { MountCompass, TfRescale, RightClick };

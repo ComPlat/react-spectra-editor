@@ -1,3 +1,5 @@
+import { RightClick } from './compass';
+
 const MountCircles = (target) => {
   const circles = target.root.append('g')
     .attr('class', 'circles-clip')
@@ -13,7 +15,8 @@ const MountPath = (target, color) => {
     .attr('class', 'line')
     .style('fill', 'none')
     .style('stroke', color)
-    .style('stroke-width', 1);
+    .style('stroke-width', 1)
+    .on('contextmenu', () => RightClick(target));
   return path;
 };
 
