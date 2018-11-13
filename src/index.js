@@ -7,6 +7,7 @@ import reducers from './reducers/index';
 import Frame from './frame';
 import { ExtractJcamp } from './helpers/chem';
 import { ToXY } from './helpers/converter';
+import { LIST_LAYOUT } from './constants/list_layout';
 
 const store = createStore(reducers);
 
@@ -53,4 +54,6 @@ SpectraViewer.defaultProps = {
   savePeaks: false,
 };
 
-export { SpectraViewer, ExtractJcamp, ToXY };
+export {
+  SpectraViewer, ExtractJcamp, ToXY, LIST_LAYOUT,
+};

@@ -1,195 +1,65 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 
-import Grid from '@material-ui/core/Grid';
-import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import Refresh from '@material-ui/icons/Refresh';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Typography from '@material-ui/core/Typography';
+import Divider from '@material-ui/core/Divider';
 import { withStyles } from '@material-ui/core/styles';
 
-import { updateThreshold, resetThreshold } from './actions/threshold';
-import { toggleIsEdit } from './actions/manager';
+import LayoutPanel from './panel_layout';
+import SavePanel from './panel_save';
+import ThresholdsPanel from './panel_thresholds';
 
 const Styles = () => ({
-  tabContainer: {
-    padding: '10px',
-  },
-  btnRefresh: {
-  },
-  btnRestore: {
-  },
   panelSummary: {
     backgroundColor: '#e0e0e0',
   },
-  txtRestore: {
-    margin: '0 10px',
-  },
 });
 
-const txtInputLabel = () => (
-  <span className="txt-input-label">
-    Peak Picking Threshold
-  </span>
-);
-
-const txtPercent = () => (
-  <InputAdornment position="end">
-    <span className="txt-percent">
-      %
-    </span>
-  </InputAdornment>
-);
-
-const setThreshold = (
-  classes, thresVal, updateThresholdAct,
-) => {
-  const onBlur = e => updateThresholdAct(e.target.value);
-  const onChange = e => updateThresholdAct(e.target.value);
-  const onEnterPress = (e) => {
-    if (e.key === 'Enter') {
-      updateThresholdAct(e.target.value);
-    }
-  };
-
-  return (
-    <Grid item xs={10}>
-      <TextField
-        disabled={!thresVal}
-        id="outlined-name"
-        label={txtInputLabel()}
-        placeholder="N.A."
-        type="number"
-        value={thresVal || false}
-        margin="normal"
-        variant="outlined"
-        InputProps={{
-          endAdornment: txtPercent(),
-          className: 'txt-input',
-        }}
-        onChange={onChange}
-        onBlur={onBlur}
-        onKeyPress={onEnterPress}
-      />
-    </Grid>
-  );
-};
-
-const btnRefresh = (
-  classes, thresVal, resetThresholdAct,
-) => (
-  <Grid item xs={2}>
-    <IconButton
-      disabled={!thresVal}
-      variant="fab"
-      color="primary"
-      className={classNames(classes.btnRefresh)}
-      onClick={resetThresholdAct}
-    >
-      <Refresh />
-    </IconButton>
-  </Grid>
-);
-
-const restoreDisplay = (hasEdit, managerSt) => (
-  hasEdit && managerSt.isEdit ? 'User' : 'System'
-);
-
-const btnRestore = (classes, hasEdit, managerSt, toggleIsEditAct) => (
-  <Grid
-    container
-    direction="row"
-    justify="center"
-    alignItems="center"
+const title = classes => (
+  <ExpansionPanelSummary
+    expandIcon={<ExpandMoreIcon />}
+    className={classNames(classes.panelSummary)}
   >
-    <Grid item xs={12}>
-      <span className={classNames(classes.txtRestore, 'txt-panel-content')}>
-        <i>Peaks defined by: </i>
-      </span>
-      <Button
-        variant="outlined"
-        color="default"
-        className={classNames(classes.btnRestore)}
-        onClick={toggleIsEditAct}
-        disabled={!hasEdit}
-      >
-        { restoreDisplay(hasEdit, managerSt) }
-      </Button>
-    </Grid>
-  </Grid>
+    <Typography className="txt-panel-header">
+      Settings
+    </Typography>
+  </ExpansionPanelSummary>
 );
 
 const SettingsPanel = ({
-  classes, peakObj, hasEdit, thresSt, managerSt,
-  updateThresholdAct, resetThresholdAct, toggleIsEditAct,
-}) => {
-  const thresVal = thresSt || peakObj.thresRef;
-  return (
-    <ExpansionPanel defaultExpanded>
-      <ExpansionPanelSummary
-        expandIcon={<ExpandMoreIcon />}
-        className={classNames(classes.panelSummary)}
-      >
-        <Typography className="txt-panel-header">
-          Settings
-        </Typography>
-      </ExpansionPanelSummary>
-      <ExpansionPanelDetails>
-        <Grid
-          container
-          direction="row"
-          justify="center"
-          alignItems="center"
-        >
-          { setThreshold(classes, thresVal, updateThresholdAct) }
-          { btnRefresh(classes, thresVal, resetThresholdAct) }
-          { btnRestore(classes, hasEdit, managerSt, toggleIsEditAct) }
-        </Grid>
-      </ExpansionPanelDetails>
-    </ExpansionPanel>
-  );
-};
-
-const mapStateToProps = (state, props) => ( // eslint-disable-line
-  {
-    thresSt: state.threshold,
-    managerSt: state.manager,
-  }
-);
-
-const mapDispatchToProps = dispatch => (
-  bindActionCreators({
-    updateThresholdAct: updateThreshold,
-    resetThresholdAct: resetThreshold,
-    toggleIsEditAct: toggleIsEdit,
-  }, dispatch)
+  classes, peakObj, hasEdit, writePeaks, savePeaks,
+}) => (
+  <ExpansionPanel defaultExpanded>
+    { title(classes) }
+    <ThresholdsPanel peakObj={peakObj} hasEdit={hasEdit} />
+    <Divider />
+    <LayoutPanel writePeaks={writePeaks} peakObj={peakObj} />
+    <Divider />
+    <SavePanel savePeaks={savePeaks} peakObj={peakObj} />
+  </ExpansionPanel>
 );
 
 SettingsPanel.propTypes = {
   classes: PropTypes.object.isRequired,
   peakObj: PropTypes.object.isRequired,
   hasEdit: PropTypes.bool.isRequired,
-  thresSt: PropTypes.oneOfType(
+  writePeaks: PropTypes.oneOfType(
     [
-      PropTypes.string,
-      PropTypes.number,
+      PropTypes.func,
       PropTypes.bool,
     ],
   ).isRequired,
-  managerSt: PropTypes.object.isRequired,
-  updateThresholdAct: PropTypes.func.isRequired,
-  resetThresholdAct: PropTypes.func.isRequired,
-  toggleIsEditAct: PropTypes.func.isRequired,
+  savePeaks: PropTypes.oneOfType(
+    [
+      PropTypes.func,
+      PropTypes.bool,
+    ],
+  ).isRequired,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(Styles)(SettingsPanel));
+export default withStyles(Styles)(SettingsPanel);
