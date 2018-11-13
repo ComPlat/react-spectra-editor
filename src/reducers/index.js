@@ -4,6 +4,7 @@ import thresholdReducer from './reducer_threshold';
 import editPeakReducer from './reducer_edit_peak';
 import statusReducer from './reducer_status';
 import managerReducer from './reducer_manager';
+import layoutReducer from './reducer_layout';
 
 const rootReducer = combineReducers({
   border: borderReducer,
@@ -11,6 +12,7 @@ const rootReducer = combineReducers({
   editPeak: editPeakReducer,
   status: statusReducer,
   manager: managerReducer,
+  layout: layoutReducer,
 });
 
 export default rootReducer;

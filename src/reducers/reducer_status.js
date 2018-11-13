@@ -1,5 +1,5 @@
 import {
-  STATUS, EDITPEAK, THRESHOLD, MANAGER,
+  STATUS, EDITPEAK, THRESHOLD, MANAGER, LAYOUT,
 } from '../constants/action_type';
 
 const initialState = {
@@ -30,6 +30,8 @@ const statusReducer = (state = initialState, action) => {
         state,
         { btnWrite: false, btnSave: false },
       );
+    case LAYOUT.UPDATE:
+      return Object.assign({}, state, { btnWrite: false });
     case MANAGER.RESETALL:
       return initialState;
     default:
