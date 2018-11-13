@@ -3,7 +3,9 @@ import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 
-import { SpectraViewer, ExtractJcamp, ToXY } from '../src/index';
+import {
+  SpectraViewer, ExtractJcamp, ToXY, LIST_LAYOUT,
+} from '../src/index';
 import C13_CPD from './source/C13_CPD';
 
 const file = ExtractJcamp(C13_CPD);
@@ -35,9 +37,25 @@ class DemoWritePeaks extends React.Component {
     return result;
   }
 
-  writePeaks(peaks) {
+  extractLayout(layout) {
+    switch (layout) {
+      case LIST_LAYOUT.IR:
+        return 'IR = ';
+      case LIST_LAYOUT.H1:
+        return '1 H = ';
+      case LIST_LAYOUT.C13:
+        return '13 C = ';
+      case LIST_LAYOUT.PLAIN:
+      default:
+        return '';
+    }
+  }
+
+  writePeaks(peaks, layout) {
     const peaksXY = ToXY(peaks);
-    const desc = this.peaksXYToStr(peaksXY);
+    const descPeaks = this.peaksXYToStr(peaksXY);
+    const descLayout = this.extractLayout(layout);
+    const desc = descLayout + descPeaks;
     this.setState({ desc });
   }
 
