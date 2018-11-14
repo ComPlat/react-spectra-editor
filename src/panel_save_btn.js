@@ -44,19 +44,21 @@ const BtnSavePeaks = ({
       className={classNames(classes.tp, 'txt-btn-save')}
       title={<span className="txt-sv-tp">Save peaks to file</span>}
     >
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={onClickCb(
-          savePeaks, peaksEdit, toggleSaveBtnAct,
-        )}
-        disabled={disable}
-      >
-        <span className="txt-btn-save">
-          SAVE TO FILE
-        </span>
-        <SaveIcon className={classes.icon} />
-      </Button>
+      <div>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={onClickCb(
+            savePeaks, peaksEdit, toggleSaveBtnAct,
+          )}
+          disabled={disable}
+        >
+          <span className="txt-btn-save">
+            SAVE TO FILE
+          </span>
+          <SaveIcon className={classes.icon} />
+        </Button>
+      </div>
     </Tooltip>
   );
 };

@@ -117,15 +117,17 @@ const btnRestore = (classes, hasEdit, managerSt, toggleIsEditAct) => (
       <Tooltip
         title={<span className="txt-sv-tp">{restoreTp(hasEdit, managerSt)}</span>}
       >
-        <Button
-          variant="outlined"
-          color="default"
-          className={classNames(classes.btnRestore)}
-          onClick={toggleIsEditAct}
-          disabled={!hasEdit}
-        >
-          { restoreDisplay(hasEdit, managerSt) }
-        </Button>
+        <div>
+          <Button
+            variant="outlined"
+            color="default"
+            className={classNames(classes.btnRestore)}
+            onClick={toggleIsEditAct}
+            disabled={!hasEdit}
+          >
+            { restoreDisplay(hasEdit, managerSt) }
+          </Button>
+        </div>
       </Tooltip>
     </Grid>
   </Grid>

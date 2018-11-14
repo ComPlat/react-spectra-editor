@@ -42,17 +42,19 @@ const BtnWritePeaks = ({
     <Tooltip
       title={<span className="txt-sv-tp">Write peaks</span>}
     >
-      <Button
-        variant="contained"
-        color="primary"
-        className={classNames(classes.btn)}
-        onClick={onClickCb(
-          writePeaks, peaksEdit, layoutSt, toggleWriteBtnAct,
-        )}
-        disabled={disable}
-      >
-        <EditIcon className={classes.icon} />
-      </Button>
+      <div>
+        <Button
+          variant="contained"
+          color="primary"
+          className={classNames(classes.btn)}
+          onClick={onClickCb(
+            writePeaks, peaksEdit, layoutSt, toggleWriteBtnAct,
+          )}
+          disabled={disable}
+        >
+          <EditIcon className={classes.icon} />
+        </Button>
+      </div>
     </Tooltip>
   );
 };
