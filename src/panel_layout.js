@@ -12,7 +12,6 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import { withStyles } from '@material-ui/core/styles';
 
-import BtnWritePeaks from './panel_layout_btn';
 import { updateLayout } from './actions/layout';
 import { LIST_LAYOUT } from './constants/list_layout';
 
@@ -32,10 +31,9 @@ const txtInputLabel = () => (
 );
 
 const LayoutPanel = ({
-  classes, writePeaks, peakObj, layoutSt,
+  classes, layoutSt,
   updateLayoutAct,
 }) => {
-  if (!writePeaks) return null;
   const onChange = e => updateLayoutAct(e.target.value);
 
   return (
@@ -74,12 +72,6 @@ const LayoutPanel = ({
             </Select>
           </FormControl>
         </Grid>
-        <Grid item xs={4}>
-          <BtnWritePeaks
-            peakObj={peakObj}
-            writePeaks={writePeaks}
-          />
-        </Grid>
       </Grid>
     </ExpansionPanelDetails>
   );
@@ -99,13 +91,6 @@ const mapDispatchToProps = dispatch => (
 
 LayoutPanel.propTypes = {
   classes: PropTypes.object.isRequired,
-  peakObj: PropTypes.object.isRequired,
-  writePeaks: PropTypes.oneOfType(
-    [
-      PropTypes.func,
-      PropTypes.bool,
-    ],
-  ).isRequired,
   layoutSt: PropTypes.string.isRequired,
   updateLayoutAct: PropTypes.func.isRequired,
 };

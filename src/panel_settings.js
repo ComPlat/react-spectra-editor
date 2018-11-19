@@ -11,7 +11,7 @@ import Divider from '@material-ui/core/Divider';
 import { withStyles } from '@material-ui/core/styles';
 
 import LayoutPanel from './panel_layout';
-import SavePanel from './panel_save';
+import SubmitPanel from './panel_submit';
 import ThresholdsPanel from './panel_thresholds';
 
 const Styles = () => ({
@@ -38,9 +38,13 @@ const SettingsPanel = ({
     { title(classes) }
     <ThresholdsPanel peakObj={peakObj} hasEdit={hasEdit} />
     <Divider />
-    <LayoutPanel writePeaks={writePeaks} peakObj={peakObj} />
+    <LayoutPanel />
     <Divider />
-    <SavePanel savePeaks={savePeaks} peakObj={peakObj} />
+    <SubmitPanel
+      savePeaks={savePeaks}
+      writePeaks={writePeaks}
+      peakObj={peakObj}
+    />
   </ExpansionPanel>
 );
 

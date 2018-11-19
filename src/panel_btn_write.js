@@ -5,58 +5,55 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
 import Tooltip from '@material-ui/core/Tooltip';
-import SaveIcon from '@material-ui/icons/Save';
+import EditIcon from '@material-ui/icons/Edit';
 import Button from '@material-ui/core/Button';
 import { withStyles } from '@material-ui/core/styles';
 
 import { PksEdit } from './helpers/converter';
 import { Convert2Peak } from './helpers/chem';
-import { toggleSaveBtn } from './actions/status';
+import { toggleWriteBtn } from './actions/status';
 
 const Styles = () => ({
   icon: {
-    margin: '0 0 0 20px',
   },
-  tp: {
-    margin: '10px 0 0 0',
+  btn: {
+    margin: '20px 0 0 0',
   },
 });
 
 const onClickCb = (
-  savePeaks, peaksEdit, toggleSaveBtnAct,
+  writePeaks, peaksEdit, layoutSt, toggleWriteBtnAct,
 ) => (
   () => {
-    toggleSaveBtnAct();
-    savePeaks(peaksEdit);
+    toggleWriteBtnAct();
+    writePeaks(peaksEdit, layoutSt);
   }
 );
 
-const BtnSavePeaks = ({
-  classes, savePeaks, peakObj, editPeakSt, thresSt, statusSt,
-  toggleSaveBtnAct,
+const BtnWritePeaks = ({
+  classes, writePeaks, peakObj, editPeakSt, thresSt, statusSt, layoutSt,
+  toggleWriteBtnAct,
 }) => {
   const peaks = Convert2Peak(peakObj, thresSt * 0.01);
   const peaksEdit = PksEdit(peaks, editPeakSt);
-  const disable = peaksEdit.length === 0 || statusSt.btnSave;
+  const disable = peaksEdit.length === 0 || statusSt.btnWrite;
+  if (!writePeaks) return null;
 
   return (
     <Tooltip
-      className={classNames(classes.tp, 'txt-btn-save')}
-      title={<span className="txt-sv-tp">Save peaks to file</span>}
+      title={<span className="txt-sv-tp">Write peaks</span>}
     >
       <div>
         <Button
           variant="contained"
           color="primary"
+          className={classNames(classes.btn)}
           onClick={onClickCb(
-            savePeaks, peaksEdit, toggleSaveBtnAct,
+            writePeaks, peaksEdit, layoutSt, toggleWriteBtnAct,
           )}
           disabled={disable}
         >
-          <span className="txt-btn-save">
-            SAVE TO FILE
-          </span>
-          <SaveIcon className={classes.icon} />
+          <EditIcon className={classes.icon} />
         </Button>
       </div>
     </Tooltip>
@@ -68,19 +65,20 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     editPeakSt: state.editPeak,
     thresSt: state.threshold,
     statusSt: state.status,
+    layoutSt: state.layout,
   }
 );
 
 const mapDispatchToProps = dispatch => (
   bindActionCreators({
-    toggleSaveBtnAct: toggleSaveBtn,
+    toggleWriteBtnAct: toggleWriteBtn,
   }, dispatch)
 );
 
-BtnSavePeaks.propTypes = {
+BtnWritePeaks.propTypes = {
   classes: PropTypes.object.isRequired,
   peakObj: PropTypes.object.isRequired,
-  savePeaks: PropTypes.oneOfType(
+  writePeaks: PropTypes.oneOfType(
     [
       PropTypes.func,
       PropTypes.bool,
@@ -95,7 +93,8 @@ BtnSavePeaks.propTypes = {
       PropTypes.bool,
     ],
   ).isRequired,
-  toggleSaveBtnAct: PropTypes.func.isRequired,
+  layoutSt: PropTypes.string.isRequired,
+  toggleWriteBtnAct: PropTypes.func.isRequired,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(Styles)(BtnSavePeaks));
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(Styles)(BtnWritePeaks));
