@@ -34,6 +34,7 @@ const pksAddPos = (dataPks, editPeakSt) => {
 const PksEdit = (dataPks, editPeakSt) => {
   let modDataPks = pksAddPos(dataPks, editPeakSt);
   modDataPks = pksRmNeg(modDataPks, editPeakSt);
+  modDataPks = modDataPks.sort((a, b) => a.x - b.x);
   return modDataPks;
 };
 

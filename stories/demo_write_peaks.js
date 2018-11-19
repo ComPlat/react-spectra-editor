@@ -31,10 +31,9 @@ class DemoWritePeaks extends React.Component {
   peaksXYToStr(peaksXY) {
     const result = peaksXY.map((p) => {
       const valX = Math.round(parseFloat(p[0]) * 10) / 10;
-      const valY = (Math.round(parseFloat(p[1]) * 10) / 10).toExponential(1);
-      return `${valX}, ${valY};`;
+      return valX;
     });
-    return result;
+    return result.join(', ');
   }
 
   extractLayout(layout) {
