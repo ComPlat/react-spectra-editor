@@ -151,7 +151,9 @@ const calcThresRef = (s, peakUp) => {
   const ys = s && s.data[0].y;
   if (!ys) return null;
   const ref = peakUp ? Math.min(...ys) : Math.max(...ys);
-  return Math.round(ref * 100 * 100 / s.maxY) / 100;
+  return peakUp
+    ? Math.floor(ref * 100 * 100 / s.maxY) / 100
+    : Math.ceil(ref * 100 * 100 / s.maxY) / 100;
 };
 
 const extractPeakObj = (jcamp, subTyp, peakUp) => {
