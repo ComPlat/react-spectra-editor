@@ -23,8 +23,10 @@ class App extends React.Component {
   componentDidMount() {
     const {
       seed, peak, cLabel, xLabel, yLabel,
-      borderSt, tEndPts, editPeakSt, updateBorderAct,
+      borderSt, tEndPts, editPeakSt, updateBorderAct, resetAllAct,
     } = this.props;
+
+    resetAllAct();
 
     const { filterSeed, filterPeak } = this.brushFilter(borderSt, seed, peak);
     const node = this.d3Ref.current;
