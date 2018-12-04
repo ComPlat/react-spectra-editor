@@ -180,7 +180,8 @@ const ExtractJcamp = (input) => {
   const peakUp = extractPeakUp(jcamp);
 
   const spectrum = extractSpectrum(jcamp, subTyp);
-  const peakObjs = extractPeakObj(jcamp, subTyp, peakUp);
+  let peakObjs = extractPeakObj(jcamp, subTyp, peakUp);
+  if (peakObjs.length === 0) peakObjs = [{ thresRef: false }];
 
   return { spectrum, peakObjs };
 };

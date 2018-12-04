@@ -44,10 +44,7 @@ const Frame = ({
     ? peakEdit.data[0].x.length > 0
     : false;
 
-  let peakObj = hasEdit && managerSt.isEdit ? peakEdit : peakAll;
-  if (!peakObj) {
-    peakObj = { thresRef: false };
-  }
+  const peakObj = hasEdit && managerSt.isEdit ? peakEdit : peakAll;
 
   return (
     <div className="react-spectrum-viewer">
