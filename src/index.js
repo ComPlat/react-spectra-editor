@@ -1,8 +1,9 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import { createStore, compose, applyMiddleware } from 'redux';
+import { createStore } from 'redux';
 import PropTypes from 'prop-types';
-import { logger } from 'redux-logger';
+// import { logger } from 'redux-logger';
+// import { createStore, compose, applyMiddleware } from 'redux';
 
 import reducers from './reducers/index';
 import Frame from './frame';
@@ -10,15 +11,17 @@ import { ExtractJcamp } from './helpers/chem';
 import { ToXY } from './helpers/converter';
 import { LIST_LAYOUT } from './constants/list_layout';
 
-let middlewares = [];
+// let middlewares = [];
 
-if (process.env.NODE_ENV === 'development') {
-  middlewares = [...middlewares, logger];
-}
+// if (process.env.NODE_ENV === 'development') {
+//   middlewares = [...middlewares, logger];
+// }
 
-const store = compose(
-  applyMiddleware(...middlewares),
-)(createStore)(reducers);
+// const store = compose(
+//   applyMiddleware(...middlewares),
+// )(createStore)(reducers);
+
+const store = createStore(reducers);
 
 const SpectraViewer = ({
   input, cLabel, xLabel, yLabel, peakObjs, writePeaks, savePeaks,
