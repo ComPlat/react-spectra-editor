@@ -6,14 +6,18 @@ import H1 from './source/H1';
 import IR from './source/IR';
 import C13_CPD from './source/C13_CPD';
 import C13_DEPT135 from './source/C13_DEPT135';
+import C13_SVS from './source/C13_SVS';
 import F19 from './source/F19';
+import TEST from './source/TEST';
 
 const files = [
   ExtractJcamp(H1),
   ExtractJcamp(IR),
   ExtractJcamp(C13_CPD),
   ExtractJcamp(C13_DEPT135),
+  ExtractJcamp(C13_SVS),
   ExtractJcamp(F19),
+  ExtractJcamp(TEST),
 ];
 
 const options = files.map(f => (
