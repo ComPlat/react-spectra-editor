@@ -4,8 +4,8 @@ import PropTypes from 'prop-types';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Grid from '@material-ui/core/Grid';
 
-import BtnSavePeaks from './panel_btn_save';
-import BtnWritePeaks from './panel_btn_write';
+import BtnSavePeaks from './btn_save';
+import BtnWritePeaks from './btn_write';
 
 const SubmitPanel = ({
   savePeaks, writePeaks, peakObj,

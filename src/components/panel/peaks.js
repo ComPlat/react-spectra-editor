@@ -14,7 +14,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 
-import { rmFromPosList, rmFromNegList } from './actions/edit_peak';
+import { rmFromPosList, rmFromNegList } from '../../actions/edit_peak';
 
 const Styles = () => ({
   chip: {

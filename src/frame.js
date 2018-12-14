@@ -9,8 +9,8 @@ import {
   withStyles, createMuiTheme, MuiThemeProvider,
 } from '@material-ui/core/styles';
 import App from './components/app';
-import SettingsPanel from './panel_settings';
-import { AddPeakPanel, RmPeakPanel } from './panel_peaks';
+import SettingsPanel from './components/panel/settings';
+import { AddPeakPanel, RmPeakPanel } from './components/panel/peaks';
 import { toggleSaveBtn, toggleWriteBtn } from './actions/status';
 
 const theme = createMuiTheme({

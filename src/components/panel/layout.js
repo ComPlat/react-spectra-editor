@@ -12,8 +12,8 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import { withStyles } from '@material-ui/core/styles';
 
-import { updateLayout } from './actions/layout';
-import { LIST_LAYOUT } from './constants/list_layout';
+import { updateLayout } from '../../actions/layout';
+import { LIST_LAYOUT } from '../../constants/list_layout';
 
 const Styles = () => ({
   formControl: {

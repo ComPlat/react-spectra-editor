@@ -10,9 +10,9 @@ import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import { withStyles } from '@material-ui/core/styles';
 
-import LayoutPanel from './panel_layout';
-import SubmitPanel from './panel_submit';
-import ThresholdsPanel from './panel_thresholds';
+import LayoutPanel from './layout';
+import SubmitPanel from './submit';
+import ThresholdsPanel from './thresholds';
 
 const Styles = () => ({
   panelSummary: {

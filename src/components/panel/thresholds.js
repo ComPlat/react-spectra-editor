@@ -16,8 +16,8 @@ import HowToReg from '@material-ui/icons/HowToReg';
 import Tooltip from '@material-ui/core/Tooltip';
 import { withStyles } from '@material-ui/core/styles';
 
-import { updateThreshold, resetThreshold } from './actions/threshold';
-import { toggleIsEdit } from './actions/manager';
+import { updateThreshold, resetThreshold } from '../../actions/threshold';
+import { toggleIsEdit } from '../../actions/manager';
 
 const Styles = () => ({
   btnRefresh: {
