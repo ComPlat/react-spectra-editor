@@ -19,6 +19,8 @@
     "prop-types": "^15.6.2",
     "react-redux": "^5.0.7",
     "redux": "^4.0.1",
+    "redux-saga": "^0.16.2",
+    "regenerator-transform": "^0.13.3",
     "reselect": "^4.0.0"
   },
   "scripts": {

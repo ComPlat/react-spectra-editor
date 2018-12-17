@@ -1,28 +1,30 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import { createStore } from 'redux';
+import { createStore, compose, applyMiddleware } from 'redux';
 import PropTypes from 'prop-types';
+
+import 'regenerator-runtime/runtime'; // eslint-disable-line
+import createSagaMiddleware from 'redux-saga';
 // import { logger } from 'redux-logger';
-// import { createStore, compose, applyMiddleware } from 'redux';
 
 import reducers from './reducers/index';
+import sagas from './sagas/index';
 import Frame from './frame';
 import { ExtractJcamp } from './helpers/chem';
 import { ToXY } from './helpers/converter';
 import { LIST_LAYOUT } from './constants/list_layout';
 
-// let middlewares = [];
+// - - - store & middleware - - -
+const sagaMiddleware = createSagaMiddleware();
+const middlewares = [sagaMiddleware]; // logger
 
-// if (process.env.NODE_ENV === 'development') {
-//   middlewares = [...middlewares, logger];
-// }
+const store = compose(
+  applyMiddleware(...middlewares),
+)(createStore)(reducers);
 
-// const store = compose(
-//   applyMiddleware(...middlewares),
-// )(createStore)(reducers);
+sagaMiddleware.run(sagas);
 
-const store = createStore(reducers);
-
+// - - - React - - -
 const SpectraViewer = ({
   input, cLabel, xLabel, yLabel, peakObjs, writePeaks, savePeaks,
 }) => (
