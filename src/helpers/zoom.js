@@ -49,11 +49,15 @@ const resetZoom = (canvas) => {
 
 const MountZoom = (canvas) => {
   const zoomedCb = () => zoomed(canvas);
-  const resetZoomCb = () => resetZoom(canvas);
+  const resetZoomCb = () => {
+    d3.event.stopPropagation();
+    d3.event.preventDefault();
+    resetZoom(canvas);
+  };
 
   canvas.zoom.on('zoom', zoomedCb);
   canvas.svg.call(canvas.zoom)
-    .on('dblclick.zoom', resetZoomCb);
+    .on('contextmenu.zoom', resetZoomCb);
 };
 
 export default MountZoom;
