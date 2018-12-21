@@ -5,22 +5,16 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
 import Grid from '@material-ui/core/Grid';
-import {
-  withStyles, createMuiTheme, MuiThemeProvider,
-} from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import App from './components/app';
-import SettingsPanel from './components/panel/settings';
-import { AddPeakPanel, RmPeakPanel } from './components/panel/peaks';
+import PanelViewer from './components/panel/index';
 import { toggleSaveBtn, toggleWriteBtn } from './actions/status';
-
-const theme = createMuiTheme({
-  typography: {
-    useNextVariants: true,
-  },
-});
 
 const Styles = () => ({
   panels: {
+    maxHeight: 630,
+    overflowX: 'hidden',
+    overflowY: 'scroll',
     padding: '10px 0 0 0',
   },
 });
@@ -58,16 +52,12 @@ const Frame = ({
           xs={3}
           className={classNames(classes.panels)}
         >
-          <MuiThemeProvider theme={theme}>
-            <SettingsPanel
-              peakObj={peakObj}
-              hasEdit={hasEdit}
-              writePeaks={writePeaks}
-              savePeaks={savePeaks}
-            />
-            <AddPeakPanel />
-            <RmPeakPanel />
-          </MuiThemeProvider>
+          <PanelViewer
+            peakObj={peakObj}
+            hasEdit={hasEdit}
+            writePeaks={writePeaks}
+            savePeaks={savePeaks}
+          />
         </Grid>
       </Grid>
     </div>

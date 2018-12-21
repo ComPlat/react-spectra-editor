@@ -3,30 +3,33 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 
-import { Spectrum2Seed, Spectrum2Peak, ToThresEndPts } from '../helpers/chem';
+import {
+  Spectrum2Seed, Spectrum2Peak, ToThresEndPts, ToShiftPeaks,
+} from '../helpers/chem';
 import { updateBorder } from '../actions/border';
 import { resetAll } from '../actions/manager';
-import { addToPosList, addToNegList } from '../actions/edit_peak';
+import { clickPoint } from '../actions/edit_peak';
 import D3Canvas from './d3_canvas';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
 
-    const { addToPosListAct, addToNegListAct } = props;
-    this.canvas = new D3Canvas({ addToPosListAct, addToNegListAct });
+    const { clickPointAct } = props;
+    this.canvas = new D3Canvas({ clickPointAct });
     this.d3Ref = React.createRef();
 
-    this.seSeedChange = this.seSeedChange.bind(this);
+    this.normChange = this.normChange.bind(this);
   }
 
   componentDidMount() {
     const {
-      seed, peak, cLabel, xLabel, yLabel,
-      borderSt, tEndPts, editPeakSt, updateBorderAct, resetAllAct,
+      seed, peak, cLabel, xLabel, yLabel, peakObj,
+      borderSt, tEndPts, tShiftPeaks, editPeakSt, editModeSt,
+      updateBorderAct, resetAllAct,
     } = this.props;
 
-    resetAllAct();
+    resetAllAct(peakObj.operation);
 
     const { filterSeed, filterPeak } = this.brushFilter(borderSt, seed, peak);
     const node = this.d3Ref.current;
@@ -35,7 +38,9 @@ class App extends React.Component {
       seed,
       peak,
       tEndPts,
+      tShiftPeaks,
       editPeakSt,
+      editModeSt,
       filterSeed,
       filterPeak,
       cLabel,
@@ -47,10 +52,11 @@ class App extends React.Component {
 
   componentDidUpdate(prevProps) {
     const {
-      seed, peak, cLabel, xLabel, yLabel, borderSt, tEndPts, editPeakSt,
+      seed, peak, cLabel, xLabel, yLabel, borderSt, tEndPts, tShiftPeaks,
+      editPeakSt, editModeSt,
     } = this.props;
 
-    this.seSeedChange(prevProps);
+    this.normChange(prevProps);
 
     const { filterSeed, filterPeak } = this.brushFilter(borderSt, seed, peak);
     const node = this.d3Ref.current;
@@ -59,7 +65,9 @@ class App extends React.Component {
       seed,
       peak,
       tEndPts,
+      tShiftPeaks,
       editPeakSt,
+      editModeSt,
       filterSeed,
       filterPeak,
       cLabel,
@@ -73,11 +81,11 @@ class App extends React.Component {
     this.canvas.destroy(node);
   }
 
-  seSeedChange(prevProps) {
-    const { seed, resetAllAct } = this.props;
-    const oldSeed = prevProps.seed;
-    if (oldSeed !== seed) {
-      resetAllAct();
+  normChange(prevProps) {
+    const { peakObj, resetAllAct } = this.props;
+    const oldPeakObj = prevProps.peakObj;
+    if (oldPeakObj !== peakObj) {
+      resetAllAct(peakObj.operation);
     }
   }
 
@@ -115,7 +123,9 @@ const mapStateToProps = (state, props) => (
     seed: Spectrum2Seed(state, props),
     peak: Spectrum2Peak(state, props),
     tEndPts: ToThresEndPts(state, props),
+    tShiftPeaks: ToShiftPeaks(state, props),
     editPeakSt: state.editPeak,
+    editModeSt: state.mode.edit,
   }
 );
 
@@ -123,8 +133,7 @@ const mapDispatchToProps = dispatch => (
   bindActionCreators({
     updateBorderAct: updateBorder,
     resetAllAct: resetAll,
-    addToPosListAct: addToPosList,
-    addToNegListAct: addToNegList,
+    clickPointAct: clickPoint,
   }, dispatch)
 );
 
@@ -134,13 +143,15 @@ App.propTypes = {
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
+  peakObj: PropTypes.object.isRequired,
   borderSt: PropTypes.array.isRequired,
   tEndPts: PropTypes.array.isRequired,
+  tShiftPeaks: PropTypes.array.isRequired,
   editPeakSt: PropTypes.object.isRequired,
+  editModeSt: PropTypes.string.isRequired,
   updateBorderAct: PropTypes.func.isRequired,
   resetAllAct: PropTypes.func.isRequired,
-  addToPosListAct: PropTypes.func.isRequired,
-  addToNegListAct: PropTypes.func.isRequired,
+  clickPointAct: PropTypes.func.isRequired,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

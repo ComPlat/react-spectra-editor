@@ -3,16 +3,17 @@ import {
   InitScale, InitAxisCall, InitTip,
 } from '../helpers/init';
 import {
-  MountPath, MountGrid, MountAxis, MountAxisLabelY,
+  MountPath, MountGrid, MountAxis, MountAxisLabelY, MountRef,
   MountClip, MountMainFrame, MountCircles, MountThresLine,
 } from '../helpers/mount';
 import { TfRescale } from '../helpers/compass';
 import { PksEdit } from '../helpers/converter';
+import { LIST_MODE } from '../constants/list_mode';
 
 class D3Focus {
   constructor(props) {
     const {
-      W, H, addToPosListAct, addToNegListAct,
+      W, H, clickPointAct,
     } = props;
     this.margin = {
       t: 10,
@@ -22,18 +23,19 @@ class D3Focus {
     };
     this.w = W - this.margin.l - this.margin.r;
     this.h = H - this.margin.t - this.margin.b;
-    this.addToPosListAct = addToPosListAct;
-    this.addToNegListAct = addToNegListAct;
+    this.clickPointAct = clickPointAct;
 
     this.axis = null;
     this.path = null;
     this.thresLine = null;
     this.grid = null;
     this.circles = null;
+    this.ref = null;
     this.ccPattern = null;
     this.data = [];
     this.dataPks = [];
     this.tEndPts = null;
+    this.tShfPks = null;
     this.root = null;
     this.svg = null;
     this.overlay = null;
@@ -54,7 +56,8 @@ class D3Focus {
     this.update = this.update.bind(this);
     this.drawLine = this.drawLine.bind(this);
     this.drawPeaks = this.drawPeaks.bind(this);
-    this.onClickPeak = this.onClickPeak.bind(this);
+    this.drawRef = this.drawRef.bind(this);
+    this.onClickEditPeak = this.onClickEditPeak.bind(this);
     this.mergedPeaks = this.mergedPeaks.bind(this);
     this.updatePathCall = this.updatePathCall.bind(this);
   }
@@ -71,10 +74,11 @@ class D3Focus {
     this.root.call(this.tip);
   }
 
-  setDataParams(data, peaks, tEndPts) {
+  setDataParams(data, peaks, tEndPts, tShiftPeaks) {
     this.data = [...data];
     this.dataPks = [...peaks];
     this.tEndPts = tEndPts;
+    this.tShfPks = tShiftPeaks;
   }
 
   setTrans() {
@@ -83,7 +87,7 @@ class D3Focus {
 
   setOverlay() {
     this.overlay = this.root.append('rect')
-      .attr('class', 'overlay')
+      .attr('class', 'overlay-focus')
       .attr('width', this.w)
       .attr('height', this.h)
       .attr('opacity', 0.0);
@@ -146,10 +150,14 @@ class D3Focus {
       .attr('fill', 'none');
   }
 
-  onClickPeak(data) {
+  onClickEditPeak(data, editModeSt) {
     d3.event.stopPropagation();
-    this.tip.hide();
-    this.addToNegListAct(data);
+    d3.event.preventDefault();
+    if (editModeSt === LIST_MODE.RM_PEAK) {
+      this.tip.hide();
+    }
+    const onPeak = true;
+    this.clickPointAct(data, onPeak);
   }
 
   mergedPeaks(editPeakSt) {
@@ -158,7 +166,7 @@ class D3Focus {
     return this.dataPks;
   }
 
-  drawPeaks(editPeakSt) {
+  drawPeaks(editPeakSt, editModeSt) {
     // rescale for zoom
     const { xt, yt } = TfRescale(this);
 
@@ -174,7 +182,7 @@ class D3Focus {
     ccp.enter()
       .append('path')
       .attr('d', symbol.type(d3.symbolDiamond))
-      .attr('class', 'enter')
+      .attr('class', 'enter-peak')
       .attr('fill', 'red')
       .attr('stroke', 'blue')
       .attr('stroke-width', 3)
@@ -183,10 +191,38 @@ class D3Focus {
       .on('mouseout', this.tip.hide)
       .merge(ccp)
       .attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y)})`)
-      .on('click', d => this.onClickPeak(d));
+      .on('click', d => this.onClickEditPeak(d, editModeSt));
   }
 
-  create(el, svg, filterSeed, filterPeak, tEndPts, editPeakSt) {
+  drawRef() {
+    // rescale for zoom
+    const { xt, yt } = TfRescale(this);
+
+    const ccp = this.ref.selectAll('path')
+      .data(this.tShfPks);
+
+    ccp.exit()
+      .attr('class', 'exit')
+      .remove();
+
+    const symbol = d3.symbol().size([12]);
+
+    ccp.enter()
+      .append('path')
+      .attr('d', symbol.type(d3.symbolCircle))
+      .attr('class', 'enter-ref')
+      .attr('fill-opacity', 0.0)
+      .attr('stroke', 'green')
+      .attr('stroke-width', 12)
+      .attr('stroke-opacity', 0.8)
+      .merge(ccp)
+      .attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y)})`)
+      .on('click', () => this.onClickEditPeak(false, false));
+  }
+
+  create(
+    el, svg, filterSeed, filterPeak, tEndPts, tShiftPeaks, editPeakSt, editModeSt,
+  ) {
     this.setSvg(svg);
 
     MountMainFrame(this, 'focus');
@@ -194,15 +230,16 @@ class D3Focus {
 
     this.setRoot(el);
     this.setTip();
-    this.setDataParams(filterSeed, filterPeak, tEndPts);
-    this.setOverlay();
+    this.setDataParams(filterSeed, filterPeak, tEndPts, tShiftPeaks);
     this.setCompass();
+    this.setOverlay();
 
     this.axis = MountAxis(this);
     this.path = MountPath(this, 'steelblue');
     this.thresLine = MountThresLine(this, 'green');
     this.grid = MountGrid(this);
     this.circles = MountCircles(this);
+    this.ref = MountRef(this);
     MountAxisLabelY(this);
     // if (cLabel) {
     //   MountMarker(this, 'steelblue');
@@ -210,17 +247,21 @@ class D3Focus {
 
     if (this.data && this.data.length > 0) {
       this.drawLine();
-      this.drawPeaks(editPeakSt);
+      this.drawRef();
+      this.drawPeaks(editPeakSt, editModeSt);
     }
   }
 
-  update(el, svg, filterSeed, filterPeak, tEndPts, editPeakSt) {
+  update(
+    el, svg, filterSeed, filterPeak, tEndPts, tShiftPeaks, editPeakSt, editModeSt,
+  ) {
     this.setRoot(el);
-    this.setDataParams(filterSeed, filterPeak, tEndPts);
+    this.setDataParams(filterSeed, filterPeak, tEndPts, tShiftPeaks);
 
     if (this.data && this.data.length > 0) {
       this.drawLine();
-      this.drawPeaks(editPeakSt);
+      this.drawRef();
+      this.drawPeaks(editPeakSt, editModeSt);
     }
   }
 }

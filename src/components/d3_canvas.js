@@ -10,9 +10,9 @@ const H = 500;
 
 class D3Canvas {
   constructor(props) {
-    const { addToPosListAct, addToNegListAct } = props;
+    const { clickPointAct } = props;
     this.focus = new D3Focus({
-      W, H, addToPosListAct, addToNegListAct,
+      W, H, clickPointAct,
     });
     this.context = new D3Context({ W, H });
 
@@ -43,7 +43,7 @@ class D3Canvas {
   }
 
   create(
-    el, seed, peaks, tEndPts, editPeakSt,
+    el, seed, peaks, tEndPts, tShiftPeaks, editPeakSt, editModeSt,
     filterSeed, filterPeak, cLabel, xLabel, yLabel,
     updateBorder,
   ) {
@@ -51,7 +51,8 @@ class D3Canvas {
 
     this.context.create(el, this.svg, seed, updateBorder);
     this.focus.create(
-      el, this.svg, filterSeed, filterPeak, tEndPts, editPeakSt, cLabel,
+      el, this.svg, filterSeed, filterPeak, tEndPts, tShiftPeaks,
+      editPeakSt, editModeSt, cLabel,
     );
     this.drawLabel(el, cLabel, xLabel, yLabel);
 
@@ -61,12 +62,13 @@ class D3Canvas {
   }
 
   update(
-    el, seed, peaks, tEndPts, editPeakSt,
+    el, seed, peaks, tEndPts, tShiftPeaks, editPeakSt, editModeSt,
     filterSeed, filterPeak, cLabel, xLabel, yLabel,
   ) {
     this.context.update(el, this.svg, seed);
     this.focus.update(
-      el, this.svg, filterSeed, filterPeak, tEndPts, editPeakSt, null,
+      el, this.svg, filterSeed, filterPeak, tEndPts, tShiftPeaks,
+      editPeakSt, editModeSt, null,
     );
     this.drawLabel(el, cLabel, xLabel, yLabel);
   }

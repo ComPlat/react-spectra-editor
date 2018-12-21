@@ -34,7 +34,7 @@ const title = classes => (
 const SettingsPanel = ({
   classes, peakObj, hasEdit, writePeaks, savePeaks,
 }) => (
-  <ExpansionPanel defaultExpanded>
+  <ExpansionPanel>
     { title(classes) }
     <ThresholdsPanel peakObj={peakObj} hasEdit={hasEdit} />
     <Divider />
