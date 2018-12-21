@@ -39,6 +39,7 @@ const zoomed = (canvas) => {
     .attr('fill', 'none');
 
   // ccPattern Re-Calculate
+  focus.drawRef();
   focus.drawPeaks();
 };
 

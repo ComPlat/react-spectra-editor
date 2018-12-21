@@ -1,10 +1,17 @@
-import { RightClick } from './compass';
+import { ClickCompass } from './compass';
 
 const MountCircles = (target) => {
   const circles = target.root.append('g')
     .attr('class', 'circles-clip')
     .attr('clip-path', 'url(#clip)');
   return circles;
+};
+
+const MountRef = (target) => {
+  const ref = target.root.append('g')
+    .attr('class', 'ref-clip')
+    .attr('clip-path', 'url(#ref-clip)');
+  return ref;
 };
 
 const MountPath = (target, color) => {
@@ -16,7 +23,7 @@ const MountPath = (target, color) => {
     .style('fill', 'none')
     .style('stroke', color)
     .style('stroke-width', 1)
-    .on('contextmenu', () => RightClick(target));
+    .on('click', () => ClickCompass(target));
   return path;
 };
 
@@ -107,7 +114,7 @@ const MountMainFrame = (target, name) => {
 };
 
 export {
-  MountCircles, MountPath, MountThresLine, MountGrid, MountAxis,
+  MountCircles, MountRef, MountPath, MountThresLine, MountGrid, MountAxis,
   MountAxisLabelX, MountAxisLabelY,
   MountMarker, MountClip, MountMainFrame,
 };

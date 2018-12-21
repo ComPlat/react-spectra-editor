@@ -1,9 +1,17 @@
 import Jcampconverter from 'jcampconverter';
 import { createSelector } from 'reselect';
+import LIST_SHIFT from '../constants/list_shift';
 
 const getSpectrum = (_, props) => props.input;
 
 const getPeakObj = (_, props) => props.peakObj;
+
+const getShiftDelta = (state, _) => { // eslint-disable-line
+  const { shift } = state;
+  const { ref, peak } = shift;
+  if (!peak || ref.name === LIST_SHIFT[0].name) return 0;
+  return peak.x - ref.value;
+};
 
 const downSample = (spectrum, peakObj) => {
   const { peakUp, maxY } = peakObj;
@@ -13,13 +21,13 @@ const downSample = (spectrum, peakObj) => {
   return { dsRef, peakUp };
 };
 
-const dsWithoutRef = (spectrum) => {
+const dsWithoutRef = (spectrum, shiftDelta) => {
   const sp = [];
   const xs = spectrum.x;
   const ys = spectrum.y;
   for (let i = 0; i < ys.length; i += 1) { // downsample
     if (i % 2 === 0) {
-      const x = xs[i];
+      const x = xs[i] - shiftDelta;
       const y = ys[i];
       sp.push({ x, y });
     }
@@ -27,7 +35,7 @@ const dsWithoutRef = (spectrum) => {
   return sp;
 };
 
-const dsWithRef = (spectrum, dsRef, peakUp) => {
+const dsWithRef = (spectrum, dsRef, peakUp, shiftDelta) => {
   const sp = [];
   const xs = spectrum.x;
   const ys = spectrum.y;
@@ -36,31 +44,32 @@ const dsWithRef = (spectrum, dsRef, peakUp) => {
     const isDownSample = (peakUp && y < dsRef) || (!peakUp && y > dsRef);
     if (isDownSample) {
       if (i % 3 === 0) {
-        const x = xs[i];
+        const x = xs[i] - shiftDelta;
         sp.push({ x, y });
       }
     } else {
-      const x = xs[i];
+      const x = xs[i] - shiftDelta;
       sp.push({ x, y });
     }
   }
   return sp;
 };
 
-const convertSpectrum = (spectrum, peakObj) => {
+const convertSpectrum = (spectrum, peakObj, shiftDelta) => {
   let ds = { dsRef: false, peakUp: false };
   if (peakObj.thresRef) {
     ds = downSample(spectrum, peakObj);
   }
   const sp = ds.dsRef
-    ? dsWithRef(spectrum, ds.dsRef, ds.peakUp)
-    : dsWithoutRef(spectrum);
+    ? dsWithRef(spectrum, ds.dsRef, ds.peakUp, shiftDelta)
+    : dsWithoutRef(spectrum, shiftDelta);
   return sp;
 };
 
 const Spectrum2Seed = createSelector(
   getSpectrum,
   getPeakObj,
+  getShiftDelta,
   convertSpectrum,
 );
 
@@ -68,7 +77,7 @@ const getThreshold = state => (
   state.threshold ? state.threshold / 100.0 : false
 );
 
-const Convert2Peak = (peakObj, threshold) => {
+const Convert2Peak = (peakObj, threshold, shiftDelta) => {
   const peak = [];
   if (!peakObj || !peakObj.data) return peak;
   const data = peakObj.data[0];
@@ -78,7 +87,7 @@ const Convert2Peak = (peakObj, threshold) => {
     const y = data.y[i];
     const overThres = (peakUp && y >= yThres) || (!peakUp && y <= yThres);
     if (overThres) {
-      const x = data.x[i];
+      const x = data.x[i] - shiftDelta;
       peak.push({ x, y });
     }
   }
@@ -88,6 +97,7 @@ const Convert2Peak = (peakObj, threshold) => {
 const Spectrum2Peak = createSelector(
   getPeakObj,
   getThreshold,
+  getShiftDelta,
   Convert2Peak,
 );
 
@@ -109,6 +119,21 @@ const ToThresEndPts = createSelector(
   convertThresEndPts,
 );
 
+const getShiftPeak = state => (
+  state.shift.peak
+);
+
+const convertShiftPeaks = (peak, delta) => {
+  if (!peak) return [];
+  return [{ x: peak.x - delta, y: peak.y }];
+};
+
+const ToShiftPeaks = createSelector(
+  getShiftPeak,
+  getShiftDelta,
+  convertShiftPeaks,
+);
+
 // - - - - - - - - - - - - - - - - - - - - - -
 // ExtractJcamp
 // - - - - - - - - - - - - - - - - - - - - - -
@@ -123,22 +148,27 @@ const extractPeakUp = (jcamp) => {
   return peakUp;
 };
 
-const isValid = (s) => {
-  const valid = s.dataType
-    && (
-      s.dataType.includes('NMR SPECTRUM')
-      || s.dataType.includes('INFRARED SPECTRUM')
-    );
-  return valid;
+const getSTyp = (s) => {
+  if (s.dataType) {
+    if (s.dataType.includes('NMR SPECTRUM')) {
+      return 'NMR';
+    }
+    if (s.dataType.includes('INFRARED SPECTRUM')) {
+      return 'INFRARED';
+    }
+  }
+  return false;
 };
 
-const extractSpectrum = (jcamp, subTyp) => {
+const extractSpectrum = (jcamp) => {
+  const subTyp = jcamp.xType ? ` - ${jcamp.xType}` : '';
   const spectrum = jcamp.spectra.map((s) => {
-    const valid = isValid(s);
-    if (!valid) return null;
+    const sTyp = getSTyp(s);
+    if (!sTyp) return null;
     const target = Object.assign(
       {
         typ: s.dataType + subTyp,
+        sTyp,
       },
       s,
     );
@@ -156,7 +186,8 @@ const calcThresRef = (s, peakUp) => {
     : Math.ceil(ref * 100 * 100 / s.maxY) / 100;
 };
 
-const extractPeakObj = (jcamp, subTyp, peakUp) => {
+const extractPeakObj = (jcamp, peakUp, sTyp) => {
+  const subTyp = jcamp.xType ? ` - ${jcamp.xType}` : '';
   const peakObjs = jcamp.spectra.map((s) => {
     const thresRef = calcThresRef(s, peakUp);
     return s.dataType && s.dataType.includes('PEAK ASSIGNMENTS')
@@ -165,6 +196,14 @@ const extractPeakObj = (jcamp, subTyp, peakUp) => {
           typ: s.dataType + subTyp,
           peakUp,
           thresRef,
+          shift: {
+            source: false,
+            solvent: false,
+          },
+          operation: {
+            typ: sTyp,
+            nucleus: jcamp.xType || '',
+          },
         },
         s,
       )
@@ -176,16 +215,25 @@ const extractPeakObj = (jcamp, subTyp, peakUp) => {
 
 const ExtractJcamp = (input) => {
   const jcamp = Jcampconverter.convert(input, { xy: true });
-  const subTyp = jcamp.xType ? ` - ${jcamp.xType}` : '';
   const peakUp = extractPeakUp(jcamp);
 
-  const spectrum = extractSpectrum(jcamp, subTyp);
-  let peakObjs = extractPeakObj(jcamp, subTyp, peakUp);
-  if (peakObjs.length === 0) peakObjs = [{ thresRef: false }];
+  const spectrum = extractSpectrum(jcamp);
+  const sTyp = spectrum ? spectrum.sTyp : '';
+  let peakObjs = extractPeakObj(jcamp, peakUp, sTyp);
+  if (peakObjs.length === 0) {
+    peakObjs = [{
+      thresRef: false,
+      operation: {
+        typ: sTyp,
+        nucleus: jcamp.xType || '',
+      },
+    }];
+  }
 
   return { spectrum, peakObjs };
 };
 
 export {
-  ExtractJcamp, Spectrum2Seed, Spectrum2Peak, ToThresEndPts, Convert2Peak,
+  ExtractJcamp, Spectrum2Seed, Spectrum2Peak,
+  ToThresEndPts, ToShiftPeaks, Convert2Peak,
 };
