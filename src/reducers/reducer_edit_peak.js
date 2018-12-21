@@ -65,13 +65,13 @@ const rmFromNeg = (state, action) => {
 
 const editPeakReducer = (state = initialState, action) => {
   switch (action.type) {
-    case EDITPEAK.ADDPOSITIVE:
+    case EDITPEAK.ADD_POSITIVE:
       return addToPos(state, action);
-    case EDITPEAK.RMPOSITIVE:
-      return rmFromPos(state, action);
-    case EDITPEAK.ADDNEGATIVE:
+    case EDITPEAK.ADD_NEGATIVE:
       return addToNeg(state, action);
-    case EDITPEAK.RMNEGATIVE:
+    case EDITPEAK.RM_POSITIVE:
+      return rmFromPos(state, action);
+    case EDITPEAK.RM_NEGATIVE:
       return rmFromNeg(state, action);
     case MANAGER.RESETALL:
       return initialState;

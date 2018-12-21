@@ -1,36 +1,29 @@
 import { EDITPEAK } from '../constants/action_type';
 
-const addToPosList = payload => (
+const clickPoint = (payload, onPeak) => (
   {
-    type: EDITPEAK.ADDPOSITIVE,
+    type: EDITPEAK.CLICK_POINT,
     payload,
+    onPeak,
   }
 );
 
 const rmFromPosList = payload => (
   {
-    type: EDITPEAK.RMPOSITIVE,
-    payload,
-  }
-);
-
-const addToNegList = payload => (
-  {
-    type: EDITPEAK.ADDNEGATIVE,
+    type: EDITPEAK.RM_POSITIVE,
     payload,
   }
 );
 
 const rmFromNegList = payload => (
   {
-    type: EDITPEAK.RMNEGATIVE,
+    type: EDITPEAK.RM_NEGATIVE,
     payload,
   }
 );
 
 export {
-  addToPosList,
+  clickPoint,
   rmFromPosList,
-  addToNegList,
   rmFromNegList,
 };

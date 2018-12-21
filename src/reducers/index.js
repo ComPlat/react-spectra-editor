@@ -5,6 +5,8 @@ import editPeakReducer from './reducer_edit_peak';
 import statusReducer from './reducer_status';
 import managerReducer from './reducer_manager';
 import layoutReducer from './reducer_layout';
+import shiftReducer from './reducer_shift';
+import modeReducer from './reducer_mode';
 
 const rootReducer = combineReducers({
   border: borderReducer,
@@ -13,6 +15,8 @@ const rootReducer = combineReducers({
   status: statusReducer,
   manager: managerReducer,
   layout: layoutReducer,
+  shift: shiftReducer,
+  mode: modeReducer,
 });
 
 export default rootReducer;
