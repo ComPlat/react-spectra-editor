@@ -25,7 +25,7 @@ class App extends React.Component {
   componentDidMount() {
     const {
       seed, peak, cLabel, xLabel, yLabel, peakObj,
-      borderSt, tEndPts, tShiftPeaks, editPeakSt, editModeSt,
+      borderSt, tTrEndPts, tShiftPeaks, editPeakSt, editModeSt,
       updateBorderAct, resetAllAct,
     } = this.props;
 
@@ -37,7 +37,7 @@ class App extends React.Component {
       node,
       seed,
       peak,
-      tEndPts,
+      tTrEndPts,
       tShiftPeaks,
       editPeakSt,
       editModeSt,
@@ -52,7 +52,7 @@ class App extends React.Component {
 
   componentDidUpdate(prevProps) {
     const {
-      seed, peak, cLabel, xLabel, yLabel, borderSt, tEndPts, tShiftPeaks,
+      seed, peak, cLabel, xLabel, yLabel, borderSt, tTrEndPts, tShiftPeaks,
       editPeakSt, editModeSt,
     } = this.props;
 
@@ -64,7 +64,7 @@ class App extends React.Component {
       node,
       seed,
       peak,
-      tEndPts,
+      tTrEndPts,
       tShiftPeaks,
       editPeakSt,
       editModeSt,
@@ -122,7 +122,7 @@ const mapStateToProps = (state, props) => (
     borderSt: state.border,
     seed: Spectrum2Seed(state, props),
     peak: Spectrum2Peak(state, props),
-    tEndPts: ToThresEndPts(state, props),
+    tTrEndPts: ToThresEndPts(state, props),
     tShiftPeaks: ToShiftPeaks(state, props),
     editPeakSt: state.editPeak,
     editModeSt: state.mode.edit,
@@ -145,7 +145,7 @@ App.propTypes = {
   yLabel: PropTypes.string.isRequired,
   peakObj: PropTypes.object.isRequired,
   borderSt: PropTypes.array.isRequired,
-  tEndPts: PropTypes.array.isRequired,
+  tTrEndPts: PropTypes.array.isRequired,
   tShiftPeaks: PropTypes.array.isRequired,
   editPeakSt: PropTypes.object.isRequired,
   editModeSt: PropTypes.string.isRequired,

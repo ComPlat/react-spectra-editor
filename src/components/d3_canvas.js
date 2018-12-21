@@ -43,7 +43,7 @@ class D3Canvas {
   }
 
   create(
-    el, seed, peaks, tEndPts, tShiftPeaks, editPeakSt, editModeSt,
+    el, seed, peaks, tTrEndPts, tShiftPeaks, editPeakSt, editModeSt,
     filterSeed, filterPeak, cLabel, xLabel, yLabel,
     updateBorder,
   ) {
@@ -51,7 +51,7 @@ class D3Canvas {
 
     this.context.create(el, this.svg, seed, updateBorder);
     this.focus.create(
-      el, this.svg, filterSeed, filterPeak, tEndPts, tShiftPeaks,
+      el, this.svg, filterSeed, filterPeak, tTrEndPts, tShiftPeaks,
       editPeakSt, editModeSt, cLabel,
     );
     this.drawLabel(el, cLabel, xLabel, yLabel);
@@ -62,12 +62,12 @@ class D3Canvas {
   }
 
   update(
-    el, seed, peaks, tEndPts, tShiftPeaks, editPeakSt, editModeSt,
+    el, seed, peaks, tTrEndPts, tShiftPeaks, editPeakSt, editModeSt,
     filterSeed, filterPeak, cLabel, xLabel, yLabel,
   ) {
     this.context.update(el, this.svg, seed);
     this.focus.update(
-      el, this.svg, filterSeed, filterPeak, tEndPts, tShiftPeaks,
+      el, this.svg, filterSeed, filterPeak, tTrEndPts, tShiftPeaks,
       editPeakSt, editModeSt, null,
     );
     this.drawLabel(el, cLabel, xLabel, yLabel);

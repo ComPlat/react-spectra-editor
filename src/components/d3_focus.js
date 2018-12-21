@@ -34,7 +34,7 @@ class D3Focus {
     this.ccPattern = null;
     this.data = [];
     this.dataPks = [];
-    this.tEndPts = null;
+    this.tTrEndPts = null;
     this.tShfPks = null;
     this.root = null;
     this.svg = null;
@@ -74,10 +74,10 @@ class D3Focus {
     this.root.call(this.tip);
   }
 
-  setDataParams(data, peaks, tEndPts, tShiftPeaks) {
+  setDataParams(data, peaks, tTrEndPts, tShiftPeaks) {
     this.data = [...data];
     this.dataPks = [...peaks];
-    this.tEndPts = tEndPts;
+    this.tTrEndPts = tTrEndPts;
     this.tShfPks = tShiftPeaks;
   }
 
@@ -128,8 +128,8 @@ class D3Focus {
     this.path.attr('d', this.pathCall(this.data));
 
     // Threshold
-    if (this.tEndPts.length > 0) {
-      this.thresLine.attr('d', this.pathCall(this.tEndPts));
+    if (this.tTrEndPts.length > 0) {
+      this.thresLine.attr('d', this.pathCall(this.tTrEndPts));
       this.thresLine.attr('visibility', 'visible');
     } else {
       this.thresLine.attr('visibility', 'hidden');
@@ -221,7 +221,7 @@ class D3Focus {
   }
 
   create(
-    el, svg, filterSeed, filterPeak, tEndPts, tShiftPeaks, editPeakSt, editModeSt,
+    el, svg, filterSeed, filterPeak, tTrEndPts, tShiftPeaks, editPeakSt, editModeSt,
   ) {
     this.setSvg(svg);
 
@@ -230,7 +230,7 @@ class D3Focus {
 
     this.setRoot(el);
     this.setTip();
-    this.setDataParams(filterSeed, filterPeak, tEndPts, tShiftPeaks);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tShiftPeaks);
     this.setCompass();
     this.setOverlay();
 
@@ -253,10 +253,10 @@ class D3Focus {
   }
 
   update(
-    el, svg, filterSeed, filterPeak, tEndPts, tShiftPeaks, editPeakSt, editModeSt,
+    el, svg, filterSeed, filterPeak, tTrEndPts, tShiftPeaks, editPeakSt, editModeSt,
   ) {
     this.setRoot(el);
-    this.setDataParams(filterSeed, filterPeak, tEndPts, tShiftPeaks);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tShiftPeaks);
 
     if (this.data && this.data.length > 0) {
       this.drawLine();

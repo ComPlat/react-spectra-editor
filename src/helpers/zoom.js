@@ -17,8 +17,8 @@ const zoomed = (canvas) => {
   focus.path.attr('d', line(focus.data));
 
   // Threshold
-  if (focus.tEndPts.length > 0) {
-    focus.thresLine.attr('d', line(focus.tEndPts));
+  if (focus.tTrEndPts.length > 0) {
+    focus.thresLine.attr('d', line(focus.tTrEndPts));
     focus.thresLine.attr('visibility', 'visible');
   } else {
     focus.thresLine.attr('visibility', 'hidden');
