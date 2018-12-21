@@ -123,7 +123,7 @@ const getShiftPeak = state => (
   state.shift.peak
 );
 
-const convertShiftPeaks = (peak, delta) => {
+const convertSfPeaks = (peak, delta) => {
   if (!peak) return [];
   return [{ x: peak.x - delta, y: peak.y }];
 };
@@ -131,7 +131,7 @@ const convertShiftPeaks = (peak, delta) => {
 const ToShiftPeaks = createSelector(
   getShiftPeak,
   getShiftDelta,
-  convertShiftPeaks,
+  convertSfPeaks,
 );
 
 // - - - - - - - - - - - - - - - - - - - - - -

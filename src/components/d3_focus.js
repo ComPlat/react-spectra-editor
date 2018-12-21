@@ -35,7 +35,7 @@ class D3Focus {
     this.data = [];
     this.dataPks = [];
     this.tTrEndPts = null;
-    this.tShfPks = null;
+    this.tSfPeaks = null;
     this.root = null;
     this.svg = null;
     this.overlay = null;
@@ -74,11 +74,11 @@ class D3Focus {
     this.root.call(this.tip);
   }
 
-  setDataParams(data, peaks, tTrEndPts, tShiftPeaks) {
+  setDataParams(data, peaks, tTrEndPts, tSfPeaks) {
     this.data = [...data];
     this.dataPks = [...peaks];
     this.tTrEndPts = tTrEndPts;
-    this.tShfPks = tShiftPeaks;
+    this.tSfPeaks = tSfPeaks;
   }
 
   setTrans() {
@@ -199,7 +199,7 @@ class D3Focus {
     const { xt, yt } = TfRescale(this);
 
     const ccp = this.ref.selectAll('path')
-      .data(this.tShfPks);
+      .data(this.tSfPeaks);
 
     ccp.exit()
       .attr('class', 'exit')
@@ -221,7 +221,7 @@ class D3Focus {
   }
 
   create(
-    el, svg, filterSeed, filterPeak, tTrEndPts, tShiftPeaks, editPeakSt, editModeSt,
+    el, svg, filterSeed, filterPeak, tTrEndPts, tSfPeaks, editPeakSt, editModeSt,
   ) {
     this.setSvg(svg);
 
@@ -230,7 +230,7 @@ class D3Focus {
 
     this.setRoot(el);
     this.setTip();
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tShiftPeaks);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks);
     this.setCompass();
     this.setOverlay();
 
@@ -253,10 +253,10 @@ class D3Focus {
   }
 
   update(
-    el, svg, filterSeed, filterPeak, tTrEndPts, tShiftPeaks, editPeakSt, editModeSt,
+    el, svg, filterSeed, filterPeak, tTrEndPts, tSfPeaks, editPeakSt, editModeSt,
   ) {
     this.setRoot(el);
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tShiftPeaks);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks);
 
     if (this.data && this.data.length > 0) {
       this.drawLine();
