@@ -6,6 +6,11 @@
 $ npm run storybook
 ```
 
-### TODO
+### Publish
 
-1. full resolution when select region
+```
+$ npm run compile
+$ npm publish
+```
+
+
