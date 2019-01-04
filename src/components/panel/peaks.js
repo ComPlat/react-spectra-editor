@@ -103,7 +103,7 @@ const AddPanel = ({
           badgeContent={posLength}
         >
           <Typography className="txt-panel-header">
-            Create Peaks
+            Created Peaks
           </Typography>
         </CenterBadge>
       </ExpansionPanelSummary>
@@ -132,7 +132,7 @@ const RmPanel = ({
           badgeContent={negLength}
         >
           <Typography className="txt-panel-header">
-            Delete Peaks
+            Deleted Peaks
           </Typography>
         </CenterBadge>
       </ExpansionPanelSummary>
