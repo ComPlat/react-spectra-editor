@@ -1,20 +1,11 @@
 import { SHIFT, EDITPEAK, MANAGER } from '../constants/action_type';
 import LIST_SHIFT from '../constants/list_shift';
+import { CalcResidualX, RealPts } from '../helpers/shift';
 
 const initialState = {
   ref: LIST_SHIFT[0],
   peak: false,
   enable: true,
-};
-
-const adjustPeak = (origState, newPeak) => {
-  if (!newPeak || origState.ref.name === LIST_SHIFT[0].name) return newPeak;
-  const oldPeakX = origState.peak ? origState.peak.x : 0.0;
-  const adjust = oldPeakX === 0.0 ? 0.0 : origState.ref.value;
-  return {
-    x: newPeak.x + oldPeakX - adjust,
-    y: newPeak.y,
-  };
 };
 
 const resetEnable = (operation) => {
@@ -39,14 +30,19 @@ const shiftReducer = (state = initialState, action) => {
         },
       );
     case SHIFT.SET_PEAK: {
-      const adjust = adjustPeak(state, action.payload);
-      const isMatch = state.peak.x === adjust.x;
-      const result = isMatch ? false : adjust;
+      const resX = CalcResidualX(
+        state.ref,
+        state.peak,
+        action.payload,
+      );
+      const trueApex = RealPts([action.payload], resX)[0];
+      const isSamePt = state.peak.x === trueApex.x;
+      const truePeak = trueApex && trueApex.x && !isSamePt ? trueApex : false;
       return Object.assign(
         {},
         state,
         {
-          peak: result,
+          peak: truePeak,
           enable: true,
         },
       );
@@ -61,8 +57,8 @@ const shiftReducer = (state = initialState, action) => {
         },
       );
     case EDITPEAK.ADD_NEGATIVE: {
-      const isMatch = state.peak.x === action.payload.x;
-      return !isMatch
+      const rmApex = state.peak.x === action.payload.x;
+      return !rmApex
         ? state
         : Object.assign(
           {},

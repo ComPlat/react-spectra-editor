@@ -1,16 +1,16 @@
 import Jcampconverter from 'jcampconverter';
 import { createSelector } from 'reselect';
-import LIST_SHIFT from '../constants/list_shift';
+
+import { FromManualToOffset } from './shift';
 
 const getSpectrum = (_, props) => props.input;
 
 const getPeakObj = (_, props) => props.peakObj;
 
-const getShiftDelta = (state, _) => { // eslint-disable-line
+const getShiftOffset = (state, _) => { // eslint-disable-line
   const { shift } = state;
   const { ref, peak } = shift;
-  if (!peak || ref.name === LIST_SHIFT[0].name) return 0;
-  return peak.x - ref.value;
+  return FromManualToOffset(ref, peak);
 };
 
 const downSample = (spectrum, peakObj) => {
@@ -21,13 +21,13 @@ const downSample = (spectrum, peakObj) => {
   return { dsRef, peakUp };
 };
 
-const dsWithoutRef = (spectrum, shiftDelta) => {
+const dsWithoutRef = (spectrum, offset) => {
   const sp = [];
   const xs = spectrum.x;
   const ys = spectrum.y;
   for (let i = 0; i < ys.length; i += 1) { // downsample
     if (i % 2 === 0) {
-      const x = xs[i] - shiftDelta;
+      const x = xs[i] - offset;
       const y = ys[i];
       sp.push({ x, y });
     }
@@ -35,7 +35,7 @@ const dsWithoutRef = (spectrum, shiftDelta) => {
   return sp;
 };
 
-const dsWithRef = (spectrum, dsRef, peakUp, shiftDelta) => {
+const dsWithRef = (spectrum, dsRef, peakUp, offset) => {
   const sp = [];
   const xs = spectrum.x;
   const ys = spectrum.y;
@@ -44,32 +44,32 @@ const dsWithRef = (spectrum, dsRef, peakUp, shiftDelta) => {
     const isDownSample = (peakUp && y < dsRef) || (!peakUp && y > dsRef);
     if (isDownSample) {
       if (i % 3 === 0) {
-        const x = xs[i] - shiftDelta;
+        const x = xs[i] - offset;
         sp.push({ x, y });
       }
     } else {
-      const x = xs[i] - shiftDelta;
+      const x = xs[i] - offset;
       sp.push({ x, y });
     }
   }
   return sp;
 };
 
-const convertSpectrum = (spectrum, peakObj, shiftDelta) => {
+const convertSpectrum = (spectrum, peakObj, offset) => {
   let ds = { dsRef: false, peakUp: false };
   if (peakObj.thresRef) {
     ds = downSample(spectrum, peakObj);
   }
   const sp = ds.dsRef
-    ? dsWithRef(spectrum, ds.dsRef, ds.peakUp, shiftDelta)
-    : dsWithoutRef(spectrum, shiftDelta);
+    ? dsWithRef(spectrum, ds.dsRef, ds.peakUp, offset)
+    : dsWithoutRef(spectrum, offset);
   return sp;
 };
 
 const Spectrum2Seed = createSelector(
   getSpectrum,
   getPeakObj,
-  getShiftDelta,
+  getShiftOffset,
   convertSpectrum,
 );
 
@@ -77,7 +77,7 @@ const getThreshold = state => (
   state.threshold ? state.threshold / 100.0 : false
 );
 
-const Convert2Peak = (peakObj, threshold, shiftDelta) => {
+const Convert2Peak = (peakObj, threshold, offset) => {
   const peak = [];
   if (!peakObj || !peakObj.data) return peak;
   const data = peakObj.data[0];
@@ -87,7 +87,7 @@ const Convert2Peak = (peakObj, threshold, shiftDelta) => {
     const y = data.y[i];
     const overThres = (peakUp && y >= yThres) || (!peakUp && y <= yThres);
     if (overThres) {
-      const x = data.x[i] - shiftDelta;
+      const x = data.x[i] - offset;
       peak.push({ x, y });
     }
   }
@@ -97,7 +97,7 @@ const Convert2Peak = (peakObj, threshold, shiftDelta) => {
 const Spectrum2Peak = createSelector(
   getPeakObj,
   getThreshold,
-  getShiftDelta,
+  getShiftOffset,
   Convert2Peak,
 );
 
@@ -123,14 +123,14 @@ const getShiftPeak = state => (
   state.shift.peak
 );
 
-const convertSfPeaks = (peak, delta) => {
-  if (!peak) return [];
-  return [{ x: peak.x - delta, y: peak.y }];
+const convertSfPeaks = (peak, offset) => {
+  if (!peak || !peak.x) return [];
+  return [{ x: peak.x - offset, y: peak.y }];
 };
 
 const ToShiftPeaks = createSelector(
   getShiftPeak,
-  getShiftDelta,
+  getShiftOffset,
   convertSfPeaks,
 );
 
@@ -235,5 +235,6 @@ const ExtractJcamp = (input) => {
 
 export {
   ExtractJcamp, Spectrum2Seed, Spectrum2Peak,
-  ToThresEndPts, ToShiftPeaks, Convert2Peak,
+  ToThresEndPts, ToShiftPeaks,
+  Convert2Peak,
 };
