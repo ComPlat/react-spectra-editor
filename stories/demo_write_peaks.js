@@ -64,10 +64,21 @@ class DemoWritePeaks extends React.Component {
     this.setState({ desc });
   }
 
-  savePeaks(peaks) {
+  savePeaks(peaks, shift) {
     const peaksXY = ToXY(peaks);
     const desc = this.peaksXYToStr(peaksXY);
-    alert(`Peaks are: ${desc}`); // eslint-disable-line
+    /*eslint-disable */
+    if (shift.ref.name !== '- - -' && shift.peak.x) {
+      alert(
+        `Peaks are: ${desc}` + '\n' +
+        '- - - - - - - - - - -' + '\n' +
+        `Shift solvent = ${shift.ref.name} (${shift.ref.value}ppm)` + '\n' +
+        `Selected peak = ${shift.peak.x}`
+      );
+    } else {
+      alert(`Peaks are: ${desc}`);
+    }
+    /*eslint-disable */
   }
 
   render() {

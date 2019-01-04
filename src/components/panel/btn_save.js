@@ -23,11 +23,11 @@ const Styles = () => ({
 });
 
 const onClickCb = (
-  savePeaks, peaksEdit, toggleSaveBtnAct,
+  savePeaks, peaksEdit, shiftSt, toggleSaveBtnAct,
 ) => (
   () => {
     toggleSaveBtnAct();
-    savePeaks(peaksEdit);
+    savePeaks(peaksEdit, shiftSt);
   }
 );
 
@@ -52,7 +52,7 @@ const BtnSavePeaks = ({
           color="primary"
           className={classNames(classes.btn)}
           onClick={onClickCb(
-            savePeaks, peaksEdit, toggleSaveBtnAct,
+            savePeaks, peaksEdit, shiftSt, toggleSaveBtnAct,
           )}
           disabled={disable}
         >
