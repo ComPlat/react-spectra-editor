@@ -28,9 +28,15 @@ class DemoWritePeaks extends React.Component {
     this.savePeaks = this.savePeaks.bind(this);
   }
 
+  fixDigit(input, precision) {
+    const output = input || 0.0;
+    return output.toFixed(precision);
+  }
+
   peaksXYToStr(peaksXY) {
+    const digit = 1;
     const result = peaksXY.map((p) => {
-      const valX = Math.round(parseFloat(p[0]) * 10) / 10;
+      const valX = this.fixDigit(parseFloat(p[0]), digit);
       return valX;
     });
     return result.join(', ');

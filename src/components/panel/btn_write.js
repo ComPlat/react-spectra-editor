@@ -11,6 +11,7 @@ import { withStyles } from '@material-ui/core/styles';
 
 import { PksEdit } from '../../helpers/converter';
 import { Convert2Peak } from '../../helpers/chem';
+import { FromManualToOffset } from '../../helpers/shift';
 import { toggleWriteBtn } from '../../actions/status';
 
 const Styles = () => ({
@@ -31,13 +32,16 @@ const onClickCb = (
 );
 
 const BtnWritePeaks = ({
-  classes, writePeaks, peakObj, editPeakSt, thresSt, statusSt, layoutSt,
-  toggleWriteBtnAct,
+  classes, writePeaks, peakObj, editPeakSt, thresSt, statusSt,
+  layoutSt, shiftSt, toggleWriteBtnAct,
 }) => {
-  const peaks = Convert2Peak(peakObj, thresSt * 0.01);
+  const { ref, peak } = shiftSt;
+  const offset = FromManualToOffset(ref, peak);
+  const peaks = Convert2Peak(peakObj, thresSt * 0.01, offset);
   const peaksEdit = PksEdit(peaks, editPeakSt);
   const disable = peaksEdit.length === 0 || statusSt.btnWrite;
   if (!writePeaks) return null;
+
 
   return (
     <Tooltip
@@ -66,6 +70,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     thresSt: state.threshold,
     statusSt: state.status,
     layoutSt: state.layout,
+    shiftSt: state.shift,
   }
 );
 
@@ -94,6 +99,7 @@ BtnWritePeaks.propTypes = {
     ],
   ).isRequired,
   layoutSt: PropTypes.string.isRequired,
+  shiftSt: PropTypes.object.isRequired,
   toggleWriteBtnAct: PropTypes.func.isRequired,
 };
 

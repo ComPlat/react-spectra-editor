@@ -11,6 +11,7 @@ import { withStyles } from '@material-ui/core/styles';
 
 import { PksEdit } from '../../helpers/converter';
 import { Convert2Peak } from '../../helpers/chem';
+import { FromManualToOffset } from '../../helpers/shift';
 import { toggleSaveBtn } from '../../actions/status';
 
 const Styles = () => ({
@@ -31,10 +32,12 @@ const onClickCb = (
 );
 
 const BtnSavePeaks = ({
-  classes, savePeaks, peakObj, editPeakSt, thresSt, statusSt,
+  classes, savePeaks, peakObj, editPeakSt, thresSt, statusSt, shiftSt,
   toggleSaveBtnAct,
 }) => {
-  const peaks = Convert2Peak(peakObj, thresSt * 0.01);
+  const { ref, peak } = shiftSt;
+  const offset = FromManualToOffset(ref, peak);
+  const peaks = Convert2Peak(peakObj, thresSt * 0.01, offset);
   const peaksEdit = PksEdit(peaks, editPeakSt);
   const disable = peaksEdit.length === 0 || statusSt.btnSave;
   if (!savePeaks) return null;
@@ -65,6 +68,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     editPeakSt: state.editPeak,
     thresSt: state.threshold,
     statusSt: state.status,
+    shiftSt: state.shift,
   }
 );
 
@@ -92,6 +96,7 @@ BtnSavePeaks.propTypes = {
       PropTypes.bool,
     ],
   ).isRequired,
+  shiftSt: PropTypes.object.isRequired,
   toggleSaveBtnAct: PropTypes.func.isRequired,
 };
 

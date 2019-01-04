@@ -83,11 +83,12 @@ const Convert2Peak = (peakObj, threshold, offset) => {
   const data = peakObj.data[0];
   const { maxY, peakUp, thresRef } = peakObj;
   const yThres = threshold ? (threshold * maxY) : (thresRef * maxY / 100.0);
+  const corrOffset = offset || 0.0;
   for (let i = 0; i < data.y.length; i += 1) {
     const y = data.y[i];
     const overThres = (peakUp && y >= yThres) || (!peakUp && y <= yThres);
     if (overThres) {
-      const x = data.x[i] - offset;
+      const x = data.x[i] - corrOffset;
       peak.push({ x, y });
     }
   }

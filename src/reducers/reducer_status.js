@@ -31,7 +31,11 @@ const statusReducer = (state = initialState, action) => {
         { btnWrite: false, btnSave: false },
       );
     case LAYOUT.UPDATE:
-      return Object.assign({}, state, { btnWrite: false });
+      return Object.assign(
+        {},
+        state,
+        { btnWrite: false, btnSave: false },
+      );
     case MANAGER.RESETALL:
       return initialState;
     default:
