@@ -110,7 +110,7 @@ const convertThresEndPts = (peakObj, threshold) => {
   const thresVal = threshold || thresRef;
   if (!thresVal || !peakObj.data) return [];
   const yThres = thresVal * maxY;
-  const endPts = [{ x: minX, y: yThres }, { x: maxX, y: yThres }];
+  const endPts = [{ x: minX - 200, y: yThres }, { x: maxX + 200, y: yThres }];
   return endPts;
 };
 
