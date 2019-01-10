@@ -90,6 +90,9 @@ class App extends React.Component {
   }
 
   brushFilter(border, seed, peak) {
+    if (border.length === 0) {
+      return { filterSeed: seed, filterPeak: peak };
+    }
     const xL = border[0];
     const xU = border[1];
     let fltSeed = [...seed];
