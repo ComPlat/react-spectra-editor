@@ -13,6 +13,7 @@ import { withStyles } from '@material-ui/core/styles';
 import LayoutPanel from './layout';
 import SubmitPanel from './submit';
 import ThresholdsPanel from './thresholds';
+import ShiftSelect from './shift_select';
 
 const Styles = () => ({
   panelSummary: {
@@ -36,6 +37,8 @@ const SettingsPanel = ({
 }) => (
   <ExpansionPanel>
     { title(classes) }
+    <ShiftSelect />
+    <Divider />
     <ThresholdsPanel peakObj={peakObj} hasEdit={hasEdit} />
     <Divider />
     <LayoutPanel />

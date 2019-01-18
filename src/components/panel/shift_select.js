@@ -25,7 +25,7 @@ const Styles = () => ({
 const txtInputLabel = () => (
   <InputLabel>
     <span className="txt-input-label">
-      Reference (ppm)
+      Solvent Ref (ppm)
     </span>
   </InputLabel>
 );
@@ -47,9 +47,10 @@ const shiftSelection = (shiftRefSt, onChange) => {
 };
 
 const ShiftSelect = ({
-  classes, shiftRefSt, setShiftRefAct,
+  classes, shiftRefSt, shiftEnableSt, setShiftRefAct,
 }) => {
   const onChange = e => setShiftRefAct(e.target.value);
+  if (!shiftEnableSt) return null;
 
   return (
     <ExpansionPanelDetails>
@@ -76,6 +77,7 @@ const ShiftSelect = ({
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     shiftRefSt: state.shift.ref,
+    shiftEnableSt: state.shift.enable,
   }
 );
 
@@ -88,6 +90,7 @@ const mapDispatchToProps = dispatch => (
 ShiftSelect.propTypes = {
   classes: PropTypes.object.isRequired,
   shiftRefSt: PropTypes.object.isRequired,
+  shiftEnableSt: PropTypes.bool.isRequired,
   setShiftRefAct: PropTypes.func.isRequired,
 };
 

@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import {
   withStyles, createMuiTheme, MuiThemeProvider,
 } from '@material-ui/core/styles';
-import ShiftPanel from './shift';
 import SettingsPanel from './settings';
 import ModeNavigation from './mode_navigation';
 import Manual from './manual';
@@ -24,7 +23,6 @@ const PanelViewer = ({
 }) => (
   <MuiThemeProvider theme={theme}>
     <ModeNavigation />
-    <ShiftPanel />
     <SettingsPanel
       peakObj={peakObj}
       hasEdit={hasEdit}
