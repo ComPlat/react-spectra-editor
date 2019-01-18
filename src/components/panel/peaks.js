@@ -11,6 +11,7 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Badge from '@material-ui/core/Badge';
 import Chip from '@material-ui/core/Chip';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 
@@ -21,7 +22,7 @@ const Styles = () => ({
     margin: '5px',
   },
   panelSummary: {
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#fbfbfb',
   },
 });
 
@@ -107,6 +108,7 @@ const AddPanel = ({
           </Typography>
         </CenterBadge>
       </ExpansionPanelSummary>
+      <Divider />
       <ExpansionPanelDetails>
         { posPeakList(pos, rmFromPosListAct, classes) }
       </ExpansionPanelDetails>
@@ -136,6 +138,7 @@ const RmPanel = ({
           </Typography>
         </CenterBadge>
       </ExpansionPanelSummary>
+      <Divider />
       <ExpansionPanelDetails>
         { negPeakList(neg, rmFromNegListAct, classes) }
       </ExpansionPanelDetails>

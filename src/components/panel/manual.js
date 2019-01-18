@@ -16,7 +16,7 @@ const styles = {
     margin: 10,
   },
   panelSummary: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#fbfbfb',
   },
   content: {
     padding: 10,
