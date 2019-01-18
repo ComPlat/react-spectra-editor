@@ -21,4 +21,13 @@ const toggleAllBtn = () => (
   }
 );
 
-export { toggleSaveBtn, toggleWriteBtn, toggleAllBtn };
+const enableAllBtn = () => (
+  {
+    type: STATUS.ENABLEBTNALL,
+    payload: [],
+  }
+);
+
+export {
+  toggleSaveBtn, toggleWriteBtn, toggleAllBtn, enableAllBtn,
+};

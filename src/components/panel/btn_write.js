@@ -23,25 +23,25 @@ const Styles = () => ({
 });
 
 const onClickCb = (
-  writePeaks, peaksEdit, layoutSt, toggleWriteBtnAct,
+  writePeaks, peaksEdit, isAscend, layoutSt, toggleWriteBtnAct,
 ) => (
   () => {
     toggleWriteBtnAct();
-    writePeaks(peaksEdit, layoutSt);
+    writePeaks(peaksEdit, layoutSt, isAscend);
   }
 );
 
 const BtnWritePeaks = ({
-  classes, writePeaks, peakObj, editPeakSt, thresSt, statusSt,
+  classes, writePeaks, peakObj, isAscend, editPeakSt, thresSt, statusSt,
   layoutSt, shiftSt, toggleWriteBtnAct,
 }) => {
   const { ref, peak } = shiftSt;
+
   const offset = FromManualToOffset(ref, peak);
   const peaks = Convert2Peak(peakObj, thresSt * 0.01, offset);
   const peaksEdit = PksEdit(peaks, editPeakSt);
   const disable = peaksEdit.length === 0 || statusSt.btnWrite;
   if (!writePeaks) return null;
-
 
   return (
     <Tooltip
@@ -53,7 +53,7 @@ const BtnWritePeaks = ({
           color="primary"
           className={classNames(classes.btn)}
           onClick={onClickCb(
-            writePeaks, peaksEdit, layoutSt, toggleWriteBtnAct,
+            writePeaks, peaksEdit, isAscend, layoutSt, toggleWriteBtnAct,
           )}
           disabled={disable}
         >
@@ -83,6 +83,7 @@ const mapDispatchToProps = dispatch => (
 BtnWritePeaks.propTypes = {
   classes: PropTypes.object.isRequired,
   peakObj: PropTypes.object.isRequired,
+  isAscend: PropTypes.bool.isRequired,
   writePeaks: PropTypes.oneOfType(
     [
       PropTypes.func,

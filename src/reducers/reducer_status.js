@@ -19,6 +19,7 @@ const statusReducer = (state = initialState, action) => {
         state,
         { btnWrite: !state.btnWrite, btnSave: !state.btnSave },
       );
+    case STATUS.ENABLEBTNALL:
     case EDITPEAK.ADDPOSITIVE:
     case EDITPEAK.RMPOSITIVE:
     case EDITPEAK.ADDNEGATIVE:
@@ -39,7 +40,7 @@ const statusReducer = (state = initialState, action) => {
     case MANAGER.RESETALL:
       return initialState;
     default:
-      return state;
+      return initialState;
   }
 };
 

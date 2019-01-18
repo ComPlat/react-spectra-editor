@@ -33,13 +33,17 @@ class DemoWritePeaks extends React.Component {
     return output.toFixed(precision);
   }
 
-  peaksXYToStr(peaksXY) {
+  peaksXYToStr(peaksXY, isAscend) {
     const digit = 1;
     const result = peaksXY.map((p) => {
       const valX = this.fixDigit(parseFloat(p[0]), digit);
       return valX;
     });
-    return result.join(', ');
+    const ascendFunc = (a, b) => a - b;
+    const descendFunc = (a, b) => b - a;
+    const sortFunc = isAscend ? ascendFunc : descendFunc;
+    const sortResult = result.sort(sortFunc);
+    return sortResult.join(', ');
   }
 
   extractLayout(layout) {
@@ -56,17 +60,17 @@ class DemoWritePeaks extends React.Component {
     }
   }
 
-  writePeaks(peaks, layout) {
+  writePeaks(peaks, layout, isAscend) {
     const peaksXY = ToXY(peaks);
-    const descPeaks = this.peaksXYToStr(peaksXY);
+    const descPeaks = this.peaksXYToStr(peaksXY, isAscend);
     const descLayout = this.extractLayout(layout);
     const desc = descLayout + descPeaks;
     this.setState({ desc });
   }
 
-  savePeaks(peaks, shift) {
+  savePeaks(peaks, shift, isAscend) {
     const peaksXY = ToXY(peaks);
-    const desc = this.peaksXYToStr(peaksXY);
+    const desc = this.peaksXYToStr(peaksXY, isAscend);
     /*eslint-disable */
     if (shift.ref.name !== '- - -' && shift.peak.x) {
       alert(

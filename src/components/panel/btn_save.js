@@ -23,23 +23,25 @@ const Styles = () => ({
 });
 
 const onClickCb = (
-  savePeaks, peaksEdit, shiftSt, toggleSaveBtnAct,
+  savePeaks, peaksEdit, isAscend, shiftSt, toggleSaveBtnAct,
 ) => (
   () => {
     toggleSaveBtnAct();
-    savePeaks(peaksEdit, shiftSt);
+    savePeaks(peaksEdit, shiftSt, isAscend);
   }
 );
 
 const BtnSavePeaks = ({
-  classes, savePeaks, peakObj, editPeakSt, thresSt, statusSt, shiftSt,
+  classes, savePeaks, peakObj, isAscend, editPeakSt, thresSt, statusSt, shiftSt,
   toggleSaveBtnAct,
 }) => {
   const { ref, peak } = shiftSt;
+
   const offset = FromManualToOffset(ref, peak);
   const peaks = Convert2Peak(peakObj, thresSt * 0.01, offset);
   const peaksEdit = PksEdit(peaks, editPeakSt);
   const disable = peaksEdit.length === 0 || statusSt.btnSave;
+
   if (!savePeaks) return null;
 
   return (
@@ -52,7 +54,7 @@ const BtnSavePeaks = ({
           color="primary"
           className={classNames(classes.btn)}
           onClick={onClickCb(
-            savePeaks, peaksEdit, shiftSt, toggleSaveBtnAct,
+            savePeaks, peaksEdit, isAscend, shiftSt, toggleSaveBtnAct,
           )}
           disabled={disable}
         >
@@ -81,6 +83,7 @@ const mapDispatchToProps = dispatch => (
 BtnSavePeaks.propTypes = {
   classes: PropTypes.object.isRequired,
   peakObj: PropTypes.object.isRequired,
+  isAscend: PropTypes.bool.isRequired,
   savePeaks: PropTypes.oneOfType(
     [
       PropTypes.func,
