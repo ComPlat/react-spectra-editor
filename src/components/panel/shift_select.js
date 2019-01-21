@@ -4,45 +4,51 @@ import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
 
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Grid from '@material-ui/core/Grid';
 import Select from '@material-ui/core/Select';
-import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
+import Tooltip from '@material-ui/core/Tooltip';
 import { withStyles } from '@material-ui/core/styles';
 
 import { setShiftRef } from '../../actions/shift';
 import LIST_SHIFT from '../../constants/list_shift';
 
 const Styles = () => ({
+  container: {
+    margin: '12px 18px',
+  },
   formControl: {
     margin: '10px 20px 0px 10px',
     minWidth: 150,
   },
 });
 
-const txtInputLabel = () => (
-  <InputLabel>
-    <span className="txt-input-label">
-      Solvent Ref (ppm)
-    </span>
-  </InputLabel>
-);
-
-const shiftSelection = (shiftRefSt, onChange) => {
+const shiftSelection = (classes, shiftRefSt, onChange) => {
   const content = LIST_SHIFT.map(ref => (
     <MenuItem value={ref} key={ref.name}>
       <span className="txt-sv-input-label">
-        { `${ref.name}: ${ref.value}` }
+        { `${ref.name}: ${ref.value} ppm` }
       </span>
     </MenuItem>
   ));
 
   return (
-    <Select value={shiftRefSt} onChange={onChange}>
-      { content }
-    </Select>
+    <Tooltip
+      title={<span className="txt-sv-tp">Shift Reference</span>}
+      placement="top"
+      disableFocusListener
+      disableTouchListener
+    >
+      <FormControl
+        variant="outlined"
+        className={classNames(classes.formControl)}
+      >
+        <Select value={shiftRefSt} onChange={onChange}>
+          { content }
+        </Select>
+      </FormControl>
+    </Tooltip>
   );
 };
 
@@ -53,24 +59,17 @@ const ShiftSelect = ({
   if (!shiftEnableSt) return null;
 
   return (
-    <ExpansionPanelDetails>
-      <Grid
-        container
-        direction="row"
-        justify="center"
-        alignItems="center"
-      >
-        <Grid item xs={12}>
-          <FormControl
-            variant="outlined"
-            className={classNames(classes.formControl)}
-          >
-            { txtInputLabel() }
-            { shiftSelection(shiftRefSt, onChange) }
-          </FormControl>
-        </Grid>
+    <Grid
+      className={classNames(classes.container)}
+      container
+      direction="row"
+      justify="center"
+      alignItems="center"
+    >
+      <Grid item xs={12}>
+        { shiftSelection(classes, shiftRefSt, onChange) }
       </Grid>
-    </ExpansionPanelDetails>
+    </Grid>
   );
 };
 

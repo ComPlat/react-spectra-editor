@@ -37,11 +37,11 @@ const SettingsPanel = ({
 }) => (
   <ExpansionPanel>
     { title(classes) }
+    <LayoutPanel />
+    <Divider />
     <ShiftSelect />
     <Divider />
     <ThresholdsPanel peakObj={peakObj} hasEdit={hasEdit} />
-    <Divider />
-    <LayoutPanel />
     <Divider />
     <SubmitPanel
       savePeaks={savePeaks}

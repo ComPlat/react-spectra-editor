@@ -4,10 +4,8 @@ import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import Refresh from '@material-ui/icons/Refresh';
@@ -20,6 +18,9 @@ import { updateThreshold, resetThreshold } from '../../actions/threshold';
 import { toggleIsEdit } from '../../actions/manager';
 
 const Styles = () => ({
+  container: {
+    margin: '12px 18px',
+  },
   btnRefresh: {
   },
   btnRestore: {
@@ -28,12 +29,6 @@ const Styles = () => ({
     margin: '0 10px',
   },
 });
-
-const txtInputLabel = () => (
-  <span className="txt-input-label">
-    Picking Threshold
-  </span>
-);
 
 const txtPercent = () => (
   <InputAdornment position="end">
@@ -55,16 +50,19 @@ const setThreshold = (
   };
 
   return (
-    <Grid item xs={8}>
+    <Tooltip
+      title={<span className="txt-sv-tp">Threshold</span>}
+      placement="top"
+      disableFocusListener
+      disableTouchListener
+    >
       <TextField
         disabled={!thresVal}
         id="outlined-name"
-        label={txtInputLabel()}
         placeholder="N.A."
         type="number"
         value={thresVal || false}
         margin="normal"
-        variant="outlined"
         InputProps={{
           endAdornment: txtPercent(),
           className: 'txt-input',
@@ -73,24 +71,22 @@ const setThreshold = (
         onBlur={onBlur}
         onKeyPress={onEnterPress}
       />
-    </Grid>
+    </Tooltip>
   );
 };
 
 const btnRefresh = (
   classes, thresVal, resetThresholdAct,
 ) => (
-  <Grid item xs={4}>
-    <IconButton
-      disabled={!thresVal}
-      variant="fab"
-      color="primary"
-      className={classNames(classes.btnRefresh)}
-      onClick={resetThresholdAct}
-    >
-      <Refresh />
-    </IconButton>
-  </Grid>
+  <IconButton
+    disabled={!thresVal}
+    variant="fab"
+    color="primary"
+    className={classNames(classes.btnRefresh)}
+    onClick={resetThresholdAct}
+  >
+    <Refresh />
+  </IconButton>
 );
 
 const restoreDisplay = (hasEdit, managerSt) => (
@@ -102,35 +98,19 @@ const restoreTp = (hasEdit, managerSt) => (
 );
 
 const btnRestore = (classes, hasEdit, managerSt, toggleIsEditAct) => (
-  <Grid
-    container
-    direction="row"
-    justify="center"
-    alignItems="center"
+  <Tooltip
+    title={<span className="txt-sv-tp">{restoreTp(hasEdit, managerSt)}</span>}
   >
-    <Grid item xs={8}>
-      <span className={classNames(classes.txtRestore, 'txt-panel-content')}>
-        <i>Peaks defined by: </i>
-      </span>
-    </Grid>
-    <Grid item xs={4}>
-      <Tooltip
-        title={<span className="txt-sv-tp">{restoreTp(hasEdit, managerSt)}</span>}
-      >
-        <div>
-          <Button
-            variant="outlined"
-            color="default"
-            className={classNames(classes.btnRestore)}
-            onClick={toggleIsEditAct}
-            disabled={!hasEdit}
-          >
-            { restoreDisplay(hasEdit, managerSt) }
-          </Button>
-        </div>
-      </Tooltip>
-    </Grid>
-  </Grid>
+    <IconButton
+      disabled={!hasEdit}
+      variant="fab"
+      color="primary"
+      className={classNames(classes.btnRestore)}
+      onClick={toggleIsEditAct}
+    >
+      { restoreDisplay(hasEdit, managerSt) }
+    </IconButton>
+  </Tooltip>
 );
 
 const ThresholdsPanel = ({
@@ -139,18 +119,23 @@ const ThresholdsPanel = ({
 }) => {
   const thresVal = thresSt || peakObj.thresRef;
   return (
-    <ExpansionPanelDetails>
-      <Grid
-        container
-        direction="row"
-        justify="center"
-        alignItems="center"
-      >
+    <Grid
+      className={classNames(classes.container)}
+      container
+      direction="row"
+      justify="center"
+      alignItems="center"
+    >
+      <Grid item xs={6}>
         { setThreshold(classes, thresVal, updateThresholdAct) }
+      </Grid>
+      <Grid item xs={3}>
         { btnRefresh(classes, thresVal, resetThresholdAct) }
+      </Grid>
+      <Grid item xs={3}>
         { btnRestore(classes, hasEdit, managerSt, toggleIsEditAct) }
       </Grid>
-    </ExpansionPanelDetails>
+    </Grid>
   );
 };
 
@@ -186,4 +171,7 @@ ThresholdsPanel.propTypes = {
   toggleIsEditAct: PropTypes.func.isRequired,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(Styles)(ThresholdsPanel));
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(withStyles(Styles)(ThresholdsPanel));

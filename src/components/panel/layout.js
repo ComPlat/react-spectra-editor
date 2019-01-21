@@ -4,76 +4,77 @@ import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Grid from '@material-ui/core/Grid';
 import Select from '@material-ui/core/Select';
-import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
+import Tooltip from '@material-ui/core/Tooltip';
 import { withStyles } from '@material-ui/core/styles';
 
 import { updateLayout } from '../../actions/layout';
 import { LIST_LAYOUT } from '../../constants/list_layout';
 
 const Styles = () => ({
+  container: {
+    margin: '12px 18px',
+  },
   formControl: {
     margin: '10px 20px 0px 10px',
     minWidth: 150,
   },
 });
 
-const txtInputLabel = () => (
-  <InputLabel>
-    <span className="txt-input-label">
-      Write Peaks Layout
-    </span>
-  </InputLabel>
+const layoutSelect = (classes, layoutSt, onChange) => (
+  <Tooltip
+    title={<span className="txt-sv-tp">Layout</span>}
+    placement="top"
+    disableFocusListener
+    disableTouchListener
+  >
+    <FormControl
+      className={classNames(classes.formControl)}
+    >
+      <Select value={layoutSt} onChange={onChange}>
+        <MenuItem value={LIST_LAYOUT.PLAIN}>
+          <span className="txt-sv-input-label">plain</span>
+        </MenuItem>
+        <MenuItem value={LIST_LAYOUT.IR}>
+          <span className="txt-sv-input-label">IR</span>
+        </MenuItem>
+        <MenuItem value={LIST_LAYOUT.H1}>
+          <span className="txt-sv-input-label">
+            <sup>1</sup>
+            H
+          </span>
+        </MenuItem>
+        <MenuItem value={LIST_LAYOUT.C13}>
+          <span className="txt-sv-input-label">
+            <sup>13</sup>
+            C
+          </span>
+        </MenuItem>
+      </Select>
+    </FormControl>
+  </Tooltip>
 );
 
 const LayoutPanel = ({
-  classes, layoutSt,
-  updateLayoutAct,
+  classes, layoutSt, updateLayoutAct,
 }) => {
   const onChange = e => updateLayoutAct(e.target.value);
 
   return (
-    <ExpansionPanelDetails>
-      <Grid
-        container
-        direction="row"
-        justify="center"
-        alignItems="center"
-      >
-        <Grid item xs={8}>
-          <FormControl
-            variant="outlined"
-            className={classNames(classes.formControl)}
-          >
-            { txtInputLabel() }
-            <Select value={layoutSt} onChange={onChange}>
-              <MenuItem value={LIST_LAYOUT.PLAIN}>
-                <span className="txt-sv-input-label">plain</span>
-              </MenuItem>
-              <MenuItem value={LIST_LAYOUT.IR}>
-                <span className="txt-sv-input-label">IR</span>
-              </MenuItem>
-              <MenuItem value={LIST_LAYOUT.H1}>
-                <span className="txt-sv-input-label">
-                  <sup>1</sup>
-                  H
-                </span>
-              </MenuItem>
-              <MenuItem value={LIST_LAYOUT.C13}>
-                <span className="txt-sv-input-label">
-                  <sup>13</sup>
-                  C
-                </span>
-              </MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
+    <Grid
+      className={classNames(classes.container)}
+      container
+      direction="row"
+      justify="center"
+      alignItems="center"
+    >
+      <Grid item xs={12}>
+        { layoutSelect(classes, layoutSt, onChange) }
       </Grid>
-    </ExpansionPanelDetails>
+    </Grid>
   );
 };
 
