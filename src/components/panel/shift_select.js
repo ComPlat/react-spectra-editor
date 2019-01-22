@@ -12,7 +12,9 @@ import Tooltip from '@material-ui/core/Tooltip';
 import { withStyles } from '@material-ui/core/styles';
 
 import { setShiftRef } from '../../actions/shift';
-import LIST_SHIFT from '../../constants/list_shift';
+import { LIST_SHIFT_13C, LIST_SHIFT_1H } from '../../constants/list_shift';
+import { LIST_LAYOUT } from '../../constants/list_layout';
+
 
 const Styles = () => ({
   container: {
@@ -24,8 +26,12 @@ const Styles = () => ({
   },
 });
 
-const shiftSelection = (classes, shiftRefSt, onChange) => {
-  const content = LIST_SHIFT.map(ref => (
+const shiftSelection = (classes, layoutSt, shiftRefSt, onChange) => {
+  const listShift = layoutSt === LIST_LAYOUT.C13
+    ? LIST_SHIFT_13C
+    : LIST_SHIFT_1H;
+
+  const content = listShift.map(ref => (
     <MenuItem value={ref} key={ref.name}>
       <span className="txt-sv-input-label">
         { `${ref.name}: ${ref.value} ppm` }
@@ -53,7 +59,7 @@ const shiftSelection = (classes, shiftRefSt, onChange) => {
 };
 
 const ShiftSelect = ({
-  classes, shiftRefSt, shiftEnableSt, setShiftRefAct,
+  classes, layoutSt, shiftRefSt, shiftEnableSt, setShiftRefAct,
 }) => {
   const onChange = e => setShiftRefAct(e.target.value);
   if (!shiftEnableSt) return null;
@@ -67,7 +73,7 @@ const ShiftSelect = ({
       alignItems="center"
     >
       <Grid item xs={12}>
-        { shiftSelection(classes, shiftRefSt, onChange) }
+        { shiftSelection(classes, layoutSt, shiftRefSt, onChange) }
       </Grid>
     </Grid>
   );
@@ -75,6 +81,7 @@ const ShiftSelect = ({
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
+    layoutSt: state.layout,
     shiftRefSt: state.shift.ref,
     shiftEnableSt: state.shift.enable,
   }
@@ -88,6 +95,7 @@ const mapDispatchToProps = dispatch => (
 
 ShiftSelect.propTypes = {
   classes: PropTypes.object.isRequired,
+  layoutSt: PropTypes.string.isRequired,
   shiftRefSt: PropTypes.object.isRequired,
   shiftEnableSt: PropTypes.bool.isRequired,
   setShiftRefAct: PropTypes.func.isRequired,

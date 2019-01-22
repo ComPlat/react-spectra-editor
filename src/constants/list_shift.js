@@ -94,11 +94,25 @@ const trifluoroethanolD3 = {
   value: 61.500,
 };
 
-const LIST_SHIFT = [
+const LIST_SHIFT_13C = [
   noReference, acidD4, acetoneD6, acetonitrileD3, benzene, chloroformD,
   cyclohexaneD12, dichloromethaneD2, dmfD7, dioxaneD8, dmsoD6,
   ethanolD6, methanolD4, pyridineD5, thfD8, tms, tolueneD8,
   tfaD, trifluoroethanolD3,
 ];
 
-export default LIST_SHIFT;
+const h1solventA = {
+  name: '1H solvent A',
+  value: 2.2,
+};
+
+const h1solventB = {
+  name: '1H solvent B',
+  value: 3.8,
+};
+
+const LIST_SHIFT_1H = [
+  noReference, h1solventA, h1solventB,
+];
+
+export { LIST_SHIFT_13C, LIST_SHIFT_1H };

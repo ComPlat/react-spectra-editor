@@ -1,28 +1,37 @@
-import { SHIFT, EDITPEAK, MANAGER } from '../constants/action_type';
-import LIST_SHIFT from '../constants/list_shift';
+import {
+  SHIFT, EDITPEAK, MANAGER, LAYOUT,
+} from '../constants/action_type';
+import { LIST_SHIFT_13C, LIST_SHIFT_1H } from '../constants/list_shift';
+import { LIST_LAYOUT } from '../constants/list_layout';
 import { CalcResidualX, RealPts } from '../helpers/shift';
 
+const shiftNone = LIST_SHIFT_13C[0];
+
 const initialState = {
-  ref: LIST_SHIFT[0],
+  ref: shiftNone,
   peak: false,
   enable: true,
 };
 
-const resetRef = (shift) => {
-  if (!shift || !shift.solventName) return LIST_SHIFT[0];
+const resetRef = (payload) => {
+  const { shift, layout } = payload;
+  if (!shift || !shift.solventName) return shiftNone;
 
   const name = shift.solventName;
   let target = false;
-  LIST_SHIFT.forEach((l) => {
+  const listShift = layout === LIST_LAYOUT.C13
+    ? LIST_SHIFT_13C
+    : LIST_SHIFT_1H;
+  listShift.forEach((l) => {
     if (l.name === name) {
       target = l;
     }
   });
-  return target || LIST_SHIFT[0];
+  return target || shiftNone[0];
 };
 
-const resetEnable = (operation) => {
-  const { typ } = operation;
+const resetEnable = (payload) => {
+  const { typ } = payload.operation;
   switch (typ) {
     case 'NMR':
       return true;
@@ -82,13 +91,22 @@ const shiftReducer = (state = initialState, action) => {
           },
         );
     }
-    case MANAGER.RESETALL:
+    case LAYOUT.UPDATE:
       return Object.assign(
         {},
         initialState,
         {
-          ref: resetRef(action.payload.shift),
-          enable: resetEnable(action.payload.operation),
+          peak: false,
+          enable: state.enable,
+        },
+      );
+    case MANAGER.RESETSHIFT: // case MANAGER.RESETALL:
+      return Object.assign(
+        {},
+        initialState,
+        {
+          ref: resetRef(action.payload),
+          enable: resetEnable(action.payload),
         },
       );
     default:
