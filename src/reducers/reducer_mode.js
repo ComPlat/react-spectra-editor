@@ -24,7 +24,7 @@ const modeReducer = (state = initialState, action) => {
         {},
         initialState,
         {
-          edit: resetMode(action.payload),
+          edit: resetMode(action.payload.operation),
         },
       );
     default:

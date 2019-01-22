@@ -29,7 +29,7 @@ class App extends React.Component {
       updateBorderAct, resetAllAct,
     } = this.props;
 
-    resetAllAct(peakObj.operation);
+    resetAllAct(peakObj);
 
     const { filterSeed, filterPeak } = this.brushFilter(borderSt, seed, peak);
     const node = this.d3Ref.current;
@@ -85,7 +85,7 @@ class App extends React.Component {
     const { peakObj, resetAllAct } = this.props;
     const oldPeakObj = prevProps.peakObj;
     if (oldPeakObj !== peakObj) {
-      resetAllAct(peakObj.operation);
+      resetAllAct(peakObj);
     }
   }
 

@@ -8,6 +8,19 @@ const initialState = {
   enable: true,
 };
 
+const resetRef = (shift) => {
+  if (!shift || !shift.solventName) return LIST_SHIFT[0];
+
+  const name = shift.solventName;
+  let target = false;
+  LIST_SHIFT.forEach((l) => {
+    if (l.name === name) {
+      target = l;
+    }
+  });
+  return target || LIST_SHIFT[0];
+};
+
 const resetEnable = (operation) => {
   const { typ } = operation;
   switch (typ) {
@@ -74,7 +87,8 @@ const shiftReducer = (state = initialState, action) => {
         {},
         initialState,
         {
-          enable: resetEnable(action.payload),
+          ref: resetRef(action.payload.shift),
+          enable: resetEnable(action.payload.operation),
         },
       );
     default:

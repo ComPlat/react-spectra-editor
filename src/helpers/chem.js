@@ -187,6 +187,24 @@ const calcThresRef = (s, peakUp) => {
     : Math.ceil(ref * 100 * 100 / s.maxY) / 100;
 };
 
+const extractShift = (s) => {
+  const shift = {
+    selectX: false,
+    solventName: false,
+    solventValue: false,
+  };
+  if (!s || !s.sampleDescription) return shift;
+
+  const desc = s.sampleDescription;
+  const info = desc.split(/;|=/);
+
+  return {
+    selectX: parseFloat(info[1]),
+    solventName: info[3],
+    solventValue: parseFloat(info[5]),
+  };
+};
+
 const extractPeakObj = (jcamp, peakUp, sTyp) => {
   const subTyp = jcamp.xType ? ` - ${jcamp.xType}` : '';
   const peakObjs = jcamp.spectra.map((s) => {
@@ -197,10 +215,7 @@ const extractPeakObj = (jcamp, peakUp, sTyp) => {
           typ: s.dataType + subTyp,
           peakUp,
           thresRef,
-          shift: {
-            source: false,
-            solvent: false,
-          },
+          shift: extractShift(s),
           operation: {
             typ: sTyp,
             nucleus: jcamp.xType || '',

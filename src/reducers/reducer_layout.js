@@ -1,7 +1,7 @@
 import { LAYOUT, MANAGER } from '../constants/action_type';
 import { LIST_LAYOUT } from '../constants/list_layout';
 
-const initialState = LIST_LAYOUT.PLAIN;
+const initialState = LIST_LAYOUT.C13;
 
 const resetLayout = (operation) => {
   const { nucleus, typ } = operation;
@@ -23,7 +23,7 @@ const layoutReducer = (state = initialState, action) => {
     case LAYOUT.UPDATE:
       return action.payload;
     case MANAGER.RESETALL:
-      return resetLayout(action.payload);
+      return resetLayout(action.payload.operation);
     default:
       return state;
   }
