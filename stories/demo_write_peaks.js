@@ -3,12 +3,10 @@ import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 
-import {
-  SpectraViewer, ExtractJcamp, ToXY, LIST_LAYOUT,
-} from '../src/index';
+import { SpectraViewer, FN } from '../src/index';
 import C13_CPD from './source/C13_CPD';
 
-const file = ExtractJcamp(C13_CPD);
+const file = FN.ExtractJcamp(C13_CPD);
 
 const noDataAvailable = () => (
   <div>
@@ -28,63 +26,24 @@ class DemoWritePeaks extends React.Component {
     this.savePeaks = this.savePeaks.bind(this);
   }
 
-  fixDigit(input, precision) {
-    const output = input || 0.0;
-    return output.toFixed(precision);
-  }
-
-  peaksXYToStr(peaksXY, isAscend) {
-    const digit = 1;
-    const result = peaksXY.map((p) => {
-      const valX = this.fixDigit(parseFloat(p[0]), digit);
-      return valX;
-    });
-    const ascendFunc = (a, b) => a - b;
-    const descendFunc = (a, b) => b - a;
-    const sortFunc = isAscend ? ascendFunc : descendFunc;
-    const sortResult = result.sort(sortFunc);
-    return sortResult.join(', ');
-  }
-
-  extractLayout(layout, shift) {
-    let solvTxt = '';
-    if (shift.ref.name !== '- - -') {
-      solvTxt = `(${shift.ref.name})`;
-    }
-
-    switch (layout) {
-      case LIST_LAYOUT.IR:
-        return `IR ${solvTxt}= `;
-      case LIST_LAYOUT.H1:
-        return `1 H ${solvTxt}= `;
-      case LIST_LAYOUT.C13:
-        return `13 C ${solvTxt}= `;
-      case LIST_LAYOUT.PLAIN:
-      default:
-        return `${solvTxt}`;
-    }
-  }
-
   writePeaks(peaks, layout, shift, isAscend) {
-    const peaksXY = ToXY(peaks);
-    const descPeaks = this.peaksXYToStr(peaksXY, isAscend);
-    const descLayout = this.extractLayout(layout, shift);
-    const desc = descLayout + descPeaks;
+    const body = FN.peaksBody(peaks, layout, isAscend);
+    const wrapper = FN.peaksWrapper(layout, shift);
+    const desc = wrapper.head + body + wrapper.tail;
     this.setState({ desc });
   }
 
-  savePeaks(peaks, shift, isAscend) {
-    const peaksXY = ToXY(peaks);
-    const desc = this.peaksXYToStr(peaksXY, isAscend);
+  savePeaks(peaks, layout, shift, isAscend) {
+    const body = FN.peaksBody(peaks, layout, isAscend);
     /*eslint-disable */
     if (shift.ref.name !== '- - -') {
       alert(
-        `Peaks are: ${desc}` + '\n' +
+        `Peaks are: ${body}` + '\n' +
         '- - - - - - - - - - -' + '\n' +
         `Shift solvent = ${shift.ref.name}, ${shift.ref.value}ppm` + '\n'
       );
     } else {
-      alert(`Peaks are: ${desc}`);
+      alert(`Peaks are: ${body}`);
     }
     /*eslint-disable */
   }

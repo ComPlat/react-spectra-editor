@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { SpectraViewer, ExtractJcamp } from '../src/index';
+import { SpectraViewer, FN } from '../src/index';
 import C13_CPD from './source/C13_CPD';
 
-const file = ExtractJcamp(C13_CPD);
+const file = FN.ExtractJcamp(C13_CPD);
 
 const noDataAvailable = () => (
   <div>

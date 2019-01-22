@@ -23,17 +23,18 @@ const Styles = () => ({
 });
 
 const onClickCb = (
-  savePeaks, peaksEdit, isAscend, shiftSt, toggleSaveBtnAct,
+  savePeaks, peaksEdit, isAscend,
+  layoutSt, shiftSt, toggleSaveBtnAct,
 ) => (
   () => {
     toggleSaveBtnAct();
-    savePeaks(peaksEdit, shiftSt, isAscend);
+    savePeaks(peaksEdit, layoutSt, shiftSt, isAscend);
   }
 );
 
 const BtnSavePeaks = ({
-  classes, savePeaks, peakObj, isAscend, editPeakSt, thresSt, statusSt, shiftSt,
-  toggleSaveBtnAct,
+  classes, savePeaks, peakObj, isAscend, editPeakSt, thresSt, statusSt,
+  layoutSt, shiftSt, toggleSaveBtnAct,
 }) => {
   const { ref, peak } = shiftSt;
 
@@ -54,7 +55,8 @@ const BtnSavePeaks = ({
           color="primary"
           className={classNames(classes.btn)}
           onClick={onClickCb(
-            savePeaks, peaksEdit, isAscend, shiftSt, toggleSaveBtnAct,
+            savePeaks, peaksEdit, isAscend,
+            layoutSt, shiftSt, toggleSaveBtnAct,
           )}
           disabled={disable}
         >
@@ -70,6 +72,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     editPeakSt: state.editPeak,
     thresSt: state.threshold,
     statusSt: state.status,
+    layoutSt: state.layout,
     shiftSt: state.shift,
   }
 );
@@ -99,6 +102,7 @@ BtnSavePeaks.propTypes = {
       PropTypes.bool,
     ],
   ).isRequired,
+  layoutSt: PropTypes.string.isRequired,
   shiftSt: PropTypes.object.isRequired,
   toggleSaveBtnAct: PropTypes.func.isRequired,
 };

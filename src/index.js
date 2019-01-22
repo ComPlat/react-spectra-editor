@@ -10,9 +10,7 @@ import createSagaMiddleware from 'redux-saga';
 import reducers from './reducers/index';
 import sagas from './sagas/index';
 import Frame from './frame';
-import { ExtractJcamp } from './helpers/chem';
-import { ToXY } from './helpers/converter';
-import { LIST_LAYOUT } from './constants/list_layout';
+import FN from './fn';
 
 // - - - store & middleware - - -
 const sagaMiddleware = createSagaMiddleware();
@@ -69,5 +67,5 @@ SpectraViewer.defaultProps = {
 };
 
 export {
-  SpectraViewer, ExtractJcamp, ToXY, LIST_LAYOUT,
+  SpectraViewer, FN,
 };

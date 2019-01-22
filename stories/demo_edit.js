@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { SpectraViewer, ExtractJcamp } from '../src/index';
+import { SpectraViewer, FN } from '../src/index';
 import IREdit from './source/IR_edit';
 
-const file = ExtractJcamp(IREdit);
+const file = FN.ExtractJcamp(IREdit);
 
 const noDataAvailable = () => (
   <div>
