@@ -1,4 +1,4 @@
-import { ToXY } from './converter';
+import { ToXY, IsSame } from './converter';
 import { LIST_LAYOUT } from '../constants/list_layout';
 
 const spectraDigit = (layout) => {
@@ -44,10 +44,17 @@ const spectraOps = {
   IR: { head: 'IR', tail: 'cm-1' },
 };
 
-const peaksBody = (peaks, layout, isAscend) => {
+const fixDigitAndRmRef = (input, precision, refValue) => {
+  if (IsSame(input, refValue)) return null;
+  return fixDigit(input, precision);
+};
+
+const peaksBody = (peaks, layout, shift, isAscend) => {
   const peaksXY = ToXY(peaks);
   const digit = spectraDigit(layout);
-  const result = peaksXY.map(p => fixDigit(parseFloat(p[0]), digit));
+  const result = peaksXY.map(
+    p => fixDigitAndRmRef(parseFloat(p[0]), digit, shift.ref.value),
+  ).filter(r => r != null);
 
   const ascendFunc = (a, b) => a - b;
   const descendFunc = (a, b) => b - a;

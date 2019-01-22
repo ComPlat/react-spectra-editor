@@ -27,14 +27,14 @@ class DemoWritePeaks extends React.Component {
   }
 
   writePeaks(peaks, layout, shift, isAscend) {
-    const body = FN.peaksBody(peaks, layout, isAscend);
+    const body = FN.peaksBody(peaks, layout, shift, isAscend);
     const wrapper = FN.peaksWrapper(layout, shift);
     const desc = wrapper.head + body + wrapper.tail;
     this.setState({ desc });
   }
 
   savePeaks(peaks, layout, shift, isAscend) {
-    const body = FN.peaksBody(peaks, layout, isAscend);
+    const body = FN.peaksBody(peaks, layout, shift, isAscend);
     /*eslint-disable */
     if (shift.ref.name !== '- - -') {
       alert(

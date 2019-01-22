@@ -211,10 +211,10 @@ class D3Focus {
       .append('path')
       .attr('d', symbol.type(d3.symbolCircle))
       .attr('class', 'enter-ref')
-      .attr('fill-opacity', 0.0)
+      .attr('fill-opacity', 1.0)
       .attr('stroke', 'green')
-      .attr('stroke-width', 12)
-      .attr('stroke-opacity', 0.8)
+      .attr('stroke-width', 2)
+      .attr('stroke-opacity', 1.0)
       .merge(ccp)
       .attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y)})`)
       .on('click', () => this.onClickEditPeak(false, false));
