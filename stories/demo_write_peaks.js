@@ -46,24 +46,29 @@ class DemoWritePeaks extends React.Component {
     return sortResult.join(', ');
   }
 
-  extractLayout(layout) {
+  extractLayout(layout, shift) {
+    let solvTxt = '';
+    if (shift.ref.name !== '- - -') {
+      solvTxt = `(${shift.ref.name})`;
+    }
+
     switch (layout) {
       case LIST_LAYOUT.IR:
-        return 'IR = ';
+        return `IR ${solvTxt}= `;
       case LIST_LAYOUT.H1:
-        return '1 H = ';
+        return `1 H ${solvTxt}= `;
       case LIST_LAYOUT.C13:
-        return '13 C = ';
+        return `13 C ${solvTxt}= `;
       case LIST_LAYOUT.PLAIN:
       default:
-        return '';
+        return `${solvTxt}`;
     }
   }
 
-  writePeaks(peaks, layout, isAscend) {
+  writePeaks(peaks, layout, shift, isAscend) {
     const peaksXY = ToXY(peaks);
     const descPeaks = this.peaksXYToStr(peaksXY, isAscend);
-    const descLayout = this.extractLayout(layout);
+    const descLayout = this.extractLayout(layout, shift);
     const desc = descLayout + descPeaks;
     this.setState({ desc });
   }
@@ -72,12 +77,11 @@ class DemoWritePeaks extends React.Component {
     const peaksXY = ToXY(peaks);
     const desc = this.peaksXYToStr(peaksXY, isAscend);
     /*eslint-disable */
-    if (shift.ref.name !== '- - -' && shift.peak.x) {
+    if (shift.ref.name !== '- - -') {
       alert(
         `Peaks are: ${desc}` + '\n' +
         '- - - - - - - - - - -' + '\n' +
-        `Shift solvent = ${shift.ref.name} (${shift.ref.value}ppm)` + '\n' +
-        `Selected peak = ${shift.peak.x}`
+        `Shift solvent = ${shift.ref.name}, ${shift.ref.value}ppm` + '\n'
       );
     } else {
       alert(`Peaks are: ${desc}`);

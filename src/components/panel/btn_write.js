@@ -23,11 +23,12 @@ const Styles = () => ({
 });
 
 const onClickCb = (
-  writePeaks, peaksEdit, isAscend, layoutSt, toggleWriteBtnAct,
+  writePeaks, peaksEdit, isAscend,
+  layoutSt, shiftSt, toggleWriteBtnAct,
 ) => (
   () => {
     toggleWriteBtnAct();
-    writePeaks(peaksEdit, layoutSt, isAscend);
+    writePeaks(peaksEdit, layoutSt, shiftSt, isAscend);
   }
 );
 
@@ -53,7 +54,8 @@ const BtnWritePeaks = ({
           color="primary"
           className={classNames(classes.btn)}
           onClick={onClickCb(
-            writePeaks, peaksEdit, isAscend, layoutSt, toggleWriteBtnAct,
+            writePeaks, peaksEdit, isAscend,
+            layoutSt, shiftSt, toggleWriteBtnAct,
           )}
           disabled={disable}
         >
