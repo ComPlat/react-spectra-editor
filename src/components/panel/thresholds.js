@@ -56,21 +56,23 @@ const setThreshold = (
       disableFocusListener
       disableTouchListener
     >
-      <TextField
-        disabled={!thresVal}
-        id="outlined-name"
-        placeholder="N.A."
-        type="number"
-        value={thresVal || false}
-        margin="normal"
-        InputProps={{
-          endAdornment: txtPercent(),
-          className: 'txt-input',
-        }}
-        onChange={onChange}
-        onBlur={onBlur}
-        onKeyPress={onEnterPress}
-      />
+      <div>
+        <TextField
+          disabled={!thresVal}
+          id="outlined-name"
+          placeholder="N.A."
+          type="number"
+          value={thresVal || false}
+          margin="normal"
+          InputProps={{
+            endAdornment: txtPercent(),
+            className: 'txt-input',
+          }}
+          onChange={onChange}
+          onBlur={onBlur}
+          onKeyPress={onEnterPress}
+        />
+      </div>
     </Tooltip>
   );
 };
@@ -101,15 +103,17 @@ const btnRestore = (classes, hasEdit, managerSt, toggleIsEditAct) => (
   <Tooltip
     title={<span className="txt-sv-tp">{restoreTp(hasEdit, managerSt)}</span>}
   >
-    <IconButton
-      disabled={!hasEdit}
-      variant="fab"
-      color="primary"
-      className={classNames(classes.btnRestore)}
-      onClick={toggleIsEditAct}
-    >
-      { restoreDisplay(hasEdit, managerSt) }
-    </IconButton>
+    <div>
+      <IconButton
+        disabled={!hasEdit}
+        variant="fab"
+        color="primary"
+        className={classNames(classes.btnRestore)}
+        onClick={toggleIsEditAct}
+      >
+        { restoreDisplay(hasEdit, managerSt) }
+      </IconButton>
+    </div>
   </Tooltip>
 );
 

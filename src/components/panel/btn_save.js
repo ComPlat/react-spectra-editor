@@ -48,6 +48,9 @@ const BtnSavePeaks = ({
   return (
     <Tooltip
       title={<span className="txt-sv-tp">Save peaks</span>}
+      placement="top"
+      disableFocusListener
+      disableTouchListener
     >
       <div>
         <Button

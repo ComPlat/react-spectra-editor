@@ -47,6 +47,9 @@ const BtnWritePeaks = ({
   return (
     <Tooltip
       title={<span className="txt-sv-tp">Write peaks</span>}
+      placement="top"
+      disableFocusListener
+      disableTouchListener
     >
       <div>
         <Button
