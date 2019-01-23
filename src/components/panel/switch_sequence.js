@@ -5,7 +5,12 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 
 const SwtichSequence = ({ isAscend, onToggleSwitch }) => {
-  const label = isAscend ? 'Ascend' : 'Descend';
+  const order = isAscend ? 'Ascend' : 'Descend';
+  const label = (
+    <p className="txt-panel-header">
+      { `${order} peaks.` }
+    </p>
+  );
 
   return (
     <FormControlLabel
@@ -17,7 +22,7 @@ const SwtichSequence = ({ isAscend, onToggleSwitch }) => {
           color="primary"
         />
       )}
-      label={`${label} peaks.`}
+      label={label}
     />
   );
 };
