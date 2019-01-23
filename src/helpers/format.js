@@ -44,6 +44,13 @@ const spectraOps = {
   IR: { head: 'IR', tail: 'cm-1' },
 };
 
+const rmRef = (peaks, shift) => {
+  const refValue = shift.ref.value;
+  return peaks.map(
+    p => (IsSame(p.x, refValue) ? null : p),
+  ).filter(r => r != null);
+};
+
 const fixDigitAndRmRef = (input, precision, refValue) => {
   if (IsSame(input, refValue)) return null;
   return fixDigit(input, precision);
@@ -85,6 +92,7 @@ const Format = {
   spectraOps,
   peaksBody,
   peaksWrapper,
+  rmRef,
 };
 
 export default Format;
