@@ -130,13 +130,13 @@ const ThresholdsPanel = ({
       justify="center"
       alignItems="center"
     >
-      <Grid item xs={6}>
+      <Grid item xs={4}>
         { setThreshold(classes, thresVal, updateThresholdAct) }
       </Grid>
-      <Grid item xs={3}>
+      <Grid item xs={4}>
         { btnRefresh(classes, thresVal, resetThresholdAct) }
       </Grid>
-      <Grid item xs={3}>
+      <Grid item xs={4}>
         { btnRestore(classes, hasEdit, managerSt, toggleIsEditAct) }
       </Grid>
     </Grid>
