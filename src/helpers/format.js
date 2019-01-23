@@ -66,8 +66,8 @@ const peaksBody = (peaks, layout, shift, isAscend) => {
 
 const peaksWrapper = (layout, shift) => {
   let solvTxt = '';
-  if (shift.ref.name !== '- - -') {
-    solvTxt = ` (${shift.ref.name}) `;
+  if (shift.ref.label) {
+    solvTxt = ` (${shift.ref.label}) `;
   }
 
   if (layout === LIST_LAYOUT.PLAIN) {

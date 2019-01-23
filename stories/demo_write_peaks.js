@@ -26,21 +26,26 @@ class DemoWritePeaks extends React.Component {
     this.savePeaks = this.savePeaks.bind(this);
   }
 
+  rmDollarSign(target) {
+    return target.replace(/\$/g, '');
+  }
+
   writePeaks(peaks, layout, shift, isAscend) {
     const body = FN.peaksBody(peaks, layout, shift, isAscend);
     const wrapper = FN.peaksWrapper(layout, shift);
-    const desc = wrapper.head + body + wrapper.tail;
+    const desc = this.rmDollarSign(wrapper.head) + body + wrapper.tail;
     this.setState({ desc });
   }
 
   savePeaks(peaks, layout, shift, isAscend) {
     const body = FN.peaksBody(peaks, layout, shift, isAscend);
     /*eslint-disable */
-    if (shift.ref.name !== '- - -') {
+    if (shift.ref.label) {
+      const label = this.rmDollarSign(shift.ref.label);
       alert(
         `Peaks are: ${body}` + '\n' +
         '- - - - - - - - - - -' + '\n' +
-        `Shift solvent = ${shift.ref.name}, ${shift.ref.value}ppm` + '\n'
+        `Shift solvent = ${label}, ${shift.ref.value}ppm` + '\n'
       );
     } else {
       alert(`Peaks are: ${body}`);
