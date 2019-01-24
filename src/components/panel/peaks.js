@@ -28,7 +28,7 @@ const Styles = () => ({
 
 const CenterBadge = withStyles({
   badge: {
-    top: '0',
+    top: '50%',
   },
 })(Badge);
 
