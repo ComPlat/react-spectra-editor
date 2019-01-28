@@ -15,7 +15,7 @@ const initialState = {
 
 const resetRef = (payload) => {
   const { shift, layout } = payload;
-  if (!shift || !shift.solventName) return shiftNone;
+  if (!shift || !shift.solventName || !shift.solventValue) return shiftNone;
 
   const name = shift.solventName;
   let target = false;
