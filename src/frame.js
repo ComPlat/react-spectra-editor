@@ -6,27 +6,18 @@ import { bindActionCreators } from 'redux';
 
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
-import App from './components/app';
+
 import PanelViewer from './components/panel/index';
+import Content from './content';
 
 const Styles = () => ({
   panels: {
     maxHeight: 630,
     overflowX: 'hidden',
     overflowY: 'scroll',
-    padding: '10px 0 0 0',
+    padding: '0 0 0 0',
   },
 });
-
-const SpectrumViewer = (input, cLabel, xLabel, yLabel, peakObj) => (
-  <App
-    input={input}
-    cLabel={cLabel}
-    xLabel={xLabel}
-    yLabel={yLabel}
-    peakObj={peakObj}
-  />
-);
 
 const Frame = ({
   input, cLabel, xLabel, yLabel, peakObjs, operations,
@@ -43,7 +34,13 @@ const Frame = ({
     <div className="react-spectrum-viewer">
       <Grid container>
         <Grid item xs={9}>
-          { SpectrumViewer(input, cLabel, xLabel, yLabel, peakObj) }
+          <Content
+            input={input}
+            cLabel={cLabel}
+            xLabel={xLabel}
+            yLabel={yLabel}
+            peakObj={peakObj}
+          />
         </Grid>
         <Grid
           item

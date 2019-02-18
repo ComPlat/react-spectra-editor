@@ -63,7 +63,7 @@ class D3Canvas {
 
   update(
     el, seed, peaks, tTrEndPts, tSfPeaks, editPeakSt, editModeSt,
-    filterSeed, filterPeak, cLabel, xLabel, yLabel,
+    filterSeed, filterPeak, cLabel, xLabel, yLabel, isHidden,
   ) {
     this.context.update(el, this.svg, seed);
     this.focus.update(
@@ -71,6 +71,12 @@ class D3Canvas {
       editPeakSt, editModeSt, null,
     );
     this.drawLabel(el, cLabel, xLabel, yLabel);
+
+    if (isHidden) {
+      d3.select(el).selectAll('svg').style('width', 0);
+    } else {
+      d3.select(el).selectAll('svg').style('width', '100%');
+    }
   }
 
   destroy(el) {

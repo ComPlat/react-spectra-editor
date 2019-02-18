@@ -11,7 +11,7 @@ import { resetAll } from '../actions/manager';
 import { clickPoint } from '../actions/edit_peak';
 import D3Canvas from './d3_canvas';
 
-class App extends React.Component {
+class AppViewer extends React.Component {
   constructor(props) {
     super(props);
 
@@ -53,7 +53,7 @@ class App extends React.Component {
   componentDidUpdate(prevProps) {
     const {
       seed, peak, cLabel, xLabel, yLabel, borderSt, tTrEndPts, tSfPeaks,
-      editPeakSt, editModeSt,
+      editPeakSt, editModeSt, isHidden,
     } = this.props;
 
     this.normChange(prevProps);
@@ -73,6 +73,7 @@ class App extends React.Component {
       cLabel,
       xLabel,
       yLabel,
+      isHidden,
     );
   }
 
@@ -140,7 +141,7 @@ const mapDispatchToProps = dispatch => (
   }, dispatch)
 );
 
-App.propTypes = {
+AppViewer.propTypes = {
   seed: PropTypes.array.isRequired,
   peak: PropTypes.array.isRequired,
   cLabel: PropTypes.string.isRequired,
@@ -155,6 +156,7 @@ App.propTypes = {
   updateBorderAct: PropTypes.func.isRequired,
   resetAllAct: PropTypes.func.isRequired,
   clickPointAct: PropTypes.func.isRequired,
+  isHidden: PropTypes.bool.isRequired,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default connect(mapStateToProps, mapDispatchToProps)(AppViewer);

@@ -83,7 +83,7 @@ class DemoWritePeaks extends React.Component {
               label="Description"
               multiline
               fullWidth
-              rows="4"
+              rows="2"
               margin="normal"
               variant="outlined"
               value={desc}
