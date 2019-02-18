@@ -8,7 +8,6 @@ import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
 import App from './components/app';
 import PanelViewer from './components/panel/index';
-import { toggleSaveBtn, toggleWriteBtn } from './actions/status';
 
 const Styles = () => ({
   panels: {
@@ -30,7 +29,7 @@ const SpectrumViewer = (input, cLabel, xLabel, yLabel, peakObj) => (
 );
 
 const Frame = ({
-  input, cLabel, xLabel, yLabel, peakObjs, writePeaks, savePeaks,
+  input, cLabel, xLabel, yLabel, peakObjs, operations,
   managerSt, classes,
 }) => {
   const [peakAll, peakEdit] = peakObjs;
@@ -55,8 +54,7 @@ const Frame = ({
           <PanelViewer
             peakObj={peakObj}
             hasEdit={hasEdit}
-            writePeaks={writePeaks}
-            savePeaks={savePeaks}
+            operations={operations}
           />
         </Grid>
       </Grid>
@@ -75,8 +73,6 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
 
 const mapDispatchToProps = dispatch => (
   bindActionCreators({
-    toggleSaveBtnAct: toggleSaveBtn,
-    toggleWriteBtnAct: toggleWriteBtn,
   }, dispatch)
 );
 
@@ -86,18 +82,7 @@ Frame.propTypes = {
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
   peakObjs: PropTypes.array.isRequired,
-  writePeaks: PropTypes.oneOfType(
-    [
-      PropTypes.func,
-      PropTypes.bool,
-    ],
-  ).isRequired,
-  savePeaks: PropTypes.oneOfType(
-    [
-      PropTypes.func,
-      PropTypes.bool,
-    ],
-  ).isRequired,
+  operations: PropTypes.array.isRequired,
   managerSt: PropTypes.object.isRequired,
   classes: PropTypes.object.isRequired,
 };

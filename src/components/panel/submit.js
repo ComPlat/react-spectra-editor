@@ -1,15 +1,56 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
 
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Grid from '@material-ui/core/Grid';
+import Tooltip from '@material-ui/core/Tooltip';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormControl from '@material-ui/core/FormControl';
+import { withStyles } from '@material-ui/core/styles';
 
 import { enableAllBtn } from '../../actions/status';
-import BtnSavePeaks from './btn_save';
-import BtnWritePeaks from './btn_write';
 import SwitchSequence from './switch_sequence';
+import SubmitBtn from './submit_btn';
+
+const Styles = () => ({
+  formControl: {
+    margin: '10px 20px 0px 10px',
+    minWidth: 150,
+  },
+});
+
+const operationSelect = (
+  classes, operations, operation, onChangeSelect,
+) => {
+  const options = operations.map(o => (
+    <MenuItem value={o.name} key={o.name}>
+      <span className="txt-sv-input-label">{o.name}</span>
+    </MenuItem>
+  ));
+
+  const selectedValue = operation.name || operations[0].name;
+
+  return (
+    <Tooltip
+      title={<span className="txt-sv-tp">Operation</span>}
+      placement="top"
+      disableFocusListener
+      disableTouchListener
+    >
+      <FormControl
+        className={classNames(classes.formControl)}
+      >
+        <Select value={selectedValue} onChange={onChangeSelect}>
+          { options }
+        </Select>
+      </FormControl>
+    </Tooltip>
+  );
+};
 
 class SubmitPanel extends React.Component {
   constructor(props) {
@@ -17,9 +58,16 @@ class SubmitPanel extends React.Component {
 
     this.state = {
       isAscend: true,
+      operation: false,
     };
 
+    this.updateOperation = this.updateOperation.bind(this);
     this.onToggleSwitch = this.onToggleSwitch.bind(this);
+  }
+
+  componentDidMount() {
+    const { operations } = this.props;
+    this.setState({ operation: operations[0] }); // eslint-disable-line
   }
 
   onToggleSwitch() {
@@ -29,13 +77,26 @@ class SubmitPanel extends React.Component {
     this.setState({ isAscend: !isAscend });
   }
 
+  updateOperation(name) {
+    const { operations } = this.props;
+    let operation = false;
+    operations.forEach((o) => {
+      if (o.name === name) {
+        operation = o;
+      }
+    });
+    this.setState({ operation });
+  }
+
   render() {
     const {
-      savePeaks, writePeaks, peakObj,
+      operations, classes, peakObj,
     } = this.props;
-    const { isAscend } = this.state;
+    const { isAscend, operation } = this.state;
 
-    if (!savePeaks && !writePeaks) return null;
+    const onChangeSelect = e => this.updateOperation(e.target.value);
+
+    if (!operations || operations.length === 0) return null;
 
     return (
       <ExpansionPanelDetails>
@@ -51,18 +112,18 @@ class SubmitPanel extends React.Component {
               onToggleSwitch={this.onToggleSwitch}
             />
           </Grid>
-          <Grid item xs={6}>
-            <BtnWritePeaks
-              isAscend={isAscend}
-              peakObj={peakObj}
-              writePeaks={writePeaks}
-            />
+          <Grid item xs={8}>
+            {
+              operationSelect(
+                classes, operations, operation, onChangeSelect,
+              )
+            }
           </Grid>
-          <Grid item xs={6}>
-            <BtnSavePeaks
+          <Grid item xs={4}>
+            <SubmitBtn
               isAscend={isAscend}
               peakObj={peakObj}
-              savePeaks={savePeaks}
+              operation={operation}
             />
           </Grid>
         </Grid>
@@ -82,22 +143,13 @@ const mapDispatchToProps = dispatch => (
 );
 
 SubmitPanel.propTypes = {
+  classes: PropTypes.object.isRequired,
   peakObj: PropTypes.object.isRequired,
-  savePeaks: PropTypes.oneOfType(
-    [
-      PropTypes.func,
-      PropTypes.bool,
-    ],
-  ).isRequired,
-  writePeaks: PropTypes.oneOfType(
-    [
-      PropTypes.func,
-      PropTypes.bool,
-    ],
-  ).isRequired,
+  operations: PropTypes.array.isRequired,
   enableAllBtnAct: PropTypes.func.isRequired,
 };
 
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
+  withStyles(Styles),
 )(SubmitPanel);

@@ -19,15 +19,14 @@ const styles = () => ({
 });
 
 const PanelViewer = ({
-  peakObj, hasEdit, writePeaks, savePeaks,
+  peakObj, hasEdit, operations,
 }) => (
   <MuiThemeProvider theme={theme}>
     <ModeNavigation />
     <SettingsPanel
       peakObj={peakObj}
       hasEdit={hasEdit}
-      writePeaks={writePeaks}
-      savePeaks={savePeaks}
+      operations={operations}
     />
     <AddPeakPanel />
     <RmPeakPanel />
@@ -37,18 +36,7 @@ const PanelViewer = ({
 
 PanelViewer.propTypes = {
   peakObj: PropTypes.object.isRequired,
-  writePeaks: PropTypes.oneOfType(
-    [
-      PropTypes.func,
-      PropTypes.bool,
-    ],
-  ).isRequired,
-  savePeaks: PropTypes.oneOfType(
-    [
-      PropTypes.func,
-      PropTypes.bool,
-    ],
-  ).isRequired,
+  operations: PropTypes.array.isRequired,
   hasEdit: PropTypes.bool.isRequired,
 };
 

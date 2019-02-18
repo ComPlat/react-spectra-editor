@@ -3,21 +3,22 @@ import {
 } from '../constants/action_type';
 
 const initialState = {
-  btnSave: false,
-  btnWrite: false,
+  btnSubmit: false,
 };
 
 const statusReducer = (state = initialState, action) => {
   switch (action.type) {
-    case STATUS.TOGGLEBTNSAVE:
-      return Object.assign({}, state, { btnSave: !state.btnSave });
-    case STATUS.TOGGLEBTNWRITE:
-      return Object.assign({}, state, { btnWrite: !state.btnWrite });
+    case STATUS.TOGGLEBTNSUBMIT:
+      return Object.assign(
+        {},
+        state,
+        { btnSubmit: false }, // !state.btnSubmit
+      );
     case STATUS.TOGGLEBTNALL:
       return Object.assign(
         {},
         state,
-        { btnWrite: !state.btnWrite, btnSave: !state.btnSave },
+        { btnSubmit: false }, // !state.btnSubmit
       );
     case STATUS.ENABLEBTNALL:
     case EDITPEAK.ADDPOSITIVE:
@@ -29,13 +30,13 @@ const statusReducer = (state = initialState, action) => {
       return Object.assign(
         {},
         state,
-        { btnWrite: false, btnSave: false },
+        { btnSubmit: false },
       );
     case LAYOUT.UPDATE:
       return Object.assign(
         {},
         state,
-        { btnWrite: false, btnSave: false },
+        { btnSubmit: false },
       );
     case MANAGER.RESETALL:
       return initialState;

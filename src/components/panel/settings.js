@@ -33,7 +33,7 @@ const title = classes => (
 );
 
 const SettingsPanel = ({
-  classes, peakObj, hasEdit, writePeaks, savePeaks,
+  classes, peakObj, hasEdit, operations,
 }) => (
   <ExpansionPanel>
     { title(classes) }
@@ -44,8 +44,7 @@ const SettingsPanel = ({
     <ThresholdsPanel peakObj={peakObj} hasEdit={hasEdit} />
     <Divider />
     <SubmitPanel
-      savePeaks={savePeaks}
-      writePeaks={writePeaks}
+      operations={operations}
       peakObj={peakObj}
     />
   </ExpansionPanel>
@@ -55,18 +54,7 @@ SettingsPanel.propTypes = {
   classes: PropTypes.object.isRequired,
   peakObj: PropTypes.object.isRequired,
   hasEdit: PropTypes.bool.isRequired,
-  writePeaks: PropTypes.oneOfType(
-    [
-      PropTypes.func,
-      PropTypes.bool,
-    ],
-  ).isRequired,
-  savePeaks: PropTypes.oneOfType(
-    [
-      PropTypes.func,
-      PropTypes.bool,
-    ],
-  ).isRequired,
+  operations: PropTypes.array.isRequired,
 };
 
 export default withStyles(Styles)(SettingsPanel);

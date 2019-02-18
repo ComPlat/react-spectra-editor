@@ -1,15 +1,8 @@
 import { STATUS } from '../constants/action_type';
 
-const toggleSaveBtn = () => (
+const toggleSubmitBtn = () => (
   {
-    type: STATUS.TOGGLEBTNSAVE,
-    payload: [],
-  }
-);
-
-const toggleWriteBtn = () => (
-  {
-    type: STATUS.TOGGLEBTNWRITE,
+    type: STATUS.TOGGLEBTNSUBMIT,
     payload: [],
   }
 );
@@ -29,5 +22,5 @@ const enableAllBtn = () => (
 );
 
 export {
-  toggleSaveBtn, toggleWriteBtn, toggleAllBtn, enableAllBtn,
+  toggleSubmitBtn, toggleAllBtn, enableAllBtn,
 };

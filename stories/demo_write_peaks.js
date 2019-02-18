@@ -62,6 +62,12 @@ class DemoWritePeaks extends React.Component {
     const input = spectrum.data[0];
     const xLabel = `X (${spectrum.xUnit})`;
     const yLabel = `Y (${spectrum.yUnit})`;
+
+    const operations = [
+      { name: 'save peaks', value: this.savePeaks },
+      { name: 'write peaks', value: this.writePeaks },
+    ].filter(r => r.value);
+
     return (
       <div style={{ width: '1200px' }}>
         <SpectraViewer
@@ -69,8 +75,7 @@ class DemoWritePeaks extends React.Component {
           xLabel={xLabel}
           yLabel={yLabel}
           peakObjs={peakObjs}
-          writePeaks={this.writePeaks}
-          savePeaks={this.savePeaks}
+          operations={operations}
         />
         <Grid container>
           <Grid item xs={6}>

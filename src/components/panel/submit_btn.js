@@ -2,17 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
+import { bindActionCreators, compose } from 'redux';
 
 import Tooltip from '@material-ui/core/Tooltip';
-import SaveIcon from '@material-ui/icons/Save';
-import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+import PlayCircleOutline from '@material-ui/icons/PlayCircleOutline';
 import { withStyles } from '@material-ui/core/styles';
 
 import { PksEdit } from '../../helpers/converter';
 import { Convert2Peak } from '../../helpers/chem';
 import { FromManualToOffset } from '../../helpers/shift';
-import { toggleSaveBtn } from '../../actions/status';
 
 const Styles = () => ({
   icon: {
@@ -23,49 +22,46 @@ const Styles = () => ({
 });
 
 const onClickCb = (
-  savePeaks, peaksEdit, isAscend,
-  layoutSt, shiftSt, toggleSaveBtnAct,
+  operation, peaksEdit, isAscend,
+  layoutSt, shiftSt,
 ) => (
   () => {
-    toggleSaveBtnAct();
-    savePeaks(peaksEdit, layoutSt, shiftSt, isAscend);
+    operation(peaksEdit, layoutSt, shiftSt, isAscend);
   }
 );
 
-const BtnSavePeaks = ({
-  classes, savePeaks, peakObj, isAscend, editPeakSt, thresSt, statusSt,
-  layoutSt, shiftSt, toggleSaveBtnAct,
+const SubmitBtn = ({
+  classes, operation, peakObj, isAscend, editPeakSt, thresSt, statusSt,
+  layoutSt, shiftSt,
 }) => {
   const { ref, peak } = shiftSt;
 
   const offset = FromManualToOffset(ref, peak);
   const peaks = Convert2Peak(peakObj, thresSt * 0.01, offset);
   const peaksEdit = PksEdit(peaks, editPeakSt);
-  const disable = peaksEdit.length === 0 || statusSt.btnSave;
+  const disable = peaksEdit.length === 0 || statusSt.btnSubmit;
 
-  if (!savePeaks) return null;
+  if (!operation) return null;
 
   return (
     <Tooltip
-      title={<span className="txt-sv-tp">Save peaks</span>}
+      title={<span className="txt-sv-tp">Execute</span>}
       placement="top"
       disableFocusListener
       disableTouchListener
     >
-      <div>
-        <Button
-          variant="contained"
-          color="primary"
-          className={classNames(classes.btn)}
-          onClick={onClickCb(
-            savePeaks, peaksEdit, isAscend,
-            layoutSt, shiftSt, toggleSaveBtnAct,
-          )}
-          disabled={disable}
-        >
-          <SaveIcon className={classes.icon} />
-        </Button>
-      </div>
+      <IconButton
+        className={classNames(classes.btn)}
+        color="primary"
+        disabled={disable}
+        onClick={onClickCb(
+          operation.value, peaksEdit, isAscend,
+          layoutSt, shiftSt,
+        )}
+        variant="fab"
+      >
+        <PlayCircleOutline className={classes.icon} />
+      </IconButton>
     </Tooltip>
   );
 };
@@ -82,17 +78,16 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
 
 const mapDispatchToProps = dispatch => (
   bindActionCreators({
-    toggleSaveBtnAct: toggleSaveBtn,
   }, dispatch)
 );
 
-BtnSavePeaks.propTypes = {
+SubmitBtn.propTypes = {
   classes: PropTypes.object.isRequired,
   peakObj: PropTypes.object.isRequired,
   isAscend: PropTypes.bool.isRequired,
-  savePeaks: PropTypes.oneOfType(
+  operation: PropTypes.oneOfType(
     [
-      PropTypes.func,
+      PropTypes.object,
       PropTypes.bool,
     ],
   ).isRequired,
@@ -107,7 +102,9 @@ BtnSavePeaks.propTypes = {
   ).isRequired,
   layoutSt: PropTypes.string.isRequired,
   shiftSt: PropTypes.object.isRequired,
-  toggleSaveBtnAct: PropTypes.func.isRequired,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(Styles)(BtnSavePeaks));
+export default compose(
+  connect(mapStateToProps, mapDispatchToProps),
+  withStyles(Styles),
+)(SubmitBtn);
