@@ -52,7 +52,7 @@ const setThreshold = (
   return (
     <Tooltip
       title={<span className="txt-sv-tp">Threshold</span>}
-      placement="top"
+      placement="left"
       disableFocusListener
       disableTouchListener
     >

@@ -27,7 +27,7 @@ const Styles = () => ({
 const layoutSelect = (classes, layoutSt, onChange) => (
   <Tooltip
     title={<span className="txt-sv-tp">Layout</span>}
-    placement="top"
+    placement="left"
     disableFocusListener
     disableTouchListener
   >

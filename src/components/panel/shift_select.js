@@ -42,7 +42,7 @@ const shiftSelection = (classes, layoutSt, shiftRefSt, onChange) => {
   return (
     <Tooltip
       title={<span className="txt-sv-tp">Shift Reference</span>}
-      placement="top"
+      placement="left"
       disableFocusListener
       disableTouchListener
     >

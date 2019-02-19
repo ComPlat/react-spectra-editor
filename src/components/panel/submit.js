@@ -37,7 +37,7 @@ const operationSelect = (
   return (
     <Tooltip
       title={<span className="txt-sv-tp">Operation</span>}
-      placement="top"
+      placement="left"
       disableFocusListener
       disableTouchListener
     >

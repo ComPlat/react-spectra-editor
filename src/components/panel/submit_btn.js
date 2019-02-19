@@ -46,7 +46,7 @@ const SubmitBtn = ({
   return (
     <Tooltip
       title={<span className="txt-sv-tp">Execute</span>}
-      placement="top"
+      placement="bottom"
       disableFocusListener
       disableTouchListener
     >
