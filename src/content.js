@@ -1,10 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { bindActionCreators, compose } from 'redux';
+
 import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import AppViewer from './components/app_viewer';
+import PredictViewer from './components/predict_viewer';
 
 const styles = () => ({
   root: {
@@ -25,17 +29,40 @@ class Content extends React.Component {
     };
 
     this.onChange = this.onChange.bind(this);
+    this.isHidePredictViewer = this.isHidePredictViewer.bind(this);
   }
 
   onChange(event, value) {
     this.setState({ value });
   }
 
+  isHidePredictViewer() {
+    const { predictObj, layoutSt } = this.props;
+    const isEmpty = Object.keys(predictObj).length === 0
+      && predictObj.constructor === Object;
+    const notTarget = ['1H', '13C'].indexOf(layoutSt) < 0;
+    return isEmpty || notTarget;
+  }
+
   render() {
     const {
-      classes, input, cLabel, xLabel, yLabel, peakObj,
+      classes, input, cLabel, xLabel, yLabel, peakObj, predictObj,
     } = this.props;
     const { value } = this.state;
+
+    const isHidePv = this.isHidePredictViewer();
+    if (isHidePv) {
+      return (
+        <AppViewer
+          input={input}
+          cLabel={cLabel}
+          xLabel={xLabel}
+          yLabel={yLabel}
+          peakObj={peakObj}
+          isHidden={false}
+        />
+      );
+    }
 
     return (
       <div className={classes.root}>
@@ -47,7 +74,7 @@ class Content extends React.Component {
             onChange={this.onChange}
           >
             <Tab label="Spectrum" />
-            <Tab label="Analysis" />
+            <Tab label="Prediction" />
           </Tabs>
         </AppBar>
         {
@@ -60,11 +87,29 @@ class Content extends React.Component {
             isHidden={value !== 0}
           />
         }
-        {value === 1 && <div>Item Two</div>}
+        {
+          value === 1 && (
+            <PredictViewer
+              peakObj={peakObj}
+              predictObj={predictObj}
+            />
+          )
+        }
       </div>
     );
   }
 }
+
+const mapStateToProps = (state, _) => (
+  {
+    layoutSt: state.layout,
+  }
+);
+
+const mapDispatchToProps = dispatch => (
+  bindActionCreators({
+  }, dispatch)
+);
 
 Content.propTypes = {
   classes: PropTypes.object.isRequired,
@@ -73,6 +118,11 @@ Content.propTypes = {
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
   peakObj: PropTypes.object.isRequired,
+  predictObj: PropTypes.object.isRequired,
+  layoutSt: PropTypes.string.isRequired,
 };
 
-export default withStyles(styles)(Content);
+export default compose(
+  connect(mapStateToProps, mapDispatchToProps),
+  withStyles(styles),
+)(Content);

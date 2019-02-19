@@ -20,7 +20,7 @@ const Styles = () => ({
 });
 
 const Frame = ({
-  input, cLabel, xLabel, yLabel, peakObjs, operations,
+  input, cLabel, xLabel, yLabel, peakObjs, operations, predictObj,
   managerSt, classes,
 }) => {
   const [peakAll, peakEdit] = peakObjs;
@@ -40,6 +40,7 @@ const Frame = ({
             xLabel={xLabel}
             yLabel={yLabel}
             peakObj={peakObj}
+            predictObj={predictObj}
           />
         </Grid>
         <Grid
@@ -79,6 +80,7 @@ Frame.propTypes = {
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
   peakObjs: PropTypes.array.isRequired,
+  predictObj: PropTypes.object.isRequired,
   operations: PropTypes.array.isRequired,
   managerSt: PropTypes.object.isRequired,
   classes: PropTypes.object.isRequired,

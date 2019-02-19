@@ -5,6 +5,7 @@ import Grid from '@material-ui/core/Grid';
 
 import { SpectraViewer, FN } from '../src/index';
 import C13_CPD from './source/C13_CPD';
+import nmrshiftdb from './source/nmrshiftdb';
 
 const file = FN.ExtractJcamp(C13_CPD);
 
@@ -20,10 +21,14 @@ class DemoWritePeaks extends React.Component {
 
     this.state = {
       desc: '',
+      predictions: false,
+      molecule: '',
     };
 
     this.writePeaks = this.writePeaks.bind(this);
     this.savePeaks = this.savePeaks.bind(this);
+    this.predict = this.predict.bind(this);
+    this.updatInput = this.updatInput.bind(this);
   }
 
   rmDollarSign(target) {
@@ -53,8 +58,23 @@ class DemoWritePeaks extends React.Component {
     /*eslint-disable */
   }
 
+  predict(peaks, layout, _) {
+    const { molecule } = this.state;
+
+    this.setState({ predictions: false });
+    // simulate fetching...
+    setTimeout(() => {
+      this.setState({ predictions: nmrshiftdb });
+    }, 1000);
+  }
+
+  updatInput(e) {
+    const molecule = e.target.value;
+    this.setState({ molecule });
+  }
+
   render() {
-    const { desc } = this.state;
+    const { desc, predictions, molecule } = this.state;
 
     const { spectrum, peakObjs } = file;
     if (!spectrum) return noDataAvailable();
@@ -68,6 +88,13 @@ class DemoWritePeaks extends React.Component {
       { name: 'write peaks', value: this.writePeaks },
     ].filter(r => r.value);
 
+    const predictObj = {
+      btnCb: this.predict,
+      inputCb: this.updatInput,
+      molecule: molecule,
+      predictions,
+    }
+
     return (
       <div style={{ width: '1200px' }}>
         <SpectraViewer
@@ -75,6 +102,7 @@ class DemoWritePeaks extends React.Component {
           xLabel={xLabel}
           yLabel={yLabel}
           peakObjs={peakObjs}
+          predictObj={predictObj}
           operations={operations}
         />
         <Grid container>
