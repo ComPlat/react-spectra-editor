@@ -4,10 +4,10 @@ import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 
 import { SpectraViewer, FN } from '../src/index';
-import C13_CPD from './source/C13_CPD';
+import IREdit from './source/IR_edit';
 import nmrshiftdb from './source/nmrshiftdb';
 
-const file = FN.ExtractJcamp(C13_CPD);
+const file = FN.ExtractJcamp(IREdit);
 
 const noDataAvailable = () => (
   <div>
@@ -15,7 +15,7 @@ const noDataAvailable = () => (
   </div>
 );
 
-class DemoWritePeaks extends React.Component {
+class DemoWriteIr extends React.Component {
   constructor(props) {
     super(props);
 
@@ -123,4 +123,4 @@ class DemoWritePeaks extends React.Component {
   }
 }
 
-export default DemoWritePeaks;
+export default DemoWriteIr;

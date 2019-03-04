@@ -3,106 +3,49 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
 
-import { withStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
 import AppViewer from './components/app_viewer';
 import PredictViewer from './components/predict_viewer';
-import { TabLabel } from './components/common/ui';
 
-const styles = () => ({
-  root: {
-    flexGrow: 1,
-  },
-  appBar: {
-    backgroundColor: '#fff',
-    boxShadow: 'none',
-  },
-  tabLabel: {
-    fontSize: '14px',
-  },
-});
+const extractLayout = (predictObj, layoutSt) => {
+  const isEmpty = Object.keys(predictObj).length === 0
+    && predictObj.constructor === Object;
+  const isNmr = ['1H', '13C'].indexOf(layoutSt) >= 0;
+  const isIr = ['IR'].indexOf(layoutSt) >= 0;
+  const showPredict = !isEmpty && (isNmr || isIr);
+  return { showPredict, isNmr, isIr };
+};
 
-class Content extends React.Component {
-  constructor(props) {
-    super(props);
+const Content = ({
+  input, cLabel, xLabel, yLabel, peakObj, predictObj, layoutSt,
+}) => {
+  const { showPredict, isNmr, isIr } = extractLayout(predictObj, layoutSt);
 
-    this.state = {
-      value: 0,
-    };
-
-    this.onChange = this.onChange.bind(this);
-    this.isHidePredictViewer = this.isHidePredictViewer.bind(this);
-  }
-
-  onChange(event, value) {
-    this.setState({ value });
-  }
-
-  isHidePredictViewer() {
-    const { predictObj, layoutSt } = this.props;
-    const isEmpty = Object.keys(predictObj).length === 0
-      && predictObj.constructor === Object;
-    const notTarget = ['1H', '13C'].indexOf(layoutSt) < 0;
-    return isEmpty || notTarget;
-  }
-
-  render() {
-    const {
-      classes, input, cLabel, xLabel, yLabel, peakObj, predictObj,
-    } = this.props;
-    const { value } = this.state;
-
-    const isHidePv = this.isHidePredictViewer();
-    if (isHidePv) {
-      return (
-        <AppViewer
-          input={input}
-          cLabel={cLabel}
-          xLabel={xLabel}
-          yLabel={yLabel}
-          peakObj={peakObj}
-          isHidden={false}
-        />
-      );
-    }
-
+  if (showPredict) {
     return (
-      <div className={classes.root}>
-        <AppBar position="static" className={classes.appBar}>
-          <Tabs
-            indicatorColor="primary"
-            textColor="primary"
-            value={value}
-            onChange={this.onChange}
-          >
-            <Tab label={TabLabel(classes, 'Spectrum', 'txt-prd-tab-label')} />
-            <Tab label={TabLabel(classes, 'Analysis', 'txt-prd-tab-label')} />
-          </Tabs>
-        </AppBar>
-        {
-          <AppViewer
-            input={input}
-            cLabel={cLabel}
-            xLabel={xLabel}
-            yLabel={yLabel}
-            peakObj={peakObj}
-            isHidden={value !== 0}
-          />
-        }
-        {
-          value === 1 && (
-            <PredictViewer
-              peakObj={peakObj}
-              predictObj={predictObj}
-            />
-          )
-        }
-      </div>
+      <PredictViewer
+        input={input}
+        cLabel={cLabel}
+        xLabel={xLabel}
+        yLabel={yLabel}
+        peakObj={peakObj}
+        predictObj={predictObj}
+        isNmr={isNmr}
+        isIr={isIr}
+      />
     );
   }
-}
+
+  return (
+    <AppViewer
+      input={input}
+      cLabel={cLabel}
+      xLabel={xLabel}
+      yLabel={yLabel}
+      peakObj={peakObj}
+      isHidden={false}
+    />
+  );
+};
 
 const mapStateToProps = (state, _) => ( // eslint-disable-line
   {
@@ -116,7 +59,6 @@ const mapDispatchToProps = dispatch => (
 );
 
 Content.propTypes = {
-  classes: PropTypes.object.isRequired,
   input: PropTypes.object.isRequired,
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
@@ -128,5 +70,4 @@ Content.propTypes = {
 
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
-  withStyles(styles),
 )(Content);
