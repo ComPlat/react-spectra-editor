@@ -20,6 +20,10 @@ const resultIr = {
       fg: 'c-,:F',
       status: 'accept',
     },
+    {
+      fg: 'CBB',
+      status: 'accept',
+    },
   ],
 };
 

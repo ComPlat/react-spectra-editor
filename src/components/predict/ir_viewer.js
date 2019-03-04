@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
+import SVGInline from 'react-svg-inline';
 
 import { withStyles } from '@material-ui/core/styles';
 
@@ -20,6 +21,7 @@ import { PksEdit } from '../../helpers/converter';
 import { Convert2Peak } from '../../helpers/chem';
 import { FromManualToOffset } from '../../helpers/shift';
 import { TxtLabel, StatusIcon } from '../common/ui';
+import SmaToSvg from '../common/chem';
 
 const Styles = () => ({
   root: {
@@ -57,8 +59,12 @@ const sectionTable = (classes, predictions) => {
       <Table className={classes.table}>
         <TableHead>
           <TableRow>
+            <TableCell />
             <TableCell>
               {TxtLabel(classes, 'Functional groups', 'txt-prd-table-title')}
+            </TableCell>
+            <TableCell align="left">
+              {TxtLabel(classes, 'SMARTS', 'txt-prd-table-title')}
             </TableCell>
             <TableCell align="right">
               {TxtLabel(classes, 'Status', 'txt-prd-table-title')}
@@ -71,6 +77,12 @@ const sectionTable = (classes, predictions) => {
               .map((row, idx) => (
                 <TableRow key={`${idx}-${row.fg}`}>
                   <TableCell component="th" scope="row">
+                    {TxtLabel(classes, `${idx + 1}`, 'txt-prd-table-content')}
+                  </TableCell>
+                  <TableCell component="th" scope="row">
+                    <SVGInline width="50%" height="50%" svg={SmaToSvg(row.fg)} />
+                  </TableCell>
+                  <TableCell align="left">
                     {TxtLabel(classes, row.fg, 'txt-prd-table-content')}
                   </TableCell>
                   <TableCell align="right">
