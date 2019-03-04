@@ -10,19 +10,23 @@ import LocationOnIcon from '@material-ui/icons/LocationOn';
 import AddIcon from '@material-ui/icons/AddCircleOutline';
 import RemoveIcon from '@material-ui/icons/RemoveCircleOutline';
 
+import { TabLabel } from '../common/ui';
 import { LIST_MODE } from '../../constants/list_mode';
 import { setEditMode } from '../../actions/mode';
 
 const styles = {
   root: {
   },
+  tabLabel: {
+    fontSize: '12px',
+  },
 };
 
-const btnShift = enable => (
+const btnShift = (classes, enable) => (
   enable
     ? (
       <BottomNavigationAction
-        label="Set Shift"
+        label={TabLabel(classes, 'Set Shift', 'txt-shift-tab-label')}
         value={LIST_MODE.ANCHOR_SHIFT}
         icon={<LocationOnIcon />}
       />
@@ -41,14 +45,14 @@ const ModeNavigation = ({
       onChange={onChange}
       className={classes.root}
     >
-      { btnShift(shiftEnableSt) }
+      { btnShift(classes, shiftEnableSt) }
       <BottomNavigationAction
-        label="Add Peak"
+        label={TabLabel(classes, 'Add Peak', 'txt-shift-tab-label')}
         value={LIST_MODE.ADD_PEAK}
         icon={<AddIcon />}
       />
       <BottomNavigationAction
-        label="Clear Peak"
+        label={TabLabel(classes, 'Clear Peak', 'txt-shift-tab-label')}
         value={LIST_MODE.RM_PEAK}
         icon={<RemoveIcon />}
       />

@@ -9,6 +9,7 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import AppViewer from './components/app_viewer';
 import PredictViewer from './components/predict_viewer';
+import { TabLabel } from './components/common/ui';
 
 const styles = () => ({
   root: {
@@ -17,6 +18,9 @@ const styles = () => ({
   appBar: {
     backgroundColor: '#fff',
     boxShadow: 'none',
+  },
+  tabLabel: {
+    fontSize: '14px',
   },
 });
 
@@ -73,8 +77,8 @@ class Content extends React.Component {
             value={value}
             onChange={this.onChange}
           >
-            <Tab label="Spectrum" />
-            <Tab label="Prediction" />
+            <Tab label={TabLabel(classes, 'Spectrum', 'txt-prd-tab-label')} />
+            <Tab label={TabLabel(classes, 'Analysis', 'txt-prd-tab-label')} />
           </Tabs>
         </AppBar>
         {
@@ -100,7 +104,7 @@ class Content extends React.Component {
   }
 }
 
-const mapStateToProps = (state, _) => (
+const mapStateToProps = (state, _) => ( // eslint-disable-line
   {
     layoutSt: state.layout,
   }
