@@ -23,6 +23,7 @@ import TextField from '@material-ui/core/TextField';
 import { PksEdit } from '../helpers/converter';
 import { Convert2Peak } from '../helpers/chem';
 import { FromManualToOffset } from '../helpers/shift';
+import { TxtLabel } from './common/ui';
 
 const Styles = () => ({
   root: {
@@ -46,6 +47,9 @@ const Styles = () => ({
   },
   inputRoot: {
     margin: '10px 40px 0px 40px',
+  },
+  txtLabel: {
+    fontSize: '12px',
   },
 });
 
@@ -72,11 +76,21 @@ const sectionTable = (classes, predictions) => {
       <Table className={classes.table}>
         <TableHead>
           <TableRow>
-            <TableCell>Atom</TableCell>
-            <TableCell align="right">Prediction (ppm)</TableCell>
-            <TableCell align="right">Real (ppm)</TableCell>
-            <TableCell align="right">Diff (ppm)</TableCell>
-            <TableCell align="right">Status</TableCell>
+            <TableCell>
+              {TxtLabel(classes, 'Atom', 'txt-prd-table-title')}
+            </TableCell>
+            <TableCell align="right">
+              {TxtLabel(classes, 'Prediction (ppm)', 'txt-prd-table-title')}
+            </TableCell>
+            <TableCell align="right">
+              {TxtLabel(classes, 'Real (ppm)', 'txt-prd-table-title')}
+            </TableCell>
+            <TableCell align="right">
+              {TxtLabel(classes, 'Diff (ppm)', 'txt-prd-table-title')}
+            </TableCell>
+            <TableCell align="right">
+              {TxtLabel(classes, 'Status', 'txt-prd-table-title')}
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -85,11 +99,21 @@ const sectionTable = (classes, predictions) => {
               .sort((a, b) => a.atom - b.atom)
               .map((row, idx) => (
                 <TableRow key={`${idx}-${row.atom}`}>
-                  <TableCell component="th" scope="row">{row.atom}</TableCell>
-                  <TableCell align="right">{numFormat(row.prediction)}</TableCell>
-                  <TableCell align="right">{numFormat(row.real)}</TableCell>
-                  <TableCell align="right">{numFormat(row.diff)}</TableCell>
-                  <TableCell align="right">{statusIcon(row.status)}</TableCell>
+                  <TableCell component="th" scope="row">
+                    {TxtLabel(classes, row.atom, 'txt-prd-table-content')}
+                  </TableCell>
+                  <TableCell align="right">
+                    {TxtLabel(classes, numFormat(row.prediction), 'txt-prd-table-content')}
+                  </TableCell>
+                  <TableCell align="right">
+                    {TxtLabel(classes, numFormat(row.real), 'txt-prd-table-content')}
+                  </TableCell>
+                  <TableCell align="right">
+                    {TxtLabel(classes, numFormat(row.diff), 'txt-prd-table-content')}
+                  </TableCell>
+                  <TableCell align="right">
+                    {statusIcon(row.status)}
+                  </TableCell>
                 </TableRow>
               ))
           }
@@ -125,7 +149,7 @@ const sectionInput = (classes, molecule, inputFuncCb) => {
         <Grid item xs={6}>
           <TextField
             fullWidth
-            label="Molfile"
+            label={TxtLabel(classes, 'Molfile', 'txt-mol-label')}
             margin="normal"
             multiline
             onChange={inputFuncCb}

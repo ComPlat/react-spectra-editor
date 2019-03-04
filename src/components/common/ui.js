@@ -9,4 +9,12 @@ const TabLabel = (classes, label, extClsName = 'txt-tab-label') => (
   </span>
 );
 
-export { TabLabel }; // eslint-disable-line
+const TxtLabel = (classes, label, extClsName = 'txt-label') => (
+  <span
+    className={classNames(classes.txtLabel, extClsName)}
+  >
+    { label }
+  </span>
+);
+
+export { TabLabel, TxtLabel };
