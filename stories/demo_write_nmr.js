@@ -5,7 +5,7 @@ import Grid from '@material-ui/core/Grid';
 
 import { SpectraViewer, FN } from '../src/index';
 import C13_CPD from './source/C13_CPD';
-import nmrshiftdb from './source/nmrshiftdb';
+import resultNmr from './source/result_nmr';
 
 const file = FN.ExtractJcamp(C13_CPD);
 
@@ -64,7 +64,7 @@ class DemoWriteNmr extends React.Component {
     this.setState({ predictions: false });
     // simulate fetching...
     setTimeout(() => {
-      this.setState({ predictions: nmrshiftdb });
+      this.setState({ predictions: resultNmr });
     }, 1000);
   }
 

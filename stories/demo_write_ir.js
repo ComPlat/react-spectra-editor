@@ -5,7 +5,7 @@ import Grid from '@material-ui/core/Grid';
 
 import { SpectraViewer, FN } from '../src/index';
 import IREdit from './source/IR_edit';
-import nmrshiftdb from './source/nmrshiftdb';
+import resultIr from './source/result_ir';
 
 const file = FN.ExtractJcamp(IREdit);
 
@@ -64,7 +64,7 @@ class DemoWriteIr extends React.Component {
     this.setState({ predictions: false });
     // simulate fetching...
     setTimeout(() => {
-      this.setState({ predictions: nmrshiftdb });
+      this.setState({ predictions: resultIr });
     }, 1000);
   }
 

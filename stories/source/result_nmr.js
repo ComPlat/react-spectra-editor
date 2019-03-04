@@ -1,4 +1,4 @@
-const nmrshiftdb = {
+const resultNmr = {
   result: [
     {
       id: 1,
@@ -58,4 +58,4 @@ const nmrshiftdb = {
   ],
 };
 
-export default nmrshiftdb;
+export default resultNmr;

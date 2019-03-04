@@ -13,17 +13,13 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import CheckCircleOutline from '@material-ui/icons/CheckCircleOutline';
-import ErrorOutline from '@material-ui/icons/ErrorOutline';
-import HighlightOff from '@material-ui/icons/HighlightOff';
-import HelpOutline from '@material-ui/icons/HelpOutline';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 
 import { PksEdit } from '../../helpers/converter';
 import { Convert2Peak } from '../../helpers/chem';
 import { FromManualToOffset } from '../../helpers/shift';
-import { TxtLabel } from '../common/ui';
+import { TxtLabel, StatusIcon } from '../common/ui';
 
 const Styles = () => ({
   root: {
@@ -54,19 +50,6 @@ const Styles = () => ({
 });
 
 const numFormat = input => parseFloat(input).toFixed(2);
-
-const statusIcon = (status) => {
-  switch (status) {
-    case 'accept':
-      return <CheckCircleOutline style={{ color: '#4caf50' }} />;
-    case 'warning':
-      return <ErrorOutline style={{ color: '#ffc107' }} />;
-    case 'reject':
-      return <HighlightOff style={{ color: '#e91e63' }} />;
-    default:
-      return <HelpOutline style={{ color: '#5d4037' }} />;
-  }
-};
 
 const sectionTable = (classes, predictions) => {
   if (!predictions) return null;
@@ -112,7 +95,7 @@ const sectionTable = (classes, predictions) => {
                     {TxtLabel(classes, numFormat(row.diff), 'txt-prd-table-content')}
                   </TableCell>
                   <TableCell align="right">
-                    {statusIcon(row.status)}
+                    {StatusIcon(row.status)}
                   </TableCell>
                 </TableRow>
               ))
