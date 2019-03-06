@@ -16,6 +16,7 @@ import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 
+import Format from '../../helpers/format';
 import { PksEdit } from '../../helpers/converter';
 import { Convert2Peak } from '../../helpers/chem';
 import { FromManualToOffset } from '../../helpers/shift';
@@ -169,12 +170,13 @@ const NmrViewer = ({
   const offset = FromManualToOffset(ref, peak);
   const peaks = Convert2Peak(peakObj, thresSt * 0.01, offset);
   const peaksEdit = PksEdit(peaks, editPeakSt);
+  const peaksWoRef = Format.rmRef(peaksEdit, shiftSt);
 
   const {
     btnCb, inputCb, predictions, molecule,
   } = predictObj;
 
-  const btnFuncCb = () => btnCb(peaksEdit, layoutSt, shiftSt);
+  const btnFuncCb = () => btnCb(peaksWoRef, layoutSt, shiftSt);
 
   return (
     <div className={classNames(classes.root, 'card-predict-viewer')}>
