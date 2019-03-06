@@ -52,6 +52,13 @@ const Styles = () => ({
 
 const numFormat = input => parseFloat(input).toFixed(2);
 
+const realFormat = (val, status) => {
+  if (status === 'missing') {
+    return '- - -';
+  }
+  return numFormat(val);
+};
+
 const sectionTable = (classes, predictions) => {
   if (!predictions) return null;
 
@@ -90,10 +97,22 @@ const sectionTable = (classes, predictions) => {
                     {TxtLabel(classes, numFormat(row.prediction), 'txt-prd-table-content')}
                   </TableCell>
                   <TableCell align="right">
-                    {TxtLabel(classes, numFormat(row.real), 'txt-prd-table-content')}
+                    {
+                      TxtLabel(
+                        classes,
+                        realFormat(row.real, row.status),
+                        'txt-prd-table-content',
+                      )
+                    }
                   </TableCell>
                   <TableCell align="right">
-                    {TxtLabel(classes, numFormat(row.diff), 'txt-prd-table-content')}
+                    {
+                      TxtLabel(
+                        classes,
+                        realFormat(row.diff, row.status),
+                        'txt-prd-table-content',
+                      )
+                    }
                   </TableCell>
                   <TableCell align="right">
                     {StatusIcon(row.status)}

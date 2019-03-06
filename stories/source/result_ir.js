@@ -22,7 +22,7 @@ const resultIr = {
     },
     {
       fg: 'CBB',
-      status: 'accept',
+      status: 'unknown',
     },
   ],
 };
