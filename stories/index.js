@@ -2,12 +2,13 @@ import React from 'react';
 import { storiesOf } from '@storybook/react';
 
 import DemoSingle from './demo_single';
+import DemoSingleMs from './demo_single_ms';
 import DemoEdit from './demo_edit';
 import DemoSelect from './demo_select';
 import DemoWriteNmr from './demo_write_nmr';
 import DemoWriteIr from './demo_write_ir';
 
-storiesOf('SpectraViewer', module)
+storiesOf('Line Spectra Viewer', module)
   .add('single spectrum', () => (
     <DemoSingle />
   ))
@@ -22,4 +23,9 @@ storiesOf('SpectraViewer', module)
   ))
   .add('write IR peaks to description', () => (
     <DemoWriteIr />
+  ));
+
+storiesOf('Bar SpectraViewer', module)
+  .add('single MS spectrum', () => (
+    <DemoSingleMs />
   ));
