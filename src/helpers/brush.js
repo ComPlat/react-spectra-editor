@@ -1,20 +1,20 @@
 import * as d3 from 'd3';
 
-const brushed = (canvas) => {
+const brushed = (main) => {
   if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'zoom') return;
-  const { context } = canvas;
+  const { context } = main;
   const selection = (d3.event.selection && d3.event.selection.reverse())
     || context.scales.x.range();
   const selectX = selection.map(context.scales.x.invert);
   context.updateBorder(selectX);
 
-  canvas.svg.call(canvas.zoom.transform, d3.zoomIdentity);
+  main.svg.call(main.zoom.transform, d3.zoomIdentity);
 };
 
-const MountBrush = (canvas) => {
-  const brushedCb = () => brushed(canvas);
+const MountBrush = (main) => {
+  const brushedCb = () => brushed(main);
 
-  const { context, brush } = canvas;
+  const { context, brush } = main;
 
   brush.handleSize(10)
     .extent([[0, 0], [context.w, context.h]])

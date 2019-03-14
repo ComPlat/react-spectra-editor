@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
 
-import AppViewer from './components/app_viewer';
+import ViewerLine from './components/viewer_line';
+import ViewerRect from './components/viewer_rect';
 import PredictViewer from './components/predict_viewer';
 
 const extractLayout = (predictObj, layoutSt) => {
@@ -36,7 +37,7 @@ const Content = ({
   }
 
   return (
-    <AppViewer
+    <ViewerLine
       input={input}
       cLabel={cLabel}
       xLabel={xLabel}

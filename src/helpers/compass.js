@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 
 const TfRescale = (focus) => {
-  const tf = d3.zoomTransform(d3.select('.canvas-main').node());
+  const tf = d3.zoomTransform(d3.select('.kanvas-main').node());
   const xt = tf.rescaleX(focus.scales.x);
   const yt = tf.rescaleY(focus.scales.y);
   return { xt, yt };
@@ -39,8 +39,8 @@ const ClickCompass = (focus) => {
   focus.clickPointAct(pt, onPeak);
 };
 
-const MountCompass = (canvas) => {
-  const { focus } = canvas;
+const MountCompass = (main) => {
+  const { focus } = main;
   const { compass, overlay } = focus;
 
   compass.append('line')

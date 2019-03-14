@@ -9,14 +9,14 @@ import {
 import { updateBorder } from '../actions/border';
 import { resetAll } from '../actions/manager';
 import { clickPoint } from '../actions/edit_peak';
-import D3Canvas from './d3_canvas';
+import LineMain from './d3_line/line_main';
 
-class AppViewer extends React.Component {
+class ViewerLine extends React.Component {
   constructor(props) {
     super(props);
 
     const { clickPointAct } = props;
-    this.canvas = new D3Canvas({ clickPointAct });
+    this.main = new LineMain({ clickPointAct });
     this.d3Ref = React.createRef();
 
     this.normChange = this.normChange.bind(this);
@@ -33,7 +33,7 @@ class AppViewer extends React.Component {
 
     const { filterSeed, filterPeak } = this.brushFilter(borderSt, seed, peak);
     const node = this.d3Ref.current;
-    this.chart = this.canvas.create(
+    this.chart = this.main.create(
       node,
       seed,
       peak,
@@ -60,7 +60,7 @@ class AppViewer extends React.Component {
 
     const { filterSeed, filterPeak } = this.brushFilter(borderSt, seed, peak);
     const node = this.d3Ref.current;
-    this.canvas.update(
+    this.main.update(
       node,
       seed,
       peak,
@@ -79,7 +79,7 @@ class AppViewer extends React.Component {
 
   componentWillUnmount() {
     const node = this.d3Ref.current;
-    this.canvas.destroy(node);
+    this.main.destroy(node);
   }
 
   normChange(prevProps) {
@@ -141,7 +141,7 @@ const mapDispatchToProps = dispatch => (
   }, dispatch)
 );
 
-AppViewer.propTypes = {
+ViewerLine.propTypes = {
   seed: PropTypes.array.isRequired,
   peak: PropTypes.array.isRequired,
   cLabel: PropTypes.string.isRequired,
@@ -159,4 +159,4 @@ AppViewer.propTypes = {
   isHidden: PropTypes.bool.isRequired,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(AppViewer);
+export default connect(mapStateToProps, mapDispatchToProps)(ViewerLine);

@@ -1,10 +1,12 @@
 import * as d3 from 'd3';
-import { InitScale, InitAxisCall, InitPathCall } from '../helpers/init';
+import {
+  InitScale, InitAxisCall, InitPathCall,
+} from '../../helpers/init';
 import {
   MountPath, MountAxis, MountMainFrame, MountAxisLabelX,
-} from '../helpers/mount';
+} from '../../helpers/mount';
 
-class D3Context {
+class LineContext {
   constructor(props) {
     const { W, H } = props;
     this.margin = {
@@ -32,6 +34,7 @@ class D3Context {
     this.setRoot = this.setRoot.bind(this);
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
+    this.setConfig = this.setConfig.bind(this);
     this.drawTime = this.drawTime.bind(this);
   }
 
@@ -47,7 +50,7 @@ class D3Context {
     this.data = [...data];
   }
 
-  drawTime() {
+  setConfig() {
     // Domain Calculate
     const factor = 1.05;
     const xExtent = d3.extent(this.data, d => d.x);
@@ -60,8 +63,9 @@ class D3Context {
     // Axis Call
     this.axis.x.call(this.axisCall.x.scale(this.scales.x));
     this.axis.y.call(this.axisCall.y.scale(this.scales.y));
+  }
 
-    // Path Calculate
+  drawTime() {
     this.path.attr('d', this.pathCall(this.data));
   }
 
@@ -88,9 +92,10 @@ class D3Context {
     this.setData(data);
 
     if (this.data && this.data.length > 0) {
+      this.setConfig();
       this.drawTime();
     }
   }
 }
 
-export default D3Context;
+export default LineContext;

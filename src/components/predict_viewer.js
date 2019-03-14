@@ -7,10 +7,10 @@ import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 
-import AppViewer from './app_viewer';
-import { TabLabel } from './common/ui';
+import ViewerLine from './viewer_line';
 import NmrViewer from './predict/nmr_viewer';
 import IrViewer from './predict/ir_viewer';
+import { TabLabel } from './common/ui';
 
 const styles = () => ({
   root: {
@@ -61,7 +61,7 @@ class PredictViewer extends React.Component {
           </Tabs>
         </AppBar>
         {
-          <AppViewer
+          <ViewerLine
             input={input}
             cLabel={cLabel}
             xLabel={xLabel}

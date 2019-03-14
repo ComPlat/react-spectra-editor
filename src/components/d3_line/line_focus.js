@@ -1,16 +1,16 @@
 import * as d3 from 'd3';
 import {
   InitScale, InitAxisCall, InitTip,
-} from '../helpers/init';
+} from '../../helpers/init';
 import {
   MountPath, MountGrid, MountAxis, MountAxisLabelY, MountRef,
   MountClip, MountMainFrame, MountCircles, MountThresLine,
-} from '../helpers/mount';
-import { TfRescale } from '../helpers/compass';
-import { PksEdit } from '../helpers/converter';
-import { LIST_MODE } from '../constants/list_mode';
+} from '../../helpers/mount';
+import { TfRescale } from '../../helpers/compass';
+import { PksEdit } from '../../helpers/converter';
+import { LIST_MODE } from '../../constants/list_mode';
 
-class D3Focus {
+class LineFocus {
   constructor(props) {
     const {
       W, H, clickPointAct,
@@ -54,12 +54,14 @@ class D3Focus {
     this.setCompass = this.setCompass.bind(this);
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
+    this.setConfig = this.setConfig.bind(this);
     this.drawLine = this.drawLine.bind(this);
+    this.drawThres = this.drawThres.bind(this);
+    this.drawGrid = this.drawGrid.bind(this);
     this.drawPeaks = this.drawPeaks.bind(this);
     this.drawRef = this.drawRef.bind(this);
     this.onClickEditPeak = this.onClickEditPeak.bind(this);
     this.mergedPeaks = this.mergedPeaks.bind(this);
-    this.updatePathCall = this.updatePathCall.bind(this);
   }
 
   setSvg(svg) {
@@ -105,7 +107,7 @@ class D3Focus {
       .y(d => yt(d.y));
   }
 
-  drawLine() {
+  setConfig() {
     // Domain Calculate
     const factor = 1.05;
     const xExtent = d3.extent(this.data, d => d.x);
@@ -122,20 +124,25 @@ class D3Focus {
     // Axis Call
     this.axisCall.x.scale(xt);
     this.axisCall.y.scale(yt);
+  }
 
-    // Path Calculate
+  drawLine() {
+    const { xt, yt } = TfRescale(this);
+
     this.updatePathCall(xt, yt);
     this.path.attr('d', this.pathCall(this.data));
+  }
 
-    // Threshold
+  drawThres() {
     if (this.tTrEndPts.length > 0) {
       this.thresLine.attr('d', this.pathCall(this.tTrEndPts));
       this.thresLine.attr('visibility', 'visible');
     } else {
       this.thresLine.attr('visibility', 'hidden');
     }
+  }
 
-    // Grid Calculate
+  drawGrid() {
     this.grid.x.call(this.axisCall.x
       .tickSize(-this.h, 0, 0))
       .selectAll('line')
@@ -246,7 +253,10 @@ class D3Focus {
     // }
 
     if (this.data && this.data.length > 0) {
+      this.setConfig();
       this.drawLine();
+      this.drawThres();
+      this.drawGrid();
       this.drawRef();
       this.drawPeaks(editPeakSt, editModeSt);
     }
@@ -259,11 +269,14 @@ class D3Focus {
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks);
 
     if (this.data && this.data.length > 0) {
+      this.setConfig();
       this.drawLine();
+      this.drawThres();
+      this.drawGrid();
       this.drawRef();
       this.drawPeaks(editPeakSt, editModeSt);
     }
   }
 }
 
-export default D3Focus;
+export default LineFocus;

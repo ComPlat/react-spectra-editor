@@ -1,14 +1,15 @@
 import * as d3 from 'd3';
-import D3Focus from './d3_focus';
-import D3Context from './d3_context';
-import MountZoom from '../helpers/zoom';
-import MountBrush from '../helpers/brush';
-import { MountCompass } from '../helpers/compass';
+import LineFocus from './line_focus';
+import LineContext from './line_context';
+import Zoomed from './line_zoomed';
+import MountZoom from '../../helpers/zoom';
+import MountBrush from '../../helpers/brush';
+import { MountCompass } from '../../helpers/compass';
 
 const W = 700;
 const H = 500;
 
-class D3Canvas {
+class LineMain {
   constructor(props) {
     const { clickPointAct } = props;
     this.focus = new D3Focus({
@@ -28,7 +29,7 @@ class D3Canvas {
 
   drawMain(el) {
     const svg = d3.select(el).append('svg')
-      .attr('class', 'canvas-main')
+      .attr('class', 'kanvas-main')
       .attr('preserveAspectRatio', 'xMinYMin meet')
       .attr('viewBox', `0 0 ${W} ${H}`);
     this.svg = svg;
@@ -57,7 +58,7 @@ class D3Canvas {
     this.drawLabel(el, cLabel, xLabel, yLabel);
 
     MountBrush(this);
-    MountZoom(this);
+    MountZoom(this, Zoomed);
     MountCompass(this);
   }
 
@@ -84,4 +85,4 @@ class D3Canvas {
   }
 }
 
-export default D3Canvas;
+export default LineMain;
