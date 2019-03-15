@@ -1,9 +1,10 @@
 import * as d3 from 'd3';
 import d3Tip from 'd3-tip';
 
-const InitScale = (target) => {
+const InitScale = (target, reverse = true) => {
+  const xRange = reverse ? [target.w, 0] : [0, target.w];
   const x = d3.scaleLinear()
-    .range([target.w, 0]);
+    .range(xRange);
   const y = d3.scaleLinear()
     .range([target.h, 0]);
   return { x, y };

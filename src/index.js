@@ -44,7 +44,7 @@ SpectraViewer.propTypes = {
   cLabel: PropTypes.string,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
-  peakObjs: PropTypes.array.isRequired,
+  peakObjs: PropTypes.array,
   predictObj: PropTypes.object,
   operations: PropTypes.array,
 };
@@ -52,6 +52,7 @@ SpectraViewer.propTypes = {
 
 SpectraViewer.defaultProps = {
   cLabel: '',
+  peakObjs: [],
   predictObj: {},
   operations: [],
 };

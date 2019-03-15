@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
-import LineFocus from './line_focus';
-import LineContext from './line_context';
-import Zoomed from './line_zoomed';
+import RectFocus from './rect_focus';
+import RectContext from './rect_context';
+import Zoomed from './rect_zoomed';
 import MountZoom from '../../helpers/zoom';
 import MountBrush from '../../helpers/brush';
 import { MountCompass } from '../../helpers/compass';
@@ -9,13 +9,13 @@ import { MountCompass } from '../../helpers/compass';
 const W = 700;
 const H = 500;
 
-class LineMain {
+class RectMain {
   constructor(props) {
     const { clickPointAct } = props;
-    this.focus = new LineFocus({
+    this.focus = new RectFocus({
       W, H, clickPointAct,
     });
-    this.context = new LineContext({ W, H });
+    this.context = new RectContext({ W, H });
 
     this.svg = null;
     this.zoom = d3.zoom();
@@ -85,4 +85,4 @@ class LineMain {
   }
 }
 
-export default LineMain;
+export default RectMain;

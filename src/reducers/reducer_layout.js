@@ -12,6 +12,8 @@ const resetLayout = (operation) => {
       return LIST_LAYOUT.H1;
     case 'NMR13C':
       return LIST_LAYOUT.C13;
+    case 'MS':
+      return LIST_LAYOUT.MS;
     case 'NMR19F':
     default:
       return LIST_LAYOUT.PLAIN;

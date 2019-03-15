@@ -25,8 +25,16 @@ const dsWithoutRef = (spectrum, offset) => {
   const sp = [];
   const xs = spectrum.x;
   const ys = spectrum.y;
-  for (let i = 0; i < ys.length; i += 1) { // downsample
-    if (i % 2 === 0) {
+  if (xs.length > 8000) {
+    for (let i = 0; i < ys.length; i += 1) { // downsample
+      if (i % 2 === 0) {
+        const x = xs[i] - offset;
+        const y = ys[i];
+        sp.push({ x, y });
+      }
+    }
+  } else {
+    for (let i = 0; i < ys.length; i += 1) { // no-downsample
       const x = xs[i] - offset;
       const y = ys[i];
       sp.push({ x, y });
@@ -138,17 +146,6 @@ const ToShiftPeaks = createSelector(
 // - - - - - - - - - - - - - - - - - - - - - -
 // ExtractJcamp
 // - - - - - - - - - - - - - - - - - - - - - -
-
-const extractPeakUp = (jcamp) => {
-  let peakUp = true;
-  jcamp.spectra.forEach((s) => {
-    if (s.dataType && s.dataType.includes('INFRARED SPECTRUM')) {
-      peakUp = false;
-    }
-  });
-  return peakUp;
-};
-
 const getSTyp = (s) => {
   if (s.dataType) {
     if (s.dataType.includes('NMR SPECTRUM')) {
@@ -156,6 +153,9 @@ const getSTyp = (s) => {
     }
     if (s.dataType.includes('INFRARED SPECTRUM')) {
       return 'INFRARED';
+    }
+    if (s.dataType.includes('MASS SPECTRUM')) {
+      return 'MS';
     }
   }
   return false;
@@ -175,7 +175,8 @@ const extractSpectrum = (jcamp) => {
     );
     return target;
   }).filter(r => r != null)[0];
-  return spectrum;
+
+  return spectrum || jcamp.spectra[0];
 };
 
 const calcThresRef = (s, peakUp) => {
@@ -231,11 +232,11 @@ const extractPeakObj = (jcamp, peakUp, sTyp) => {
 
 const ExtractJcamp = (input) => {
   const jcamp = Jcampconverter.convert(input, { xy: true });
-  const peakUp = extractPeakUp(jcamp);
-
   const spectrum = extractSpectrum(jcamp);
   const sTyp = spectrum ? spectrum.sTyp : '';
-  let peakObjs = extractPeakObj(jcamp, peakUp, sTyp);
+
+  const peakUp = sTyp !== 'INFRARED';
+  let peakObjs = sTyp !== 'MS' ? extractPeakObj(jcamp, peakUp, sTyp) : [];
   if (peakObjs.length === 0) {
     peakObjs = [{
       thresRef: false,

@@ -11,15 +11,20 @@ const extractLayout = (predictObj, layoutSt) => {
   const isEmpty = Object.keys(predictObj).length === 0
     && predictObj.constructor === Object;
   const isNmr = ['1H', '13C'].indexOf(layoutSt) >= 0;
-  const isIr = ['IR'].indexOf(layoutSt) >= 0;
+  const isMs = ['MS'].indexOf(layoutSt) >= 0;
+  const isIr = false; // ['IR'].indexOf(layoutSt) >= 0;
   const showPredict = !isEmpty && (isNmr || isIr);
-  return { showPredict, isNmr, isIr };
+  return {
+    showPredict, isNmr, isIr, isMs,
+  };
 };
 
 const Content = ({
   input, cLabel, xLabel, yLabel, peakObj, predictObj, layoutSt,
 }) => {
-  const { showPredict, isNmr, isIr } = extractLayout(predictObj, layoutSt);
+  const {
+    showPredict, isNmr, isIr,
+  } = extractLayout(predictObj, layoutSt);
 
   if (showPredict) {
     return (
@@ -32,6 +37,19 @@ const Content = ({
         predictObj={predictObj}
         isNmr={isNmr}
         isIr={isIr}
+      />
+    );
+  }
+
+  if (peakObj.operation.typ === 'MS') {
+    return (
+      <ViewerRect
+        input={input}
+        cLabel={cLabel}
+        xLabel={xLabel}
+        yLabel={yLabel}
+        peakObj={peakObj}
+        isHidden={false}
       />
     );
   }

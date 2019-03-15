@@ -7,6 +7,13 @@ const MountCircles = (target) => {
   return circles;
 };
 
+const MountBars = (target) => {
+  const bars = target.root.append('g')
+    .attr('class', 'bars-clip')
+    .attr('clip-path', 'url(#clip)');
+  return bars;
+};
+
 const MountRef = (target) => {
   const ref = target.root.append('g')
     .attr('class', 'ref-clip')
@@ -116,5 +123,5 @@ const MountMainFrame = (target, name) => {
 export {
   MountCircles, MountRef, MountPath, MountThresLine, MountGrid, MountAxis,
   MountAxisLabelX, MountAxisLabelY,
-  MountMarker, MountClip, MountMainFrame,
+  MountMarker, MountClip, MountMainFrame, MountBars,
 };
