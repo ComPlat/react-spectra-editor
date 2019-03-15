@@ -85,6 +85,12 @@ const peaksWrapper = (layout, shift) => {
   return { head: `${ops.head}${solvTxt}= `, tail: ops.tail };
 };
 
+const isMs = po => po.operation.typ === 'MS';
+
+const isNmrLayout = layoutSt => ['1H', '13C'].indexOf(layoutSt) >= 0;
+const isMsLayout = layoutSt => ['MS'].indexOf(layoutSt) >= 0;
+const isIrLayout = layoutSt => ['IR'].indexOf(layoutSt) >= 0;
+
 const Format = {
   toPeakStr,
   buildData,
@@ -93,6 +99,10 @@ const Format = {
   peaksBody,
   peaksWrapper,
   rmRef,
+  isMs,
+  isNmrLayout,
+  isMsLayout,
+  isIrLayout,
 };
 
 export default Format;

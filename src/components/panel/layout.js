@@ -53,6 +53,9 @@ const layoutSelect = (classes, layoutSt, onChange) => (
             C
           </span>
         </MenuItem>
+        <MenuItem value={LIST_LAYOUT.MS}>
+          <span className="txt-sv-input-label">MS</span>
+        </MenuItem>
       </Select>
     </FormControl>
   </Tooltip>

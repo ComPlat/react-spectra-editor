@@ -118,9 +118,12 @@ const btnRestore = (classes, hasEdit, managerSt, toggleIsEditAct) => (
 );
 
 const ThresholdsPanel = ({
-  classes, peakObj, hasEdit, thresSt, managerSt,
+  classes, peakObj, hasEdit, layoutSt, thresSt, managerSt,
   updateThresholdAct, resetThresholdAct, toggleIsEditAct,
 }) => {
+  const isMs = ['MS'].indexOf(layoutSt) >= 0;
+  if (isMs) return null;
+
   const thresVal = thresSt || peakObj.thresRef;
   return (
     <Grid
@@ -145,6 +148,7 @@ const ThresholdsPanel = ({
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
+    layoutSt: state.layout,
     thresSt: state.threshold,
     managerSt: state.manager,
   }
@@ -162,6 +166,7 @@ ThresholdsPanel.propTypes = {
   classes: PropTypes.object.isRequired,
   peakObj: PropTypes.object.isRequired,
   hasEdit: PropTypes.bool.isRequired,
+  layoutSt: PropTypes.string.isRequired,
   thresSt: PropTypes.oneOfType(
     [
       PropTypes.string,

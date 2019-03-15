@@ -35,9 +35,12 @@ const btnShift = (classes, enable) => (
 );
 
 const ModeNavigation = ({
-  classes, editModeSt, shiftEnableSt, setEditModeAct,
+  classes, layoutSt, editModeSt, shiftEnableSt, setEditModeAct,
 }) => {
   const onChange = (e, v) => setEditModeAct(v);
+  const isMs = ['MS'].indexOf(layoutSt) >= 0;
+
+  if (isMs) return <div><br /></div>;
 
   return (
     <BottomNavigation
@@ -62,6 +65,7 @@ const ModeNavigation = ({
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
+    layoutSt: state.layout,
     editModeSt: state.mode.edit,
     shiftEnableSt: state.shift.enable,
   }
@@ -75,6 +79,7 @@ const mapDispatchToProps = dispatch => (
 
 ModeNavigation.propTypes = {
   classes: PropTypes.object.isRequired,
+  layoutSt: PropTypes.string.isRequired,
   editModeSt: PropTypes.string.isRequired,
   shiftEnableSt: PropTypes.bool.isRequired,
   setEditModeAct: PropTypes.func.isRequired,

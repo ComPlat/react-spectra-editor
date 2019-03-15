@@ -6,13 +6,14 @@ import { bindActionCreators, compose } from 'redux';
 import ViewerLine from './components/viewer_line';
 import ViewerRect from './components/viewer_rect';
 import PredictViewer from './components/predict_viewer';
+import Format from './helpers/format';
 
 const extractLayout = (predictObj, layoutSt) => {
   const isEmpty = Object.keys(predictObj).length === 0
     && predictObj.constructor === Object;
-  const isNmr = ['1H', '13C'].indexOf(layoutSt) >= 0;
-  const isMs = ['MS'].indexOf(layoutSt) >= 0;
-  const isIr = false; // ['IR'].indexOf(layoutSt) >= 0;
+  const isNmr = Format.isNmrLayout(layoutSt);
+  const isMs = Format.isMsLayout(layoutSt);
+  const isIr = false; // Format.isIrLayout(layoutSt);
   const showPredict = !isEmpty && (isNmr || isIr);
   return {
     showPredict, isNmr, isIr, isMs,
@@ -41,7 +42,7 @@ const Content = ({
     );
   }
 
-  if (peakObj.operation.typ === 'MS') {
+  if (Format.isMs(peakObj)) {
     return (
       <ViewerRect
         input={input}
