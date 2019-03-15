@@ -4,7 +4,7 @@ import RectContext from './rect_context';
 import Zoomed from './rect_zoomed';
 import MountZoom from '../../helpers/zoom';
 import MountBrush from '../../helpers/brush';
-import { MountCompass } from '../../helpers/compass';
+// import { MountCompass } from '../../helpers/compass';
 
 const W = 700;
 const H = 500;
@@ -59,7 +59,7 @@ class RectMain {
 
     MountBrush(this);
     MountZoom(this, Zoomed);
-    MountCompass(this);
+    // MountCompass(this);
   }
 
   update(

@@ -140,6 +140,8 @@ class RectFocus {
       .attr('class', 'enter-bar')
       .attr('fill', 'steelblue')
       .attr('width', 1.5)
+      .on('mouseover', this.tip.show)
+      .on('mouseout', this.tip.hide)
       .merge(bars)
       .attr('height', d => this.posHeight(gnd, yt(d.y)))
       .attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y)})`);

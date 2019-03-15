@@ -47,7 +47,7 @@ const tpDiv = d => (
     class="peak-tp"
     style="${tpStyle()}"
   >
-    <span> x: ${d3.format('.3~s')(d.x)}</span>
+    <span> x: ${d3.format('.4~s')(d.x)}</span>
     <br/>
     <span> y: ${d3.format('.2~e')(d.y)}</span>
   <div>
