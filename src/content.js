@@ -13,7 +13,7 @@ const extractLayout = (predictObj, layoutSt) => {
     && predictObj.constructor === Object;
   const isNmr = Format.isNmrLayout(layoutSt);
   const isMs = Format.isMsLayout(layoutSt);
-  const isIr = false; // Format.isIrLayout(layoutSt);
+  const isIr = Format.isIrLayout(layoutSt);
   const showPredict = !isEmpty && (isNmr || isIr);
   return {
     showPredict, isNmr, isIr, isMs,
