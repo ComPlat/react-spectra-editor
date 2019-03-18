@@ -20,36 +20,42 @@ const cAcetoneD6Sep = {
   name: 'Acetone-d6 (sep)',
   value: 29.920,
   label: 'Acetone-d6',
+  nsdb: 'Acetone-D6 ((CD3)2CO)',
 };
 
 const cAcetoneD6Broad = {
   name: 'Acetone-d6 (broad)',
   value: 206.68,
   label: 'Acetone-d6',
+  nsdb: 'Acetone-D6 ((CD3)2CO)',
 };
 
 const cAcetonitrileD3Sep = {
   name: 'Acetonitrile-d3 (sep)',
   value: 1.39,
   label: 'Acetonitrile-d3',
+  nsdb: 'Acetonitrile-D3(CD3CN)',
 };
 
 const cAcetonitrileD3S = {
   name: 'Acetonitrile-d3 (s)',
   value: 118.69,
   label: 'Acetonitrile-d3',
+  nsdb: 'Acetonitrile-D3(CD3CN)',
 };
 
 const cBenzeneT = {
   name: 'Benzene (t)',
   value: 128.390,
   label: 'Benzene-d6',
+  nsdb: 'Benzene-D6 (C6D6)',
 };
 
 const cChloroformDT = {
   name: 'Chloroform-d (t)',
   value: 77.00,
   label: 'CDCl$3',
+  nsdb: 'Chloroform-D1 (CDCl3)',
 };
 
 const cCyclohexaneD12Quin = {
@@ -92,6 +98,7 @@ const cDmsoD6 = {
   name: 'DMSO-d6',
   value: 39.51,
   label: 'DMSO-d6',
+  nsdb: 'Dimethylsulphoxide-D6 (DMSO-D6, C2D6SO))',
 };
 
 const cEthanolD6Sep = {
@@ -110,36 +117,42 @@ const cMethanolD4Sep = {
   name: 'Methanol-d4 (sep)',
   value: 49.15,
   label: 'Methanol-d4',
+  nsdb: 'Methanol-D4 (CD3OD)',
 };
 
 const cPyridineD5T1 = {
   name: 'Pyridine-d5 (t)-1',
   value: 123.87,
   label: 'Pyridine-d5',
+  nsdb: 'Pyridin-D5 (C5D5N)',
 };
 
 const cPyridineD5T2 = {
   name: 'Pyridine-d5 (t)-2',
   value: 135.91,
   label: 'Pyridine-d5',
+  nsdb: 'Pyridin-D5 (C5D5N)',
 };
 
 const cPyridineD5T3 = {
   name: 'Pyridine-d5 (t)-3',
   value: 150.35,
   label: 'Pyridine-d5',
+  nsdb: 'Pyridin-D5 (C5D5N)',
 };
 
 const cThfD8Quin1 = {
   name: 'THF-d8 (quin)-1',
   value: 25.37,
   label: 'THF-d8 ',
+  nsdb: 'Tetrahydrofuran-D8 (THF-D8, C4D4O)',
 };
 
 const cThfD8Quin2 = {
   name: 'THF-d8 (quin)-2',
   value: 67.57,
   label: 'THF-d8 ',
+  nsdb: 'Tetrahydrofuran-D8 (THF-D8, C4D4O)',
 };
 
 const cTmsS = {
@@ -229,24 +242,28 @@ const hAcetoneD6Quin = {
   name: 'Acetone-d6 (quin)',
   value: 2.05,
   label: 'Acetone-d6',
+  nsdb: 'Acetone-D6 ((CD3)2CO)',
 };
 
 const hAcetonitrileD3Qquin = {
   name: 'Acetonitrile-d3 (quin)',
   value: 1.94,
   label: 'Acetonitrile-d3',
+  nsdb: 'Acetonitrile-D3(CD3CN)',
 };
 
 const hBenzeneS = {
   name: 'Benzene (s)',
   value: 7.16,
   label: 'Benzene-d6',
+  nsdb: 'Benzene-D6 (C6D6)',
 };
 
 const hChloroformDS = {
   name: 'Chloroform-d (s)',
   value: 7.27,
   label: 'CDCl$3',
+  nsdb: 'Chloroform-D1 (CDCl3)',
 };
 
 const hCyclohexaneD12S = {
@@ -259,6 +276,7 @@ const hDeuteriumOxideS = {
   name: 'Deuterium oxide (s)',
   value: 4.75,
   label: 'D$2O',
+  nsdb: 'Deuteriumoxide (D2O)',
 };
 
 const hDichloroethaneD4S = {
@@ -271,6 +289,7 @@ const hDichloromethaneD2T = {
   name: 'Dichloromethane-d2 (t)',
   value: 5.32,
   label: 'CD2Cl2',
+  nsdb: 'Methylenchloride-D2 (CD2Cl2)',
 };
 
 const hDMFD7Quin1 = {
@@ -301,6 +320,7 @@ const hDMSOD6Quin = {
   name: 'DMSO-d6 (quin)',
   value: 2.50,
   label: 'DMSO-d6',
+  nsdb: 'Dimethylsulphoxide-D6 (DMSO-D6, C2D6SO))',
 };
 
 const hEthanolD6Broad1 = {
@@ -325,12 +345,14 @@ const hMethanolD4Quin = {
   name: 'Methanol-d4 (quin)',
   value: 3.31,
   label: 'Methanol-d4',
+  nsdb: 'Methanol-D4 (CD3OD)',
 };
 
 const hMethanolD4S = {
   name: 'Methanol-d4 (s)',
   value: 4.87,
   label: 'Methanol-d4',
+  nsdb: 'Methanol-D4 (CD3OD)',
 };
 
 const hNitromethaneD3S = {
@@ -343,30 +365,35 @@ const hPyridineD5Broad1 = {
   name: 'Pyridine-d5 (broad)-1',
   value: 7.22,
   label: 'Pyridine-d5',
+  nsdb: 'Pyridin-D5 (C5D5N)',
 };
 
 const hPyridineD5Broad2 = {
   name: 'Pyridine-d5 (broad)-2',
   value: 7.58,
   label: 'Pyridine-d5',
+  nsdb: 'Pyridin-D5 (C5D5N)',
 };
 
 const hPyridineD5Broad3 = {
   name: 'Pyridine-d5 (broad)-3',
   value: 8.74,
   label: 'Pyridine-d5',
+  nsdb: 'Pyridin-D5 (C5D5N)',
 };
 
 const hTHFD8S1 = {
   name: 'THF-d8 (s)-1',
   value: 1.73,
   label: 'THF-d8',
+  nsdb: 'Tetrahydrofuran-D8 (THF-D8, C4D4O)',
 };
 
 const hTHFD8S2 = {
   name: 'THF-d8 (s)-2',
   value: 3.58,
   label: 'THF-d8',
+  nsdb: 'Tetrahydrofuran-D8 (THF-D8, C4D4O)',
 };
 
 const hTMSS = {
