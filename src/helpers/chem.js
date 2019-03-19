@@ -82,7 +82,7 @@ const Spectrum2Seed = createSelector(
 );
 
 const getThreshold = state => (
-  state.threshold ? state.threshold / 100.0 : false
+  state.threshold ? state.threshold * 1.0 : false
 );
 
 const Convert2Peak = (peakObj, threshold, offset) => {
@@ -90,7 +90,8 @@ const Convert2Peak = (peakObj, threshold, offset) => {
   if (!peakObj || !peakObj.data) return peak;
   const data = peakObj.data[0];
   const { maxY, peakUp, thresRef } = peakObj;
-  const yThres = threshold ? (threshold * maxY) : (thresRef * maxY / 100.0);
+  const thresVal = threshold || thresRef;
+  const yThres = thresVal * maxY / 100.0;
   const corrOffset = offset || 0.0;
   for (let i = 0; i < data.y.length; i += 1) {
     const y = data.y[i];
@@ -115,9 +116,10 @@ const convertThresEndPts = (peakObj, threshold) => {
   const {
     maxY, maxX, minX, thresRef,
   } = peakObj;
+
   const thresVal = threshold || thresRef;
   if (!thresVal || !peakObj.data) return [];
-  const yThres = thresVal * maxY;
+  const yThres = thresVal * maxY / 100.0;
   const endPts = [{ x: minX - 200, y: yThres }, { x: maxX + 200, y: yThres }];
   return endPts;
 };
@@ -206,37 +208,69 @@ const extractShift = (s) => {
   };
 };
 
-const extractPeakObj = (jcamp, peakUp, sTyp) => {
+const corePeakObj = (jcamp, sTyp, peakUp, s, thresRef) => {
   const subTyp = jcamp.xType ? ` - ${jcamp.xType}` : '';
+
+  return (
+    Object.assign(
+      {
+        typ: s.dataType + subTyp,
+        peakUp,
+        thresRef,
+        shift: extractShift(s),
+        operation: {
+          typ: sTyp,
+          nucleus: jcamp.xType || '',
+        },
+      },
+      s,
+    )
+  );
+};
+
+const extractPeakObj = (jcamp, sTyp, peakUp) => {
   const peakObjs = jcamp.spectra.map((s) => {
     const thresRef = calcThresRef(s, peakUp);
     return s.dataType && s.dataType.includes('PEAK ASSIGNMENTS')
-      ? Object.assign(
-        {
-          typ: s.dataType + subTyp,
-          peakUp,
-          thresRef,
-          shift: extractShift(s),
-          operation: {
-            typ: sTyp,
-            nucleus: jcamp.xType || '',
-          },
-        },
-        s,
-      )
+      ? corePeakObj(jcamp, sTyp, peakUp, s, thresRef)
       : null;
   }).filter(r => r != null);
 
   return peakObjs;
 };
 
+const getBoundary = (s) => {
+  const { x, y } = s.data[0];
+  const maxX = Math.max(...x);
+  const minX = Math.min(...x);
+  const maxY = Math.max(...y);
+  const minY = Math.min(...y);
+  return {
+    maxX, minX, maxY, minY,
+  };
+};
+
+const extractMsPeakObj = (jcamp, sTyp, peakUp) => {
+  const thresRef = (jcamp.info && jcamp.info.THRESHOLD * 100) || 5;
+
+  const peakObjs = jcamp.spectra.map((s) => {
+    const cpo = corePeakObj(jcamp, sTyp, peakUp, s, thresRef);
+    const bnd = getBoundary(s);
+    return Object.assign({}, cpo, bnd);
+  }).filter(r => r != null);
+
+  return peakObjs;
+};
+
 const ExtractJcamp = (input) => {
-  const jcamp = Jcampconverter.convert(input, { xy: true });
+  const jcamp = Jcampconverter.convert(input, { xy: true, keepRecordsRegExp: 'THRESHOLD' });
   const spectrum = extractSpectrum(jcamp);
   const sTyp = spectrum ? spectrum.sTyp : '';
 
   const peakUp = sTyp !== 'INFRARED';
-  let peakObjs = sTyp !== 'MS' ? extractPeakObj(jcamp, peakUp, sTyp) : [];
+  let peakObjs = sTyp === 'MS'
+    ? extractMsPeakObj(jcamp, sTyp, peakUp)
+    : extractPeakObj(jcamp, sTyp, peakUp);
   if (peakObjs.length === 0) {
     peakObjs = [{
       thresRef: false,

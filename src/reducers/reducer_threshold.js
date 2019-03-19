@@ -9,7 +9,7 @@ const thresholdReducer = (state = initialState, action) => {
     case THRESHOLD.RESET:
       return action.payload;
     case MANAGER.RESETALL:
-      return initialState;
+      return action.payload && action.payload.thresRef;
     default:
       return state;
   }

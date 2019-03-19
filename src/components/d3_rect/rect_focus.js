@@ -42,6 +42,7 @@ class RectFocus {
     this.bars = null;
     this.scales = InitScale(this, false);
     this.axisCall = InitAxisCall(5);
+    this.pathCall = null;
     this.tip = InitTip(this);
 
     this.setSvg = this.setSvg.bind(this);
@@ -55,6 +56,7 @@ class RectFocus {
     this.update = this.update.bind(this);
     this.setConfig = this.setConfig.bind(this);
     this.drawBar = this.drawBar.bind(this);
+    this.drawThres = this.drawThres.bind(this);
     this.drawGrid = this.drawGrid.bind(this);
     this.onClickEditPeak = this.onClickEditPeak.bind(this);
     this.mergedPeaks = this.mergedPeaks.bind(this);
@@ -97,6 +99,12 @@ class RectFocus {
       .attr('display', 'none');
   }
 
+  updatePathCall(xt, yt) {
+    this.pathCall = d3.line()
+      .x(d => xt(d.x))
+      .y(d => yt(d.y));
+  }
+
   setConfig() {
     // Domain Calculate
     const factor = 1.05;
@@ -124,8 +132,15 @@ class RectFocus {
     return h >= 0 ? h : 0;
   }
 
+  barColor(y, yRef) {
+    return y >= yRef ? 'steelblue' : '#ddd';
+  }
+
   drawBar() {
     const { xt, yt } = TfRescale(this);
+    this.updatePathCall(xt, yt);
+
+    const yRef = this.tTrEndPts[0].y;
 
     const bars = this.bars.selectAll('rect')
       .data(this.data);
@@ -138,13 +153,22 @@ class RectFocus {
     bars.enter()
       .append('rect')
       .attr('class', 'enter-bar')
-      .attr('fill', 'steelblue')
       .attr('width', 1.5)
       .on('mouseover', this.tip.show)
       .on('mouseout', this.tip.hide)
       .merge(bars)
+      .attr('fill', d => this.barColor(d.y, yRef))
       .attr('height', d => this.posHeight(gnd, yt(d.y)))
       .attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y)})`);
+  }
+
+  drawThres() {
+    if (this.tTrEndPts.length > 0) {
+      this.thresLine.attr('d', this.pathCall(this.tTrEndPts));
+      this.thresLine.attr('visibility', 'visible');
+    } else {
+      this.thresLine.attr('visibility', 'hidden');
+    }
   }
 
   drawGrid() {
@@ -206,6 +230,7 @@ class RectFocus {
     if (this.data && this.data.length > 0) {
       this.setConfig();
       this.drawBar();
+      this.drawThres();
       this.drawGrid();
     }
   }
@@ -219,6 +244,7 @@ class RectFocus {
     if (this.data && this.data.length > 0) {
       this.setConfig();
       this.drawBar();
+      this.drawThres();
       this.drawGrid();
     }
   }

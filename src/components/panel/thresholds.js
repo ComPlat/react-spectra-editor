@@ -122,8 +122,6 @@ const ThresholdsPanel = ({
   updateThresholdAct, resetThresholdAct, toggleIsEditAct,
 }) => {
   const isMs = ['MS'].indexOf(layoutSt) >= 0;
-  if (isMs) return null;
-
   const thresVal = thresSt || peakObj.thresRef;
   return (
     <Grid
@@ -139,9 +137,15 @@ const ThresholdsPanel = ({
       <Grid item xs={4}>
         { btnRefresh(classes, thresVal, resetThresholdAct) }
       </Grid>
-      <Grid item xs={4}>
-        { btnRestore(classes, hasEdit, managerSt, toggleIsEditAct) }
-      </Grid>
+      {
+        isMs
+          ? null
+          : (
+            <Grid item xs={4}>
+              { btnRestore(classes, hasEdit, managerSt, toggleIsEditAct) }
+            </Grid>
+          )
+      }
     </Grid>
   );
 };
