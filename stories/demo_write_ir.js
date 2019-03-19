@@ -111,7 +111,7 @@ class DemoWriteIr extends React.Component {
               label="Description"
               multiline
               fullWidth
-              rows="2"
+              rows="1"
               margin="normal"
               variant="outlined"
               value={desc}
