@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
@@ -10,18 +9,12 @@ import { withStyles } from '@material-ui/core/styles';
 import PanelViewer from './components/panel/index';
 import Content from './content';
 
-const Styles = () => ({
-  panels: {
-    maxHeight: 630,
-    overflowX: 'hidden',
-    overflowY: 'scroll',
-    padding: '0 0 0 0',
-  },
+const styles = () => ({
 });
 
 const Frame = ({
   input, cLabel, xLabel, yLabel, peakObjs, operations, predictObj,
-  managerSt, classes,
+  managerSt,
 }) => {
   const [peakAll, peakEdit] = peakObjs;
   const hasEdit = peakEdit && peakEdit.data
@@ -43,12 +36,7 @@ const Frame = ({
             predictObj={predictObj}
           />
         </Grid>
-        <Grid
-          item
-          align="center"
-          xs={3}
-          className={classNames(classes.panels)}
-        >
+        <Grid item xs={3} align="center">
           <PanelViewer
             peakObj={peakObj}
             hasEdit={hasEdit}
@@ -83,9 +71,8 @@ Frame.propTypes = {
   predictObj: PropTypes.object.isRequired,
   operations: PropTypes.array.isRequired,
   managerSt: PropTypes.object.isRequired,
-  classes: PropTypes.object.isRequired,
 };
 
 export default connect(
   mapStateToProps, mapDispatchToProps,
-)(withStyles(Styles)(Frame));
+)(withStyles(styles)(Frame));
