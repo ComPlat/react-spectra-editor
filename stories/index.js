@@ -7,6 +7,7 @@ import DemoEdit from './demo_edit';
 import DemoSelect from './demo_select';
 import DemoWriteNmr from './demo_write_nmr';
 import DemoWriteIr from './demo_write_ir';
+import DemoWriteMs from './demo_write_ms';
 
 storiesOf('Line Spectra Viewer', module)
   .add('single spectrum', () => (
@@ -28,4 +29,7 @@ storiesOf('Line Spectra Viewer', module)
 storiesOf('Bar SpectraViewer', module)
   .add('single MS spectrum', () => (
     <DemoSingleMs />
+  ))
+  .add('write MS peaks to description', () => (
+    <DemoWriteMs />
   ));
