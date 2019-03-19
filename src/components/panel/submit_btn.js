@@ -37,7 +37,7 @@ const SubmitBtn = ({
   const { ref, peak } = shiftSt;
 
   const offset = FromManualToOffset(ref, peak);
-  const peaks = Convert2Peak(peakObj, thresSt * 0.01, offset);
+  const peaks = Convert2Peak(peakObj, thresSt, offset);
   const peaksEdit = PksEdit(peaks, editPeakSt);
   const disable = peaksEdit.length === 0 || statusSt.btnSubmit;
 

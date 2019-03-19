@@ -42,6 +42,7 @@ const spectraOps = {
   '1H': { head: '1H', tail: '.' },
   '13C': { head: '13C', tail: '.' },
   IR: { head: 'IR', tail: 'cm-1' },
+  MS: { head: 'MASS', tail: 'm/z' },
 };
 
 const rmRef = (peaks, shift) => {
