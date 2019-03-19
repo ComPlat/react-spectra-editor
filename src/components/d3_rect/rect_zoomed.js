@@ -12,6 +12,7 @@ const Zoomed = (main) => {
 
   // Re-Calculate
   focus.drawBar();
+  focus.drawThres();
   focus.drawGrid();
 };
 

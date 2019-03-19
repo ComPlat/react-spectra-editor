@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 import RectFocus from './rect_focus';
-import RectContext from './rect_context';
+import D3Context from '../d3_share/context';
 import Zoomed from './rect_zoomed';
 import MountZoom from '../../helpers/zoom';
 import MountBrush from '../../helpers/brush';
@@ -15,7 +15,9 @@ class RectMain {
     this.focus = new RectFocus({
       W, H, clickPointAct,
     });
-    this.context = new RectContext({ W, H });
+    this.context = new D3Context({
+      W, H, isReverse: false, isBars: true,
+    });
 
     this.svg = null;
     this.zoom = d3.zoom();

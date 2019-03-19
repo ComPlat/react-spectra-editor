@@ -1,14 +1,17 @@
 import * as d3 from 'd3';
 import {
-  InitScale, InitAxisCall,
+  InitScale, InitAxisCall, InitPathCall,
 } from '../../helpers/init';
 import {
-  MountBars, MountAxis, MountMainFrame, MountAxisLabelX,
+  MountPath, MountBars,
+  MountAxis, MountMainFrame, MountAxisLabelX,
 } from '../../helpers/mount';
 
-class RectContext {
+class D3Context {
   constructor(props) {
-    const { W, H } = props;
+    const {
+      W, H, isReverse, isBars,
+    } = props;
     this.margin = {
       t: 20 + Math.round((H - 90) * 0.8) + 20,
       b: 50,
@@ -19,22 +22,27 @@ class RectContext {
     this.h = H - this.margin.t - this.margin.b;
 
     this.axis = null;
+    this.path = null;
     this.grid = null;
     this.data = {};
     this.root = null;
     this.updateBorder = null;
     this.svg = null;
     this.bars = null;
-    this.scales = InitScale(this, false);
+    this.scales = InitScale(this, isReverse);
     this.axisCall = InitAxisCall(3);
+    this.pathCall = InitPathCall(this);
+    this.isBars = isBars;
 
     this.setSvg = this.setSvg.bind(this);
     this.setData = this.setData.bind(this);
     this.setRoot = this.setRoot.bind(this);
+    this.setExtent = this.setExtent.bind(this);
     this.setConfig = this.setConfig.bind(this);
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
-    this.drawTime = this.drawTime.bind(this);
+    this.drawLineTime = this.drawLineTime.bind(this);
+    this.drawBarsTime = this.drawBarsTime.bind(this);
   }
 
   setSvg(svg) {
@@ -49,17 +57,30 @@ class RectContext {
     this.data = [...data];
   }
 
-  setConfig() {
-    // Domain Calculate
+  setExtent() {
     const factor = 1.05;
-    const xExtent = [
-      0,
-      d3.max(this.data, d => d.x) + 10,
-    ];
-    const yExtent = [
-      0,
+
+    let xExtent = d3.extent(this.data, d => d.x);
+    let yExtent = [
+      d3.min(this.data, d => d.y) / factor,
       d3.max(this.data, d => d.y) * factor,
     ];
+    if (this.isBars) {
+      xExtent = [
+        0,
+        d3.max(this.data, d => d.x) + 10,
+      ];
+      yExtent = [
+        0,
+        d3.max(this.data, d => d.y) * factor,
+      ];
+    }
+    return { xExtent, yExtent };
+  }
+
+  setConfig() {
+    const { xExtent, yExtent } = this.setExtent();
+
     this.scales.x.domain(xExtent);
     this.scales.y.domain(yExtent);
     // Axis Call
@@ -72,7 +93,11 @@ class RectContext {
     return h >= 0 ? h : 0;
   }
 
-  drawTime() {
+  drawLineTime() {
+    this.path.attr('d', this.pathCall(this.data));
+  }
+
+  drawBarsTime() {
     const bars = this.bars.selectAll('rect')
       .data(this.data);
 
@@ -101,12 +126,17 @@ class RectContext {
     this.setData(data);
 
     this.axis = MountAxis(this);
-    this.bars = MountBars(this);
     MountAxisLabelX(this);
 
     if (this.data && this.data.length > 0) {
       this.setConfig();
-      this.drawTime();
+      if (this.isBars) {
+        this.bars = MountBars(this);
+        this.drawBarsTime();
+      } else {
+        this.path = MountPath(this, '#80013f');
+        this.drawLineTime();
+      }
     }
   }
 
@@ -116,9 +146,13 @@ class RectContext {
 
     if (this.data && this.data.length > 0) {
       this.setConfig();
-      this.drawTime();
+      if (this.isBars) {
+        this.drawBarsTime();
+      } else {
+        this.drawLineTime();
+      }
     }
   }
 }
 
-export default RectContext;
+export default D3Context;

@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 import LineFocus from './line_focus';
-import LineContext from './line_context';
+import D3Context from '../d3_share/context';
 import Zoomed from './line_zoomed';
 import MountZoom from '../../helpers/zoom';
 import MountBrush from '../../helpers/brush';
@@ -15,7 +15,9 @@ class LineMain {
     this.focus = new LineFocus({
       W, H, clickPointAct,
     });
-    this.context = new LineContext({ W, H });
+    this.context = new D3Context({
+      W, H, isReverse: true, isBars: false,
+    });
 
     this.svg = null;
     this.zoom = d3.zoom();
