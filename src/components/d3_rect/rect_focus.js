@@ -109,8 +109,8 @@ class RectFocus {
     // Domain Calculate
     const factor = 1.05;
     const xExtent = [
-      0,
-      d3.max(this.data, d => d.x) + 10,
+      d3.min(this.data, d => d.x) - 5,
+      d3.max(this.data, d => d.x) + 5,
     ];
     const yExtent = [
       0,

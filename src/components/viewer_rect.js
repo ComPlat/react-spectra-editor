@@ -94,8 +94,9 @@ class ViewerRect extends React.Component {
     if (border.length === 0) {
       return { filterSeed: seed, filterPeak: peak };
     }
-    const xL = border[1];
-    const xU = border[0];
+    const [one, two] = border;
+    const xL = one < two ? one : two;
+    const xU = one > two ? one : two;
     let fltSeed = [...seed];
     if (xL && xU) {
       fltSeed = fltSeed.filter(

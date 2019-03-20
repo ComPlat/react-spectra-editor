@@ -67,8 +67,8 @@ class D3Context {
     ];
     if (this.isBars) {
       xExtent = [
-        0,
-        d3.max(this.data, d => d.x) + 10,
+        d3.min(this.data, d => d.x) - 5,
+        d3.max(this.data, d => d.x) + 5,
       ];
       yExtent = [
         0,
