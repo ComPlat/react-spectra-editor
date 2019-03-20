@@ -109,11 +109,11 @@ class D3Context {
       .append('rect')
       .attr('class', 'enter-bar')
       .attr('fill', 'steelblue')
+      .attr('width', 1.5)
+      .merge(bars)
       .attr('y', d => this.scales.y(d.y))
       .attr('x', d => this.scales.x(d.x))
-      .attr('height', d => this.posHeight(this.h, this.scales.y(d.y)))
-      .attr('width', 1.5)
-      .merge(bars);
+      .attr('height', d => this.posHeight(this.h, this.scales.y(d.y)));
   }
 
   create(el, svg, data, updateBorder) {

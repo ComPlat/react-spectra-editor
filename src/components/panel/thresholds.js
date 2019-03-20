@@ -118,11 +118,11 @@ const btnRestore = (classes, hasEdit, managerSt, toggleIsEditAct) => (
 );
 
 const ThresholdsPanel = ({
-  classes, peakObj, hasEdit, layoutSt, thresSt, managerSt,
+  classes, feature, hasEdit, layoutSt, thresSt, managerSt,
   updateThresholdAct, resetThresholdAct, toggleIsEditAct,
 }) => {
   const isMs = ['MS'].indexOf(layoutSt) >= 0;
-  const thresVal = thresSt || peakObj.thresRef;
+  const thresVal = thresSt || feature.thresRef;
   return (
     <Grid
       className={classNames(classes.container)}
@@ -168,7 +168,7 @@ const mapDispatchToProps = dispatch => (
 
 ThresholdsPanel.propTypes = {
   classes: PropTypes.object.isRequired,
-  peakObj: PropTypes.object.isRequired,
+  feature: PropTypes.object.isRequired,
   hasEdit: PropTypes.bool.isRequired,
   layoutSt: PropTypes.string.isRequired,
   thresSt: PropTypes.oneOfType(

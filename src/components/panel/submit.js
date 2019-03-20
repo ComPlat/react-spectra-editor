@@ -90,7 +90,7 @@ class SubmitPanel extends React.Component {
 
   render() {
     const {
-      operations, classes, peakObj,
+      operations, classes, feature,
     } = this.props;
     const { isAscend, operation } = this.state;
 
@@ -122,7 +122,7 @@ class SubmitPanel extends React.Component {
           <Grid item xs={4}>
             <SubmitBtn
               isAscend={isAscend}
-              peakObj={peakObj}
+              feature={feature}
               operation={operation}
             />
           </Grid>
@@ -144,7 +144,7 @@ const mapDispatchToProps = dispatch => (
 
 SubmitPanel.propTypes = {
   classes: PropTypes.object.isRequired,
-  peakObj: PropTypes.object.isRequired,
+  feature: PropTypes.object.isRequired,
   operations: PropTypes.array.isRequired,
   enableAllBtnAct: PropTypes.func.isRequired,
 };

@@ -21,7 +21,7 @@ const extractLayout = (predictObj, layoutSt) => {
 };
 
 const Content = ({
-  input, cLabel, xLabel, yLabel, peakObj, predictObj, layoutSt,
+  topic, feature, cLabel, xLabel, yLabel, predictObj, layoutSt,
 }) => {
   const {
     showPredict, isNmr, isIr,
@@ -30,11 +30,11 @@ const Content = ({
   if (showPredict) {
     return (
       <PredictViewer
-        input={input}
+        topic={topic}
         cLabel={cLabel}
         xLabel={xLabel}
         yLabel={yLabel}
-        peakObj={peakObj}
+        feature={feature}
         predictObj={predictObj}
         isNmr={isNmr}
         isIr={isIr}
@@ -42,14 +42,14 @@ const Content = ({
     );
   }
 
-  if (Format.isMs(peakObj)) {
+  if (Format.isMs(feature)) {
     return (
       <ViewerRect
-        input={input}
+        topic={topic}
         cLabel={cLabel}
         xLabel={xLabel}
         yLabel={yLabel}
-        peakObj={peakObj}
+        feature={feature}
         isHidden={false}
       />
     );
@@ -57,11 +57,11 @@ const Content = ({
 
   return (
     <ViewerLine
-      input={input}
+      topic={topic}
       cLabel={cLabel}
       xLabel={xLabel}
       yLabel={yLabel}
-      peakObj={peakObj}
+      feature={feature}
       isHidden={false}
     />
   );
@@ -79,11 +79,11 @@ const mapDispatchToProps = dispatch => (
 );
 
 Content.propTypes = {
-  input: PropTypes.object.isRequired,
+  topic: PropTypes.object.isRequired,
+  feature: PropTypes.object.isRequired,
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
-  peakObj: PropTypes.object.isRequired,
   predictObj: PropTypes.object.isRequired,
   layoutSt: PropTypes.string.isRequired,
 };

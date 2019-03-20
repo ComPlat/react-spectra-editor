@@ -24,15 +24,14 @@ sagaMiddleware.run(sagas);
 
 // - - - React - - -
 const SpectraViewer = ({
-  input, cLabel, xLabel, yLabel, peakObjs, operations, predictObj,
+  entity, cLabel, xLabel, yLabel, operations, predictObj,
 }) => (
   <Provider store={store}>
     <Frame
-      input={input}
+      entity={entity}
       cLabel={cLabel}
       xLabel={xLabel}
       yLabel={yLabel}
-      peakObjs={peakObjs}
       predictObj={predictObj}
       operations={operations}
     />
@@ -40,11 +39,10 @@ const SpectraViewer = ({
 );
 
 SpectraViewer.propTypes = {
-  input: PropTypes.object.isRequired,
+  entity: PropTypes.object.isRequired,
   cLabel: PropTypes.string,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
-  peakObjs: PropTypes.array,
   predictObj: PropTypes.object,
   operations: PropTypes.array,
 };
@@ -52,7 +50,6 @@ SpectraViewer.propTypes = {
 
 SpectraViewer.defaultProps = {
   cLabel: '',
-  peakObjs: [],
   predictObj: {},
   operations: [],
 };

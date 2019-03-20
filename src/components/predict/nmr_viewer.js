@@ -181,13 +181,13 @@ const sectionBtn = (classes, molecule, layoutSt, btnCb) => (
 );
 
 const NmrViewer = ({
-  classes, peakObj, predictObj, editPeakSt, thresSt,
+  classes, feature, predictObj, editPeakSt, thresSt,
   layoutSt, shiftSt,
 }) => {
   const { ref, peak } = shiftSt;
 
   const offset = FromManualToOffset(ref, peak);
-  const peaks = Convert2Peak(peakObj, thresSt * 0.01, offset);
+  const peaks = Convert2Peak(feature, thresSt * 0.01, offset);
   const peaksEdit = PksEdit(peaks, editPeakSt);
   const peaksWoRef = Format.rmRef(peaksEdit, shiftSt);
 
@@ -223,7 +223,7 @@ const mapDispatchToProps = dispatch => (
 
 NmrViewer.propTypes = {
   classes: PropTypes.object.isRequired,
-  peakObj: PropTypes.object.isRequired,
+  feature: PropTypes.object.isRequired,
   predictObj: PropTypes.object.isRequired,
   editPeakSt: PropTypes.object.isRequired,
   thresSt: PropTypes.oneOfType(

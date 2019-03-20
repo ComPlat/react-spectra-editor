@@ -14,6 +14,7 @@ import LayoutPanel from './layout';
 import SubmitPanel from './submit';
 import ThresholdsPanel from './thresholds';
 import ShiftSelect from './shift_select';
+import ScanSelect from './scan_select';
 
 const Styles = () => ({
   panelSummary: {
@@ -33,26 +34,27 @@ const title = classes => (
 );
 
 const SettingsPanel = ({
-  classes, peakObj, hasEdit, operations,
+  classes, feature, hasEdit, operations,
 }) => (
   <ExpansionPanel>
     { title(classes) }
     <LayoutPanel />
     <Divider />
     <ShiftSelect />
+    <ScanSelect feature={feature} />
     <Divider />
-    <ThresholdsPanel peakObj={peakObj} hasEdit={hasEdit} />
+    <ThresholdsPanel feature={feature} hasEdit={hasEdit} />
     <Divider />
     <SubmitPanel
       operations={operations}
-      peakObj={peakObj}
+      feature={feature}
     />
   </ExpansionPanel>
 );
 
 SettingsPanel.propTypes = {
   classes: PropTypes.object.isRequired,
-  peakObj: PropTypes.object.isRequired,
+  feature: PropTypes.object.isRequired,
   hasEdit: PropTypes.bool.isRequired,
   operations: PropTypes.array.isRequired,
 };

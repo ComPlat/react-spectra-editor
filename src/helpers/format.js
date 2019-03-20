@@ -25,9 +25,9 @@ const buildData = (target) => {
   const input = sp ? sp.data[0] : {};
   const xLabel = sp ? `X (${sp.xUnit})` : '';
   const yLabel = sp ? `Y (${sp.yUnit})` : '';
-  const peakObjs = target && target.peakObjs;
+  const features = target && target.features;
   return {
-    input, xLabel, yLabel, peakObjs, isExist: true,
+    input, xLabel, yLabel, features, isExist: true,
   };
 };
 

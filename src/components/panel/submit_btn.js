@@ -31,13 +31,13 @@ const onClickCb = (
 );
 
 const SubmitBtn = ({
-  classes, operation, peakObj, isAscend, editPeakSt, thresSt, statusSt,
+  classes, operation, feature, isAscend, editPeakSt, thresSt, statusSt,
   layoutSt, shiftSt,
 }) => {
   const { ref, peak } = shiftSt;
 
   const offset = FromManualToOffset(ref, peak);
-  const peaks = Convert2Peak(peakObj, thresSt, offset);
+  const peaks = Convert2Peak(feature, thresSt, offset);
   const peaksEdit = PksEdit(peaks, editPeakSt);
   const disable = peaksEdit.length === 0 || statusSt.btnSubmit;
 
@@ -83,7 +83,7 @@ const mapDispatchToProps = dispatch => (
 
 SubmitBtn.propTypes = {
   classes: PropTypes.object.isRequired,
-  peakObj: PropTypes.object.isRequired,
+  feature: PropTypes.object.isRequired,
   isAscend: PropTypes.bool.isRequired,
   operation: PropTypes.oneOfType(
     [

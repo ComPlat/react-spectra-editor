@@ -28,7 +28,7 @@ const styles = () => ({
 });
 
 const PanelViewer = ({
-  classes, peakObj, hasEdit, operations,
+  classes, feature, hasEdit, operations,
 }) => (
   <div>
     <ModeNavigation />
@@ -37,7 +37,7 @@ const PanelViewer = ({
         theme={theme}
       >
         <SettingsPanel
-          peakObj={peakObj}
+          feature={feature}
           hasEdit={hasEdit}
           operations={operations}
         />
@@ -51,7 +51,7 @@ const PanelViewer = ({
 
 PanelViewer.propTypes = {
   classes: PropTypes.object.isRequired,
-  peakObj: PropTypes.object.isRequired,
+  feature: PropTypes.object.isRequired,
   operations: PropTypes.array.isRequired,
   hasEdit: PropTypes.bool.isRequired,
 };

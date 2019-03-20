@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 
 import {
-  Spectrum2Seed, Spectrum2Peak, ToThresEndPts, ToShiftPeaks,
+  Topic2Seed, Feature2Peak, ToThresEndPts, ToShiftPeaks,
 } from '../helpers/chem';
 import { updateBorder } from '../actions/border';
 import { resetAll } from '../actions/manager';
@@ -24,12 +24,12 @@ class ViewerRect extends React.Component {
 
   componentDidMount() {
     const {
-      seed, peak, cLabel, xLabel, yLabel, peakObj,
+      seed, peak, cLabel, xLabel, yLabel, feature,
       borderSt, tTrEndPts, tSfPeaks, editPeakSt, editModeSt,
       updateBorderAct, resetAllAct,
     } = this.props;
 
-    resetAllAct(peakObj);
+    resetAllAct(feature);
 
     const { filterSeed, filterPeak } = this.brushFilter(borderSt, seed, peak);
     const node = this.d3Ref.current;
@@ -83,10 +83,10 @@ class ViewerRect extends React.Component {
   }
 
   normChange(prevProps) {
-    const { peakObj, resetAllAct } = this.props;
-    const oldPeakObj = prevProps.peakObj;
-    if (oldPeakObj !== peakObj) {
-      resetAllAct(peakObj);
+    const { feature, resetAllAct } = this.props;
+    const oldFeature = prevProps.feature;
+    if (oldFeature !== feature) {
+      resetAllAct(feature);
     }
   }
 
@@ -124,8 +124,8 @@ class ViewerRect extends React.Component {
 const mapStateToProps = (state, props) => (
   {
     borderSt: state.border,
-    seed: Spectrum2Seed(state, props),
-    peak: Spectrum2Peak(state, props),
+    seed: Topic2Seed(state, props),
+    peak: Feature2Peak(state, props),
     tTrEndPts: ToThresEndPts(state, props),
     tSfPeaks: ToShiftPeaks(state, props),
     editPeakSt: state.editPeak,
@@ -147,7 +147,7 @@ ViewerRect.propTypes = {
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
-  peakObj: PropTypes.object.isRequired,
+  feature: PropTypes.object.isRequired,
   borderSt: PropTypes.array.isRequired,
   tTrEndPts: PropTypes.array.isRequired,
   tSfPeaks: PropTypes.array.isRequired,

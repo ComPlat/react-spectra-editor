@@ -3,9 +3,9 @@ import { createSelector } from 'reselect';
 
 import { FromManualToOffset } from './shift';
 
-const getSpectrum = (_, props) => props.input;
+const getTopic = (_, props) => props.topic;
 
-const getPeakObj = (_, props) => props.peakObj;
+const getFeature = (_, props) => props.feature;
 
 const getShiftOffset = (state, _) => { // eslint-disable-line
   const { shift } = state;
@@ -13,18 +13,18 @@ const getShiftOffset = (state, _) => { // eslint-disable-line
   return FromManualToOffset(ref, peak);
 };
 
-const downSample = (spectrum, peakObj) => {
-  const { peakUp, maxY } = peakObj;
+const downSample = (feature) => {
+  const { peakUp, maxY } = feature;
   if (!maxY) return { dsRef: false, peakUp };
   const factor = peakUp ? 0.02 : 0.9;
   const dsRef = factor * maxY;
   return { dsRef, peakUp };
 };
 
-const dsWithoutRef = (spectrum, offset) => {
+const dsWithoutRef = (topic, offset) => {
   const sp = [];
-  const xs = spectrum.x;
-  const ys = spectrum.y;
+  const xs = topic.x;
+  const ys = topic.y;
   if (xs.length > 8000) {
     for (let i = 0; i < ys.length; i += 1) { // downsample
       if (i % 2 === 0) {
@@ -43,10 +43,10 @@ const dsWithoutRef = (spectrum, offset) => {
   return sp;
 };
 
-const dsWithRef = (spectrum, dsRef, peakUp, offset) => {
+const dsWithRef = (topic, dsRef, peakUp, offset) => {
   const sp = [];
-  const xs = spectrum.x;
-  const ys = spectrum.y;
+  const xs = topic.x;
+  const ys = topic.y;
   for (let i = 0; i < ys.length; i += 1) { // downsample
     const y = ys[i];
     const isDownSample = (peakUp && y < dsRef) || (!peakUp && y > dsRef);
@@ -63,33 +63,33 @@ const dsWithRef = (spectrum, dsRef, peakUp, offset) => {
   return sp;
 };
 
-const convertSpectrum = (spectrum, peakObj, offset) => {
+const convertTopic = (topic, feature, offset) => {
   let ds = { dsRef: false, peakUp: false };
-  if (peakObj.thresRef) {
-    ds = downSample(spectrum, peakObj);
+  if (feature.thresRef) {
+    ds = downSample(feature);
   }
   const sp = ds.dsRef
-    ? dsWithRef(spectrum, ds.dsRef, ds.peakUp, offset)
-    : dsWithoutRef(spectrum, offset);
+    ? dsWithRef(topic, ds.dsRef, ds.peakUp, offset)
+    : dsWithoutRef(topic, offset);
   return sp;
 };
 
-const Spectrum2Seed = createSelector(
-  getSpectrum,
-  getPeakObj,
+const Topic2Seed = createSelector(
+  getTopic,
+  getFeature,
   getShiftOffset,
-  convertSpectrum,
+  convertTopic,
 );
 
 const getThreshold = state => (
   state.threshold ? state.threshold * 1.0 : false
 );
 
-const Convert2Peak = (peakObj, threshold, offset) => {
+const Convert2Peak = (feature, threshold, offset) => {
   const peak = [];
-  if (!peakObj || !peakObj.data) return peak;
-  const data = peakObj.data[0];
-  const { maxY, peakUp, thresRef } = peakObj;
+  if (!feature || !feature.data) return peak;
+  const data = feature.data[0];
+  const { maxY, peakUp, thresRef } = feature;
   const thresVal = threshold || thresRef;
   const yThres = thresVal * maxY / 100.0;
   const corrOffset = offset || 0.0;
@@ -104,28 +104,28 @@ const Convert2Peak = (peakObj, threshold, offset) => {
   return peak;
 };
 
-const Spectrum2Peak = createSelector(
-  getPeakObj,
+const Feature2Peak = createSelector(
+  getFeature,
   getThreshold,
   getShiftOffset,
   Convert2Peak,
 );
 
-const convertThresEndPts = (peakObj, threshold) => {
-  if (!peakObj.thresRef) return [{ x: false, y: false }, { x: false, y: false }];
+const convertThresEndPts = (feature, threshold) => {
+  if (!feature.thresRef) return [{ x: false, y: false }, { x: false, y: false }];
   const {
     maxY, maxX, minX, thresRef,
-  } = peakObj;
+  } = feature;
 
   const thresVal = threshold || thresRef;
-  if (!thresVal || !peakObj.data) return [];
+  if (!thresVal || !feature.data) return [];
   const yThres = thresVal * maxY / 100.0;
   const endPts = [{ x: minX - 200, y: yThres }, { x: maxX + 200, y: yThres }];
   return endPts;
 };
 
 const ToThresEndPts = createSelector(
-  getPeakObj,
+  getFeature,
   getThreshold,
   convertThresEndPts,
 );
@@ -208,7 +208,7 @@ const extractShift = (s) => {
   };
 };
 
-const corePeakObj = (jcamp, sTyp, peakUp, s, thresRef) => {
+const buildFeature = (jcamp, sTyp, peakUp, s, thresRef) => {
   const subTyp = jcamp.xType ? ` - ${jcamp.xType}` : '';
 
   return (
@@ -217,6 +217,8 @@ const corePeakObj = (jcamp, sTyp, peakUp, s, thresRef) => {
         typ: s.dataType + subTyp,
         peakUp,
         thresRef,
+        scanCount: jcamp.info.$SCANCOUNT,
+        scanTarget: jcamp.info.$SCANTARGET,
         shift: extractShift(s),
         operation: {
           typ: sTyp,
@@ -228,15 +230,15 @@ const corePeakObj = (jcamp, sTyp, peakUp, s, thresRef) => {
   );
 };
 
-const extractPeakObj = (jcamp, sTyp, peakUp) => {
-  const peakObjs = jcamp.spectra.map((s) => {
+const extractFeature = (jcamp, sTyp, peakUp) => {
+  const features = jcamp.spectra.map((s) => {
     const thresRef = calcThresRef(s, peakUp);
     return s.dataType && s.dataType.includes('PEAK ASSIGNMENTS')
-      ? corePeakObj(jcamp, sTyp, peakUp, s, thresRef)
+      ? buildFeature(jcamp, sTyp, peakUp, s, thresRef)
       : null;
   }).filter(r => r != null);
 
-  return peakObjs;
+  return features;
 };
 
 const getBoundary = (s) => {
@@ -250,29 +252,36 @@ const getBoundary = (s) => {
   };
 };
 
-const extractMsPeakObj = (jcamp, sTyp, peakUp) => {
-  const thresRef = (jcamp.info && jcamp.info.THRESHOLD * 100) || 5;
+const extractMsFeature = (jcamp, sTyp, peakUp) => {
+  const thresRef = (jcamp.info && jcamp.info.$THRESHOLD * 100) || 5;
+  const base = jcamp.spectra[0];
 
-  const peakObjs = jcamp.spectra.map((s) => {
-    const cpo = corePeakObj(jcamp, sTyp, peakUp, s, thresRef);
+  const features = jcamp.spectra.map((s) => {
+    const cpo = buildFeature(jcamp, sTyp, peakUp, s, thresRef);
     const bnd = getBoundary(s);
-    return Object.assign({}, cpo, bnd);
+    return Object.assign({}, base, cpo, bnd);
   }).filter(r => r != null);
 
-  return peakObjs;
+  return features;
 };
 
-const ExtractJcamp = (input) => {
-  const jcamp = Jcampconverter.convert(input, { xy: true, keepRecordsRegExp: 'THRESHOLD' });
+const ExtractJcamp = (source) => {
+  const jcamp = Jcampconverter.convert(
+    source,
+    {
+      xy: true,
+      keepRecordsRegExp: /(\$THRESHOLD|\$SCANTARGET|\$SCANCOUNT)/,
+    },
+  );
   const spectrum = extractSpectrum(jcamp);
   const sTyp = spectrum ? spectrum.sTyp : '';
 
   const peakUp = sTyp !== 'INFRARED';
-  let peakObjs = sTyp === 'MS'
-    ? extractMsPeakObj(jcamp, sTyp, peakUp)
-    : extractPeakObj(jcamp, sTyp, peakUp);
-  if (peakObjs.length === 0) {
-    peakObjs = [{
+  let features = sTyp === 'MS'
+    ? extractMsFeature(jcamp, sTyp, peakUp)
+    : extractFeature(jcamp, sTyp, peakUp);
+  if (features.length === 0) {
+    features = [{
       thresRef: false,
       operation: {
         typ: sTyp,
@@ -281,11 +290,11 @@ const ExtractJcamp = (input) => {
     }];
   }
 
-  return { spectrum, peakObjs };
+  return { spectrum, features };
 };
 
 export {
-  ExtractJcamp, Spectrum2Seed, Spectrum2Peak,
+  ExtractJcamp, Topic2Seed, Feature2Peak,
   ToThresEndPts, ToShiftPeaks,
   Convert2Peak,
 };

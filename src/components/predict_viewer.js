@@ -42,7 +42,7 @@ class PredictViewer extends React.Component {
 
   render() {
     const {
-      classes, input, cLabel, xLabel, yLabel, peakObj, predictObj,
+      classes, topic, feature, cLabel, xLabel, yLabel, predictObj,
       isNmr, isIr,
     } = this.props;
     const { tabNum } = this.state;
@@ -62,18 +62,18 @@ class PredictViewer extends React.Component {
         </AppBar>
         {
           <ViewerLine
-            input={input}
+            topic={topic}
+            feature={feature}
             cLabel={cLabel}
             xLabel={xLabel}
             yLabel={yLabel}
-            peakObj={peakObj}
             isHidden={tabNum !== 0}
           />
         }
         {
           tabNum === 1 && isNmr && (
             <NmrViewer
-              peakObj={peakObj}
+              feature={feature}
               predictObj={predictObj}
             />
           )
@@ -81,7 +81,7 @@ class PredictViewer extends React.Component {
         {
           tabNum === 1 && isIr && (
             <IrViewer
-              peakObj={peakObj}
+              feature={feature}
               predictObj={predictObj}
             />
           )
@@ -93,11 +93,11 @@ class PredictViewer extends React.Component {
 
 PredictViewer.propTypes = {
   classes: PropTypes.object.isRequired,
-  input: PropTypes.object.isRequired,
+  topic: PropTypes.object.isRequired,
+  feature: PropTypes.object.isRequired,
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
-  peakObj: PropTypes.object.isRequired,
   predictObj: PropTypes.object.isRequired,
   isNmr: PropTypes.bool.isRequired,
   isIr: PropTypes.bool.isRequired,
