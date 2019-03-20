@@ -1,4 +1,4 @@
-const MS = `
+const MS2 = `
 ##TITLE= GC-MS analysis of Phenol, 2-Chlorphenol, and o-Kresol
 ##JCAMP-DX= 5.00   $$ ISAS JCAMP-DX program (V.1.0)
 ##DATA TYPE= MASS SPECTRUM
@@ -10,8 +10,8 @@ const MS = `
 ##.INLET= GC
 ##.IONIZATION MODE= EI+
 ##$SCANAUTOTARGET= 2
-##$SCANEDITTARGET=
-##$SCANCOUNT= 4
+##$SCANEDITTARGET= 3
+##$SCANCOUNT= 5
 ##$THRESHOLD= 0.07
 ##NTUPLES= MASS SPECTRUM
 ##VAR_NAME= MASS, INTENSITY, RETENTION TIME,
@@ -47,13 +47,13 @@ const MS = `
 ##PAGE= T= 410
 ##NPOINTS= 5
 ##DATA TABLE= (XY..XY), PEAKS
-30, 100
-55, 150
-70, 200
-75, 220
-100, 50
+30, 100; 55, 150; 70, 200; 75, 220; 100, 50;
+##PAGE= T= 550
+##NPOINTS= 5
+##DATA TABLE= (XY..XY), PEAKS
+30, 400; 55, 200; 70, 180; 75, 160; 100, 50;
 ##END NTUPLES= MASS SPECTRUM
 ##END=
 `;
 
-export default MS;
+export default MS2;

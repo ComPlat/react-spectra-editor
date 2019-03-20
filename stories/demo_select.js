@@ -12,7 +12,7 @@ import TEST from './source/TEST';
 
 const { ExtractJcamp } = FN;
 
-const files = [
+const entities = [
   ExtractJcamp(H1),
   ExtractJcamp(IR),
   ExtractJcamp(C13_CPD),
@@ -22,12 +22,11 @@ const files = [
   ExtractJcamp(TEST),
 ];
 
-const options = files.map(f => (
+const options = entities.map(f => (
   f.spectrum
     ? {
-      value: f.spectrum,
+      value: f,
       label: f.spectrum.typ,
-      peakObjs: f.peakObjs,
     }
     : null
 )).filter(r => r != null);
@@ -49,10 +48,10 @@ class DemoSelect extends React.Component {
 
   render() {
     const { selectedOption } = this.state;
-    const { value, peakObjs } = selectedOption;
-    const input = value.data[0];
-    const xLabel = `X (${value.xUnit})`;
-    const yLabel = `Y (${value.yUnit})`;
+    const { value } = selectedOption;
+
+    const xLabel = `X (${value.spectrum.xUnit})`;
+    const yLabel = `Y (${value.spectrum.yUnit})`;
 
     return (
       <div style={{ width: '1200px' }}>
@@ -62,10 +61,9 @@ class DemoSelect extends React.Component {
           options={options}
         />
         <SpectraViewer
-          input={input}
+          entity={value}
           xLabel={xLabel}
           yLabel={yLabel}
-          peakObjs={peakObjs}
         />
       </div>
     );

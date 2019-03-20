@@ -7,13 +7,7 @@ import { SpectraViewer, FN } from '../src/index';
 import IREdit from './source/IR_edit';
 import resultIr from './source/result_ir';
 
-const file = FN.ExtractJcamp(IREdit);
-
-const noDataAvailable = () => (
-  <div>
-    No data available!
-  </div>
-);
+const entity = FN.ExtractJcamp(IREdit);
 
 class DemoWriteIr extends React.Component {
   constructor(props) {
@@ -76,12 +70,8 @@ class DemoWriteIr extends React.Component {
   render() {
     const { desc, predictions, molecule } = this.state;
 
-    const { spectrum, peakObjs } = file;
-    if (!spectrum) return noDataAvailable();
-
-    const input = spectrum.data[0];
-    const xLabel = `X (${spectrum.xUnit})`;
-    const yLabel = `Y (${spectrum.yUnit})`;
+    const xLabel = `X (${entity.spectrum.xUnit})`;
+    const yLabel = `Y (${entity.spectrum.yUnit})`;
 
     const operations = [
       { name: 'save peaks', value: this.savePeaks },
@@ -98,10 +88,9 @@ class DemoWriteIr extends React.Component {
     return (
       <div style={{ width: '1200px' }}>
         <SpectraViewer
-          input={input}
+          entity={entity}
           xLabel={xLabel}
           yLabel={yLabel}
-          peakObjs={peakObjs}
           predictObj={predictObj}
           operations={operations}
         />

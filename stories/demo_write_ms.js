@@ -4,15 +4,9 @@ import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 
 import { SpectraViewer, FN } from '../src/index';
-import MS from './source/MS';
+import MS2 from './source/MS2';
 
-const file = FN.ExtractJcamp(MS);
-
-const noDataAvailable = () => (
-  <div>
-    No data available!
-  </div>
-);
+const entity = FN.ExtractJcamp(MS2);
 
 class DemoWriteMs extends React.Component {
   constructor(props) {
@@ -75,10 +69,6 @@ class DemoWriteMs extends React.Component {
   render() {
     const { desc, predictions, molecule } = this.state;
 
-    const { spectrum, peakObjs } = file;
-    if (!spectrum) return noDataAvailable();
-
-    const input = spectrum.data[0];
     const xLabel = 'X (m/z)';
     const yLabel = 'Y (Relative Abundance)';
 
@@ -97,10 +87,9 @@ class DemoWriteMs extends React.Component {
     return (
       <div style={{ width: '1200px' }}>
         <SpectraViewer
-          input={input}
+          entity={entity}
           xLabel={xLabel}
           yLabel={yLabel}
-          peakObjs={peakObjs}
           operations={operations}
         />
         <Grid container>
