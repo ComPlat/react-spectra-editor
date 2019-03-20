@@ -12,13 +12,19 @@ import Content from './content';
 const styles = () => ({
 });
 
-const extractMs = feature => (
-  {
-    topic: feature.data[0],
-    feature,
-    hasEdit: false,
-  }
-);
+const extractMs = (entity, scanSt) => {
+  const defaultFeat = entity.features[0];
+  const defaultIdx = defaultFeat.scanTarget || 1;
+  const idx = scanSt.target || defaultIdx;
+  const feature = entity.features[idx - 1];
+  return (
+    {
+      topic: feature.data[0],
+      feature,
+      hasEdit: false,
+    }
+  );
+};
 
 const extractNmrIr = (entity, managerSt) => {
   const { spectrum, features } = entity;
@@ -32,14 +38,11 @@ const extractNmrIr = (entity, managerSt) => {
 };
 
 const extract = (entity, managerSt, scanSt) => {
-  const defaultIdx = entity.features[0].scanTarget || 1;
-  const idx = scanSt.target || defaultIdx;
-  const feature = entity.features[idx - 1];
-  if (!feature) return {};
-  const layout = feature.dataType;
+  const defaultFeat = entity.features[0];
+  const layout = defaultFeat.dataType;
   const isMS = layout === 'MASS SPECTRUM';
   return isMS
-    ? extractMs(feature)
+    ? extractMs(entity, scanSt)
     : extractNmrIr(entity, managerSt);
 };
 
@@ -48,7 +51,6 @@ const Frame = ({
   managerSt, scanSt,
 }) => {
   const { topic, feature, hasEdit } = extract(entity, managerSt, scanSt);
-
   if (!topic) return null;
 
   return (
