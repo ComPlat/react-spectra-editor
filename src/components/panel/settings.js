@@ -36,7 +36,7 @@ const title = classes => (
 const SettingsPanel = ({
   classes, feature, hasEdit, operations,
 }) => (
-  <ExpansionPanel>
+  <ExpansionPanel defaultExpanded >
     { title(classes) }
     <LayoutPanel />
     <Divider />

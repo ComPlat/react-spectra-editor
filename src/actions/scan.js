@@ -14,6 +14,13 @@ const resetScanTarget = () => (
   }
 );
 
+const resetScanAll = payload => (
+  {
+    type: SCAN.RESET_ALL,
+    payload,
+  }
+);
+
 export {
-  setScanTarget, resetScanTarget, // eslint-disable-line
+  setScanTarget, resetScanTarget, resetScanAll, // eslint-disable-line
 };

@@ -1,4 +1,4 @@
-import { SCAN, MANAGER } from '../constants/action_type';
+import { SCAN } from '../constants/action_type';
 
 const initialState = {
   target: false,
@@ -13,22 +13,27 @@ const setTarget = (state, payload) => (
   )
 );
 
-const resetCount = (state, payload) => {
+const resetAll = (state, payload) => {
   const { scanCount } = payload;
+
   return Object.assign(
     {},
     state,
-    { count: parseInt(scanCount, 10) },
+    {
+      target: false,
+      count: parseInt(scanCount, 10),
+    },
   );
 };
 
 const scanReducer = (state = initialState, action) => {
+  console.log(action)
   switch (action.type) {
     case SCAN.SET_TARGET:
     case SCAN.RESET_TARGET:
       return setTarget(state, action.payload);
-    case MANAGER.RESETALL:
-      return resetCount(state, action.payload);
+    case SCAN.RESET_ALL:
+      return resetAll(state, action.payload);
     default:
       return state;
   }

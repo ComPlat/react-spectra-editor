@@ -27,6 +27,7 @@ const scanSelection = (
   classes, feature, layoutSt, scanSt, onChange,
 ) => {
   const { target, count } = scanSt;
+  if (!count) return null;
   const range = [...Array(count + 1).keys()].slice(1);
   const content = range.map(num => (
     <MenuItem value={num} key={num}>

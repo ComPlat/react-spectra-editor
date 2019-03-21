@@ -46,6 +46,7 @@ const MODE = {
 const SCAN = {
   SET_TARGET: 'SCAN_SET_TARGET',
   RESET_TARGET: 'SCAN_RESET_TARGET',
+  RESET_ALL: 'SCAN_RESET_ALL',
 };
 
 export {

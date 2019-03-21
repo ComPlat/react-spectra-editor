@@ -9,7 +9,7 @@ import createSagaMiddleware from 'redux-saga';
 
 import reducers from './reducers/index';
 import sagas from './sagas/index';
-import Frame from './frame';
+import LayerInit from './layer_init';
 import FN from './fn';
 
 // - - - store & middleware - - -
@@ -27,7 +27,7 @@ const SpectraViewer = ({
   entity, cLabel, xLabel, yLabel, operations, predictObj,
 }) => (
   <Provider store={store}>
-    <Frame
+    <LayerInit
       entity={entity}
       cLabel={cLabel}
       xLabel={xLabel}
@@ -46,7 +46,6 @@ SpectraViewer.propTypes = {
   predictObj: PropTypes.object,
   operations: PropTypes.array,
 };
-
 
 SpectraViewer.defaultProps = {
   cLabel: '',

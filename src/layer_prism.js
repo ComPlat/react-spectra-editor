@@ -7,7 +7,7 @@ import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
 
 import PanelViewer from './components/panel/index';
-import Content from './content';
+import LayerContent from './layer_content';
 
 const styles = () => ({
 });
@@ -15,7 +15,9 @@ const styles = () => ({
 const extractMs = (entity, scanSt) => {
   const defaultFeat = entity.features[0];
   const defaultIdx = defaultFeat.scanTarget || 1;
-  const idx = scanSt.target || defaultIdx;
+  const defaultCount = defaultFeat.scanCount;
+  let idx = scanSt.target || defaultIdx;
+  if (idx > defaultCount) idx = defaultCount;
   const feature = entity.features[idx - 1];
   return (
     {
@@ -46,7 +48,7 @@ const extract = (entity, thresSt, scanSt) => {
     : extractNmrIr(entity, thresSt);
 };
 
-const Frame = ({
+const LayerPrism = ({
   entity, cLabel, xLabel, yLabel, operations, predictObj,
   thresSt, scanSt,
 }) => {
@@ -57,7 +59,7 @@ const Frame = ({
     <div className="react-spectrum-viewer">
       <Grid container>
         <Grid item xs={9}>
-          <Content
+          <LayerContent
             topic={topic}
             feature={feature}
             cLabel={cLabel}
@@ -90,7 +92,7 @@ const mapDispatchToProps = dispatch => (
   }, dispatch)
 );
 
-Frame.propTypes = {
+LayerPrism.propTypes = {
   entity: PropTypes.object.isRequired,
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
@@ -103,4 +105,4 @@ Frame.propTypes = {
 
 export default connect(
   mapStateToProps, mapDispatchToProps,
-)(withStyles(styles)(Frame));
+)(withStyles(styles)(LayerPrism));
