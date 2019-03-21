@@ -258,7 +258,7 @@ const extractMsFeature = (jcamp, sTyp, peakUp) => {
   const base = jcamp.spectra[0];
 
   const features = jcamp.spectra.map((s) => {
-    const cpo = buildFeature(jcamp, sTyp, peakUp, s, thresRef);
+    const cpo = buildFeature(jcamp, sTyp, peakUp, s, +thresRef.toFixed(4));
     const bnd = getBoundary(s);
     return Object.assign({}, base, cpo, bnd);
   }).filter(r => r != null);
