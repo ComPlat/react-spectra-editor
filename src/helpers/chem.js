@@ -219,7 +219,7 @@ const buildFeature = (jcamp, sTyp, peakUp, s, thresRef) => {
         thresRef,
         scanCount: jcamp.info.$SCANCOUNT,
         scanAutoTarget: jcamp.info.$SCANAUTOTARGET,
-        scanManualTarget: jcamp.info.$SCANMANUALTARGET,
+        scanEditTarget: jcamp.info.$SCANEDITTARGET,
         shift: extractShift(s),
         operation: {
           typ: sTyp,
@@ -271,7 +271,7 @@ const ExtractJcamp = (source) => {
     source,
     {
       xy: true,
-      keepRecordsRegExp: /(\$THRESHOLD|\$SCANAUTOTARGET|\$SCANMANUALTARGET|\$SCANCOUNT)/,
+      keepRecordsRegExp: /(\$THRESHOLD|\$SCANAUTOTARGET|\$SCANEDITTARGET|\$SCANCOUNT)/,
     },
   );
   const spectrum = extractSpectrum(jcamp);

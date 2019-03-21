@@ -41,7 +41,7 @@ const SettingsPanel = ({
     <LayoutPanel />
     <Divider />
     <ShiftSelect />
-    <Scan feature={feature} />
+    <Scan feature={feature} hasEdit={hasEdit} />
     <Divider />
     <ThresholdsPanel feature={feature} hasEdit={hasEdit} />
     <Divider />

@@ -13,17 +13,21 @@ const styles = () => ({
 });
 
 const extractMs = (entity, scanSt) => {
+  const { target, isAuto } = scanSt;
   const defaultFeat = entity.features[0];
-  const defaultIdx = defaultFeat.scanTarget || 1;
+  const hasEdit = !!defaultFeat.scanEditTarget;
+  const defaultIdx = isAuto || !hasEdit
+    ? defaultFeat.scanAutoTarget
+    : defaultFeat.scanEditTarget;
   const defaultCount = defaultFeat.scanCount;
-  let idx = scanSt.target || defaultIdx;
+  let idx = target || defaultIdx || 1;
   if (idx > defaultCount) idx = defaultCount;
   const feature = entity.features[idx - 1];
   return (
     {
       topic: feature.data[0],
       feature,
-      hasEdit: false,
+      hasEdit,
     }
   );
 };

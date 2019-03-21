@@ -21,6 +21,13 @@ const resetScanAll = payload => (
   }
 );
 
+const toggleScanIsAuto = payload => (
+  {
+    type: SCAN.TOGGLE_ISAUTO,
+    payload,
+  }
+);
+
 export {
-  setScanTarget, resetScanTarget, resetScanAll, // eslint-disable-line
+  setScanTarget, resetScanTarget, resetScanAll, toggleScanIsAuto,
 };

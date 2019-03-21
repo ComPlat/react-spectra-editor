@@ -11,7 +11,10 @@ import Tooltip from '@material-ui/core/Tooltip';
 import { withStyles } from '@material-ui/core/styles';
 
 import BtnRefresh from './btn_refresh';
-import { setScanTarget, resetScanTarget } from '../../actions/scan';
+import BtnRestore from './btn_restore';
+import {
+  setScanTarget, resetScanTarget, toggleScanIsAuto,
+} from '../../actions/scan';
 
 const styles = () => ({
   container: {
@@ -23,7 +26,7 @@ const styles = () => ({
   },
 });
 
-const scanSelection = (
+const scanSelect = (
   classes, feature, layoutSt, scanSt, onChange,
 ) => {
   const { target, count } = scanSt;
@@ -37,7 +40,10 @@ const scanSelection = (
     </MenuItem>
   ));
 
-  const selValue = target || feature.scanTarget;
+  const defaultValue = scanSt.isAuto || !feature.scanEditTarget
+    ? feature.scanAutoTarget
+    : feature.scanEditTarget;
+  const selValue = target || defaultValue;
 
   return (
     <Tooltip
@@ -56,7 +62,8 @@ const scanSelection = (
 };
 
 const Scan = ({
-  classes, feature, layoutSt, scanSt, setScanTargetAct, resetScanTargetAct,
+  classes, feature, hasEdit, layoutSt, scanSt,
+  setScanTargetAct, resetScanTargetAct, toggleScanIsAutoAct,
 }) => {
   const isMs = ['MS'].indexOf(layoutSt) >= 0;
   if (!isMs) return null;
@@ -73,7 +80,7 @@ const Scan = ({
     >
       <Grid item xs={4}>
         {
-          scanSelection(
+          scanSelect(
             classes, feature, layoutSt, scanSt, onChange,
           )
         }
@@ -82,6 +89,13 @@ const Scan = ({
         <BtnRefresh
           disabled={false}
           refreshAct={resetScanTargetAct}
+        />
+      </Grid>
+      <Grid item xs={4}>
+        <BtnRestore
+          hasEdit={hasEdit}
+          isEdit={!scanSt.isAuto}
+          toggleEditAct={toggleScanIsAutoAct}
         />
       </Grid>
     </Grid>
@@ -99,16 +113,19 @@ const mapDispatchToProps = dispatch => (
   bindActionCreators({
     setScanTargetAct: setScanTarget,
     resetScanTargetAct: resetScanTarget,
+    toggleScanIsAutoAct: toggleScanIsAuto,
   }, dispatch)
 );
 
 Scan.propTypes = {
   classes: PropTypes.object.isRequired,
   feature: PropTypes.object.isRequired,
+  hasEdit: PropTypes.bool.isRequired,
   layoutSt: PropTypes.string.isRequired,
   scanSt: PropTypes.object.isRequired,
   setScanTargetAct: PropTypes.func.isRequired,
   resetScanTargetAct: PropTypes.func.isRequired,
+  toggleScanIsAutoAct: PropTypes.func.isRequired,
 };
 
 export default compose(
