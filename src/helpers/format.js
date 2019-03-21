@@ -19,15 +19,13 @@ const fixDigit = (input, precision) => {
   return output.toFixed(precision);
 };
 
-const buildData = (target) => {
-  if (!target) return { isExist: false };
-  const sp = target && target.spectrum;
-  const input = sp ? sp.data[0] : {};
+const buildData = (entity) => {
+  if (!entity) return { isExist: false };
+  const sp = entity && entity.spectrum;
   const xLabel = sp ? `X (${sp.xUnit})` : '';
   const yLabel = sp ? `Y (${sp.yUnit})` : '';
-  const features = target && target.features;
   return {
-    input, xLabel, yLabel, features, isExist: true,
+    entity, xLabel, yLabel, isExist: true,
   };
 };
 
