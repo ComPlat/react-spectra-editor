@@ -14,7 +14,7 @@ import LayoutPanel from './layout';
 import SubmitPanel from './submit';
 import ThresholdsPanel from './thresholds';
 import ShiftSelect from './shift_select';
-import ScanSelect from './scan_select';
+import Scan from './scan';
 
 const Styles = () => ({
   panelSummary: {
@@ -41,7 +41,7 @@ const SettingsPanel = ({
     <LayoutPanel />
     <Divider />
     <ShiftSelect />
-    <ScanSelect feature={feature} />
+    <Scan feature={feature} />
     <Divider />
     <ThresholdsPanel feature={feature} hasEdit={hasEdit} />
     <Divider />

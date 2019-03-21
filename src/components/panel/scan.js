@@ -8,36 +8,20 @@ import Grid from '@material-ui/core/Grid';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import Tooltip from '@material-ui/core/Tooltip';
-import IconButton from '@material-ui/core/IconButton';
-import Refresh from '@material-ui/icons/Refresh';
 import { withStyles } from '@material-ui/core/styles';
 
+import BtnRefresh from './btn_refresh';
 import { setScanTarget, resetScanTarget } from '../../actions/scan';
 
 const styles = () => ({
   container: {
     margin: '12px 18px',
   },
-  btnRefresh: {
-  },
   formControl: {
     margin: '10px 20px 0px 10px',
     minWidth: 150,
   },
 });
-
-const btnRefresh = (
-  classes, resetScanTargetAct,
-) => (
-  <IconButton
-    variant="fab"
-    color="primary"
-    className={classNames(classes.btnRefresh)}
-    onClick={resetScanTargetAct}
-  >
-    <Refresh />
-  </IconButton>
-);
 
 const scanSelection = (
   classes, feature, layoutSt, scanSt, onChange,
@@ -70,7 +54,7 @@ const scanSelection = (
   );
 };
 
-const ScanSelect = ({
+const Scan = ({
   classes, feature, layoutSt, scanSt, setScanTargetAct, resetScanTargetAct,
 }) => {
   const isMs = ['MS'].indexOf(layoutSt) >= 0;
@@ -94,7 +78,10 @@ const ScanSelect = ({
         }
       </Grid>
       <Grid item xs={4}>
-        { btnRefresh(classes, resetScanTargetAct) }
+        <BtnRefresh
+          disabled={false}
+          refreshAct={resetScanTargetAct}
+        />
       </Grid>
     </Grid>
   );
@@ -114,7 +101,7 @@ const mapDispatchToProps = dispatch => (
   }, dispatch)
 );
 
-ScanSelect.propTypes = {
+Scan.propTypes = {
   classes: PropTypes.object.isRequired,
   feature: PropTypes.object.isRequired,
   layoutSt: PropTypes.string.isRequired,
@@ -126,4 +113,4 @@ ScanSelect.propTypes = {
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
   withStyles(styles),
-)(ScanSelect);
+)(Scan);
