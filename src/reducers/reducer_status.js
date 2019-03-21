@@ -25,8 +25,8 @@ const statusReducer = (state = initialState, action) => {
     case EDITPEAK.RMPOSITIVE:
     case EDITPEAK.ADDNEGATIVE:
     case EDITPEAK.RMNEGATIVE:
-    case THRESHOLD.UPDATE:
-    case THRESHOLD.RESET:
+    case THRESHOLD.UPDATE_VALUE:
+    case THRESHOLD.RESET_VALUE:
       return Object.assign(
         {},
         state,

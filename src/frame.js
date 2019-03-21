@@ -26,31 +26,31 @@ const extractMs = (entity, scanSt) => {
   );
 };
 
-const extractNmrIr = (entity, managerSt) => {
+const extractNmrIr = (entity, thresSt) => {
   const { spectrum, features } = entity;
   const [peakAll, peakEdit] = features;
   const hasEdit = peakEdit && peakEdit.data
     ? peakEdit.data[0].x.length > 0
     : false;
 
-  const feature = hasEdit && managerSt.isEdit ? peakEdit : peakAll;
+  const feature = hasEdit && thresSt.isEdit ? peakEdit : peakAll;
   return { topic: spectrum.data[0], feature, hasEdit };
 };
 
-const extract = (entity, managerSt, scanSt) => {
+const extract = (entity, thresSt, scanSt) => {
   const defaultFeat = entity.features[0];
   const layout = defaultFeat.dataType;
   const isMS = layout === 'MASS SPECTRUM';
   return isMS
     ? extractMs(entity, scanSt)
-    : extractNmrIr(entity, managerSt);
+    : extractNmrIr(entity, thresSt);
 };
 
 const Frame = ({
   entity, cLabel, xLabel, yLabel, operations, predictObj,
-  managerSt, scanSt,
+  thresSt, scanSt,
 }) => {
-  const { topic, feature, hasEdit } = extract(entity, managerSt, scanSt);
+  const { topic, feature, hasEdit } = extract(entity, thresSt, scanSt);
   if (!topic) return null;
 
   return (
@@ -81,7 +81,7 @@ const Frame = ({
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     scanSt: state.scan,
-    managerSt: state.manager,
+    thresSt: state.threshold,
   }
 );
 
@@ -97,7 +97,7 @@ Frame.propTypes = {
   yLabel: PropTypes.string.isRequired,
   predictObj: PropTypes.object.isRequired,
   operations: PropTypes.array.isRequired,
-  managerSt: PropTypes.object.isRequired,
+  thresSt: PropTypes.object.isRequired,
   scanSt: PropTypes.object.isRequired,
 };
 

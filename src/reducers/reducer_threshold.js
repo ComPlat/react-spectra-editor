@@ -1,15 +1,24 @@
 import { THRESHOLD, MANAGER } from '../constants/action_type';
 
-const initialState = false;
+const initialState = {
+  isEdit: true,
+  value: false,
+};
 
 const thresholdReducer = (state = initialState, action) => {
   switch (action.type) {
-    case THRESHOLD.UPDATE:
-      return action.payload;
-    case THRESHOLD.RESET:
-      return action.payload;
+    case THRESHOLD.UPDATE_VALUE:
+      return Object.assign({}, state, { value: action.payload });
+    case THRESHOLD.RESET_VALUE:
+      return Object.assign({}, state, { value: action.payload });
+    case THRESHOLD.TOGGLE_ISEDIT:
+      return Object.assign({}, state, { isEdit: !state.isEdit });
     case MANAGER.RESETALL:
-      return action.payload && action.payload.thresRef;
+      return Object.assign(
+        {},
+        state,
+        { value: action.payload && action.payload.thresRef },
+      );
     default:
       return state;
   }

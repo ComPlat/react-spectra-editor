@@ -187,7 +187,7 @@ const NmrViewer = ({
   const { ref, peak } = shiftSt;
 
   const offset = FromManualToOffset(ref, peak);
-  const peaks = Convert2Peak(feature, thresSt * 0.01, offset);
+  const peaks = Convert2Peak(feature, thresSt.value * 0.01, offset);
   const peaksEdit = PksEdit(peaks, editPeakSt);
   const peaksWoRef = Format.rmRef(peaksEdit, shiftSt);
 

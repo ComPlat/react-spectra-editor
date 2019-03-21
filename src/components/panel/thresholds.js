@@ -14,8 +14,10 @@ import HowToReg from '@material-ui/icons/HowToReg';
 import Tooltip from '@material-ui/core/Tooltip';
 import { withStyles } from '@material-ui/core/styles';
 
-import { updateThreshold, resetThreshold } from '../../actions/threshold';
-import { toggleIsEdit } from '../../actions/manager';
+import {
+  updateThresholdValue, resetThresholdValue, toggleThresholdIsEdit,
+} from '../../actions/threshold';
+
 
 const Styles = () => ({
   container: {
@@ -39,13 +41,13 @@ const txtPercent = () => (
 );
 
 const setThreshold = (
-  classes, thresVal, updateThresholdAct,
+  classes, thresVal, updateThresholdValueAct,
 ) => {
-  const onBlur = e => updateThresholdAct(e.target.value);
-  const onChange = e => updateThresholdAct(e.target.value);
+  const onBlur = e => updateThresholdValueAct(e.target.value);
+  const onChange = e => updateThresholdValueAct(e.target.value);
   const onEnterPress = (e) => {
     if (e.key === 'Enter') {
-      updateThresholdAct(e.target.value);
+      updateThresholdValueAct(e.target.value);
     }
   };
 
@@ -78,30 +80,30 @@ const setThreshold = (
 };
 
 const btnRefresh = (
-  classes, thresVal, resetThresholdAct,
+  classes, thresVal, resetThresholdValueAct,
 ) => (
   <IconButton
     disabled={!thresVal}
     variant="fab"
     color="primary"
     className={classNames(classes.btnRefresh)}
-    onClick={resetThresholdAct}
+    onClick={resetThresholdValueAct}
   >
     <Refresh />
   </IconButton>
 );
 
-const restoreDisplay = (hasEdit, managerSt) => (
-  hasEdit && managerSt.isEdit ? <HowToReg /> : <CloudDone />
+const restoreDisplay = (hasEdit, thresSt) => (
+  hasEdit && thresSt.isEdit ? <HowToReg /> : <CloudDone />
 );
 
-const restoreTp = (hasEdit, managerSt) => (
-  hasEdit && managerSt.isEdit ? 'User' : 'Automation'
+const restoreTp = (hasEdit, thresSt) => (
+  hasEdit && thresSt.isEdit ? 'User' : 'Automation'
 );
 
-const btnRestore = (classes, hasEdit, managerSt, toggleIsEditAct) => (
+const btnRestore = (classes, hasEdit, thresSt, toggleThresholdIsEditAct) => (
   <Tooltip
-    title={<span className="txt-sv-tp">{restoreTp(hasEdit, managerSt)}</span>}
+    title={<span className="txt-sv-tp">{restoreTp(hasEdit, thresSt)}</span>}
   >
     <div>
       <IconButton
@@ -109,20 +111,20 @@ const btnRestore = (classes, hasEdit, managerSt, toggleIsEditAct) => (
         variant="fab"
         color="primary"
         className={classNames(classes.btnRestore)}
-        onClick={toggleIsEditAct}
+        onClick={toggleThresholdIsEditAct}
       >
-        { restoreDisplay(hasEdit, managerSt) }
+        { restoreDisplay(hasEdit, thresSt) }
       </IconButton>
     </div>
   </Tooltip>
 );
 
 const ThresholdsPanel = ({
-  classes, feature, hasEdit, layoutSt, thresSt, managerSt,
-  updateThresholdAct, resetThresholdAct, toggleIsEditAct,
+  classes, feature, hasEdit, layoutSt, thresSt,
+  updateThresholdValueAct, resetThresholdValueAct, toggleThresholdIsEditAct,
 }) => {
   const isMs = ['MS'].indexOf(layoutSt) >= 0;
-  const thresVal = thresSt || feature.thresRef;
+  const thresVal = thresSt.value || feature.thresRef;
   return (
     <Grid
       className={classNames(classes.container)}
@@ -132,17 +134,17 @@ const ThresholdsPanel = ({
       alignItems="center"
     >
       <Grid item xs={4}>
-        { setThreshold(classes, thresVal, updateThresholdAct) }
+        { setThreshold(classes, thresVal, updateThresholdValueAct) }
       </Grid>
       <Grid item xs={4}>
-        { btnRefresh(classes, thresVal, resetThresholdAct) }
+        { btnRefresh(classes, thresVal, resetThresholdValueAct) }
       </Grid>
       {
         isMs
           ? null
           : (
             <Grid item xs={4}>
-              { btnRestore(classes, hasEdit, managerSt, toggleIsEditAct) }
+              { btnRestore(classes, hasEdit, thresSt, toggleThresholdIsEditAct) }
             </Grid>
           )
       }
@@ -154,15 +156,14 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     layoutSt: state.layout,
     thresSt: state.threshold,
-    managerSt: state.manager,
   }
 );
 
 const mapDispatchToProps = dispatch => (
   bindActionCreators({
-    updateThresholdAct: updateThreshold,
-    resetThresholdAct: resetThreshold,
-    toggleIsEditAct: toggleIsEdit,
+    updateThresholdValueAct: updateThresholdValue,
+    resetThresholdValueAct: resetThresholdValue,
+    toggleThresholdIsEditAct: toggleThresholdIsEdit,
   }, dispatch)
 );
 
@@ -171,17 +172,10 @@ ThresholdsPanel.propTypes = {
   feature: PropTypes.object.isRequired,
   hasEdit: PropTypes.bool.isRequired,
   layoutSt: PropTypes.string.isRequired,
-  thresSt: PropTypes.oneOfType(
-    [
-      PropTypes.string,
-      PropTypes.number,
-      PropTypes.bool,
-    ],
-  ).isRequired,
-  managerSt: PropTypes.object.isRequired,
-  updateThresholdAct: PropTypes.func.isRequired,
-  resetThresholdAct: PropTypes.func.isRequired,
-  toggleIsEditAct: PropTypes.func.isRequired,
+  thresSt: PropTypes.object.isRequired,
+  updateThresholdValueAct: PropTypes.func.isRequired,
+  resetThresholdValueAct: PropTypes.func.isRequired,
+  toggleThresholdIsEditAct: PropTypes.func.isRequired,
 };
 
 export default connect(

@@ -82,7 +82,7 @@ const Topic2Seed = createSelector(
 );
 
 const getThreshold = state => (
-  state.threshold ? state.threshold * 1.0 : false
+  state.threshold ? state.threshold.value * 1.0 : false
 );
 
 const Convert2Peak = (feature, threshold, offset) => {

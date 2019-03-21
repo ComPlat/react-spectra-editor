@@ -1,17 +1,26 @@
 import { THRESHOLD } from '../constants/action_type';
 
-const updateThreshold = payload => (
+const updateThresholdValue = payload => (
   {
-    type: THRESHOLD.UPDATE,
+    type: THRESHOLD.UPDATE_VALUE,
     payload,
   }
 );
 
-const resetThreshold = () => (
+const resetThresholdValue = () => (
   {
-    type: THRESHOLD.RESET,
+    type: THRESHOLD.RESET_VALUE,
     payload: false,
   }
 );
 
-export { updateThreshold, resetThreshold };
+const toggleThresholdIsEdit = payload => (
+  {
+    type: THRESHOLD.TOGGLE_ISEDIT,
+    payload,
+  }
+);
+
+export {
+  updateThresholdValue, resetThresholdValue, toggleThresholdIsEdit,
+};
