@@ -14,7 +14,7 @@ import { withStyles } from '@material-ui/core/styles';
 
 import { enableAllBtn } from '../../actions/status';
 import SwitchSequence from './switch_sequence';
-import SubmitBtn from './submit_btn';
+import BtnSubmit from './btn_submit';
 
 const Styles = () => ({
   formControl: {
@@ -120,7 +120,7 @@ class SubmitPanel extends React.Component {
             }
           </Grid>
           <Grid item xs={4}>
-            <SubmitBtn
+            <BtnSubmit
               isAscend={isAscend}
               feature={feature}
               operation={operation}

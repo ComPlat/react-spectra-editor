@@ -13,7 +13,7 @@ import { PksEdit } from '../../helpers/converter';
 import { Convert2Peak } from '../../helpers/chem';
 import { FromManualToOffset } from '../../helpers/shift';
 
-const Styles = () => ({
+const styles = () => ({
   icon: {
   },
   btn: {
@@ -30,7 +30,7 @@ const onClickCb = (
   }
 );
 
-const SubmitBtn = ({
+const BtnSubmit = ({
   classes, operation, feature, isAscend, editPeakSt, thresSt, statusSt,
   layoutSt, shiftSt,
 }) => {
@@ -81,7 +81,7 @@ const mapDispatchToProps = dispatch => (
   }, dispatch)
 );
 
-SubmitBtn.propTypes = {
+BtnSubmit.propTypes = {
   classes: PropTypes.object.isRequired,
   feature: PropTypes.object.isRequired,
   isAscend: PropTypes.bool.isRequired,
@@ -93,18 +93,12 @@ SubmitBtn.propTypes = {
   ).isRequired,
   editPeakSt: PropTypes.object.isRequired,
   statusSt: PropTypes.object.isRequired,
-  thresSt: PropTypes.oneOfType(
-    [
-      PropTypes.string,
-      PropTypes.number,
-      PropTypes.bool,
-    ],
-  ).isRequired,
+  thresSt: PropTypes.object.isRequired,
   layoutSt: PropTypes.string.isRequired,
   shiftSt: PropTypes.object.isRequired,
 };
 
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
-  withStyles(Styles),
-)(SubmitBtn);
+  withStyles(styles),
+)(BtnSubmit);
