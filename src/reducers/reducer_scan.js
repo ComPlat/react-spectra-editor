@@ -15,7 +15,7 @@ const setTarget = (state, payload) => (
 );
 
 const resetAll = (state, payload) => {
-  const { scanCount } = payload;
+  const { scanCount, scanEditTarget } = payload;
 
   return Object.assign(
     {},
@@ -23,6 +23,7 @@ const resetAll = (state, payload) => {
     {
       target: false,
       count: parseInt(scanCount, 10),
+      isAuto: !scanEditTarget,
     },
   );
 };

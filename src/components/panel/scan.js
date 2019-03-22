@@ -43,7 +43,7 @@ const scanSelect = (
   const defaultValue = scanSt.isAuto || !feature.scanEditTarget
     ? feature.scanAutoTarget
     : feature.scanEditTarget;
-  const selValue = target || defaultValue;
+  const selValue = target || defaultValue || 1;
 
   return (
     <Tooltip
