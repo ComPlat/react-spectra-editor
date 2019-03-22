@@ -19,9 +19,9 @@ const extractMs = (entity, scanSt) => {
   const defaultIdx = isAuto || !hasEdit
     ? defaultFeat.scanAutoTarget
     : defaultFeat.scanEditTarget;
-  const defaultCount = defaultFeat.scanCount;
-  let idx = target || defaultIdx || 1;
-  if (idx > defaultCount) idx = defaultCount;
+  const defaultCount = +defaultFeat.scanCount;
+  let idx = +(target || defaultIdx || 1);
+  if (idx > defaultCount) { idx = defaultCount; }
   const feature = entity.features[idx - 1];
   return (
     {

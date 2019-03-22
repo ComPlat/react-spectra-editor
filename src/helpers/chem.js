@@ -217,9 +217,9 @@ const buildFeature = (jcamp, sTyp, peakUp, s, thresRef) => {
         typ: s.dataType + subTyp,
         peakUp,
         thresRef,
-        scanCount: jcamp.info.$SCANCOUNT,
-        scanAutoTarget: jcamp.info.$SCANAUTOTARGET,
-        scanEditTarget: jcamp.info.$SCANEDITTARGET,
+        scanCount: +jcamp.info.$SCANCOUNT,
+        scanAutoTarget: +jcamp.info.$SCANAUTOTARGET,
+        scanEditTarget: +jcamp.info.$SCANEDITTARGET,
         shift: extractShift(s),
         operation: {
           typ: sTyp,
