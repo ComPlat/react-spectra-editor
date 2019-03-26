@@ -29,14 +29,18 @@ class DemoWriteIr extends React.Component {
     return target.replace(/\$/g, '');
   }
 
-  writePeaks(peaks, layout, shift, isAscend) {
+  writePeaks({
+    peaks, layout, shift, isAscend,
+  }) {
     const body = FN.peaksBody(peaks, layout, shift, isAscend);
     const wrapper = FN.peaksWrapper(layout, shift);
     const desc = this.rmDollarSign(wrapper.head) + body + wrapper.tail;
     this.setState({ desc });
   }
 
-  savePeaks(peaks, layout, shift, isAscend) {
+  savePeaks({
+    peaks, layout, shift, isAscend,
+  }) {
     const body = FN.peaksBody(peaks, layout, shift, isAscend);
     /*eslint-disable */
     if (shift.ref.label) {

@@ -294,8 +294,21 @@ const ExtractJcamp = (source) => {
   return { spectrum, features };
 };
 
+const Convert2Scan = (feature, scanSt) => {
+  const { scanAutoTarget, scanEditTarget } = feature;
+  const { target, isAuto } = scanSt;
+  const hasEdit = !!scanEditTarget;
+  const defaultIdx = (isAuto || !hasEdit) ? scanAutoTarget : scanEditTarget;
+  return target || defaultIdx;
+};
+
+const Convert2Thres = (feature, thresSt) => {
+  const value = thresSt.value || feature.thresRef;
+  return value;
+};
+
 export {
   ExtractJcamp, Topic2Seed, Feature2Peak,
   ToThresEndPts, ToShiftPeaks,
-  Convert2Peak,
+  Convert2Peak, Convert2Scan, Convert2Thres,
 };

@@ -28,25 +28,34 @@ class DemoWriteMs extends React.Component {
     return target.replace(/\$/g, '');
   }
 
-  writePeaks(peaks, layout, shift, isAscend) {
+  writePeaks({
+    peaks, layout, shift, isAscend,
+  }) {
     const body = FN.peaksBody(peaks, layout, shift, isAscend);
     const wrapper = FN.peaksWrapper(layout, shift);
     const desc = this.rmDollarSign(wrapper.head) + body + wrapper.tail;
     this.setState({ desc });
   }
 
-  savePeaks(peaks, layout, shift, isAscend) {
+  savePeaks({
+    peaks, layout, shift, isAscend, scan, thres,
+  }) {
     const body = FN.peaksBody(peaks, layout, shift, isAscend);
     /*eslint-disable */
     if (shift.ref.label) {
       const label = this.rmDollarSign(shift.ref.label);
       alert(
-        `Peaks are: ${body}` + '\n' +
-        '- - - - - - - - - - -' + '\n' +
-        `Shift solvent = ${label}, ${shift.ref.value}ppm` + '\n'
+        `Peaks = ${body}` + '\n' +
+        `Shift solvent = ${label}, ${shift.ref.value}ppm` + '\n' +
+        `scan = ${scan}` + '\n' +
+        `threshold =  ${thres} %`
       );
     } else {
-      alert(`Peaks are: ${body}`);
+      alert(
+        `Peaks = ${body}` + '\n' +
+        `scan = ${scan}` + '\n' +
+        `threshold =  ${thres} %`
+      );
     }
     /*eslint-disable */
   }
@@ -73,8 +82,8 @@ class DemoWriteMs extends React.Component {
     const yLabel = 'Y (Relative Abundance)';
 
     const operations = [
-      { name: 'save peaks', value: this.savePeaks },
-      { name: 'write peaks', value: this.writePeaks },
+      { name: 'save', value: this.savePeaks },
+      { name: 'write', value: this.writePeaks },
     ].filter(r => r.value);
 
     // const predictObj = {

@@ -10,7 +10,9 @@ import PlayCircleOutline from '@material-ui/icons/PlayCircleOutline';
 import { withStyles } from '@material-ui/core/styles';
 
 import { PksEdit } from '../../helpers/converter';
-import { Convert2Peak } from '../../helpers/chem';
+import {
+  Convert2Peak, Convert2Scan, Convert2Thres,
+} from '../../helpers/chem';
 import { FromManualToOffset } from '../../helpers/shift';
 
 const styles = () => ({
@@ -23,16 +25,23 @@ const styles = () => ({
 
 const onClickCb = (
   operation, peaksEdit, isAscend,
-  layoutSt, shiftSt,
+  scan, thres, layoutSt, shiftSt,
 ) => (
   () => {
-    operation(peaksEdit, layoutSt, shiftSt, isAscend);
+    operation({
+      peaks: peaksEdit,
+      layout: layoutSt,
+      shift: shiftSt,
+      scan,
+      thres,
+      isAscend,
+    });
   }
 );
 
 const BtnSubmit = ({
   classes, operation, feature, isAscend, editPeakSt, thresSt, statusSt,
-  layoutSt, shiftSt,
+  layoutSt, shiftSt, scanSt,
 }) => {
   const { ref, peak } = shiftSt;
 
@@ -40,6 +49,8 @@ const BtnSubmit = ({
   const peaks = Convert2Peak(feature, thresSt.value, offset);
   const peaksEdit = PksEdit(peaks, editPeakSt);
   const disable = peaksEdit.length === 0 || statusSt.btnSubmit;
+  const scan = Convert2Scan(feature, scanSt);
+  const thres = Convert2Thres(feature, thresSt);
 
   if (!operation) return null;
 
@@ -56,7 +67,7 @@ const BtnSubmit = ({
         disabled={disable}
         onClick={onClickCb(
           operation.value, peaksEdit, isAscend,
-          layoutSt, shiftSt,
+          scan, thres, layoutSt, shiftSt,
         )}
         variant="fab"
       >
@@ -73,6 +84,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     statusSt: state.status,
     layoutSt: state.layout,
     shiftSt: state.shift,
+    scanSt: state.scan,
   }
 );
 
@@ -96,6 +108,7 @@ BtnSubmit.propTypes = {
   thresSt: PropTypes.object.isRequired,
   layoutSt: PropTypes.string.isRequired,
   shiftSt: PropTypes.object.isRequired,
+  scanSt: PropTypes.object.isRequired,
 };
 
 export default compose(
