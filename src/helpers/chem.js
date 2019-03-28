@@ -231,13 +231,24 @@ const buildFeature = (jcamp, sTyp, peakUp, s, thresRef) => {
   );
 };
 
+const isPeakTable = s => (
+  s.dataType && (
+    s.dataType.includes('PEAKTABLE')
+      || s.dataType.includes('PEAK ASSIGNMENTS')
+  )
+);
+
 const extractFeature = (jcamp, sTyp, peakUp) => {
   const features = jcamp.spectra.map((s) => {
     const thresRef = calcThresRef(s, peakUp);
-    return s.dataType && s.dataType.includes('PEAK ASSIGNMENTS')
+    return isPeakTable(s)
       ? buildFeature(jcamp, sTyp, peakUp, s, thresRef)
       : null;
   }).filter(r => r != null);
+  // workaround for legacy design
+  if (features.length > 0 && features[0].dataType.includes('PEAKTABLE')) {
+    features.reverse();
+  }
 
   return features;
 };
