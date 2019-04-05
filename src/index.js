@@ -41,14 +41,16 @@ const SpectraViewer = ({
 SpectraViewer.propTypes = {
   entity: PropTypes.object.isRequired,
   cLabel: PropTypes.string,
-  xLabel: PropTypes.string.isRequired,
-  yLabel: PropTypes.string.isRequired,
+  xLabel: PropTypes.string,
+  yLabel: PropTypes.string,
   predictObj: PropTypes.object,
   operations: PropTypes.array,
 };
 
 SpectraViewer.defaultProps = {
   cLabel: '',
+  xLabel: '',
+  yLabel: '',
   predictObj: {},
   operations: [],
 };

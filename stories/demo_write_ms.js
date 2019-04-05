@@ -78,9 +78,6 @@ class DemoWriteMs extends React.Component {
   render() {
     const { desc, predictions, molecule } = this.state;
 
-    const xLabel = 'X (m/z)';
-    const yLabel = 'Y (Relative Abundance)';
-
     const operations = [
       { name: 'save', value: this.savePeaks },
       { name: 'write', value: this.writePeaks },
@@ -97,8 +94,6 @@ class DemoWriteMs extends React.Component {
       <div style={{ width: '1200px' }}>
         <SpectraViewer
           entity={entity}
-          xLabel={xLabel}
-          yLabel={yLabel}
           operations={operations}
         />
         <Grid container>

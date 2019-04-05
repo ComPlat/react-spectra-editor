@@ -5,19 +5,12 @@ import MS from './source/MS';
 
 const entity = FN.ExtractJcamp(MS);
 
-const DemoSingleMs = () => {
-  const xLabel = 'X (m/z)';
-  const yLabel = 'Y (Relative Abundance)';
-
-  return (
-    <div style={{ width: '1200px' }}>
-      <SpectraViewer
-        entity={entity}
-        xLabel={xLabel}
-        yLabel={yLabel}
-      />
-    </div>
-  );
-};
+const DemoSingleMs = () => (
+  <div style={{ width: '1200px' }}>
+    <SpectraViewer
+      entity={entity}
+    />
+  </div>
+);
 
 export default DemoSingleMs;

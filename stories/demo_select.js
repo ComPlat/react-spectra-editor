@@ -50,9 +50,6 @@ class DemoSelect extends React.Component {
     const { selectedOption } = this.state;
     const { value } = selectedOption;
 
-    const xLabel = `X (${value.spectrum.xUnit})`;
-    const yLabel = `Y (${value.spectrum.yUnit})`;
-
     return (
       <div style={{ width: '1200px' }}>
         <Select
@@ -62,8 +59,6 @@ class DemoSelect extends React.Component {
         />
         <SpectraViewer
           entity={value}
-          xLabel={xLabel}
-          yLabel={yLabel}
         />
       </div>
     );

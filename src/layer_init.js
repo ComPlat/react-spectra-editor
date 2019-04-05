@@ -48,12 +48,15 @@ class LayerInit extends React.Component {
       entity, cLabel, xLabel, yLabel, operations, predictObj,
     } = this.props;
 
+    const xxLabel = xLabel === '' ? `X (${entity.spectrum.xUnit})` : xLabel;
+    const yyLabel = yLabel === '' ? `Y (${entity.spectrum.yUnit})` : yLabel;
+
     return (
       <LayerPrism
         entity={entity}
         cLabel={cLabel}
-        xLabel={xLabel}
-        yLabel={yLabel}
+        xLabel={xxLabel}
+        yLabel={yyLabel}
         predictObj={predictObj}
         operations={operations}
       />

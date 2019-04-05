@@ -5,19 +5,12 @@ import IREdit from './source/IR_edit';
 
 const entity = FN.ExtractJcamp(IREdit);
 
-const DemoEdit = () => {
-  const xLabel = `X (${entity.spectrum.xUnit})`;
-  const yLabel = `Y (${entity.spectrum.yUnit})`;
-
-  return (
-    <div style={{ width: '1200px' }}>
-      <SpectraViewer
-        entity={entity}
-        xLabel={xLabel}
-        yLabel={yLabel}
-      />
-    </div>
-  );
-};
+const DemoEdit = () => (
+  <div style={{ width: '1200px' }}>
+    <SpectraViewer
+      entity={entity}
+    />
+  </div>
+);
 
 export default DemoEdit;

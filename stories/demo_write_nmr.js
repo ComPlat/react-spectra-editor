@@ -74,9 +74,6 @@ class DemoWriteNmr extends React.Component {
   render() {
     const { desc, predictions, molecule } = this.state;
 
-    const xLabel = `X (${entity.spectrum.xUnit})`;
-    const yLabel = `Y (${entity.spectrum.yUnit})`;
-
     const operations = [
       { name: 'save peaks', value: this.savePeaks },
       { name: 'write peaks', value: this.writePeaks },
@@ -93,8 +90,6 @@ class DemoWriteNmr extends React.Component {
       <div style={{ width: '1200px' }}>
         <SpectraViewer
           entity={entity}
-          xLabel={xLabel}
-          yLabel={yLabel}
           predictObj={predictObj}
           operations={operations}
         />
