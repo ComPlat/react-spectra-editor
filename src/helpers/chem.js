@@ -13,70 +13,20 @@ const getShiftOffset = (state, _) => { // eslint-disable-line
   return FromManualToOffset(ref, peak);
 };
 
-const downSample = (feature) => {
-  const { peakUp, maxY } = feature;
-  if (!maxY) return { dsRef: false, peakUp };
-  const factor = peakUp ? 0.02 : 0.9;
-  const dsRef = factor * maxY;
-  return { dsRef, peakUp };
-};
-
-const dsWithoutRef = (topic, offset) => {
+const convertTopic = (topic, offset) => {
   const sp = [];
   const xs = topic.x;
   const ys = topic.y;
-  if (xs.length > 8000) {
-    for (let i = 0; i < ys.length; i += 1) { // downsample
-      if (i % 2 === 0) {
-        const x = xs[i] - offset;
-        const y = ys[i];
-        sp.push({ x, y });
-      }
-    }
-  } else {
-    for (let i = 0; i < ys.length; i += 1) { // no-downsample
-      const x = xs[i] - offset;
-      const y = ys[i];
-      sp.push({ x, y });
-    }
-  }
-  return sp;
-};
-
-const dsWithRef = (topic, dsRef, peakUp, offset) => {
-  const sp = [];
-  const xs = topic.x;
-  const ys = topic.y;
-  for (let i = 0; i < ys.length; i += 1) { // downsample
+  for (let i = 0; i < ys.length; i += 1) { // no-downsample
+    const x = xs[i] - offset;
     const y = ys[i];
-    const isDownSample = (peakUp && y < dsRef) || (!peakUp && y > dsRef);
-    if (isDownSample) {
-      if (i % 3 === 0) {
-        const x = xs[i] - offset;
-        sp.push({ x, y });
-      }
-    } else {
-      const x = xs[i] - offset;
-      sp.push({ x, y });
-    }
+    sp.push({ x, y });
   }
-  return sp;
-};
-
-const convertTopic = (topic, feature, offset) => {
-  let ds = { dsRef: false, peakUp: false };
-  if (feature.thresRef) {
-    ds = downSample(feature);
-  }
-  const sp = ds.dsRef
-    ? dsWithRef(topic, ds.dsRef, ds.peakUp, offset)
-    : dsWithoutRef(topic, offset);
   return sp;
 };
 
 const Topic2Seed = createSelector(
   getTopic,
-  getFeature,
   getShiftOffset,
   convertTopic,
 );
