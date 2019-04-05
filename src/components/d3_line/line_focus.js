@@ -109,7 +109,7 @@ class LineFocus {
 
   setConfig() {
     // Domain Calculate
-    const factor = 1.05;
+    const factor = 1.10;
     const xExtent = d3.extent(this.data, d => d.x);
     const yExtent = [
       d3.min(this.data, d => d.y) / factor,
@@ -173,7 +173,7 @@ class LineFocus {
     return this.dataPks;
   }
 
-  drawPeaks(editPeakSt, editModeSt) {
+  drawPeaks(editPeakSt, editModeSt, peakUp) {
     // rescale for zoom
     const { xt, yt } = TfRescale(this);
 
@@ -184,15 +184,24 @@ class LineFocus {
       .attr('class', 'exit')
       .remove();
 
-    const symbol = d3.symbol().size([15]);
+    const linePath = [
+      { x: -0.5, y: -5 },
+      { x: -0.5, y: -15 },
+      { x: 0.5, y: -15 },
+      { x: 0.5, y: -5 },
+    ];
+    const faktor = peakUp ? 1 : -1;
+    const lineSymbol = d3.line()
+      .x(d => d.x)
+      .y(d => faktor * d.y)(linePath);
 
     ccp.enter()
       .append('path')
-      .attr('d', symbol.type(d3.symbolDiamond))
+      .attr('d', lineSymbol)
       .attr('class', 'enter-peak')
       .attr('fill', 'red')
-      .attr('stroke', 'blue')
-      .attr('stroke-width', 3)
+      .attr('stroke', 'green')
+      .attr('stroke-width', 2)
       .attr('stroke-opacity', 0.0)
       .on('mouseover', this.tip.show)
       .on('mouseout', this.tip.hide)
@@ -201,7 +210,7 @@ class LineFocus {
       .on('click', d => this.onClickEditPeak(d, editModeSt));
   }
 
-  drawRef() {
+  drawRef(peakUp) {
     // rescale for zoom
     const { xt, yt } = TfRescale(this);
 
@@ -212,23 +221,31 @@ class LineFocus {
       .attr('class', 'exit')
       .remove();
 
-    const symbol = d3.symbol().size([12]);
+    const linePath = [
+      { x: -0.5, y: -5 },
+      { x: -4, y: -20 },
+      { x: 4, y: -20 },
+      { x: 0.5, y: -5 },
+    ];
+    const faktor = peakUp ? 1 : -1;
+    const lineSymbol = d3.line()
+      .x(d => d.x)
+      .y(d => faktor * d.y)(linePath);
 
     ccp.enter()
       .append('path')
-      .attr('d', symbol.type(d3.symbolCircle))
+      .attr('d', lineSymbol)
       .attr('class', 'enter-ref')
-      .attr('fill-opacity', 1.0)
-      .attr('stroke', 'green')
-      .attr('stroke-width', 2)
-      .attr('stroke-opacity', 1.0)
+      .attr('fill', 'green')
+      .attr('fill-opacity', 0.8)
       .merge(ccp)
       .attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y)})`)
       .on('click', () => this.onClickEditPeak(false, false));
   }
 
   create(
-    el, svg, filterSeed, filterPeak, tTrEndPts, tSfPeaks, editPeakSt, editModeSt,
+    el, svg, filterSeed, filterPeak, peakUp,
+    tTrEndPts, tSfPeaks, editPeakSt, editModeSt,
   ) {
     this.setSvg(svg);
 
@@ -257,13 +274,14 @@ class LineFocus {
       this.drawLine();
       this.drawThres();
       this.drawGrid();
-      this.drawRef();
-      this.drawPeaks(editPeakSt, editModeSt);
+      this.drawRef(peakUp);
+      this.drawPeaks(editPeakSt, editModeSt, peakUp);
     }
   }
 
   update(
-    el, svg, filterSeed, filterPeak, tTrEndPts, tSfPeaks, editPeakSt, editModeSt,
+    el, svg, filterSeed, filterPeak, peakUp,
+    tTrEndPts, tSfPeaks, editPeakSt, editModeSt,
   ) {
     this.setRoot(el);
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks);
@@ -273,8 +291,8 @@ class LineFocus {
       this.drawLine();
       this.drawThres();
       this.drawGrid();
-      this.drawRef();
-      this.drawPeaks(editPeakSt, editModeSt);
+      this.drawRef(peakUp);
+      this.drawPeaks(editPeakSt, editModeSt, peakUp);
     }
   }
 }

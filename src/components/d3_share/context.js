@@ -58,7 +58,7 @@ class D3Context {
   }
 
   setExtent() {
-    const factor = 1.05;
+    const factor = 1.10;
 
     let xExtent = d3.extent(this.data, d => d.x);
     let yExtent = [

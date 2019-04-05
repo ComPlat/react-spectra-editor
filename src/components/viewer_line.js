@@ -37,6 +37,7 @@ class ViewerLine extends React.Component {
       node,
       seed,
       peak,
+      feature.peakUp,
       tTrEndPts,
       tSfPeaks,
       editPeakSt,
@@ -52,8 +53,8 @@ class ViewerLine extends React.Component {
 
   componentDidUpdate(prevProps) {
     const {
-      seed, peak, cLabel, xLabel, yLabel, borderSt, tTrEndPts, tSfPeaks,
-      editPeakSt, editModeSt, isHidden,
+      seed, peak, cLabel, xLabel, yLabel, feature,
+      borderSt, tTrEndPts, tSfPeaks, editPeakSt, editModeSt, isHidden,
     } = this.props;
 
     this.normChange(prevProps);
@@ -64,6 +65,7 @@ class ViewerLine extends React.Component {
       node,
       seed,
       peak,
+      feature.peakUp,
       tTrEndPts,
       tSfPeaks,
       editPeakSt,
