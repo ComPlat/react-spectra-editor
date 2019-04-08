@@ -32,9 +32,9 @@ class ViewerLine extends React.Component {
     resetAllAct(feature);
 
     const { filterSeed, filterPeak } = this.brushFilter(borderSt, seed, peak);
-    const node = this.d3Ref.current;
-    this.chart = this.main.create(
-      node,
+    const el = this.d3Ref.current;
+    this.chart = this.main.create({
+      el,
       seed,
       peak,
       tTrEndPts,
@@ -47,8 +47,8 @@ class ViewerLine extends React.Component {
       cLabel,
       xLabel,
       yLabel,
-      updateBorderAct,
-    );
+      updateBorder: updateBorderAct,
+    });
   }
 
   componentDidUpdate(prevProps) {
@@ -60,9 +60,9 @@ class ViewerLine extends React.Component {
     this.normChange(prevProps);
 
     const { filterSeed, filterPeak } = this.brushFilter(borderSt, seed, peak);
-    const node = this.d3Ref.current;
-    this.main.update(
-      node,
+    const el = this.d3Ref.current;
+    this.main.update({
+      el,
       seed,
       peak,
       tTrEndPts,
@@ -76,12 +76,12 @@ class ViewerLine extends React.Component {
       xLabel,
       yLabel,
       isHidden,
-    );
+    });
   }
 
   componentWillUnmount() {
-    const node = this.d3Ref.current;
-    this.main.destroy(node);
+    const el = this.d3Ref.current;
+    this.main.destroy(el);
   }
 
   normChange(prevProps) {

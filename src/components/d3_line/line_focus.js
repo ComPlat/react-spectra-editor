@@ -245,10 +245,10 @@ class LineFocus {
       .on('click', () => this.onClickEditPeak(false, false));
   }
 
-  create(
+  create({
     el, svg, filterSeed, filterPeak,
     tTrEndPts, tSfPeaks, editPeakSt, editModeSt, layoutSt,
-  ) {
+  }) {
     this.setSvg(svg);
 
     MountMainFrame(this, 'focus');
@@ -281,10 +281,10 @@ class LineFocus {
     }
   }
 
-  update(
-    el, svg, filterSeed, filterPeak,
+  update({
+    el, filterSeed, filterPeak,
     tTrEndPts, tSfPeaks, editPeakSt, editModeSt, layoutSt,
-  ) {
+  }) {
     this.setRoot(el);
     this.setTip(layoutSt);
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks);

@@ -45,18 +45,25 @@ class LineMain {
     }
   }
 
-  create(
-    el, seed, peaks, tTrEndPts, tSfPeaks, editPeakSt, editModeSt, layoutSt,
+  create({
+    el, seed, tTrEndPts, tSfPeaks, editPeakSt, editModeSt, layoutSt,
     filterSeed, filterPeak, cLabel, xLabel, yLabel,
     updateBorder,
-  ) {
+  }) {
     this.drawMain(el);
 
     this.context.create(el, this.svg, seed, updateBorder);
-    this.focus.create(
-      el, this.svg, filterSeed, filterPeak, tTrEndPts, tSfPeaks,
-      editPeakSt, editModeSt, layoutSt, cLabel,
-    );
+    this.focus.create({
+      el,
+      svg: this.svg,
+      filterSeed,
+      filterPeak,
+      tTrEndPts,
+      tSfPeaks,
+      editPeakSt,
+      editModeSt,
+      layoutSt,
+    });
     this.drawLabel(el, cLabel, xLabel, yLabel);
 
     MountBrush(this);
@@ -64,15 +71,22 @@ class LineMain {
     MountCompass(this);
   }
 
-  update(
-    el, seed, peaks, tTrEndPts, tSfPeaks, editPeakSt, editModeSt, layoutSt,
+  update({
+    el, seed, tTrEndPts, tSfPeaks, editPeakSt, editModeSt, layoutSt,
     filterSeed, filterPeak, cLabel, xLabel, yLabel, isHidden,
-  ) {
+  }) {
     this.context.update(el, this.svg, seed);
-    this.focus.update(
-      el, this.svg, filterSeed, filterPeak, tTrEndPts, tSfPeaks,
-      editPeakSt, editModeSt, layoutSt, null,
-    );
+    this.focus.update({
+      el,
+      svg: this.svg,
+      filterSeed,
+      filterPeak,
+      tTrEndPts,
+      tSfPeaks,
+      editPeakSt,
+      editModeSt,
+      layoutSt,
+    });
     this.drawLabel(el, cLabel, xLabel, yLabel);
 
     if (isHidden) {
