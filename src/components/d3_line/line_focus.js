@@ -9,6 +9,7 @@ import {
 import { TfRescale } from '../../helpers/compass';
 import { PksEdit } from '../../helpers/converter';
 import { LIST_MODE } from '../../constants/list_mode';
+import { LIST_LAYOUT } from '../../constants/list_layout';
 
 class LineFocus {
   constructor(props) {
@@ -43,7 +44,7 @@ class LineFocus {
     this.scales = InitScale(this);
     this.axisCall = InitAxisCall(5);
     this.pathCall = null;
-    this.tip = InitTip(this);
+    this.tip = null;
 
     this.setSvg = this.setSvg.bind(this);
     this.setRoot = this.setRoot.bind(this);
@@ -72,7 +73,8 @@ class LineFocus {
     this.root = d3.select(el).selectAll('.focus-main');
   }
 
-  setTip() {
+  setTip(typ) {
+    this.tip = InitTip(typ);
     this.root.call(this.tip);
   }
 
@@ -173,7 +175,7 @@ class LineFocus {
     return this.dataPks;
   }
 
-  drawPeaks(editPeakSt, editModeSt, peakUp) {
+  drawPeaks(editPeakSt, editModeSt, layoutSt) {
     // rescale for zoom
     const { xt, yt } = TfRescale(this);
 
@@ -190,7 +192,7 @@ class LineFocus {
       { x: 0.5, y: -15 },
       { x: 0.5, y: -5 },
     ];
-    const faktor = peakUp ? 1 : -1;
+    const faktor = layoutSt === LIST_LAYOUT.IR ? -1 : 1;
     const lineSymbol = d3.line()
       .x(d => d.x)
       .y(d => faktor * d.y)(linePath);
@@ -210,7 +212,7 @@ class LineFocus {
       .on('click', d => this.onClickEditPeak(d, editModeSt));
   }
 
-  drawRef(peakUp) {
+  drawRef(layoutSt) {
     // rescale for zoom
     const { xt, yt } = TfRescale(this);
 
@@ -227,7 +229,7 @@ class LineFocus {
       { x: 4, y: -20 },
       { x: 0.5, y: -5 },
     ];
-    const faktor = peakUp ? 1 : -1;
+    const faktor = layoutSt === LIST_LAYOUT.IR ? -1 : 1;
     const lineSymbol = d3.line()
       .x(d => d.x)
       .y(d => faktor * d.y)(linePath);
@@ -244,8 +246,8 @@ class LineFocus {
   }
 
   create(
-    el, svg, filterSeed, filterPeak, peakUp,
-    tTrEndPts, tSfPeaks, editPeakSt, editModeSt,
+    el, svg, filterSeed, filterPeak,
+    tTrEndPts, tSfPeaks, editPeakSt, editModeSt, layoutSt,
   ) {
     this.setSvg(svg);
 
@@ -253,7 +255,7 @@ class LineFocus {
     MountClip(this);
 
     this.setRoot(el);
-    this.setTip();
+    this.setTip(layoutSt);
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks);
     this.setCompass();
     this.setOverlay();
@@ -274,16 +276,17 @@ class LineFocus {
       this.drawLine();
       this.drawThres();
       this.drawGrid();
-      this.drawRef(peakUp);
-      this.drawPeaks(editPeakSt, editModeSt, peakUp);
+      this.drawRef(layoutSt);
+      this.drawPeaks(editPeakSt, editModeSt, layoutSt);
     }
   }
 
   update(
-    el, svg, filterSeed, filterPeak, peakUp,
-    tTrEndPts, tSfPeaks, editPeakSt, editModeSt,
+    el, svg, filterSeed, filterPeak,
+    tTrEndPts, tSfPeaks, editPeakSt, editModeSt, layoutSt,
   ) {
     this.setRoot(el);
+    this.setTip(layoutSt);
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks);
 
     if (this.data && this.data.length > 0) {
@@ -291,8 +294,8 @@ class LineFocus {
       this.drawLine();
       this.drawThres();
       this.drawGrid();
-      this.drawRef(peakUp);
-      this.drawPeaks(editPeakSt, editModeSt, peakUp);
+      this.drawRef(layoutSt);
+      this.drawPeaks(editPeakSt, editModeSt, layoutSt);
     }
   }
 }

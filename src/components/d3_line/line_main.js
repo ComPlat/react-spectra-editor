@@ -46,7 +46,7 @@ class LineMain {
   }
 
   create(
-    el, seed, peaks, peakUp, tTrEndPts, tSfPeaks, editPeakSt, editModeSt,
+    el, seed, peaks, tTrEndPts, tSfPeaks, editPeakSt, editModeSt, layoutSt,
     filterSeed, filterPeak, cLabel, xLabel, yLabel,
     updateBorder,
   ) {
@@ -54,8 +54,8 @@ class LineMain {
 
     this.context.create(el, this.svg, seed, updateBorder);
     this.focus.create(
-      el, this.svg, filterSeed, filterPeak, peakUp, tTrEndPts, tSfPeaks,
-      editPeakSt, editModeSt, cLabel,
+      el, this.svg, filterSeed, filterPeak, tTrEndPts, tSfPeaks,
+      editPeakSt, editModeSt, layoutSt, cLabel,
     );
     this.drawLabel(el, cLabel, xLabel, yLabel);
 
@@ -65,13 +65,13 @@ class LineMain {
   }
 
   update(
-    el, seed, peaks, peakUp, tTrEndPts, tSfPeaks, editPeakSt, editModeSt,
+    el, seed, peaks, tTrEndPts, tSfPeaks, editPeakSt, editModeSt, layoutSt,
     filterSeed, filterPeak, cLabel, xLabel, yLabel, isHidden,
   ) {
     this.context.update(el, this.svg, seed);
     this.focus.update(
-      el, this.svg, filterSeed, filterPeak, peakUp, tTrEndPts, tSfPeaks,
-      editPeakSt, editModeSt, null,
+      el, this.svg, filterSeed, filterPeak, tTrEndPts, tSfPeaks,
+      editPeakSt, editModeSt, layoutSt, null,
     );
     this.drawLabel(el, cLabel, xLabel, yLabel);
 

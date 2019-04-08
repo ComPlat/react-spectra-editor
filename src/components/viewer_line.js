@@ -25,7 +25,7 @@ class ViewerLine extends React.Component {
   componentDidMount() {
     const {
       seed, peak, cLabel, xLabel, yLabel, feature,
-      borderSt, tTrEndPts, tSfPeaks, editPeakSt, editModeSt,
+      borderSt, tTrEndPts, tSfPeaks, editPeakSt, editModeSt, layoutSt,
       updateBorderAct, resetAllAct,
     } = this.props;
 
@@ -37,11 +37,11 @@ class ViewerLine extends React.Component {
       node,
       seed,
       peak,
-      feature.peakUp,
       tTrEndPts,
       tSfPeaks,
       editPeakSt,
       editModeSt,
+      layoutSt,
       filterSeed,
       filterPeak,
       cLabel,
@@ -53,8 +53,8 @@ class ViewerLine extends React.Component {
 
   componentDidUpdate(prevProps) {
     const {
-      seed, peak, cLabel, xLabel, yLabel, feature,
-      borderSt, tTrEndPts, tSfPeaks, editPeakSt, editModeSt, isHidden,
+      seed, peak, cLabel, xLabel, yLabel,
+      borderSt, tTrEndPts, tSfPeaks, editPeakSt, editModeSt, layoutSt, isHidden,
     } = this.props;
 
     this.normChange(prevProps);
@@ -65,11 +65,11 @@ class ViewerLine extends React.Component {
       node,
       seed,
       peak,
-      feature.peakUp,
       tTrEndPts,
       tSfPeaks,
       editPeakSt,
       editModeSt,
+      layoutSt,
       filterSeed,
       filterPeak,
       cLabel,
@@ -133,6 +133,7 @@ const mapStateToProps = (state, props) => (
     tSfPeaks: ToShiftPeaks(state, props),
     editPeakSt: state.editPeak,
     editModeSt: state.mode.edit,
+    layoutSt: state.layout,
   }
 );
 
@@ -156,6 +157,7 @@ ViewerLine.propTypes = {
   tSfPeaks: PropTypes.array.isRequired,
   editPeakSt: PropTypes.object.isRequired,
   editModeSt: PropTypes.string.isRequired,
+  layoutSt: PropTypes.string.isRequired,
   updateBorderAct: PropTypes.func.isRequired,
   resetAllAct: PropTypes.func.isRequired,
   clickPointAct: PropTypes.func.isRequired,

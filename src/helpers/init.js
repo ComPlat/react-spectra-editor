@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import d3Tip from 'd3-tip';
+import FN from './format';
 
 const InitScale = (target, reverse = true) => {
   const xRange = reverse ? [target.w, 0] : [0, target.w];
@@ -41,23 +42,24 @@ const tpStyle = () => {
   return style;
 };
 
-const tpDiv = d => (
+const tpDiv = (d, digits) => (
   `
   <div
     class="peak-tp"
     style="${tpStyle()}"
   >
-    <span> x: ${d3.format('.4~s')(d.x)}</span>
+    <span> x: ${FN.fixDigit(d.x, digits)}</span>
     <br/>
     <span> y: ${d3.format('.2~e')(d.y)}</span>
   <div>
   `
 );
 
-const InitTip = () => {
+const InitTip = (typ) => {
+  const digits = FN.spectraDigit(typ);
   const tip = d3Tip()
     .attr('class', 'd3-tip')
-    .html(d => tpDiv(d));
+    .html(d => tpDiv(d, digits));
   return tip;
 };
 

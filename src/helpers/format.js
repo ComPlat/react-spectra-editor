@@ -102,6 +102,7 @@ const Format = {
   isNmrLayout,
   isMsLayout,
   isIrLayout,
+  fixDigit,
 };
 
 export default Format;
