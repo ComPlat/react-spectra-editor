@@ -1,0 +1,29 @@
+import { PREDICT } from '../constants/action_type';
+
+const initialState = {};
+
+const predictReducer = (state = initialState, action) => {
+  switch (action.type) {
+    case PREDICT.INIT_STATUS:
+      if (!action.payload) return state;
+      return Object.assign(
+        {},
+        action.payload.result[0],
+      );
+    case PREDICT.SELECT_IR_STATUS: {
+      const { fg, identity, value } = action.payload;
+      const prevVal = state[fg];
+      const buffVal = { [`status${identity}`]: value };
+      const nextVal = Object.assign({}, prevVal, buffVal);
+      return Object.assign(
+        {},
+        state,
+        { [fg]: nextVal },
+      );
+    }
+    default:
+      return state;
+  }
+};
+
+export default predictReducer;

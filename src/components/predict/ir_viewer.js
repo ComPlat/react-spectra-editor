@@ -21,8 +21,8 @@ import { PksEdit } from '../../helpers/converter';
 import { Convert2Peak } from '../../helpers/chem';
 import { FromManualToOffset } from '../../helpers/shift';
 import {
-  TxtLabel, StatusIcon, ConfidenceLabel,
-} from '../common/comps';
+  TxtLabel, StatusIcon, ConfidenceLabel, SelectStatus,
+} from './comps';
 import SmaToSvg from '../common/chem';
 
 const Styles = () => ({
@@ -53,67 +53,83 @@ const Styles = () => ({
   },
 });
 
+const tableHeader = classes => (
+  <TableHead>
+    <TableRow>
+      <TableCell />
+      <TableCell>
+        {TxtLabel(classes, 'Functional groups', 'txt-prd-table-title')}
+      </TableCell>
+      <TableCell align="left">
+        {TxtLabel(classes, 'SMARTS', 'txt-prd-table-title')}
+      </TableCell>
+      <TableCell align="right">
+        {TxtLabel(classes, 'Machine Confidence', 'txt-prd-table-title')}
+      </TableCell>
+      <TableCell align="right">
+        {TxtLabel(classes, 'Machine', 'txt-prd-table-title')}
+      </TableCell>
+      <TableCell align="right">
+        {TxtLabel(classes, 'Owner', 'txt-prd-table-title')}
+      </TableCell>
+      <TableCell align="right">
+        {TxtLabel(classes, 'Reviewer', 'txt-prd-table-title')}
+      </TableCell>
+    </TableRow>
+  </TableHead>
+);
+
+const tableBodyRow = (classes, idx, fg, value) => (
+  <TableRow key={`${idx}-${fg}`}>
+    <TableCell component="th" scope="row">
+      {TxtLabel(classes, `${idx + 1}`, 'txt-prd-table-content')}
+    </TableCell>
+    <TableCell component="th" scope="row">
+      <SVGInline width="80px" svg={SmaToSvg(fg)} />
+    </TableCell>
+    <TableCell align="left">
+      {TxtLabel(classes, fg, 'txt-prd-table-content')}
+    </TableCell>
+    <TableCell align="right">
+      {
+        ConfidenceLabel(
+          classes, value.confidence, 'txt-prd-table-content',
+        )
+      }
+    </TableCell>
+    <TableCell align="right">
+      {StatusIcon(value.status)}
+    </TableCell>
+    <TableCell align="right">
+      <SelectStatus
+        fg={fg}
+        status={value.statusOwner}
+        identity="Owner"
+      />
+    </TableCell>
+    <TableCell align="right">
+      <SelectStatus
+        fg={fg}
+        status={value.statusReviewer}
+        identity="Reviewer"
+      />
+    </TableCell>
+  </TableRow>
+);
+
 const sectionTable = (classes, predictions) => {
   if (!predictions) return null;
 
   return (
     <Paper className={classes.tableRoot}>
       <Table className={classes.table}>
-        <TableHead>
-          <TableRow>
-            <TableCell />
-            <TableCell>
-              {TxtLabel(classes, 'Functional groups', 'txt-prd-table-title')}
-            </TableCell>
-            <TableCell align="left">
-              {TxtLabel(classes, 'SMARTS', 'txt-prd-table-title')}
-            </TableCell>
-            <TableCell align="right">
-              {TxtLabel(classes, 'Machine Confidence', 'txt-prd-table-title')}
-            </TableCell>
-            <TableCell align="right">
-              {TxtLabel(classes, 'Machine', 'txt-prd-table-title')}
-            </TableCell>
-            <TableCell align="right">
-              {TxtLabel(classes, 'Owner', 'txt-prd-table-title')}
-            </TableCell>
-            <TableCell align="right">
-              {TxtLabel(classes, 'Reviewer', 'txt-prd-table-title')}
-            </TableCell>
-          </TableRow>
-        </TableHead>
+        { tableHeader(classes) }
         <TableBody>
           {
-            predictions.result
-              .map((row, idx) => (
-                <TableRow key={`${idx}-${row.fg}`}>
-                  <TableCell component="th" scope="row">
-                    {TxtLabel(classes, `${idx + 1}`, 'txt-prd-table-content')}
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    <SVGInline width="80px" svg={SmaToSvg(row.fg)} />
-                  </TableCell>
-                  <TableCell align="left">
-                    {TxtLabel(classes, row.fg, 'txt-prd-table-content')}
-                  </TableCell>
-                  <TableCell align="right">
-                    {
-                      ConfidenceLabel(
-                        classes, row.confidence, 'txt-prd-table-content',
-                      )
-                    }
-                  </TableCell>
-                  <TableCell align="right">
-                    {StatusIcon(row.status_machine)}
-                  </TableCell>
-                  <TableCell align="right">
-                    {StatusIcon(row.status_owner)}
-                  </TableCell>
-                  <TableCell align="right">
-                    {StatusIcon(row.status_reviewer)}
-                  </TableCell>
-                </TableRow>
-              ))
+            Object.keys(predictions).map((fg, idx) => {
+              const value = predictions[fg];
+              return tableBodyRow(classes, idx, fg, value);
+            })
           }
         </TableBody>
       </Table>
@@ -162,7 +178,7 @@ const sectionBtn = (classes, molecule, layoutSt, btnCb) => (
 
 const IrViewer = ({
   classes, feature, predictObj, editPeakSt, thresSt,
-  layoutSt, shiftSt,
+  layoutSt, shiftSt, predictSt,
 }) => {
   const { ref, peak } = shiftSt;
 
@@ -171,7 +187,7 @@ const IrViewer = ({
   const peaksEdit = PksEdit(peaks, editPeakSt);
 
   const {
-    btnCb, inputCb, predictions, molecule,
+    btnCb, inputCb, molecule,
   } = predictObj;
 
   const btnFuncCb = () => btnCb(peaksEdit, layoutSt, shiftSt);
@@ -179,7 +195,7 @@ const IrViewer = ({
   return (
     <div className={classNames(classes.root, 'card-predict-viewer')}>
       { sectionBtn(classes, molecule, layoutSt, btnFuncCb) }
-      { sectionTable(classes, predictions) }
+      { sectionTable(classes, predictSt) }
       { sectionInput(classes, molecule, inputCb) }
     </div>
   );
@@ -191,6 +207,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     thresSt: state.threshold,
     layoutSt: state.layout,
     shiftSt: state.shift,
+    predictSt: state.predict,
   }
 );
 
@@ -204,15 +221,10 @@ IrViewer.propTypes = {
   feature: PropTypes.object.isRequired,
   predictObj: PropTypes.object.isRequired,
   editPeakSt: PropTypes.object.isRequired,
-  thresSt: PropTypes.oneOfType(
-    [
-      PropTypes.string,
-      PropTypes.number,
-      PropTypes.bool,
-    ],
-  ).isRequired,
+  thresSt: PropTypes.object.isRequired,
   layoutSt: PropTypes.string.isRequired,
   shiftSt: PropTypes.object.isRequired,
+  predictSt: PropTypes.object.isRequired,
 };
 
 export default compose(
