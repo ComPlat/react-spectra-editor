@@ -20,7 +20,9 @@ import TextField from '@material-ui/core/TextField';
 import { PksEdit } from '../../helpers/converter';
 import { Convert2Peak } from '../../helpers/chem';
 import { FromManualToOffset } from '../../helpers/shift';
-import { TxtLabel, StatusIcon } from '../common/ui';
+import {
+  TxtLabel, StatusIcon, ConfidenceLabel,
+} from '../common/comps';
 import SmaToSvg from '../common/chem';
 
 const Styles = () => ({
@@ -67,7 +69,16 @@ const sectionTable = (classes, predictions) => {
               {TxtLabel(classes, 'SMARTS', 'txt-prd-table-title')}
             </TableCell>
             <TableCell align="right">
-              {TxtLabel(classes, 'Status', 'txt-prd-table-title')}
+              {TxtLabel(classes, 'Machine Confidence', 'txt-prd-table-title')}
+            </TableCell>
+            <TableCell align="right">
+              {TxtLabel(classes, 'Machine', 'txt-prd-table-title')}
+            </TableCell>
+            <TableCell align="right">
+              {TxtLabel(classes, 'Owner', 'txt-prd-table-title')}
+            </TableCell>
+            <TableCell align="right">
+              {TxtLabel(classes, 'Reviewer', 'txt-prd-table-title')}
             </TableCell>
           </TableRow>
         </TableHead>
@@ -80,13 +91,26 @@ const sectionTable = (classes, predictions) => {
                     {TxtLabel(classes, `${idx + 1}`, 'txt-prd-table-content')}
                   </TableCell>
                   <TableCell component="th" scope="row">
-                    <SVGInline width="50%" height="50%" svg={SmaToSvg(row.fg)} />
+                    <SVGInline width="80px" svg={SmaToSvg(row.fg)} />
                   </TableCell>
                   <TableCell align="left">
                     {TxtLabel(classes, row.fg, 'txt-prd-table-content')}
                   </TableCell>
                   <TableCell align="right">
-                    {StatusIcon(row.status)}
+                    {
+                      ConfidenceLabel(
+                        classes, row.confidence, 'txt-prd-table-content',
+                      )
+                    }
+                  </TableCell>
+                  <TableCell align="right">
+                    {StatusIcon(row.status_machine)}
+                  </TableCell>
+                  <TableCell align="right">
+                    {StatusIcon(row.status_owner)}
+                  </TableCell>
+                  <TableCell align="right">
+                    {StatusIcon(row.status_reviewer)}
                   </TableCell>
                 </TableRow>
               ))

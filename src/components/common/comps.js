@@ -72,8 +72,22 @@ const StatusIcon = (status) => {
         </Tooltip>
       );
     default:
-      return <HelpOutline style={{ color: '#5d4037' }} />;
+      return null;
   }
 };
 
-export { TabLabel, TxtLabel, StatusIcon };
+const ConfidenceLabel = (classes, confidence, extClsName = 'txt-label') => {
+  if (!confidence) return <span> - - </span>;
+
+  return (
+    <span
+      className={classNames(classes.txtLabel, extClsName)}
+    >
+      { `${confidence} %` }
+    </span>
+  );
+};
+
+export {
+  TabLabel, TxtLabel, StatusIcon, ConfidenceLabel,
+};
