@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { compose } from 'redux';
+import { connect } from 'react-redux';
+import { bindActionCreators, compose } from 'redux';
 
 import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -10,7 +11,8 @@ import Tab from '@material-ui/core/Tab';
 import ViewerLine from './viewer_line';
 import NmrViewer from './predict/nmr_viewer';
 import IrViewer from './predict/ir_viewer';
-import { TabLabel } from './common/ui';
+import { TabLabel } from './common/comps';
+import { setPanelIdx } from '../actions/ui';
 
 const styles = () => ({
   root: {
@@ -25,71 +27,66 @@ const styles = () => ({
   },
 });
 
-class PredictViewer extends React.Component {
-  constructor(props) {
-    super(props);
+const PredictViewer = ({
+  classes, topic, feature, cLabel, xLabel, yLabel, predictObj,
+  isNmr, isIr, uiSt, setPanelIdxAct,
+}) => {
+  const { panelIdx } = uiSt.viewer;
 
-    this.state = {
-      tabNum: 0,
-    };
-
-    this.onChange = this.onChange.bind(this);
-  }
-
-  onChange(event, tabNum) {
-    this.setState({ tabNum });
-  }
-
-  render() {
-    const {
-      classes, topic, feature, cLabel, xLabel, yLabel, predictObj,
-      isNmr, isIr,
-    } = this.props;
-    const { tabNum } = this.state;
-
-    return (
-      <div className={classes.root}>
-        <AppBar position="static" className={classes.appBar}>
-          <Tabs
-            indicatorColor="primary"
-            textColor="primary"
-            value={tabNum}
-            onChange={this.onChange}
-          >
-            <Tab label={TabLabel(classes, 'Spectrum', 'txt-prd-tab-label')} />
-            <Tab label={TabLabel(classes, 'Analysis', 'txt-prd-tab-label')} />
-          </Tabs>
-        </AppBar>
-        {
-          <ViewerLine
-            topic={topic}
+  return (
+    <div className={classes.root}>
+      <AppBar position="static" className={classes.appBar}>
+        <Tabs
+          indicatorColor="primary"
+          textColor="primary"
+          value={panelIdx}
+          onChange={setPanelIdxAct}
+        >
+          <Tab label={TabLabel(classes, 'Spectrum', 'txt-prd-tab-label')} />
+          <Tab label={TabLabel(classes, 'Analysis', 'txt-prd-tab-label')} />
+        </Tabs>
+      </AppBar>
+      {
+        <ViewerLine
+          topic={topic}
+          feature={feature}
+          cLabel={cLabel}
+          xLabel={xLabel}
+          yLabel={yLabel}
+          isHidden={panelIdx !== 0}
+        />
+      }
+      {
+        panelIdx === 1 && isNmr && (
+          <NmrViewer
             feature={feature}
-            cLabel={cLabel}
-            xLabel={xLabel}
-            yLabel={yLabel}
-            isHidden={tabNum !== 0}
+            predictObj={predictObj}
           />
-        }
-        {
-          tabNum === 1 && isNmr && (
-            <NmrViewer
-              feature={feature}
-              predictObj={predictObj}
-            />
-          )
-        }
-        {
-          tabNum === 1 && isIr && (
-            <IrViewer
-              feature={feature}
-              predictObj={predictObj}
-            />
-          )
-        }
-      </div>
-    );
+        )
+      }
+      {
+        panelIdx === 1 && isIr && (
+          <IrViewer
+            feature={feature}
+            predictObj={predictObj}
+          />
+        )
+      }
+    </div>
+  );
+};
+
+const mapStateToProps = (state, _) => ( // eslint-disable-line
+  {
+    uiSt: state.ui,
   }
-}
+);
+
+const mapDispatchToProps = dispatch => (
+  bindActionCreators({
+    setPanelIdxAct: setPanelIdx,
+  }, dispatch)
+);
 
 PredictViewer.propTypes = {
   classes: PropTypes.object.isRequired,
@@ -101,8 +98,11 @@ PredictViewer.propTypes = {
   predictObj: PropTypes.object.isRequired,
   isNmr: PropTypes.bool.isRequired,
   isIr: PropTypes.bool.isRequired,
+  uiSt: PropTypes.object.isRequired,
+  setPanelIdxAct: PropTypes.func.isRequired,
 };
 
 export default compose(
+  connect(mapStateToProps, mapDispatchToProps),
   withStyles(styles),
 )(PredictViewer);

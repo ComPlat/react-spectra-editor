@@ -8,6 +8,7 @@ import layoutReducer from './reducer_layout';
 import shiftReducer from './reducer_shift';
 import modeReducer from './reducer_mode';
 import scanReducer from './reducer_scan';
+import uiReducer from './reducer_ui';
 
 const rootReducer = combineReducers({
   border: borderReducer,
@@ -19,6 +20,7 @@ const rootReducer = combineReducers({
   shift: shiftReducer,
   mode: modeReducer,
   scan: scanReducer,
+  ui: uiReducer,
 });
 
 export default rootReducer;

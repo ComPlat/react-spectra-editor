@@ -10,7 +10,7 @@ import LocationOnIcon from '@material-ui/icons/LocationOn';
 import AddIcon from '@material-ui/icons/AddCircleOutline';
 import RemoveIcon from '@material-ui/icons/RemoveCircleOutline';
 
-import { TabLabel } from '../common/ui';
+import { TabLabel } from '../common/comps';
 import { LIST_MODE } from '../../constants/list_mode';
 import { setEditMode } from '../../actions/mode';
 

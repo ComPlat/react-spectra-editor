@@ -54,10 +54,30 @@ const extract = (entity, thresSt, scanSt) => {
 
 const LayerPrism = ({
   entity, cLabel, xLabel, yLabel, operations, predictObj,
-  thresSt, scanSt,
+  thresSt, scanSt, uiSt,
 }) => {
   const { topic, feature, hasEdit } = extract(entity, thresSt, scanSt);
   if (!topic) return null;
+
+  const { panelIdx } = uiSt.viewer;
+  if (panelIdx === 1) {
+    return (
+      <div className="react-spectrum-viewer">
+        <Grid container>
+          <Grid item xs={12}>
+            <LayerContent
+              topic={topic}
+              feature={feature}
+              cLabel={cLabel}
+              xLabel={xLabel}
+              yLabel={yLabel}
+              predictObj={predictObj}
+            />
+          </Grid>
+        </Grid>
+      </div>
+    );
+  }
 
   return (
     <div className="react-spectrum-viewer">
@@ -88,6 +108,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     scanSt: state.scan,
     thresSt: state.threshold,
+    uiSt: state.ui,
   }
 );
 
@@ -105,6 +126,7 @@ LayerPrism.propTypes = {
   operations: PropTypes.array.isRequired,
   thresSt: PropTypes.object.isRequired,
   scanSt: PropTypes.object.isRequired,
+  uiSt: PropTypes.object.isRequired,
 };
 
 export default connect(

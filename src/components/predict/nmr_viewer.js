@@ -20,7 +20,7 @@ import Format from '../../helpers/format';
 import { PksEdit } from '../../helpers/converter';
 import { Convert2Peak } from '../../helpers/chem';
 import { FromManualToOffset } from '../../helpers/shift';
-import { TxtLabel, StatusIcon } from '../common/ui';
+import { TxtLabel, StatusIcon } from '../common/comps';
 
 const Styles = () => ({
   root: {
