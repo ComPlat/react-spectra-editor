@@ -6,24 +6,22 @@ import { bindActionCreators, compose } from 'redux';
 import SVGInline from 'react-svg-inline';
 
 import { withStyles } from '@material-ui/core/styles';
-
-import Grid from '@material-ui/core/Grid';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
 
 import { PksEdit } from '../../helpers/converter';
 import { Convert2Peak } from '../../helpers/chem';
 import { FromManualToOffset } from '../../helpers/shift';
 import {
-  TxtLabel, StatusIcon, ConfidenceLabel, SelectStatus,
+  TxtLabel, StatusIcon, ConfidenceLabel, sectionInput, sectionBtn,
 } from './comps';
+import { SelectIrStatus } from './ir_comps';
 import SmaToSvg from '../common/chem';
+import { clearPredictStatus } from '../../actions/predict';
 
 const Styles = () => ({
   root: {
@@ -101,14 +99,14 @@ const tableBodyRow = (classes, idx, fg, value) => (
       {StatusIcon(value.status)}
     </TableCell>
     <TableCell align="right">
-      <SelectStatus
+      <SelectIrStatus
         fg={fg}
         status={value.statusOwner}
         identity="Owner"
       />
     </TableCell>
     <TableCell align="right">
-      <SelectStatus
+      <SelectIrStatus
         fg={fg}
         status={value.statusReviewer}
         identity="Reviewer"
@@ -137,48 +135,9 @@ const sectionTable = (classes, predictions) => {
   );
 };
 
-const sectionInput = (classes, molecule, inputFuncCb) => {
-  if (!inputFuncCb) return null;
-
-  return (
-    <div
-      className={classNames(classes.inputRoot)}
-    >
-      <Grid container>
-        <Grid item xs={6}>
-          <TextField
-            fullWidth
-            label={TxtLabel(classes, 'Molfile', 'txt-mol-label')}
-            margin="normal"
-            multiline
-            onChange={inputFuncCb}
-            rows="2"
-            variant="outlined"
-            value={molecule}
-          />
-        </Grid>
-      </Grid>
-    </div>
-  );
-};
-
-const sectionBtn = (classes, molecule, layoutSt, btnCb) => (
-  <div className={classNames(classes.title)}>
-    <Button
-      variant="contained"
-      color="primary"
-      className={classNames(classes.btn, 'txt-btn-save')}
-      onClick={btnCb}
-      disabled={!molecule}
-    >
-      { `Predict - ${layoutSt}` }
-    </Button>
-  </div>
-);
-
 const IrViewer = ({
-  classes, feature, predictObj, editPeakSt, thresSt,
-  layoutSt, shiftSt, predictSt,
+  classes, feature, molecule, btnCb, inputCb,
+  editPeakSt, thresSt, layoutSt, shiftSt, predictSt, clearPredictStatusAct,
 }) => {
   const { ref, peak } = shiftSt;
 
@@ -186,15 +145,20 @@ const IrViewer = ({
   const peaks = Convert2Peak(feature, thresSt.value * 0.01, offset);
   const peaksEdit = PksEdit(peaks, editPeakSt);
 
-  const {
-    btnCb, inputCb, molecule,
-  } = predictObj;
-
   const btnFuncCb = () => btnCb(peaksEdit, layoutSt, shiftSt);
 
   return (
     <div className={classNames(classes.root, 'card-predict-viewer')}>
-      { sectionBtn(classes, molecule, layoutSt, btnFuncCb) }
+      {
+        sectionBtn(
+          classes,
+          molecule,
+          layoutSt,
+          predictSt,
+          btnFuncCb,
+          clearPredictStatusAct,
+        )
+      }
       { sectionTable(classes, predictSt) }
       { sectionInput(classes, molecule, inputCb) }
     </div>
@@ -213,18 +177,22 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
 
 const mapDispatchToProps = dispatch => (
   bindActionCreators({
+    clearPredictStatusAct: clearPredictStatus,
   }, dispatch)
 );
 
 IrViewer.propTypes = {
   classes: PropTypes.object.isRequired,
   feature: PropTypes.object.isRequired,
-  predictObj: PropTypes.object.isRequired,
+  molecule: PropTypes.string.isRequired,
+  btnCb: PropTypes.func.isRequired,
+  inputCb: PropTypes.func.isRequired,
   editPeakSt: PropTypes.object.isRequired,
   thresSt: PropTypes.object.isRequired,
   layoutSt: PropTypes.string.isRequired,
   shiftSt: PropTypes.object.isRequired,
   predictSt: PropTypes.object.isRequired,
+  clearPredictStatusAct: PropTypes.func.isRequired,
 };
 
 export default compose(

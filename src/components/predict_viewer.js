@@ -13,6 +13,7 @@ import NmrViewer from './predict/nmr_viewer';
 import IrViewer from './predict/ir_viewer';
 import { TabLabel } from './common/comps';
 import { setPanelIdx } from '../actions/ui';
+import { initPredictStatus } from '../actions/predict';
 
 const styles = () => ({
   root: {
@@ -27,54 +28,91 @@ const styles = () => ({
   },
 });
 
-const PredictViewer = ({
-  classes, topic, feature, cLabel, xLabel, yLabel, predictObj,
-  isNmr, isIr, uiSt, setPanelIdxAct,
-}) => {
-  const { panelIdx } = uiSt.viewer;
+class PredictViewer extends React.Component {
+  constructor(props) {
+    super(props);
 
-  return (
-    <div className={classes.root}>
-      <AppBar position="static" className={classes.appBar}>
-        <Tabs
-          indicatorColor="primary"
-          textColor="primary"
-          value={panelIdx}
-          onChange={setPanelIdxAct}
-        >
-          <Tab label={TabLabel(classes, 'Spectrum', 'txt-prd-tab-label')} />
-          <Tab label={TabLabel(classes, 'Analysis', 'txt-prd-tab-label')} />
-        </Tabs>
-      </AppBar>
-      {
-        <ViewerLine
-          topic={topic}
-          feature={feature}
-          cLabel={cLabel}
-          xLabel={xLabel}
-          yLabel={yLabel}
-          isHidden={panelIdx !== 0}
-        />
-      }
-      {
-        panelIdx === 1 && isNmr && (
-          <NmrViewer
+    this.initPredictReducer = this.initPredictReducer.bind(this);
+  }
+
+  componentDidMount() {
+    this.initPredictReducer();
+  }
+
+  componentDidUpdate(prevProps) {
+    const { predictObj, uiSt } = this.props;
+    const { panelIdx } = uiSt.viewer;
+
+    const prevPredictions = predictObj.predictions;
+    const nextPredictions = prevProps.predictObj.predictions;
+    if (panelIdx === 1 && prevPredictions !== nextPredictions) {
+      this.initPredictReducer();
+    }
+  }
+
+  initPredictReducer() {
+    const { predictObj, initPredictStatusAct } = this.props;
+    const { predictions } = predictObj;
+    initPredictStatusAct(predictions);
+  }
+
+  render() {
+    const {
+      classes, topic, feature, cLabel, xLabel, yLabel, predictObj,
+      isNmr, isIr, uiSt, setPanelIdxAct,
+    } = this.props;
+    const { panelIdx } = uiSt.viewer;
+    const {
+      btnCb, inputCb, molecule,
+    } = predictObj;
+
+    return (
+      <div className={classes.root}>
+        <AppBar position="static" className={classes.appBar}>
+          <Tabs
+            indicatorColor="primary"
+            textColor="primary"
+            value={panelIdx}
+            onChange={setPanelIdxAct}
+          >
+            <Tab label={TabLabel(classes, 'Spectrum', 'txt-prd-tab-label')} />
+            <Tab label={TabLabel(classes, 'Analysis', 'txt-prd-tab-label')} />
+          </Tabs>
+        </AppBar>
+        {
+          <ViewerLine
+            topic={topic}
             feature={feature}
-            predictObj={predictObj}
+            cLabel={cLabel}
+            xLabel={xLabel}
+            yLabel={yLabel}
+            isHidden={panelIdx !== 0}
           />
-        )
-      }
-      {
-        panelIdx === 1 && isIr && (
-          <IrViewer
-            feature={feature}
-            predictObj={predictObj}
-          />
-        )
-      }
-    </div>
-  );
-};
+        }
+        {
+          panelIdx === 1 && isNmr && (
+            <NmrViewer
+              feature={feature}
+              molecule={molecule}
+              btnCb={btnCb}
+              inputCb={inputCb}
+            />
+          )
+        }
+        {
+          panelIdx === 1 && isIr && (
+            <IrViewer
+              feature={feature}
+              molecule={molecule}
+              btnCb={btnCb}
+              inputCb={inputCb}
+            />
+          )
+        }
+      </div>
+    );
+  }
+}
 
 const mapStateToProps = (state, _) => ( // eslint-disable-line
   {
@@ -85,6 +123,7 @@ const mapStateToProps = (state, _) => ( // eslint-disable-line
 const mapDispatchToProps = dispatch => (
   bindActionCreators({
     setPanelIdxAct: setPanelIdx,
+    initPredictStatusAct: initPredictStatus,
   }, dispatch)
 );
 
@@ -100,6 +139,7 @@ PredictViewer.propTypes = {
   isIr: PropTypes.bool.isRequired,
   uiSt: PropTypes.object.isRequired,
   setPanelIdxAct: PropTypes.func.isRequired,
+  initPredictStatusAct: PropTypes.func.isRequired,
 };
 
 export default compose(

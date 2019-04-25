@@ -1,4 +1,4 @@
-import { UI } from '../constants/action_type';
+import { UI, MANAGER } from '../constants/action_type';
 
 const initialState = {
   viewer: {
@@ -14,6 +14,8 @@ const uiReducer = (state = initialState, action) => {
           panelIdx: action.payload,
         },
       });
+    case MANAGER.RESETALL:
+      return initialState;
     default:
       return state;
   }

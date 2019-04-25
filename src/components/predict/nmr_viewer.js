@@ -6,21 +6,22 @@ import { bindActionCreators, compose } from 'redux';
 
 import { withStyles } from '@material-ui/core/styles';
 
-import Grid from '@material-ui/core/Grid';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
 
 import Format from '../../helpers/format';
 import { PksEdit } from '../../helpers/converter';
 import { Convert2Peak } from '../../helpers/chem';
 import { FromManualToOffset } from '../../helpers/shift';
-import { TxtLabel, StatusIcon } from './comps';
+import {
+  TxtLabel, StatusIcon, sectionInput, sectionBtn,
+} from './comps';
+import { SelectNmrStatus } from './nmr_comps';
+import { clearPredictStatus } from '../../actions/predict';
 
 const Styles = () => ({
   root: {
@@ -59,66 +60,92 @@ const realFormat = (val, status) => {
   return numFormat(val);
 };
 
+const tableHeader = classes => (
+  <TableHead>
+    <TableRow>
+      <TableCell>
+        {TxtLabel(classes, 'Atom', 'txt-prd-table-title')}
+      </TableCell>
+      <TableCell align="right">
+        {TxtLabel(classes, 'Prediction (ppm)', 'txt-prd-table-title')}
+      </TableCell>
+      <TableCell align="right">
+        {TxtLabel(classes, 'Real (ppm)', 'txt-prd-table-title')}
+      </TableCell>
+      <TableCell align="right">
+        {TxtLabel(classes, 'Diff (ppm)', 'txt-prd-table-title')}
+      </TableCell>
+      <TableCell align="right">
+        {TxtLabel(classes, 'Machine', 'txt-prd-table-title')}
+      </TableCell>
+      <TableCell align="right">
+        {TxtLabel(classes, 'Owner', 'txt-prd-table-title')}
+      </TableCell>
+      <TableCell align="right">
+        {TxtLabel(classes, 'Reviewer', 'txt-prd-table-title')}
+      </TableCell>
+    </TableRow>
+  </TableHead>
+);
+
+const tableBodyRow = (classes, row, idx) => (
+  <TableRow key={`${idx}-${row.atom}`}>
+    <TableCell component="th" scope="row">
+      {TxtLabel(classes, row.atom, 'txt-prd-table-content')}
+    </TableCell>
+    <TableCell align="right">
+      {TxtLabel(classes, numFormat(row.prediction), 'txt-prd-table-content')}
+    </TableCell>
+    <TableCell align="right">
+      {
+        TxtLabel(
+          classes,
+          realFormat(row.real, row.status),
+          'txt-prd-table-content',
+        )
+      }
+    </TableCell>
+    <TableCell align="right">
+      {
+        TxtLabel(
+          classes,
+          realFormat(row.diff, row.status),
+          'txt-prd-table-content',
+        )
+      }
+    </TableCell>
+    <TableCell align="right">
+      {StatusIcon(row.status)}
+    </TableCell>
+    <TableCell align="right">
+      <SelectNmrStatus
+        atom={row.atom}
+        status={row.statusOwner}
+        identity="Owner"
+      />
+    </TableCell>
+    <TableCell align="right">
+      <SelectNmrStatus
+        atom={row.atom}
+        status={row.statusReviewer}
+        identity="Reviewer"
+      />
+    </TableCell>
+  </TableRow>
+);
+
 const sectionTable = (classes, predictions) => {
-  if (!predictions) return null;
+  if (!predictions || !predictions.shifts) return null;
 
   return (
     <Paper className={classes.tableRoot}>
       <Table className={classes.table}>
-        <TableHead>
-          <TableRow>
-            <TableCell>
-              {TxtLabel(classes, 'Atom', 'txt-prd-table-title')}
-            </TableCell>
-            <TableCell align="right">
-              {TxtLabel(classes, 'Prediction (ppm)', 'txt-prd-table-title')}
-            </TableCell>
-            <TableCell align="right">
-              {TxtLabel(classes, 'Real (ppm)', 'txt-prd-table-title')}
-            </TableCell>
-            <TableCell align="right">
-              {TxtLabel(classes, 'Diff (ppm)', 'txt-prd-table-title')}
-            </TableCell>
-            <TableCell align="right">
-              {TxtLabel(classes, 'Status', 'txt-prd-table-title')}
-            </TableCell>
-          </TableRow>
-        </TableHead>
+        { tableHeader(classes) }
         <TableBody>
           {
-            predictions.result[0].shifts
+            predictions.shifts
               .sort((a, b) => a.atom - b.atom)
-              .map((row, idx) => (
-                <TableRow key={`${idx}-${row.atom}`}>
-                  <TableCell component="th" scope="row">
-                    {TxtLabel(classes, row.atom, 'txt-prd-table-content')}
-                  </TableCell>
-                  <TableCell align="right">
-                    {TxtLabel(classes, numFormat(row.prediction), 'txt-prd-table-content')}
-                  </TableCell>
-                  <TableCell align="right">
-                    {
-                      TxtLabel(
-                        classes,
-                        realFormat(row.real, row.status),
-                        'txt-prd-table-content',
-                      )
-                    }
-                  </TableCell>
-                  <TableCell align="right">
-                    {
-                      TxtLabel(
-                        classes,
-                        realFormat(row.diff, row.status),
-                        'txt-prd-table-content',
-                      )
-                    }
-                  </TableCell>
-                  <TableCell align="right">
-                    {StatusIcon(row.status)}
-                  </TableCell>
-                </TableRow>
-              ))
+              .map((row, idx) => tableBodyRow(classes, row, idx))
           }
         </TableBody>
       </Table>
@@ -141,48 +168,9 @@ const sectionReference = classes => (
   </div>
 );
 
-const sectionInput = (classes, molecule, inputFuncCb) => {
-  if (!inputFuncCb) return null;
-
-  return (
-    <div
-      className={classNames(classes.inputRoot)}
-    >
-      <Grid container>
-        <Grid item xs={6}>
-          <TextField
-            fullWidth
-            label={TxtLabel(classes, 'Molfile', 'txt-mol-label')}
-            margin="normal"
-            multiline
-            onChange={inputFuncCb}
-            rows="2"
-            variant="outlined"
-            value={molecule}
-          />
-        </Grid>
-      </Grid>
-    </div>
-  );
-};
-
-const sectionBtn = (classes, molecule, layoutSt, btnCb) => (
-  <div className={classNames(classes.title)}>
-    <Button
-      variant="contained"
-      color="primary"
-      className={classNames(classes.btn, 'txt-btn-save')}
-      onClick={btnCb}
-      disabled={!molecule}
-    >
-      { `Predict - ${layoutSt}` }
-    </Button>
-  </div>
-);
-
 const NmrViewer = ({
-  classes, feature, predictObj, editPeakSt, thresSt,
-  layoutSt, shiftSt,
+  classes, feature, molecule, btnCb, inputCb,
+  editPeakSt, thresSt, layoutSt, shiftSt, predictSt, clearPredictStatusAct,
 }) => {
   const { ref, peak } = shiftSt;
 
@@ -191,16 +179,21 @@ const NmrViewer = ({
   const peaksEdit = PksEdit(peaks, editPeakSt);
   const peaksWoRef = Format.rmRef(peaksEdit, shiftSt);
 
-  const {
-    btnCb, inputCb, predictions, molecule,
-  } = predictObj;
-
   const btnFuncCb = () => btnCb(peaksWoRef, layoutSt, shiftSt);
 
   return (
     <div className={classNames(classes.root, 'card-predict-viewer')}>
-      { sectionBtn(classes, molecule, layoutSt, btnFuncCb) }
-      { sectionTable(classes, predictions) }
+      {
+        sectionBtn(
+          classes,
+          molecule,
+          layoutSt,
+          predictSt,
+          btnFuncCb,
+          clearPredictStatusAct,
+        )
+      }
+      { sectionTable(classes, predictSt) }
       { sectionInput(classes, molecule, inputCb) }
       { sectionReference(classes) }
     </div>
@@ -213,28 +206,28 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     thresSt: state.threshold,
     layoutSt: state.layout,
     shiftSt: state.shift,
+    predictSt: state.predict,
   }
 );
 
 const mapDispatchToProps = dispatch => (
   bindActionCreators({
+    clearPredictStatusAct: clearPredictStatus,
   }, dispatch)
 );
 
 NmrViewer.propTypes = {
   classes: PropTypes.object.isRequired,
   feature: PropTypes.object.isRequired,
-  predictObj: PropTypes.object.isRequired,
+  molecule: PropTypes.string.isRequired,
+  btnCb: PropTypes.func.isRequired,
+  inputCb: PropTypes.func.isRequired,
   editPeakSt: PropTypes.object.isRequired,
-  thresSt: PropTypes.oneOfType(
-    [
-      PropTypes.string,
-      PropTypes.number,
-      PropTypes.bool,
-    ],
-  ).isRequired,
+  thresSt: PropTypes.object.isRequired,
   layoutSt: PropTypes.string.isRequired,
   shiftSt: PropTypes.object.isRequired,
+  predictSt: PropTypes.object.isRequired,
+  clearPredictStatusAct: PropTypes.func.isRequired,
 };
 
 export default compose(

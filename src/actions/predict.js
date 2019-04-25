@@ -7,13 +7,27 @@ const initPredictStatus = payload => (
   }
 );
 
-const selectIrStatus = payload => (
+const setIrStatus = payload => (
   {
-    type: PREDICT.SELECT_IR_STATUS,
+    type: PREDICT.SET_IR_STATUS,
+    payload,
+  }
+);
+
+const setNmrStatus = payload => (
+  {
+    type: PREDICT.SET_NMR_STATUS,
+    payload,
+  }
+);
+
+const clearPredictStatus = payload => (
+  {
+    type: PREDICT.CLEAR_STATUS,
     payload,
   }
 );
 
 export {
-  initPredictStatus, selectIrStatus, // eslint-disable-line
+  initPredictStatus, setIrStatus, setNmrStatus, clearPredictStatus,
 };

@@ -6,7 +6,6 @@ import { bindActionCreators } from 'redux';
 import { withStyles } from '@material-ui/core/styles';
 
 import { resetScanAll } from './actions/scan';
-import { initPredictStatus } from './actions/predict';
 import LayerPrism from './layer_prism';
 
 const styles = () => ({
@@ -47,13 +46,10 @@ class LayerInit extends React.Component {
   render() {
     const {
       entity, cLabel, xLabel, yLabel, operations, predictObj,
-      initPredictStatusAct,
     } = this.props;
 
     const xxLabel = xLabel === '' ? `X (${entity.spectrum.xUnit})` : xLabel;
     const yyLabel = yLabel === '' ? `Y (${entity.spectrum.yUnit})` : yLabel;
-
-    initPredictStatusAct(predictObj.predictions);
 
     return (
       <LayerPrism
@@ -75,7 +71,6 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
 const mapDispatchToProps = dispatch => (
   bindActionCreators({
     resetScanAllAct: resetScanAll,
-    initPredictStatusAct: initPredictStatus,
   }, dispatch)
 );
 
@@ -87,7 +82,6 @@ LayerInit.propTypes = {
   predictObj: PropTypes.object.isRequired,
   operations: PropTypes.array.isRequired,
   resetScanAllAct: PropTypes.func.isRequired,
-  initPredictStatusAct: PropTypes.func.isRequired,
 };
 
 export default connect(

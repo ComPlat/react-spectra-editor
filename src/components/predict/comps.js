@@ -1,8 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 
 import CheckCircleOutline from '@material-ui/icons/CheckCircleOutline';
 import ErrorOutline from '@material-ui/icons/ErrorOutline';
@@ -10,11 +7,9 @@ import HighlightOff from '@material-ui/icons/HighlightOff';
 import HelpOutline from '@material-ui/icons/HelpOutline';
 import Help from '@material-ui/icons/Help';
 import Tooltip from '@material-ui/core/Tooltip';
-import Select from '@material-ui/core/Select';
-import FormControl from '@material-ui/core/FormControl';
-import MenuItem from '@material-ui/core/MenuItem';
-
-import { selectIrStatus } from '../../actions/predict';
+import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
 
 const TxtLabel = (classes, label, extClsName = 'txt-label') => (
   <span
@@ -88,59 +83,52 @@ const ConfidenceLabel = (classes, confidence, extClsName = 'txt-label') => {
   );
 };
 
-const baseSelectStatus = ({
-  fg, status, identity,
-  selectIrStatusAct,
-}) => {
-  const theStatus = ['accept', 'reject'].includes(status) ? status : '';
+const sectionInput = (classes, molecule, inputFuncCb) => {
+  if (!inputFuncCb) return null;
 
   return (
-    <FormControl>
-      <Select
-        value={theStatus}
-        onChange={(e) => {
-          selectIrStatusAct({ fg, identity, value: e.target.value });
-        }}
-      >
-        <MenuItem value="accept">
-          <CheckCircleOutline style={{ color: '#4caf50' }} />
-        </MenuItem>
-        <MenuItem value="reject">
-          <HighlightOff style={{ color: '#e91e63' }} />
-        </MenuItem>
-        <MenuItem value="">
-          <span />
-        </MenuItem>
-      </Select>
-    </FormControl>
+    <div
+      className={classNames(classes.inputRoot)}
+    >
+      <Grid container>
+        <Grid item xs={6}>
+          <TextField
+            fullWidth
+            label={TxtLabel(classes, 'Molfile', 'txt-mol-label')}
+            margin="normal"
+            multiline
+            onChange={inputFuncCb}
+            rows="2"
+            variant="outlined"
+            value={molecule}
+          />
+        </Grid>
+      </Grid>
+    </div>
   );
 };
 
-const bssMapStateToProps = (state, props) => ( // eslint-disable-line
-  {}
-);
+const sectionBtn = (classes, molecule, layoutSt, predictSt, predictCb, clearCb) => {
+  const hasResult = Object.keys(predictSt).length !== 0;
+  const title = hasResult ? 'Clear' : `Predict - ${layoutSt}`;
+  const color = hasResult ? 'secondary' : 'primary';
+  const onClickCb = hasResult ? clearCb : predictCb;
 
-const bssMapDispatchToProps = dispatch => (
-  bindActionCreators({
-    selectIrStatusAct: selectIrStatus,
-  }, dispatch)
-);
-
-baseSelectStatus.propTypes = {
-  fg: PropTypes.string.isRequired,
-  status: PropTypes.string,
-  identity: PropTypes.string.isRequired,
-  selectIrStatusAct: PropTypes.func.isRequired,
+  return (
+    <div className={classNames(classes.title)}>
+      <Button
+        variant="contained"
+        color={color}
+        className={classNames(classes.btn, 'txt-btn-save')}
+        onClick={onClickCb}
+        disabled={!molecule}
+      >
+        { title }
+      </Button>
+    </div>
+  );
 };
-
-baseSelectStatus.defaultProps = {
-  status: '',
-};
-
-const SelectStatus = connect(
-  bssMapStateToProps, bssMapDispatchToProps,
-)(baseSelectStatus);
 
 export {
-  TxtLabel, StatusIcon, ConfidenceLabel, SelectStatus,
+  TxtLabel, StatusIcon, ConfidenceLabel, sectionInput, sectionBtn,
 };
