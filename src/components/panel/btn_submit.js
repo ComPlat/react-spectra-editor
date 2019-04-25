@@ -25,7 +25,7 @@ const styles = () => ({
 
 const onClickCb = (
   operation, peaksEdit, isAscend,
-  scan, thres, layoutSt, shiftSt,
+  scan, thres, layoutSt, shiftSt, predictSt,
 ) => (
   () => {
     operation({
@@ -35,13 +35,14 @@ const onClickCb = (
       scan,
       thres,
       isAscend,
+      analysis: predictSt,
     });
   }
 );
 
 const BtnSubmit = ({
   classes, operation, feature, isAscend, editPeakSt, thresSt, statusSt,
-  layoutSt, shiftSt, scanSt,
+  layoutSt, shiftSt, scanSt, predictSt,
 }) => {
   const { ref, peak } = shiftSt;
 
@@ -67,7 +68,7 @@ const BtnSubmit = ({
         disabled={disable}
         onClick={onClickCb(
           operation.value, peaksEdit, isAscend,
-          scan, thres, layoutSt, shiftSt,
+          scan, thres, layoutSt, shiftSt, predictSt,
         )}
         variant="fab"
       >
@@ -85,6 +86,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     layoutSt: state.layout,
     shiftSt: state.shift,
     scanSt: state.scan,
+    predictSt: state.predict,
   }
 );
 
@@ -109,6 +111,7 @@ BtnSubmit.propTypes = {
   layoutSt: PropTypes.string.isRequired,
   shiftSt: PropTypes.object.isRequired,
   scanSt: PropTypes.object.isRequired,
+  predictSt: PropTypes.object.isRequired,
 };
 
 export default compose(

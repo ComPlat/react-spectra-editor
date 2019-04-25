@@ -39,19 +39,25 @@ class DemoWriteIr extends React.Component {
   }
 
   savePeaks({
-    peaks, layout, shift, isAscend,
+    peaks, layout, shift, isAscend, analysis,
   }) {
     const body = FN.peaksBody(peaks, layout, shift, isAscend);
     /*eslint-disable */
     if (shift.ref.label) {
       const label = this.rmDollarSign(shift.ref.label);
       alert(
-        `Peaks are: ${body}` + '\n' +
+        `Peaks: ${body}` + '\n' +
+        '- - - - - - - - - - -' + '\n' +
+        `Analysis: ${Object.keys(analysis)}` + '\n' +
         '- - - - - - - - - - -' + '\n' +
         `Shift solvent = ${label}, ${shift.ref.value}ppm` + '\n'
       );
     } else {
-      alert(`Peaks are: ${body}`);
+      alert(
+        `Peaks: ${body}` + '\n' +
+        '- - - - - - - - - - -' + '\n' +
+        `Analysis: ${Object.keys(analysis)}` + '\n'
+      );
     }
     /*eslint-disable */
   }
@@ -75,8 +81,8 @@ class DemoWriteIr extends React.Component {
     const { desc, predictions, molecule } = this.state;
 
     const operations = [
-      { name: 'save peaks', value: this.savePeaks },
-      { name: 'write peaks', value: this.writePeaks },
+      { name: 'save', value: this.savePeaks },
+      { name: 'write', value: this.writePeaks },
     ].filter(r => r.value);
 
     const predictObj = {
