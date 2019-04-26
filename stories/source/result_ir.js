@@ -1,7 +1,7 @@
 const resultIr = {
   result: [
     {
-      'C-,:O': {
+      'c-,:C(-,:C)=O': {
         confidence: 85,
         status: 'accept',
       },
@@ -17,11 +17,11 @@ const resultIr = {
         confidence: 93,
         status: 'reject',
       },
-      'c-,:F': {
+      'C-,:N-,:C(-,:C)=O': {
         confidence: 94,
         status: 'accept',
       },
-      CBB: {
+      'c,:O,:P(=S)(,:O,:C),:O,:C': {
         confidence: 0,
         status: 'unknown',
       },
