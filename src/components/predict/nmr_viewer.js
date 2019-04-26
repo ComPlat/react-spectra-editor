@@ -221,13 +221,20 @@ NmrViewer.propTypes = {
   feature: PropTypes.object.isRequired,
   molecule: PropTypes.string.isRequired,
   btnCb: PropTypes.func.isRequired,
-  inputCb: PropTypes.func.isRequired,
+  inputCb: PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.bool,
+  ]),
   editPeakSt: PropTypes.object.isRequired,
   thresSt: PropTypes.object.isRequired,
   layoutSt: PropTypes.string.isRequired,
   shiftSt: PropTypes.object.isRequired,
   predictSt: PropTypes.object.isRequired,
   clearPredictStatusAct: PropTypes.func.isRequired,
+};
+
+NmrViewer.defaultProps = {
+  inputCb: false,
 };
 
 export default compose(
