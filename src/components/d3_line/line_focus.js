@@ -175,7 +175,7 @@ class LineFocus {
     return this.dataPks;
   }
 
-  drawPeaks(editPeakSt, editModeSt, layoutSt) {
+  drawPeaks(editPeakSt, editModeSt) {
     // rescale for zoom
     const { xt, yt } = TfRescale(this);
 
@@ -187,15 +187,15 @@ class LineFocus {
       .remove();
 
     const linePath = [
-      { x: -0.5, y: -5 },
-      { x: -0.5, y: -15 },
-      { x: 0.5, y: -15 },
-      { x: 0.5, y: -5 },
+      { x: -0.5, y: 10 },
+      { x: -0.5, y: -10 },
+      { x: 0.5, y: -10 },
+      { x: 0.5, y: 10 },
     ];
-    const faktor = layoutSt === LIST_LAYOUT.IR ? -1 : 1;
+    // const faktor = layoutSt === LIST_LAYOUT.IR ? -1 : 1;
     const lineSymbol = d3.line()
       .x(d => d.x)
-      .y(d => faktor * d.y)(linePath);
+      .y(d => d.y)(linePath);
 
     ccp.enter()
       .append('path')
