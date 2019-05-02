@@ -81,9 +81,6 @@ const tableHeader = classes => (
       <TableCell align="right">
         {TxtLabel(classes, 'Owner', 'txt-prd-table-title')}
       </TableCell>
-      <TableCell align="right">
-        {TxtLabel(classes, 'Reviewer', 'txt-prd-table-title')}
-      </TableCell>
     </TableRow>
   </TableHead>
 );
@@ -122,13 +119,6 @@ const tableBodyRow = (classes, row, idx) => (
         atom={row.atom}
         status={row.statusOwner}
         identity="Owner"
-      />
-    </TableCell>
-    <TableCell align="right">
-      <SelectNmrStatus
-        atom={row.atom}
-        status={row.statusReviewer}
-        identity="Reviewer"
       />
     </TableCell>
   </TableRow>
