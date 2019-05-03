@@ -73,12 +73,15 @@ const StatusIcon = (status) => {
 
 const ConfidenceLabel = (classes, confidence, extClsName = 'txt-label') => {
   if (!confidence) return <span> - - </span>;
+  const confidenceDp = parseFloat(
+    Math.round(confidence * 100) / 100,
+  ).toFixed(2);
 
   return (
     <span
       className={classNames(classes.txtLabel, extClsName)}
     >
-      { `${confidence} %` }
+      { `${confidenceDp} %` }
     </span>
   );
 };

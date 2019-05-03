@@ -2,15 +2,15 @@ const resultIr = {
   result: [
     {
       'c-,:C(-,:C)=O': {
-        confidence: 85,
+        confidence: 85.11,
         status: 'accept',
       },
       'C-,:C(=O)-,:O-,:C': {
-        confidence: 93,
+        confidence: 93.2,
         status: 'accept',
       },
       'c-,:[Cl]': {
-        confidence: 87,
+        confidence: 87.30,
         status: 'reject',
       },
       'c-,:[N&+](=O)-,:[O&-]': {
@@ -18,7 +18,7 @@ const resultIr = {
         status: 'reject',
       },
       'C-,:N-,:C(-,:C)=O': {
-        confidence: 94,
+        confidence: 94.12345,
         status: 'accept',
       },
       'c,:O,:P(=S)(,:O,:C),:O,:C': {
