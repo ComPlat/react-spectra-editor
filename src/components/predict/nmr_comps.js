@@ -12,7 +12,7 @@ import HighlightOff from '@material-ui/icons/HighlightOff';
 import { setNmrStatus } from '../../actions/predict';
 
 const baseSelectNmrStatus = ({
-  atom, status, identity,
+  idx, atom, status, identity,
   setNmrStatusAct,
 }) => {
   const theStatus = ['accept', 'reject'].includes(status) ? status : '';
@@ -22,7 +22,9 @@ const baseSelectNmrStatus = ({
       <Select
         value={theStatus}
         onChange={(e) => {
-          setNmrStatusAct({ atom, identity, value: e.target.value });
+          setNmrStatusAct({
+            idx, atom, identity, value: e.target.value,
+          });
         }}
       >
         <MenuItem value="accept">
@@ -50,6 +52,7 @@ const bssMapDispatchToProps = dispatch => (
 );
 
 baseSelectNmrStatus.propTypes = {
+  idx: PropTypes.number.isRequired,
   atom: PropTypes.number.isRequired,
   status: PropTypes.string,
   identity: PropTypes.string.isRequired,

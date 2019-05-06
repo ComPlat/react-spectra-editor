@@ -22,10 +22,12 @@ const predictReducer = (state = initialState, action) => {
       );
     }
     case PREDICT.SET_NMR_STATUS: {
-      const { atom, identity, value } = action.payload;
+      const {
+        idx, atom, identity, value,
+      } = action.payload;
       const { shifts } = state;
-      const nextShifts = shifts.map((s) => {
-        if (s.atom === atom) {
+      const nextShifts = shifts.map((s, index) => {
+        if (s.atom === atom && index === idx) {
           return Object.assign({}, s, { [`status${identity}`]: value });
         }
         return s;

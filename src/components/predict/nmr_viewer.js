@@ -116,6 +116,7 @@ const tableBodyRow = (classes, row, idx) => (
     </TableCell>
     <TableCell align="right">
       <SelectNmrStatus
+        idx={idx}
         atom={row.atom}
         status={row.statusOwner}
         identity="Owner"
