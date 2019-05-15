@@ -59,11 +59,11 @@ class PredictViewer extends React.Component {
   render() {
     const {
       classes, topic, feature, cLabel, xLabel, yLabel, predictObj,
-      isNmr, isIr, uiSt, setPanelIdxAct,
+      isNmr, isIr, operations, uiSt, setPanelIdxAct,
     } = this.props;
     const { panelIdx } = uiSt.viewer;
     const {
-      btnCb, inputCb, molecule,
+      inputCb, molecule,
     } = predictObj;
 
     return (
@@ -94,7 +94,7 @@ class PredictViewer extends React.Component {
             <NmrViewer
               feature={feature}
               molecule={molecule}
-              btnCb={btnCb}
+              operations={operations}
               inputCb={inputCb}
             />
           )
@@ -104,7 +104,7 @@ class PredictViewer extends React.Component {
             <IrViewer
               feature={feature}
               molecule={molecule}
-              btnCb={btnCb}
+              operations={operations}
               inputCb={inputCb}
             />
           )
@@ -137,6 +137,7 @@ PredictViewer.propTypes = {
   predictObj: PropTypes.object.isRequired,
   isNmr: PropTypes.bool.isRequired,
   isIr: PropTypes.bool.isRequired,
+  operations: PropTypes.array.isRequired,
   uiSt: PropTypes.object.isRequired,
   setPanelIdxAct: PropTypes.func.isRequired,
   initPredictStatusAct: PropTypes.func.isRequired,

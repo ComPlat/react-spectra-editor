@@ -13,16 +13,12 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
-import { PksEdit } from '../../helpers/converter';
-import { Convert2Peak } from '../../helpers/chem';
-import { FromManualToOffset } from '../../helpers/shift';
 import {
   TxtLabel, StatusIcon, ConfidenceLabel,
-  sectionInput, sectionBtn, SectionRunning,
+  sectionInput, sectionSubmit, SectionRunning,
 } from './comps';
 import { SelectIrStatus } from './ir_comps';
 import SmaToSvg from '../common/chem';
-import { clearPredictStatus } from '../../actions/predict';
 
 const Styles = () => ({
   root: {
@@ -49,6 +45,10 @@ const Styles = () => ({
   },
   txtLabel: {
     fontSize: '12px',
+  },
+  submit: {
+    margin: '0 0 0 30px',
+    width: 300,
   },
 });
 
@@ -128,48 +128,23 @@ const sectionTable = (classes, predictions) => {
 };
 
 const IrViewer = ({
-  classes, feature, molecule, btnCb, inputCb,
-  editPeakSt, thresSt, layoutSt, shiftSt, predictSt, clearPredictStatusAct,
-}) => {
-  const { ref, peak } = shiftSt;
-
-  const offset = FromManualToOffset(ref, peak);
-  const peaks = Convert2Peak(feature, thresSt.value * 0.01, offset);
-  const peaksEdit = PksEdit(peaks, editPeakSt);
-
-  const btnFuncCb = () => btnCb(peaksEdit, layoutSt, shiftSt);
-
-  return (
-    <div className={classNames(classes.root, 'card-predict-viewer')}>
-      {
-        sectionBtn(
-          classes,
-          molecule,
-          layoutSt,
-          predictSt,
-          btnFuncCb,
-          clearPredictStatusAct,
-        )
-      }
-      { sectionTable(classes, predictSt) }
-      { sectionInput(classes, molecule, inputCb) }
-    </div>
-  );
-};
+  classes, feature, molecule, operations, inputCb, predictSt,
+}) => (
+  <div className={classNames(classes.root, 'card-predict-viewer')}>
+    { sectionSubmit(classes, operations, feature, molecule) }
+    { sectionTable(classes, predictSt) }
+    { sectionInput(classes, molecule, inputCb) }
+  </div>
+);
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
-    editPeakSt: state.editPeak,
-    thresSt: state.threshold,
-    layoutSt: state.layout,
-    shiftSt: state.shift,
     predictSt: state.predict,
   }
 );
 
 const mapDispatchToProps = dispatch => (
   bindActionCreators({
-    clearPredictStatusAct: clearPredictStatus,
   }, dispatch)
 );
 
@@ -177,17 +152,12 @@ IrViewer.propTypes = {
   classes: PropTypes.object.isRequired,
   feature: PropTypes.object.isRequired,
   molecule: PropTypes.string.isRequired,
-  btnCb: PropTypes.func.isRequired,
+  operations: PropTypes.array.isRequired,
   inputCb: PropTypes.oneOfType([
     PropTypes.func,
     PropTypes.bool,
   ]),
-  editPeakSt: PropTypes.object.isRequired,
-  thresSt: PropTypes.object.isRequired,
-  layoutSt: PropTypes.string.isRequired,
-  shiftSt: PropTypes.object.isRequired,
   predictSt: PropTypes.object.isRequired,
-  clearPredictStatusAct: PropTypes.func.isRequired,
 };
 
 IrViewer.defaultProps = {

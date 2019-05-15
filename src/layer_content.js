@@ -21,7 +21,7 @@ const extractLayout = (predictObj, layoutSt) => {
 };
 
 const Content = ({
-  topic, feature, cLabel, xLabel, yLabel, predictObj, layoutSt,
+  topic, feature, cLabel, xLabel, yLabel, predictObj, operations, layoutSt,
 }) => {
   const {
     showPredict, isNmr, isIr,
@@ -38,6 +38,7 @@ const Content = ({
         predictObj={predictObj}
         isNmr={isNmr}
         isIr={isIr}
+        operations={operations}
       />
     );
   }
@@ -85,6 +86,7 @@ Content.propTypes = {
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
   predictObj: PropTypes.object.isRequired,
+  operations: PropTypes.array.isRequired,
   layoutSt: PropTypes.string.isRequired,
 };
 

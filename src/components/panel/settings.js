@@ -36,7 +36,7 @@ const title = classes => (
 const SettingsPanel = ({
   classes, feature, hasEdit, operations,
 }) => (
-  <ExpansionPanel defaultExpanded >
+  <ExpansionPanel defaultExpanded>
     { title(classes) }
     <LayoutPanel />
     <Divider />
@@ -49,6 +49,7 @@ const SettingsPanel = ({
       operations={operations}
       feature={feature}
       hideSwitch={false}
+      disabled={false}
     />
   </ExpansionPanel>
 );

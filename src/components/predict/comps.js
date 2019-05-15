@@ -11,6 +11,8 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 
+import SubmitPanel from '../panel/submit';
+
 const titleStyle = {
   backgroundColor: '#f5f5f5',
   border: '2px solid #e3e3e3',
@@ -137,28 +139,24 @@ const sectionInput = (classes, molecule, inputFuncCb) => {
   );
 };
 
-const sectionBtn = (classes, molecule, layoutSt, predictSt, predictCb, clearCb) => {
-  const hasResult = Object.keys(predictSt).length !== 0;
-  const title = hasResult ? 'Clear' : `Predict - ${layoutSt}`;
-  const color = hasResult ? 'secondary' : 'primary';
-  const onClickCb = hasResult ? clearCb : predictCb;
+const sectionSubmit = (classes, operations, feature, molecule) => {
+  const disBtn = !molecule;
 
   return (
-    <div className={classNames(classes.title)}>
-      <Button
-        variant="contained"
-        color={color}
-        className={classNames(classes.btn, 'txt-btn-save')}
-        onClick={onClickCb}
-        disabled={!molecule}
-      >
-        { title }
-      </Button>
+    <div
+      className={classNames(classes.submit)}
+    >
+      <SubmitPanel
+        operations={operations}
+        feature={feature}
+        hideSwitch
+        disabled={disBtn}
+      />
     </div>
   );
 };
 
 export {
   TxtLabel, StatusIcon, ConfidenceLabel,
-  sectionInput, sectionBtn, SectionRunning,
+  sectionInput, sectionSubmit, SectionRunning,
 };

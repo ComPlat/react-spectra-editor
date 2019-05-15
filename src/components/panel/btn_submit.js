@@ -4,7 +4,6 @@ import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
 
-import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 import PlayCircleOutline from '@material-ui/icons/PlayCircleOutline';
 import { withStyles } from '@material-ui/core/styles';
@@ -41,40 +40,33 @@ const onClickCb = (
 );
 
 const BtnSubmit = ({
-  classes, operation, feature, isAscend, editPeakSt, thresSt, statusSt,
-  layoutSt, shiftSt, scanSt, predictSt,
+  classes, operation, feature, isAscend, disabled,
+  editPeakSt, thresSt, statusSt, layoutSt, shiftSt, scanSt, predictSt,
 }) => {
   const { ref, peak } = shiftSt;
 
   const offset = FromManualToOffset(ref, peak);
   const peaks = Convert2Peak(feature, thresSt.value, offset);
   const peaksEdit = PksEdit(peaks, editPeakSt);
-  const disable = peaksEdit.length === 0 || statusSt.btnSubmit;
+  const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
   const scan = Convert2Scan(feature, scanSt);
   const thres = Convert2Thres(feature, thresSt);
 
   if (!operation) return null;
 
   return (
-    <Tooltip
-      title={<span className="txt-sv-tp">Execute</span>}
-      placement="bottom"
-      disableFocusListener
-      disableTouchListener
+    <IconButton
+      className={classNames(classes.btn)}
+      color="primary"
+      onClick={onClickCb(
+        operation.value, peaksEdit, isAscend,
+        scan, thres, layoutSt, shiftSt, predictSt,
+      )}
+      variant="fab"
+      disabled={disBtn}
     >
-      <IconButton
-        className={classNames(classes.btn)}
-        color="primary"
-        disabled={disable}
-        onClick={onClickCb(
-          operation.value, peaksEdit, isAscend,
-          scan, thres, layoutSt, shiftSt, predictSt,
-        )}
-        variant="fab"
-      >
-        <PlayCircleOutline className={classes.icon} />
-      </IconButton>
-    </Tooltip>
+      <PlayCircleOutline className={classes.icon} />
+    </IconButton>
   );
 };
 
@@ -105,6 +97,7 @@ BtnSubmit.propTypes = {
       PropTypes.bool,
     ],
   ).isRequired,
+  disabled: PropTypes.bool.isRequired,
   editPeakSt: PropTypes.object.isRequired,
   statusSt: PropTypes.object.isRequired,
   thresSt: PropTypes.object.isRequired,

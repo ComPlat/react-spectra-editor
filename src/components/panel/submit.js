@@ -4,9 +4,7 @@ import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
 
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Grid from '@material-ui/core/Grid';
-import Tooltip from '@material-ui/core/Tooltip';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
@@ -35,20 +33,13 @@ const operationSelect = (
   const selectedValue = operation.name || operations[0].name;
 
   return (
-    <Tooltip
-      title={<span className="txt-sv-tp">Operation</span>}
-      placement="left"
-      disableFocusListener
-      disableTouchListener
+    <FormControl
+      className={classNames(classes.formControl)}
     >
-      <FormControl
-        className={classNames(classes.formControl)}
-      >
-        <Select value={selectedValue} onChange={onChangeSelect}>
-          { options }
-        </Select>
-      </FormControl>
-    </Tooltip>
+      <Select value={selectedValue} onChange={onChangeSelect}>
+        { options }
+      </Select>
+    </FormControl>
   );
 };
 
@@ -63,7 +54,8 @@ const selectOperation = (name, operations, updateOperationAct) => {
 };
 
 const SubmitPanel = ({
-  operations, classes, feature, isAscendSt, operationSt, hideSwitch,
+  operations, classes, feature, hideSwitch, disabled,
+  isAscendSt, operationSt,
   toggleIsAscendAct, updateOperationAct,
 }) => {
   const onChangeSelect = e => (
@@ -73,42 +65,41 @@ const SubmitPanel = ({
   if (!operations || operations.length === 0) return null;
 
   return (
-    <ExpansionPanelDetails>
-      <Grid
-        container
-        direction="row"
-        justify="center"
-        alignItems="center"
-      >
-        {
-          hideSwitch
-            ? null
-            : (
-              <Grid item xs={12}>
-                <SwitchSequence
-                  isAscend={isAscendSt}
-                  onToggleSwitch={toggleIsAscendAct}
-                />
-              </Grid>
-            )
-        }
+    <Grid
+      container
+      direction="row"
+      justify="center"
+      alignItems="center"
+    >
+      {
+        hideSwitch
+          ? null
+          : (
+            <Grid item xs={12}>
+              <SwitchSequence
+                isAscend={isAscendSt}
+                onToggleSwitch={toggleIsAscendAct}
+              />
+            </Grid>
+          )
+      }
 
-        <Grid item xs={8}>
-          {
-            operationSelect(
-              classes, operations, operationSt, onChangeSelect,
-            )
-          }
-        </Grid>
-        <Grid item xs={4}>
-          <BtnSubmit
-            feature={feature}
-            isAscend={isAscendSt}
-            operation={operationSt}
-          />
-        </Grid>
+      <Grid item xs={8}>
+        {
+          operationSelect(
+            classes, operations, operationSt, onChangeSelect,
+          )
+        }
       </Grid>
-    </ExpansionPanelDetails>
+      <Grid item xs={4}>
+        <BtnSubmit
+          feature={feature}
+          isAscend={isAscendSt}
+          operation={operationSt}
+          disabled={disabled}
+        />
+      </Grid>
+    </Grid>
   );
 };
 
@@ -131,6 +122,7 @@ SubmitPanel.propTypes = {
   feature: PropTypes.object.isRequired,
   operations: PropTypes.array.isRequired,
   hideSwitch: PropTypes.bool.isRequired,
+  disabled: PropTypes.bool.isRequired,
   isAscendSt: PropTypes.bool.isRequired,
   operationSt: PropTypes.object.isRequired,
   toggleIsAscendAct: PropTypes.func.isRequired,

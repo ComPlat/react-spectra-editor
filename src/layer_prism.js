@@ -72,6 +72,7 @@ const LayerPrism = ({
               xLabel={xLabel}
               yLabel={yLabel}
               predictObj={predictObj}
+              operations={operations}
             />
           </Grid>
         </Grid>
@@ -90,6 +91,7 @@ const LayerPrism = ({
             xLabel={xLabel}
             yLabel={yLabel}
             predictObj={predictObj}
+            operations={operations}
           />
         </Grid>
         <Grid item xs={3} align="center">
