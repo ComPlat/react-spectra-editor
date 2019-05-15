@@ -17,7 +17,8 @@ import { PksEdit } from '../../helpers/converter';
 import { Convert2Peak } from '../../helpers/chem';
 import { FromManualToOffset } from '../../helpers/shift';
 import {
-  TxtLabel, StatusIcon, ConfidenceLabel, sectionInput, sectionBtn,
+  TxtLabel, StatusIcon, ConfidenceLabel,
+  sectionInput, sectionBtn, SectionRunning,
 } from './comps';
 import { SelectIrStatus } from './ir_comps';
 import SmaToSvg from '../common/chem';
@@ -107,6 +108,7 @@ const tableBodyRow = (classes, idx, fg, value) => (
 
 const sectionTable = (classes, predictions) => {
   if (!predictions) return null;
+  if (predictions.running) return <SectionRunning />;
 
   return (
     <Paper className={classes.tableRoot}>

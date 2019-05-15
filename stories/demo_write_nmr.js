@@ -21,7 +21,7 @@ class DemoWriteNmr extends React.Component {
 
     this.writePeaks = this.writePeaks.bind(this);
     this.savePeaks = this.savePeaks.bind(this);
-    this.predict = this.predict.bind(this);
+    this.predictOp = this.predictOp.bind(this);
     this.updatInput = this.updatInput.bind(this);
   }
 
@@ -62,14 +62,15 @@ class DemoWriteNmr extends React.Component {
     /*eslint-disable */
   }
 
-  predict(peaks, layout, _) {
+  predictOp(peaks, layout, _) {
     const { molecule } = this.state;
+    const predictions = { result: [{ running: true, shifts: true }] };
 
-    this.setState({ predictions: false });
+    this.setState({ predictions });
     // simulate fetching...
     setTimeout(() => {
       this.setState({ predictions: resultNmr });
-    }, 1000);
+    }, 2000);
   }
 
   updatInput(e) {
@@ -83,10 +84,11 @@ class DemoWriteNmr extends React.Component {
     const operations = [
       { name: 'save', value: this.savePeaks },
       { name: 'write', value: this.writePeaks },
+      { name: 'predict', value: this.predictOp },
     ].filter(r => r.value);
 
     const predictObj = {
-      btnCb: this.predict,
+      btnCb: this.predictOp,
       inputCb: this.updatInput,
       molecule: molecule,
       predictions,

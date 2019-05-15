@@ -18,7 +18,8 @@ import { PksEdit } from '../../helpers/converter';
 import { Convert2Peak } from '../../helpers/chem';
 import { FromManualToOffset } from '../../helpers/shift';
 import {
-  TxtLabel, StatusIcon, sectionInput, sectionBtn,
+  TxtLabel, StatusIcon,
+  sectionInput, sectionBtn, SectionRunning,
 } from './comps';
 import { SelectNmrStatus } from './nmr_comps';
 import { clearPredictStatus } from '../../actions/predict';
@@ -127,6 +128,7 @@ const tableBodyRow = (classes, row, idx) => (
 
 const sectionTable = (classes, predictions) => {
   if (!predictions || !predictions.shifts) return null;
+  if (predictions.running) return <SectionRunning />;
 
   return (
     <Paper className={classes.tableRoot}>

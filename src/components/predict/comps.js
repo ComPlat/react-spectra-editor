@@ -11,6 +11,32 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 
+const titleStyle = {
+  backgroundColor: '#f5f5f5',
+  border: '2px solid #e3e3e3',
+  borderRadius: '10px',
+  height: 150,
+  lineHeight: '150px',
+  marginBottom: 10,
+  marginTop: 10,
+  marginLeft: 40,
+  textAlign: 'center',
+  width: '70%',
+};
+
+const txtStyle = {
+  lineHeight: '40px',
+};
+
+const SectionRunning = () => (
+  <div style={titleStyle}>
+    <h2 style={txtStyle}>
+      <p>The server is making predictions...</p>
+      <p>Please check it later.</p>
+    </h2>
+  </div>
+);
+
 const TxtLabel = (classes, label, extClsName = 'txt-label') => (
   <span
     className={classNames(classes.txtLabel, extClsName)}
@@ -133,5 +159,6 @@ const sectionBtn = (classes, molecule, layoutSt, predictSt, predictCb, clearCb) 
 };
 
 export {
-  TxtLabel, StatusIcon, ConfidenceLabel, sectionInput, sectionBtn,
+  TxtLabel, StatusIcon, ConfidenceLabel,
+  sectionInput, sectionBtn, SectionRunning,
 };
