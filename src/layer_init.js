@@ -5,6 +5,7 @@ import { bindActionCreators } from 'redux';
 
 import { withStyles } from '@material-ui/core/styles';
 
+import { updateOperation } from './actions/submit';
 import { resetScanAll } from './actions/scan';
 import LayerPrism from './layer_prism';
 
@@ -17,10 +18,12 @@ class LayerInit extends React.Component {
 
     this.normChange = this.normChange.bind(this);
     this.execReset = this.execReset.bind(this);
+    this.initReducer = this.initReducer.bind(this);
   }
 
   componentDidMount() {
     this.execReset();
+    this.initReducer();
   }
 
   componentDidUpdate(prevProps) {
@@ -41,6 +44,11 @@ class LayerInit extends React.Component {
     const { entity, resetScanAllAct } = this.props;
     const baseFeat = entity.features[0];
     resetScanAllAct(baseFeat);
+  }
+
+  initReducer() {
+    const { operations, updateOperationAct } = this.props;
+    updateOperationAct(operations[0]);
   }
 
   render() {
@@ -71,6 +79,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
 const mapDispatchToProps = dispatch => (
   bindActionCreators({
     resetScanAllAct: resetScanAll,
+    updateOperationAct: updateOperation,
   }, dispatch)
 );
 
@@ -82,6 +91,7 @@ LayerInit.propTypes = {
   predictObj: PropTypes.object.isRequired,
   operations: PropTypes.array.isRequired,
   resetScanAllAct: PropTypes.func.isRequired,
+  updateOperationAct: PropTypes.func.isRequired,
 };
 
 export default connect(

@@ -12,7 +12,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import { withStyles } from '@material-ui/core/styles';
 
-import { enableAllBtn } from '../../actions/status';
+import { toggleIsAscend, updateOperation } from '../../actions/submit';
 import SwitchSequence from './switch_sequence';
 import BtnSubmit from './btn_submit';
 
@@ -52,93 +52,77 @@ const operationSelect = (
   );
 };
 
-class SubmitPanel extends React.Component {
-  constructor(props) {
-    super(props);
+const selectOperation = (name, operations, updateOperationAct) => {
+  let operation = false;
+  operations.forEach((o) => {
+    if (o.name === name) {
+      operation = o;
+    }
+  });
+  updateOperationAct(operation);
+};
 
-    this.state = {
-      isAscend: true,
-      operation: false,
-    };
+const SubmitPanel = ({
+  operations, classes, feature, isAscendSt, operationSt, hideSwitch,
+  toggleIsAscendAct, updateOperationAct,
+}) => {
+  const onChangeSelect = e => (
+    selectOperation(e.target.value, operations, updateOperationAct)
+  );
 
-    this.updateOperation = this.updateOperation.bind(this);
-    this.onToggleSwitch = this.onToggleSwitch.bind(this);
-  }
+  if (!operations || operations.length === 0) return null;
 
-  componentDidMount() {
-    const { operations } = this.props;
-    this.setState({ operation: operations[0] }); // eslint-disable-line
-  }
+  return (
+    <ExpansionPanelDetails>
+      <Grid
+        container
+        direction="row"
+        justify="center"
+        alignItems="center"
+      >
+        {
+          hideSwitch
+            ? null
+            : (
+              <Grid item xs={12}>
+                <SwitchSequence
+                  isAscend={isAscendSt}
+                  onToggleSwitch={toggleIsAscendAct}
+                />
+              </Grid>
+            )
+        }
 
-  onToggleSwitch() {
-    const { isAscend } = this.state;
-    const { enableAllBtnAct } = this.props;
-    enableAllBtnAct();
-    this.setState({ isAscend: !isAscend });
-  }
-
-  updateOperation(name) {
-    const { operations } = this.props;
-    let operation = false;
-    operations.forEach((o) => {
-      if (o.name === name) {
-        operation = o;
-      }
-    });
-    this.setState({ operation });
-  }
-
-  render() {
-    const {
-      operations, classes, feature,
-    } = this.props;
-    const { isAscend, operation } = this.state;
-
-    const onChangeSelect = e => this.updateOperation(e.target.value);
-
-    if (!operations || operations.length === 0) return null;
-
-    return (
-      <ExpansionPanelDetails>
-        <Grid
-          container
-          direction="row"
-          justify="center"
-          alignItems="center"
-        >
-          <Grid item xs={12}>
-            <SwitchSequence
-              isAscend={isAscend}
-              onToggleSwitch={this.onToggleSwitch}
-            />
-          </Grid>
-          <Grid item xs={8}>
-            {
-              operationSelect(
-                classes, operations, operation, onChangeSelect,
-              )
-            }
-          </Grid>
-          <Grid item xs={4}>
-            <BtnSubmit
-              isAscend={isAscend}
-              feature={feature}
-              operation={operation}
-            />
-          </Grid>
+        <Grid item xs={8}>
+          {
+            operationSelect(
+              classes, operations, operationSt, onChangeSelect,
+            )
+          }
         </Grid>
-      </ExpansionPanelDetails>
-    );
-  }
-}
+        <Grid item xs={4}>
+          <BtnSubmit
+            feature={feature}
+            isAscend={isAscendSt}
+            operation={operationSt}
+          />
+        </Grid>
+      </Grid>
+    </ExpansionPanelDetails>
+  );
+};
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
-  {}
+  {
+    isAscendSt: state.submit.isAscend,
+    operationSt: state.submit.operation,
+  }
 );
 
 const mapDispatchToProps = dispatch => (
   bindActionCreators({
-    enableAllBtnAct: enableAllBtn,
+    toggleIsAscendAct: toggleIsAscend,
+    updateOperationAct: updateOperation,
   }, dispatch)
 );
 
@@ -146,7 +130,11 @@ SubmitPanel.propTypes = {
   classes: PropTypes.object.isRequired,
   feature: PropTypes.object.isRequired,
   operations: PropTypes.array.isRequired,
-  enableAllBtnAct: PropTypes.func.isRequired,
+  hideSwitch: PropTypes.bool.isRequired,
+  isAscendSt: PropTypes.bool.isRequired,
+  operationSt: PropTypes.object.isRequired,
+  toggleIsAscendAct: PropTypes.func.isRequired,
+  updateOperationAct: PropTypes.func.isRequired,
 };
 
 export default compose(

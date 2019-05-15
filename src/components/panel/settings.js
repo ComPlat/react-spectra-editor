@@ -48,6 +48,7 @@ const SettingsPanel = ({
     <SubmitPanel
       operations={operations}
       feature={feature}
+      hideSwitch={false}
     />
   </ExpansionPanel>
 );

@@ -10,6 +10,7 @@ import modeReducer from './reducer_mode';
 import scanReducer from './reducer_scan';
 import predictReducer from './reducer_predict';
 import uiReducer from './reducer_ui';
+import submitReducer from './reducer_submit';
 
 const rootReducer = combineReducers({
   border: borderReducer,
@@ -23,6 +24,7 @@ const rootReducer = combineReducers({
   scan: scanReducer,
   predict: predictReducer,
   ui: uiReducer,
+  submit: submitReducer,
 });
 
 export default rootReducer;
