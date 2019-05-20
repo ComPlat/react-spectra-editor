@@ -5,12 +5,16 @@ const initialState = {
   operation: { name: 'empty' },
 };
 
+const updateOperation = action => (
+  { operation: action.payload || initialState.operation }
+);
+
 const submitReducer = (state = initialState, action) => {
   switch (action.type) {
     case SUBMIT.TOGGLE_IS_ASCEND:
       return Object.assign({}, state, { isAscend: !state.isAscend });
     case SUBMIT.UPDATE_OPERATION:
-      return Object.assign({}, state, { operation: action.payload });
+      return Object.assign({}, state, updateOperation(action));
     default:
       return state;
   }
