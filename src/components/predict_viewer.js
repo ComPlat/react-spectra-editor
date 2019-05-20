@@ -45,7 +45,7 @@ class PredictViewer extends React.Component {
 
     const prevPredictions = predictObj.predictions;
     const nextPredictions = prevProps.predictObj.predictions;
-    if (panelIdx === 1 && prevPredictions !== nextPredictions) {
+    if (prevPredictions !== nextPredictions) {
       this.initPredictReducer();
     }
   }
