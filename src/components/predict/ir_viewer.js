@@ -106,9 +106,10 @@ const tableBodyRow = (classes, idx, fg, value) => (
   </TableRow>
 );
 
-const sectionTable = (classes, predictions) => {
-  if (!predictions) return null;
-  if (predictions.running) return <SectionRunning />;
+const sectionTable = (classes, pds) => {
+  if (pds.running) return <SectionRunning />;
+  if (!pds.output.result[0]) return null;
+  const dict = pds.output.result[0];
 
   return (
     <Paper className={classes.tableRoot}>
@@ -116,8 +117,8 @@ const sectionTable = (classes, predictions) => {
         { tableHeader(classes) }
         <TableBody>
           {
-            Object.keys(predictions).map((fg, idx) => {
-              const value = predictions[fg];
+            Object.keys(dict).map((fg, idx) => {
+              const value = dict[fg];
               return tableBodyRow(classes, idx, fg, value);
             })
           }

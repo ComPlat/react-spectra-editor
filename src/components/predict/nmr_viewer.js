@@ -125,9 +125,10 @@ const tableBodyRow = (classes, row, idx) => (
   </TableRow>
 );
 
-const sectionTable = (classes, predictions) => {
-  if (!predictions || !predictions.shifts) return null;
-  if (predictions.running) return <SectionRunning />;
+const sectionTable = (classes, pds) => {
+  if (pds.running) return <SectionRunning />;
+  if (!pds.output.result[0]) return null;
+  const dict = pds.output.result[0];
 
   return (
     <Paper className={classes.tableRoot}>
@@ -135,7 +136,7 @@ const sectionTable = (classes, predictions) => {
         { tableHeader(classes) }
         <TableBody>
           {
-            predictions.shifts
+            dict.shifts
               .sort((a, b) => a.atom - b.atom)
               .map((row, idx) => tableBodyRow(classes, row, idx))
           }

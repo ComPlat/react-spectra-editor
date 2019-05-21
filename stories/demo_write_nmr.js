@@ -48,23 +48,20 @@ class DemoWriteNmr extends React.Component {
       alert(
         `Peaks: ${body}` + '\n' +
         '- - - - - - - - - - -' + '\n' +
-        `Analysis: ${analysis.shifts && analysis.shifts.length}` + '\n' +
-        '- - - - - - - - - - -' + '\n' +
         `Shift solvent = ${label}, ${shift.ref.value}ppm` + '\n'
       );
     } else {
       alert(
-        `Peaks: ${body}` + '\n' +
-        '- - - - - - - - - - -' + '\n' +
-        `Analysis: ${analysis.shifts && analysis.shifts.length}`
+        `Peaks: ${body}`
       );
     }
+    console.log(analysis);
     /*eslint-disable */
   }
 
   predictOp(peaks, layout, _) {
     const { molecule } = this.state;
-    const predictions = { result: [{ running: true, shifts: true }] };
+    const predictions = { running: true };
 
     this.setState({ predictions });
     // simulate fetching...

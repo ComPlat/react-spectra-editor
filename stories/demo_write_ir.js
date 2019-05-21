@@ -48,23 +48,20 @@ class DemoWriteIr extends React.Component {
       alert(
         `Peaks: ${body}` + '\n' +
         '- - - - - - - - - - -' + '\n' +
-        `Analysis: ${Object.keys(analysis)}` + '\n' +
-        '- - - - - - - - - - -' + '\n' +
         `Shift solvent = ${label}, ${shift.ref.value}ppm` + '\n'
       );
     } else {
       alert(
-        `Peaks: ${body}` + '\n' +
-        '- - - - - - - - - - -' + '\n' +
-        `Analysis: ${Object.keys(analysis)}` + '\n'
+        `Peaks: ${body}` + '\n'
       );
     }
+    console.log(analysis);
     /*eslint-disable */
   }
 
   predictOp(peaks, layout, _) {
     const { molecule } = this.state;
-    const predictions = { result: [{ running: true, shifts: true }] };
+    const predictions = { running: true };
 
     this.setState({ predictions });
     // simulate fetching...
