@@ -5,19 +5,18 @@ import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
 
 import { withStyles } from '@material-ui/core/styles';
-
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
 import {
-  TxtLabel, StatusIcon,
   sectionInput, sectionSubmit, SectionRunning,
+  SectionNoService, SectionMissMatch, SectionUnknown,
 } from './comps';
-import { SelectNmrStatus } from './nmr_comps';
+import {
+  NmrTableHeader, NmrTableBodyRow, SectionReference,
+} from './nmr_comps';
+
 
 const Styles = () => ({
   root: {
@@ -51,115 +50,31 @@ const Styles = () => ({
   },
 });
 
-const numFormat = input => parseFloat(input).toFixed(2);
-
-const realFormat = (val, status) => {
-  if (status === 'missing') {
-    return '- - -';
-  }
-  return numFormat(val);
-};
-
-const tableHeader = classes => (
-  <TableHead>
-    <TableRow>
-      <TableCell>
-        {TxtLabel(classes, 'Atom', 'txt-prd-table-title')}
-      </TableCell>
-      <TableCell align="right">
-        {TxtLabel(classes, 'Prediction (ppm)', 'txt-prd-table-title')}
-      </TableCell>
-      <TableCell align="right">
-        {TxtLabel(classes, 'Real (ppm)', 'txt-prd-table-title')}
-      </TableCell>
-      <TableCell align="right">
-        {TxtLabel(classes, 'Diff (ppm)', 'txt-prd-table-title')}
-      </TableCell>
-      <TableCell align="right">
-        {TxtLabel(classes, 'Machine', 'txt-prd-table-title')}
-      </TableCell>
-      <TableCell align="right">
-        {TxtLabel(classes, 'Owner', 'txt-prd-table-title')}
-      </TableCell>
-    </TableRow>
-  </TableHead>
-);
-
-const tableBodyRow = (classes, row, idx) => (
-  <TableRow key={`${idx}-${row.atom}`}>
-    <TableCell component="th" scope="row">
-      {TxtLabel(classes, row.atom, 'txt-prd-table-content')}
-    </TableCell>
-    <TableCell align="right">
-      {TxtLabel(classes, numFormat(row.prediction), 'txt-prd-table-content')}
-    </TableCell>
-    <TableCell align="right">
-      {
-        TxtLabel(
-          classes,
-          realFormat(row.real, row.status),
-          'txt-prd-table-content',
-        )
-      }
-    </TableCell>
-    <TableCell align="right">
-      {
-        TxtLabel(
-          classes,
-          realFormat(row.diff, row.status),
-          'txt-prd-table-content',
-        )
-      }
-    </TableCell>
-    <TableCell align="right">
-      {StatusIcon(row.status)}
-    </TableCell>
-    <TableCell align="right">
-      <SelectNmrStatus
-        idx={idx}
-        atom={row.atom}
-        status={row.statusOwner}
-        identity="Owner"
-      />
-    </TableCell>
-  </TableRow>
-);
-
 const sectionTable = (classes, pds) => {
   if (pds.running) return <SectionRunning />;
-  if (!pds.output.result[0]) return null;
-  const dict = pds.output.result[0];
+  if (!pds.outline || !pds.outline.code) return null;
 
+  if (pds.outline.code === 503) return <SectionNoService />;
+  if (pds.outline.code === 400) return <SectionMissMatch />;
+  if (pds.outline.code > 299) return <SectionUnknown />;
+
+  const dict = pds.output.result[0];
+  if (!dict) return null;
   return (
     <Paper className={classes.tableRoot}>
       <Table className={classes.table}>
-        { tableHeader(classes) }
+        { NmrTableHeader(classes) }
         <TableBody>
           {
             dict.shifts
               .sort((a, b) => a.atom - b.atom)
-              .map((row, idx) => tableBodyRow(classes, row, idx))
+              .map((row, idx) => NmrTableBodyRow(classes, row, idx))
           }
         </TableBody>
       </Table>
     </Paper>
   );
 };
-
-const sectionReference = classes => (
-  <div className={classNames(classes.reference)}>
-    <p>
-      <span>NMR prediction source: </span>
-      <a
-        href="https://www.ncbi.nlm.nih.gov/pubmed/15464159"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        nmrshiftdb
-      </a>
-    </p>
-  </div>
-);
 
 const NmrViewer = ({
   classes, feature, molecule, operations, inputCb, predictSt,
@@ -168,7 +83,7 @@ const NmrViewer = ({
     { sectionSubmit(classes, operations, feature, molecule) }
     { sectionTable(classes, predictSt) }
     { sectionInput(classes, molecule, inputCb) }
-    { sectionReference(classes) }
+    { SectionReference(classes) }
   </div>
 );
 

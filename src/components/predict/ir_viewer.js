@@ -3,22 +3,18 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
-import SVGInline from 'react-svg-inline';
 
 import { withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
 import {
-  TxtLabel, StatusIcon, ConfidenceLabel,
   sectionInput, sectionSubmit, SectionRunning,
+  SectionNoService, SectionMissMatch, SectionUnknown,
 } from './comps';
-import { SelectIrStatus } from './ir_comps';
-import SmaToSvg from '../common/chem';
+import { IrTableHeader, IrTableBodyRow } from './ir_comps';
+
 
 const Styles = () => ({
   root: {
@@ -52,74 +48,25 @@ const Styles = () => ({
   },
 });
 
-const tableHeader = classes => (
-  <TableHead>
-    <TableRow>
-      <TableCell />
-      <TableCell>
-        {TxtLabel(classes, 'Functional groups', 'txt-prd-table-title')}
-      </TableCell>
-      <TableCell align="left">
-        {TxtLabel(classes, 'SMARTS', 'txt-prd-table-title')}
-      </TableCell>
-      <TableCell align="right">
-        {TxtLabel(classes, 'Machine Confidence', 'txt-prd-table-title')}
-      </TableCell>
-      <TableCell align="right">
-        {TxtLabel(classes, 'Machine', 'txt-prd-table-title')}
-      </TableCell>
-      <TableCell align="right">
-        {TxtLabel(classes, 'Owner', 'txt-prd-table-title')}
-      </TableCell>
-    </TableRow>
-  </TableHead>
-);
-
-const tableBodyRow = (classes, idx, fg, value) => (
-  <TableRow key={`${idx}-${fg}`}>
-    <TableCell component="th" scope="row">
-      {TxtLabel(classes, `${idx + 1}`, 'txt-prd-table-content')}
-    </TableCell>
-    <TableCell component="th" scope="row">
-      <SVGInline width="80px" svg={SmaToSvg(fg)} />
-    </TableCell>
-    <TableCell align="left">
-      {TxtLabel(classes, fg, 'txt-prd-table-content')}
-    </TableCell>
-    <TableCell align="right">
-      {
-        ConfidenceLabel(
-          classes, value.confidence, 'txt-prd-table-content',
-        )
-      }
-    </TableCell>
-    <TableCell align="right">
-      {StatusIcon(value.status)}
-    </TableCell>
-    <TableCell align="right">
-      <SelectIrStatus
-        fg={fg}
-        status={value.statusOwner}
-        identity="Owner"
-      />
-    </TableCell>
-  </TableRow>
-);
-
 const sectionTable = (classes, pds) => {
   if (pds.running) return <SectionRunning />;
-  if (!pds.output.result[0]) return null;
-  const dict = pds.output.result[0];
+  if (!pds.outline || !pds.outline.code) return null;
 
+  if (pds.outline.code === 503) return <SectionNoService />;
+  if (pds.outline.code === 400) return <SectionMissMatch />;
+  if (pds.outline.code > 299) return <SectionUnknown />;
+
+  const dict = pds.output.result[0];
+  if (!dict) return null;
   return (
     <Paper className={classes.tableRoot}>
       <Table className={classes.table}>
-        { tableHeader(classes) }
+        { IrTableHeader(classes) }
         <TableBody>
           {
             Object.keys(dict).map((fg, idx) => {
               const value = dict[fg];
-              return tableBodyRow(classes, idx, fg, value);
+              return IrTableBodyRow(classes, idx, fg, value);
             })
           }
         </TableBody>

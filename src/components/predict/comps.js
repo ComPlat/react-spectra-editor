@@ -8,8 +8,9 @@ import HelpOutline from '@material-ui/icons/HelpOutline';
 import Help from '@material-ui/icons/Help';
 import Tooltip from '@material-ui/core/Tooltip';
 import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import CloudOff from '@material-ui/icons/CloudOff';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import SubmitPanel from '../panel/submit';
 
@@ -17,8 +18,8 @@ const titleStyle = {
   backgroundColor: '#f5f5f5',
   border: '2px solid #e3e3e3',
   borderRadius: '10px',
-  height: 150,
-  lineHeight: '150px',
+  height: 200,
+  lineHeight: '200px',
   marginBottom: 10,
   marginTop: 10,
   marginLeft: 40,
@@ -27,17 +28,8 @@ const titleStyle = {
 };
 
 const txtStyle = {
-  lineHeight: '40px',
+  lineHeight: '20px',
 };
-
-const SectionRunning = () => (
-  <div style={titleStyle}>
-    <h2 style={txtStyle}>
-      <p>The server is making predictions...</p>
-      <p>Please check it later.</p>
-    </h2>
-  </div>
-);
 
 const TxtLabel = (classes, label, extClsName = 'txt-label') => (
   <span
@@ -156,7 +148,46 @@ const sectionSubmit = (classes, operations, feature, molecule) => {
   );
 };
 
+const SectionRunning = () => (
+  <div style={titleStyle}>
+    <h2 style={txtStyle}>
+      <CircularProgress style={{ color: 'blue', fontSize: 50 }} />
+      <p>The server is making predictions...</p>
+    </h2>
+  </div>
+);
+
+const SectionMissMatch = () => (
+  <div style={titleStyle}>
+    <h2 style={txtStyle}>
+      <ErrorOutline style={{ color: 'red', fontSize: 50 }} />
+      <p>Peak & Element count mismatch!</p>
+      <p>Please check peak-picking.</p>
+    </h2>
+  </div>
+);
+
+const SectionNoService = () => (
+  <div style={titleStyle}>
+    <h2 style={txtStyle}>
+      <CloudOff style={{ color: 'red', fontSize: 50 }} />
+      <p>Service is not available.</p>
+      <p>Please try it again later.</p>
+    </h2>
+  </div>
+);
+
+const SectionUnknown = () => (
+  <div style={titleStyle}>
+    <h2 style={txtStyle}>
+      <HelpOutline style={{ color: 'purple', fontSize: 50 }} />
+      <p>Unknown state.</p>
+    </h2>
+  </div>
+);
+
 export {
   TxtLabel, StatusIcon, ConfidenceLabel,
   sectionInput, sectionSubmit, SectionRunning,
+  SectionMissMatch, SectionNoService, SectionUnknown,
 };
