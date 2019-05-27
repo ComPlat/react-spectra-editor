@@ -9,6 +9,7 @@ const spectraDigit = (layout) => {
       return 0;
     case LIST_LAYOUT.H1:
     case LIST_LAYOUT.PLAIN:
+    case LIST_LAYOUT.MS:
     default:
       return 2;
   }
@@ -36,11 +37,11 @@ const toPeakStr = (peaks) => {
 };
 
 const spectraOps = {
-  PLAIN: { head: '', tail: '.' },
-  '1H': { head: '1H', tail: '.' },
-  '13C': { head: '13C', tail: '.' },
-  IR: { head: 'IR', tail: 'cm-1' },
-  MS: { head: 'MASS', tail: 'm/z' },
+  [LIST_LAYOUT.PLAIN]: { head: '', tail: '.' },
+  [LIST_LAYOUT.H1]: { head: '1H', tail: '.' },
+  [LIST_LAYOUT.C13]: { head: '13C', tail: '.' },
+  [LIST_LAYOUT.IR]: { head: 'IR', tail: 'cm-1' },
+  [LIST_LAYOUT.MS]: { head: 'MASS', tail: 'm/z' },
 };
 
 const rmRef = (peaks, shift) => {
@@ -58,16 +59,23 @@ const fixDigitAndRmRef = (input, precision, refValue) => {
 const peaksBody = (peaks, layout, shift, isAscend) => {
   const peaksXY = ToXY(peaks);
   const digit = spectraDigit(layout);
-  const result = peaksXY.map(
-    p => fixDigitAndRmRef(parseFloat(p[0]), digit, shift.ref.value),
-  ).filter(r => r != null);
+  const result = peaksXY.map((p) => {
+    const x = fixDigitAndRmRef(parseFloat(p[0]), digit, shift.ref.value);
+    const y = parseFloat(p[1]);
+    return { x, y };
+  }).filter(r => r != null);
 
-  const ascendFunc = (a, b) => a - b;
-  const descendFunc = (a, b) => b - a;
+  const ascendFunc = (a, b) => a.x - b.x;
+  const descendFunc = (a, b) => b.x - a.x;
   const sortFunc = isAscend ? ascendFunc : descendFunc;
+  const ordered = result.sort(sortFunc);
+  const maxY = Math.max(...ordered.map(o => o.y));
 
-  const ordered = result.sort(sortFunc).join(', ');
-  return ordered;
+  if (layout !== LIST_LAYOUT.MS) {
+    return ordered.map(o => o.x).join(', ');
+  }
+  return ordered.map(o => `${o.x}(${parseInt((100 * o.y / maxY), 10)}%)`)
+    .join(', ');
 };
 
 const peaksWrapper = (layout, shift) => {
@@ -84,11 +92,13 @@ const peaksWrapper = (layout, shift) => {
   return { head: `${ops.head}${solvTxt}= `, tail: ops.tail };
 };
 
-const isMs = po => po.operation.typ === 'MS';
+const isMs = po => po.operation.typ === LIST_LAYOUT.MS;
 
-const isNmrLayout = layoutSt => ['1H', '13C'].indexOf(layoutSt) >= 0;
-const isMsLayout = layoutSt => ['MS'].indexOf(layoutSt) >= 0;
-const isIrLayout = layoutSt => ['IR'].indexOf(layoutSt) >= 0;
+const isNmrLayout = layoutSt => (
+  [LIST_LAYOUT.H1, LIST_LAYOUT.C13].indexOf(layoutSt) >= 0
+);
+const isMsLayout = layoutSt => [LIST_LAYOUT.MS].indexOf(layoutSt) >= 0;
+const isIrLayout = layoutSt => [LIST_LAYOUT.IR].indexOf(layoutSt) >= 0;
 
 const Format = {
   toPeakStr,
