@@ -14,6 +14,13 @@ const updateOperation = payload => (
   }
 );
 
+const updateDecimal = payload => (
+  {
+    type: SUBMIT.UPDATE_DECIMAL,
+    payload,
+  }
+);
+
 export {
-  toggleIsAscend, updateOperation,
+  toggleIsAscend, updateOperation, updateDecimal,
 };

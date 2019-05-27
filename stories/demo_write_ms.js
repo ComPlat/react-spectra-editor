@@ -29,18 +29,18 @@ class DemoWriteMs extends React.Component {
   }
 
   writePeaks({
-    peaks, layout, shift, isAscend,
+    peaks, layout, shift, isAscend, decimal,
   }) {
-    const body = FN.peaksBody(peaks, layout, shift, isAscend);
+    const body = FN.peaksBody(peaks, layout, decimal, shift, isAscend);
     const wrapper = FN.peaksWrapper(layout, shift);
     const desc = this.rmDollarSign(wrapper.head) + body + wrapper.tail;
     this.setState({ desc });
   }
 
   savePeaks({
-    peaks, layout, shift, isAscend, scan, thres,
+    peaks, layout, shift, isAscend, decimal, scan, thres,
   }) {
-    const body = FN.peaksBody(peaks, layout, shift, isAscend);
+    const body = FN.peaksBody(peaks, layout, decimal, shift, isAscend);
     /*eslint-disable */
     if (shift.ref.label) {
       const label = this.rmDollarSign(shift.ref.label);

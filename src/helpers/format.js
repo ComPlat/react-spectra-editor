@@ -15,6 +15,23 @@ const spectraDigit = (layout) => {
   }
 };
 
+const opToLayout = (operation) => {
+  const { nucleus, typ } = operation;
+  switch (typ + nucleus) {
+    case 'INFRARED':
+      return LIST_LAYOUT.IR;
+    case 'NMR1H':
+      return LIST_LAYOUT.H1;
+    case 'NMR13C':
+      return LIST_LAYOUT.C13;
+    case 'MS':
+      return LIST_LAYOUT.MS;
+    case 'NMR19F':
+    default:
+      return LIST_LAYOUT.PLAIN;
+  }
+};
+
 const fixDigit = (input, precision) => {
   const output = input || 0.0;
   return output.toFixed(precision);
@@ -56,11 +73,11 @@ const fixDigitAndRmRef = (input, precision, refValue) => {
   return fixDigit(input, precision);
 };
 
-const peaksBody = (peaks, layout, shift, isAscend) => {
+const peaksBody = (peaks, layout, decimal, shift, isAscend) => {
   const peaksXY = ToXY(peaks);
-  const digit = spectraDigit(layout);
+  // const digit = spectraDigit(layout);
   const result = peaksXY.map((p) => {
-    const x = fixDigitAndRmRef(parseFloat(p[0]), digit, shift.ref.value);
+    const x = fixDigitAndRmRef(parseFloat(p[0]), decimal, shift.ref.value);
     const y = parseFloat(p[1]);
     return { x, y };
   }).filter(r => r != null);
@@ -113,6 +130,7 @@ const Format = {
   isMsLayout,
   isIrLayout,
   fixDigit,
+  opToLayout,
 };
 
 export default Format;
