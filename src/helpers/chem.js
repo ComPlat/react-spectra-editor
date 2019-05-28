@@ -140,21 +140,17 @@ const calcThresRef = (s, peakUp) => {
     : Math.ceil(ref * 100 * 100 / s.maxY) / 100;
 };
 
-const extractShift = (s) => {
+const extractShift = (s, jcamp) => {
   const shift = {
     selectX: false,
     solventName: false,
     solventValue: false,
   };
-  if (!s || !s.sampleDescription) return shift;
-
-  const desc = s.sampleDescription;
-  const info = desc.split(/;|=/);
-
+  if (!s) return shift;
   return {
-    selectX: parseFloat(info[1]),
-    solventName: info[3],
-    solventValue: parseFloat(info[5]),
+    selectX: parseFloat(jcamp.info.$CSSOLVENTX) || false,
+    solventName: jcamp.info.$CSSOLVENTNAME || false,
+    solventValue: parseFloat(jcamp.info.$CSSOLVENTVALUE) || false,
   };
 };
 
@@ -167,10 +163,10 @@ const buildFeature = (jcamp, sTyp, peakUp, s, thresRef) => {
         typ: s.dataType + subTyp,
         peakUp,
         thresRef,
-        scanCount: +jcamp.info.$SCANCOUNT,
-        scanAutoTarget: +jcamp.info.$SCANAUTOTARGET,
-        scanEditTarget: +jcamp.info.$SCANEDITTARGET,
-        shift: extractShift(s),
+        scanCount: +jcamp.info.$CSSCANCOUNT,
+        scanAutoTarget: +jcamp.info.$CSSCANAUTOTARGET,
+        scanEditTarget: +jcamp.info.$CSSCANEDITTARGET,
+        shift: extractShift(s, jcamp),
         operation: {
           typ: sTyp,
           nucleus: jcamp.xType || '',
@@ -215,7 +211,7 @@ const getBoundary = (s) => {
 };
 
 const extractMsFeature = (jcamp, sTyp, peakUp) => {
-  const thresRef = (jcamp.info && jcamp.info.$THRESHOLD * 100) || 5;
+  const thresRef = (jcamp.info && jcamp.info.$CSTHRESHOLD * 100) || 5;
   const base = jcamp.spectra[0];
 
   const features = jcamp.spectra.map((s) => {
@@ -232,7 +228,7 @@ const ExtractJcamp = (source) => {
     source,
     {
       xy: true,
-      keepRecordsRegExp: /(\$THRESHOLD|\$SCANAUTOTARGET|\$SCANEDITTARGET|\$SCANCOUNT)/,
+      keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX)/, // eslint-disable-line
     },
   );
   const spectrum = extractSpectrum(jcamp);
