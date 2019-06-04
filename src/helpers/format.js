@@ -73,6 +73,21 @@ const fixDigitAndRmRef = (input, precision, refValue) => {
   return fixDigit(input, precision);
 };
 
+const formatedMS = (peaks, maxY) => {
+  let ordered = {};
+  peaks.forEach((p) => {
+    const better = !ordered[p.x] || (p.y > ordered[p.x]);
+    if (better) {
+      ordered = Object.assign({}, ordered, { [p.x]: p.y });
+    }
+  });
+
+  ordered = Object.keys(ordered).map(k => ({ x: k, y: ordered[k] }));
+
+  return ordered.map(o => `${o.x}(${parseInt((100 * o.y / maxY), 10)}%)`)
+    .join(', ');
+};
+
 const peaksBody = (peaks, layout, decimal, shift, isAscend) => {
   const peaksXY = ToXY(peaks);
   // const digit = spectraDigit(layout);
@@ -88,11 +103,10 @@ const peaksBody = (peaks, layout, decimal, shift, isAscend) => {
   const ordered = result.sort(sortFunc);
   const maxY = Math.max(...ordered.map(o => o.y));
 
-  if (layout !== LIST_LAYOUT.MS) {
-    return ordered.map(o => o.x).join(', ');
+  if (layout === LIST_LAYOUT.MS) {
+    return formatedMS(ordered, maxY);
   }
-  return ordered.map(o => `${o.x}(${parseInt((100 * o.y / maxY), 10)}%)`)
-    .join(', ');
+  return ordered.map(o => o.x).join(', ');
 };
 
 const peaksWrapper = (layout, shift) => {
