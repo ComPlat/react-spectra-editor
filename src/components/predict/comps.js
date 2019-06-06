@@ -152,6 +152,8 @@ const SectionRunning = () => (
   <div style={titleStyle}>
     <h2 style={txtStyle}>
       <CircularProgress style={{ color: 'blue', fontSize: 50 }} />
+      <br />
+      <br />
       <p>The server is making predictions...</p>
     </h2>
   </div>
