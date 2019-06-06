@@ -147,6 +147,16 @@ const extractShift = (s, jcamp) => {
     solventValue: false,
   };
   if (!s) return shift;
+  if (s && s.sampleDescription) {
+    const desc = s.sampleDescription;
+    const info = desc.split(/;|=/);
+
+    return {
+      selectX: parseFloat(info[1]),
+      solventName: info[3],
+      solventValue: parseFloat(info[5]),
+    };
+  }
   return {
     selectX: parseFloat(jcamp.info.$CSSOLVENTX) || false,
     solventName: jcamp.info.$CSSOLVENTNAME || false,
