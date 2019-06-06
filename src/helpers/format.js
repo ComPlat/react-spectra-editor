@@ -131,6 +131,35 @@ const isNmrLayout = layoutSt => (
 const isMsLayout = layoutSt => [LIST_LAYOUT.MS].indexOf(layoutSt) >= 0;
 const isIrLayout = layoutSt => [LIST_LAYOUT.IR].indexOf(layoutSt) >= 0;
 
+const formatPeaksByPrediction = (
+  peaks, layout, isAscend, decimal, predictions = [],
+) => {
+  const pDict = {};
+  peaks.forEach((p) => {
+    pDict[p.x.toFixed(decimal)] = 0;
+  });
+
+  predictions.forEach((p) => {
+    const key = p.real.toFixed(decimal);
+    if (typeof pDict[key] === 'number') {
+      pDict[key] += 1;
+    }
+  });
+
+  const typ = layout === '13C' ? 'C' : 'H';
+
+  const ascendFunc = (a, b) => a.k - b.k;
+  const descendFunc = (a, b) => b.k - a.k;
+  const sortFunc = isAscend ? ascendFunc : descendFunc;
+  const pArr = Object.keys(pDict).map((k) => {
+    if (pDict[k] === 1) return { k, v: k };
+    return { k, v: `${k}(${pDict[k]}${typ})` };
+  }).sort(sortFunc);
+
+  const body = pArr.map(p => p.v).join(', ');
+  return body;
+};
+
 const Format = {
   toPeakStr,
   buildData,
@@ -145,6 +174,7 @@ const Format = {
   isIrLayout,
   fixDigit,
   opToLayout,
+  formatPeaksByPrediction,
 };
 
 export default Format;
