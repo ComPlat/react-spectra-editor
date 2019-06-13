@@ -56,18 +56,19 @@ const sectionTable = (classes, pds) => {
   if (pds.outline.code === 400) return <SectionMissMatch />;
   if (pds.outline.code > 299) return <SectionUnknown />;
 
-  const dict = pds.output.result[0];
-  if (!dict) return null;
+  if (!pds.output.result || !pds.output.result[0]) return null;
+
+  const { fgs } = pds.output.result[0];
+  if (!fgs) return null;
   return (
     <Paper className={classes.tableRoot}>
       <Table className={classes.table}>
         { IrTableHeader(classes) }
         <TableBody>
           {
-            Object.keys(dict).map((fg, idx) => {
-              const value = dict[fg];
-              return IrTableBodyRow(classes, idx, fg, value);
-            })
+            fgs.sort((a, b) => b.confidence - a.confidence).map((fg, idx) => (
+              IrTableBodyRow(classes, idx, fg)
+            ))
           }
         </TableBody>
       </Table>

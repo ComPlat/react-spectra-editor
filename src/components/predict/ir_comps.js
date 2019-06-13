@@ -21,7 +21,7 @@ import SmaToSvg from '../common/chem';
 
 
 const baseSelectIrStatus = ({
-  fg, status, identity,
+  sma, status, identity,
   setIrStatusAct,
 }) => {
   const theStatus = ['accept', 'reject'].includes(status) ? status : '';
@@ -31,7 +31,7 @@ const baseSelectIrStatus = ({
       <Select
         value={theStatus}
         onChange={(e) => {
-          setIrStatusAct({ fg, identity, value: e.target.value });
+          setIrStatusAct({ sma, identity, value: e.target.value });
         }}
       >
         <MenuItem value="accept">
@@ -59,7 +59,7 @@ const bssMapDispatchToProps = dispatch => (
 );
 
 baseSelectIrStatus.propTypes = {
-  fg: PropTypes.string.isRequired,
+  sma: PropTypes.string.isRequired,
   status: PropTypes.string,
   identity: PropTypes.string.isRequired,
   setIrStatusAct: PropTypes.func.isRequired,
@@ -97,31 +97,31 @@ const IrTableHeader = classes => (
   </TableHead>
 );
 
-const IrTableBodyRow = (classes, idx, fg, value) => (
-  <TableRow key={`${idx}-${fg}`}>
+const IrTableBodyRow = (classes, idx, fg) => (
+  <TableRow key={`${idx}-${fg.name}`}>
     <TableCell component="th" scope="row">
       {TxtLabel(classes, `${idx + 1}`, 'txt-prd-table-content')}
     </TableCell>
     <TableCell component="th" scope="row">
-      <SVGInline width="80px" svg={SmaToSvg(fg)} />
+      <SVGInline width="80px" svg={SmaToSvg(fg.sma)} />
     </TableCell>
     <TableCell align="left">
-      {TxtLabel(classes, fg, 'txt-prd-table-content')}
+      {TxtLabel(classes, fg.sma, 'txt-prd-table-content')}
     </TableCell>
     <TableCell align="right">
       {
         ConfidenceLabel(
-          classes, value.confidence, 'txt-prd-table-content',
+          classes, fg.confidence, 'txt-prd-table-content',
         )
       }
     </TableCell>
     <TableCell align="right">
-      {StatusIcon(value.status)}
+      {StatusIcon(fg.status)}
     </TableCell>
     <TableCell align="right">
       <SelectIrStatus
-        fg={fg}
-        status={value.statusOwner}
+        sma={fg.sma}
+        status={fg.statusOwner}
         identity="Owner"
       />
     </TableCell>
