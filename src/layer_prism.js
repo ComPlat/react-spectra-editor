@@ -53,7 +53,7 @@ const extract = (entity, thresSt, scanSt) => {
 };
 
 const LayerPrism = ({
-  entity, cLabel, xLabel, yLabel, operations, predictObj,
+  entity, cLabel, xLabel, yLabel, operations, forecast,
   thresSt, scanSt, uiSt,
 }) => {
   const { topic, feature, hasEdit } = extract(entity, thresSt, scanSt);
@@ -71,7 +71,7 @@ const LayerPrism = ({
               cLabel={cLabel}
               xLabel={xLabel}
               yLabel={yLabel}
-              predictObj={predictObj}
+              forecast={forecast}
               operations={operations}
             />
           </Grid>
@@ -90,7 +90,7 @@ const LayerPrism = ({
             cLabel={cLabel}
             xLabel={xLabel}
             yLabel={yLabel}
-            predictObj={predictObj}
+            forecast={forecast}
             operations={operations}
           />
         </Grid>
@@ -124,7 +124,7 @@ LayerPrism.propTypes = {
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
-  predictObj: PropTypes.object.isRequired,
+  forecast: PropTypes.object.isRequired,
   operations: PropTypes.array.isRequired,
   thresSt: PropTypes.object.isRequired,
   scanSt: PropTypes.object.isRequired,

@@ -53,7 +53,7 @@ class LayerInit extends React.Component {
 
   render() {
     const {
-      entity, cLabel, xLabel, yLabel, operations, predictObj,
+      entity, cLabel, xLabel, yLabel, operations, forecast,
     } = this.props;
 
     const xxLabel = xLabel === '' ? `X (${entity.spectrum.xUnit})` : xLabel;
@@ -65,7 +65,7 @@ class LayerInit extends React.Component {
         cLabel={cLabel}
         xLabel={xxLabel}
         yLabel={yyLabel}
-        predictObj={predictObj}
+        forecast={forecast}
         operations={operations}
       />
     );
@@ -88,7 +88,7 @@ LayerInit.propTypes = {
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
-  predictObj: PropTypes.object.isRequired,
+  forecast: PropTypes.object.isRequired,
   operations: PropTypes.array.isRequired,
   resetScanAllAct: PropTypes.func.isRequired,
   updateOperationAct: PropTypes.func.isRequired,

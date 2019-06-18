@@ -40,31 +40,31 @@ class PredictViewer extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { predictObj, uiSt } = this.props;
+    const { forecast, uiSt } = this.props;
     const { panelIdx } = uiSt.viewer;
 
-    const prevPredictions = predictObj.predictions;
-    const nextPredictions = prevProps.predictObj.predictions;
+    const prevPredictions = forecast.predictions;
+    const nextPredictions = prevProps.forecast.predictions;
     if (prevPredictions !== nextPredictions) {
       this.initPredictReducer();
     }
   }
 
   initPredictReducer() {
-    const { predictObj, initPredictStatusAct } = this.props;
-    const { predictions } = predictObj;
+    const { forecast, initPredictStatusAct } = this.props;
+    const { predictions } = forecast;
     initPredictStatusAct(predictions);
   }
 
   render() {
     const {
-      classes, topic, feature, cLabel, xLabel, yLabel, predictObj,
+      classes, topic, feature, cLabel, xLabel, yLabel, forecast,
       isNmr, isIr, operations, uiSt, setPanelIdxAct,
     } = this.props;
     const { panelIdx } = uiSt.viewer;
     const {
       inputCb, molecule,
-    } = predictObj;
+    } = forecast;
 
     return (
       <div className={classes.root}>
@@ -134,7 +134,7 @@ PredictViewer.propTypes = {
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
-  predictObj: PropTypes.object.isRequired,
+  forecast: PropTypes.object.isRequired,
   isNmr: PropTypes.bool.isRequired,
   isIr: PropTypes.bool.isRequired,
   operations: PropTypes.array.isRequired,

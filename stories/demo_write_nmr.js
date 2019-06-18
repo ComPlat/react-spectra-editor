@@ -84,7 +84,7 @@ class DemoWriteNmr extends React.Component {
       { name: 'predict', value: this.predictOp },
     ].filter(r => r.value);
 
-    const predictObj = {
+    const forecast = {
       btnCb: this.predictOp,
       inputCb: this.updatInput,
       molecule: molecule,
@@ -95,7 +95,7 @@ class DemoWriteNmr extends React.Component {
       <div style={{ width: '1200px' }}>
         <SpectraViewer
           entity={entity}
-          predictObj={predictObj}
+          forecast={forecast}
           operations={operations}
         />
         <Grid container>

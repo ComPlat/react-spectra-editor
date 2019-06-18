@@ -8,9 +8,9 @@ import ViewerRect from './components/viewer_rect';
 import PredictViewer from './components/predict_viewer';
 import Format from './helpers/format';
 
-const extractLayout = (predictObj, layoutSt) => {
-  const isEmpty = Object.keys(predictObj).length === 0
-    && predictObj.constructor === Object;
+const extractLayout = (forecast, layoutSt) => {
+  const isEmpty = Object.keys(forecast).length === 0
+    && forecast.constructor === Object;
   const isNmr = Format.isNmrLayout(layoutSt);
   const isMs = Format.isMsLayout(layoutSt);
   const isIr = Format.isIrLayout(layoutSt);
@@ -21,11 +21,11 @@ const extractLayout = (predictObj, layoutSt) => {
 };
 
 const Content = ({
-  topic, feature, cLabel, xLabel, yLabel, predictObj, operations, layoutSt,
+  topic, feature, cLabel, xLabel, yLabel, forecast, operations, layoutSt,
 }) => {
   const {
     showPredict, isNmr, isIr,
-  } = extractLayout(predictObj, layoutSt);
+  } = extractLayout(forecast, layoutSt);
 
   if (showPredict) {
     return (
@@ -35,7 +35,7 @@ const Content = ({
         xLabel={xLabel}
         yLabel={yLabel}
         feature={feature}
-        predictObj={predictObj}
+        forecast={forecast}
         isNmr={isNmr}
         isIr={isIr}
         operations={operations}
@@ -85,7 +85,7 @@ Content.propTypes = {
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
-  predictObj: PropTypes.object.isRequired,
+  forecast: PropTypes.object.isRequired,
   operations: PropTypes.array.isRequired,
   layoutSt: PropTypes.string.isRequired,
 };

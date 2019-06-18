@@ -83,7 +83,7 @@ class DemoWriteMs extends React.Component {
       { name: 'write', value: this.writePeaks },
     ].filter(r => r.value);
 
-    // const predictObj = {
+    // const forecast = {
     //   btnCb: this.predict,
     //   inputCb: this.updatInput,
     //   molecule: molecule,
