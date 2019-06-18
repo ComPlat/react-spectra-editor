@@ -224,10 +224,10 @@ class LineFocus {
       .remove();
 
     const linePath = [
-      { x: -0.5, y: -5 },
-      { x: -4, y: -20 },
-      { x: 4, y: -20 },
-      { x: 0.5, y: -5 },
+      { x: -0.5, y: 10 },
+      { x: -4, y: -10 },
+      { x: 4, y: -10 },
+      { x: 0.5, y: 10 },
     ];
     const faktor = layoutSt === LIST_LAYOUT.IR ? -1 : 1;
     const lineSymbol = d3.line()

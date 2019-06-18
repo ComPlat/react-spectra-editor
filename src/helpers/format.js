@@ -93,6 +93,7 @@ const peaksBody = (peaks, layout, decimal, shift, isAscend) => {
   // const digit = spectraDigit(layout);
   const result = peaksXY.map((p) => {
     const x = fixDigitAndRmRef(parseFloat(p[0]), decimal, shift.ref.value);
+    if (!x) return null;
     const y = parseFloat(p[1]);
     return { x, y };
   }).filter(r => r != null);
