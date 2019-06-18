@@ -40,8 +40,7 @@ class PredictViewer extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { forecast, uiSt } = this.props;
-    const { panelIdx } = uiSt.viewer;
+    const { forecast } = this.props;
 
     const prevPredictions = forecast.predictions;
     const nextPredictions = prevProps.forecast.predictions;
