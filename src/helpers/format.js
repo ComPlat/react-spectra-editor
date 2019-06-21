@@ -62,41 +62,49 @@ const spectraOps = {
 };
 
 const rmRef = (peaks, shift) => {
-  const refValue = shift.ref.value;
+  const refValue = shift.ref.value || shift.peak.x;
   return peaks.map(
     p => (IsSame(p.x, refValue) ? null : p),
   ).filter(r => r != null);
 };
 
-const fixDigitAndRmRef = (input, precision, refValue) => {
-  if (IsSame(input, refValue)) return null;
-  return fixDigit(input, precision);
-};
-
-const formatedMS = (peaks, maxY) => {
+const formatedMS = (peaks, maxY, decimal = 2, isAscend = true) => {
+  const ascendFunc = (a, b) => parseFloat(a) - parseFloat(b);
+  const descendFunc = (a, b) => parseFloat(b) - parseFloat(a);
+  const sortFunc = isAscend ? ascendFunc : descendFunc;
   let ordered = {};
+
   peaks.forEach((p) => {
-    const better = !ordered[p.x] || (p.y > ordered[p.x]);
+    const x = fixDigit(p.x, decimal);
+    const better = !ordered[x] || (p.y > ordered[x]);
     if (better) {
-      ordered = Object.assign({}, ordered, { [p.x]: p.y });
+      ordered = Object.assign({}, ordered, { [x]: p.y });
     }
   });
 
-  ordered = Object.keys(ordered).map(k => ({ x: k, y: ordered[k] }));
+  ordered = Object.keys(ordered).sort(sortFunc)
+    .map(k => ({ x: k, y: ordered[k] }));
 
   return ordered.map(o => `${o.x}(${parseInt((100 * o.y / maxY), 10)}%)`)
     .join(', ');
 };
 
-const peaksBody = (peaks, layout, decimal, shift, isAscend) => {
+const rmShiftFromPeaks = (peaks, shift) => {
   const peaksXY = ToXY(peaks);
   // const digit = spectraDigit(layout);
+  const rmShiftX = shift.ref.value || shift.peak.x;
   const result = peaksXY.map((p) => {
-    const x = fixDigitAndRmRef(parseFloat(p[0]), decimal, shift.ref.value);
+    const srcX = parseFloat(p[0]);
+    const x = IsSame(srcX, rmShiftX) ? null : srcX;
     if (!x) return null;
     const y = parseFloat(p[1]);
     return { x, y };
   }).filter(r => r != null);
+  return result;
+};
+
+const peaksBody = (peaks, layout, decimal, shift, isAscend) => {
+  const result = rmShiftFromPeaks(peaks, shift);
 
   const ascendFunc = (a, b) => a.x - b.x;
   const descendFunc = (a, b) => b.x - a.x;
@@ -105,9 +113,9 @@ const peaksBody = (peaks, layout, decimal, shift, isAscend) => {
   const maxY = Math.max(...ordered.map(o => o.y));
 
   if (layout === LIST_LAYOUT.MS) {
-    return formatedMS(ordered, maxY);
+    return formatedMS(ordered, maxY, decimal, isAscend);
   }
-  return ordered.map(o => o.x).join(', ');
+  return ordered.map(o => fixDigit(o.x, decimal)).join(', ');
 };
 
 const peaksWrapper = (layout, shift) => {
@@ -169,6 +177,7 @@ const Format = {
   peaksBody,
   peaksWrapper,
   rmRef,
+  rmShiftFromPeaks,
   isMs,
   isNmrLayout,
   isMsLayout,
@@ -176,6 +185,7 @@ const Format = {
   fixDigit,
   opToLayout,
   formatPeaksByPrediction,
+  formatedMS,
 };
 
 export default Format;
