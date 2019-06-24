@@ -6,6 +6,8 @@ import Grid from '@material-ui/core/Grid';
 import { SpectraViewer, FN } from '../src/index';
 import C13_CPD from './source/C13_CPD';
 import resultNmr from './source/result_nmr';
+import svgNmr from './source/svg_nmr';
+import './style/svg.css';
 
 const entity = FN.ExtractJcamp(C13_CPD);
 
@@ -17,6 +19,7 @@ class DemoWriteNmr extends React.Component {
       desc: '',
       predictions: false,
       molecule: '',
+      svgs: [],
     };
 
     this.writePeaks = this.writePeaks.bind(this);
@@ -68,6 +71,9 @@ class DemoWriteNmr extends React.Component {
     setTimeout(() => {
       this.setState({ predictions: resultNmr });
     }, 2000);
+    setTimeout(() => {
+      this.setState({ svgs: [svgNmr] });
+    }, 4000);
   }
 
   updatInput(e) {
@@ -76,7 +82,7 @@ class DemoWriteNmr extends React.Component {
   }
 
   render() {
-    const { desc, predictions, molecule } = this.state;
+    const { desc, predictions, molecule, svgs } = this.state;
 
     const operations = [
       { name: 'save', value: this.savePeaks },
@@ -89,6 +95,7 @@ class DemoWriteNmr extends React.Component {
       inputCb: this.updatInput,
       molecule: molecule,
       predictions,
+      svgs,
     }
 
     return (

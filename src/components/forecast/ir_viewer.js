@@ -8,10 +8,12 @@ import { withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import Paper from '@material-ui/core/Paper';
+import Grid from '@material-ui/core/Grid';
 
 import {
   sectionInput, sectionSubmit, SectionRunning,
   SectionNoService, SectionMissMatch, SectionUnknown,
+  sectionSvg,
 } from './comps';
 import { IrTableHeader, IrTableBodyRow } from './ir_comps';
 
@@ -21,6 +23,9 @@ const Styles = () => ({
     height: '65vh',
     overflowX: 'hidden',
     overflowY: 'scroll',
+  },
+  container: {
+    minHeight: '400px',
   },
   tableRoot: {
     margin: '10px 40px 0px 40px',
@@ -62,7 +67,7 @@ const sectionTable = (classes, pds) => {
   if (!fgs) return null;
   return (
     <Paper className={classes.tableRoot}>
-      <Table className={classes.table}>
+      <Table className={classes.table} size="small">
         { IrTableHeader(classes) }
         <TableBody>
           {
@@ -81,7 +86,14 @@ const IrViewer = ({
 }) => (
   <div className={classNames(classes.root, 'card-forecast-viewer')}>
     { sectionSubmit(classes, operations, feature, molecule) }
-    { sectionTable(classes, forecastSt.predictions) }
+    <Grid className={classNames(classes.container)} container>
+      <Grid item xs={4}>
+        { sectionSvg(classes, forecastSt) }
+      </Grid>
+      <Grid item xs={8}>
+        { sectionTable(classes, forecastSt.predictions) }
+      </Grid>
+    </Grid>
     { sectionInput(classes, molecule, inputCb) }
   </div>
 );

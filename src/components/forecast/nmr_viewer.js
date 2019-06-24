@@ -13,6 +13,7 @@ import Grid from '@material-ui/core/Grid';
 import {
   sectionInput, sectionSubmit, SectionRunning,
   SectionNoService, SectionMissMatch, SectionUnknown,
+  sectionSvg,
 } from './comps';
 import {
   NmrTableHeader, NmrTableBodyRow, SectionReference,
@@ -24,6 +25,9 @@ const Styles = () => ({
     height: '65vh',
     overflowX: 'hidden',
     overflowY: 'scroll',
+  },
+  container: {
+    minHeight: '400px',
   },
   tableRoot: {
     margin: '10px 40px 0px 40px',
@@ -82,10 +86,11 @@ const NmrViewer = ({
 }) => (
   <div className={classNames(classes.root, 'card-forecast-viewer')}>
     { sectionSubmit(classes, operations, feature, molecule) }
-    <Grid container>
-      <Grid item xs={6}>
+    <Grid className={classNames(classes.container)} container>
+      <Grid item xs={4}>
+        { sectionSvg(classes, forecastSt) }
       </Grid>
-      <Grid item xs={6}>
+      <Grid item xs={8}>
         { sectionTable(classes, forecastSt.predictions) }
       </Grid>
     </Grid>
