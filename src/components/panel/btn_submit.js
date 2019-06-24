@@ -24,7 +24,7 @@ const styles = () => ({
 
 const onClickCb = (
   operation, peaksEdit, isAscend,
-  scan, thres, layoutSt, shiftSt, predictSt, decimalSt,
+  scan, thres, layoutSt, shiftSt, forecastSt, decimalSt,
 ) => (
   () => {
     operation({
@@ -34,7 +34,7 @@ const onClickCb = (
       scan,
       thres,
       isAscend,
-      analysis: predictSt,
+      analysis: forecastSt.predictions,
       decimal: decimalSt,
     });
   }
@@ -42,7 +42,7 @@ const onClickCb = (
 
 const BtnSubmit = ({
   classes, operation, feature, isAscend, disabled,
-  editPeakSt, thresSt, statusSt, layoutSt, shiftSt, scanSt, predictSt,
+  editPeakSt, thresSt, statusSt, layoutSt, shiftSt, scanSt, forecastSt,
   decimalSt,
 }) => {
   const { ref, peak } = shiftSt;
@@ -62,7 +62,7 @@ const BtnSubmit = ({
       color="primary"
       onClick={onClickCb(
         operation.value, peaksEdit, isAscend,
-        scan, thres, layoutSt, shiftSt, predictSt, decimalSt,
+        scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt,
       )}
       variant="fab"
       disabled={disBtn}
@@ -80,7 +80,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     layoutSt: state.layout,
     shiftSt: state.shift,
     scanSt: state.scan,
-    predictSt: state.predict,
+    forecastSt: state.forecast,
     decimalSt: state.submit.decimal,
   }
 );
@@ -107,7 +107,7 @@ BtnSubmit.propTypes = {
   layoutSt: PropTypes.string.isRequired,
   shiftSt: PropTypes.object.isRequired,
   scanSt: PropTypes.object.isRequired,
-  predictSt: PropTypes.object.isRequired,
+  forecastSt: PropTypes.object.isRequired,
   decimalSt: PropTypes.number.isRequired,
 };
 

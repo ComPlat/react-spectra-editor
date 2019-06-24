@@ -13,9 +13,7 @@ import {
   sectionInput, sectionSubmit, SectionRunning,
   SectionNoService, SectionMissMatch, SectionUnknown,
 } from './comps';
-import {
-  NmrTableHeader, NmrTableBodyRow, SectionReference,
-} from './nmr_comps';
+import { IrTableHeader, IrTableBodyRow } from './ir_comps';
 
 
 const Styles = () => ({
@@ -58,17 +56,19 @@ const sectionTable = (classes, pds) => {
   if (pds.outline.code === 400) return <SectionMissMatch />;
   if (pds.outline.code > 299) return <SectionUnknown />;
 
-  const dict = pds.output.result[0];
-  if (!dict) return null;
+  if (!pds.output.result || !pds.output.result[0]) return null;
+
+  const { fgs } = pds.output.result[0];
+  if (!fgs) return null;
   return (
     <Paper className={classes.tableRoot}>
       <Table className={classes.table}>
-        { NmrTableHeader(classes) }
+        { IrTableHeader(classes) }
         <TableBody>
           {
-            dict.shifts
-              .sort((a, b) => a.atom - b.atom)
-              .map((row, idx) => NmrTableBodyRow(classes, row, idx))
+            fgs.sort((a, b) => b.confidence - a.confidence).map((fg, idx) => (
+              IrTableBodyRow(classes, idx, fg)
+            ))
           }
         </TableBody>
       </Table>
@@ -76,20 +76,19 @@ const sectionTable = (classes, pds) => {
   );
 };
 
-const NmrViewer = ({
-  classes, feature, molecule, operations, inputCb, predictSt,
+const IrViewer = ({
+  classes, feature, molecule, operations, inputCb, forecastSt,
 }) => (
-  <div className={classNames(classes.root, 'card-predict-viewer')}>
+  <div className={classNames(classes.root, 'card-forecast-viewer')}>
     { sectionSubmit(classes, operations, feature, molecule) }
-    { sectionTable(classes, predictSt) }
+    { sectionTable(classes, forecastSt.predictions) }
     { sectionInput(classes, molecule, inputCb) }
-    { SectionReference(classes) }
   </div>
 );
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
-    predictSt: state.predict,
+    forecastSt: state.forecast,
   }
 );
 
@@ -98,7 +97,7 @@ const mapDispatchToProps = dispatch => (
   }, dispatch)
 );
 
-NmrViewer.propTypes = {
+IrViewer.propTypes = {
   classes: PropTypes.object.isRequired,
   feature: PropTypes.object.isRequired,
   molecule: PropTypes.string.isRequired,
@@ -107,14 +106,14 @@ NmrViewer.propTypes = {
     PropTypes.func,
     PropTypes.bool,
   ]),
-  predictSt: PropTypes.object.isRequired,
+  forecastSt: PropTypes.object.isRequired,
 };
 
-NmrViewer.defaultProps = {
+IrViewer.defaultProps = {
   inputCb: false,
 };
 
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
   withStyles(Styles),
-)(NmrViewer);
+)(IrViewer);

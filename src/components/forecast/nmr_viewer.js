@@ -8,12 +8,15 @@ import { withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import Paper from '@material-ui/core/Paper';
+import Grid from '@material-ui/core/Grid';
 
 import {
   sectionInput, sectionSubmit, SectionRunning,
   SectionNoService, SectionMissMatch, SectionUnknown,
 } from './comps';
-import { IrTableHeader, IrTableBodyRow } from './ir_comps';
+import {
+  NmrTableHeader, NmrTableBodyRow, SectionReference,
+} from './nmr_comps';
 
 
 const Styles = () => ({
@@ -56,19 +59,17 @@ const sectionTable = (classes, pds) => {
   if (pds.outline.code === 400) return <SectionMissMatch />;
   if (pds.outline.code > 299) return <SectionUnknown />;
 
-  if (!pds.output.result || !pds.output.result[0]) return null;
-
-  const { fgs } = pds.output.result[0];
-  if (!fgs) return null;
+  const dict = pds.output.result[0];
+  if (!dict) return null;
   return (
     <Paper className={classes.tableRoot}>
-      <Table className={classes.table}>
-        { IrTableHeader(classes) }
+      <Table className={classes.table} size="small">
+        { NmrTableHeader(classes) }
         <TableBody>
           {
-            fgs.sort((a, b) => b.confidence - a.confidence).map((fg, idx) => (
-              IrTableBodyRow(classes, idx, fg)
-            ))
+            dict.shifts
+              .sort((a, b) => a.atom - b.atom)
+              .map((row, idx) => NmrTableBodyRow(classes, row, idx))
           }
         </TableBody>
       </Table>
@@ -76,19 +77,26 @@ const sectionTable = (classes, pds) => {
   );
 };
 
-const IrViewer = ({
-  classes, feature, molecule, operations, inputCb, predictSt,
+const NmrViewer = ({
+  classes, feature, molecule, operations, inputCb, forecastSt,
 }) => (
-  <div className={classNames(classes.root, 'card-predict-viewer')}>
+  <div className={classNames(classes.root, 'card-forecast-viewer')}>
     { sectionSubmit(classes, operations, feature, molecule) }
-    { sectionTable(classes, predictSt) }
+    <Grid container>
+      <Grid item xs={6}>
+      </Grid>
+      <Grid item xs={6}>
+        { sectionTable(classes, forecastSt.predictions) }
+      </Grid>
+    </Grid>
     { sectionInput(classes, molecule, inputCb) }
+    { SectionReference(classes) }
   </div>
 );
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
-    predictSt: state.predict,
+    forecastSt: state.forecast,
   }
 );
 
@@ -97,7 +105,7 @@ const mapDispatchToProps = dispatch => (
   }, dispatch)
 );
 
-IrViewer.propTypes = {
+NmrViewer.propTypes = {
   classes: PropTypes.object.isRequired,
   feature: PropTypes.object.isRequired,
   molecule: PropTypes.string.isRequired,
@@ -106,14 +114,14 @@ IrViewer.propTypes = {
     PropTypes.func,
     PropTypes.bool,
   ]),
-  predictSt: PropTypes.object.isRequired,
+  forecastSt: PropTypes.object.isRequired,
 };
 
-IrViewer.defaultProps = {
+NmrViewer.defaultProps = {
   inputCb: false,
 };
 
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
   withStyles(Styles),
-)(IrViewer);
+)(NmrViewer);

@@ -24,6 +24,9 @@ const Styles = () => ({
   panelSummary: {
     backgroundColor: '#fbfbfb',
   },
+  txtBadge: {
+    marginRight: '20px',
+  },
 });
 
 const CenterBadge = withStyles({
@@ -104,7 +107,9 @@ const AddPanel = ({
           badgeContent={posLength}
         >
           <Typography className="txt-panel-header">
-            Created Peaks
+            <span className={classNames(classes.txtBadge)}>
+              Created Peaks
+            </span>
           </Typography>
         </CenterBadge>
       </ExpansionPanelSummary>
@@ -134,7 +139,9 @@ const RmPanel = ({
           badgeContent={negLength}
         >
           <Typography className="txt-panel-header">
-            Deleted Peaks
+            <span className={classNames(classes.txtBadge)}>
+              Deleted Peaks
+            </span>
           </Typography>
         </CenterBadge>
       </ExpansionPanelSummary>

@@ -8,7 +8,7 @@ import layoutReducer from './reducer_layout';
 import shiftReducer from './reducer_shift';
 import modeReducer from './reducer_mode';
 import scanReducer from './reducer_scan';
-import predictReducer from './reducer_predict';
+import forecastReducer from './reducer_forecast';
 import uiReducer from './reducer_ui';
 import submitReducer from './reducer_submit';
 
@@ -22,7 +22,7 @@ const rootReducer = combineReducers({
   shift: shiftReducer,
   mode: modeReducer,
   scan: scanReducer,
-  predict: predictReducer,
+  forecast: forecastReducer,
   ui: uiReducer,
   submit: submitReducer,
 });

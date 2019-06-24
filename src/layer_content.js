@@ -5,7 +5,7 @@ import { bindActionCreators, compose } from 'redux';
 
 import ViewerLine from './components/viewer_line';
 import ViewerRect from './components/viewer_rect';
-import PredictViewer from './components/predict_viewer';
+import ForecastViewer from './components/forecast_viewer';
 import Format from './helpers/format';
 
 const extractLayout = (forecast, layoutSt) => {
@@ -14,9 +14,9 @@ const extractLayout = (forecast, layoutSt) => {
   const isNmr = Format.isNmrLayout(layoutSt);
   const isMs = Format.isMsLayout(layoutSt);
   const isIr = Format.isIrLayout(layoutSt);
-  const showPredict = !isEmpty && (isNmr || isIr);
+  const showForecast = !isEmpty && (isNmr || isIr);
   return {
-    showPredict, isNmr, isIr, isMs,
+    showForecast, isNmr, isIr, isMs,
   };
 };
 
@@ -24,12 +24,12 @@ const Content = ({
   topic, feature, cLabel, xLabel, yLabel, forecast, operations, layoutSt,
 }) => {
   const {
-    showPredict, isNmr, isIr,
+    showForecast, isNmr, isIr,
   } = extractLayout(forecast, layoutSt);
 
-  if (showPredict) {
+  if (showForecast) {
     return (
-      <PredictViewer
+      <ForecastViewer
         topic={topic}
         cLabel={cLabel}
         xLabel={xLabel}

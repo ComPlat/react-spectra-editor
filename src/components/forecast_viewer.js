@@ -9,11 +9,11 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 
 import ViewerLine from './viewer_line';
-import NmrViewer from './predict/nmr_viewer';
-import IrViewer from './predict/ir_viewer';
+import NmrViewer from './forecast/nmr_viewer';
+import IrViewer from './forecast/ir_viewer';
 import { TabLabel } from './common/comps';
 import { setPanelIdx } from '../actions/ui';
-import { initPredictStatus } from '../actions/predict';
+import { initForecastStatus } from '../actions/forecast';
 
 const styles = () => ({
   root: {
@@ -28,31 +28,30 @@ const styles = () => ({
   },
 });
 
-class PredictViewer extends React.Component {
+class ForecastViewer extends React.Component {
   constructor(props) {
     super(props);
 
-    this.initPredictReducer = this.initPredictReducer.bind(this);
+    this.initForecastReducer = this.initForecastReducer.bind(this);
   }
 
   componentDidMount() {
-    this.initPredictReducer();
+    this.initForecastReducer();
   }
 
   componentDidUpdate(prevProps) {
     const { forecast } = this.props;
 
-    const prevPredictions = forecast.predictions;
-    const nextPredictions = prevProps.forecast.predictions;
-    if (prevPredictions !== nextPredictions) {
-      this.initPredictReducer();
+    const prevForecast = forecast;
+    const nextForecast = prevProps.forecast;
+    if (prevForecast !== nextForecast) {
+      this.initForecastReducer();
     }
   }
 
-  initPredictReducer() {
-    const { forecast, initPredictStatusAct } = this.props;
-    const { predictions } = forecast;
-    initPredictStatusAct(predictions);
+  initForecastReducer() {
+    const { forecast, initForecastStatusAct } = this.props;
+    initForecastStatusAct(forecast);
   }
 
   render() {
@@ -122,11 +121,11 @@ const mapStateToProps = (state, _) => ( // eslint-disable-line
 const mapDispatchToProps = dispatch => (
   bindActionCreators({
     setPanelIdxAct: setPanelIdx,
-    initPredictStatusAct: initPredictStatus,
+    initForecastStatusAct: initForecastStatus,
   }, dispatch)
 );
 
-PredictViewer.propTypes = {
+ForecastViewer.propTypes = {
   classes: PropTypes.object.isRequired,
   topic: PropTypes.object.isRequired,
   feature: PropTypes.object.isRequired,
@@ -139,10 +138,10 @@ PredictViewer.propTypes = {
   operations: PropTypes.array.isRequired,
   uiSt: PropTypes.object.isRequired,
   setPanelIdxAct: PropTypes.func.isRequired,
-  initPredictStatusAct: PropTypes.func.isRequired,
+  initForecastStatusAct: PropTypes.func.isRequired,
 };
 
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
   withStyles(styles),
-)(PredictViewer);
+)(ForecastViewer);

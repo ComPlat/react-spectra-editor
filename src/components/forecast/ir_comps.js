@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import SVGInline from 'react-svg-inline';
 
 import Select from '@material-ui/core/Select';
 import FormControl from '@material-ui/core/FormControl';
@@ -14,13 +14,15 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 
 import {
-  TxtLabel, StatusIcon,
+  TxtLabel, StatusIcon, ConfidenceLabel,
 } from './comps';
-import { setNmrStatus } from '../../actions/predict';
+import { setIrStatus } from '../../actions/forecast';
+import SmaToSvg from '../common/chem';
 
-const baseSelectNmrStatus = ({
-  idx, atom, status, identity,
-  setNmrStatusAct,
+
+const baseSelectIrStatus = ({
+  sma, status, identity,
+  setIrStatusAct,
 }) => {
   const theStatus = ['accept', 'reject'].includes(status) ? status : '';
 
@@ -29,8 +31,11 @@ const baseSelectNmrStatus = ({
       <Select
         value={theStatus}
         onChange={(e) => {
-          setNmrStatusAct({
-            idx, atom, identity, value: e.target.value,
+          setIrStatusAct({
+            predictions: {
+              sma, identity, value: e.target.value ,
+            },
+            svgs: [],
           });
         }}
       >
@@ -54,49 +59,38 @@ const bssMapStateToProps = (state, props) => ( // eslint-disable-line
 
 const bssMapDispatchToProps = dispatch => (
   bindActionCreators({
-    setNmrStatusAct: setNmrStatus,
+    setIrStatusAct: setIrStatus,
   }, dispatch)
 );
 
-baseSelectNmrStatus.propTypes = {
-  idx: PropTypes.number.isRequired,
-  atom: PropTypes.number.isRequired,
+baseSelectIrStatus.propTypes = {
+  sma: PropTypes.string.isRequired,
   status: PropTypes.string,
   identity: PropTypes.string.isRequired,
-  setNmrStatusAct: PropTypes.func.isRequired,
+  setIrStatusAct: PropTypes.func.isRequired,
 };
 
-baseSelectNmrStatus.defaultProps = {
+baseSelectIrStatus.defaultProps = {
   status: '',
 };
 
-const SelectNmrStatus = connect(
+const SelectIrStatus = connect(
   bssMapStateToProps, bssMapDispatchToProps,
-)(baseSelectNmrStatus);
+)(baseSelectIrStatus);
 
-const numFormat = input => parseFloat(input).toFixed(2);
 
-const realFormat = (val, status) => {
-  if (status === 'missing') {
-    return '- - -';
-  }
-  return numFormat(val);
-};
-
-const NmrTableHeader = classes => (
+const IrTableHeader = classes => (
   <TableHead>
     <TableRow>
+      <TableCell />
       <TableCell>
-        {TxtLabel(classes, 'Atom', 'txt-prd-table-title')}
+        {TxtLabel(classes, 'Functional groups', 'txt-prd-table-title')}
+      </TableCell>
+      <TableCell align="left">
+        {TxtLabel(classes, 'SMARTS', 'txt-prd-table-title')}
       </TableCell>
       <TableCell align="right">
-        {TxtLabel(classes, 'Prediction (ppm)', 'txt-prd-table-title')}
-      </TableCell>
-      <TableCell align="right">
-        {TxtLabel(classes, 'Real (ppm)', 'txt-prd-table-title')}
-      </TableCell>
-      <TableCell align="right">
-        {TxtLabel(classes, 'Diff (ppm)', 'txt-prd-table-title')}
+        {TxtLabel(classes, 'Machine Confidence', 'txt-prd-table-title')}
       </TableCell>
       <TableCell align="right">
         {TxtLabel(classes, 'Machine', 'txt-prd-table-title')}
@@ -108,61 +102,37 @@ const NmrTableHeader = classes => (
   </TableHead>
 );
 
-const NmrTableBodyRow = (classes, row, idx) => (
-  <TableRow key={`${idx}-${row.atom}`}>
+const IrTableBodyRow = (classes, idx, fg) => (
+  <TableRow key={`${idx}-${fg.name}`}>
     <TableCell component="th" scope="row">
-      {TxtLabel(classes, row.atom, 'txt-prd-table-content')}
+      {TxtLabel(classes, `${idx + 1}`, 'txt-prd-table-content')}
     </TableCell>
-    <TableCell align="right">
-      {TxtLabel(classes, numFormat(row.prediction), 'txt-prd-table-content')}
+    <TableCell component="th" scope="row">
+      <SVGInline width="80px" svg={SmaToSvg(fg.sma)} />
+    </TableCell>
+    <TableCell align="left">
+      {TxtLabel(classes, fg.sma, 'txt-prd-table-content')}
     </TableCell>
     <TableCell align="right">
       {
-        TxtLabel(
-          classes,
-          realFormat(row.real, row.status),
-          'txt-prd-table-content',
+        ConfidenceLabel(
+          classes, fg.confidence, 'txt-prd-table-content',
         )
       }
     </TableCell>
     <TableCell align="right">
-      {
-        TxtLabel(
-          classes,
-          realFormat(row.diff, row.status),
-          'txt-prd-table-content',
-        )
-      }
+      {StatusIcon(fg.status)}
     </TableCell>
     <TableCell align="right">
-      {StatusIcon(row.status)}
-    </TableCell>
-    <TableCell align="right">
-      <SelectNmrStatus
-        idx={idx}
-        atom={row.atom}
-        status={row.statusOwner}
+      <SelectIrStatus
+        sma={fg.sma}
+        status={fg.statusOwner}
         identity="Owner"
       />
     </TableCell>
   </TableRow>
 );
 
-const SectionReference = classes => (
-  <div className={classNames(classes.reference)}>
-    <p>
-      <span>NMR prediction source: </span>
-      <a
-        href="https://www.ncbi.nlm.nih.gov/pubmed/15464159"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        nmrshiftdb
-      </a>
-    </p>
-  </div>
-);
-
 export {
-  NmrTableHeader, NmrTableBodyRow, SectionReference,
+  IrTableHeader, IrTableBodyRow,
 };
