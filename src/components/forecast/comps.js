@@ -14,6 +14,7 @@ import CloudOff from '@material-ui/icons/CloudOff';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
 import SubmitPanel from '../panel/submit';
+import SectionLoading from './section_loading';
 
 const titleStyle = {
   backgroundColor: '#f5f5f5',
@@ -160,19 +161,6 @@ const SectionRunning = () => (
   </div>
 );
 
-const cardLoading = {
-  alignItems: 'center',
-  display: 'flex',
-  height: '100%',
-  justifyContent: 'center',
-};
-
-const SectionLoadingSvg = () => (
-  <div style={cardLoading}>
-    <CircularProgress style={{ color: 'blue', fontSize: 50 }} />
-  </div>
-);
-
 const SectionMissMatch = () => (
   <div style={titleStyle}>
     <h2 style={txtStyle}>
@@ -206,7 +194,7 @@ const sectionSvg = (classes, forecastSt) => {
   const { svgs, predictions } = forecastSt;
   const targetSvg = svgs[0];
   if (!predictions.outline || !predictions.outline.code) return null;
-  if (!targetSvg) return <SectionLoadingSvg />;
+  if (!targetSvg) return <SectionLoading />;
   return (
     <SvgFileZoomPan
       svg={targetSvg}
@@ -220,5 +208,5 @@ export {
   TxtLabel, StatusIcon, ConfidenceLabel,
   sectionInput, sectionSubmit, SectionRunning,
   SectionMissMatch, SectionNoService, SectionUnknown,
-  SectionLoadingSvg, sectionSvg,
+  sectionSvg,
 };

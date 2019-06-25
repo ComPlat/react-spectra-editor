@@ -72,7 +72,7 @@ class DemoWriteNmr extends React.Component {
       this.setState({ predictions: resultNmr });
     }, 2000);
     setTimeout(() => {
-      this.setState({ svgs: [svgNmr] });
+      this.setState({ svgs: [] });
     }, 4000);
   }
 
