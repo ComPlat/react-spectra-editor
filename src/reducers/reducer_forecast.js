@@ -5,11 +5,11 @@ const initialState = {
     outline: {},
     output: { result: [] },
   },
-  svgs: [],
 };
 
 const updateIrResl = (stResl, plPred) => {
   const { sma, identity, value } = plPred;
+  const { svgs } = stResl;
   const prevFgs = stResl.fgs;
   const nextVal = { [`status${identity}`]: value };
   const nextFgs = prevFgs.map((fg) => {
@@ -18,19 +18,15 @@ const updateIrResl = (stResl, plPred) => {
     }
     return fg;
   });
-  const nextResult = { type: 'ir', fgs: nextFgs };
+  const nextResult = { type: 'ir', fgs: nextFgs, svgs };
   return nextResult;
 };
 
-const updateSvgs = (stSvgs, plSvgs) => [...stSvgs, ...plSvgs];
-
 const updateIrStatus = (state, action) => {
-  const { predictions, svgs } = action.payload;
+  const { predictions } = action.payload;
   const { outline, output } = state.predictions;
   const stResl = output.result[0];
-  const stSvgs = state.svgs;
   const nextResl = updateIrResl(stResl, predictions);
-  const nextSvgs = updateSvgs(stSvgs, svgs);
 
   return Object.assign(
     {},
@@ -42,7 +38,6 @@ const updateIrStatus = (state, action) => {
           result: [nextResl],
         },
       },
-      svgs: nextSvgs,
     },
   );
 };
@@ -68,12 +63,10 @@ const updateNmrResl = (stResl, plPred) => {
 };
 
 const updateNmrStatus = (state, action) => {
-  const { predictions, svgs } = action.payload;
+  const { predictions } = action.payload;
   const { outline, output } = state.predictions;
   const stResl = output.result[0];
-  const stSvgs = state.svgs;
   const nextResl = updateNmrResl(stResl, predictions);
-  const nextSvgs = updateSvgs(stSvgs, svgs);
 
   const newSt = Object.assign(
     {},
@@ -85,7 +78,6 @@ const updateNmrStatus = (state, action) => {
           result: [nextResl],
         },
       },
-      svgs: nextSvgs,
     },
   );
   return newSt;

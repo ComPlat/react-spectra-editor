@@ -6,7 +6,6 @@ import Grid from '@material-ui/core/Grid';
 import { SpectraViewer, FN } from '../src/index';
 import IREdit from './source/IR_edit';
 import resultIr from './source/result_ir';
-import svgIr from './source/svg_ir';
 import './style/svg.css';
 
 const entity = FN.ExtractJcamp(IREdit);
@@ -19,7 +18,6 @@ class DemoWriteIr extends React.Component {
       desc: '',
       predictions: false,
       molecule: '',
-      svgs: [],
     };
 
     this.writePeaks = this.writePeaks.bind(this);
@@ -71,9 +69,6 @@ class DemoWriteIr extends React.Component {
     setTimeout(() => {
       this.setState({ predictions: resultIr });
     }, 2000);
-    setTimeout(() => {
-      this.setState({ svgs: [svgIr] });
-    }, 4000);
   }
 
   updatInput(e) {
@@ -82,7 +77,7 @@ class DemoWriteIr extends React.Component {
   }
 
   render() {
-    const { desc, predictions, molecule, svgs } = this.state;
+    const { desc, predictions, molecule } = this.state;
 
     const operations = [
       { name: 'save', value: this.savePeaks },
@@ -95,7 +90,6 @@ class DemoWriteIr extends React.Component {
       inputCb: this.updatInput,
       molecule: molecule,
       predictions,
-      svgs,
     }
 
     return (

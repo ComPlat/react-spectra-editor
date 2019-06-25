@@ -1,3 +1,5 @@
+import svgIr from './svg_ir';
+
 const resultIr = {
   outline: {
     code: 200,
@@ -7,6 +9,7 @@ const resultIr = {
     result: [
       {
         type: 'ir',
+        svgs: [svgIr],
         fgs: [
           {
             sma: 'c-,:C(-,:C)=O',

@@ -88,7 +88,7 @@ const IrViewer = ({
     { sectionSubmit(classes, operations, feature, molecule) }
     <Grid className={classNames(classes.container)} container>
       <Grid item xs={4}>
-        { sectionSvg(classes, forecastSt) }
+        { sectionSvg(classes, forecastSt.predictions) }
       </Grid>
       <Grid item xs={8}>
         { sectionTable(classes, forecastSt.predictions) }

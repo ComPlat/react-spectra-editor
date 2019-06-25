@@ -190,10 +190,11 @@ const SectionUnknown = () => (
   </div>
 );
 
-const sectionSvg = (classes, forecastSt) => {
-  const { svgs, predictions } = forecastSt;
-  const targetSvg = svgs[0];
+const sectionSvg = (classes, predictions) => {
+  if (!predictions) return null;
   if (!predictions.outline || !predictions.outline.code) return null;
+  if (!predictions.output) return null;
+  const targetSvg = predictions.output.result[0].svgs[0];
   if (!targetSvg) return <SectionLoading />;
   return (
     <SvgFileZoomPan

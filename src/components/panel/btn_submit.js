@@ -24,7 +24,7 @@ const styles = () => ({
 
 const onClickCb = (
   operation, peaksEdit, isAscend,
-  scan, thres, layoutSt, shiftSt, forecastSt, decimalSt,
+  scan, thres, layoutSt, shiftSt, analysis, decimalSt,
 ) => (
   () => {
     operation({
@@ -34,7 +34,7 @@ const onClickCb = (
       scan,
       thres,
       isAscend,
-      analysis: forecastSt.predictions,
+      analysis,
       decimal: decimalSt,
     });
   }

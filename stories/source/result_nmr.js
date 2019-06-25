@@ -1,3 +1,5 @@
+import svgNmr from './svg_nmr';
+
 const resultNmr = {
   outline: {
     code: 200,
@@ -8,6 +10,7 @@ const resultNmr = {
       {
         id: 1,
         type: 'nmr;13C;1d',
+        svgs: [svgNmr],
         statistics: {
           accept: 0,
           warning: 0,
