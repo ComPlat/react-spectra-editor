@@ -85,7 +85,7 @@ const formatedMS = (peaks, maxY, decimal = 2, isAscend = true) => {
   ordered = Object.keys(ordered).sort(sortFunc)
     .map(k => ({ x: k, y: ordered[k] }));
 
-  return ordered.map(o => `${o.x}(${parseInt((100 * o.y / maxY), 10)}%)`)
+  return ordered.map(o => `${o.x} (${parseInt((100 * o.y / maxY), 10)}%)`)
     .join(', ');
 };
 
@@ -162,7 +162,7 @@ const formatPeaksByPrediction = (
   const sortFunc = isAscend ? ascendFunc : descendFunc;
   const pArr = Object.keys(pDict).map((k) => {
     if (pDict[k] === 1) return { k, v: k };
-    return { k, v: `${k}(${pDict[k]}${typ})` };
+    return { k, v: `${k} (${pDict[k]}${typ})` };
   }).sort(sortFunc);
 
   const body = pArr.map(p => p.v).join(', ');
