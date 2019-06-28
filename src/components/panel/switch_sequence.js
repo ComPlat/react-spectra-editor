@@ -7,7 +7,7 @@ import Switch from '@material-ui/core/Switch';
 const SwtichSequence = ({ isAscend, onToggleSwitch }) => {
   const order = isAscend ? 'Ascend' : 'Descend';
   const label = (
-    <p className="txt-panel-header">
+    <p className="txt-panel-header txt-sequence">
       { `${order} peaks.` }
     </p>
   );
