@@ -11,9 +11,8 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 
 import {
-  sectionInput, sectionSubmit, SectionRunning,
-  SectionNoService, SectionMissMatch, SectionUnknown,
-  sectionSvg,
+  sectionInput, sectionSubmit, sectionSvg,
+  notToRenderAnalysis,
 } from './comps';
 import {
   NmrTableHeader, NmrTableBodyRow, SectionReference,
@@ -56,12 +55,8 @@ const Styles = () => ({
 });
 
 const sectionTable = (classes, pds) => {
-  if (pds.running) return <SectionRunning />;
-  if (!pds.outline || !pds.outline.code) return null;
-
-  if (pds.outline.code === 503) return <SectionNoService />;
-  if (pds.outline.code === 400) return <SectionMissMatch />;
-  if (pds.outline.code > 299) return <SectionUnknown />;
+  const renderMsg = notToRenderAnalysis(pds);
+  if (renderMsg) return renderMsg;
 
   const dict = pds.output.result[0];
   if (!dict) return null;

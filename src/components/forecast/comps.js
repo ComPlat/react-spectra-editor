@@ -190,9 +190,20 @@ const SectionUnknown = () => (
   </div>
 );
 
+const notToRenderAnalysis = (pds) => {
+  if (pds.running) return <SectionRunning />;
+  if (!pds.outline || !pds.outline.code) return true;
+
+  if (pds.outline.code >= 500) return <SectionNoService />;
+  if (pds.outline.code === 400) return <SectionMissMatch />;
+  if (pds.outline.code >= 300) return <SectionUnknown />;
+  return false;
+};
+
 const sectionSvg = (classes, predictions) => {
-  if (!predictions) return null;
-  if (!predictions.outline || !predictions.outline.code) return null;
+  const renderMsg = notToRenderAnalysis(predictions);
+  if (renderMsg) return null;
+
   if (!predictions.output) return null;
   const targetSvg = predictions.output.result[0].svgs[0];
   if (!targetSvg) return <SectionLoading />;
@@ -207,7 +218,6 @@ const sectionSvg = (classes, predictions) => {
 
 export {
   TxtLabel, StatusIcon, ConfidenceLabel,
-  sectionInput, sectionSubmit, SectionRunning,
-  SectionMissMatch, SectionNoService, SectionUnknown,
+  sectionInput, sectionSubmit, notToRenderAnalysis,
   sectionSvg,
 };
