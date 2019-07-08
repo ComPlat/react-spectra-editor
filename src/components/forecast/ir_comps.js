@@ -100,10 +100,10 @@ const IrTableHeader = classes => (
 );
 
 const colorStyles = [
-  { backgroundColor: '#FFB6C1' },
-  { backgroundColor: '#00FF00' },
   { backgroundColor: '#FFFF00' },
   { backgroundColor: '#87CEFA' },
+  { backgroundColor: '#FFB6C1' },
+  { backgroundColor: '#00FF00' },
   { backgroundColor: '#E6E6FA' },
   { backgroundColor: '#FFD700' },
   { backgroundColor: '#F0FFFF' },
