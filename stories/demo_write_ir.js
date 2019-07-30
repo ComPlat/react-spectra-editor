@@ -3,7 +3,7 @@ import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 
-import { SpectraViewer, FN } from '../src/index';
+import { SpectraViewer, FN } from '../src/app';
 import IREdit from './source/IR_edit';
 import resultIr from './source/result_ir';
 import './style/svg.css';

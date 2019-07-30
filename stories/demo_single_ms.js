@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { SpectraViewer, FN } from '../src/index';
+import { SpectraViewer, FN } from '../src/app';
 import MS from './source/MS';
 
 const entity = FN.ExtractJcamp(MS);
