@@ -1,16 +1,13 @@
 # react-spectra-editor
 
+### Install
+
+```
+$ yarn install
+```
+
 ### Demo
 
 ```
-$ npm run storybook
+$ yarn storybook
 ```
-
-### Publish
-
-```
-$ npm run compile
-$ npm publish
-```
-
-
