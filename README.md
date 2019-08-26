@@ -1,4 +1,4 @@
-# react-spectra-viewer
+# react-spectra-editor
 
 ### Demo
 

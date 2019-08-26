@@ -3,7 +3,7 @@ import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 
-import { SpectraViewer, FN } from '../src/app';
+import { SpectraEditor, FN } from '../src/app';
 import MS2 from './source/MS2';
 
 const entity = FN.ExtractJcamp(MS2);
@@ -92,7 +92,7 @@ class DemoWriteMs extends React.Component {
 
     return (
       <div style={{ width: '1200px' }}>
-        <SpectraViewer
+        <SpectraEditor
           entity={entity}
           operations={operations}
         />

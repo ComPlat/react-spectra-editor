@@ -5,7 +5,7 @@ import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 
-import { SpectraViewer, FN } from './app';
+import { SpectraEditor, FN } from './app';
 import nmrJcamp from './__tests__/fixtures/nmr_jcamp';
 import irJcamp from './__tests__/fixtures/ir_jcamp';
 import msJcamp from './__tests__/fixtures/ms_jcamp';
@@ -154,7 +154,7 @@ class DemoWriteIr extends React.Component {
             MS
           </Button>
         </div>
-        <SpectraViewer
+        <SpectraEditor
           entity={entity}
           forecast={forecast}
           operations={operations}

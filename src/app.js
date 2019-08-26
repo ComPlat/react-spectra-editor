@@ -23,7 +23,7 @@ const store = compose(
 sagaMiddleware.run(sagas);
 
 // - - - React - - -
-const SpectraViewer = ({
+const SpectraEditor = ({
   entity, cLabel, xLabel, yLabel, operations, forecast,
 }) => (
   <Provider store={store}>
@@ -38,7 +38,7 @@ const SpectraViewer = ({
   </Provider>
 );
 
-SpectraViewer.propTypes = {
+SpectraEditor.propTypes = {
   entity: PropTypes.object.isRequired,
   cLabel: PropTypes.string,
   xLabel: PropTypes.string,
@@ -47,7 +47,7 @@ SpectraViewer.propTypes = {
   operations: PropTypes.array,
 };
 
-SpectraViewer.defaultProps = {
+SpectraEditor.defaultProps = {
   cLabel: '',
   xLabel: '',
   yLabel: '',
@@ -56,5 +56,5 @@ SpectraViewer.defaultProps = {
 };
 
 export {
-  SpectraViewer, FN,
+  SpectraEditor, FN,
 };

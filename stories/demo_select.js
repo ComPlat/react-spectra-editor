@@ -1,7 +1,7 @@
 import React from 'react';
 import Select from 'react-select';
 
-import { SpectraViewer, FN } from '../src/app';
+import { SpectraEditor, FN } from '../src/app';
 import H1 from './source/H1';
 import IR from './source/IR';
 import C13_CPD from './source/C13_CPD';
@@ -57,7 +57,7 @@ class DemoSelect extends React.Component {
           onChange={this.onChange}
           options={options}
         />
-        <SpectraViewer
+        <SpectraEditor
           entity={value}
         />
       </div>

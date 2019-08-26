@@ -3,7 +3,7 @@ import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 
-import { SpectraViewer, FN } from '../src/app';
+import { SpectraEditor, FN } from '../src/app';
 import C13_CPD from './source/C13_CPD';
 import resultNmr from './source/result_nmr';
 import './style/svg.css';
@@ -94,7 +94,7 @@ class DemoWriteNmr extends React.Component {
 
     return (
       <div style={{ width: '1200px' }}>
-        <SpectraViewer
+        <SpectraEditor
           entity={entity}
           forecast={forecast}
           operations={operations}
