@@ -1,6 +1,6 @@
 {
-  "name": "react-spectra-viewer",
-  "version": "0.3.31",
+  "name": "react-spectra-editor",
+  "version": "0.4.20",
   "description": "View Spectra data from React",
   "repository": {
     "type": "git",
@@ -18,9 +18,10 @@
     "jcampconverter": "https://github.com/cheminfo-js/jcampconverter.git",
     "prop-types": "^15.6.2",
     "react-redux": "^5.0.7",
+    "react-svg-file-zoom-pan": "^1.0.5",
+    "react-svg-inline": "^2.1.1",
     "redux": "^4.0.1",
     "redux-saga": "^0.16.2",
-    "react-svg-inline": "^2.1.1",
     "regenerator-transform": "^0.13.3",
     "reselect": "^4.0.0"
   },
@@ -51,10 +52,16 @@
     "react-select": "^2.0.0",
     "redux-logger": "^3.0.6"
   },
-  "main": "dist/index.js",
-  "module": "dist/index.js",
+  "main": "dist/app.js",
+  "module": "dist/app.js",
   "files": [
     "dist",
     "README.md"
+  ],
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
   ]
 }
