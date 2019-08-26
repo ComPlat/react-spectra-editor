@@ -57,8 +57,8 @@ const spectraOps = {
   [LIST_LAYOUT.PLAIN]: { head: '', tail: '.' },
   [LIST_LAYOUT.H1]: { head: '1H', tail: '.' },
   [LIST_LAYOUT.C13]: { head: '13C', tail: '.' },
-  [LIST_LAYOUT.IR]: { head: 'IR', tail: 'cm-1' },
-  [LIST_LAYOUT.MS]: { head: 'MASS', tail: 'm/z' },
+  [LIST_LAYOUT.IR]: { head: 'IR', tail: ' cm-1' },
+  [LIST_LAYOUT.MS]: { head: 'MASS', tail: ' m/z' },
 };
 
 const rmRef = (peaks, shift) => {
@@ -121,7 +121,7 @@ const peaksBody = (peaks, layout, decimal, shift, isAscend) => {
 const peaksWrapper = (layout, shift) => {
   let solvTxt = '';
   if (shift.ref.label) {
-    solvTxt = ` (${shift.ref.label}) `;
+    solvTxt = ` (${shift.ref.label})`;
   }
 
   if (layout === LIST_LAYOUT.PLAIN) {
@@ -129,7 +129,7 @@ const peaksWrapper = (layout, shift) => {
   }
 
   const ops = spectraOps[layout];
-  return { head: `${ops.head}${solvTxt}= `, tail: ops.tail };
+  return { head: `${ops.head}${solvTxt} = `, tail: ops.tail };
 };
 
 const isMs = po => po.operation.typ === LIST_LAYOUT.MS;
