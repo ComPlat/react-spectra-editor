@@ -31,18 +31,26 @@ class DemoWriteIr extends React.Component {
   }
 
   writePeaks({
-    peaks, layout, shift, isAscend, decimal,
+    peaks, layout, shift, decimal, isAscend, isIntensity,
   }) {
-    const body = FN.peaksBody(peaks, layout, decimal, shift, isAscend);
+    const { maxY, minY } = entity.features[0];
+    const boundary = { maxY, minY };
+    const body = FN.peaksBody({
+      peaks, layout, decimal, shift, isAscend, isIntensity, boundary,
+    });
     const wrapper = FN.peaksWrapper(layout, shift);
     const desc = this.rmDollarSign(wrapper.head) + body + wrapper.tail;
     this.setState({ desc });
   }
 
   savePeaks({
-    peaks, layout, shift, isAscend, decimal, analysis,
+    peaks, layout, shift, decimal, analysis, isAscend, isIntensity,
   }) {
-    const body = FN.peaksBody(peaks, layout, decimal, shift, isAscend);
+    const { maxY, minY } = entity.features[0];
+    const boundary = { maxY, minY };
+    const body = FN.peaksBody({
+      peaks, layout, decimal, shift, isAscend, isIntensity, boundary,
+    });
     /*eslint-disable */
     if (shift.ref.label) {
       const label = this.rmDollarSign(shift.ref.label);

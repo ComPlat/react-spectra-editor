@@ -3,6 +3,7 @@ import Format from '../helpers/format';
 
 const initialState = {
   isAscend: true,
+  isIntensity: true,
   decimal: 2,
   operation: { name: 'empty' },
 };
@@ -15,6 +16,8 @@ const submitReducer = (state = initialState, action) => {
   switch (action.type) {
     case SUBMIT.TOGGLE_IS_ASCEND:
       return Object.assign({}, state, { isAscend: !state.isAscend });
+    case SUBMIT.TOGGLE_IS_INTENSITY:
+      return Object.assign({}, state, { isIntensity: !state.isIntensity });
     case SUBMIT.UPDATE_OPERATION:
       return Object.assign({}, state, updateOperation(action));
     case SUBMIT.UPDATE_DECIMAL:

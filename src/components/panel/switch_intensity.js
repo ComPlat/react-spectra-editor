@@ -4,11 +4,11 @@ import PropTypes from 'prop-types';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 
-const SwtichSequence = ({ isAscend, onToggleSwitch }) => {
-  const order = isAscend ? 'Ascend' : 'Descend';
+const SwtichIntensity = ({ isIntensity, onToggleSwitch }) => {
+  const order = isIntensity ? 'Show' : 'Hide';
   const label = (
     <p className="txt-panel-header txt-sequence">
-      { `${order} peaks.` }
+      { `${order} Intensity.` }
     </p>
   );
 
@@ -16,7 +16,7 @@ const SwtichSequence = ({ isAscend, onToggleSwitch }) => {
     <FormControlLabel
       control={(
         <Switch
-          checked={isAscend}
+          checked={isIntensity}
           onChange={onToggleSwitch}
           value="sequence"
           color="primary"
@@ -27,9 +27,9 @@ const SwtichSequence = ({ isAscend, onToggleSwitch }) => {
   );
 };
 
-SwtichSequence.propTypes = {
-  isAscend: PropTypes.bool.isRequired,
+SwtichIntensity.propTypes = {
+  isIntensity: PropTypes.bool.isRequired,
   onToggleSwitch: PropTypes.func.isRequired,
 };
 
-export default SwtichSequence;
+export default SwtichIntensity;

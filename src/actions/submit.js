@@ -7,6 +7,13 @@ const toggleIsAscend = () => (
   }
 );
 
+const toggleIsIntensity = () => (
+  {
+    type: SUBMIT.TOGGLE_IS_INTENSITY,
+    payload: false,
+  }
+);
+
 const updateOperation = payload => (
   {
     type: SUBMIT.UPDATE_OPERATION,
@@ -22,5 +29,6 @@ const updateDecimal = payload => (
 );
 
 export {
-  toggleIsAscend, updateOperation, updateDecimal,
+  toggleIsAscend, toggleIsIntensity,
+  updateOperation, updateDecimal,
 };

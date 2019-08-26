@@ -11,9 +11,11 @@ import FormControl from '@material-ui/core/FormControl';
 import { withStyles } from '@material-ui/core/styles';
 
 import {
-  toggleIsAscend, updateOperation, updateDecimal,
+  toggleIsAscend, toggleIsIntensity,
+  updateOperation, updateDecimal,
 } from '../../actions/submit';
-import SwitchSequence from './switch_sequence';
+import SwitchAscend from './switch_ascend';
+import SwitchIntensity from './switch_intensity';
 import BtnSubmit from './btn_submit';
 
 const Styles = () => ({
@@ -80,14 +82,16 @@ const selectOperation = (name, operations, updateOperationAct) => {
 
 const SubmitPanel = ({
   operations, classes, feature, hideSwitch, disabled,
-  isAscendSt, operationSt, decimalSt,
-  toggleIsAscendAct, updateOperationAct, updateDecimalAct,
+  isAscendSt, isIntensitySt, operationSt, decimalSt, layoutSt,
+  toggleIsAscendAct, toggleIsIntensityAct,
+  updateOperationAct, updateDecimalAct,
 }) => {
   const onChangeSelect = e => (
     selectOperation(e.target.value, operations, updateOperationAct)
   );
 
   if (!operations || operations.length === 0) return null;
+  const isIR = ['IR'].indexOf(layoutSt) >= 0;
 
   return (
     <Grid
@@ -101,9 +105,21 @@ const SubmitPanel = ({
           ? null
           : (
             <Grid item xs={12}>
-              <SwitchSequence
+              <SwitchAscend
                 isAscend={isAscendSt}
                 onToggleSwitch={toggleIsAscendAct}
+              />
+            </Grid>
+          )
+      }
+      {
+        hideSwitch || !isIR
+          ? null
+          : (
+            <Grid item xs={12}>
+              <SwitchIntensity
+                isIntensity={isIntensitySt}
+                onToggleSwitch={toggleIsIntensityAct}
               />
             </Grid>
           )
@@ -132,6 +148,7 @@ const SubmitPanel = ({
         <BtnSubmit
           feature={feature}
           isAscend={isAscendSt}
+          isIntensity={isIntensitySt}
           operation={operationSt}
           disabled={disabled}
         />
@@ -142,7 +159,9 @@ const SubmitPanel = ({
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
+    layoutSt: state.layout,
     isAscendSt: state.submit.isAscend,
+    isIntensitySt: state.submit.isIntensity,
     decimalSt: state.submit.decimal,
     operationSt: state.submit.operation,
   }
@@ -151,6 +170,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
 const mapDispatchToProps = dispatch => (
   bindActionCreators({
     toggleIsAscendAct: toggleIsAscend,
+    toggleIsIntensityAct: toggleIsIntensity,
     updateOperationAct: updateOperation,
     updateDecimalAct: updateDecimal,
   }, dispatch)
@@ -163,9 +183,12 @@ SubmitPanel.propTypes = {
   hideSwitch: PropTypes.bool.isRequired,
   disabled: PropTypes.bool.isRequired,
   isAscendSt: PropTypes.bool.isRequired,
+  isIntensitySt: PropTypes.bool.isRequired,
   operationSt: PropTypes.object.isRequired,
   decimalSt: PropTypes.number.isRequired,
+  layoutSt: PropTypes.string.isRequired,
   toggleIsAscendAct: PropTypes.func.isRequired,
+  toggleIsIntensityAct: PropTypes.func.isRequired,
   updateOperationAct: PropTypes.func.isRequired,
   updateDecimalAct: PropTypes.func.isRequired,
 };

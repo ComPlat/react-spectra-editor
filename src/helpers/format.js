@@ -89,6 +89,45 @@ const formatedMS = (peaks, maxY, decimal = 2, isAscend = true) => {
     .join(', ');
 };
 
+const irLevel = (boundary, val) => {
+  const { maxY, minY } = boundary;
+  const ratio = 100 * (val - minY) / (maxY - minY);
+  if (ratio > 85) return 'vw';
+  if (ratio > 60) return 'w';
+  if (ratio > 45) return 'm';
+  if (ratio > 30) return 's';
+  return 'vs';
+};
+
+const formatedIR = (
+  peaks, maxY, decimal = 2, isAscend = true,
+  isIntensity = false, boundary = {},
+) => {
+  const ascendFunc = (a, b) => parseFloat(a) - parseFloat(b);
+  const descendFunc = (a, b) => parseFloat(b) - parseFloat(a);
+  const sortFunc = isAscend ? ascendFunc : descendFunc;
+  let ordered = {};
+
+  peaks.forEach((p) => {
+    const x = fixDigit(p.x, decimal);
+    const better = !ordered[x] || (p.y > ordered[x]);
+    if (better) {
+      ordered = Object.assign({}, ordered, { [x]: p.y });
+    }
+  });
+
+  ordered = Object.keys(ordered).sort(sortFunc)
+    .map(k => ({ x: k, y: ordered[k] }));
+
+  if (isIntensity) {
+    return ordered.map(o => `${o.x} (${irLevel(boundary, o.y)})`)
+      .join(', ');
+  }
+  return ordered.map(o => `${o.x}`)
+    .join(', ');
+};
+
+
 const rmShiftFromPeaks = (peaks, shift) => {
   const peaksXY = ToXY(peaks);
   // const digit = spectraDigit(layout);
@@ -103,17 +142,23 @@ const rmShiftFromPeaks = (peaks, shift) => {
   return result;
 };
 
-const peaksBody = (peaks, layout, decimal, shift, isAscend) => {
+const peaksBody = ({
+  peaks, layout, decimal, shift, isAscend,
+  isIntensity = false, boundary = {},
+}) => {
   const result = rmShiftFromPeaks(peaks, shift);
 
-  const ascendFunc = (a, b) => a.x - b.x;
-  const descendFunc = (a, b) => b.x - a.x;
+  const ascendFunc = (a, b) => parseFloat(a.x) - parseFloat(b.x);
+  const descendFunc = (a, b) => parseFloat(b.x) - parseFloat(a.x);
   const sortFunc = isAscend ? ascendFunc : descendFunc;
   const ordered = result.sort(sortFunc);
   const maxY = Math.max(...ordered.map(o => o.y));
 
   if (layout === LIST_LAYOUT.MS) {
     return formatedMS(ordered, maxY, decimal, isAscend);
+  }
+  if (layout === LIST_LAYOUT.IR) {
+    return formatedIR(ordered, maxY, decimal, isAscend, isIntensity, boundary);
   }
   return ordered.map(o => fixDigit(o.x, decimal)).join(', ');
 };
@@ -157,8 +202,8 @@ const formatPeaksByPrediction = (
 
   const typ = layout === '13C' ? 'C' : 'H';
 
-  const ascendFunc = (a, b) => a.k - b.k;
-  const descendFunc = (a, b) => b.k - a.k;
+  const ascendFunc = (a, b) => parseFloat(a.k) - parseFloat(b.k);
+  const descendFunc = (a, b) => parseFloat(b.k) - parseFloat(a.k);
   const sortFunc = isAscend ? ascendFunc : descendFunc;
   const pArr = Object.keys(pDict).map((k) => {
     if (pDict[k] === 1) return { k, v: k };
@@ -186,6 +231,7 @@ const Format = {
   opToLayout,
   formatPeaksByPrediction,
   formatedMS,
+  formatedIR,
 };
 
 export default Format;

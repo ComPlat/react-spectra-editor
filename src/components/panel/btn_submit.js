@@ -23,7 +23,7 @@ const styles = () => ({
 });
 
 const onClickCb = (
-  operation, peaksEdit, isAscend,
+  operation, peaksEdit, isAscend, isIntensity,
   scan, thres, layoutSt, shiftSt, analysis, decimalSt,
 ) => (
   () => {
@@ -34,6 +34,7 @@ const onClickCb = (
       scan,
       thres,
       isAscend,
+      isIntensity,
       analysis,
       decimal: decimalSt,
     });
@@ -41,7 +42,7 @@ const onClickCb = (
 );
 
 const BtnSubmit = ({
-  classes, operation, feature, isAscend, disabled,
+  classes, operation, feature, isAscend, isIntensity, disabled,
   editPeakSt, thresSt, statusSt, layoutSt, shiftSt, scanSt, forecastSt,
   decimalSt,
 }) => {
@@ -61,7 +62,7 @@ const BtnSubmit = ({
       className={classNames(classes.btn)}
       color="primary"
       onClick={onClickCb(
-        operation.value, peaksEdit, isAscend,
+        operation.value, peaksEdit, isAscend, isIntensity,
         scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt,
       )}
       variant="fab"
@@ -94,6 +95,7 @@ BtnSubmit.propTypes = {
   classes: PropTypes.object.isRequired,
   feature: PropTypes.object.isRequired,
   isAscend: PropTypes.bool.isRequired,
+  isIntensity: PropTypes.bool.isRequired,
   operation: PropTypes.oneOfType(
     [
       PropTypes.object,
