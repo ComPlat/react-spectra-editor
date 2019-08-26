@@ -28,7 +28,7 @@ const styles = () => ({
 });
 
 const PanelViewer = ({
-  classes, feature, hasEdit, operations,
+  classes, feature, hasEdit, operations, isMs,
 }) => (
   <div>
     <ModeNavigation />
@@ -41,8 +41,8 @@ const PanelViewer = ({
           hasEdit={hasEdit}
           operations={operations}
         />
-        <AddPeakPanel />
-        <RmPeakPanel />
+        { isMs ? null : <AddPeakPanel /> }
+        { isMs ? null : <RmPeakPanel /> }
         <Manual />
       </MuiThemeProvider>
     </div>
@@ -54,6 +54,7 @@ PanelViewer.propTypes = {
   feature: PropTypes.object.isRequired,
   operations: PropTypes.array.isRequired,
   hasEdit: PropTypes.bool.isRequired,
+  isMs: PropTypes.bool.isRequired,
 };
 
 export default compose(

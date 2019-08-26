@@ -54,11 +54,12 @@ const extract = (entity, thresSt, scanSt) => {
 
 const LayerPrism = ({
   entity, cLabel, xLabel, yLabel, operations, forecast,
-  thresSt, scanSt, uiSt,
+  thresSt, scanSt, uiSt, layoutSt,
 }) => {
   const { topic, feature, hasEdit } = extract(entity, thresSt, scanSt);
   if (!topic) return null;
 
+  const isMs = ['MS'].indexOf(layoutSt) >= 0;
   const { panelIdx } = uiSt.viewer;
   if (panelIdx === 1) {
     return (
@@ -99,6 +100,7 @@ const LayerPrism = ({
             feature={feature}
             hasEdit={hasEdit}
             operations={operations}
+            isMs={isMs}
           />
         </Grid>
       </Grid>
@@ -111,6 +113,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     scanSt: state.scan,
     thresSt: state.threshold,
     uiSt: state.ui,
+    layoutSt: state.layout,
   }
 );
 
@@ -129,6 +132,7 @@ LayerPrism.propTypes = {
   thresSt: PropTypes.object.isRequired,
   scanSt: PropTypes.object.isRequired,
   uiSt: PropTypes.object.isRequired,
+  layoutSt: PropTypes.string.isRequired,
 };
 
 export default connect(
