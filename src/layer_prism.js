@@ -63,7 +63,7 @@ const LayerPrism = ({
   const { panelIdx } = uiSt.viewer;
   if (panelIdx === 1) {
     return (
-      <div className="react-spectrum-viewer">
+      <div className="react-spectrum-editor">
         <Grid container>
           <Grid item xs={12}>
             <LayerContent
@@ -82,7 +82,7 @@ const LayerPrism = ({
   }
 
   return (
-    <div className="react-spectrum-viewer">
+    <div className="react-spectrum-editor">
       <Grid container>
         <Grid item xs={9}>
           <LayerContent
