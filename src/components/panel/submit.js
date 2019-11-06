@@ -28,7 +28,7 @@ const Styles = () => ({
 const decimalSelect = (
   classes, decimalSt, updateDecimalAct,
 ) => {
-  const decimals = [0, 1, 2];
+  const decimals = [0, 1, 2, 3, 4];
   const options = decimals.map(d => (
     <MenuItem value={d} key={d}>
       <span className="txt-sv-input-label">
