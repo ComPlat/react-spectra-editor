@@ -85,7 +85,7 @@ const formatedMS = (peaks, maxY, decimal = 2, isAscend = true) => {
   ordered = Object.keys(ordered).sort(sortFunc)
     .map(k => ({ x: k, y: ordered[k] }));
 
-  return ordered.map(o => `${o.x} (${parseInt((100 * o.y / maxY), 10)}%)`)
+  return ordered.map(o => `${o.x} (${parseInt((100 * o.y / maxY), 10)})`)
     .join(', ');
 };
 
