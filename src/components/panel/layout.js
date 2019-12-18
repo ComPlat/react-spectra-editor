@@ -8,7 +8,7 @@ import Grid from '@material-ui/core/Grid';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
-import Tooltip from '@material-ui/core/Tooltip';
+import InputLabel from '@material-ui/core/InputLabel';
 import { withStyles } from '@material-ui/core/styles';
 
 import { updateLayout } from '../../actions/layout';
@@ -25,40 +25,38 @@ const Styles = () => ({
 });
 
 const layoutSelect = (classes, layoutSt, onChange) => (
-  <Tooltip
-    title={<span className="txt-sv-tp">Layout</span>}
-    placement="left"
-    disableFocusListener
-    disableTouchListener
+  <FormControl
+    className={classNames(classes.formControl)}
   >
-    <FormControl
-      className={classNames(classes.formControl)}
-    >
-      <Select value={layoutSt} onChange={onChange}>
-        <MenuItem value={LIST_LAYOUT.PLAIN}>
-          <span className="txt-sv-input-label">plain</span>
-        </MenuItem>
-        <MenuItem value={LIST_LAYOUT.IR}>
-          <span className="txt-sv-input-label">IR</span>
-        </MenuItem>
-        <MenuItem value={LIST_LAYOUT.H1}>
-          <span className="txt-sv-input-label">
-            <sup>1</sup>
-            H
-          </span>
-        </MenuItem>
-        <MenuItem value={LIST_LAYOUT.C13}>
-          <span className="txt-sv-input-label">
-            <sup>13</sup>
-            C
-          </span>
-        </MenuItem>
-        <MenuItem value={LIST_LAYOUT.MS}>
-          <span className="txt-sv-input-label">MS</span>
-        </MenuItem>
-      </Select>
-    </FormControl>
-  </Tooltip>
+    <InputLabel shrink>
+      <p className="txt-field-label">
+        Layout
+      </p>
+    </InputLabel>
+    <Select value={layoutSt} onChange={onChange}>
+      <MenuItem value={LIST_LAYOUT.PLAIN}>
+        <span className="txt-sv-input-label">plain</span>
+      </MenuItem>
+      <MenuItem value={LIST_LAYOUT.IR}>
+        <span className="txt-sv-input-label">IR</span>
+      </MenuItem>
+      <MenuItem value={LIST_LAYOUT.H1}>
+        <span className="txt-sv-input-label">
+          <sup>1</sup>
+          H
+        </span>
+      </MenuItem>
+      <MenuItem value={LIST_LAYOUT.C13}>
+        <span className="txt-sv-input-label">
+          <sup>13</sup>
+          C
+        </span>
+      </MenuItem>
+      <MenuItem value={LIST_LAYOUT.MS}>
+        <span className="txt-sv-input-label">MS</span>
+      </MenuItem>
+    </Select>
+  </FormControl>
 );
 
 const LayoutPanel = ({

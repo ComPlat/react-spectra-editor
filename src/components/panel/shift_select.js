@@ -3,12 +3,11 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
-
+import InputLabel from '@material-ui/core/InputLabel';
 import Grid from '@material-ui/core/Grid';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
-import Tooltip from '@material-ui/core/Tooltip';
 import { withStyles } from '@material-ui/core/styles';
 
 import { setShiftRef } from '../../actions/shift';
@@ -40,21 +39,19 @@ const shiftSelection = (classes, layoutSt, shiftRefSt, onChange) => {
   ));
 
   return (
-    <Tooltip
-      title={<span className="txt-sv-tp">Shift Reference</span>}
-      placement="left"
-      disableFocusListener
-      disableTouchListener
+    <FormControl
+      variant="outlined"
+      className={classNames(classes.formControl)}
     >
-      <FormControl
-        variant="outlined"
-        className={classNames(classes.formControl)}
-      >
-        <Select value={shiftRefSt} onChange={onChange}>
-          { content }
-        </Select>
-      </FormControl>
-    </Tooltip>
+      <InputLabel shrink>
+        <p className="txt-field-label">
+          Shift Reference
+        </p>
+      </InputLabel>
+      <Select value={shiftRefSt} onChange={onChange}>
+        { content }
+      </Select>
+    </FormControl>
   );
 };
 

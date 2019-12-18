@@ -7,7 +7,6 @@ import { bindActionCreators } from 'redux';
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import Tooltip from '@material-ui/core/Tooltip';
 import { withStyles } from '@material-ui/core/styles';
 
 import BtnRefresh from './btn_refresh';
@@ -20,6 +19,9 @@ const styles = () => ({
   container: {
     margin: '12px 18px',
   },
+  txtThres: {
+    margin: '0 0 10px 0',
+  },
 });
 
 const txtPercent = () => (
@@ -28,6 +30,12 @@ const txtPercent = () => (
       %
     </span>
   </InputAdornment>
+);
+
+const thresLable = classes => (
+  <p className={classNames(classes.txtThres, 'txt-field-label')}>
+    Threshold
+  </p>
 );
 
 const setThreshold = (
@@ -42,30 +50,24 @@ const setThreshold = (
   };
 
   return (
-    <Tooltip
-      title={<span className="txt-sv-tp">Threshold</span>}
-      placement="left"
-      disableFocusListener
-      disableTouchListener
-    >
-      <div>
-        <TextField
-          disabled={!thresVal}
-          id="outlined-name"
-          placeholder="N.A."
-          type="number"
-          value={thresVal || false}
-          margin="normal"
-          InputProps={{
-            endAdornment: txtPercent(),
-            className: 'txt-input',
-          }}
-          onChange={onChange}
-          onBlur={onBlur}
-          onKeyPress={onEnterPress}
-        />
-      </div>
-    </Tooltip>
+    <div>
+      <TextField
+        disabled={!thresVal}
+        id="outlined-name"
+        placeholder="N.A."
+        type="number"
+        label={thresLable(classes)}
+        value={thresVal || false}
+        margin="normal"
+        InputProps={{
+          endAdornment: txtPercent(),
+          className: 'txt-input',
+        }}
+        onChange={onChange}
+        onBlur={onBlur}
+        onKeyPress={onEnterPress}
+      />
+    </div>
   );
 };
 

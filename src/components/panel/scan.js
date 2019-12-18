@@ -7,7 +7,6 @@ import { bindActionCreators, compose } from 'redux';
 import Grid from '@material-ui/core/Grid';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
-import Tooltip from '@material-ui/core/Tooltip';
 import { withStyles } from '@material-ui/core/styles';
 
 import BtnRefresh from './btn_refresh';
@@ -46,18 +45,11 @@ const scanSelect = (
   const selValue = target || defaultValue || 1;
 
   return (
-    <Tooltip
-      title={<span className="txt-sv-tp">Scan</span>}
-      placement="left"
-      disableFocusListener
-      disableTouchListener
-    >
-      <div>
-        <Select value={selValue} onChange={onChange}>
-          { content }
-        </Select>
-      </div>
-    </Tooltip>
+    <div>
+      <Select value={selValue} onChange={onChange}>
+        { content }
+      </Select>
+    </div>
   );
 };
 
