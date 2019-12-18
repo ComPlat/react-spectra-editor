@@ -16,10 +16,9 @@ import { LIST_LAYOUT } from '../../constants/list_layout';
 
 const Styles = () => ({
   container: {
-    margin: '12px 18px',
+    margin: '0 0 10px 0',
   },
   formControl: {
-    margin: '10px 20px 0px 10px',
     minWidth: 150,
   },
 });

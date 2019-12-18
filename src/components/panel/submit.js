@@ -20,7 +20,7 @@ import BtnSubmit from './btn_submit';
 
 const Styles = () => ({
   formControl: {
-    margin: '10px 20px 0px 10px',
+    margin: '0px 20px 0px 10px',
     minWidth: 150,
   },
 });

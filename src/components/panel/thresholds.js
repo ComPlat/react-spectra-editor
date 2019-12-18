@@ -17,7 +17,7 @@ import {
 
 const styles = () => ({
   container: {
-    margin: '12px 18px',
+    margin: '0 0 0 20px',
   },
   txtThres: {
     margin: '0 0 10px 0',
