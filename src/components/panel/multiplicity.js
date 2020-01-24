@@ -21,7 +21,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import { selectMpyType, rmMpyPeakByPanel, clickMpyOne } from '../../actions/multiplicity';
 import { LIST_LAYOUT } from '../../constants/list_layout';
 import MpySelect from './multiplicity_select';
-import { calcMpyCenter } from '../../helpers/calc';
+import { calcMpyCenter, calcJStr } from '../../helpers/calc';
 
 const styles = theme => ({
   panel: {
@@ -36,7 +36,7 @@ const styles = theme => ({
   },
   panelDetail: {
     backgroundColor: '#fff',
-    height: 'calc(63vh - 118px)',
+    height: 'calc(75vh - 220px)',
     overflow: 'auto',
   },
   table: {
@@ -121,7 +121,8 @@ const createData = (idx, xExtent, peaks, shift, smExtext, mpyType, onSelect, onC
     onSelect,
     onClick,
     peaks,
-    center: calcMpyCenter(peaks, shift),
+    center: calcMpyCenter(peaks, shift, mpyType),
+    coupJ: calcJStr(peaks, shift, mpyType),
     mpyType,
     isCheck: (smExtext.xL === xExtent.xL && smExtext.xU === xExtent.xU),
   }
@@ -135,10 +136,10 @@ const pkList = (classes, row, shift, digits, rmMpyPeakByPanelAct) => (
 
     return (
       <TableRow key={pk.x} className={classes.tRow} hover>
-        <TableCell align="right" className={classes.tTxt}>
+        <TableCell align="right" className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>
           {`(${(pk.x - shift).toFixed(digits)}, ${pk.y.toExponential(2)})`}
         </TableCell>
-        <TableCell align="right" className={classes.tTxt}>{rmBtn}</TableCell>
+        <TableCell align="right" className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{rmBtn}</TableCell>
       </TableRow>
     );
   })
@@ -170,9 +171,9 @@ const mpyList = (
               checked={row.isCheck}
               onChange={row.onClick}
             />
-            <Chip label={row.idx} className={classes.moChip} variant="outlined" />
-            <span className={classes.moExtTxt}>{`${(row.center).toFixed(digits)}(ppm)`}</span>
-            <span className={classes.moSelect}><MpySelect target={row} /></span>
+            <Chip label={row.idx} className={classNames(classes.moChip, 'txt-sv-panel-head')} variant="outlined" />
+            <span className={classNames(classes.moExtTxt, 'txt-sv-panel-head')}>{`${(row.center).toFixed(3)}(ppm) ${row.coupJ}`}</span>
+            <span className={classNames(classes.moSelect, 'txt-sv-panel-head')}><MpySelect target={row} /></span>
 
           </div>
           <Table className={classes.table}>
@@ -204,7 +205,7 @@ const MultiplicityPanel = ({
         className={classNames(classes.panelSummary)}
       >
         <Typography className="txt-panel-header">
-          <span className={classNames(classes.txtBadge)}>
+          <span className={classNames(classes.txtBadge, 'txt-sv-panel-title')}>
             Multiplicity
           </span>
         </Typography>

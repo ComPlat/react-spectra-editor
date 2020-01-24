@@ -11,7 +11,7 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 
 import {
-  sectionInput, sectionSubmit, sectionSvg,
+  sectionInput, sectionSvg,
   notToRenderAnalysis,
 } from './comps';
 import { IrTableHeader, IrTableBodyRow } from './ir_comps';
@@ -19,9 +19,8 @@ import { IrTableHeader, IrTableBodyRow } from './ir_comps';
 
 const Styles = () => ({
   root: {
-    height: '65vh',
     overflowX: 'hidden',
-    overflowY: 'scroll',
+    overflowY: 'auto',
   },
   container: {
     minHeight: '400px',
@@ -77,10 +76,9 @@ const sectionTable = (classes, pds) => {
 };
 
 const IrViewer = ({
-  classes, feature, molecule, operations, inputCb, forecastSt,
+  classes, molecule, inputCb, forecastSt,
 }) => (
   <div className={classNames(classes.root, 'card-forecast-viewer')}>
-    { sectionSubmit(classes, operations, feature, molecule) }
     <Grid className={classNames(classes.container)} container>
       <Grid item xs={4}>
         { sectionSvg(classes, forecastSt.predictions) }
@@ -106,9 +104,7 @@ const mapDispatchToProps = dispatch => (
 
 IrViewer.propTypes = {
   classes: PropTypes.object.isRequired,
-  feature: PropTypes.object.isRequired,
   molecule: PropTypes.string.isRequired,
-  operations: PropTypes.array.isRequired,
   inputCb: PropTypes.oneOfType([
     PropTypes.func,
     PropTypes.bool,

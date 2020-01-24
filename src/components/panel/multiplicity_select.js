@@ -10,7 +10,7 @@ import FormControl from '@material-ui/core/FormControl';
 import OutlinedInput from '@material-ui/core/OutlinedInput';
 import { withStyles } from '@material-ui/core/styles';
 
-import { LIST_MPY } from '../../constants/list_mpy';
+import { LIST_MPYS } from '../../constants/list_mpy';
 import { selectMpyType } from '../../actions/multiplicity';
 
 const Styles = () => ({
@@ -32,6 +32,16 @@ const Styles = () => ({
   },
 });
 
+const options = classes => (
+  LIST_MPYS.map(m => (
+    <MenuItem value={m} key={m}>
+      <span className={classNames(classes.selectTxt, 'txt-sv-panel-txt')}>
+        { m }
+      </span>
+    </MenuItem>
+  ))
+);
+
 const MpySelect = ({
   classes, target, selectMpyTypeAct,
 }) => {
@@ -49,26 +59,9 @@ const MpySelect = ({
         onChange={onChange}
         input={<OutlinedInput labelWidth={0} />}
       >
-        <MenuItem value={LIST_MPY.s}>
-          <span className={classNames(classes.selectTxt, 'txt-sv-input-label')}>
-            { LIST_MPY.s }
-          </span>
-        </MenuItem>
-        <MenuItem value={LIST_MPY.d}>
-          <span className={classNames(classes.selectTxt, 'txt-sv-input-label')}>
-            { LIST_MPY.d }
-          </span>
-        </MenuItem>
-        <MenuItem value={LIST_MPY.dd}>
-          <span className={classNames(classes.selectTxt, 'txt-sv-input-label')}>
-            { LIST_MPY.dd }
-          </span>
-        </MenuItem>
-        <MenuItem value={LIST_MPY.t}>
-          <span className={classNames(classes.selectTxt, 'txt-sv-input-label')}>
-            { LIST_MPY.t }
-          </span>
-        </MenuItem>
+        {
+          options(classes)
+        }
       </Select>
     </FormControl>
   );

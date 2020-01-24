@@ -13,6 +13,7 @@ import CloudDoneOutlinedIcon from '@material-ui/icons/CloudDoneOutlined';
 import HowToRegOutlinedIcon from '@material-ui/icons/HowToRegOutlined';
 import RefreshOutlinedIcon from '@material-ui/icons/RefreshOutlined';
 
+import Cfg from '../../helpers/cfg';
 import {
   updateThresholdValue, resetThresholdValue, toggleThresholdIsEdit,
 } from '../../actions/threshold';
@@ -57,8 +58,8 @@ const setThreshold = (
 
   return (
     <TextField
-      className={classes.txtField}
-      disabled={!thresVal}
+      className={classNames(classes.txtField, 'txt-cmd-field')}
+      disabled={Cfg.btnCmdThres(thresVal)}
       id="outlined-name"
       placeholder="N.A."
       type="number"
@@ -66,9 +67,9 @@ const setThreshold = (
       margin="none"
       InputProps={{
         endAdornment: txtPercent(),
-        className: classNames(classes.txtInput, 'txt-input'),
+        className: classNames(classes.txtInput, 'txt-sv-input-label'),
       }}
-      label="Threshold"
+      label={<span className={classNames('cmd-txt-label')}>Threshold</span>}
       onChange={onChange}
       onBlur={onBlur}
       onKeyPress={onEnterPress}
@@ -89,39 +90,33 @@ const Threshold = ({
   classes, feature, hasEdit, layoutSt, thresSt,
   updateThresholdValueAct, resetThresholdValueAct, toggleThresholdIsEditAct,
 }) => {
-  const isMs = ['MS'].indexOf(layoutSt) >= 0;
   const thresVal = thresSt.value || feature.thresRef;
   const { isEdit } = thresSt;
 
   return (
     <span className={classes.group}>
       { setThreshold(classes, thresVal, updateThresholdValueAct) }
-      <Tooltip title="Restore Threshold">
-        <span>
-          <Button
-            className={classes.btn}
-            disabled={!thresVal}
-            onClick={resetThresholdValueAct}
-          >
-            <RefreshOutlinedIcon />
-          </Button>
-        </span>
+      <Tooltip title={<span className="txt-sv-tp">Restore Threshold</span>}>
+        <Button
+          className={classes.btn}
+          disabled={Cfg.btnCmdThres(thresVal)}
+          onClick={resetThresholdValueAct}
+        >
+          <RefreshOutlinedIcon />
+        </Button>
       </Tooltip>
       {
-        isMs
+        Cfg.hideCmdThres(layoutSt)
           ? null
           : (
-
-            <Tooltip title={restoreTp(hasEdit, isEdit)}>
-              <span>
-                <Button
-                  className={classes.btn}
-                  disabled={!thresVal}
-                  onClick={toggleThresholdIsEditAct}
-                >
-                  { restoreIcon(hasEdit, isEdit) }
-                </Button>
-              </span>
+            <Tooltip title={<span className="txt-sv-tp">{restoreTp(hasEdit, isEdit)}</span>}>
+              <Button
+                className={classes.btn}
+                disabled={Cfg.btnCmdThres(thresVal)}
+                onClick={toggleThresholdIsEditAct}
+              >
+                { restoreIcon(hasEdit, isEdit) }
+              </Button>
             </Tooltip>
           )
       }

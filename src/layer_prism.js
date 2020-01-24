@@ -7,65 +7,59 @@ import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
 
 import PanelViewer from './components/panel/index';
+import CmdBar from './components/cmd_bar/index';
 import LayerContent from './layer_content';
+import { LIST_UI_VIEWER_TYPE } from './constants/list_ui';
+import { extractParams } from './helpers/extractParams';
 
 const styles = () => ({
 });
 
-const extractMs = (entity, scanSt) => {
-  const { target, isAuto } = scanSt;
-  const defaultFeat = entity.features[0];
-  const hasEdit = !!defaultFeat.scanEditTarget;
-  const defaultIdx = isAuto || !hasEdit
-    ? defaultFeat.scanAutoTarget
-    : defaultFeat.scanEditTarget;
-  const defaultCount = +defaultFeat.scanCount;
-  let idx = +(target || defaultIdx || 1);
-  if (idx > defaultCount) { idx = defaultCount; }
-  const feature = entity.features[idx - 1];
-  return (
-    {
-      topic: feature.data[0],
-      feature,
-      hasEdit,
-    }
-  );
-};
-
-const extractNmrIr = (entity, thresSt) => {
-  const { spectrum, features } = entity;
-  const [peakAll, peakEdit] = features;
-  const hasEdit = peakEdit && peakEdit.data
-    ? peakEdit.data[0].x.length > 0
-    : false;
-
-  const feature = hasEdit && thresSt.isEdit ? peakEdit : peakAll;
-  return { topic: spectrum.data[0], feature, hasEdit };
-};
-
-const extract = (entity, thresSt, scanSt) => {
-  const defaultFeat = entity.features[0];
-  const layout = defaultFeat.dataType;
-  const isMS = layout === 'MASS SPECTRUM';
-  return isMS
-    ? extractMs(entity, scanSt)
-    : extractNmrIr(entity, thresSt);
-};
-
 const LayerPrism = ({
   entity, cLabel, xLabel, yLabel, operations, forecast,
-  thresSt, scanSt, uiSt, layoutSt,
+  thresSt, scanSt, uiSt,
 }) => {
-  const { topic, feature, hasEdit } = extract(entity, thresSt, scanSt);
+  const { topic, feature, hasEdit } = extractParams(entity, thresSt, scanSt);
   if (!topic) return null;
 
-  const isMs = ['MS'].indexOf(layoutSt) >= 0;
-  const { panelIdx } = uiSt.viewer;
-  if (panelIdx === 1) {
+  const { viewer } = uiSt;
+  if (viewer === LIST_UI_VIEWER_TYPE.ANALYSIS) {
     return (
+      <div>
+        <CmdBar
+          feature={feature}
+          hasEdit={hasEdit}
+          operations={operations}
+        />
+        <div className="react-spectrum-editor">
+          <Grid container>
+            <Grid item xs={12}>
+              <LayerContent
+                topic={topic}
+                feature={feature}
+                cLabel={cLabel}
+                xLabel={xLabel}
+                yLabel={yLabel}
+                forecast={forecast}
+                operations={operations}
+              />
+            </Grid>
+          </Grid>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <CmdBar
+        feature={feature}
+        hasEdit={hasEdit}
+        operations={operations}
+      />
       <div className="react-spectrum-editor">
         <Grid container>
-          <Grid item xs={12}>
+          <Grid item xs={9}>
             <LayerContent
               topic={topic}
               feature={feature}
@@ -76,34 +70,11 @@ const LayerPrism = ({
               operations={operations}
             />
           </Grid>
+          <Grid item xs={3} align="center">
+            <PanelViewer />
+          </Grid>
         </Grid>
       </div>
-    );
-  }
-
-  return (
-    <div className="react-spectrum-editor">
-      <Grid container>
-        <Grid item xs={9}>
-          <LayerContent
-            topic={topic}
-            feature={feature}
-            cLabel={cLabel}
-            xLabel={xLabel}
-            yLabel={yLabel}
-            forecast={forecast}
-            operations={operations}
-          />
-        </Grid>
-        <Grid item xs={3} align="center">
-          <PanelViewer
-            feature={feature}
-            hasEdit={hasEdit}
-            operations={operations}
-            isMs={isMs}
-          />
-        </Grid>
-      </Grid>
     </div>
   );
 };
@@ -113,7 +84,6 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     scanSt: state.scan,
     thresSt: state.threshold,
     uiSt: state.ui,
-    layoutSt: state.layout,
   }
 );
 
@@ -132,7 +102,6 @@ LayerPrism.propTypes = {
   thresSt: PropTypes.object.isRequired,
   scanSt: PropTypes.object.isRequired,
   uiSt: PropTypes.object.isRequired,
-  layoutSt: PropTypes.string.isRequired,
 };
 
 export default connect(

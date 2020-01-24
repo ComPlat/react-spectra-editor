@@ -6,14 +6,16 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 
 import { SpectraEditor, FN } from './app';
-import nmrJcamp from './__tests__/fixtures/nmr_jcamp';
+import nmr1HJcamp from './__tests__/fixtures/nmr1h_jcamp';
+import nmr13CJcamp from './__tests__/fixtures/nmr13c_jcamp';
 import irJcamp from './__tests__/fixtures/ir_jcamp';
 import msJcamp from './__tests__/fixtures/ms_jcamp';
 import nmrResult from './__tests__/fixtures/nmr_result';
 import irResult from './__tests__/fixtures/ir_result';
 import './__tests__/style/svg.css';
 
-const nmrEntity = FN.ExtractJcamp(nmrJcamp);
+const nmr1HEntity = FN.ExtractJcamp(nmr1HJcamp);
+const nmr13CEntity = FN.ExtractJcamp(nmr13CJcamp);
 const irEntity = FN.ExtractJcamp(irJcamp);
 const msEntity = FN.ExtractJcamp(msJcamp);
 
@@ -22,7 +24,7 @@ class DemoWriteIr extends React.Component {
     super(props);
 
     this.state = {
-      typ: 'ir',
+      typ: 'nmr 1h',
       desc: '',
       predictions: false,
       molecule: '',
@@ -55,7 +57,10 @@ class DemoWriteIr extends React.Component {
     peaks, layout, shift, isAscend, decimal, isIntensity,
   }) {
     const entity = this.loadEntity();
-    const { maxY, minY } = entity.features[0];
+    const { features } = entity;
+    const { maxY, minY } = Array.isArray(features)
+      ? features[0]
+      : (features.editPeak || features.autoPeak);
     const boundary = { maxY, minY };
     const body = FN.peaksBody({
       peaks, layout, decimal, shift, isAscend, isIntensity, boundary,
@@ -67,14 +72,21 @@ class DemoWriteIr extends React.Component {
 
   savePeaks({
     peaks, layout, shift, isAscend, decimal, analysis, isIntensity,
+    integration, multiplicity,
   }) {
     const entity = this.loadEntity();
-    const { maxY, minY } = entity.features[0];
+    const { features } = entity;
+    const { maxY, minY } = Array.isArray(features)
+      ? features[0]
+      : (features.editPeak || features.autoPeak);
     const boundary = { maxY, minY };
     const body = FN.peaksBody({
       peaks, layout, decimal, shift, isAscend, isIntensity, boundary,
     });
     /*eslint-disable */
+    console.log(analysis);
+    console.log(integration);
+    console.log(multiplicity);
     if (shift.ref.label) {
       const label = this.rmDollarSign(shift.ref.label);
       alert(
@@ -87,7 +99,6 @@ class DemoWriteIr extends React.Component {
         `Peaks: ${body}` + '\n'
       );
     }
-    console.log(analysis);
     /*eslint-disable */
   }
 
@@ -97,7 +108,7 @@ class DemoWriteIr extends React.Component {
 
     this.setState({ predictions });
     // simulate fetching...
-    const result = typ === 'nmr' ? nmrResult : irResult;
+    const result = typ === 'ir' ? irResult : nmrResult;
     setTimeout(() => {
       this.setState({ predictions: result });
     }, 2000);
@@ -111,8 +122,10 @@ class DemoWriteIr extends React.Component {
   loadEntity() {
     const { typ } = this.state;
     switch (typ) {
-      case 'nmr':
-        return nmrEntity;
+      case 'nmr 1h':
+        return nmr1HEntity;
+      case 'nmr 13c':
+        return nmr13CEntity;
       case 'ir':
         return irEntity;
       case 'ms':
@@ -140,14 +153,21 @@ class DemoWriteIr extends React.Component {
     const entity = this.loadEntity();
 
     return (
-      <div style={{ width: '1200px' }}>
+      <div style={{ width: Math.round(window.innerWidth * 0.9) }}>
         <div>
           <Button
             variant="contained"
             style={{ margin: '0 10px 0 10px' }}
-            onClick={this.onClick('nmr')}
+            onClick={this.onClick('nmr 1h')}
           >
-            NMR
+            NMR 1H
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('nmr 13c')}
+          >
+            NMR 13C
           </Button>
           <Button
             variant="contained"

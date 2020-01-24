@@ -4,16 +4,13 @@ import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
 
 import { withStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
 
-import ViewerLine from './viewer_line';
+import ViewerLine from './d3_line/index';
 import NmrViewer from './forecast/nmr_viewer';
 import IrViewer from './forecast/ir_viewer';
-import { TabLabel } from './common/comps';
-import { setPanelIdx } from '../actions/ui';
 import { initForecastStatus } from '../actions/forecast';
+import { setUiViewerType } from '../actions/ui';
+import { LIST_UI_VIEWER_TYPE } from '../constants/list_ui';
 
 const styles = () => ({
   root: {
@@ -50,33 +47,26 @@ class ForecastViewer extends React.Component {
   }
 
   initForecastReducer() {
-    const { forecast, initForecastStatusAct } = this.props;
+    const { forecast, initForecastStatusAct, setUiViewerTypeAct } = this.props;
     initForecastStatusAct(forecast);
+    if (forecast && forecast.predictions) {
+      const { running } = forecast.predictions;
+      if (running) setUiViewerTypeAct(LIST_UI_VIEWER_TYPE.ANALYSIS);
+    }
   }
 
   render() {
     const {
       classes, topic, feature, cLabel, xLabel, yLabel, forecast,
-      isNmr, isIr, operations, uiSt, setPanelIdxAct,
+      isNmr, isIr, uiSt,
     } = this.props;
-    const { panelIdx } = uiSt.viewer;
+    const { viewer } = uiSt;
     const {
       inputCb, molecule,
     } = forecast;
 
     return (
       <div className={classes.root}>
-        <AppBar position="static" className={classes.appBar}>
-          <Tabs
-            indicatorColor="primary"
-            textColor="primary"
-            value={panelIdx}
-            onChange={setPanelIdxAct}
-          >
-            <Tab label={TabLabel(classes, 'Spectrum', 'txt-prd-tab-label')} />
-            <Tab label={TabLabel(classes, 'Analysis', 'txt-prd-tab-label')} />
-          </Tabs>
-        </AppBar>
         {
           <ViewerLine
             topic={topic}
@@ -84,25 +74,21 @@ class ForecastViewer extends React.Component {
             cLabel={cLabel}
             xLabel={xLabel}
             yLabel={yLabel}
-            isHidden={panelIdx !== 0}
+            isHidden={viewer !== LIST_UI_VIEWER_TYPE.SPECTRUM}
           />
         }
         {
-          panelIdx === 1 && isNmr && (
+          (viewer === LIST_UI_VIEWER_TYPE.ANALYSIS) && isNmr && (
             <NmrViewer
-              feature={feature}
               molecule={molecule}
-              operations={operations}
               inputCb={inputCb}
             />
           )
         }
         {
-          panelIdx === 1 && isIr && (
+          (viewer === LIST_UI_VIEWER_TYPE.ANALYSIS) && isIr && (
             <IrViewer
-              feature={feature}
               molecule={molecule}
-              operations={operations}
               inputCb={inputCb}
             />
           )
@@ -120,8 +106,8 @@ const mapStateToProps = (state, _) => ( // eslint-disable-line
 
 const mapDispatchToProps = dispatch => (
   bindActionCreators({
-    setPanelIdxAct: setPanelIdx,
     initForecastStatusAct: initForecastStatus,
+    setUiViewerTypeAct: setUiViewerType,
   }, dispatch)
 );
 
@@ -135,10 +121,9 @@ ForecastViewer.propTypes = {
   forecast: PropTypes.object.isRequired,
   isNmr: PropTypes.bool.isRequired,
   isIr: PropTypes.bool.isRequired,
-  operations: PropTypes.array.isRequired,
   uiSt: PropTypes.object.isRequired,
-  setPanelIdxAct: PropTypes.func.isRequired,
   initForecastStatusAct: PropTypes.func.isRequired,
+  setUiViewerTypeAct: PropTypes.func.isRequired,
 };
 
 export default compose(

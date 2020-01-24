@@ -1,18 +1,13 @@
 import {
   UI, EDITPEAK, INTEGRATION, MULTIPLICITY, MANAGER,
 } from '../constants/action_type';
+import { calcMpyType } from '../helpers/calc';
 
 const initialState = {
   stack: [],
   shift: 0,
   smExtext: false,
 };
-
-const mpyTypes = ['s', 'd', 't', 'dd'];
-
-const calcMpyType = pks => (
-  (pks.length > mpyTypes.length || pks.length === 0) ? mpyTypes[3] : mpyTypes[pks.length - 1]
-);
 
 const addToStack = (state, action) => {
   const { xExtent, yExtent, dataPks } = action.payload;
@@ -21,12 +16,16 @@ const addToStack = (state, action) => {
   const { yL, yU } = yExtent;
   let peaks = dataPks.filter(p => xL <= p.x && p.x <= xU && yL <= p.y && p.y <= yU);
   peaks = peaks.map(pk => ({ x: pk.x + shift, y: pk.y }));
+  const newXExtemt = { xL: xL + shift, xU: xU + shift };
   const m = {
-    peaks, xExtent, yExtent, mpyType: calcMpyType(peaks),
+    peaks,
+    xExtent: newXExtemt,
+    yExtent,
+    mpyType: calcMpyType(peaks),
   };
   const { stack } = state;
   const newStack = [...stack, m];
-  return Object.assign({}, state, { stack: newStack, smExtext: xExtent });
+  return Object.assign({}, state, { stack: newStack, smExtext: newXExtemt });
 };
 
 const setShift = (state, action) => {
@@ -59,7 +58,8 @@ const rmPanelPeakFromStack = (state, action) => {
   let newStack = stack.map((k) => {
     if (k.xExtent.xL === xExtent.xL && k.xExtent.xU === xExtent.xU) {
       const newPks = k.peaks.filter(pk => pk.x !== peak.x);
-      return Object.assign({}, k, { peaks: newPks });
+      const mpyType = calcMpyType(newPks);
+      return Object.assign({}, k, { peaks: newPks, mpyType });
     }
     return k;
   });
@@ -80,8 +80,10 @@ const rmUiPeakFromStack = (state, action) => {
 };
 
 const AddUiPeakToStack = (state, action) => {
-  const { x, y } = action.payload;
+  const { shift } = state;
+  let { x, y } = action.payload; // eslint-disable-line
   if (!x || !y) return state;
+  x += shift;
   const newPeak = { x, y };
   const { stack, smExtext } = state;
   const { xL, xU } = smExtext;
@@ -90,7 +92,9 @@ const AddUiPeakToStack = (state, action) => {
     if (k.xExtent.xL === xL && k.xExtent.xU === xU) {
       const existXs = k.peaks.map(pk => pk.x);
       if (existXs.indexOf(newPeak.x) >= 0) return k;
-      return Object.assign({}, k, { peaks: [...k.peaks, newPeak] });
+      const newPks = [...k.peaks, newPeak];
+      const mpyType = calcMpyType(newPks);
+      return Object.assign({}, k, { peaks: newPks, mpyType });
     }
     return k;
   });
@@ -114,6 +118,11 @@ const clickMpyOne = (state, action) => {
   return Object.assign({}, state, { smExtext: payload });
 };
 
+const resetAll = (state, action) => {
+  const newState = action.payload;
+  return Object.assign({}, state, newState);
+};
+
 const multiplicityReducer = (state = initialState, action) => {
   switch (action.type) {
     case UI.SWEEP.SELECT_MULTIPLICITY:
@@ -133,8 +142,10 @@ const multiplicityReducer = (state = initialState, action) => {
     case MULTIPLICITY.ONE_CLICK:
     case MULTIPLICITY.ONE_CLICK_BY_UI:
       return clickMpyOne(state, action);
+    case MULTIPLICITY.RESET_ALL:
+      return resetAll(state, action);
     case MANAGER.RESETALL:
-      return initialState;
+      return state;
     default:
       return state;
   }

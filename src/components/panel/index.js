@@ -10,7 +10,7 @@ import {
 
 import PeakPanel from './peaks';
 import MultiplicityPanel from './multiplicity';
-import Format from '../../helpers/format';
+import Cfg from '../../helpers/cfg';
 
 const theme = createMuiTheme({
   typography: {
@@ -20,7 +20,7 @@ const theme = createMuiTheme({
 
 const styles = () => ({
   panels: {
-    height: '63vh',
+    height: 'calc(75vh - 220px)',
     display: 'table',
     overflowX: 'hidden',
     overflowY: 'auto',
@@ -35,7 +35,7 @@ class PanelViewer extends React.Component {
     super(props);
 
     this.state = {
-      expand: 'mpy',
+      expand: 'peak',
     };
 
     this.onExapnd = this.onExapnd.bind(this);
@@ -52,15 +52,13 @@ class PanelViewer extends React.Component {
     const onExapndMpy = () => this.onExapnd('mpy');
 
     return (
-      <div>
-        <div className={classNames(classes.panels)}>
-          <MuiThemeProvider
-            theme={theme}
-          >
-            { !Format.isMsLayout(layoutSt) ? <PeakPanel expand={expand === 'peak'} onExapnd={onExapndPeak} /> : null }
-            { Format.isNmrLayout(layoutSt) ? <MultiplicityPanel expand={expand === 'mpy'} onExapnd={onExapndMpy} /> : null }
-          </MuiThemeProvider>
-        </div>
+      <div className={classNames(classes.panels)}>
+        <MuiThemeProvider
+          theme={theme}
+        >
+          { Cfg.hidePanelPeak(layoutSt) ? null : <PeakPanel expand={expand === 'peak'} onExapnd={onExapndPeak} /> }
+          { Cfg.hidePanelMpy(layoutSt) ? null : <MultiplicityPanel expand={expand === 'mpy'} onExapnd={onExapndMpy} /> }
+        </MuiThemeProvider>
       </div>
     );
   }

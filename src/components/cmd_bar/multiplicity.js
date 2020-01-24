@@ -7,13 +7,13 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
-import Icon from '@mdi/react';
-import { mdiCursorDefaultOutline } from '@mdi/js';
+// import Icon from '@mdi/react';
+// import { mdiCursorDefaultOutline } from '@mdi/js';
 
 import {
   LIST_UI_SWEEP_TYPE,
 } from '../../constants/list_ui';
-import Format from '../../helpers/format';
+import Cfg from '../../helpers/cfg';
 
 const styles = () => ({
   btn: {
@@ -55,78 +55,45 @@ const Multiplicity = ({
   const onSweepMutAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD);
   const onOneMutAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_RM);
   const onPeakMutAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_ADD);
-  const onPeakMutRm = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_RM);
-  const onOneMutClk = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_CLICK);
-  const iconColor = (sweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_CLICK) || !Format.is1HLayout(layoutSt) ? '#fff' : '#000';
-  const isDisable = !Format.isNmrLayout(layoutSt);
-  const { smExtext } = multiplicitySt;
-  const isDisablePeak = !smExtext;
 
   return (
     <span>
-      <Tooltip title="Add Multiplicity">
+      <Tooltip title={<span className="txt-sv-tp">Add Multiplicity</span>}>
         <span>
           <Button
             className={
               highlight(sweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD, classes)
             }
-            disabled={isDisable}
+            disabled={Cfg.btnCmdMpy(layoutSt)}
             onClick={onSweepMutAdd}
           >
-            <span className={classNames(classes.btnTxt, classes.sweepWrap)}>J+</span>
+            <span className={classNames(classes.btnTxt, classes.sweepWrap, 'cmd-txt-btn')}>J+</span>
           </Button>
         </span>
       </Tooltip>
-      <Tooltip title="Remove Multiplicity">
+      <Tooltip title={<span className="txt-sv-tp">Remove Multiplicity</span>}>
         <span>
           <Button
             className={
               highlight(sweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_RM, classes)
             }
-            disabled={isDisable}
+            disabled={Cfg.btnCmdMpy(layoutSt)}
             onClick={onOneMutAdd}
           >
-            <span className={classes.btnTxt}>J-</span>
+            <span className={classNames(classes.btnTxt, 'cmd-txt-btn')}>J-</span>
           </Button>
         </span>
       </Tooltip>
-      <Tooltip title="Select Multiplicity">
-        <span>
-          <Button
-            className={
-              highlight(sweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_CLICK, classes)
-            }
-            disabled={isDisable}
-            onClick={onOneMutClk}
-          >
-            <span className={classes.btnTxt}>J</span>
-            <Icon path={mdiCursorDefaultOutline} size={0.5} color={iconColor} />
-          </Button>
-        </span>
-      </Tooltip>
-      <Tooltip title="Add Peak for Multiplicity">
+      <Tooltip title={<span className="txt-sv-tp">Add Peak for Multiplicity</span>}>
         <span>
           <Button
             className={
               highlight(sweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_ADD, classes)
             }
-            disabled={isDisable || isDisablePeak}
+            disabled={Cfg.btnCmdMpyPeak(layoutSt, multiplicitySt)}
             onClick={onPeakMutAdd}
           >
-            <span className={classes.btnTxt}>JP+</span>
-          </Button>
-        </span>
-      </Tooltip>
-      <Tooltip title="Remove Peak for Multiplicity">
-        <span>
-          <Button
-            className={
-              highlight(sweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_RM, classes)
-            }
-            disabled={isDisable || isDisablePeak}
-            onClick={onPeakMutRm}
-          >
-            <span className={classes.btnTxt}>JP-</span>
+            <span className={classNames(classes.btnTxt, 'cmd-txt-btn')}>JP+</span>
           </Button>
         </span>
       </Tooltip>
@@ -157,3 +124,33 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps,
 )(withStyles(styles)(Multiplicity));
+
+/*
+      <Tooltip title={<span className="txt-sv-tp">Select Multiplicity</span>}>
+        <span>
+          <Button
+            className={
+              highlight(sweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_CLICK, classes)
+            }
+            disabled={isDisable}
+            onClick={onOneMutClk}
+          >
+            <span className={classes.btnTxt}>J</span>
+            <Icon path={mdiCursorDefaultOutline} size={0.5} color={iconColor} />
+          </Button>
+        </span>
+      </Tooltip>
+      <Tooltip title={<span className="txt-sv-tp">Remove Peak for Multiplicity</span>}>
+        <span>
+          <Button
+            className={
+              highlight(sweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_RM, classes)
+            }
+            disabled={isDisable || isDisablePeak}
+            onClick={onPeakMutRm}
+          >
+            <span className={classes.btnTxt}>JP-</span>
+          </Button>
+        </span>
+      </Tooltip>
+*/

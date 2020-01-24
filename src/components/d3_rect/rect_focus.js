@@ -2,33 +2,38 @@ import * as d3 from 'd3';
 import {
   InitScale, InitAxisCall, InitTip,
 } from '../../helpers/init';
+import MountBrush from '../../helpers/brush';
 import {
-  MountGrid, MountAxis, MountAxisLabelY, MountRef,
-  MountClip, MountMainFrame, MountCircles, MountThresLine, MountBars,
+  MountGrid, MountAxis, MountAxisLabelX, MountAxisLabelY, MountRef,
+  MountClip, MountMainFrame, MountThresLine, MountBars,
 } from '../../helpers/mount';
 import { TfRescale } from '../../helpers/compass';
 import { PksEdit } from '../../helpers/converter';
-import { LIST_MODE } from '../../constants/list_mode';
+import { LIST_LAYOUT } from '../../constants/list_layout';
 
 class RectFocus {
   constructor(props) {
     const {
-      W, H, clickPointAct,
+      W, H, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
     } = props;
+
+    this.rootKlass = '.d3Rect';
     this.margin = {
-      t: 10,
-      b: 60 + Math.round((H - 90) * 0.2) + 20,
-      l: 80,
-      r: 20,
+      t: 5,
+      b: 40,
+      l: 60,
+      r: 5,
     };
     this.w = W - this.margin.l - this.margin.r;
     this.h = H - this.margin.t - this.margin.b;
-    this.clickPointAct = clickPointAct;
+    this.clickUiTargetAct = clickUiTargetAct;
+    this.selectUiSweepAct = selectUiSweepAct;
+    this.scrollUiWheelAct = scrollUiWheelAct;
+    this.brush = d3.brush();
 
     this.axis = null;
     this.thresLine = null;
     this.grid = null;
-    this.circles = null;
     this.ref = null;
     this.ccPattern = null;
     this.data = [];
@@ -37,40 +42,27 @@ class RectFocus {
     this.tSfPeaks = null;
     this.root = null;
     this.svg = null;
-    this.overlay = null;
-    this.compass = null;
     this.bars = null;
     this.scales = InitScale(this, false);
     this.axisCall = InitAxisCall(5);
     this.pathCall = null;
-    this.tip = InitTip(this);
+    this.tip = null;
+    this.factor = 0.125;
+    this.currentExtent = null;
 
-    this.setSvg = this.setSvg.bind(this);
-    this.setRoot = this.setRoot.bind(this);
     this.setTip = this.setTip.bind(this);
-    this.setTrans = this.setTrans.bind(this);
     this.setDataParams = this.setDataParams.bind(this);
-    this.setOverlay = this.setOverlay.bind(this);
-    this.setCompass = this.setCompass.bind(this);
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
     this.setConfig = this.setConfig.bind(this);
     this.drawBar = this.drawBar.bind(this);
     this.drawThres = this.drawThres.bind(this);
     this.drawGrid = this.drawGrid.bind(this);
-    this.onClickEditPeak = this.onClickEditPeak.bind(this);
     this.mergedPeaks = this.mergedPeaks.bind(this);
   }
 
-  setSvg(svg) {
-    this.svg = svg;
-  }
-
-  setRoot(el) {
-    this.root = d3.select(el).selectAll('.focus-main');
-  }
-
-  setTip() {
+  setTip(typ) {
+    this.tip = InitTip(typ);
     this.root.call(this.tip);
   }
 
@@ -81,43 +73,31 @@ class RectFocus {
     this.tSfPeaks = tSfPeaks;
   }
 
-  setTrans() {
-    this.trans = d3.transition().duration(500);
-  }
-
-  setOverlay() {
-    this.overlay = this.root.append('rect')
-      .attr('class', 'overlay-focus')
-      .attr('width', this.w)
-      .attr('height', this.h)
-      .attr('opacity', 0.0);
-  }
-
-  setCompass() {
-    this.compass = this.root.append('g')
-      .attr('class', 'compass')
-      .attr('display', 'none');
-  }
-
   updatePathCall(xt, yt) {
     this.pathCall = d3.line()
       .x(d => xt(d.x))
       .y(d => yt(d.y));
   }
 
-  setConfig() {
+  setConfig(uiSt) {
     // Domain Calculate
-    const factor = 1.10;
-    const xExtent = [
-      d3.min(this.data, d => d.x) - 5,
-      d3.max(this.data, d => d.x) + 5,
-    ];
-    const yExtent = [
-      0,
-      d3.max(this.data, d => d.y) * factor,
-    ];
-    this.scales.x.domain(xExtent);
-    this.scales.y.domain(yExtent);
+    let { xExtent, yExtent } = uiSt
+      ? uiSt.sweepExtent
+      : { xExtent: false, yExtent: false };
+    if (!xExtent || !yExtent) {
+      const xes = d3.extent(this.data, d => d.x).sort((a, b) => a - b);
+      xExtent = { xL: xes[0] - 10, xU: xes[1] + 10 };
+      const btm = 0; // MS baseline is always 0.
+      const top = d3.max(this.data, d => d.y);
+      const height = top - btm;
+      yExtent = {
+        yL: (btm - this.factor * height),
+        yU: (top + this.factor * height),
+      };
+    }
+
+    this.scales.x.domain([xExtent.xL, xExtent.xU]);
+    this.scales.y.domain([yExtent.yL, yExtent.yU]);
 
     // rescale for zoom
     const { xt, yt } = TfRescale(this);
@@ -125,6 +105,8 @@ class RectFocus {
     // Axis Call
     this.axisCall.x.scale(xt);
     this.axisCall.y.scale(yt);
+
+    this.currentExtent = { xExtent, yExtent };
   }
 
   posHeight(gnd, val) {
@@ -133,7 +115,7 @@ class RectFocus {
   }
 
   barColor(y, yRef) {
-    return y >= yRef ? 'steelblue' : '#ddd';
+    return y >= yRef ? 'steelblue' : '#aaa';
   }
 
   drawBar() {
@@ -175,25 +157,15 @@ class RectFocus {
     this.grid.x.call(this.axisCall.x
       .tickSize(-this.h, 0, 0))
       .selectAll('line')
-      .attr('stroke', '#bbbbbb')
+      .attr('stroke', '#ddd')
       .attr('stroke-opacity', 0.6)
       .attr('fill', 'none');
     this.grid.y.call(this.axisCall.y
       .tickSize(-this.w, 0, 0))
       .selectAll('line')
-      .attr('stroke', '#bbbbbb')
+      .attr('stroke', '#ddd')
       .attr('stroke-opacity', 0.6)
       .attr('fill', 'none');
-  }
-
-  onClickEditPeak(data, editModeSt) {
-    d3.event.stopPropagation();
-    d3.event.preventDefault();
-    if (editModeSt === LIST_MODE.RM_PEAK) {
-      this.tip.hide();
-    }
-    const onPeak = true;
-    this.clickPointAct(data, onPeak);
   }
 
   mergedPeaks(editPeakSt) {
@@ -202,51 +174,47 @@ class RectFocus {
     return this.dataPks;
   }
 
-  create(
-    el, svg, filterSeed, filterPeak, tTrEndPts, tSfPeaks,
-  ) {
-    this.setSvg(svg);
-
+  create({
+    filterSeed, filterPeak, tTrEndPts, tSfPeaks, uiSt,
+  }) {
+    this.svg = d3.select('.d3Svg');
     MountMainFrame(this, 'focus');
     MountClip(this);
 
-    this.setRoot(el);
-    this.setTip();
+    this.root = d3.select(this.rootKlass).selectAll('.focus-main');
+    this.setTip(LIST_LAYOUT.MS);
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks);
-    this.setCompass();
-    this.setOverlay();
 
     this.axis = MountAxis(this);
     this.thresLine = MountThresLine(this, 'green');
     this.grid = MountGrid(this);
-    this.circles = MountCircles(this);
     this.ref = MountRef(this);
     this.bars = MountBars(this);
+    MountAxisLabelX(this);
     MountAxisLabelY(this);
-    // if (cLabel) {
-    //   MountMarker(this, 'steelblue');
-    // }
 
     if (this.data && this.data.length > 0) {
-      this.setConfig();
+      this.setConfig(uiSt);
       this.drawBar();
       this.drawThres();
       this.drawGrid();
     }
+    MountBrush(this, uiSt);
   }
 
-  update(
-    el, svg, filterSeed, filterPeak, tTrEndPts, tSfPeaks,
-  ) {
-    this.setRoot(el);
+  update({
+    filterSeed, filterPeak, tTrEndPts, tSfPeaks, uiSt,
+  }) {
+    this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks);
 
     if (this.data && this.data.length > 0) {
-      this.setConfig();
+      this.setConfig(uiSt);
       this.drawBar();
       this.drawThres();
       this.drawGrid();
     }
+    MountBrush(this, uiSt);
   }
 }
 

@@ -7,7 +7,9 @@ import { withStyles } from '@material-ui/core/styles';
 
 import { updateOperation } from './actions/submit';
 import { resetScanAll } from './actions/scan';
+import { resetParamsAll } from './actions/manager';
 import LayerPrism from './layer_prism';
+import { GetFeature } from './helpers/chem';
 
 const styles = () => ({
 });
@@ -31,9 +33,9 @@ class LayerInit extends React.Component {
   }
 
   normChange(prevProps) {
-    const oldFeat = prevProps.entity.features[0];
+    const oldFeat = GetFeature(prevProps.entity);
     const { entity } = this.props;
-    const newFeat = entity.features[0];
+    const newFeat = GetFeature(entity);
 
     if (oldFeat !== newFeat) {
       this.execReset();
@@ -41,9 +43,16 @@ class LayerInit extends React.Component {
   }
 
   execReset() {
-    const { entity, resetScanAllAct } = this.props;
-    const baseFeat = entity.features[0];
-    resetScanAllAct(baseFeat);
+    const { entity, resetScanAllAct, resetParamsAllAct } = this.props;
+    const isEnMs = entity.spectrum.sTyp === 'MS';
+    if (isEnMs) {
+      const baseFeat = entity.features[0];
+      resetScanAllAct(baseFeat);
+    }
+    const { integration, multiplicity } = entity.features;
+    resetParamsAllAct({
+      integration, multiplicity,
+    });
   }
 
   initReducer() {
@@ -79,6 +88,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
 const mapDispatchToProps = dispatch => (
   bindActionCreators({
     resetScanAllAct: resetScanAll,
+    resetParamsAllAct: resetParamsAll,
     updateOperationAct: updateOperation,
   }, dispatch)
 );
@@ -91,6 +101,7 @@ LayerInit.propTypes = {
   forecast: PropTypes.object.isRequired,
   operations: PropTypes.array.isRequired,
   resetScanAllAct: PropTypes.func.isRequired,
+  resetParamsAllAct: PropTypes.func.isRequired,
   updateOperationAct: PropTypes.func.isRequired,
 };
 

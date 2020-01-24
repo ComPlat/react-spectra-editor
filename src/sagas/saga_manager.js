@@ -1,6 +1,8 @@
 import { put, takeEvery, select } from 'redux-saga/effects';
 
-import { MANAGER } from '../constants/action_type';
+import {
+  MANAGER, INTEGRATION, MULTIPLICITY,
+} from '../constants/action_type';
 
 
 const getLayout = state => state.layout;
@@ -21,8 +23,26 @@ function* resetShift(action) {
   });
 }
 
+function* resetParamsAll(action) {
+  const { integration, multiplicity } = action.payload;
+
+  if (integration) {
+    yield put({
+      type: INTEGRATION.RESET_ALL,
+      payload: integration,
+    });
+  }
+  if (multiplicity) {
+    yield put({
+      type: MULTIPLICITY.RESET_ALL,
+      payload: multiplicity,
+    });
+  }
+}
+
 const managerSagas = [
   takeEvery(MANAGER.RESETALL, resetShift),
+  takeEvery(MANAGER.RESETPARAMSALL, resetParamsAll),
 ];
 
 export default managerSagas;

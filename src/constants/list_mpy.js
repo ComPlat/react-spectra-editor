@@ -1,10 +1,5 @@
-const LIST_MPY = {
-  s: 's',
-  d: 'd',
-  dd: 'dd',
-  t: 't',
-};
+const LIST_MPYS = ['s', 'd', 't', 'dd', 'm'];
 
 export {
-  LIST_MPY,  // eslint-disable-line
+  LIST_MPYS, // eslint-disable-line
 };

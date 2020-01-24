@@ -11,7 +11,7 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 
 import {
-  sectionInput, sectionSubmit, sectionSvg,
+  sectionInput, sectionSvg,
   notToRenderAnalysis,
 } from './comps';
 import {
@@ -21,9 +21,8 @@ import {
 
 const Styles = () => ({
   root: {
-    height: '65vh',
     overflowX: 'hidden',
-    overflowY: 'scroll',
+    overflowY: 'auto',
   },
   container: {
     minHeight: '400px',
@@ -59,7 +58,7 @@ const sectionTable = (classes, pds) => {
   if (renderMsg) return renderMsg;
 
   const dict = pds.output.result[0];
-  if (!dict) return null;
+  if (!dict) return <div />;
   return (
     <Paper className={classes.tableRoot}>
       <Table className={classes.table} size="small">
@@ -77,10 +76,9 @@ const sectionTable = (classes, pds) => {
 };
 
 const NmrViewer = ({
-  classes, feature, molecule, operations, inputCb, forecastSt,
+  classes, molecule, inputCb, forecastSt,
 }) => (
   <div className={classNames(classes.root, 'card-forecast-viewer')}>
-    { sectionSubmit(classes, operations, feature, molecule) }
     <Grid className={classNames(classes.container)} container>
       <Grid item xs={4}>
         { sectionSvg(classes, forecastSt.predictions) }
@@ -107,9 +105,7 @@ const mapDispatchToProps = dispatch => (
 
 NmrViewer.propTypes = {
   classes: PropTypes.object.isRequired,
-  feature: PropTypes.object.isRequired,
   molecule: PropTypes.string.isRequired,
-  operations: PropTypes.array.isRequired,
   inputCb: PropTypes.oneOfType([
     PropTypes.func,
     PropTypes.bool,

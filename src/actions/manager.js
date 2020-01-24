@@ -7,4 +7,13 @@ const resetAll = payload => (
   }
 );
 
-export { resetAll }; // eslint-disable-line
+const resetParamsAll = payload => (
+  {
+    type: MANAGER.RESETPARAMSALL,
+    payload,
+  }
+);
+
+export {
+  resetAll, resetParamsAll,
+}; // eslint-disable-line

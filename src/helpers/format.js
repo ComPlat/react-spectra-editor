@@ -182,8 +182,10 @@ const isMs = po => po.operation.typ === LIST_LAYOUT.MS;
 const isNmrLayout = layoutSt => (
   [LIST_LAYOUT.H1, LIST_LAYOUT.C13].indexOf(layoutSt) >= 0
 );
-const isMsLayout = layoutSt => [LIST_LAYOUT.MS].indexOf(layoutSt) >= 0;
-const isIrLayout = layoutSt => [LIST_LAYOUT.IR].indexOf(layoutSt) >= 0;
+const is13CLayout = layoutSt => (LIST_LAYOUT.C13 === layoutSt);
+const is1HLayout = layoutSt => (LIST_LAYOUT.H1 === layoutSt);
+const isMsLayout = layoutSt => (LIST_LAYOUT.MS === layoutSt);
+const isIrLayout = layoutSt => (LIST_LAYOUT.IR === layoutSt);
 
 const formatPeaksByPrediction = (
   peaks, layout, isAscend, decimal, predictions = [],
@@ -225,6 +227,8 @@ const Format = {
   rmShiftFromPeaks,
   isMs,
   isNmrLayout,
+  is13CLayout,
+  is1HLayout,
   isMsLayout,
   isIrLayout,
   fixDigit,

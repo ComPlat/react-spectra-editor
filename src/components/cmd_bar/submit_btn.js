@@ -25,6 +25,7 @@ const styles = () => ({
 const onClickCb = (
   operation, peaksEdit, isAscend, isIntensity,
   scan, thres, layoutSt, shiftSt, analysis, decimalSt,
+  integrationSt, multiplicitySt,
 ) => (
   () => {
     operation({
@@ -37,6 +38,8 @@ const onClickCb = (
       isIntensity,
       analysis,
       decimal: decimalSt,
+      integration: integrationSt,
+      multiplicity: multiplicitySt,
     });
   }
 );
@@ -44,7 +47,7 @@ const onClickCb = (
 const BtnSubmit = ({
   classes, operation, feature, isAscend, isIntensity, disabled,
   editPeakSt, thresSt, statusSt, layoutSt, shiftSt, scanSt, forecastSt,
-  decimalSt,
+  decimalSt, integrationSt, multiplicitySt,
 }) => {
   const { ref, peak } = shiftSt;
 
@@ -58,20 +61,19 @@ const BtnSubmit = ({
   if (!operation) return null;
 
   return (
-    <Tooltip title="Submit">
-      <span>
-        <Button
-          className={classes.btn}
-          color="primary"
-          disabled={disBtn}
-          onClick={onClickCb(
-            operation.value, peaksEdit, isAscend, isIntensity,
-            scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt,
-          )}
-        >
-          <PlayCircleOutlineIcon />
-        </Button>
-      </span>
+    <Tooltip title={<span className="txt-sv-tp">Submit</span>}>
+      <Button
+        className={classes.btn}
+        color="primary"
+        disabled={disBtn}
+        onClick={onClickCb(
+          operation.value, peaksEdit, isAscend, isIntensity,
+          scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt,
+          integrationSt, multiplicitySt,
+        )}
+      >
+        <PlayCircleOutlineIcon />
+      </Button>
     </Tooltip>
   );
 };
@@ -86,6 +88,8 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     scanSt: state.scan,
     forecastSt: state.forecast,
     decimalSt: state.submit.decimal,
+    integrationSt: state.integration,
+    multiplicitySt: state.multiplicity,
   }
 );
 
@@ -114,6 +118,8 @@ BtnSubmit.propTypes = {
   scanSt: PropTypes.object.isRequired,
   forecastSt: PropTypes.object.isRequired,
   decimalSt: PropTypes.number.isRequired,
+  integrationSt: PropTypes.object.isRequired,
+  multiplicitySt: PropTypes.object.isRequired,
 };
 
 export default compose(

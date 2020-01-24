@@ -15,6 +15,7 @@ import {
   LIST_UI_SWEEP_TYPE,
 } from '../../constants/list_ui';
 import Format from '../../helpers/format';
+import Cfg from '../../helpers/cfg';
 
 const styles = () => ({
   btn: {
@@ -70,9 +71,9 @@ const setFactor = (
       value={refFactor || 1.00}
       margin="none"
       InputProps={{
-        className: classNames(classes.txtInput, 'txt-input'),
+        className: classNames(classes.txtInput, 'txt-sv-input-label'),
       }}
-      label="Ref. Area"
+      label={<span className={classNames('cmd-txt-label')}>Ref Area</span>}
       onChange={onChange}
       onBlur={onBlur}
       onKeyPress={onEnterPress}
@@ -92,11 +93,11 @@ const Integration = ({
   const iconAddColor = (sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD) || !Format.is1HLayout(layoutSt) ? '#fff' : '#000';
   const iconRMColor = (sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_RM) || !Format.is1HLayout(layoutSt) ? '#fff' : '#000';
   const iconSRColor = (sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF) || !Format.is1HLayout(layoutSt) ? '#fff' : '#000';
-  const isDisable = !Format.is1HLayout(layoutSt);
+  const isDisable = Cfg.btnCmdIntg(layoutSt);
 
   return (
     <span>
-      <Tooltip title="Add Integration">
+      <Tooltip title={<span className="txt-sv-tp">Add Integration</span>}>
         <span>
           <Button
             className={
@@ -109,13 +110,13 @@ const Integration = ({
               path={mdiMathIntegral}
               size={1}
               color={iconAddColor}
-              className={classes.sweepWrap}
+              className={classNames(classes.sweepWrap, 'cmd-mdi-icon')}
             />
             <span className={classes.btnTxt}>+</span>
           </Button>
         </span>
       </Tooltip>
-      <Tooltip title="Remove Integration">
+      <Tooltip title={<span className="txt-sv-tp">Remove Integration</span>}>
         <span>
           <Button
             className={
@@ -124,12 +125,17 @@ const Integration = ({
             disabled={isDisable}
             onClick={onSweepIntegtRm}
           >
-            <Icon path={mdiMathIntegral} size={1} color={iconRMColor} />
+            <Icon
+              path={mdiMathIntegral}
+              size={1}
+              color={iconRMColor}
+              className={classNames('cmd-mdi-icon')}
+            />
             <span className={classes.btnTxt}>-</span>
           </Button>
         </span>
       </Tooltip>
-      <Tooltip title="Set Integration Reference">
+      <Tooltip title={<span className="txt-sv-tp">Set Integration Reference</span>}>
         <span>
           <Button
             className={
@@ -138,7 +144,12 @@ const Integration = ({
             disabled={isDisable}
             onClick={onSweepIntegtSR}
           >
-            <Icon path={mdiReflectVertical} size={1} color={iconSRColor} />
+            <Icon
+              path={mdiReflectVertical}
+              size={1}
+              color={iconSRColor}
+              className={classNames('cmd-mdi-icon')}
+            />
           </Button>
         </span>
       </Tooltip>

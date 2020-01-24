@@ -60,7 +60,7 @@ const ascendSelect = (
       className={classNames(classes.formControlAsc)}
       variant="outlined"
     >
-      <InputLabel className={classes.selectLabel}>
+      <InputLabel className={classNames(classes.selectLabel, 'cmd-txt-label')}>
         Write Peaks
       </InputLabel>
       <Select
@@ -101,7 +101,7 @@ const intensitySelect = (
       className={classNames(classes.formControlInt)}
       variant="outlined"
     >
-      <InputLabel className={classes.selectLabel}>
+      <InputLabel className={classNames(classes.selectLabel, 'cmd-txt-label')}>
         Write Intensity
       </InputLabel>
       <Select
@@ -150,7 +150,7 @@ const decimalSelect = (
       className={classNames(classes.formControlDcm)}
       variant="outlined"
     >
-      <InputLabel className={classes.selectLabel}>
+      <InputLabel className={classNames(classes.selectLabel, 'cmd-txt-label')}>
         Decimal
       </InputLabel>
       <Select
@@ -188,7 +188,7 @@ const operationSelect = (
       className={classNames(classes.formControlOp)}
       variant="outlined"
     >
-      <InputLabel className={classes.selectLabel}>
+      <InputLabel className={classNames(classes.selectLabel, 'cmd-txt-label')}>
         Submit
       </InputLabel>
       <Select

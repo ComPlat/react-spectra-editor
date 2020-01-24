@@ -1,10 +1,39 @@
 import { ClickCompass } from './compass';
 
-const MountCircles = (target) => {
-  const circles = target.root.append('g')
-    .attr('class', 'circles-clip')
+const MountTags = (target) => {
+  const igbPath = target.root.append('g')
+    .attr('class', 'igbPath-clip')
     .attr('clip-path', 'url(#clip)');
-  return circles;
+  const igcPath = target.root.append('g')
+    .attr('class', 'igcPath-clip')
+    .attr('clip-path', 'url(#clip)');
+  const igtPath = target.root.append('g')
+    .attr('class', 'igtPath-clip')
+    .attr('clip-path', 'url(#clip)');
+  const pPath = target.root.append('g')
+    .attr('class', 'pPath-clip')
+    .attr('clip-path', 'url(#clip)');
+  const bpPath = target.root.append('g')
+    .attr('class', 'bpPath-clip')
+    .attr('clip-path', 'url(#clip)');
+  const bpTxt = target.root.append('g')
+    .attr('class', 'bpTxt-clip')
+    .attr('clip-path', 'url(#clip)');
+  const mpybPath = target.root.append('g')
+    .attr('class', 'mpybPath-clip')
+    .attr('clip-path', 'url(#clip)');
+  const mpyt1Path = target.root.append('g')
+    .attr('class', 'mpyt1Path-clip')
+    .attr('clip-path', 'url(#clip)');
+  const mpyt2Path = target.root.append('g')
+    .attr('class', 'mpyt2Path-clip')
+    .attr('clip-path', 'url(#clip)');
+  const mpypPath = target.root.append('g')
+    .attr('class', 'mpypPath-clip')
+    .attr('clip-path', 'url(#clip)');
+  return {
+    pPath, bpPath, bpTxt, igbPath, igcPath, igtPath, mpybPath, mpyt1Path, mpyt2Path, mpypPath,
+  };
 };
 
 const MountBars = (target) => {
@@ -68,7 +97,7 @@ const MountAxis = (target) => {
 };
 
 const MountAxisLabelX = (target) => {
-  const xTrans = `translate(${target.w / 2}, ${target.h + 40})`;
+  const xTrans = `translate(${target.w / 2}, ${target.h + 30})`;
   target.root.append('text')
     .attr('text-anchor', 'middle')
     .attr('transform', xTrans)
@@ -77,7 +106,7 @@ const MountAxisLabelX = (target) => {
 
 const MountAxisLabelY = (target) => {
   const yR = 'rotate(-90)';
-  const yTrans = `translate(${30 - target.margin.l}, ${target.h / 2}) ${yR}`;
+  const yTrans = `translate(${16 - target.margin.l}, ${target.h / 2}) ${yR}`;
   target.root.append('text')
     .attr('text-anchor', 'middle')
     .attr('transform', yTrans)
@@ -121,7 +150,7 @@ const MountMainFrame = (target, name) => {
 };
 
 export {
-  MountCircles, MountRef, MountPath, MountThresLine, MountGrid, MountAxis,
+  MountTags, MountRef, MountPath, MountThresLine, MountGrid, MountAxis,
   MountAxisLabelX, MountAxisLabelY,
   MountMarker, MountClip, MountMainFrame, MountBars,
 };

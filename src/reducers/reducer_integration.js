@@ -57,7 +57,7 @@ const setRef = (state, action) => {
 };
 
 const setFkr = (state, action) => {
-  const val = action.payload;
+  const val = parseFloat(action.payload);
   const refFactor = val < 0.01 ? 0.01 : val;
   return Object.assign({}, state, { refFactor });
 };
@@ -65,6 +65,11 @@ const setFkr = (state, action) => {
 const setShift = (state, action) => {
   const shift = action.payload.prevOffset;
   return Object.assign({}, state, { shift });
+};
+
+const resetAll = (state, action) => {
+  const newState = action.payload;
+  return Object.assign({}, state, newState);
 };
 
 const integrationReducer = (state = initialState, action) => {
@@ -77,10 +82,12 @@ const integrationReducer = (state = initialState, action) => {
       return setRef(state, action);
     case INTEGRATION.SET_FKR:
       return setFkr(state, action);
+    case INTEGRATION.RESET_ALL:
+      return resetAll(state, action);
     case EDITPEAK.SHIFT:
       return setShift(state, action);
     case MANAGER.RESETALL:
-      return initialState;
+      return state;
     default:
       return state;
   }

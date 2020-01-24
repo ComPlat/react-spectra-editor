@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
 
-import ViewerLine from './components/viewer_line';
-import ViewerRect from './components/viewer_rect';
+import ViewerLine from './components/d3_line/index';
+import ViewerRect from './components/d3_rect/index';
 import ForecastViewer from './components/forecast_viewer';
 import Format from './helpers/format';
 

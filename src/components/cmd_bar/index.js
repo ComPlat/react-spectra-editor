@@ -20,12 +20,12 @@ import {
   LIST_UI_VIEWER_TYPE,
   LIST_UI_SWEEP_TYPE,
 } from '../../constants/list_ui';
-import Format from '../../helpers/format';
 import Layout from './layout';
 import Threshold from './threshold';
 import Submit from './submit';
 import Integration from './integration';
 import Multiplicity from './multiplicity';
+import Cfg from '../../helpers/cfg';
 
 const styles = () => ({
   card: {
@@ -34,7 +34,7 @@ const styles = () => ({
     height: 104,
     margin: '7px 0 5px 0',
   },
-  cardFirst: {
+  cardTop: {
     margin: '4px 0 0 0',
   },
   group: {
@@ -88,31 +88,33 @@ const GroupViewer = ({
 
   return (
     <span className={classes.group}>
-      <Tooltip title="Spectrum Viewer">
-        <span>
-          <Button
-            className={
-              highlight(viewer === LIST_UI_VIEWER_TYPE.SPECTRUM, classes)
-            }
-            onClick={onViewSpectrum}
-          >
-            <TimelineOutlinedIcon />
-          </Button>
-        </span>
+      <Tooltip title={<span className="txt-sv-tp">Spectrum Viewer</span>}>
+        <Button
+          className={
+            highlight(viewer === LIST_UI_VIEWER_TYPE.SPECTRUM, classes)
+          }
+          onClick={onViewSpectrum}
+        >
+          <TimelineOutlinedIcon />
+        </Button>
       </Tooltip>
-      <Tooltip title="Analysis Viewer">
-        <span>
-          <Button
-            className={
-              highlight(viewer === LIST_UI_VIEWER_TYPE.ANALYSIS, classes)
-            }
-            disabled={Format.isMsLayout(layoutSt)}
-            onClick={onViewAnalysis}
-          >
-            <SpellcheckOutlinedIcon />
-          </Button>
-        </span>
-      </Tooltip>
+      {
+        Cfg.hideCmdAnaViewer(layoutSt)
+          ? null
+          : (
+            <Tooltip title={<span className="txt-sv-tp">Analysis Viewer</span>}>
+              <Button
+                className={
+                  highlight(viewer === LIST_UI_VIEWER_TYPE.ANALYSIS, classes)
+                }
+                disabled={Cfg.btnCmdAnaViewer(layoutSt)}
+                onClick={onViewAnalysis}
+              >
+                <SpellcheckOutlinedIcon />
+              </Button>
+            </Tooltip>
+          )
+      }
     </span>
   );
 };
@@ -177,27 +179,23 @@ const GroupZoom = ({
 
   return (
     <span className={classes.group}>
-      <Tooltip title="Zoom In">
-        <span>
-          <Button
-            className={
-              highlight(sweepType === LIST_UI_SWEEP_TYPE.ZOOMIN, classes)
-            }
-            onClick={onSweepZoomIn}
-          >
-            <ZoomInOutlinedIcon className={classes.sweepWrap} />
-          </Button>
-        </span>
+      <Tooltip title={<span className="txt-sv-tp">Zoom In</span>}>
+        <Button
+          className={
+            highlight(sweepType === LIST_UI_SWEEP_TYPE.ZOOMIN, classes)
+          }
+          onClick={onSweepZoomIn}
+        >
+          <ZoomInOutlinedIcon className={classes.sweepWrap} />
+        </Button>
       </Tooltip>
-      <Tooltip title="Reset Zoom">
-        <span>
-          <Button
-            className={classes.btn}
-            onClick={onSweepZoomReset}
-          >
-            <FindReplaceOutlinedIcon />
-          </Button>
-        </span>
+      <Tooltip title={<span className="txt-sv-tp">Reset Zoom</span>}>
+        <Button
+          className={classes.btn}
+          onClick={onSweepZoomReset}
+        >
+          <FindReplaceOutlinedIcon />
+        </Button>
       </Tooltip>
     </span>
   );
@@ -218,39 +216,39 @@ const GroupPeak = ({
   const onSweepAnchorShift = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT);
   return (
     <span className={classes.group}>
-      <Tooltip title="Add Peak">
+      <Tooltip title={<span className="txt-sv-tp">Add Peak</span>}>
         <span>
           <Button
             className={
               highlight(sweepType === LIST_UI_SWEEP_TYPE.PEAK_ADD, classes)
             }
-            disabled={Format.isMsLayout(layoutSt)}
+            disabled={Cfg.btnCmdAddPeak(layoutSt)}
             onClick={onSweepPeakAdd}
           >
-            <span className={classNames(classes.btnPeakTxt)}>P+</span>
+            <span className={classNames(classes.btnPeakTxt, 'cmd-txt-btn')}>P+</span>
           </Button>
         </span>
       </Tooltip>
-      <Tooltip title="Remove Peak">
+      <Tooltip title={<span className="txt-sv-tp">Remove Peak</span>}>
         <span>
           <Button
             className={
               highlight(sweepType === LIST_UI_SWEEP_TYPE.PEAK_DELETE, classes)
             }
-            disabled={Format.isMsLayout(layoutSt)}
+            disabled={Cfg.btnCmdRmPeak(layoutSt)}
             onClick={onSweepPeakDELETE}
           >
-            <span className={classNames(classes.btnPeakTxt)}>P-</span>
+            <span className={classNames(classes.btnPeakTxt, 'cmd-txt-btn')}>P-</span>
           </Button>
         </span>
       </Tooltip>
-      <Tooltip title="Set Reference">
+      <Tooltip title={<span className="txt-sv-tp">Set Reference</span>}>
         <span>
           <Button
             className={
               highlight(sweepType === LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT, classes)
             }
-            disabled={!Format.isNmrLayout(layoutSt)}
+            disabled={Cfg.btnCmdSetRef(layoutSt)}
             onClick={onSweepAnchorShift}
           >
             <AddLocationOutlinedIcon />
@@ -314,7 +312,7 @@ const CmdBar = ({
   setUiViewerTypeAct, setUiSweepTypeAct, setIntegrationFkrAct,
 }) => (
   <Card className={classes.card}>
-    <div className={classes.cardFirst}>
+    <div className={classes.cardTop}>
       <GroupViewer
         classes={classes}
         uiSt={uiSt}

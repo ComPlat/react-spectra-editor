@@ -58,32 +58,28 @@ const restoreTp = (hasEdit, isEdit) => (
 const btnRestore = (
   classes, hasEdit, isEdit, toggleEditAct,
 ) => (
-  <Tooltip title={restoreTp(hasEdit, isEdit)}>
-    <span>
-      <Button
-        className={classes.btn}
-        disabled={!hasEdit}
-        onClick={toggleEditAct}
-      >
-        { restoreIcon(hasEdit, isEdit) }
-      </Button>
-    </span>
+  <Tooltip title={<span className="txt-sv-tp">{restoreTp(hasEdit, isEdit)}</span>}>
+    <Button
+      className={classes.btn}
+      disabled={!hasEdit}
+      onClick={toggleEditAct}
+    >
+      { restoreIcon(hasEdit, isEdit) }
+    </Button>
   </Tooltip>
 );
 
 const btnRrfresh = (
   classes, disabled, refreshAct,
 ) => (
-  <Tooltip title="Refresh Scan">
-    <span>
-      <Button
-        className={classes.btn}
-        disabled={disabled}
-        onClick={refreshAct}
-      >
-        <RefreshOutlinedIcon />
-      </Button>
-    </span>
+  <Tooltip title={<span className="txt-sv-tp">Refresh Scan</span>}>
+    <Button
+      className={classes.btn}
+      disabled={disabled}
+      onClick={refreshAct}
+    >
+      <RefreshOutlinedIcon />
+    </Button>
   </Tooltip>
 );
 
@@ -111,7 +107,7 @@ const scanSelect = (
       className={classNames(classes.formControlScan)}
       variant="outlined"
     >
-      <InputLabel className={classes.selectLabel}>
+      <InputLabel className={classNames(classes.selectLabel, 'cmd-txt-label')}>
         Current Scan
       </InputLabel>
       <Select

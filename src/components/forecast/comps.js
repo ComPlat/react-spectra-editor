@@ -13,7 +13,6 @@ import TextField from '@material-ui/core/TextField';
 import CloudOff from '@material-ui/icons/CloudOff';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
-import SubmitPanel from '../panel/submit';
 import SectionLoading from './section_loading';
 
 const titleStyle = {
@@ -133,23 +132,6 @@ const sectionInput = (classes, molecule, inputFuncCb) => {
   );
 };
 
-const sectionSubmit = (classes, operations, feature, molecule) => {
-  const disBtn = !molecule;
-
-  return (
-    <div
-      className={classNames(classes.submit)}
-    >
-      <SubmitPanel
-        operations={operations}
-        feature={feature}
-        hideSwitch
-        disabled={disBtn}
-      />
-    </div>
-  );
-};
-
 const SectionRunning = () => (
   <div style={titleStyle}>
     <h2 style={txtStyle}>
@@ -192,7 +174,7 @@ const SectionUnknown = () => (
 
 const notToRenderAnalysis = (pds) => {
   if (pds.running) return <SectionRunning />;
-  if (!pds.outline || !pds.outline.code) return true;
+  if (!pds.outline || !pds.outline.code) return <div />;
 
   if (pds.outline.code >= 500) return <SectionNoService />;
   if (pds.outline.code === 400) return <SectionMissMatch />;
@@ -218,6 +200,6 @@ const sectionSvg = (classes, predictions) => {
 
 export {
   TxtLabel, StatusIcon, ConfidenceLabel,
-  sectionInput, sectionSubmit, notToRenderAnalysis,
+  sectionInput, notToRenderAnalysis,
   sectionSvg,
 };

@@ -1,9 +1,8 @@
 import * as d3 from 'd3';
 
 const TfRescale = (focus) => {
-  const tf = d3.zoomTransform(d3.select('.kanvas-main').node());
-  const xt = tf.rescaleX(focus.scales.x);
-  const yt = tf.rescaleY(focus.scales.y);
+  const xt = focus.scales.x;
+  const yt = focus.scales.y;
   return { xt, yt };
 };
 
@@ -17,14 +16,14 @@ const fetchPt = (focus, xt) => {
   return sortData[idx];
 };
 
-const mouseMove = (focus) => {
+const mouseMove = (focus, compass) => {
   const { xt, yt } = TfRescale(focus);
   const pt = fetchPt(focus, xt);
   if (pt) {
     const tx = xt(pt.x);
     const ty = yt(pt.y);
-    focus.compass.attr('transform', `translate(${tx},${ty})`);
-    focus.compass.select('.x-hover-line')
+    compass.attr('transform', `translate(${tx},${ty})`);
+    compass.select('.x-hover-line')
       .attr('y1', 0 - ty)
       .attr('y2', focus.h - ty);
   }
@@ -36,19 +35,24 @@ const ClickCompass = (focus) => {
   const { xt } = TfRescale(focus);
   const pt = fetchPt(focus, xt);
   const onPeak = false;
-  focus.clickPointAct(pt, onPeak);
+  focus.clickUiTargetAct(pt, onPeak);
 };
 
-const MountCompass = (main) => {
-  const { focus } = main;
-  const { compass, overlay } = focus;
-
+const MountCompass = (focus) => {
+  const { root, w, h } = focus;
+  const compass = root.append('g')
+    .attr('class', 'compass')
+    .attr('display', 'none');
+  const overlay = root.append('rect')
+    .attr('class', 'overlay-focus')
+    .attr('width', w)
+    .attr('height', h)
+    .attr('opacity', 0.0);
   compass.append('line')
     .attr('class', 'x-hover-line hover-line')
     .attr('stroke', '#777')
     .attr('stroke-width', 1)
     .attr('stroke-dasharray', 2, 2);
-
   compass.append('circle')
     .attr('r', 4)
     .attr('fill', 'none')
@@ -58,7 +62,7 @@ const MountCompass = (main) => {
   overlay
     .on('mouseover', () => compass.attr('display', null))
     .on('mouseout', () => compass.attr('display', 'none'))
-    .on('mousemove', () => mouseMove(focus))
+    .on('mousemove', () => mouseMove(focus, compass))
     .on('click', () => ClickCompass(focus));
 };
 

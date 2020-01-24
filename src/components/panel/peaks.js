@@ -36,18 +36,18 @@ const styles = theme => ({
   },
   panelDetail: {
     backgroundColor: '#fff',
-    height: 'calc(63vh - 118px)',
+    height: 'calc(75vh - 220px)',
     overflow: 'auto',
   },
   table: {
     width: '100%',
   },
   tRowHeadPos: {
-    backgroundColor: '#2196f3',
+    backgroundColor: '#e0e0e0',
     height: 32,
   },
   tRowHeadNeg: {
-    backgroundColor: '#fa004f',
+    backgroundColor: '#e0e0e0',
     height: 32,
   },
   tTxtHead: {
@@ -99,19 +99,19 @@ const peakList = (peaks, digits, cbAct, classes, isPos) => {
     <Table className={classes.table}>
       <TableHead>
         <TableRow className={rowKlass}>
-          <TableCell align="right" className={classes.tTxtHead}><i>{ headTxt }</i></TableCell>
-          <TableCell align="right" className={classes.tTxtHeadXY}>X</TableCell>
-          <TableCell align="right" className={classes.tTxtHeadXY}>Y</TableCell>
-          <TableCell align="right" className={classes.tTxtHead}>-</TableCell>
+          <TableCell align="right" className={classNames(classes.tTxtHead, 'txt-sv-panel-head')}><i>{ headTxt }</i></TableCell>
+          <TableCell align="right" className={classNames(classes.tTxtHeadXY, 'txt-sv-panel-head')}>X</TableCell>
+          <TableCell align="right" className={classNames(classes.tTxtHeadXY, 'txt-sv-panel-head')}>Y</TableCell>
+          <TableCell align="right" className={classNames(classes.tTxtHead, 'txt-sv-panel-head')}>-</TableCell>
         </TableRow>
       </TableHead>
       <TableBody>
         {rows.map(row => (
           <TableRow key={row.idx} className={classes.tRow} hover>
-            <TableCell align="right" className={classes.tTxt}>{row.idx}</TableCell>
-            <TableCell align="right" className={classes.tTxt}>{row.x}</TableCell>
-            <TableCell align="right" className={classes.tTxt}>{row.y.toExponential(2)}</TableCell>
-            <TableCell align="right" className={classes.tTxt}>{row.rmBtn}</TableCell>
+            <TableCell align="right" className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{row.idx}</TableCell>
+            <TableCell align="right" className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{row.x}</TableCell>
+            <TableCell align="right" className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{row.y.toExponential(2)}</TableCell>
+            <TableCell align="right" className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{row.rmBtn}</TableCell>
           </TableRow>
         ))}
       </TableBody>
@@ -137,7 +137,7 @@ const PeakPanel = ({
         className={classNames(classes.panelSummary)}
       >
         <Typography className="txt-panel-header">
-          <span className={classNames(classes.txtBadge)}>
+          <span className={classNames(classes.txtBadge, 'txt-sv-panel-title')}>
             Peaks
           </span>
         </Typography>

@@ -68,7 +68,7 @@ const shiftSelect = (
       className={classNames(classes.formControlSft)}
       variant="outlined"
     >
-      <InputLabel className={classes.selectLabel}>
+      <InputLabel className={classNames(classes.selectLabel, 'cmd-txt-label')}>
         Solvent
       </InputLabel>
       <Select
@@ -98,7 +98,7 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
       className={classNames(classes.formControl)}
       variant="outlined"
     >
-      <InputLabel className={classes.selectLabel}>
+      <InputLabel className={classNames(classes.selectLabel, 'cmd-txt-label')}>
         Layout
       </InputLabel>
       <Select
