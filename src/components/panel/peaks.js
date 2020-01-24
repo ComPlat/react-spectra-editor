@@ -6,149 +6,147 @@ import { bindActionCreators } from 'redux';
 
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-
-import Badge from '@material-ui/core/Badge';
-import Chip from '@material-ui/core/Chip';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import { withStyles } from '@material-ui/core/styles';
 
 import { rmFromPosList, rmFromNegList } from '../../actions/edit_peak';
+import { LIST_LAYOUT } from '../../constants/list_layout';
 
-const Styles = () => ({
+const styles = theme => ({
   chip: {
-    margin: '5px',
+    margin: '1px 0 1px 0',
+  },
+  panel: {
+    backgroundColor: '#eee',
+    display: 'table-row',
   },
   panelSummary: {
-    backgroundColor: '#fbfbfb',
+    backgroundColor: '#eee',
+    height: 32,
   },
   txtBadge: {
-    marginRight: '20px',
+  },
+  panelDetail: {
+    backgroundColor: '#fff',
+    height: 'calc(63vh - 118px)',
+    overflow: 'auto',
+  },
+  table: {
+    width: '100%',
+  },
+  tRowHeadPos: {
+    backgroundColor: '#2196f3',
+    height: 32,
+  },
+  tRowHeadNeg: {
+    backgroundColor: '#fa004f',
+    height: 32,
+  },
+  tTxtHead: {
+    color: 'white',
+    padding: '4px 0 4px 5px',
+  },
+  tTxtHeadXY: {
+    color: 'white',
+    padding: '4px 0 4px 90px',
+  },
+  tTxt: {
+    padding: '4px 0 4px 0',
+  },
+  tRow: {
+    height: 28,
+    '&:nth-of-type(even)': {
+      backgroundColor: theme.palette.background.default,
+    },
+  },
+  rmBtn: {
+    color: 'red',
+    '&:hover': {
+      borderRadius: 12,
+      backgroundColor: 'red',
+      color: 'white',
+    },
   },
 });
 
-const CenterBadge = withStyles({
-  badge: {
-    top: '50%',
-  },
-})(Badge);
-
-const negPeakList = (negPeaks, rmFromNegListAct, classes) => (
-  negPeaks.length === 0
-    ? (
-      <Typography className="txt-panel-content">
-        <i>No peak deleted!</i>
-      </Typography>
-    )
-    : (
-      <div>
-        {
-          negPeaks.map((np) => {
-            const onDelete = () => rmFromNegListAct(np);
-            return (
-              <div key={np.x}>
-                <Chip
-                  className={classNames(classes.chip, 'txt-panel-content')}
-                  label={np.x}
-                  onDelete={onDelete}
-                />
-              </div>
-            );
-          })
-        }
-      </div>
-    )
+const createData = (classes, idx, x, y, cb, digits) => (
+  {
+    idx: idx + 1,
+    x: x.toFixed(digits),
+    y,
+    rmBtn: <HighlightOffIcon onClick={cb} className={classes.rmBtn} />,
+  }
 );
 
-const posPeakList = (posPeaks, rmFromPosListAct, classes) => (
-  posPeaks.length === 0
-    ? (
-      <Typography className="txt-panel-content">
-        <i>No peak created!</i>
-      </Typography>
-    )
-    : (
-      <div>
-        {
-          posPeaks.map((pp) => {
-            const onDelete = () => rmFromPosListAct(pp);
-            return (
-              <div key={pp.x}>
-                <Chip
-                  className={classNames(classes.chip, 'txt-panel-content')}
-                  label={pp.x}
-                  onDelete={onDelete}
-                />
-              </div>
-            );
-          })
-        }
-      </div>
-    )
-);
+const peakList = (peaks, digits, cbAct, classes, isPos) => {
+  const rows = peaks.map((pp, idx) => {
+    const onDelete = () => cbAct(pp);
+    return createData(classes, idx, pp.x, pp.y, onDelete, digits);
+  });
 
+  const rowKlass = isPos ? classes.tRowHeadPos : classes.tRowHeadNeg;
+  const headTxt = isPos ? 'P+' : 'P-';
 
-const AddPanel = ({
-  editPeakSt, rmFromPosListAct, classes,
-}) => {
-  const { pos } = editPeakSt;
-  const posLength = pos.length;
   return (
-    <ExpansionPanel>
-      <ExpansionPanelSummary
-        expandIcon={<ExpandMoreIcon />}
-        className={classNames(classes.panelSummary)}
-      >
-        <CenterBadge
-          color="primary"
-          className={classNames(classes.badge, 'txt-panel-badge')}
-          badgeContent={posLength}
-        >
-          <Typography className="txt-panel-header">
-            <span className={classNames(classes.txtBadge)}>
-              Created Peaks
-            </span>
-          </Typography>
-        </CenterBadge>
-      </ExpansionPanelSummary>
-      <Divider />
-      <ExpansionPanelDetails>
-        { posPeakList(pos, rmFromPosListAct, classes) }
-      </ExpansionPanelDetails>
-    </ExpansionPanel>
+    <Table className={classes.table}>
+      <TableHead>
+        <TableRow className={rowKlass}>
+          <TableCell align="right" className={classes.tTxtHead}><i>{ headTxt }</i></TableCell>
+          <TableCell align="right" className={classes.tTxtHeadXY}>X</TableCell>
+          <TableCell align="right" className={classes.tTxtHeadXY}>Y</TableCell>
+          <TableCell align="right" className={classes.tTxtHead}>-</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {rows.map(row => (
+          <TableRow key={row.idx} className={classes.tRow} hover>
+            <TableCell align="right" className={classes.tTxt}>{row.idx}</TableCell>
+            <TableCell align="right" className={classes.tTxt}>{row.x}</TableCell>
+            <TableCell align="right" className={classes.tTxt}>{row.y.toExponential(2)}</TableCell>
+            <TableCell align="right" className={classes.tTxt}>{row.rmBtn}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   );
 };
 
-
-const RmPanel = ({
-  editPeakSt, rmFromNegListAct, classes,
+const PeakPanel = ({
+  editPeakSt, layoutSt, classes, expand, onExapnd,
+  rmFromPosListAct, rmFromNegListAct,
 }) => {
-  const { neg } = editPeakSt;
-  const negLength = neg.length;
+  const { neg, pos } = editPeakSt;
+  const digits = layoutSt === LIST_LAYOUT.IR ? 0 : 4;
+
   return (
-    <ExpansionPanel>
+    <ExpansionPanel
+      expanded={expand}
+      onChange={onExapnd}
+      className={classNames(classes.panel)}
+    >
       <ExpansionPanelSummary
         expandIcon={<ExpandMoreIcon />}
         className={classNames(classes.panelSummary)}
       >
-        <CenterBadge
-          color="secondary"
-          className={classNames(classes.badge, 'txt-panel-badge')}
-          badgeContent={negLength}
-        >
-          <Typography className="txt-panel-header">
-            <span className={classNames(classes.txtBadge)}>
-              Deleted Peaks
-            </span>
-          </Typography>
-        </CenterBadge>
+        <Typography className="txt-panel-header">
+          <span className={classNames(classes.txtBadge)}>
+            Peaks
+          </span>
+        </Typography>
       </ExpansionPanelSummary>
       <Divider />
-      <ExpansionPanelDetails>
-        { negPeakList(neg, rmFromNegListAct, classes) }
-      </ExpansionPanelDetails>
+      <div className={classNames(classes.panelDetail)}>
+        { peakList(pos, digits, rmFromPosListAct, classes, true) }
+        { peakList(neg, digits, rmFromNegListAct, classes, false) }
+      </div>
     </ExpansionPanel>
   );
 };
@@ -156,6 +154,7 @@ const RmPanel = ({
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     editPeakSt: state.editPeak,
+    layoutSt: state.layout,
   }
 );
 
@@ -166,19 +165,16 @@ const mapDispatchToProps = dispatch => (
   }, dispatch)
 );
 
-AddPanel.propTypes = {
+PeakPanel.propTypes = {
   classes: PropTypes.object.isRequired,
+  expand: PropTypes.bool.isRequired,
   editPeakSt: PropTypes.object.isRequired,
+  layoutSt: PropTypes.string.isRequired,
+  onExapnd: PropTypes.func.isRequired,
   rmFromPosListAct: PropTypes.func.isRequired,
-};
-
-RmPanel.propTypes = {
-  classes: PropTypes.object.isRequired,
-  editPeakSt: PropTypes.object.isRequired,
   rmFromNegListAct: PropTypes.func.isRequired,
 };
 
-const AddPeakPanel = connect(mapStateToProps, mapDispatchToProps)(withStyles(Styles)(AddPanel));
-const RmPeakPanel = connect(mapStateToProps, mapDispatchToProps)(withStyles(Styles)(RmPanel));
-
-export { AddPeakPanel, RmPeakPanel };
+export default connect(
+  mapStateToProps, mapDispatchToProps,
+)(withStyles(styles)(PeakPanel));

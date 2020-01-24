@@ -1,16 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { compose } from 'redux';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 
 import {
   withStyles, createMuiTheme, MuiThemeProvider,
 } from '@material-ui/core/styles';
 
-import SettingsPanel from './settings';
-import ModeNavigation from './mode_navigation';
-import Manual from './manual';
-import { AddPeakPanel, RmPeakPanel } from './peaks';
+import PeakPanel from './peaks';
+import MultiplicityPanel from './multiplicity';
+import Format from '../../helpers/format';
 
 const theme = createMuiTheme({
   typography: {
@@ -20,43 +20,68 @@ const theme = createMuiTheme({
 
 const styles = () => ({
   panels: {
-    height: '65vh',
+    height: '63vh',
+    display: 'table',
     overflowX: 'hidden',
-    overflowY: 'scroll',
+    overflowY: 'auto',
+    margin: '5px 0 0 0',
     padding: '0 0 0 0',
+    width: '100%',
   },
 });
 
-const PanelViewer = ({
-  classes, feature, hasEdit, operations, isMs,
-}) => (
-  <div>
-    <ModeNavigation />
-    <div className={classNames(classes.panels)}>
-      <MuiThemeProvider
-        theme={theme}
-      >
-        <SettingsPanel
-          feature={feature}
-          hasEdit={hasEdit}
-          operations={operations}
-        />
-        { isMs ? null : <AddPeakPanel /> }
-        { isMs ? null : <RmPeakPanel /> }
-        <Manual />
-      </MuiThemeProvider>
-    </div>
-  </div>
+class PanelViewer extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      expand: 'mpy',
+    };
+
+    this.onExapnd = this.onExapnd.bind(this);
+  }
+
+  onExapnd(expand) {
+    this.setState({ expand });
+  }
+
+  render() {
+    const { expand } = this.state;
+    const { classes, layoutSt } = this.props;
+    const onExapndPeak = () => this.onExapnd('peak');
+    const onExapndMpy = () => this.onExapnd('mpy');
+
+    return (
+      <div>
+        <div className={classNames(classes.panels)}>
+          <MuiThemeProvider
+            theme={theme}
+          >
+            { !Format.isMsLayout(layoutSt) ? <PeakPanel expand={expand === 'peak'} onExapnd={onExapndPeak} /> : null }
+            { Format.isNmrLayout(layoutSt) ? <MultiplicityPanel expand={expand === 'mpy'} onExapnd={onExapndMpy} /> : null }
+          </MuiThemeProvider>
+        </div>
+      </div>
+    );
+  }
+}
+
+const mapStateToProps = (state, _) => ( // eslint-disable-line
+  {
+    layoutSt: state.layout,
+  }
+);
+
+const mapDispatchToProps = dispatch => (
+  bindActionCreators({
+  }, dispatch)
 );
 
 PanelViewer.propTypes = {
   classes: PropTypes.object.isRequired,
-  feature: PropTypes.object.isRequired,
-  operations: PropTypes.array.isRequired,
-  hasEdit: PropTypes.bool.isRequired,
-  isMs: PropTypes.bool.isRequired,
+  layoutSt: PropTypes.string.isRequired,
 };
 
-export default compose(
-  withStyles(styles),
-)(PanelViewer);
+export default connect(
+  mapStateToProps, mapDispatchToProps,
+)(withStyles(styles)(PanelViewer));
