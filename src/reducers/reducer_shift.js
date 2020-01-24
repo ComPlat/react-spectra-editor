@@ -5,7 +5,7 @@ import { LIST_SHIFT_13C, LIST_SHIFT_1H } from '../constants/list_shift';
 import { LIST_LAYOUT } from '../constants/list_layout';
 import { CalcResidualX, RealPts } from '../helpers/shift';
 
-const shiftNone = LIST_SHIFT_13C[0];
+const shiftNone = LIST_SHIFT_1H[0];
 
 const initialState = {
   ref: shiftNone,

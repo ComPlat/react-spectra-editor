@@ -1,0 +1,89 @@
+import {
+  UI, INTEGRATION, EDITPEAK, MANAGER,
+} from '../constants/action_type';
+
+const initialState = {
+  stack: [],
+  refArea: 1,
+  refFactor: 1,
+  shift: 0,
+};
+
+const getArea = (xL, xU, data) => {
+  let [iL, iU] = [data.length - 1, 0];
+
+  for (let i = 0; i < data.length; i += 1) {
+    const pt = data[i];
+    if (xL <= pt.x && pt.x <= xU) {
+      if (iL > i) { iL = i; }
+      if (i > iU) { iU = i; }
+    }
+  }
+  return Math.abs(data[iU].k - data[iL].k);
+};
+
+const addToStack = (state, action) => {
+  const { stack, refArea, shift } = state;
+  const { xExtent, data } = action.payload;
+  const { xL, xU } = xExtent;
+  if (!xL || !xU || (xU - xL) === 0) { return state; }
+  const area = getArea(xL, xU, data);
+  const defaultRefArea = stack.length === 0 ? area : refArea;
+  const newStack = [...stack, { xL: xL + shift, xU: xU + shift, area }];
+  return Object.assign({}, state, { stack: newStack, refArea: defaultRefArea });
+};
+
+const rmFromStack = (state, action) => {
+  const { stack } = state;
+  const { xL, xU, xExtent } = action.payload;
+  let [txL, txU] = [0, 0];
+  if (xL && xU) { // rm click integration
+    [txL, txU] = [xL, xU];
+  } else if (xExtent) { // rm click multiplicity
+    [txL, txU] = [xExtent.xL, xExtent.xU];
+  } else {
+    return state;
+  }
+  const newStack = stack.filter(k => k.xL !== txL && k.xU !== txU);
+  return Object.assign({}, state, { stack: newStack });
+};
+
+const setRef = (state, action) => {
+  const { stack } = state;
+  const { xL, xU } = action.payload;
+  const ref = stack.filter(k => k.xL === xL && k.xU === xU)[0];
+  const refArea = ref.area;
+  return Object.assign({}, state, { refArea });
+};
+
+const setFkr = (state, action) => {
+  const val = action.payload;
+  const refFactor = val < 0.01 ? 0.01 : val;
+  return Object.assign({}, state, { refFactor });
+};
+
+const setShift = (state, action) => {
+  const shift = action.payload.prevOffset;
+  return Object.assign({}, state, { shift });
+};
+
+const integrationReducer = (state = initialState, action) => {
+  switch (action.type) {
+    case UI.SWEEP.SELECT_INTEGRATION:
+      return addToStack(state, action);
+    case INTEGRATION.RM_ONE:
+      return rmFromStack(state, action);
+    case INTEGRATION.SET_REF:
+      return setRef(state, action);
+    case INTEGRATION.SET_FKR:
+      return setFkr(state, action);
+    case EDITPEAK.SHIFT:
+      return setShift(state, action);
+    case MANAGER.RESETALL:
+      return initialState;
+    default:
+      return state;
+  }
+};
+
+export default integrationReducer;

@@ -3,7 +3,7 @@ const LIST_LAYOUT = {
   IR: 'IR',
   H1: '1H',
   C13: '13C',
-  MS: 'MS'
+  MS: 'MS',
 };
 
 export {
