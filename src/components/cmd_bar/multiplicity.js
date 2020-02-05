@@ -7,9 +7,8 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
-// import Icon from '@mdi/react';
-// import { mdiCursorDefaultOutline } from '@mdi/js';
 
+import { clearMultiplicityAll } from '../../actions/multiplicity';
 import {
   LIST_UI_SWEEP_TYPE,
 } from '../../constants/list_ui';
@@ -22,6 +21,9 @@ const styles = () => ({
   btnTxt: {
     fontStyle: 'italic',
     fontWeight: 'bold',
+  },
+  btnTxtX: {
+    marginLeft: 2,
   },
   btnHighlight: {
     backgroundColor: '#2196f3',
@@ -49,7 +51,7 @@ const highlight = (criteria, cls) => (criteria ? cls.btnHighlight : cls.btn);
 
 const Multiplicity = ({
   classes, uiSt, layoutSt, multiplicitySt,
-  setUiSweepTypeAct,
+  setUiSweepTypeAct, clearMultiplicityAllAct,
 }) => {
   const { sweepType } = uiSt;
   const onSweepMutAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD);
@@ -97,6 +99,18 @@ const Multiplicity = ({
           </Button>
         </span>
       </Tooltip>
+      <Tooltip title={<span className="txt-sv-tp">Clear All Multiplicity</span>}>
+        <span>
+          <Button
+            className={classes.btn}
+            disabled={Cfg.btnCmdMpy(layoutSt)}
+            onClick={clearMultiplicityAllAct}
+          >
+            <span className={classNames(classes.btnTxt, 'cmd-txt-btn')}>J</span>
+            <span className={classNames(classes.btnTxtX, 'cmd-txt-btn')}>X</span>
+          </Button>
+        </span>
+      </Tooltip>
     </span>
   );
 };
@@ -109,6 +123,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
 
 const mapDispatchToProps = dispatch => (
   bindActionCreators({
+    clearMultiplicityAllAct: clearMultiplicityAll,
   }, dispatch)
 );
 
@@ -118,6 +133,7 @@ Multiplicity.propTypes = {
   layoutSt: PropTypes.string.isRequired,
   multiplicitySt: PropTypes.object.isRequired,
   setUiSweepTypeAct: PropTypes.func.isRequired,
+  clearMultiplicityAllAct: PropTypes.func.isRequired,
 };
 
 export default connect(

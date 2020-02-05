@@ -7,6 +7,7 @@ const initialState = {
   refArea: 1,
   refFactor: 1,
   shift: 0,
+  edited: false,
 };
 
 const getArea = (xL, xU, data) => {
@@ -72,6 +73,10 @@ const resetAll = (state, action) => {
   return Object.assign({}, state, newState);
 };
 
+const clearAll = () => (
+  Object.assign({}, initialState, { edited: true })
+);
+
 const integrationReducer = (state = initialState, action) => {
   switch (action.type) {
     case UI.SWEEP.SELECT_INTEGRATION:
@@ -84,6 +89,8 @@ const integrationReducer = (state = initialState, action) => {
       return setFkr(state, action);
     case INTEGRATION.RESET_ALL:
       return resetAll(state, action);
+    case INTEGRATION.CLEAR_ALL:
+      return clearAll();
     case EDITPEAK.SHIFT:
       return setShift(state, action);
     case MANAGER.RESETALL:

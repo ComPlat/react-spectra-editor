@@ -21,6 +21,16 @@ const resetIntegrationAll = payload => (
   }
 );
 
+const clearIntegrationAll = payload => (
+  {
+    type: INTEGRATION.CLEAR_ALL,
+    payload,
+  }
+);
+
 export {
-  sweepIntegration, setIntegrationFkr, resetIntegrationAll,
+  sweepIntegration,
+  setIntegrationFkr,
+  resetIntegrationAll,
+  clearIntegrationAll,
 }; // eslint-disable-line

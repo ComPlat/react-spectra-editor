@@ -15,6 +15,7 @@ const LIST_UI_SWEEP_TYPE = {
   MULTIPLICITY_ONE_RM: 'multiplicity one remove',
   MULTIPLICITY_PEAK_ADD: 'multiplicity peak add',
   MULTIPLICITY_PEAK_RM: 'multiplicity peak remove',
+  MULTIPLICITY_ALL_CLEAR: 'multiplicity all clear',
   PEAK_ADD: 'peak add',
   PEAK_DELETE: 'peak delete',
   ANCHOR_SHIFT: 'anchor shift',

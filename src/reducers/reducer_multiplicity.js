@@ -7,6 +7,7 @@ const initialState = {
   stack: [],
   shift: 0,
   smExtext: false,
+  edited: false,
 };
 
 const addToStack = (state, action) => {
@@ -123,6 +124,10 @@ const resetAll = (state, action) => {
   return Object.assign({}, state, newState);
 };
 
+const clearAll = () => (
+  Object.assign({}, initialState, { edited: true })
+);
+
 const multiplicityReducer = (state = initialState, action) => {
   switch (action.type) {
     case UI.SWEEP.SELECT_MULTIPLICITY:
@@ -144,6 +149,8 @@ const multiplicityReducer = (state = initialState, action) => {
       return clickMpyOne(state, action);
     case MULTIPLICITY.RESET_ALL:
       return resetAll(state, action);
+    case MULTIPLICITY.CLEAR_ALL:
+      return clearAll();
     case MANAGER.RESETALL:
       return state;
     default:

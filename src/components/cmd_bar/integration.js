@@ -1,5 +1,6 @@
 import React from 'react';
-import { compose } from 'redux';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
@@ -11,6 +12,7 @@ import TextField from '@material-ui/core/TextField';
 import Icon from '@mdi/react';
 import { mdiReflectVertical, mdiMathIntegral } from '@mdi/js';
 
+import { clearIntegrationAll } from '../../actions/integration';
 import {
   LIST_UI_SWEEP_TYPE,
 } from '../../constants/list_ui';
@@ -84,7 +86,7 @@ const setFactor = (
 
 const Integration = ({
   classes, uiSt, layoutSt, integrationSt,
-  setUiSweepTypeAct, setIntegrationFkrAct,
+  setUiSweepTypeAct, setIntegrationFkrAct, clearIntegrationAllAct,
 }) => {
   const { sweepType } = uiSt;
   const onSweepIntegtAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.INTEGRATION_ADD);
@@ -158,9 +160,37 @@ const Integration = ({
           classes, isDisable, integrationSt, setIntegrationFkrAct,
         )
       }
+      <Tooltip title={<span className="txt-sv-tp">Clear All Integration</span>}>
+        <span>
+          <Button
+            className={classes.btn}
+            disabled={isDisable}
+            onClick={clearIntegrationAllAct}
+          >
+            <Icon
+              path={mdiMathIntegral}
+              size={1}
+              color={iconRMColor}
+              className={classNames('cmd-mdi-icon')}
+            />
+            <span className={classes.btnTxt}>X</span>
+          </Button>
+        </span>
+      </Tooltip>
     </span>
   );
 };
+
+const mapStateToProps = (state, props) => ( // eslint-disable-line
+  {
+  }
+);
+
+const mapDispatchToProps = dispatch => (
+  bindActionCreators({
+    clearIntegrationAllAct: clearIntegrationAll,
+  }, dispatch)
+);
 
 Integration.propTypes = {
   classes: PropTypes.object.isRequired,
@@ -169,8 +199,10 @@ Integration.propTypes = {
   integrationSt: PropTypes.object.isRequired,
   setUiSweepTypeAct: PropTypes.func.isRequired,
   setIntegrationFkrAct: PropTypes.func.isRequired,
+  clearIntegrationAllAct: PropTypes.func.isRequired,
 };
 
-export default compose(
-  withStyles(styles),
-)(Integration);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(withStyles(styles)(Integration));
