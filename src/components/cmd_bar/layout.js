@@ -15,7 +15,7 @@ import Scan from './scan';
 import { updateLayout } from '../../actions/layout';
 import { setShiftRef } from '../../actions/shift';
 import { LIST_LAYOUT } from '../../constants/list_layout';
-import { LIST_SHIFT_13C, LIST_SHIFT_1H } from '../../constants/list_shift';
+import { getListShift } from '../../constants/list_shift';
 
 const Styles = () => ({
   container: {
@@ -51,9 +51,7 @@ const shiftSelect = (
   if (!shiftEnableSt) return null;
   const onChange = e => setShiftRefAct(e.target.value);
 
-  const listShift = layoutSt === LIST_LAYOUT.C13
-    ? LIST_SHIFT_13C
-    : LIST_SHIFT_1H;
+  const listShift = getListShift(layoutSt);
 
   const content = listShift.map(ref => (
     <MenuItem value={ref} key={ref.name}>
@@ -130,6 +128,12 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
           <span className={classNames(classes.selectTxt, 'txt-sv-input-label')}>
             <sup>13</sup>
             C
+          </span>
+        </MenuItem>
+        <MenuItem value={LIST_LAYOUT.F19}>
+          <span className={classNames(classes.selectTxt, 'txt-sv-input-label')}>
+            <sup>19</sup>
+            F
           </span>
         </MenuItem>
         <MenuItem value={LIST_LAYOUT.MS}>

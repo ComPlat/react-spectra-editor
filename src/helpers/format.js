@@ -8,6 +8,7 @@ const spectraDigit = (layout) => {
     case LIST_LAYOUT.IR:
       return 0;
     case LIST_LAYOUT.H1:
+    case LIST_LAYOUT.F19:
     case LIST_LAYOUT.PLAIN:
     case LIST_LAYOUT.MS:
     default:
@@ -24,9 +25,10 @@ const opToLayout = (operation) => {
       return LIST_LAYOUT.H1;
     case 'NMR13C':
       return LIST_LAYOUT.C13;
+    case 'NMR19F':
+      return LIST_LAYOUT.F19;
     case 'MS':
       return LIST_LAYOUT.MS;
-    case 'NMR19F':
     default:
       return LIST_LAYOUT.PLAIN;
   }
@@ -57,6 +59,7 @@ const spectraOps = {
   [LIST_LAYOUT.PLAIN]: { head: '', tail: '.' },
   [LIST_LAYOUT.H1]: { head: '1H', tail: '.' },
   [LIST_LAYOUT.C13]: { head: '13C', tail: '.' },
+  [LIST_LAYOUT.F19]: { head: '19F', tail: '.' },
   [LIST_LAYOUT.IR]: { head: 'IR', tail: ' cm-1' },
   [LIST_LAYOUT.MS]: { head: 'MASS', tail: ' m/z' },
 };
@@ -180,12 +183,26 @@ const peaksWrapper = (layout, shift) => {
 const isMs = po => po.operation.typ === LIST_LAYOUT.MS;
 
 const isNmrLayout = layoutSt => (
-  [LIST_LAYOUT.H1, LIST_LAYOUT.C13].indexOf(layoutSt) >= 0
+  [LIST_LAYOUT.H1, LIST_LAYOUT.C13, LIST_LAYOUT.F19].indexOf(layoutSt) >= 0
 );
+const is19FLayout = layoutSt => (LIST_LAYOUT.F19 === layoutSt);
 const is13CLayout = layoutSt => (LIST_LAYOUT.C13 === layoutSt);
 const is1HLayout = layoutSt => (LIST_LAYOUT.H1 === layoutSt);
 const isMsLayout = layoutSt => (LIST_LAYOUT.MS === layoutSt);
 const isIrLayout = layoutSt => (LIST_LAYOUT.IR === layoutSt);
+
+const getNmrTyp = (layout) => {
+  switch (layout) {
+    case LIST_LAYOUT.H1:
+      return 'H';
+    case LIST_LAYOUT.C13:
+      return 'C';
+    case LIST_LAYOUT.F19:
+      return 'F';
+    default:
+      return '';
+  }
+};
 
 const formatPeaksByPrediction = (
   peaks, layout, isAscend, decimal, predictions = [],
@@ -202,7 +219,7 @@ const formatPeaksByPrediction = (
     }
   });
 
-  const typ = layout === '13C' ? 'C' : 'H';
+  const typ = getNmrTyp(layout);
 
   const ascendFunc = (a, b) => parseFloat(a.k) - parseFloat(b.k);
   const descendFunc = (a, b) => parseFloat(b.k) - parseFloat(a.k);
@@ -229,6 +246,7 @@ const Format = {
   isNmrLayout,
   is13CLayout,
   is1HLayout,
+  is19FLayout,
   isMsLayout,
   isIrLayout,
   fixDigit,

@@ -3,6 +3,7 @@ const LIST_LAYOUT = {
   IR: 'IR',
   H1: '1H',
   C13: '13C',
+  F19: '19F',
   MS: 'MS',
 };
 

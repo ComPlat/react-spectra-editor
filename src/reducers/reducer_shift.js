@@ -1,8 +1,7 @@
 import {
   SHIFT, EDITPEAK, MANAGER, LAYOUT,
 } from '../constants/action_type';
-import { LIST_SHIFT_13C, LIST_SHIFT_1H } from '../constants/list_shift';
-import { LIST_LAYOUT } from '../constants/list_layout';
+import { getListShift, LIST_SHIFT_1H } from '../constants/list_shift';
 import { CalcResidualX, RealPts } from '../helpers/shift';
 
 const shiftNone = LIST_SHIFT_1H[0];
@@ -19,9 +18,7 @@ const resetRef = (payload) => {
 
   const name = shift.solventName;
   let target = false;
-  const listShift = layout === LIST_LAYOUT.C13
-    ? LIST_SHIFT_13C
-    : LIST_SHIFT_1H;
+  const listShift = getListShift(layout);
   listShift.forEach((l) => {
     if (l.name === name) {
       target = l;

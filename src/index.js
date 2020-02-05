@@ -8,6 +8,7 @@ import Button from '@material-ui/core/Button';
 import { SpectraEditor, FN } from './app';
 import nmr1HJcamp from './__tests__/fixtures/nmr1h_jcamp';
 import nmr13CJcamp from './__tests__/fixtures/nmr13c_jcamp';
+import nmr19FJcamp from './__tests__/fixtures/nmr19f_jcamp';
 import irJcamp from './__tests__/fixtures/ir_jcamp';
 import msJcamp from './__tests__/fixtures/ms_jcamp';
 import nmrResult from './__tests__/fixtures/nmr_result';
@@ -16,6 +17,7 @@ import './__tests__/style/svg.css';
 
 const nmr1HEntity = FN.ExtractJcamp(nmr1HJcamp);
 const nmr13CEntity = FN.ExtractJcamp(nmr13CJcamp);
+const nmr19FEntity = FN.ExtractJcamp(nmr19FJcamp);
 const irEntity = FN.ExtractJcamp(irJcamp);
 const msEntity = FN.ExtractJcamp(msJcamp);
 
@@ -126,6 +128,8 @@ class DemoWriteIr extends React.Component {
         return nmr1HEntity;
       case 'nmr 13c':
         return nmr13CEntity;
+      case 'nmr 19f':
+        return nmr19FEntity;
       case 'ir':
         return irEntity;
       case 'ms':
@@ -168,6 +172,13 @@ class DemoWriteIr extends React.Component {
             onClick={this.onClick('nmr 13c')}
           >
             NMR 13C
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('nmr 19f')}
+          >
+            NMR 19F
           </Button>
           <Button
             variant="contained"

@@ -1,3 +1,5 @@
+import { LIST_LAYOUT } from './list_layout';
+
 const noReference = {
   name: '- - -',
   value: 0.0,
@@ -456,4 +458,24 @@ const LIST_SHIFT_1H = [
   hTolueneD8Broad4, hTFADS, hTrifluoroethanolD31, hTrifluoroethanolD32,
 ];
 
-export { LIST_SHIFT_13C, LIST_SHIFT_1H };
+const LIST_SHIFT_19F = [];
+
+const getListShift = (layoutSt) => {
+  switch (layoutSt) {
+    case LIST_LAYOUT.H1:
+      return LIST_SHIFT_1H;
+    case LIST_LAYOUT.C13:
+      return LIST_SHIFT_13C;
+    case LIST_LAYOUT.F19:
+      return LIST_SHIFT_19F;
+    default:
+      return [];
+  }
+};
+
+export {
+  LIST_SHIFT_13C,
+  LIST_SHIFT_1H,
+  LIST_SHIFT_19F,
+  getListShift,
+};
