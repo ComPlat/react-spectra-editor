@@ -16,16 +16,19 @@ const fetchPt = (focus, xt) => {
   return sortData[idx];
 };
 
-const mouseMove = (focus, compass) => {
+const MouseMove = (focus) => {
   const { xt, yt } = TfRescale(focus);
   const pt = fetchPt(focus, xt);
   if (pt) {
     const tx = xt(pt.x);
     const ty = yt(pt.y);
-    compass.attr('transform', `translate(${tx},${ty})`);
-    compass.select('.x-hover-line')
+    focus.root.select('.compass').attr('transform', `translate(${tx},${ty})`);
+    focus.root.select('.x-hover-line')
       .attr('y1', 0 - ty)
       .attr('y2', focus.h - ty);
+    focus.root.select('.cursor-txt')
+      .attr('transform', `translate(${tx},${10})`)
+      .text(pt.x.toFixed(3));
   }
 };
 
@@ -41,8 +44,9 @@ const ClickCompass = (focus) => {
 const MountCompass = (focus) => {
   const { root, w, h } = focus;
   const compass = root.append('g')
-    .attr('class', 'compass')
-    .attr('display', 'none');
+    .attr('class', 'compass');
+  const cursor = root.append('g')
+    .attr('class', 'cursor');
   const overlay = root.append('rect')
     .attr('class', 'overlay-focus')
     .attr('width', w)
@@ -58,12 +62,19 @@ const MountCompass = (focus) => {
     .attr('fill', 'none')
     .attr('stroke', '#777')
     .attr('stroke-width', 2);
+  cursor.append('text')
+    .attr('class', 'cursor-txt')
+    .style('font-size', '12px')
+    .style('text-anchor', 'middle');
 
   overlay
-    .on('mouseover', () => compass.attr('display', null))
-    .on('mouseout', () => compass.attr('display', 'none'))
-    .on('mousemove', () => mouseMove(focus, compass))
+    .on('mousemove', () => MouseMove(focus))
     .on('click', () => ClickCompass(focus));
 };
 
-export { MountCompass, TfRescale, ClickCompass };
+export {
+  MountCompass,
+  TfRescale,
+  ClickCompass,
+  MouseMove,
+};

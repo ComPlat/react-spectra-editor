@@ -1,6 +1,7 @@
 import * as d3 from 'd3';
 
 import { LIST_UI_SWEEP_TYPE } from '../constants/list_ui';
+import { MouseMove } from './compass';
 
 const noBrushTypes = [
   LIST_UI_SWEEP_TYPE.PEAK_ADD,
@@ -68,6 +69,7 @@ const MountBrush = (focus, uiSt) => {
       ? 'brushX' : 'brush';
     root.append('g')
       .attr('class', klass)
+      .on('mousemove', () => MouseMove(focus))
       .call(target);
   }
 

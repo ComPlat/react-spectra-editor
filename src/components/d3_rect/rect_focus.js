@@ -7,7 +7,7 @@ import {
   MountGrid, MountAxis, MountAxisLabelX, MountAxisLabelY, MountRef,
   MountClip, MountMainFrame, MountThresLine, MountBars,
 } from '../../helpers/mount';
-import { TfRescale } from '../../helpers/compass';
+import { TfRescale, MountCompass } from '../../helpers/compass';
 import { PksEdit } from '../../helpers/converter';
 import { LIST_LAYOUT } from '../../constants/list_layout';
 
@@ -184,6 +184,7 @@ class RectFocus {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.setTip(LIST_LAYOUT.MS);
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks);
+    MountCompass(this);
 
     this.axis = MountAxis(this);
     this.thresLine = MountThresLine(this, 'green');
