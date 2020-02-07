@@ -2,7 +2,7 @@ import Jcampconverter from 'jcampconverter';
 import { createSelector } from 'reselect';
 
 import { FromManualToOffset } from './shift';
-import { LIST_LAYOUT } from '../constants/list_layout';
+import Cfg from './cfg';
 
 const getTopic = (_, props) => props.topic;
 
@@ -22,14 +22,15 @@ const convertTopic = (topic, layout, feature, offset) => {
   const xs = topic.x;
   const ys = topic.y;
 
-  if (layout === LIST_LAYOUT.H1) {
+  const isItgDisable = Cfg.btnCmdIntg(layout);
+  if (!isItgDisable) {
     const gate = 0.03;
     let k = 0;
     for (let i = 0; i < ys.length; i += 1) { // no-downsample
       const x = xs[i] - offset;
       const y = ys[i];
       const cy = y / maxY;
-      if (Math.abs(gate < cy)) { k += cy; }
+      if (gate < Math.abs(cy)) { k += cy; }
       sp.push({ x, y, k });
     }
     return sp;

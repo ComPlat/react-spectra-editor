@@ -16,7 +16,6 @@ import { clearIntegrationAll } from '../../actions/integration';
 import {
   LIST_UI_SWEEP_TYPE,
 } from '../../constants/list_ui';
-import Format from '../../helpers/format';
 import Cfg from '../../helpers/cfg';
 
 const styles = () => ({
@@ -92,10 +91,10 @@ const Integration = ({
   const onSweepIntegtAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.INTEGRATION_ADD);
   const onSweepIntegtRm = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.INTEGRATION_RM);
   const onSweepIntegtSR = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF);
-  const iconAddColor = (sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD) || !Format.is1HLayout(layoutSt) ? '#fff' : '#000';
-  const iconRMColor = (sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_RM) || !Format.is1HLayout(layoutSt) ? '#fff' : '#000';
-  const iconSRColor = (sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF) || !Format.is1HLayout(layoutSt) ? '#fff' : '#000';
   const isDisable = Cfg.btnCmdIntg(layoutSt);
+  const iconAddColor = (sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD) || isDisable ? '#fff' : '#000';
+  const iconRMColor = (sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_RM) || isDisable ? '#fff' : '#000';
+  const iconSRColor = (sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF) || isDisable ? '#fff' : '#000';
 
   return (
     <span>

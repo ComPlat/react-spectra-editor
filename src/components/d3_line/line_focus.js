@@ -11,7 +11,7 @@ import { TfRescale, MountCompass } from '../../helpers/compass';
 import { PksEdit } from '../../helpers/converter';
 import { itgIdTag, mpyIdTag } from '../../helpers/focus';
 import { calcMpyCenter, calcArea } from '../../helpers/calc';
-import Format from '../../helpers/format';
+import Cfg from '../../helpers/cfg';
 import { LIST_LAYOUT } from '../../constants/list_layout';
 
 class LineFocus {
@@ -277,7 +277,8 @@ class LineFocus {
     const {
       stack, refArea, refFactor, shift,
     } = integationSt;
-    const itgs = Format.is1HLayout(layoutSt) ? stack : [];
+    const isDisable = Cfg.btnCmdIntg(layoutSt);
+    const itgs = isDisable ? [] : stack;
 
     const igbp = this.tags.igbPath.selectAll('path').data(itgs);
     igbp.exit()
@@ -293,7 +294,7 @@ class LineFocus {
       .attr('class', 'exit')
       .remove();
 
-    if (itgs.length === 0 || !Format.is1HLayout(layoutSt)) return;
+    if (itgs.length === 0 || isDisable) return;
     // rescale for zoom
     const { xt } = TfRescale(this);
 
@@ -411,7 +412,8 @@ class LineFocus {
 
     const { stack, smExtext, shift } = mtplySt;
     const mpys = stack;
-    if (mpys === 0 || !Format.isNmrLayout(layoutSt)) return;
+    const isDisable = Cfg.btnCmdMpy(layoutSt);
+    if (mpys === 0 || isDisable) return;
     // rescale for zoom
     const { xt } = TfRescale(this);
 
