@@ -71,7 +71,9 @@ const LayerPrism = ({
             />
           </Grid>
           <Grid item xs={3} align="center">
-            <PanelViewer />
+            <PanelViewer
+              feature={feature}
+            />
           </Grid>
         </Grid>
       </div>

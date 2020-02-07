@@ -186,7 +186,8 @@ const extractShift = (s, jcamp) => {
 };
 
 const buildPeakFeature = (jcamp, sTyp, peakUp, s, thresRef) => {
-  const subTyp = jcamp.xType ? ` - ${jcamp.xType}` : '';
+  const { xType, info } = jcamp;
+  const subTyp = xType ? ` - ${xType}` : '';
 
   return (
     Object.assign(
@@ -194,14 +195,16 @@ const buildPeakFeature = (jcamp, sTyp, peakUp, s, thresRef) => {
         typ: s.dataType + subTyp,
         peakUp,
         thresRef,
-        scanCount: +jcamp.info.$CSSCANCOUNT,
-        scanAutoTarget: +jcamp.info.$CSSCANAUTOTARGET,
-        scanEditTarget: +jcamp.info.$CSSCANEDITTARGET,
+        scanCount: +info.$CSSCANCOUNT,
+        scanAutoTarget: +info.$CSSCANAUTOTARGET,
+        scanEditTarget: +info.$CSSCANEDITTARGET,
         shift: extractShift(s, jcamp),
         operation: {
           typ: sTyp,
-          nucleus: jcamp.xType || '',
+          nucleus: xType || '',
         },
+        observeFrequency: info['.OBSERVEFREQUENCY'],
+        solventName: info['.SOLVENTNAME'],
       },
       s,
     )
@@ -371,7 +374,7 @@ const ExtractJcamp = (source) => {
     source,
     {
       xy: true,
-      keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS)/, // eslint-disable-line
+      keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY)/, // eslint-disable-line
     },
   );
   const spectrum = extractSpectrum(jcamp);

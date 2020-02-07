@@ -8,6 +8,7 @@ import {
   withStyles, createMuiTheme, MuiThemeProvider,
 } from '@material-ui/core/styles';
 
+import InfoPanel from './info';
 import PeakPanel from './peaks';
 import MultiplicityPanel from './multiplicity';
 import Cfg from '../../helpers/cfg';
@@ -20,7 +21,7 @@ const theme = createMuiTheme({
 
 const styles = () => ({
   panels: {
-    height: 'calc(75vh - 220px)',
+    height: 'calc(75vh - 280px)',
     display: 'table',
     overflowX: 'hidden',
     overflowY: 'auto',
@@ -35,7 +36,7 @@ class PanelViewer extends React.Component {
     super(props);
 
     this.state = {
-      expand: 'peak',
+      expand: 'info',
     };
 
     this.onExapnd = this.onExapnd.bind(this);
@@ -47,7 +48,8 @@ class PanelViewer extends React.Component {
 
   render() {
     const { expand } = this.state;
-    const { classes, layoutSt } = this.props;
+    const { classes, feature, layoutSt } = this.props;
+    const onExapndInfo = () => this.onExapnd('info');
     const onExapndPeak = () => this.onExapnd('peak');
     const onExapndMpy = () => this.onExapnd('mpy');
 
@@ -56,6 +58,11 @@ class PanelViewer extends React.Component {
         <MuiThemeProvider
           theme={theme}
         >
+          <InfoPanel
+            feature={feature}
+            expand={expand === 'info'}
+            onExapnd={onExapndInfo}
+          />
           { Cfg.hidePanelPeak(layoutSt) ? null : <PeakPanel expand={expand === 'peak'} onExapnd={onExapndPeak} /> }
           { Cfg.hidePanelMpy(layoutSt) ? null : <MultiplicityPanel expand={expand === 'mpy'} onExapnd={onExapndMpy} /> }
         </MuiThemeProvider>
@@ -77,6 +84,7 @@ const mapDispatchToProps = dispatch => (
 
 PanelViewer.propTypes = {
   classes: PropTypes.object.isRequired,
+  feature: PropTypes.object.isRequired,
   layoutSt: PropTypes.string.isRequired,
 };
 
