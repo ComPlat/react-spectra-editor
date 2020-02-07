@@ -57,6 +57,7 @@ const Multiplicity = ({
   const onSweepMutAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD);
   const onOneMutAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_RM);
   const onPeakMutAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_ADD);
+  const onPeakMutRm = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_RM);
 
   return (
     <span>
@@ -96,6 +97,19 @@ const Multiplicity = ({
             onClick={onPeakMutAdd}
           >
             <span className={classNames(classes.btnTxt, 'cmd-txt-btn')}>JP+</span>
+          </Button>
+        </span>
+      </Tooltip>
+      <Tooltip title={<span className="txt-sv-tp">Remove Peak for Multiplicity</span>}>
+        <span>
+          <Button
+            className={
+              highlight(sweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_REMOVE, classes)
+            }
+            disabled={Cfg.btnCmdMpyPeak(layoutSt, multiplicitySt)}
+            onClick={onPeakMutRm}
+          >
+            <span className={classNames(classes.btnTxt, 'cmd-txt-btn')}>JP-</span>
           </Button>
         </span>
       </Tooltip>

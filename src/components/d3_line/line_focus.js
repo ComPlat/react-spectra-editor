@@ -429,7 +429,12 @@ class LineFocus {
     mpyt2.exit()
       .attr('class', 'exit')
       .remove();
-    const mpyp = this.tags.mpypPath.selectAll('path').data(mpys);
+    let mPeaks = mpys.map((m) => {
+      const { peaks, xExtent } = m;
+      return peaks.map(p => Object.assign({}, p, { xExtent }));
+    });
+    mPeaks = [].concat(...mPeaks);
+    const mpyp = this.tags.mpypPath.selectAll('path').data(mPeaks);
     mpyp.exit()
       .attr('class', 'exit')
       .remove();
@@ -462,24 +467,24 @@ class LineFocus {
       .attr('id', d => `mpyb${mpyIdTag(d)}`)
       .attr('d', d => mpyBar(d))
       .on('mouseover', (d) => {
-        d3.select(`#mpyb${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyb${mpyIdTag(d)}`)
           .attr('stroke', 'blue');
-        d3.select(`#mpyt1${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyt1${mpyIdTag(d)}`)
           .style('fill', 'blue');
-        d3.select(`#mpyt2${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyt2${mpyIdTag(d)}`)
           .style('fill', 'blue');
-        d3.select(`#mpyp${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyp${mpyIdTag(d)}`)
           .attr('stroke', 'blue');
       })
       .on('mouseout', (d) => {
         const dColor = mpyColor(d);
-        d3.select(`#mpyb${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyb${mpyIdTag(d)}`)
           .attr('stroke', dColor);
-        d3.select(`#mpyt1${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyt1${mpyIdTag(d)}`)
           .style('fill', dColor);
-        d3.select(`#mpyt2${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyt2${mpyIdTag(d)}`)
           .style('fill', dColor);
-        d3.select(`#mpyp${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyp${mpyIdTag(d)}`)
           .attr('stroke', dColor);
       })
       .on('click', d => this.onClickTarget(d));
@@ -495,24 +500,24 @@ class LineFocus {
       .text(d => `${calcMpyCenter(d.peaks, shift, d.mpyType).toFixed(3)}`)
       .attr('transform', d => `translate(${xt((d.xExtent.xL + d.xExtent.xU) / 2 - shift)}, ${height - dh + 10})`)
       .on('mouseover', (d) => {
-        d3.select(`#mpyb${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyb${mpyIdTag(d)}`)
           .attr('stroke', 'blue');
-        d3.select(`#mpyt1${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyt1${mpyIdTag(d)}`)
           .style('fill', 'blue');
-        d3.select(`#mpyt2${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyt2${mpyIdTag(d)}`)
           .style('fill', 'blue');
-        d3.select(`#mpyp${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyp${mpyIdTag(d)}`)
           .attr('stroke', 'blue');
       })
       .on('mouseout', (d) => {
         const dColor = mpyColor(d);
-        d3.select(`#mpyb${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyb${mpyIdTag(d)}`)
           .attr('stroke', dColor);
-        d3.select(`#mpyt1${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyt1${mpyIdTag(d)}`)
           .style('fill', dColor);
-        d3.select(`#mpyt2${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyt2${mpyIdTag(d)}`)
           .style('fill', dColor);
-        d3.select(`#mpyp${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyp${mpyIdTag(d)}`)
           .attr('stroke', dColor);
       })
       .on('click', d => this.onClickTarget(d));
@@ -528,40 +533,36 @@ class LineFocus {
       .text(d => `(${d.mpyType})`)
       .attr('transform', d => `translate(${xt((d.xExtent.xL + d.xExtent.xU) / 2 - shift)}, ${height - dh + 20})`)
       .on('mouseover', (d) => {
-        d3.select(`#mpyb${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyb${mpyIdTag(d)}`)
           .attr('stroke', 'blue');
-        d3.select(`#mpyt1${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyt1${mpyIdTag(d)}`)
           .style('fill', 'blue');
-        d3.select(`#mpyt2${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyt2${mpyIdTag(d)}`)
           .style('fill', 'blue');
-        d3.select(`#mpyp${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyp${mpyIdTag(d)}`)
           .attr('stroke', 'blue');
       })
       .on('mouseout', (d) => {
         const dColor = mpyColor(d);
-        d3.select(`#mpyb${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyb${mpyIdTag(d)}`)
           .attr('stroke', dColor);
-        d3.select(`#mpyt1${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyt1${mpyIdTag(d)}`)
           .style('fill', dColor);
-        d3.select(`#mpyt2${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyt2${mpyIdTag(d)}`)
           .style('fill', dColor);
-        d3.select(`#mpyp${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyp${mpyIdTag(d)}`)
           .attr('stroke', dColor);
       })
       .on('click', d => this.onClickTarget(d));
 
     const mpypH = height - dh;
-    const mpypPath = d => (
-      [].concat(
-        ...d.peaks.map(pk => (
-          [
-            { x: xt(pk.x - shift) - 0.5, y: mpypH - 5 },
-            { x: xt(pk.x - shift) - 0.5, y: mpypH - 20 },
-            { x: xt(pk.x - shift) + 0.5, y: mpypH - 20 },
-            { x: xt(pk.x - shift) + 0.5, y: mpypH - 5 },
-          ]
-        )),
-      )
+    const mpypPath = pk => (
+      [
+        { x: xt(pk.x - shift) - 0.5, y: mpypH - 5 },
+        { x: xt(pk.x - shift) - 0.5, y: mpypH - 20 },
+        { x: xt(pk.x - shift) + 0.5, y: mpypH - 20 },
+        { x: xt(pk.x - shift) + 0.5, y: mpypH - 5 },
+      ]
     );
     // const faktor = layoutSt === LIST_LAYOUT.IR ? -1 : 1;
     const lineSymbol = d3.line()
@@ -577,24 +578,24 @@ class LineFocus {
       .attr('d', d => lineSymbol(mpypPath(d)))
       .attr('id', d => `mpyp${mpyIdTag(d)}`)
       .on('mouseover', (d) => {
-        d3.select(`#mpyb${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyb${mpyIdTag(d)}`)
           .attr('stroke', 'blue');
-        d3.select(`#mpyt1${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyt1${mpyIdTag(d)}`)
           .style('fill', 'blue');
-        d3.select(`#mpyt2${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyt2${mpyIdTag(d)}`)
           .style('fill', 'blue');
-        d3.select(`#mpyp${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyp${mpyIdTag(d)}`)
           .attr('stroke', 'blue');
       })
       .on('mouseout', (d) => {
         const dColor = mpyColor(d);
-        d3.select(`#mpyb${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyb${mpyIdTag(d)}`)
           .attr('stroke', dColor);
-        d3.select(`#mpyt1${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyt1${mpyIdTag(d)}`)
           .style('fill', dColor);
-        d3.select(`#mpyt2${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyt2${mpyIdTag(d)}`)
           .style('fill', dColor);
-        d3.select(`#mpyp${mpyIdTag(d)}`)
+        d3.selectAll(`#mpyp${mpyIdTag(d)}`)
           .attr('stroke', dColor);
       })
       .on('click', d => this.onClickTarget(d));
