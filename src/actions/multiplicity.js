@@ -21,9 +21,16 @@ const selectMpyType = payload => (
   }
 );
 
-const clearMultiplicityAll = payload => (
+const clearMpyAll = payload => (
   {
     type: MULTIPLICITY.CLEAR_ALL,
+    payload,
+  }
+);
+
+const resetMpyOne = payload => (
+  {
+    type: MULTIPLICITY.RESET_ONE,
     payload,
   }
 );
@@ -32,5 +39,6 @@ export {
   clickMpyOne,
   rmMpyPeakByPanel,
   selectMpyType,
-  clearMultiplicityAll,
+  clearMpyAll,
+  resetMpyOne,
 }; // eslint-disable-line
