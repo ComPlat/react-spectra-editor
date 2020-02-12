@@ -146,9 +146,9 @@ function updateSignal(signal, Jc) {
   signal.stopX =
     peaks[nbPeaks - 1].x / signal.observe + peaks[nbPeaks - 1].width;
 
-  signal.integralData.from = peaks[0].x / signal.observe - peaks[0].width * 3;
-  signal.integralData.to =
-    peaks[nbPeaks - 1].x / signal.observe + peaks[nbPeaks - 1].width * 3;
+  // signal.integralData.from = peaks[0].x / signal.observe - peaks[0].width * 3;
+  // signal.integralData.to =
+  //   peaks[nbPeaks - 1].x / signal.observe + peaks[nbPeaks - 1].width * 3;
 
   // Compile the pattern and format the constant couplings
   signal.maskPattern = signal.mask2;
@@ -196,9 +196,9 @@ function abstractPattern(signal, Jc) {
     signal.nmrJs = newNmrJs;
   } else {
     pattern = 's';
-    if (Math.abs(signal.startX - signal.stopX) * signal.observe > 16) {
-      pattern = 'br s';
-    }
+    // if (Math.abs(signal.startX - signal.stopX) * signal.observe > 16) {
+    //   pattern = 'br s';
+    // }
   }
   return pattern;
 }
