@@ -1,4 +1,4 @@
-import { LIST_MPYS } from '../constants/list_mpy';
+import JAnalyzer from '../third_party/jAnalyzer';
 
 const centerX = (ps, shift) => {
   const pxs = ps.map(p => p.x).sort((a, b) => a - b);
@@ -24,44 +24,61 @@ const calcMpyCenter = (ps, shift, typ) => {
   }
 };
 
-const jD = ps => Math.abs(ps[1].x - ps[0].x);
-
-const jT = (ps) => {
-  const pxs = ps.map(p => p.x).sort((a, b) => a - b);
-  const one = Math.abs(pxs[1] - pxs[0]);
-  const two = Math.abs(pxs[2] - pxs[1]);
-  return (one + two) / 2;
-};
-
-const calcJ = (ps, shift, typ) => {
-  const count = ps.length;
-  switch (typ) {
-    case 's':
-      return false;
-    case 'd':
-      return count === 2 ? jD(ps) : false;
-    case 't':
-      return count === 3 ? jT(ps) : false;
-    case 'm':
-      return false;
-    default:
-      return false;
-  }
-};
-
-const calcJStr = (ps, shift, typ) => {
-  const cJ = calcJ(ps, shift, typ);
-  return cJ ? `J=${(cJ * 1000).toFixed(2)}(Hz)` : '';
+const calcJStr = (js) => {
+  if (!Array.isArray(js) || js.length === 0) return ' - ';
+  const cJ = js.map(j => j.toFixed(3)).join(', ');
+  return `${cJ}`;
 };
 
 const calcArea = (d, refArea, refFactor) => (
   (d.area * refFactor / refArea).toFixed(2)
 );
 
-const calcMpyType = pks => (
-  (pks.length > LIST_MPYS.length || pks.length === 0) ? LIST_MPYS[4] : LIST_MPYS[pks.length - 1]
-);
+const calcPeakWidth = (x, metaSt) => {
+  const { intervalL, intervalR, deltaX } = metaSt.peaks;
+  let idxL = null;
+  intervalL.every((l, idx) => {
+    if (l.x < x) {
+      idxL = idx - 1;
+      return false;
+    }
+    return true;
+  });
+  let idxR = null;
+  intervalR.every((l, idx) => {
+    if (l.x < x) {
+      idxR = idx;
+      return false;
+    }
+    return true;
+  });
+  if (!idxL || !idxR) return 10 * deltaX;
+  return Math.abs(intervalL[idxL].x - intervalR[idxR].x);
+};
+
+const calcMpyCoup = (pks, metaSt) => {
+  if (pks.length === 0) return { type: '', js: '' };
+  const sortPks = pks.sort((a, b) => b.x - a.x);
+  const { observeFrequency } = metaSt.peaks;
+  const peaks = sortPks.map(p => (
+    {
+      x: p.x,
+      intensity: p.y,
+      width: calcPeakWidth(p.x, metaSt),
+    }
+  ));
+
+  const signal = {
+    nbPeaks: peaks.length,
+    observe: observeFrequency,
+    nucleus: '1H',
+    peaks,
+  };
+  JAnalyzer.compilePattern(signal);
+  const js = signal.nmrJs ? signal.nmrJs.map(j => j.coupling).sort() : [];
+  return { type: signal.multiplicity, js };
+};
 
 export {
-  calcMpyCenter, calcArea, calcJ, calcJStr, calcMpyType,
+  calcMpyCenter, calcArea, calcJStr, calcMpyCoup,
 };

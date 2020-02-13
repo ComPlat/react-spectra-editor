@@ -15,7 +15,6 @@ import AddLocationOutlinedIcon from '@material-ui/icons/AddLocationOutlined';
 import FindReplaceOutlinedIcon from '@material-ui/icons/FindReplaceOutlined';
 
 import { setUiViewerType, setUiSweepType } from '../../actions/ui';
-import { setIntegrationFkr } from '../../actions/integration';
 import {
   LIST_UI_VIEWER_TYPE,
   LIST_UI_SWEEP_TYPE,
@@ -126,48 +125,24 @@ GroupViewer.propTypes = {
   setUiViewerTypeAct: PropTypes.func.isRequired,
 };
 
-const GroupIntegration = ({
-  classes, uiSt, layoutSt, integrationSt,
-  setUiSweepTypeAct, setIntegrationFkrAct,
-}) => (
+const GroupIntegration = ({ classes }) => (
   <span className={classes.group}>
-    <Integration
-      uiSt={uiSt}
-      layoutSt={layoutSt}
-      integrationSt={integrationSt}
-      setUiSweepTypeAct={setUiSweepTypeAct}
-      setIntegrationFkrAct={setIntegrationFkrAct}
-    />
+    <Integration />
   </span>
 );
 
 GroupIntegration.propTypes = {
   classes: PropTypes.object.isRequired,
-  uiSt: PropTypes.object.isRequired,
-  layoutSt: PropTypes.string.isRequired,
-  integrationSt: PropTypes.object.isRequired,
-  setUiSweepTypeAct: PropTypes.func.isRequired,
-  setIntegrationFkrAct: PropTypes.func.isRequired,
 };
 
-const GroupMultiplicity = ({
-  classes, uiSt, layoutSt,
-  setUiSweepTypeAct,
-}) => (
+const GroupMultiplicity = ({ classes }) => (
   <span className={classes.group}>
-    <Multiplicity
-      uiSt={uiSt}
-      layoutSt={layoutSt}
-      setUiSweepTypeAct={setUiSweepTypeAct}
-    />
+    <Multiplicity />
   </span>
 );
 
 GroupMultiplicity.propTypes = {
   classes: PropTypes.object.isRequired,
-  uiSt: PropTypes.object.isRequired,
-  layoutSt: PropTypes.string.isRequired,
-  setUiSweepTypeAct: PropTypes.func.isRequired,
 };
 
 const GroupZoom = ({
@@ -308,8 +283,8 @@ GroupSubmit.propTypes = {
 };
 
 const CmdBar = ({
-  classes, uiSt, layoutSt, integrationSt, feature, hasEdit, operations,
-  setUiViewerTypeAct, setUiSweepTypeAct, setIntegrationFkrAct,
+  classes, uiSt, layoutSt, feature, hasEdit, operations,
+  setUiViewerTypeAct, setUiSweepTypeAct,
 }) => (
   <Card className={classes.card}>
     <div className={classes.cardTop}>
@@ -344,17 +319,9 @@ const CmdBar = ({
     <div>
       <GroupIntegration
         classes={classes}
-        uiSt={uiSt}
-        layoutSt={layoutSt}
-        integrationSt={integrationSt}
-        setUiSweepTypeAct={setUiSweepTypeAct}
-        setIntegrationFkrAct={setIntegrationFkrAct}
       />
       <GroupMultiplicity
         classes={classes}
-        uiSt={uiSt}
-        layoutSt={layoutSt}
-        setUiSweepTypeAct={setUiSweepTypeAct}
       />
       <GroupSubmit
         classes={classes}
@@ -377,7 +344,6 @@ const mapDispatchToProps = dispatch => (
   bindActionCreators({
     setUiViewerTypeAct: setUiViewerType,
     setUiSweepTypeAct: setUiSweepType,
-    setIntegrationFkrAct: setIntegrationFkr,
   }, dispatch)
 );
 
@@ -388,10 +354,8 @@ CmdBar.propTypes = {
   operations: PropTypes.array.isRequired,
   uiSt: PropTypes.object.isRequired,
   layoutSt: PropTypes.string.isRequired,
-  integrationSt: PropTypes.object.isRequired,
   setUiViewerTypeAct: PropTypes.func.isRequired,
   setUiSweepTypeAct: PropTypes.func.isRequired,
-  setIntegrationFkrAct: PropTypes.func.isRequired,
 };
 
 export default compose(

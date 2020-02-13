@@ -11,6 +11,8 @@ import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 
+import Format from '../../helpers/format';
+
 const styles = () => ({
   chip: {
     margin: '1px 0 1px 0',
@@ -64,7 +66,7 @@ const styles = () => ({
 });
 
 const InfoPanel = ({
-  classes, expand, feature,
+  classes, expand, feature, layoutSt,
   onExapnd,
 }) => {
   if (!feature) return null;
@@ -92,14 +94,26 @@ const InfoPanel = ({
           <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Title: </span>
           <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{ title }</span>
         </div>
-        <div className={classNames(classes.rowEven)}>
-          <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Frequency: </span>
-          <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{observeFrequency}</span>
-        </div>
-        <div className={classNames(classes.rowOdd)}>
-          <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Solvent: </span>
-          <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{solventName}</span>
-        </div>
+        {
+          Format.isNmrLayout(layoutSt)
+            ? (
+              <div className={classNames(classes.rowEven)}>
+                <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Frequency: </span>
+                <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{observeFrequency}</span>
+              </div>
+            )
+            : null
+        }
+        {
+          Format.isNmrLayout(layoutSt)
+            ? (
+              <div className={classNames(classes.rowOdd)}>
+                <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Solvent: </span>
+                <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{solventName}</span>
+              </div>
+            )
+            : null
+        }
       </div>
     </ExpansionPanel>
   );
@@ -107,6 +121,7 @@ const InfoPanel = ({
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
+    layoutSt: state.layout,
   }
 );
 
@@ -119,6 +134,7 @@ InfoPanel.propTypes = {
   classes: PropTypes.object.isRequired,
   expand: PropTypes.bool.isRequired,
   feature: PropTypes.object.isRequired,
+  layoutSt: PropTypes.string.isRequired,
   onExapnd: PropTypes.func.isRequired,
 };
 

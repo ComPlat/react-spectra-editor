@@ -262,6 +262,7 @@ const range = (head, tail, length) => {
 const buildMpyFeature = (jcamp) => {
   const { $OBSERVEDMULTIPLETS, $OBSERVEDMULTIPLETSPEAKS } = jcamp.info;
   const regx = /[^A-Za-z0-9.,-]/g;
+  const regxNum = /[^0-9.]/g;
   let stack = [];
   if (!$OBSERVEDMULTIPLETSPEAKS) return { stack: [] };
   const allPeaks = $OBSERVEDMULTIPLETSPEAKS.split('\n').map(
@@ -281,8 +282,13 @@ const buildMpyFeature = (jcamp) => {
         }
         return null;
       }).filter(r => r != null);
+      let js = m.split(',');
+      js = js[js.length - 1].split(' ')
+        .map(j => parseFloat(j.replace(regxNum, '')))
+        .filter(Boolean);
 
       return {
+        js,
         mpyType: ms[6],
         xExtent: {
           xL: parseFloat(ms[1]),

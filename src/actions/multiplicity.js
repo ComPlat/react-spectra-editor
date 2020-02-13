@@ -35,10 +35,18 @@ const resetMpyOne = payload => (
   }
 );
 
+const updateMpyJ = payload => (
+  {
+    type: MULTIPLICITY.UPDATE_J,
+    payload,
+  }
+);
+
 export {
   clickMpyOne,
   rmMpyPeakByPanel,
   selectMpyType,
   clearMpyAll,
   resetMpyOne,
+  updateMpyJ,
 }; // eslint-disable-line

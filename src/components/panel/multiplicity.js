@@ -17,10 +17,16 @@ import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import Chip from '@material-ui/core/Chip';
 import { withStyles } from '@material-ui/core/styles';
 import Checkbox from '@material-ui/core/Checkbox';
+import Button from '@material-ui/core/Button';
+import Tooltip from '@material-ui/core/Tooltip';
+import RefreshOutlinedIcon from '@material-ui/icons/RefreshOutlined';
 
-import { selectMpyType, rmMpyPeakByPanel, clickMpyOne } from '../../actions/multiplicity';
+import {
+  rmMpyPeakByPanel, clickMpyOne, resetMpyOne,
+} from '../../actions/multiplicity';
 import { LIST_LAYOUT } from '../../constants/list_layout';
 import MpySelect from './multiplicity_select';
+import MpyCoupling from './multiplicity_coupling';
 import { calcMpyCenter, calcJStr } from '../../helpers/calc';
 
 const styles = theme => ({
@@ -89,17 +95,23 @@ const styles = theme => ({
     width: 26,
   },
   moExtTxt: {
-    margin: '0 5px 0 5px',
+    margin: '0 5px 0 5x',
     fontSize: '0.8rem',
     fontFamily: 'Helvetica',
   },
   moSelect: {
-    margin: '0 5px 0 5px',
+    margin: '0 5x 0 5px',
     fontSize: '0.8rem',
     fontFamily: 'Helvetica',
   },
   moCBox: {
-    padding: 4,
+    padding: '4px 0 4px 4px',
+  },
+  btnRf: {
+    color: '#fff',
+    float: 'right',
+    minWidth: 40,
+    right: 15,
   },
 });
 
@@ -114,15 +126,18 @@ const cBoxStyle = () => ({
 });
 const MUCheckbox = withStyles(cBoxStyle)(Checkbox);
 
-const createData = (idx, xExtent, peaks, shift, smExtext, mpyType, onSelect, onClick) => (
+const createData = (
+  idx, xExtent, peaks, shift, smExtext, mpyType, js,
+  onClick, onRefresh,
+) => (
   {
     idx: idx + 1,
     xExtent,
-    onSelect,
     onClick,
+    onRefresh,
     peaks,
     center: calcMpyCenter(peaks, shift, mpyType),
-    coupJ: calcJStr(peaks, shift, mpyType),
+    jStr: calcJStr(js),
     mpyType,
     isCheck: (smExtext.xL === xExtent.xL && smExtext.xU === xExtent.xU),
   }
@@ -145,20 +160,39 @@ const pkList = (classes, row, shift, digits, rmMpyPeakByPanelAct) => (
   })
 );
 
+const refreshBtn = (classes, onRefresh) => (
+  <Tooltip
+    placement="left"
+    title={<span className="txt-sv-tp">Calculate Multiplicity</span>}
+  >
+    <Button
+      className={classes.btnRf}
+      onClick={onRefresh}
+    >
+      <RefreshOutlinedIcon />
+    </Button>
+  </Tooltip>
+);
+
 const mpyList = (
-  classes, digits, layoutSt, integrationSt, multiplicitySt,
-  selectMpyTypeAct, clickMpyOneAct, rmMpyPeakByPanelAct,
+  classes, digits, multiplicitySt,
+  clickMpyOneAct, rmMpyPeakByPanelAct, resetMpyOneAct,
 ) => {
   const { stack, shift, smExtext } = multiplicitySt;
   const rows = stack.map((k, idx) => {
-    const { peaks, xExtent, mpyType } = k;
-    const onSelect = () => selectMpyTypeAct(xExtent);
+    const {
+      peaks, xExtent, mpyType, js,
+    } = k;
+    const onRefresh = () => resetMpyOneAct(xExtent);
     const onClick = (e) => {
       e.stopPropagation();
       e.preventDefault();
       clickMpyOneAct(xExtent);
     };
-    return createData(idx, xExtent, peaks, shift, smExtext, mpyType, onSelect, onClick);
+    return createData(
+      idx, xExtent, peaks, shift, smExtext, mpyType, js,
+      onClick, onRefresh,
+    );
   });
 
   return (
@@ -166,15 +200,20 @@ const mpyList = (
       {rows.map(row => (
         <div className={classes.moCard} key={row.idx}>
           <div className={classes.moCardHead}>
-            <MUCheckbox
-              className={classes.moCBox}
-              checked={row.isCheck}
-              onChange={row.onClick}
+            <div>
+              <MUCheckbox
+                className={classes.moCBox}
+                checked={row.isCheck}
+                onChange={row.onClick}
+              />
+              <Chip label={row.idx} className={classNames(classes.moChip, 'txt-sv-panel-head')} variant="outlined" />
+              <span className={classNames(classes.moExtTxt, 'txt-sv-panel-head')}>{`${(row.center).toFixed(3)}(ppm)`}</span>
+              <span className={classNames(classes.moSelect, 'txt-sv-panel-head')}><MpySelect target={row} /></span>
+              { refreshBtn(classes, row.onRefresh) }
+            </div>
+            <MpyCoupling
+              row={row}
             />
-            <Chip label={row.idx} className={classNames(classes.moChip, 'txt-sv-panel-head')} variant="outlined" />
-            <span className={classNames(classes.moExtTxt, 'txt-sv-panel-head')}>{`${(row.center).toFixed(3)}(ppm) ${row.coupJ}`}</span>
-            <span className={classNames(classes.moSelect, 'txt-sv-panel-head')}><MpySelect target={row} /></span>
-
           </div>
           <Table className={classes.table}>
             <TableBody>
@@ -189,8 +228,8 @@ const mpyList = (
 
 const MultiplicityPanel = ({
   classes, expand, onExapnd,
-  layoutSt, integrationSt, multiplicitySt,
-  selectMpyTypeAct, clickMpyOneAct, rmMpyPeakByPanelAct,
+  layoutSt, multiplicitySt,
+  clickMpyOneAct, rmMpyPeakByPanelAct, resetMpyOneAct,
 }) => {
   const digits = layoutSt === LIST_LAYOUT.IR ? 0 : 4;
 
@@ -214,8 +253,8 @@ const MultiplicityPanel = ({
       <div className={classNames(classes.panelDetail)}>
         {
           mpyList(
-            classes, digits, layoutSt, integrationSt, multiplicitySt,
-            selectMpyTypeAct, clickMpyOneAct, rmMpyPeakByPanelAct,
+            classes, digits, multiplicitySt,
+            clickMpyOneAct, rmMpyPeakByPanelAct, resetMpyOneAct,
           )
         }
       </div>
@@ -233,9 +272,9 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
 
 const mapDispatchToProps = dispatch => (
   bindActionCreators({
-    selectMpyTypeAct: selectMpyType,
     clickMpyOneAct: clickMpyOne,
     rmMpyPeakByPanelAct: rmMpyPeakByPanel,
+    resetMpyOneAct: resetMpyOne,
   }, dispatch)
 );
 
@@ -244,11 +283,10 @@ MultiplicityPanel.propTypes = {
   expand: PropTypes.bool.isRequired,
   onExapnd: PropTypes.func.isRequired,
   layoutSt: PropTypes.string.isRequired,
-  integrationSt: PropTypes.object.isRequired,
   multiplicitySt: PropTypes.object.isRequired,
-  selectMpyTypeAct: PropTypes.func.isRequired,
   clickMpyOneAct: PropTypes.func.isRequired,
   rmMpyPeakByPanelAct: PropTypes.func.isRequired,
+  resetMpyOneAct: PropTypes.func.isRequired,
 };
 
 export default connect(

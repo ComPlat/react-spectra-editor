@@ -45,6 +45,23 @@ const selectMpyType = (state, action) => {
   return Object.assign({}, state, { stack: newStack });
 };
 
+const updateMpyJ = (state, action) => {
+  const { payload } = action;
+  const { xExtent, value } = payload;
+  if (!value) return state;
+  const { stack } = state;
+  const regx = /[^0-9.,-]/g;
+  const js = value.replace(regx, '').split(',').map(j => parseFloat(j));
+
+  const newStack = stack.map((k) => {
+    if (k.xExtent.xL === xExtent.xL && k.xExtent.xU === xExtent.xU) {
+      return Object.assign({}, k, { js });
+    }
+    return k;
+  });
+  return Object.assign({}, state, { stack: newStack });
+};
+
 const clickMpyOne = (state, action) => {
   const { payload } = action;
   return Object.assign({}, state, { smExtext: payload });
@@ -66,6 +83,8 @@ const multiplicityReducer = (state = initialState, action) => {
     case MULTIPLICITY.PEAK_ADD_BY_UI_RDC:
     case MULTIPLICITY.RESET_ONE_RDC:
       return action.payload;
+    case MULTIPLICITY.UPDATE_J:
+      return updateMpyJ(state, action);
     case MULTIPLICITY.TYPE_SELECT:
       return selectMpyType(state, action);
     case MULTIPLICITY.ONE_CLICK:

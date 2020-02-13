@@ -8,6 +8,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { updateOperation } from './actions/submit';
 import { resetScanAll } from './actions/scan';
 import { resetParamsAll } from './actions/manager';
+import { updateMetaPeaks } from './actions/meta';
 import LayerPrism from './layer_prism';
 import { GetFeature } from './helpers/chem';
 
@@ -43,16 +44,22 @@ class LayerInit extends React.Component {
   }
 
   execReset() {
-    const { entity, resetScanAllAct, resetParamsAllAct } = this.props;
+    const {
+      entity, resetScanAllAct, resetParamsAllAct, updateMetaPeaksAct,
+    } = this.props;
     const isEnMs = entity.spectrum.sTyp === 'MS';
     if (isEnMs) {
       const baseFeat = entity.features[0];
       resetScanAllAct(baseFeat);
     }
-    const { integration, multiplicity } = entity.features;
-    resetParamsAllAct({
-      integration, multiplicity,
-    });
+    const isEnNmr = entity.spectrum.sTyp === 'NMR';
+    if (isEnNmr) {
+      const { integration, multiplicity } = entity.features;
+      updateMetaPeaksAct(entity);
+      resetParamsAllAct({
+        integration, multiplicity,
+      });
+    }
   }
 
   initReducer() {
@@ -90,6 +97,7 @@ const mapDispatchToProps = dispatch => (
     resetScanAllAct: resetScanAll,
     resetParamsAllAct: resetParamsAll,
     updateOperationAct: updateOperation,
+    updateMetaPeaksAct: updateMetaPeaks,
   }, dispatch)
 );
 
@@ -103,6 +111,7 @@ LayerInit.propTypes = {
   resetScanAllAct: PropTypes.func.isRequired,
   resetParamsAllAct: PropTypes.func.isRequired,
   updateOperationAct: PropTypes.func.isRequired,
+  updateMetaPeaksAct: PropTypes.func.isRequired,
 };
 
 export default connect(

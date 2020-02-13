@@ -3,16 +3,15 @@ import { LIST_LAYOUT } from '../constants/list_layout';
 
 const spectraDigit = (layout) => {
   switch (layout) {
-    case LIST_LAYOUT.C13:
-      return 1;
     case LIST_LAYOUT.IR:
       return 0;
     case LIST_LAYOUT.H1:
     case LIST_LAYOUT.F19:
     case LIST_LAYOUT.PLAIN:
     case LIST_LAYOUT.MS:
+    case LIST_LAYOUT.C13:
     default:
-      return 2;
+      return 3;
   }
 };
 

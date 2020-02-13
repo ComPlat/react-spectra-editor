@@ -8,11 +8,13 @@ import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
 
-import { clearMultiplicityAll } from '../../actions/multiplicity';
+import { setUiSweepType } from '../../actions/ui';
+import { clearMpyAll } from '../../actions/multiplicity';
 import {
   LIST_UI_SWEEP_TYPE,
 } from '../../constants/list_ui';
 import Cfg from '../../helpers/cfg';
+import TriBtn from './tri_btn';
 
 const styles = () => ({
   btn: {
@@ -51,7 +53,7 @@ const highlight = (criteria, cls) => (criteria ? cls.btnHighlight : cls.btn);
 
 const Multiplicity = ({
   classes, uiSt, layoutSt, multiplicitySt,
-  setUiSweepTypeAct, clearMultiplicityAllAct,
+  setUiSweepTypeAct, clearMpyAllAct,
 }) => {
   const { sweepType } = uiSt;
   const onSweepMutAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD);
@@ -113,31 +115,29 @@ const Multiplicity = ({
           </Button>
         </span>
       </Tooltip>
-      <Tooltip title={<span className="txt-sv-tp">Clear All Multiplicity</span>}>
-        <span>
-          <Button
-            className={classes.btn}
-            disabled={Cfg.btnCmdMpy(layoutSt)}
-            onClick={clearMultiplicityAllAct}
-          >
-            <span className={classNames(classes.btnTxt, 'cmd-txt-btn')}>J</span>
-            <span className={classNames(classes.btnTxtX, 'cmd-txt-btn')}>X</span>
-          </Button>
-        </span>
-      </Tooltip>
+      <TriBtn
+        content={{ tp: 'Clear All Multiplicity' }}
+        cb={clearMpyAllAct}
+      >
+        <span className={classNames(classes.btnTxt, 'cmd-txt-btn')}>J</span>
+        <span className={classNames(classes.btnTxtX, 'cmd-txt-btn')}>X</span>
+      </TriBtn>
     </span>
   );
 };
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
+    uiSt: state.ui,
+    layoutSt: state.layout,
     multiplicitySt: state.multiplicity,
   }
 );
 
 const mapDispatchToProps = dispatch => (
   bindActionCreators({
-    clearMultiplicityAllAct: clearMultiplicityAll,
+    setUiSweepTypeAct: setUiSweepType,
+    clearMpyAllAct: clearMpyAll,
   }, dispatch)
 );
 
@@ -147,7 +147,7 @@ Multiplicity.propTypes = {
   layoutSt: PropTypes.string.isRequired,
   multiplicitySt: PropTypes.object.isRequired,
   setUiSweepTypeAct: PropTypes.func.isRequired,
-  clearMultiplicityAllAct: PropTypes.func.isRequired,
+  clearMpyAllAct: PropTypes.func.isRequired,
 };
 
 export default connect(

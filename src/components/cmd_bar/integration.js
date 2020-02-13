@@ -12,11 +12,15 @@ import TextField from '@material-ui/core/TextField';
 import Icon from '@mdi/react';
 import { mdiReflectVertical, mdiMathIntegral } from '@mdi/js';
 
-import { clearIntegrationAll } from '../../actions/integration';
+import {
+  clearIntegrationAll, setIntegrationFkr,
+} from '../../actions/integration';
+import { setUiSweepType } from '../../actions/ui';
 import {
   LIST_UI_SWEEP_TYPE,
 } from '../../constants/list_ui';
 import Cfg from '../../helpers/cfg';
+import TriBtn from './tri_btn';
 
 const styles = () => ({
   btn: {
@@ -159,34 +163,34 @@ const Integration = ({
           classes, isDisable, integrationSt, setIntegrationFkrAct,
         )
       }
-      <Tooltip title={<span className="txt-sv-tp">Clear All Integration</span>}>
-        <span>
-          <Button
-            className={classes.btn}
-            disabled={isDisable}
-            onClick={clearIntegrationAllAct}
-          >
-            <Icon
-              path={mdiMathIntegral}
-              size={1}
-              color={iconRMColor}
-              className={classNames('cmd-mdi-icon')}
-            />
-            <span className={classes.btnTxt}>X</span>
-          </Button>
-        </span>
-      </Tooltip>
+      <TriBtn
+        content={{ tp: 'Clear All Integration' }}
+        cb={clearIntegrationAllAct}
+      >
+        <Icon
+          path={mdiMathIntegral}
+          size={1}
+          color={iconRMColor}
+          className={classNames('cmd-mdi-icon')}
+        />
+        <span className={classes.btnTxt}>X</span>
+      </TriBtn>
     </span>
   );
 };
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
+    uiSt: state.ui,
+    layoutSt: state.layout,
+    integrationSt: state.integration,
   }
 );
 
 const mapDispatchToProps = dispatch => (
   bindActionCreators({
+    setUiSweepTypeAct: setUiSweepType,
+    setIntegrationFkrAct: setIntegrationFkr,
     clearIntegrationAllAct: clearIntegrationAll,
   }, dispatch)
 );
