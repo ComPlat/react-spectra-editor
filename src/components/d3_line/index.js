@@ -14,7 +14,7 @@ import {
 } from '../common/draw';
 
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12);
-const H = Math.round(window.innerHeight * 0.63); // 71vh @ panel/index.js
+const H = Math.round(window.innerHeight * 0.66); // 71vh @ panel/index.js
 
 class ViewerLine extends React.Component {
   constructor(props) {

@@ -21,7 +21,7 @@ const theme = createMuiTheme({
 
 const styles = () => ({
   panels: {
-    height: 'calc(75vh - 280px)',
+    height: 'calc(78vh - 280px)',
     display: 'table',
     overflowX: 'hidden',
     overflowY: 'auto',

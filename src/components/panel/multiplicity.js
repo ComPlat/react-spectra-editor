@@ -14,7 +14,6 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
-import Chip from '@material-ui/core/Chip';
 import { withStyles } from '@material-ui/core/styles';
 import Checkbox from '@material-ui/core/Checkbox';
 import Button from '@material-ui/core/Button';
@@ -42,7 +41,7 @@ const styles = theme => ({
   },
   panelDetail: {
     backgroundColor: '#fff',
-    height: 'calc(75vh - 280px)',
+    height: 'calc(78vh - 280px)',
     overflow: 'auto',
   },
   table: {
@@ -65,6 +64,7 @@ const styles = theme => ({
     padding: '4px 0 4px 90px',
   },
   tTxt: {
+    padding: 0,
   },
   tRow: {
     height: 28,
@@ -87,12 +87,12 @@ const styles = theme => ({
     backgroundColor: '#999',
     color: 'white',
   },
-  moChip: {
-    borderColor: 'white',
+  moExtId: {
+    border: '2px solid white',
+    borderRadius: 12,
     color: 'white',
-    height: 26,
     margin: '0 5px 0 5px',
-    width: 26,
+    padding: '0 5px 0 5px',
   },
   moExtTxt: {
     margin: '0 5px 0 5x',
@@ -206,7 +206,7 @@ const mpyList = (
                 checked={row.isCheck}
                 onChange={row.onClick}
               />
-              <Chip label={row.idx} className={classNames(classes.moChip, 'txt-sv-panel-head')} variant="outlined" />
+              <span className={classNames(classes.moExtTxt, classes.moExtId, 'txt-sv-panel-head')}>{row.idx}</span>
               <span className={classNames(classes.moExtTxt, 'txt-sv-panel-head')}>{`${(row.center).toFixed(3)}(ppm)`}</span>
               <span className={classNames(classes.moSelect, 'txt-sv-panel-head')}><MpySelect target={row} /></span>
               { refreshBtn(classes, row.onRefresh) }
@@ -238,6 +238,7 @@ const MultiplicityPanel = ({
       expanded={expand}
       onChange={onExapnd}
       className={classNames(classes.panel)}
+      TransitionProps={{ unmountOnExit: true }} // increase ExpansionPanel performance
     >
       <ExpansionPanelSummary
         expandIcon={<ExpandMoreIcon />}

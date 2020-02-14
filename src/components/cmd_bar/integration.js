@@ -170,7 +170,6 @@ const Integration = ({
         <Icon
           path={mdiMathIntegral}
           size={1}
-          color={iconRMColor}
           className={classNames('cmd-mdi-icon')}
         />
         <span className={classes.btnTxt}>X</span>

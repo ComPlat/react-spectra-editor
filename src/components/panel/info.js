@@ -27,7 +27,7 @@ const styles = () => ({
   },
   panelDetail: {
     backgroundColor: '#fff',
-    height: 'calc(75vh - 280px)',
+    height: 'calc(78vh - 280px)',
     overflow: 'auto',
   },
   table: {
@@ -77,6 +77,7 @@ const InfoPanel = ({
       expanded={expand}
       onChange={onExapnd}
       className={classNames(classes.panel)}
+      TransitionProps={{ unmountOnExit: true }} // increase ExpansionPanel performance
     >
       <ExpansionPanelSummary
         expandIcon={<ExpandMoreIcon />}

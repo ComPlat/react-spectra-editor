@@ -36,23 +36,23 @@ const styles = theme => ({
   },
   panelDetail: {
     backgroundColor: '#fff',
-    height: 'calc(75vh - 280px)',
+    height: 'calc(78vh - 280px)',
     overflow: 'auto',
   },
   table: {
     width: '100%',
   },
   tRowHeadPos: {
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#999',
     height: 32,
   },
   tRowHeadNeg: {
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#999',
     height: 32,
   },
   tTxtHead: {
     color: 'white',
-    padding: '4px 0 4px 5px',
+    padding: '5px 5px 5px 5px',
   },
   tTxtHeadXY: {
     color: 'white',
@@ -131,6 +131,7 @@ const PeakPanel = ({
       expanded={expand}
       onChange={onExapnd}
       className={classNames(classes.panel)}
+      TransitionProps={{ unmountOnExit: true }} // increase ExpansionPanel performance
     >
       <ExpansionPanelSummary
         expandIcon={<ExpandMoreIcon />}

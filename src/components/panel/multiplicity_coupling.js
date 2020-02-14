@@ -90,7 +90,6 @@ class MpyCoupling extends React.Component {
         <span className={classNames(classes.moExtTxt, classes.jTxt, 'txt-sv-panel-head')}>
           <TextField
             className={classNames(classes.txtField, 'txt-cmd-field')}
-            id="outlined-name"
             placeholder="-"
             value={value}
             margin="none"

@@ -51,7 +51,7 @@ const updateMpyJ = (state, action) => {
   if (!value) return state;
   const { stack } = state;
   const regx = /[^0-9.,-]/g;
-  const js = value.replace(regx, '').split(',').map(j => parseFloat(j));
+  const js = value.replace(regx, '').split(',').map(j => parseFloat(j)).filter(j => j);
 
   const newStack = stack.map((k) => {
     if (k.xExtent.xL === xExtent.xL && k.xExtent.xU === xExtent.xU) {
