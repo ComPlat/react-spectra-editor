@@ -5,7 +5,7 @@ import { calcMpyCoup } from '../helpers/calc';
 
 const getMetaSt = state => state.meta;
 
-const getMultiplicitySt = state => state.multiplicity;
+const getMultiplicitySt = state => state.multiplicity.present;
 
 function* selectMpy(action) {
   const metaSt = yield select(getMetaSt);

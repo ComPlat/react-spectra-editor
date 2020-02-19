@@ -1,6 +1,9 @@
+import undoable from 'redux-undo';
 import {
   UI, INTEGRATION, EDITPEAK, MANAGER,
 } from '../constants/action_type';
+
+import { undoRedoConfig, undoRedoActions } from './undo_redo_config';
 
 const initialState = {
   stack: [],
@@ -96,8 +99,15 @@ const integrationReducer = (state = initialState, action) => {
     case MANAGER.RESETALL:
       return state;
     default:
-      return state;
+      return undoRedoActions.indexOf(action.type)
+        ? Object.assign({}, state)
+        : state;
   }
 };
 
-export default integrationReducer;
+const undoableIntegrationReducer = undoable(
+  integrationReducer,
+  undoRedoConfig,
+);
+
+export default undoableIntegrationReducer;

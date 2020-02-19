@@ -266,8 +266,8 @@ const MultiplicityPanel = ({
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     layoutSt: state.layout,
-    integrationSt: state.integration,
-    multiplicitySt: state.multiplicity,
+    integrationSt: state.integration.present,
+    multiplicitySt: state.multiplicity.present,
   }
 );
 

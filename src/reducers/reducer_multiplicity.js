@@ -1,6 +1,9 @@
+import undoable from 'redux-undo';
 import {
   UI, EDITPEAK, INTEGRATION, MULTIPLICITY, MANAGER,
 } from '../constants/action_type';
+
+import { undoRedoConfig, undoRedoActions } from './undo_redo_config';
 
 const initialState = {
   stack: [],
@@ -97,8 +100,15 @@ const multiplicityReducer = (state = initialState, action) => {
     case MANAGER.RESETALL:
       return state;
     default:
-      return state;
+      return undoRedoActions.indexOf(action.type)
+        ? Object.assign({}, state)
+        : state;
   }
 };
 
-export default multiplicityReducer;
+const undoableMultiplicityReducer = undoable(
+  multiplicityReducer,
+  undoRedoConfig,
+);
+
+export default undoableMultiplicityReducer;

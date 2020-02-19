@@ -5,7 +5,7 @@ import { FromManualToOffset, VirtalPts } from '../helpers/shift';
 
 const getShiftRef = state => state.shift.ref;
 const getShiftPeak = state => state.shift.peak;
-const getEditPeak = state => state.editPeak;
+const getEditPeak = state => state.editPeak.present;
 
 function* addVirtualFactor(action) {
   const origRef = yield select(getShiftRef);

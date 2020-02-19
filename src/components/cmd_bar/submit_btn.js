@@ -80,7 +80,7 @@ const BtnSubmit = ({
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
-    editPeakSt: state.editPeak,
+    editPeakSt: state.editPeak.present,
     thresSt: state.threshold,
     statusSt: state.status,
     layoutSt: state.layout,
@@ -88,8 +88,8 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     scanSt: state.scan,
     forecastSt: state.forecast,
     decimalSt: state.submit.decimal,
-    integrationSt: state.integration,
-    multiplicitySt: state.multiplicity,
+    integrationSt: state.integration.present,
+    multiplicitySt: state.multiplicity.present,
   }
 );
 

@@ -23,7 +23,8 @@ const hideCmdThres = layoutSt => Format.isMsLayout(layoutSt);
 
 const btnCmdThres = thresVal => !thresVal;
 
-const hidePanelPeak = layoutSt => Format.isMsLayout(layoutSt);
+// const hidePanelPeak = layoutSt => Format.isMsLayout(layoutSt);
+const hidePanelPeak = layoutSt => true;  // eslint-disable-line
 
 const hidePanelMpy = layoutSt => !Format.isNmrLayout(layoutSt);
 

@@ -108,11 +108,11 @@ const mapStateToProps = (state, props) => (
     peak: Feature2Peak(state, props),
     tTrEndPts: ToThresEndPts(state, props),
     tSfPeaks: ToShiftPeaks(state, props),
-    editPeakSt: state.editPeak,
+    editPeakSt: state.editPeak.present,
     layoutSt: state.layout,
-    integationSt: state.integration,
+    integationSt: state.integration.present,
     uiSt: state.ui,
-    mtplySt: state.multiplicity,
+    mtplySt: state.multiplicity.present,
   }
 );
 

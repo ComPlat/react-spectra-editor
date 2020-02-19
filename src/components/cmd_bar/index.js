@@ -24,6 +24,7 @@ import Threshold from './threshold';
 import Submit from './submit';
 import Integration from './integration';
 import Multiplicity from './multiplicity';
+import UndoRedo from './undo_redo';
 import Cfg from '../../helpers/cfg';
 
 const styles = () => ({
@@ -241,6 +242,14 @@ GroupPeak.propTypes = {
   setUiSweepTypeAct: PropTypes.func.isRequired,
 };
 
+
+const GroupUndoRedo = () => (
+  <UndoRedo />
+);
+
+GroupUndoRedo.propTypes = {
+};
+
 const GroupLayout = ({ classes, feature, hasEdit }) => (
   <span className={classes.groupRight}>
     <Layout feature={feature} hasEdit={hasEdit} />
@@ -305,6 +314,9 @@ const CmdBar = ({
         layoutSt={layoutSt}
         setUiSweepTypeAct={setUiSweepTypeAct}
       />
+      <GroupUndoRedo
+        classes={classes}
+      />
       <GroupThreshold
         classes={classes}
         feature={feature}
@@ -336,7 +348,7 @@ const mapStateToProps = (state, _) => ( // eslint-disable-line
   {
     uiSt: state.ui,
     layoutSt: state.layout,
-    integrationSt: state.integration,
+    integrationSt: state.integration.present,
   }
 );
 

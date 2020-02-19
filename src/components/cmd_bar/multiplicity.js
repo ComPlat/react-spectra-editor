@@ -130,7 +130,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     uiSt: state.ui,
     layoutSt: state.layout,
-    multiplicitySt: state.multiplicity,
+    multiplicitySt: state.multiplicity.present,
   }
 );
 

@@ -99,6 +99,7 @@ const Integration = ({
   const iconAddColor = (sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD) || isDisable ? '#fff' : '#000';
   const iconRMColor = (sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_RM) || isDisable ? '#fff' : '#000';
   const iconSRColor = (sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF) || isDisable ? '#fff' : '#000';
+  const iconRAColor = isDisable ? '#fff' : '#000';
 
   return (
     <span>
@@ -170,6 +171,7 @@ const Integration = ({
         <Icon
           path={mdiMathIntegral}
           size={1}
+          color={iconRAColor}
           className={classNames('cmd-mdi-icon')}
         />
         <span className={classes.btnTxt}>X</span>
@@ -182,7 +184,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     uiSt: state.ui,
     layoutSt: state.layout,
-    integrationSt: state.integration,
+    integrationSt: state.integration.present,
   }
 );
 

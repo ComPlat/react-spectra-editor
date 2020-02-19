@@ -1,4 +1,7 @@
+import undoable from 'redux-undo';
 import { EDITPEAK, MANAGER } from '../constants/action_type';
+
+import { undoRedoConfig, undoRedoActions } from './undo_redo_config';
 
 const initialState = {
   prevOffset: 0,
@@ -79,8 +82,15 @@ const editPeakReducer = (state = initialState, action) => {
     case MANAGER.RESETALL:
       return initialState;
     default:
-      return state;
+      return undoRedoActions.indexOf(action.type)
+        ? Object.assign({}, state)
+        : state;
   }
 };
 
-export default editPeakReducer;
+const undoableEditPeakReducer = undoable(
+  editPeakReducer,
+  undoRedoConfig,
+);
+
+export default undoableEditPeakReducer;

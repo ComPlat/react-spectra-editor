@@ -154,7 +154,7 @@ const PeakPanel = ({
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
-    editPeakSt: state.editPeak,
+    editPeakSt: state.editPeak.present,
     layoutSt: state.layout,
   }
 );
