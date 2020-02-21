@@ -136,6 +136,8 @@ const getSTyp = (s) => {
 
 const extractSpectrum = (jcamp) => {
   const subTyp = jcamp.xType ? ` - ${jcamp.xType}` : '';
+  const categorys = jcamp.info.$CSCATEGORY || ['SPECTRUM'];
+  const targetIdx = categorys.indexOf('SPECTRUM');
   const spectrum = jcamp.spectra.map((s) => {
     const sTyp = getSTyp(s);
     if (!sTyp) return null;
@@ -147,7 +149,7 @@ const extractSpectrum = (jcamp) => {
       s,
     );
     return target;
-  }).filter(r => r != null)[0];
+  }).filter(r => r != null)[targetIdx];
 
   return spectrum || jcamp.spectra[0];
 };
