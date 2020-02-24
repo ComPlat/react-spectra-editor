@@ -28,6 +28,8 @@ const hidePanelPeak = layoutSt => true;  // eslint-disable-line
 
 const hidePanelMpy = layoutSt => !Format.isNmrLayout(layoutSt);
 
+const hideSolvent = layoutSt => !Format.isNmrLayout(layoutSt);
+
 const Config = {
   btnCmdAnaViewer,
   hideCmdAnaViewer,
@@ -41,6 +43,7 @@ const Config = {
   btnCmdThres,
   hidePanelPeak,
   hidePanelMpy,
+  hideSolvent,
 };
 
 export default Config;

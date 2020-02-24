@@ -7,7 +7,6 @@ import { bindActionCreators } from 'redux';
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
 import CloudDoneOutlinedIcon from '@material-ui/icons/CloudDoneOutlined';
 import HowToRegOutlinedIcon from '@material-ui/icons/HowToRegOutlined';
@@ -17,25 +16,20 @@ import Cfg from '../../helpers/cfg';
 import {
   updateThresholdValue, resetThresholdValue, toggleThresholdIsEdit,
 } from '../../actions/threshold';
+import { MuButton, commonStyle } from './common';
 
-const styles = () => ({
-  txtField: {
-    width: 110,
-    margin: '6px 3px 0 3px',
-  },
-  txtInput: {
-    height: 30,
-    fontSize: '0.9rem',
-    fontFamily: 'Helvetica',
-  },
-  txtPercent: {
-    fontSize: '0.9rem',
-    fontFamily: 'Helvetica',
-  },
-  btn: {
-    minWidth: 40,
-  },
-});
+const styles = () => (
+  Object.assign(
+    {
+      field: {
+        width: 90,
+      },
+      txtIcon: {
+      },
+    },
+    commonStyle,
+  )
+);
 
 const txtPercent = () => (
   <InputAdornment position="end">
@@ -58,7 +52,7 @@ const setThreshold = (
 
   return (
     <TextField
-      className={classNames(classes.txtField, 'txt-cmd-field')}
+      className={classes.field}
       disabled={Cfg.btnCmdThres(thresVal)}
       id="outlined-name"
       placeholder="N.A."
@@ -67,9 +61,9 @@ const setThreshold = (
       margin="none"
       InputProps={{
         endAdornment: txtPercent(),
-        className: classNames(classes.txtInput, 'txt-sv-input-label'),
+        className: classNames(classes.txtInput, 'txtfield-sv-bar-input'),
       }}
-      label={<span className={classNames('cmd-txt-label')}>Threshold</span>}
+      label={<span className={classNames(classes.txtLabel, 'txtfield-sv-bar-label')}>Threshold</span>}
       onChange={onChange}
       onBlur={onBlur}
       onKeyPress={onEnterPress}
@@ -78,8 +72,10 @@ const setThreshold = (
   );
 };
 
-const restoreIcon = (hasEdit, isEdit) => (
-  hasEdit && isEdit ? <HowToRegOutlinedIcon /> : <CloudDoneOutlinedIcon />
+const restoreIcon = (classes, hasEdit, isEdit) => (
+  hasEdit && isEdit
+    ? <HowToRegOutlinedIcon className={classes.icon} />
+    : <CloudDoneOutlinedIcon className={classes.icon} />
 );
 
 const restoreTp = (hasEdit, isEdit) => (
@@ -97,26 +93,34 @@ const Threshold = ({
     <span className={classes.group}>
       { setThreshold(classes, thresVal, updateThresholdValueAct) }
       <Tooltip title={<span className="txt-sv-tp">Restore Threshold</span>}>
-        <Button
-          className={classes.btn}
+        <MuButton
+          className={
+            classNames(
+              'btn-sv-bar-thresref',
+            )
+          }
           disabled={Cfg.btnCmdThres(thresVal)}
           onClick={resetThresholdValueAct}
         >
-          <RefreshOutlinedIcon />
-        </Button>
+          <RefreshOutlinedIcon className={classes.icon} />
+        </MuButton>
       </Tooltip>
       {
         Cfg.hideCmdThres(layoutSt)
           ? null
           : (
             <Tooltip title={<span className="txt-sv-tp">{restoreTp(hasEdit, isEdit)}</span>}>
-              <Button
-                className={classes.btn}
+              <MuButton
+                className={
+                  classNames(
+                    'btn-sv-bar-thresrst',
+                  )
+                }
                 disabled={Cfg.btnCmdThres(thresVal)}
                 onClick={toggleThresholdIsEditAct}
               >
-                { restoreIcon(hasEdit, isEdit) }
-              </Button>
+                { restoreIcon(classes, hasEdit, isEdit) }
+              </MuButton>
             </Tooltip>
           )
       }

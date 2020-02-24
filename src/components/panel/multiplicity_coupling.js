@@ -37,7 +37,7 @@ const styles = () => ({
 const txtJ = () => (
   <InputAdornment position="start">
     <span className="txt-cmd-j">
-      J=
+      J&nbsp;=
     </span>
   </InputAdornment>
 );

@@ -13,8 +13,8 @@ import {
   drawMain, drawLabel, drawDisplay, drawDestroy,
 } from '../common/draw';
 
-const W = Math.round(window.innerWidth * 0.90 * 9 / 12);
-const H = Math.round(window.innerHeight * 0.66); // 71vh @ panel/index.js
+const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
+const H = Math.round(window.innerHeight * 0.90 * 0.85); // ROI
 
 class ViewerLine extends React.Component {
   constructor(props) {

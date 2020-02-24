@@ -41,7 +41,7 @@ const styles = theme => ({
   },
   panelDetail: {
     backgroundColor: '#fff',
-    height: 'calc(78vh - 280px)',
+    maxHeight: 'calc(90vh - 220px)', // ROI
     overflow: 'auto',
   },
   table: {
@@ -105,6 +105,7 @@ const styles = theme => ({
     fontFamily: 'Helvetica',
   },
   moCBox: {
+    marginLeft: 24,
     padding: '4px 0 4px 4px',
   },
   btnRf: {
@@ -207,7 +208,7 @@ const mpyList = (
                 onChange={row.onClick}
               />
               <span className={classNames(classes.moExtTxt, classes.moExtId, 'txt-sv-panel-head')}>{row.idx}</span>
-              <span className={classNames(classes.moExtTxt, 'txt-sv-panel-head')}>{`${(row.center).toFixed(3)}(ppm)`}</span>
+              <span className={classNames(classes.moExtTxt, 'txt-sv-panel-head')}>{`${(row.center).toFixed(3)} (ppm)`}</span>
               <span className={classNames(classes.moSelect, 'txt-sv-panel-head')}><MpySelect target={row} /></span>
               { refreshBtn(classes, row.onRefresh) }
             </div>

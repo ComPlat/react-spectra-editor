@@ -21,7 +21,7 @@ const theme = createMuiTheme({
 
 const styles = () => ({
   panels: {
-    height: 'calc(78vh - 280px)',
+    maxHeight: 'calc(90vh - 220px)', // ROI
     display: 'table',
     overflowX: 'hidden',
     overflowY: 'auto',
@@ -42,8 +42,10 @@ class PanelViewer extends React.Component {
     this.onExapnd = this.onExapnd.bind(this);
   }
 
-  onExapnd(expand) {
-    this.setState({ expand });
+  onExapnd(input) {
+    const { expand } = this.state;
+    const nextExpand = input === expand ? '' : input;
+    this.setState({ expand: nextExpand });
   }
 
   render() {

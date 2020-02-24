@@ -5,32 +5,28 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
 import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
 
 import Cfg from '../../helpers/cfg';
+import { MuButton, commonStyle } from './common';
 
-const styles = () => ({
-  btn: {
-    minWidth: 40,
-  },
-  btnTxt: {
-    fontStyle: 'italic',
-    fontWeight: 'bold',
-  },
-  btnYes: {
-    color: 'green',
-  },
-  btnNo: {
-    color: 'red',
-  },
-  btnTxtConfirm: {
-    fontFamily: 'Helvetica',
-    fontStyle: 'italic',
-    fontWeight: 'bold',
-    fontSize: 12,
-  },
-});
+const styles = () => (
+  Object.assign(
+    {
+      btnYes: {
+        color: 'green',
+      },
+      btnNo: {
+        color: 'red',
+      },
+      btnTxtConfirm: {
+        fontFamily: 'Helvetica',
+        fontSize: 12,
+      },
+    },
+    commonStyle,
+  )
+);
 
 class TriBtn extends React.Component {
   constructor(props) {
@@ -54,7 +50,7 @@ class TriBtn extends React.Component {
 
   renderStageOne() {
     const {
-      content, classes, layoutSt, children,
+      content, layoutSt, children,
     } = this.props;
     const { tp } = content;
     const title = <span className="txt-sv-tp">{ tp }</span>;
@@ -62,13 +58,17 @@ class TriBtn extends React.Component {
     return (
       <Tooltip title={title}>
         <span>
-          <Button
-            className={classes.btn}
+          <MuButton
+            className={
+              classNames(
+                'btn-sv-bar-one',
+              )
+            }
             disabled={Cfg.btnCmdMpy(layoutSt)}
             onClick={this.onToggle}
           >
             { children }
-          </Button>
+          </MuButton>
         </span>
       </Tooltip>
     );
@@ -85,21 +85,29 @@ class TriBtn extends React.Component {
 
     return (
       <span disabled={Cfg.btnCmdMpy(layoutSt)}>
-        <span className={classNames(classes.btnTxtConfirm, 'cmd-txt-btn')}>
+        <span className={classNames(classes.txtLabel, 'txt-sv-bar-desc')}>
           Delete ALL?
         </span>
-        <Button
-          className={classes.btn}
+        <MuButton
+          className={
+            classNames(
+              'btn-sv-bar-yes',
+            )
+          }
           onClick={onExec}
         >
-          <span className={classNames(classes.btnTxt, classes.btnYes, 'cmd-txt-btn')}>Yes</span>
-        </Button>
-        <Button
-          className={classes.btn}
+          <span className={classNames(classes.txt, classes.btnYes, 'txt-sv-bar-yes')}>Y</span>
+        </MuButton>
+        <MuButton
+          className={
+            classNames(
+              'btn-sv-bar-no',
+            )
+          }
           onClick={this.onToggle}
         >
-          <span className={classNames(classes.btnTxt, classes.btnNo, 'cmd-txt-btn')}>No</span>
-        </Button>
+          <span className={classNames(classes.txt, classes.btnNo, 'txt-sv-bar-no')}>N</span>
+        </MuButton>
       </span>
     );
   }

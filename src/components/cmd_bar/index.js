@@ -5,8 +5,6 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
 import { withStyles } from '@material-ui/core/styles';
-import Card from '@material-ui/core/Card';
-import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
 import SpellcheckOutlinedIcon from '@material-ui/icons/SpellcheckOutlined';
 import TimelineOutlinedIcon from '@material-ui/icons/TimelineOutlined';
@@ -26,58 +24,33 @@ import Integration from './integration';
 import Multiplicity from './multiplicity';
 import UndoRedo from './undo_redo';
 import Cfg from '../../helpers/cfg';
+import { MuButton, commonStyle, focusStyle } from './common';
 
-const styles = () => ({
-  card: {
-    backgroundColor: '#e0e0e0',
-    borderRadius: 5,
-    height: 104,
-    margin: '7px 0 5px 0',
-  },
-  cardTop: {
-    margin: '4px 0 0 0',
-  },
-  group: {
-    border: '2px solid white',
-    borderRadius: 5,
-    display: 'inline-block',
-    margin: '3px 5px 3px 5px',
-    verticalAlign: 'middle',
-  },
-  groupRight: {
-    border: '2px solid white',
-    borderRadius: 5,
-    display: 'inline-block',
-    float: 'right',
-    margin: '3px 5px 3px 5px',
-    verticalAlign: 'middle',
-  },
-  btn: {
-    minWidth: 40,
-  },
-  btnTxt: {
-    textIndent: -7,
-    width: 10,
-  },
-  btnPeakTxt: {
-    fontStyle: 'italic',
-    fontWeight: 'bold',
-  },
-  btnHighlight: {
-    backgroundColor: '#2196f3',
-    color: '#fff',
-    minWidth: 40,
-    '&:hover': {
-      backgroundColor: '#51c6f3',
+const styles = () => (
+  Object.assign(
+    {},
+    {
+      card: {
+        margin: '0 0 5px 52px',
+        border: '1px solid white',
+        borderRadius: 4,
+      },
+      groupRightMost: {
+        display: 'inline-block',
+        float: 'right',
+        margin: '0px 0px 0px 10px',
+        verticalAlign: 'middle',
+      },
+      groupRight: {
+        display: 'inline-block',
+        float: 'right',
+        margin: '0px 0px 0px 10px',
+        verticalAlign: 'middle',
+      },
     },
-  },
-  sweepWrap: {
-    border: '1px dashed',
-    borderRadius: '5px',
-  },
-});
-
-const highlight = (criteria, cls) => (criteria ? cls.btnHighlight : cls.btn);
+    commonStyle,
+  )
+);
 
 const GroupViewer = ({
   classes, uiSt, layoutSt, setUiViewerTypeAct,
@@ -89,29 +62,35 @@ const GroupViewer = ({
   return (
     <span className={classes.group}>
       <Tooltip title={<span className="txt-sv-tp">Spectrum Viewer</span>}>
-        <Button
+        <MuButton
           className={
-            highlight(viewer === LIST_UI_VIEWER_TYPE.SPECTRUM, classes)
+            classNames(
+              focusStyle(viewer === LIST_UI_VIEWER_TYPE.SPECTRUM, classes),
+              'btn-sv-bar-spctrum',
+            )
           }
           onClick={onViewSpectrum}
         >
-          <TimelineOutlinedIcon />
-        </Button>
+          <TimelineOutlinedIcon className={classes.icon} />
+        </MuButton>
       </Tooltip>
       {
         Cfg.hideCmdAnaViewer(layoutSt)
           ? null
           : (
             <Tooltip title={<span className="txt-sv-tp">Analysis Viewer</span>}>
-              <Button
+              <MuButton
                 className={
-                  highlight(viewer === LIST_UI_VIEWER_TYPE.ANALYSIS, classes)
+                  classNames(
+                    focusStyle(viewer === LIST_UI_VIEWER_TYPE.ANALYSIS, classes),
+                    'btn-sv-bar-analysis',
+                  )
                 }
                 disabled={Cfg.btnCmdAnaViewer(layoutSt)}
                 onClick={onViewAnalysis}
               >
-                <SpellcheckOutlinedIcon />
-              </Button>
+                <SpellcheckOutlinedIcon className={classes.icon} />
+              </MuButton>
             </Tooltip>
           )
       }
@@ -156,22 +135,29 @@ const GroupZoom = ({
   return (
     <span className={classes.group}>
       <Tooltip title={<span className="txt-sv-tp">Zoom In</span>}>
-        <Button
+        <MuButton
           className={
-            highlight(sweepType === LIST_UI_SWEEP_TYPE.ZOOMIN, classes)
+            classNames(
+              focusStyle(sweepType === LIST_UI_SWEEP_TYPE.ZOOMIN, classes),
+              'btn-sv-bar-zoomin',
+            )
           }
           onClick={onSweepZoomIn}
         >
-          <ZoomInOutlinedIcon className={classes.sweepWrap} />
-        </Button>
+          <ZoomInOutlinedIcon className={classNames(classes.icon, classes.iconWp)} />
+        </MuButton>
       </Tooltip>
       <Tooltip title={<span className="txt-sv-tp">Reset Zoom</span>}>
-        <Button
-          className={classes.btn}
+        <MuButton
+          className={
+            classNames(
+              'btn-sv-bar-zoomreset',
+            )
+          }
           onClick={onSweepZoomReset}
         >
-          <FindReplaceOutlinedIcon />
-        </Button>
+          <FindReplaceOutlinedIcon className={classes.icon} />
+        </MuButton>
       </Tooltip>
     </span>
   );
@@ -194,41 +180,50 @@ const GroupPeak = ({
     <span className={classes.group}>
       <Tooltip title={<span className="txt-sv-tp">Add Peak</span>}>
         <span>
-          <Button
+          <MuButton
             className={
-              highlight(sweepType === LIST_UI_SWEEP_TYPE.PEAK_ADD, classes)
+              classNames(
+                focusStyle(sweepType === LIST_UI_SWEEP_TYPE.PEAK_ADD, classes),
+                'btn-sv-bar-addpeak',
+              )
             }
             disabled={Cfg.btnCmdAddPeak(layoutSt)}
             onClick={onSweepPeakAdd}
           >
-            <span className={classNames(classes.btnPeakTxt, 'cmd-txt-btn')}>P+</span>
-          </Button>
+            <span className={classNames(classes.txt, 'txt-sv-bar-addpeak')}>P+</span>
+          </MuButton>
         </span>
       </Tooltip>
       <Tooltip title={<span className="txt-sv-tp">Remove Peak</span>}>
         <span>
-          <Button
+          <MuButton
             className={
-              highlight(sweepType === LIST_UI_SWEEP_TYPE.PEAK_DELETE, classes)
+              classNames(
+                focusStyle(sweepType === LIST_UI_SWEEP_TYPE.PEAK_DELETE, classes),
+                'btn-sv-bar-rmpeak',
+              )
             }
             disabled={Cfg.btnCmdRmPeak(layoutSt)}
             onClick={onSweepPeakDELETE}
           >
-            <span className={classNames(classes.btnPeakTxt, 'cmd-txt-btn')}>P-</span>
-          </Button>
+            <span className={classNames(classes.txt, 'txt-sv-bar-rmpeak')}>P-</span>
+          </MuButton>
         </span>
       </Tooltip>
       <Tooltip title={<span className="txt-sv-tp">Set Reference</span>}>
         <span>
-          <Button
+          <MuButton
             className={
-              highlight(sweepType === LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT, classes)
+              classNames(
+                focusStyle(sweepType === LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT, classes),
+                'btn-sv-bar-setref',
+              )
             }
             disabled={Cfg.btnCmdSetRef(layoutSt)}
             onClick={onSweepAnchorShift}
           >
-            <AddLocationOutlinedIcon />
-          </Button>
+            <AddLocationOutlinedIcon className={classes.icon} />
+          </MuButton>
         </span>
       </Tooltip>
     </span>
@@ -275,7 +270,7 @@ GroupThreshold.propTypes = {
 };
 
 const GroupSubmit = ({ classes, operations, feature }) => (
-  <span className={classes.groupRight}>
+  <span className={classes.groupRightMost}>
     <Submit
       operations={operations}
       feature={feature}
@@ -295,53 +290,49 @@ const CmdBar = ({
   classes, uiSt, layoutSt, feature, hasEdit, operations,
   setUiViewerTypeAct, setUiSweepTypeAct,
 }) => (
-  <Card className={classes.card}>
-    <div className={classes.cardTop}>
-      <GroupViewer
-        classes={classes}
-        uiSt={uiSt}
-        layoutSt={layoutSt}
-        setUiViewerTypeAct={setUiViewerTypeAct}
-      />
-      <GroupZoom
-        classes={classes}
-        uiSt={uiSt}
-        setUiSweepTypeAct={setUiSweepTypeAct}
-      />
-      <GroupPeak
-        classes={classes}
-        uiSt={uiSt}
-        layoutSt={layoutSt}
-        setUiSweepTypeAct={setUiSweepTypeAct}
-      />
-      <GroupUndoRedo
-        classes={classes}
-      />
-      <GroupThreshold
-        classes={classes}
-        feature={feature}
-        hasEdit={hasEdit}
-      />
-      <GroupLayout
-        classes={classes}
-        feature={feature}
-        hasEdit={hasEdit}
-      />
-    </div>
-    <div>
-      <GroupIntegration
-        classes={classes}
-      />
-      <GroupMultiplicity
-        classes={classes}
-      />
-      <GroupSubmit
-        classes={classes}
-        operations={operations}
-        feature={feature}
-      />
-    </div>
-  </Card>
+  <div className={classes.card}>
+    <GroupViewer
+      classes={classes}
+      uiSt={uiSt}
+      layoutSt={layoutSt}
+      setUiViewerTypeAct={setUiViewerTypeAct}
+    />
+    <GroupZoom
+      classes={classes}
+      uiSt={uiSt}
+      setUiSweepTypeAct={setUiSweepTypeAct}
+    />
+    <GroupPeak
+      classes={classes}
+      uiSt={uiSt}
+      layoutSt={layoutSt}
+      setUiSweepTypeAct={setUiSweepTypeAct}
+    />
+    <GroupIntegration
+      classes={classes}
+    />
+    <GroupMultiplicity
+      classes={classes}
+    />
+    <GroupUndoRedo
+      classes={classes}
+    />
+    <GroupSubmit
+      classes={classes}
+      operations={operations}
+      feature={feature}
+    />
+    <GroupThreshold
+      classes={classes}
+      feature={feature}
+      hasEdit={hasEdit}
+    />
+    <GroupLayout
+      classes={classes}
+      feature={feature}
+      hasEdit={hasEdit}
+    />
+  </div>
 );
 
 const mapStateToProps = (state, _) => ( // eslint-disable-line

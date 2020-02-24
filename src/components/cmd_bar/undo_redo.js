@@ -2,31 +2,22 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import { ActionCreators as UndoActionCreators } from 'redux-undo';
 
 import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
 import RedoOutlinedIcon from '@material-ui/icons/RedoOutlined';
 import UndoOutlinedIcon from '@material-ui/icons/UndoOutlined';
+import { MuButton, commonStyle } from './common';
 
+const styles = () => (
+  Object.assign(
+    {},
+    commonStyle,
+  )
+);
 
-const styles = () => ({
-  group: {
-    border: '2px solid white',
-    borderRadius: 5,
-    display: 'inline-block',
-    margin: '3px 5px 3px 5px',
-    verticalAlign: 'middle',
-  },
-  btn: {
-    minWidth: 40,
-  },
-  btnPeakTxt: {
-    fontStyle: 'italic',
-    fontWeight: 'bold',
-  },
-});
 
 const UndoRedo = ({
   classes, canUndo, canRedo, onUndoAct, onRedoAct,
@@ -34,24 +25,32 @@ const UndoRedo = ({
   <span className={classes.group}>
     <Tooltip title={<span className="txt-sv-tp">Undo</span>}>
       <span>
-        <Button
-          className={classes.btn}
+        <MuButton
+          className={
+            classNames(
+              'btn-sv-bar-undo',
+            )
+          }
           disabled={!canUndo}
           onClick={onUndoAct}
         >
-          <UndoOutlinedIcon />
-        </Button>
+          <UndoOutlinedIcon className={classes.icon} />
+        </MuButton>
       </span>
     </Tooltip>
     <Tooltip title={<span className="txt-sv-tp">Redo</span>}>
       <span>
-        <Button
-          className={classes.btn}
+        <MuButton
+          className={
+            classNames(
+              'btn-sv-bar-redo',
+            )
+          }
           disabled={!canRedo}
           onClick={onRedoAct}
         >
-          <RedoOutlinedIcon />
-        </Button>
+          <RedoOutlinedIcon className={classes.icon} />
+        </MuButton>
       </span>
     </Tooltip>
   </span>

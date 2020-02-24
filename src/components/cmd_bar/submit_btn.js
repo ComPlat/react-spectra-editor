@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import classNames from 'classnames';
 import { bindActionCreators, compose } from 'redux';
 
-import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
 import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import { withStyles } from '@material-ui/core/styles';
@@ -13,14 +13,14 @@ import {
   Convert2Peak, Convert2Scan, Convert2Thres,
 } from '../../helpers/chem';
 import { FromManualToOffset } from '../../helpers/shift';
+import { MuButton, commonStyle } from './common';
 
-const styles = () => ({
-  icon: {
-  },
-  btn: {
-    minWidth: 40,
-  },
-});
+const styles = () => (
+  Object.assign(
+    {},
+    commonStyle,
+  )
+);
 
 const onClickCb = (
   operation, peaksEdit, isAscend, isIntensity,
@@ -62,8 +62,12 @@ const BtnSubmit = ({
 
   return (
     <Tooltip title={<span className="txt-sv-tp">Submit</span>}>
-      <Button
-        className={classes.btn}
+      <MuButton
+        className={
+          classNames(
+            'btn-sv-bar-submit',
+          )
+        }
         color="primary"
         disabled={disBtn}
         onClick={onClickCb(
@@ -72,8 +76,8 @@ const BtnSubmit = ({
           integrationSt, multiplicitySt,
         )}
       >
-        <PlayCircleOutlineIcon />
-      </Button>
+        <PlayCircleOutlineIcon className={classes.icon} />
+      </MuButton>
     </Tooltip>
   );
 };

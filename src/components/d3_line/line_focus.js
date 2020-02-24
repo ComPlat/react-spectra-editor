@@ -298,7 +298,7 @@ class LineFocus {
     // rescale for zoom
     const { xt } = TfRescale(this);
 
-    const dh = 30;
+    const dh = 40;
     const integBar = data => (
       d3.line()([
         [xt(data.xL - shift), dh],
@@ -379,13 +379,14 @@ class LineFocus {
     igtp.enter()
       .append('text')
       .attr('class', 'igtp')
-      .attr('fill', '#228B22')
+      .attr('font-family', 'Helvetica')
       .style('font-size', '12px')
+      .attr('fill', '#228B22')
       .style('text-anchor', 'middle')
       .merge(igtp)
       .attr('id', d => `igtp${itgIdTag(d)}`)
       .text(d => calcArea(d, refArea, refFactor))
-      .attr('transform', d => `translate(${xt((d.xL + d.xU) / 2 - shift)}, ${dh - 10})`)
+      .attr('transform', d => `translate(${xt((d.xL + d.xU) / 2 - shift)}, ${dh - 12})`)
       .on('mouseover', (d) => {
         d3.select(`#igbp${itgIdTag(d)}`)
           .attr('stroke', 'blue');
@@ -440,7 +441,7 @@ class LineFocus {
       .remove();
 
     const height = this.h;
-    const dh = Math.abs(0.05 * height);
+    const dh = Math.abs(0.06 * height);
     const mpyBar = data => (
       d3.line()([
         [xt(data.xExtent.xL - shift), height - dh],
@@ -492,13 +493,14 @@ class LineFocus {
     mpyt1.enter()
       .append('text')
       .attr('class', 'mpyt1')
+      .attr('font-family', 'Helvetica')
       .style('font-size', '12px')
       .style('text-anchor', 'middle')
       .merge(mpyt1)
       .attr('fill', d => mpyColor(d))
       .attr('id', d => `mpyt1${mpyIdTag(d)}`)
       .text(d => `${calcMpyCenter(d.peaks, shift, d.mpyType).toFixed(3)}`)
-      .attr('transform', d => `translate(${xt((d.xExtent.xL + d.xExtent.xU) / 2 - shift)}, ${height - dh + 10})`)
+      .attr('transform', d => `translate(${xt((d.xExtent.xL + d.xExtent.xU) / 2 - shift)}, ${height - dh + 12})`)
       .on('mouseover', (d) => {
         d3.selectAll(`#mpyb${mpyIdTag(d)}`)
           .attr('stroke', 'blue');
@@ -525,13 +527,14 @@ class LineFocus {
     mpyt2.enter()
       .append('text')
       .attr('class', 'mpyt2')
+      .attr('font-family', 'Helvetica')
       .style('font-size', '12px')
       .style('text-anchor', 'middle')
       .merge(mpyt2)
       .attr('fill', d => mpyColor(d))
       .attr('id', d => `mpyt2${mpyIdTag(d)}`)
       .text(d => `(${d.mpyType})`)
-      .attr('transform', d => `translate(${xt((d.xExtent.xL + d.xExtent.xU) / 2 - shift)}, ${height - dh + 20})`)
+      .attr('transform', d => `translate(${xt((d.xExtent.xL + d.xExtent.xU) / 2 - shift)}, ${height - dh + 24})`)
       .on('mouseover', (d) => {
         d3.selectAll(`#mpyb${mpyIdTag(d)}`)
           .attr('stroke', 'blue');

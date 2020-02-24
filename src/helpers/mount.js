@@ -101,7 +101,9 @@ const MountAxisLabelX = (target) => {
   target.root.append('text')
     .attr('text-anchor', 'middle')
     .attr('transform', xTrans)
-    .attr('class', 'xLabel');
+    .attr('class', 'xLabel')
+    .attr('font-family', 'Helvetica')
+    .style('font-size', '12px');
 };
 
 const MountAxisLabelY = (target) => {
@@ -110,7 +112,9 @@ const MountAxisLabelY = (target) => {
   target.root.append('text')
     .attr('text-anchor', 'middle')
     .attr('transform', yTrans)
-    .attr('class', 'yLabel');
+    .attr('class', 'yLabel')
+    .attr('font-family', 'Helvetica')
+    .style('font-size', '12px');
 };
 
 const MountMarker = (target, color) => {
@@ -119,7 +123,8 @@ const MountMarker = (target, color) => {
   target.root.append('text')
     .attr('text-anchor', 'middle')
     .attr('transform', tTrans)
-    .attr('class', 'mark-text');
+    .attr('class', 'mark-text')
+    .attr('font-family', 'Helvetica');
 
   target.root.append('rect')
     .attr('transform', lTrans)

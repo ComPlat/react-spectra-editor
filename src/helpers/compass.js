@@ -64,6 +64,7 @@ const MountCompass = (focus) => {
     .attr('stroke-width', 2);
   cursor.append('text')
     .attr('class', 'cursor-txt')
+    .attr('font-family', 'Helvetica')
     .style('font-size', '12px')
     .style('text-anchor', 'middle');
 

@@ -16,39 +16,27 @@ import {
   updateOperation, updateDecimal,
 } from '../../actions/submit';
 import BtnSubmit from './submit_btn';
+import { commonStyle } from './common';
 
-const Styles = () => ({
-  formControlAsc: {
-    minWidth: 110,
-    margin: '0 3px 0 3px',
-  },
-  formControlInt: {
-    minWidth: 110,
-    margin: '0 3px 0 3px',
-  },
-  formControlOp: {
-    minWidth: 150,
-    margin: '0 3px 0 3px',
-  },
-  formControlDcm: {
-    minWidth: 70,
-    margin: '0 3px 0 3px',
-  },
-  selectInput: {
-    height: 30,
-    margin: '6px 0 0 0',
-  },
-  selectInputCls: {
-    padding: '0 15px 0 15px',
-  },
-  selectLabel: {
-    margin: '6px 0 0 0',
-  },
-  selectTxt: {
-    fontSize: '0.9rem',
-    fontFamily: 'Helvetica',
-  },
-});
+const styles = () => (
+  Object.assign(
+    {
+      fieldOrder: {
+        width: 90,
+      },
+      fieldIntensity: {
+        width: 90,
+      },
+      fieldDecimal: {
+        width: 80,
+      },
+      fieldOpertaion: {
+        width: 120,
+      },
+    },
+    commonStyle,
+  )
+);
 
 const ascendSelect = (
   classes, hideSwitch, isAscendSt, toggleIsAscendAct,
@@ -57,10 +45,10 @@ const ascendSelect = (
 
   return (
     <FormControl
-      className={classNames(classes.formControlAsc)}
+      className={classNames(classes.fieldOrder)}
       variant="outlined"
     >
-      <InputLabel className={classNames(classes.selectLabel, 'cmd-txt-label')}>
+      <InputLabel className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
         Write Peaks
       </InputLabel>
       <Select
@@ -69,20 +57,19 @@ const ascendSelect = (
         input={
           (
             <OutlinedInput
-              className={classes.selectInput}
-              classes={{ input: classes.selectInputCls }}
+              className={classNames(classes.selectInput, 'input-sv-bar-order')}
               labelWidth={90}
             />
           )
         }
       >
         <MenuItem value key="ascend">
-          <span className={classNames(classes.selectTxt, 'txt-sv-input-label')}>
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-ascend')}>
             Ascend
           </span>
         </MenuItem>
         <MenuItem value={false} key="descend">
-          <span className={classNames(classes.selectTxt, 'txt-sv-input-label')}>
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-descend')}>
             Descend
           </span>
         </MenuItem>
@@ -98,10 +85,10 @@ const intensitySelect = (
 
   return (
     <FormControl
-      className={classNames(classes.formControlInt)}
+      className={classNames(classes.fieldIntensity)}
       variant="outlined"
     >
-      <InputLabel className={classNames(classes.selectLabel, 'cmd-txt-label')}>
+      <InputLabel className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
         Write Intensity
       </InputLabel>
       <Select
@@ -110,20 +97,19 @@ const intensitySelect = (
         input={
           (
             <OutlinedInput
-              className={classes.selectInput}
-              classes={{ input: classes.selectInputCls }}
+              className={classNames(classes.selectInput, 'input-sv-bar-intensity')}
               labelWidth={100}
             />
           )
         }
       >
         <MenuItem value key="ascend">
-          <span className={classNames(classes.selectTxt, 'txt-sv-input-label')}>
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-show')}>
             Show
           </span>
         </MenuItem>
         <MenuItem value={false} key="descend">
-          <span className={classNames(classes.selectTxt, 'txt-sv-input-label')}>
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-hide')}>
             Hide
           </span>
         </MenuItem>
@@ -139,7 +125,7 @@ const decimalSelect = (
   const decimals = [0, 1, 2, 3, 4];
   const options = decimals.map(d => (
     <MenuItem value={d} key={d}>
-      <span className={classNames(classes.selectTxt, 'txt-sv-input-label')}>
+      <span className={classNames(classes.txtOpt, 'option-sv-bar-decimal')}>
         {d}
       </span>
     </MenuItem>
@@ -147,10 +133,10 @@ const decimalSelect = (
 
   return (
     <FormControl
-      className={classNames(classes.formControlDcm)}
+      className={classNames(classes.fieldDecimal)}
       variant="outlined"
     >
-      <InputLabel className={classNames(classes.selectLabel, 'cmd-txt-label')}>
+      <InputLabel className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
         Decimal
       </InputLabel>
       <Select
@@ -159,8 +145,7 @@ const decimalSelect = (
         input={
           (
             <OutlinedInput
-              className={classes.selectInput}
-              classes={{ input: classes.selectInputCls }}
+              className={classNames(classes.selectInput, 'input-sv-bar-decimal')}
               labelWidth={60}
             />
           )
@@ -177,7 +162,7 @@ const operationSelect = (
 ) => {
   const options = operations.map(o => (
     <MenuItem value={o.name} key={o.name}>
-      <span className={classNames(classes.selectTxt, 'txt-sv-input-label')}>{o.name}</span>
+      <span className={classNames(classes.txtOpt, 'option-sv-bar-operation')}>{o.name}</span>
     </MenuItem>
   ));
 
@@ -185,10 +170,10 @@ const operationSelect = (
 
   return (
     <FormControl
-      className={classNames(classes.formControlOp)}
+      className={classNames(classes.fieldOpertaion)}
       variant="outlined"
     >
-      <InputLabel className={classNames(classes.selectLabel, 'cmd-txt-label')}>
+      <InputLabel className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
         Submit
       </InputLabel>
       <Select
@@ -197,8 +182,7 @@ const operationSelect = (
         input={
           (
             <OutlinedInput
-              className={classes.selectInput}
-              classes={{ input: classes.selectInputCls }}
+              className={classNames(classes.selectInput, 'input-sv-bar-operation')}
               labelWidth={50}
             />
           )
@@ -304,5 +288,5 @@ Submit.propTypes = {
 
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
-  withStyles(Styles),
+  withStyles(styles),
 )(Submit);

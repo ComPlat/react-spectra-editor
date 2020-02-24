@@ -27,11 +27,11 @@ const styles = () => ({
   },
   panelDetail: {
     backgroundColor: '#fff',
-    height: 'calc(78vh - 280px)',
+    maxHeight: 'calc(90vh - 220px)', // ROI
     overflow: 'auto',
   },
   table: {
-    width: '100%',
+    width: 'auto',
   },
   rowOdd: {
     backgroundColor: '#fff',
@@ -56,12 +56,14 @@ const styles = () => ({
   tHead: {
     fontWeight: 'bold',
     float: 'left',
-    width: 90,
+    fontSize: '0.8rem',
+    fontFamily: 'Helvetica',
+    marginLeft: 24,
   },
   tTxt: {
-    fontSize: '0.9rem',
+    fontSize: '0.8rem',
     fontFamily: 'Helvetica',
-    margin: '0 0 0 90',
+    marginRight: 3,
   },
 });
 
@@ -92,15 +94,15 @@ const InfoPanel = ({
       <Divider />
       <div className={classNames(classes.panelDetail)}>
         <div className={classNames(classes.rowOdd)}>
-          <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Title: </span>
+          <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Title : </span>
           <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{ title }</span>
         </div>
         {
           Format.isNmrLayout(layoutSt)
             ? (
               <div className={classNames(classes.rowEven)}>
-                <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Frequency: </span>
-                <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{observeFrequency}</span>
+                <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Freq : </span>
+                <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{ parseInt(observeFrequency, 10) }</span>
               </div>
             )
             : null
@@ -109,7 +111,7 @@ const InfoPanel = ({
           Format.isNmrLayout(layoutSt)
             ? (
               <div className={classNames(classes.rowOdd)}>
-                <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Solvent: </span>
+                <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Solv : </span>
                 <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{solventName}</span>
               </div>
             )

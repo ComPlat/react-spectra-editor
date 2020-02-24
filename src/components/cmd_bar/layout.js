@@ -16,57 +16,46 @@ import { updateLayout } from '../../actions/layout';
 import { setShiftRef } from '../../actions/shift';
 import { LIST_LAYOUT } from '../../constants/list_layout';
 import { getListShift } from '../../constants/list_shift';
+import Cfg from '../../helpers/cfg';
+import { commonStyle } from './common';
 
-const Styles = () => ({
-  container: {
-    margin: '0 0 0 0',
-  },
-  formControl: {
-    minWidth: 80,
-    margin: '0 3px 0 3px',
-  },
-  formControlSft: {
-    minWidth: 200,
-    margin: '0 3px 0 3px',
-  },
-  selectInput: {
-    height: 30,
-    margin: '6px 0 0 0',
-  },
-  selectInputCls: {
-    padding: '0 15px 0 15px',
-  },
-  selectLabel: {
-    margin: '6px 0 0 0',
-  },
-  selectTxt: {
-    fontSize: '0.9rem',
-    fontFamily: 'Helvetica',
-  },
-});
+const styles = () => (
+  Object.assign(
+    {
+      fieldShift: {
+        width: 160,
+      },
+      fieldLayout: {
+        width: 70,
+      },
+    },
+    commonStyle,
+  )
+);
 
 const shiftSelect = (
   classes, layoutSt, shiftRefSt, shiftEnableSt, setShiftRefAct,
 ) => {
   if (!shiftEnableSt) return null;
+  if (Cfg.hideSolvent(layoutSt)) return null;
   const onChange = e => setShiftRefAct(e.target.value);
 
   const listShift = getListShift(layoutSt);
 
   const content = listShift.map(ref => (
     <MenuItem value={ref} key={ref.name}>
-      <span className={classNames(classes.selectTxt, 'txt-sv-input-label')}>
-        { `${ref.name}: ${ref.value}ppm` }
+      <span className={classNames(classes.txtOpt, 'option-sv-bar-shift')}>
+        { `${ref.name}: ${ref.value} ppm` }
       </span>
     </MenuItem>
   ));
 
   return (
     <FormControl
-      className={classNames(classes.formControlSft)}
+      className={classNames(classes.fieldShift)}
       variant="outlined"
     >
-      <InputLabel className={classNames(classes.selectLabel, 'cmd-txt-label')}>
+      <InputLabel className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
         Solvent
       </InputLabel>
       <Select
@@ -75,8 +64,7 @@ const shiftSelect = (
         input={
           (
             <OutlinedInput
-              className={classes.selectInput}
-              classes={{ input: classes.selectInputCls }}
+              className={classNames(classes.selectInput, 'input-sv-bar-shift')}
               labelWidth={60}
             />
           )
@@ -93,10 +81,10 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
 
   return (
     <FormControl
-      className={classNames(classes.formControl)}
+      className={classNames(classes.fieldLayout)}
       variant="outlined"
     >
-      <InputLabel className={classNames(classes.selectLabel, 'cmd-txt-label')}>
+      <InputLabel className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
         Layout
       </InputLabel>
       <Select
@@ -105,39 +93,38 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
         input={
           (
             <OutlinedInput
-              className={classes.selectInput}
-              classes={{ input: classes.selectInputCls }}
+              className={classNames(classes.selectInput, 'input-sv-bar-layout')}
               labelWidth={60}
             />
           )
         }
       >
         <MenuItem value={LIST_LAYOUT.PLAIN}>
-          <span className={classNames(classes.selectTxt, 'txt-sv-input-label')}>plain</span>
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>plain</span>
         </MenuItem>
         <MenuItem value={LIST_LAYOUT.IR}>
-          <span className={classNames(classes.selectTxt, 'txt-sv-input-label')}>IR</span>
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>IR</span>
         </MenuItem>
         <MenuItem value={LIST_LAYOUT.H1}>
-          <span className={classNames(classes.selectTxt, 'txt-sv-input-label')}>
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>
             <sup>1</sup>
             H
           </span>
         </MenuItem>
         <MenuItem value={LIST_LAYOUT.C13}>
-          <span className={classNames(classes.selectTxt, 'txt-sv-input-label')}>
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>
             <sup>13</sup>
             C
           </span>
         </MenuItem>
         <MenuItem value={LIST_LAYOUT.F19}>
-          <span className={classNames(classes.selectTxt, 'txt-sv-input-label')}>
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>
             <sup>19</sup>
             F
           </span>
         </MenuItem>
         <MenuItem value={LIST_LAYOUT.MS}>
-          <span className={classNames(classes.selectTxt, 'txt-sv-input-label')}>MS</span>
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>MS</span>
         </MenuItem>
       </Select>
     </FormControl>
@@ -184,4 +171,4 @@ Layout.propTypes = {
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(withStyles(Styles)(Layout));
+)(withStyles(styles)(Layout));

@@ -5,7 +5,6 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
 import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
 import TextField from '@material-ui/core/TextField';
 
@@ -21,39 +20,22 @@ import {
 } from '../../constants/list_ui';
 import Cfg from '../../helpers/cfg';
 import TriBtn from './tri_btn';
+import { MuButton, commonStyle, focusStyle } from './common';
 
-const styles = () => ({
-  btn: {
-    minWidth: 40,
-  },
-  btnTxt: {
-    textIndent: -10,
-    width: 0,
-  },
-  btnHighlight: {
-    backgroundColor: '#2196f3',
-    color: '#fff',
-    minWidth: 40,
-    '&:hover': {
-      backgroundColor: '#51c6f3',
+const styles = () => (
+  Object.assign(
+    {
+      field: {
+        width: 80,
+      },
+      txtIcon: {
+      },
     },
-  },
-  txtField: {
-    width: 80,
-    margin: '6px 3px 0 3px',
-  },
-  txtInput: {
-    fontSize: '0.8rem',
-    fontFamily: 'Helvetica',
-    height: 30,
-  },
-  sweepWrap: {
-    border: '1px dashed',
-    borderRadius: '5px',
-  },
-});
+    commonStyle,
+  )
+);
 
-const highlight = (criteria, cls) => (criteria ? cls.btnHighlight : cls.btn);
+const iconSize = '16px';
 
 const setFactor = (
   classes, isDisable, integrationSt, setIntegrationFkrAct,
@@ -69,16 +51,16 @@ const setFactor = (
 
   return (
     <TextField
-      className={classes.txtField}
+      className={classes.field}
       disabled={isDisable}
       id="intg-factor-name"
       type="number"
       value={refFactor || 1.00}
       margin="none"
       InputProps={{
-        className: classNames(classes.txtInput, 'txt-sv-input-label'),
+        className: classNames(classes.txtInput, 'txtfield-sv-bar-input'),
       }}
-      label={<span className={classNames('cmd-txt-label')}>Ref Area</span>}
+      label={<span className={classNames(classes.txtLabel, 'txtfield-sv-bar-label')}>Ref Area</span>}
       onChange={onChange}
       onBlur={onBlur}
       onKeyPress={onEnterPress}
@@ -105,58 +87,64 @@ const Integration = ({
     <span>
       <Tooltip title={<span className="txt-sv-tp">Add Integration</span>}>
         <span>
-          <Button
+          <MuButton
             className={
-              highlight(sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD, classes)
+              classNames(
+                focusStyle(sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD, classes)
+              )
             }
             disabled={isDisable}
             onClick={onSweepIntegtAdd}
           >
             <Icon
               path={mdiMathIntegral}
-              size={1}
+              size={iconSize}
               color={iconAddColor}
-              className={classNames(classes.sweepWrap, 'cmd-mdi-icon')}
+              className={classNames(classes.iconMdi, 'icon-sv-bar-addint')}
             />
-            <span className={classes.btnTxt}>+</span>
-          </Button>
+            <span className={classNames(classes.txt, classes.txtIcon, 'txt-sv-bar-addint')}>+</span>
+          </MuButton>
         </span>
       </Tooltip>
       <Tooltip title={<span className="txt-sv-tp">Remove Integration</span>}>
         <span>
-          <Button
+          <MuButton
             className={
-              highlight(sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_RM, classes)
+              classNames(
+                focusStyle(sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_RM, classes)
+              )
             }
             disabled={isDisable}
             onClick={onSweepIntegtRm}
           >
             <Icon
               path={mdiMathIntegral}
-              size={1}
+              size={iconSize}
               color={iconRMColor}
-              className={classNames('cmd-mdi-icon')}
+              className={classNames(classes.iconMdi, 'icon-sv-bar-rmint')}
             />
-            <span className={classes.btnTxt}>-</span>
-          </Button>
+            <span className={classNames(classes.txt, classes.txtIcon, 'txt-sv-bar-rmint')}>-</span>
+          </MuButton>
         </span>
       </Tooltip>
       <Tooltip title={<span className="txt-sv-tp">Set Integration Reference</span>}>
         <span>
-          <Button
+          <MuButton
             className={
-              highlight(sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF, classes)
+              classNames(
+                focusStyle(sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF, classes)
+              )
             }
             disabled={isDisable}
             onClick={onSweepIntegtSR}
           >
             <Icon
               path={mdiReflectVertical}
-              size={1}
+              size={iconSize}
               color={iconSRColor}
-              className={classNames('cmd-mdi-icon')}
+              className={classNames(classes.iconMdi, 'icon-sv-bar-refint')}
             />
-          </Button>
+          </MuButton>
         </span>
       </Tooltip>
       {
@@ -170,11 +158,11 @@ const Integration = ({
       >
         <Icon
           path={mdiMathIntegral}
-          size={1}
+          size={iconSize}
           color={iconRAColor}
-          className={classNames('cmd-mdi-icon')}
+          className={classNames(classes.iconMdi, 'icon-sv-bar-rmallint')}
         />
-        <span className={classes.btnTxt}>X</span>
+        <span className={classNames(classes.txt, classes.txtIcon, 'txt-sv-bar-rmallint')}>x</span>
       </TriBtn>
     </span>
   );

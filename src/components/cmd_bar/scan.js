@@ -10,7 +10,6 @@ import FormControl from '@material-ui/core/FormControl';
 import OutlinedInput from '@material-ui/core/OutlinedInput';
 import InputLabel from '@material-ui/core/InputLabel';
 import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';
 import CloudDoneOutlinedIcon from '@material-ui/icons/CloudDoneOutlined';
 import HowToRegOutlinedIcon from '@material-ui/icons/HowToRegOutlined';
@@ -19,36 +18,23 @@ import RefreshOutlinedIcon from '@material-ui/icons/RefreshOutlined';
 import {
   setScanTarget, resetScanTarget, toggleScanIsAuto,
 } from '../../actions/scan';
+import { MuButton, commonStyle } from './common';
 
-const styles = () => ({
-  container: {
-    margin: '12px 18px',
-  },
-  formControlScan: {
-    minWidth: 100,
-    margin: '0 3px 0 3px',
-  },
-  selectInput: {
-    height: 30,
-    margin: '6px 0 0 0',
-  },
-  selectInputCls: {
-    padding: '0 15px 0 15px',
-  },
-  selectLabel: {
-    margin: '6px 0 0 0',
-  },
-  btn: {
-    minWidth: 40,
-  },
-  selectTxt: {
-    fontSize: '0.9rem',
-    fontFamily: 'Helvetica',
-  },
-});
+const styles = () => (
+  Object.assign(
+    {
+      fieldScan: {
+        width: 90,
+      },
+    },
+    commonStyle,
+  )
+);
 
-const restoreIcon = (hasEdit, isEdit) => (
-  hasEdit && isEdit ? <HowToRegOutlinedIcon /> : <CloudDoneOutlinedIcon />
+const restoreIcon = (classes, hasEdit, isEdit) => (
+  hasEdit && isEdit
+    ? <HowToRegOutlinedIcon className={classes.icon} />
+    : <CloudDoneOutlinedIcon className={classes.icon} />
 );
 
 const restoreTp = (hasEdit, isEdit) => (
@@ -59,13 +45,17 @@ const btnRestore = (
   classes, hasEdit, isEdit, toggleEditAct,
 ) => (
   <Tooltip title={<span className="txt-sv-tp">{restoreTp(hasEdit, isEdit)}</span>}>
-    <Button
-      className={classes.btn}
+    <MuButton
+      className={
+        classNames(
+          'btn-sv-bar-scanrst',
+        )
+      }
       disabled={!hasEdit}
       onClick={toggleEditAct}
     >
-      { restoreIcon(hasEdit, isEdit) }
-    </Button>
+      { restoreIcon(classes, hasEdit, isEdit) }
+    </MuButton>
   </Tooltip>
 );
 
@@ -73,13 +63,17 @@ const btnRrfresh = (
   classes, disabled, refreshAct,
 ) => (
   <Tooltip title={<span className="txt-sv-tp">Refresh Scan</span>}>
-    <Button
-      className={classes.btn}
+    <MuButton
+      className={
+        classNames(
+          'btn-sv-bar-scanrfs',
+        )
+      }
       disabled={disabled}
       onClick={refreshAct}
     >
-      <RefreshOutlinedIcon />
-    </Button>
+      <RefreshOutlinedIcon className={classes.icon} />
+    </MuButton>
   </Tooltip>
 );
 
@@ -91,7 +85,7 @@ const scanSelect = (
   const range = [...Array(count + 1).keys()].slice(1);
   const content = range.map(num => (
     <MenuItem value={num} key={num}>
-      <span className={classNames(classes.selectTxt, 'txt-sv-input-label')}>
+      <span className={classNames(classes.txtOpt, 'option-sv-bar-scan')}>
         { `scan ${num}` }
       </span>
     </MenuItem>
@@ -104,10 +98,10 @@ const scanSelect = (
 
   return (
     <FormControl
-      className={classNames(classes.formControlScan)}
+      className={classNames(classes.fieldScan)}
       variant="outlined"
     >
-      <InputLabel className={classNames(classes.selectLabel, 'cmd-txt-label')}>
+      <InputLabel className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
         Current Scan
       </InputLabel>
       <Select
@@ -116,8 +110,7 @@ const scanSelect = (
         input={
           (
             <OutlinedInput
-              className={classes.selectInput}
-              classes={{ input: classes.selectInputCls }}
+              className={classNames(classes.selectInput, 'input-sv-bar-scan')}
               labelWidth={90}
             />
           )

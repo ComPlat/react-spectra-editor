@@ -67,16 +67,14 @@ class ForecastViewer extends React.Component {
 
     return (
       <div className={classes.root}>
-        {
-          <ViewerLine
-            topic={topic}
-            feature={feature}
-            cLabel={cLabel}
-            xLabel={xLabel}
-            yLabel={yLabel}
-            isHidden={viewer !== LIST_UI_VIEWER_TYPE.SPECTRUM}
-          />
-        }
+        <ViewerLine
+          topic={topic}
+          feature={feature}
+          cLabel={cLabel}
+          xLabel={xLabel}
+          yLabel={yLabel}
+          isHidden={viewer !== LIST_UI_VIEWER_TYPE.SPECTRUM}
+        />
         {
           (viewer === LIST_UI_VIEWER_TYPE.ANALYSIS) && isNmr && (
             <NmrViewer

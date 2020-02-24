@@ -36,8 +36,9 @@ const tpStyle = () => {
   const stPadding = ' padding: 8px;';
   const stOpacity = ' opacity: 0.9; ';
   const stZindex = ' z-index: 1999;';
+  const stFontFamily = ' font-family: Helvetica;';
   const style = stBorder + stBorderRadius + stBackground + stColor
-    + stPadding + stOpacity + stPadding + stZindex;
+    + stPadding + stOpacity + stPadding + stZindex + stFontFamily;
 
   return style;
 };

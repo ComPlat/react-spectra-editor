@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import TextField from '@material-ui/core/TextField';
+import InputBase from '@material-ui/core/InputBase';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 
@@ -157,8 +157,8 @@ class DemoWriteIr extends React.Component {
     const entity = this.loadEntity();
 
     return (
-      <div style={{ width: Math.round(window.innerWidth * 0.9) }}>
-        <div>
+      <div style={{ width: Math.round(window.innerWidth * 0.96) }}>
+        <div style={{ margin: '0 0 15px 55px' }}>
           <Button
             variant="contained"
             style={{ margin: '0 10px 0 10px' }}
@@ -199,16 +199,17 @@ class DemoWriteIr extends React.Component {
           entity={entity}
           forecast={forecast}
           operations={operations}
+          style={{ fontFamily: 'Helvetica' }}
         />
         <Grid container>
           <Grid item xs={6}>
-            <TextField
-              label="Description"
+            <InputBase
+              style={{ margin: '0 0 0 63px' }}
+              placeholder="Description"
               multiline
               fullWidth
               rows="1"
               margin="normal"
-              variant="outlined"
               value={desc}
             />
           </Grid>

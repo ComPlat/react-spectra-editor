@@ -36,7 +36,7 @@ const styles = theme => ({
   },
   panelDetail: {
     backgroundColor: '#fff',
-    height: 'calc(78vh - 280px)',
+    maxHeight: 'calc(90vh - 220px)', // ROI
     overflow: 'auto',
   },
   table: {
