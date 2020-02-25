@@ -75,8 +75,21 @@ const calcMpyCoup = (pks, metaSt) => {
     peaks,
   };
   JAnalyzer.compilePattern(signal);
+  const type = signal.multiplicity;
   const js = signal.nmrJs ? signal.nmrJs.map(j => j.coupling).sort() : [];
-  return { type: signal.multiplicity, js };
+  const isWrong = (type === 's' && peaks.length > 1)
+    || (type === 'd' && peaks.length > 2)
+    || (type === 't' && peaks.length > 3)
+    || (type === 'q' && peaks.length > 4)
+    || (type === 'quint' && peaks.length > 5)
+    || (type === 'h' && peaks.length > 6)
+    || (type === 'sept' && peaks.length > 7)
+    || (type === 'o' && peaks.length > 8)
+    || (type === 'n' && peaks.length > 9);
+  if (isWrong) {
+    return { type: 'm', js: [] };
+  }
+  return { type, js };
 };
 
 export {

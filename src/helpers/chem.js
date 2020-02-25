@@ -24,13 +24,12 @@ const convertTopic = (topic, layout, feature, offset) => {
 
   const isItgDisable = Cfg.btnCmdIntg(layout);
   if (!isItgDisable) {
-    const gate = 0.03;
     let k = 0;
     for (let i = 0; i < ys.length; i += 1) { // no-downsample
       const x = xs[i] - offset;
       const y = ys[i];
       const cy = y / maxY;
-      if (gate < Math.abs(cy)) { k += cy; }
+      if (cy > 0.0) { k += cy; }
       sp.push({ x, y, k });
     }
     return sp;

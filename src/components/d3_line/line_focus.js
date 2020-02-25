@@ -342,11 +342,11 @@ class LineFocus {
       const [nXL, nXU] = [xL - shift, xU - shift];
       const ps = this.data.filter(d => d.x > nXL && d.x < nXU);
       const kMax = this.data[this.data.length - 1].k;
-      if (!ps[0]) return 'X';
+      if (!ps[0]) return null;
       const kRef = ps[0].k;
       return d3.line()
         .x(d => xt(d.x))
-        .y(d => 250 - (d.k - kRef) * 400 / kMax)(ps);
+        .y(d => 300 - (d.k - kRef) * 400 / kMax)(ps);
     };
 
     igcp.enter()
