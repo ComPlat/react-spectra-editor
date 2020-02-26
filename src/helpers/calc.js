@@ -10,18 +10,9 @@ const centerX = (ps, shift) => {
 const calcMpyCenter = (ps, shift, typ) => {
   const count = ps.length;
   const avgX = ps.reduce((sum, nxt) => sum + nxt.x, 0) / ps.length - shift;
-  switch (typ) {
-    case 's':
-      return avgX;
-    case 'd':
-      return avgX;
-    case 't':
-      return count === 3 ? centerX(ps, shift) : avgX;
-    case 'm':
-      return avgX;
-    default:
-      return avgX;
-  }
+  if (typ === 'm') return avgX;
+  if (count % 2 === 0) return avgX;
+  return centerX(ps, shift);
 };
 
 const calcJStr = (js) => {

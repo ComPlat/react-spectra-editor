@@ -33,7 +33,9 @@ class DemoWriteIr extends React.Component {
     };
 
     this.onClick = this.onClick.bind(this);
-    this.writePeaks = this.writePeaks.bind(this);
+    this.write = this.write.bind(this);
+    this.formatPks = this.formatPks.bind(this);
+    this.formatMpy = this.formatMpy.bind(this);
     this.savePeaks = this.savePeaks.bind(this);
     this.predictOp = this.predictOp.bind(this);
     this.updatInput = this.updatInput.bind(this);
@@ -55,7 +57,7 @@ class DemoWriteIr extends React.Component {
     return target.replace(/\$/g, '');
   }
 
-  writePeaks({
+  formatPks({
     peaks, layout, shift, isAscend, decimal, isIntensity,
   }) {
     const entity = this.loadEntity();
@@ -69,6 +71,63 @@ class DemoWriteIr extends React.Component {
     });
     const wrapper = FN.peaksWrapper(layout, shift);
     const desc = this.rmDollarSign(wrapper.head) + body + wrapper.tail;
+    return desc;
+  }
+
+  formatMpy({
+    multiplicity, integration, shift, isAscend, decimal, layout,
+  }) {
+    // obsv freq
+    const entity = this.loadEntity();
+    const { features } = entity;
+    const { observeFrequency } = Array.isArray(features)
+      ? features[0]
+      : (features.editPeak || features.autoPeak);
+    const freq = observeFrequency[0];
+    const freqStr = freq ? `${parseInt(freq, 10)} MHz, ` : '';
+    // multiplicity
+    const { refArea, refFactor } = integration;
+    const shiftVal = multiplicity.shift;
+    const ms = multiplicity.stack;
+    const is = integration.stack;
+
+    const macs = ms.map((m) => {
+      const { peaks, mpyType, xExtent } = m;
+      const { xL, xU } = xExtent;
+      const it = is.filter(i => i.xL === xL && i.xU === xU)[0] || { area: 0 };
+      const area = it.area * refFactor / refArea;
+      const center = FN.calcMpyCenter(peaks, shiftVal, mpyType);
+      return Object.assign({}, m, { area, center });
+    }).sort((a, b) => (isAscend ? a.center - b.center : b.center - a.center));
+    const str = macs.map((m) => {
+      const c = m.center.toFixed(1);
+      const type = m.mpyType;
+      const it = Math.round(m.area);
+      const js = m.js.map(j => `J = ${j.toFixed(decimal)} Hz`).join(', ');
+      const atomCount = layout === '1H' ? `, ${it}H` : '';
+      return m.js.length === 0
+        ? `${c} (${type}${atomCount})`
+        : `${c} (${type}, ${js}${atomCount})`;
+    }).join(', ');
+    const { label, value, name } = shift.ref;
+    const solvent = label ? `${name}, ` : '';
+    return `${layout} (${freqStr}${solvent}${value} ppm) δ = ${str}.`;
+  }
+
+  write({
+    peaks, layout, shift, isAscend, decimal, isIntensity,
+    multiplicity, integration,
+  }) {
+    let desc = '';
+    if (['1H', '13C', '19F'].indexOf(layout) >= 0) {
+      desc = this.formatMpy({
+        multiplicity, integration, shift, isAscend, decimal, layout,
+      });
+    } else {
+      desc = this.formatPks({
+        peaks, layout, shift, isAscend, decimal, isIntensity,
+      });
+    }
     this.setState({ desc });
   }
 
@@ -143,7 +202,7 @@ class DemoWriteIr extends React.Component {
 
     const operations = [
       { name: 'save', value: this.savePeaks },
-      { name: 'write', value: this.writePeaks },
+      { name: 'write', value: this.write },
       { name: 'predict', value: this.predictOp },
     ].filter(r => r.value);
 
@@ -202,14 +261,14 @@ class DemoWriteIr extends React.Component {
           style={{ fontFamily: 'Helvetica' }}
         />
         <Grid container>
-          <Grid item xs={6}>
+          <Grid item xs={10}>
             <InputBase
               style={{ margin: '0 0 0 63px' }}
               placeholder="Description"
               multiline
               fullWidth
-              rows="1"
-              margin="normal"
+              rows="2"
+              margin="dense"
               value={desc}
             />
           </Grid>

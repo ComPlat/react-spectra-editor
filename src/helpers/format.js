@@ -1,5 +1,6 @@
 import { ToXY, IsSame } from './converter';
 import { LIST_LAYOUT } from '../constants/list_layout';
+import { calcMpyCenter } from './calc';
 
 const spectraDigit = (layout) => {
   switch (layout) {
@@ -253,6 +254,7 @@ const Format = {
   formatPeaksByPrediction,
   formatedMS,
   formatedIR,
+  calcMpyCenter,
 };
 
 export default Format;
