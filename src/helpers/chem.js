@@ -3,6 +3,7 @@ import { createSelector } from 'reselect';
 
 import { FromManualToOffset } from './shift';
 import Cfg from './cfg';
+import Format from './format';
 
 const getTopic = (_, props) => props.topic;
 
@@ -125,6 +126,9 @@ const getSTyp = (s) => {
     }
     if (s.dataType.includes('INFRARED SPECTRUM')) {
       return 'INFRARED';
+    }
+    if (s.dataType.includes('RAMAN SPECTRUM')) {
+      return 'RAMAN';
     }
     if (s.dataType.includes('MASS SPECTRUM')) {
       return 'MS';
@@ -387,7 +391,7 @@ const ExtractJcamp = (source) => {
   const spectrum = extractSpectrum(jcamp);
   const sTyp = spectrum ? spectrum.sTyp : '';
 
-  const peakUp = sTyp !== 'INFRARED';
+  const peakUp = !Format.isIrLayout(sTyp);
   const features = sTyp === 'MS'
     ? extractMsFeatures(jcamp, sTyp, peakUp)
     : extractFeatures(jcamp, sTyp, peakUp);

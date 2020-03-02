@@ -11,8 +11,8 @@ import { TfRescale, MountCompass } from '../../helpers/compass';
 import { PksEdit } from '../../helpers/converter';
 import { itgIdTag, mpyIdTag } from '../../helpers/focus';
 import { calcMpyCenter, calcArea } from '../../helpers/calc';
+import Format from '../../helpers/format';
 import Cfg from '../../helpers/cfg';
-import { LIST_LAYOUT } from '../../constants/list_layout';
 
 class LineFocus {
   constructor(props) {
@@ -621,7 +621,7 @@ class LineFocus {
       { x: 4, y: -20 },
       { x: 0.5, y: 10 },
     ];
-    const faktor = layoutSt === LIST_LAYOUT.IR ? -1 : 1;
+    const faktor = Format.isIrLayout(layoutSt) ? -1 : 1;
     const lineSymbol = d3.line()
       .x(d => d.x)
       .y(d => faktor * d.y)(linePath);

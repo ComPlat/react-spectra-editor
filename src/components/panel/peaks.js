@@ -18,7 +18,7 @@ import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import { withStyles } from '@material-ui/core/styles';
 
 import { rmFromPosList, rmFromNegList } from '../../actions/edit_peak';
-import { LIST_LAYOUT } from '../../constants/list_layout';
+import Format from '../../helpers/format';
 
 const styles = theme => ({
   chip: {
@@ -124,7 +124,7 @@ const PeakPanel = ({
   rmFromPosListAct, rmFromNegListAct,
 }) => {
   const { neg, pos } = editPeakSt;
-  const digits = layoutSt === LIST_LAYOUT.IR ? 0 : 4;
+  const digits = Format.isEmWaveLayout(layoutSt) ? 0 : 4;
 
   return (
     <ExpansionPanel

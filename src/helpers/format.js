@@ -5,6 +5,7 @@ import { calcMpyCenter } from './calc';
 const spectraDigit = (layout) => {
   switch (layout) {
     case LIST_LAYOUT.IR:
+    case LIST_LAYOUT.RAMAN:
       return 0;
     case LIST_LAYOUT.H1:
     case LIST_LAYOUT.F19:
@@ -21,6 +22,8 @@ const opToLayout = (operation) => {
   switch (typ + nucleus) {
     case 'INFRARED':
       return LIST_LAYOUT.IR;
+    case 'RAMAN':
+      return LIST_LAYOUT.RAMAN;
     case 'NMR1H':
       return LIST_LAYOUT.H1;
     case 'NMR13C':
@@ -61,6 +64,7 @@ const spectraOps = {
   [LIST_LAYOUT.C13]: { head: '13C', tail: '.' },
   [LIST_LAYOUT.F19]: { head: '19F', tail: '.' },
   [LIST_LAYOUT.IR]: { head: 'IR', tail: ' cm-1' },
+  [LIST_LAYOUT.RAMAN]: { head: 'RAMAN', tail: ' cm-1' },
   [LIST_LAYOUT.MS]: { head: 'MASS', tail: ' m/z' },
 };
 
@@ -163,6 +167,9 @@ const peaksBody = ({
   if (layout === LIST_LAYOUT.IR) {
     return formatedIR(ordered, maxY, decimal, isAscend, isIntensity, boundary);
   }
+  if (layout === LIST_LAYOUT.RAMAN) {
+    return formatedIR(ordered, maxY, decimal, isAscend, isIntensity, boundary);
+  }
   return ordered.map(o => fixDigit(o.x, decimal)).join(', ');
 };
 
@@ -189,7 +196,9 @@ const is19FLayout = layoutSt => (LIST_LAYOUT.F19 === layoutSt);
 const is13CLayout = layoutSt => (LIST_LAYOUT.C13 === layoutSt);
 const is1HLayout = layoutSt => (LIST_LAYOUT.H1 === layoutSt);
 const isMsLayout = layoutSt => (LIST_LAYOUT.MS === layoutSt);
-const isIrLayout = layoutSt => (LIST_LAYOUT.IR === layoutSt);
+const isIrLayout = layoutSt => ([LIST_LAYOUT.IR, 'INFRARED'].indexOf(layoutSt) >= 0);
+const isRamanLayout = layoutSt => (LIST_LAYOUT.RAMAN === layoutSt);
+const isEmWaveLayout = layoutSt => ([LIST_LAYOUT.IR, LIST_LAYOUT.RAMAN].indexOf(layoutSt) >= 0);
 
 const getNmrTyp = (layout) => {
   switch (layout) {
@@ -249,6 +258,8 @@ const Format = {
   is19FLayout,
   isMsLayout,
   isIrLayout,
+  isRamanLayout,
+  isEmWaveLayout,
   fixDigit,
   opToLayout,
   formatPeaksByPrediction,

@@ -23,7 +23,6 @@ import RefreshOutlinedIcon from '@material-ui/icons/RefreshOutlined';
 import {
   rmMpyPeakByPanel, clickMpyOne, resetMpyOne,
 } from '../../actions/multiplicity';
-import { LIST_LAYOUT } from '../../constants/list_layout';
 import MpySelect from './multiplicity_select';
 import MpyCoupling from './multiplicity_coupling';
 import { calcMpyCenter, calcJStr } from '../../helpers/calc';
@@ -229,10 +228,10 @@ const mpyList = (
 
 const MultiplicityPanel = ({
   classes, expand, onExapnd,
-  layoutSt, multiplicitySt,
+  multiplicitySt,
   clickMpyOneAct, rmMpyPeakByPanelAct, resetMpyOneAct,
 }) => {
-  const digits = layoutSt === LIST_LAYOUT.IR ? 0 : 4;
+  const digits = 4;
 
   return (
     <ExpansionPanel
@@ -266,7 +265,6 @@ const MultiplicityPanel = ({
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
-    layoutSt: state.layout,
     integrationSt: state.integration.present,
     multiplicitySt: state.multiplicity.present,
   }
@@ -284,7 +282,6 @@ MultiplicityPanel.propTypes = {
   classes: PropTypes.object.isRequired,
   expand: PropTypes.bool.isRequired,
   onExapnd: PropTypes.func.isRequired,
-  layoutSt: PropTypes.string.isRequired,
   multiplicitySt: PropTypes.object.isRequired,
   clickMpyOneAct: PropTypes.func.isRequired,
   rmMpyPeakByPanelAct: PropTypes.func.isRequired,

@@ -26,7 +26,7 @@ const styles = () => (
         width: 160,
       },
       fieldLayout: {
-        width: 70,
+        width: 100,
       },
     },
     commonStyle,
@@ -104,6 +104,9 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
         </MenuItem>
         <MenuItem value={LIST_LAYOUT.IR}>
           <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>IR</span>
+        </MenuItem>
+        <MenuItem value={LIST_LAYOUT.RAMAN}>
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>RAMAN</span>
         </MenuItem>
         <MenuItem value={LIST_LAYOUT.H1}>
           <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>

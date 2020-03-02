@@ -17,6 +17,7 @@ import {
 } from '../../actions/submit';
 import BtnSubmit from './submit_btn';
 import { commonStyle } from './common';
+import Format from '../../helpers/format';
 
 const styles = () => (
   Object.assign(
@@ -215,7 +216,7 @@ const Submit = ({
   );
 
   if (!operations || operations.length === 0) return null;
-  const isIR = ['IR'].indexOf(layoutSt) >= 0;
+  const isEmWave = Format.isEmWaveLayout(layoutSt);
 
   return (
     <span>
@@ -226,7 +227,7 @@ const Submit = ({
       }
       {
         intensitySelect(
-          classes, (hideSwitch || !isIR), isIntensitySt, toggleIsIntensityAct,
+          classes, (hideSwitch || !isEmWave), isIntensitySt, toggleIsIntensityAct,
         )
       }
       {

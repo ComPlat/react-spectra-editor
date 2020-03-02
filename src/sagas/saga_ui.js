@@ -74,6 +74,7 @@ function* scrollUiWheel(action) {
 
   switch (layoutSt) {
     case LIST_LAYOUT.IR:
+    case LIST_LAYOUT.RAMAN:
       [nyeL, nyeU] = [yeL + (yeU - yeL) * (1 - scale), yeU];
       h = nyeU - nyeL;
       [nytL, nytU] = [nyeL - 0.125 * h, nyeU + 0.125 * h];

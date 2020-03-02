@@ -22,7 +22,7 @@ const styles = () => (
   Object.assign(
     {
       field: {
-        width: 90,
+        width: 110,
       },
       txtIcon: {
       },
