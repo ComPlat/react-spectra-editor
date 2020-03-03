@@ -1,6 +1,6 @@
 {
   "name": "react-spectra-editor",
-  "version": "0.6.30",
+  "version": "0.6.46",
   "description": "An editor to View and Edit Chemical Spectra data (NMR, IR and MS).",
   "repository": {
     "type": "git",
