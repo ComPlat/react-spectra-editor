@@ -45,8 +45,8 @@ const onClickCb = (
 );
 
 const BtnSubmit = ({
-  classes, operation, feature, isAscend, isIntensity, disabled,
-  editPeakSt, thresSt, statusSt, layoutSt, shiftSt, scanSt, forecastSt,
+  classes, operation, feature, isAscend, isIntensity,
+  editPeakSt, thresSt, layoutSt, shiftSt, scanSt, forecastSt,
   decimalSt, integrationSt, multiplicitySt,
 }) => {
   const { ref, peak } = shiftSt;
@@ -54,7 +54,7 @@ const BtnSubmit = ({
   const offset = FromManualToOffset(ref, peak);
   const peaks = Convert2Peak(feature, thresSt.value, offset);
   const peaksEdit = PksEdit(peaks, editPeakSt);
-  const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
+  // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
   const scan = Convert2Scan(feature, scanSt);
   const thres = Convert2Thres(feature, thresSt);
 
@@ -69,7 +69,6 @@ const BtnSubmit = ({
           )
         }
         color="primary"
-        disabled={disBtn}
         onClick={onClickCb(
           operation.value, peaksEdit, isAscend, isIntensity,
           scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt,
@@ -86,7 +85,6 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     editPeakSt: state.editPeak.present,
     thresSt: state.threshold,
-    statusSt: state.status,
     layoutSt: state.layout,
     shiftSt: state.shift,
     scanSt: state.scan,
@@ -113,9 +111,7 @@ BtnSubmit.propTypes = {
       PropTypes.bool,
     ],
   ).isRequired,
-  disabled: PropTypes.bool.isRequired,
   editPeakSt: PropTypes.object.isRequired,
-  statusSt: PropTypes.object.isRequired,
   thresSt: PropTypes.object.isRequired,
   layoutSt: PropTypes.string.isRequired,
   shiftSt: PropTypes.object.isRequired,
