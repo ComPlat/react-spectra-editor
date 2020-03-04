@@ -366,25 +366,25 @@ const getBoundary = (s) => {
 };
 
 const extrFeaturesMs = (jcamp, layout, peakUp) => {
-  const nfs = {};
-  const category = jcamp.info.$CSCATEGORY;
-  const scanCount = parseInt(jcamp.info.$CSSCANCOUNT, 10) - 1;
-  if (category) {
-    const idxEditPeak = category.indexOf('EDIT_PEAK');
-    if (idxEditPeak >= 0) {
-      const sEP = jcamp.spectra[idxEditPeak + scanCount];
-      const thresRef = calcThresRef(sEP, peakUp);
-      nfs.editPeak = buildPeakFeature(jcamp, layout, peakUp, sEP, thresRef);
-    }
-    const idxAutoPeak = category.indexOf('AUTO_PEAK');
-    if (idxAutoPeak >= 0) {
-      const sAP = jcamp.spectra[idxAutoPeak + scanCount];
-      const thresRef = calcThresRef(sAP, peakUp);
-      nfs.autoPeak = buildPeakFeature(jcamp, layout, peakUp, sAP, thresRef);
-    }
-    return nfs;
-  }
-  // workaround for legacy design
+  // const nfs = {};
+  // const category = jcamp.info.$CSCATEGORY;
+  // const scanCount = parseInt(jcamp.info.$CSSCANCOUNT, 10) - 1;
+  // if (category) {
+  //   const idxEditPeak = category.indexOf('EDIT_PEAK');
+  //   if (idxEditPeak >= 0) {
+  //     const sEP = jcamp.spectra[idxEditPeak + scanCount];
+  //     const thresRef = calcThresRef(sEP, peakUp);
+  //     nfs.editPeak = buildPeakFeature(jcamp, layout, peakUp, sEP, thresRef);
+  //   }
+  //   const idxAutoPeak = category.indexOf('AUTO_PEAK');
+  //   if (idxAutoPeak >= 0) {
+  //     const sAP = jcamp.spectra[idxAutoPeak + scanCount];
+  //     const thresRef = calcThresRef(sAP, peakUp);
+  //     nfs.autoPeak = buildPeakFeature(jcamp, layout, peakUp, sAP, thresRef);
+  //   }
+  //   return nfs;
+  // }
+  // // workaround for legacy design
   const thresRef = (jcamp.info && jcamp.info.$CSTHRESHOLD * 100) || 5;
   const base = jcamp.spectra[0];
 

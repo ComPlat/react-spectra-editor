@@ -51,7 +51,9 @@ class LayerInit extends React.Component {
     } = this.props;
     const { layout, features } = entity;
     if (Format.isMsLayout(layout)) {
-      const { autoPeak, editPeak } = features;
+      // const { autoPeak, editPeak } = features; // TBD
+      const autoPeak = features.autoPeak || features[0];
+      const editPeak = features.editPeak || features[0];
       const baseFeat = editPeak || autoPeak;
       resetScanAllAct(baseFeat);
     }

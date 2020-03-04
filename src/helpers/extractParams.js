@@ -2,12 +2,13 @@ import Format from './format';
 
 const getScanIdx = (entity, scanSt) => {
   const { target, isAuto } = scanSt;
-  const defaultFeat = entity.features.editPeak || entity.features.autoPeak;
+  const { features, spectra } = entity;
+  const defaultFeat = features.editPeak || features.autoPeak || features[0];
   const hasEdit = !!defaultFeat.scanEditTarget;
   const defaultIdx = isAuto || !hasEdit
     ? defaultFeat.scanAutoTarget
     : defaultFeat.scanEditTarget;
-  const defaultCount = +entity.spectra.length;
+  const defaultCount = +spectra.length;
   let idx = +(target || defaultIdx || 0);
   if (idx > defaultCount) { idx = defaultCount; }
   return idx - 1;
@@ -15,7 +16,9 @@ const getScanIdx = (entity, scanSt) => {
 
 const extrShare = (entity, thresSt) => {
   const { spectra, features } = entity;
-  const { autoPeak, editPeak } = features;
+  // const { autoPeak, editPeak } = features; // TBD
+  const autoPeak = features.autoPeak || features[0];
+  const editPeak = features.editPeak || features[0];
   const hasEdit = editPeak && editPeak.data
     ? editPeak.data[0].x.length > 0
     : false;
