@@ -6,7 +6,7 @@ import { getPeakIntervals } from '../third_party/peakInterval';
 function* updateMetaPeaks(action) {
   const { payload } = action;
   const { intervalL, intervalR } = getPeakIntervals(payload);
-  const { observeFrequency, data } = payload.spectrum;
+  const { observeFrequency, data } = payload.spectra[0];
   const deltaX = Math.abs(data[0].x[0] - data[0].x[1]);
 
   yield put({

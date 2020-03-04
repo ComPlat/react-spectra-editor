@@ -10,7 +10,7 @@ import { resetScanAll } from './actions/scan';
 import { resetParamsAll } from './actions/manager';
 import { updateMetaPeaks } from './actions/meta';
 import LayerPrism from './layer_prism';
-import { GetFeature } from './helpers/chem';
+import Format from './helpers/format';
 
 const styles = () => ({
 });
@@ -34,11 +34,13 @@ class LayerInit extends React.Component {
   }
 
   normChange(prevProps) {
-    const oldFeat = GetFeature(prevProps.entity);
+    const prevFeatures = prevProps.entity.features;
+    const prevPeak = prevFeatures.editPeak || prevFeatures.autoPeak;
     const { entity } = this.props;
-    const newFeat = GetFeature(entity);
+    const nextFeatures = entity.features;
+    const nextPeak = nextFeatures.editPeak || nextFeatures.autoPeak;
 
-    if (oldFeat !== newFeat) {
+    if (prevPeak !== nextPeak) {
       this.execReset();
     }
   }
@@ -47,14 +49,14 @@ class LayerInit extends React.Component {
     const {
       entity, resetScanAllAct, resetParamsAllAct, updateMetaPeaksAct,
     } = this.props;
-    const isEnMs = entity.spectrum.sTyp === 'MS';
-    if (isEnMs) {
-      const baseFeat = entity.features[0];
+    const { layout, features } = entity;
+    if (Format.isMsLayout(layout)) {
+      const { autoPeak, editPeak } = features;
+      const baseFeat = editPeak || autoPeak;
       resetScanAllAct(baseFeat);
     }
-    const isEnNmr = entity.spectrum.sTyp === 'NMR';
-    if (isEnNmr) {
-      const { integration, multiplicity } = entity.features;
+    if (Format.isNmrLayout(layout)) {
+      const { integration, multiplicity } = features;
       updateMetaPeaksAct(entity);
       resetParamsAllAct({
         integration, multiplicity,
@@ -71,9 +73,10 @@ class LayerInit extends React.Component {
     const {
       entity, cLabel, xLabel, yLabel, operations, forecast,
     } = this.props;
+    const target = entity.spectra[0];
 
-    const xxLabel = xLabel === '' ? `X (${entity.spectrum.xUnit})` : xLabel;
-    const yyLabel = yLabel === '' ? `Y (${entity.spectrum.yUnit})` : yLabel;
+    const xxLabel = !xLabel && xLabel === '' ? `X (${target.xUnit})` : xLabel;
+    const yyLabel = !yLabel && yLabel === '' ? `Y (${target.yUnit})` : yLabel;
 
     return (
       <LayerPrism

@@ -24,7 +24,7 @@ const Content = ({
   topic, feature, cLabel, xLabel, yLabel, forecast, operations, layoutSt,
 }) => {
   const {
-    showForecast, isNmr, isIr,
+    showForecast, isNmr, isIr, isMs,
   } = extractLayout(forecast, layoutSt);
 
   if (showForecast) {
@@ -43,7 +43,7 @@ const Content = ({
     );
   }
 
-  if (Format.isMs(feature)) {
+  if (isMs) {
     return (
       <ViewerRect
         topic={topic}

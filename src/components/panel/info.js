@@ -103,7 +103,7 @@ const InfoPanel = ({
             ? (
               <div className={classNames(classes.rowEven)}>
                 <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Freq : </span>
-                <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{ parseInt(observeFrequency, 10) }</span>
+                <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{ parseInt(observeFrequency, 10) || ' - ' }</span>
               </div>
             )
             : null

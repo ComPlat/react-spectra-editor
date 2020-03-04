@@ -18,7 +18,7 @@ const options = {
 };
 
 const getPeakIntervals = (entity) => {
-  const data = entity.spectrum.data[0];
+  const data = entity.spectra[0].data[0];
 
   const X = data.x;
   const dX = X[1] - X[0];
@@ -91,7 +91,6 @@ const getPeakIntervals = (entity) => {
         }
       }
     }
-
     // Minimum in second derivative
     if (ddY[i] < ddY[i - 1] && ddY[i] < ddY[i + 1]) {
       // TODO should we change this to have 3 arrays ? Huge overhead creating arrays
