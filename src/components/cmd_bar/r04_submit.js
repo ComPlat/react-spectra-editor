@@ -15,7 +15,7 @@ import {
   toggleIsAscend, toggleIsIntensity,
   updateOperation, updateDecimal,
 } from '../../actions/submit';
-import BtnSubmit from './submit_btn';
+import BtnSubmit from './r05_submit_btn';
 import { commonStyle } from './common';
 import Format from '../../helpers/format';
 
@@ -207,7 +207,7 @@ const selectOperation = (name, operations, updateOperationAct) => {
 
 const Submit = ({
   operations, classes, feature, hideSwitch, disabled,
-  isAscendSt, isIntensitySt, operationSt, decimalSt, layoutSt,
+  isAscendSt, isIntensitySt, operationSt, decimalSt, isEmWaveSt,
   toggleIsAscendAct, toggleIsIntensityAct,
   updateOperationAct, updateDecimalAct,
 }) => {
@@ -216,10 +216,9 @@ const Submit = ({
   );
 
   if (!operations || operations.length === 0) return null;
-  const isEmWave = Format.isEmWaveLayout(layoutSt);
 
   return (
-    <span>
+    <span className={classes.groupRightMost}>
       {
         ascendSelect(
           classes, hideSwitch, isAscendSt, toggleIsAscendAct,
@@ -227,7 +226,7 @@ const Submit = ({
       }
       {
         intensitySelect(
-          classes, (hideSwitch || !isEmWave), isIntensitySt, toggleIsIntensityAct,
+          classes, (hideSwitch || !isEmWaveSt), isIntensitySt, toggleIsIntensityAct,
         )
       }
       {
@@ -253,7 +252,7 @@ const Submit = ({
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
-    layoutSt: state.layout,
+    isEmWaveSt: Format.isEmWaveLayout(state.layout),
     isAscendSt: state.submit.isAscend,
     isIntensitySt: state.submit.isIntensity,
     decimalSt: state.submit.decimal,
@@ -274,13 +273,13 @@ Submit.propTypes = {
   classes: PropTypes.object.isRequired,
   feature: PropTypes.object.isRequired,
   operations: PropTypes.array.isRequired,
+  operationSt: PropTypes.object.isRequired,
   hideSwitch: PropTypes.bool.isRequired,
   disabled: PropTypes.bool.isRequired,
   isAscendSt: PropTypes.bool.isRequired,
   isIntensitySt: PropTypes.bool.isRequired,
-  operationSt: PropTypes.object.isRequired,
+  isEmWaveSt: PropTypes.bool.isRequired,
   decimalSt: PropTypes.number.isRequired,
-  layoutSt: PropTypes.string.isRequired,
   toggleIsAscendAct: PropTypes.func.isRequired,
   toggleIsIntensityAct: PropTypes.func.isRequired,
   updateOperationAct: PropTypes.func.isRequired,

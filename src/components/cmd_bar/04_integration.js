@@ -38,7 +38,7 @@ const styles = () => (
 const iconSize = '16px';
 
 const setFactor = (
-  classes, isDisable, integrationSt, setIntegrationFkrAct,
+  classes, isDisable, refFactor, setIntegrationFkrAct,
 ) => {
   const onBlur = e => setIntegrationFkrAct(e.target.value);
   const onChange = e => setIntegrationFkrAct(e.target.value);
@@ -47,7 +47,6 @@ const setFactor = (
       setIntegrationFkrAct(e.target.value);
     }
   };
-  const { refFactor } = integrationSt;
 
   return (
     <TextField
@@ -69,37 +68,34 @@ const setFactor = (
   );
 };
 
+const iconColor = criteria => (criteria ? '#fff' : '#000');
+
 const Integration = ({
-  classes, uiSt, layoutSt, integrationSt,
+  classes, refFactorSt,
+  isDisableSt, isFocusAddIntgSt, isFocusRmIntgSt, isFocusSetRefSt,
   setUiSweepTypeAct, setIntegrationFkrAct, clearIntegrationAllAct,
 }) => {
-  const { sweepType } = uiSt;
   const onSweepIntegtAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.INTEGRATION_ADD);
   const onSweepIntegtRm = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.INTEGRATION_RM);
   const onSweepIntegtSR = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF);
-  const isDisable = Cfg.btnCmdIntg(layoutSt);
-  const iconAddColor = (sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD) || isDisable ? '#fff' : '#000';
-  const iconRMColor = (sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_RM) || isDisable ? '#fff' : '#000';
-  const iconSRColor = (sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF) || isDisable ? '#fff' : '#000';
-  const iconRAColor = isDisable ? '#fff' : '#000';
 
   return (
-    <span>
+    <span className={classes.group}>
       <Tooltip title={<span className="txt-sv-tp">Add Integration</span>}>
         <span>
           <MuButton
             className={
               classNames(
-                focusStyle(sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD, classes)
+                focusStyle(isFocusAddIntgSt, classes),
               )
             }
-            disabled={isDisable}
+            disabled={isDisableSt}
             onClick={onSweepIntegtAdd}
           >
             <Icon
               path={mdiMathIntegral}
               size={iconSize}
-              color={iconAddColor}
+              color={iconColor(isFocusAddIntgSt || isDisableSt)}
               className={classNames(classes.iconMdi, 'icon-sv-bar-addint')}
             />
             <span className={classNames(classes.txt, classes.txtIcon, 'txt-sv-bar-addint')}>+</span>
@@ -111,16 +107,16 @@ const Integration = ({
           <MuButton
             className={
               classNames(
-                focusStyle(sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_RM, classes)
+                focusStyle(isFocusRmIntgSt, classes),
               )
             }
-            disabled={isDisable}
+            disabled={isDisableSt}
             onClick={onSweepIntegtRm}
           >
             <Icon
               path={mdiMathIntegral}
               size={iconSize}
-              color={iconRMColor}
+              color={iconColor(isFocusRmIntgSt || isDisableSt)}
               className={classNames(classes.iconMdi, 'icon-sv-bar-rmint')}
             />
             <span className={classNames(classes.txt, classes.txtIcon, 'txt-sv-bar-rmint')}>-</span>
@@ -132,16 +128,16 @@ const Integration = ({
           <MuButton
             className={
               classNames(
-                focusStyle(sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF, classes)
+                focusStyle(isFocusSetRefSt, classes),
               )
             }
-            disabled={isDisable}
+            disabled={isDisableSt}
             onClick={onSweepIntegtSR}
           >
             <Icon
               path={mdiReflectVertical}
               size={iconSize}
-              color={iconSRColor}
+              color={iconColor(isFocusSetRefSt || isDisableSt)}
               className={classNames(classes.iconMdi, 'icon-sv-bar-refint')}
             />
           </MuButton>
@@ -149,7 +145,7 @@ const Integration = ({
       </Tooltip>
       {
         setFactor(
-          classes, isDisable, integrationSt, setIntegrationFkrAct,
+          classes, isDisableSt, refFactorSt, setIntegrationFkrAct,
         )
       }
       <TriBtn
@@ -159,7 +155,7 @@ const Integration = ({
         <Icon
           path={mdiMathIntegral}
           size={iconSize}
-          color={iconRAColor}
+          color={iconColor(isDisableSt)}
           className={classNames(classes.iconMdi, 'icon-sv-bar-rmallint')}
         />
         <span className={classNames(classes.txt, classes.txtIcon, 'txt-sv-bar-rmallint')}>x</span>
@@ -170,9 +166,11 @@ const Integration = ({
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
-    uiSt: state.ui,
-    layoutSt: state.layout,
-    integrationSt: state.integration.present,
+    isDisableSt: Cfg.btnCmdIntg(state.layout),
+    isFocusAddIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
+    isFocusRmIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_RM,
+    isFocusSetRefSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF,
+    refFactorSt: state.integration.present.refFactor,
   }
 );
 
@@ -186,9 +184,11 @@ const mapDispatchToProps = dispatch => (
 
 Integration.propTypes = {
   classes: PropTypes.object.isRequired,
-  uiSt: PropTypes.object.isRequired,
-  layoutSt: PropTypes.string.isRequired,
-  integrationSt: PropTypes.object.isRequired,
+  isDisableSt: PropTypes.bool.isRequired,
+  isFocusAddIntgSt: PropTypes.bool.isRequired,
+  isFocusRmIntgSt: PropTypes.bool.isRequired,
+  isFocusSetRefSt: PropTypes.bool.isRequired,
+  refFactorSt: PropTypes.number.isRequired,
   setUiSweepTypeAct: PropTypes.func.isRequired,
   setIntegrationFkrAct: PropTypes.func.isRequired,
   clearIntegrationAllAct: PropTypes.func.isRequired,

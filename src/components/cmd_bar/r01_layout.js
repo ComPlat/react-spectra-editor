@@ -11,7 +11,7 @@ import OutlinedInput from '@material-ui/core/OutlinedInput';
 import InputLabel from '@material-ui/core/InputLabel';
 import { withStyles } from '@material-ui/core/styles';
 
-import Scan from './scan';
+import Scan from './r02_scan';
 import { updateLayout } from '../../actions/layout';
 import { setShiftRef } from '../../actions/shift';
 import { LIST_LAYOUT } from '../../constants/list_layout';
@@ -34,9 +34,8 @@ const styles = () => (
 );
 
 const shiftSelect = (
-  classes, layoutSt, shiftRefSt, shiftEnableSt, setShiftRefAct,
+  classes, layoutSt, shiftRefSt, setShiftRefAct,
 ) => {
-  if (!shiftEnableSt) return null;
   if (Cfg.hideSolvent(layoutSt)) return null;
   const onChange = e => setShiftRefAct(e.target.value);
 
@@ -135,12 +134,12 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
 };
 
 const Layout = ({
-  classes, feature, hasEdit, layoutSt, shiftRefSt, shiftEnableSt,
+  classes, feature, hasEdit, layoutSt, shiftRefSt,
   setShiftRefAct, updateLayoutAct,
 }) => (
-  <span>
+  <span className={classes.groupRight}>
     { layoutSelect(classes, layoutSt, updateLayoutAct) }
-    { shiftSelect(classes, layoutSt, shiftRefSt, shiftEnableSt, setShiftRefAct) }
+    { shiftSelect(classes, layoutSt, shiftRefSt, setShiftRefAct) }
     <Scan feature={feature} hasEdit={hasEdit} />
   </span>
 );
@@ -149,7 +148,6 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     layoutSt: state.layout,
     shiftRefSt: state.shift.ref,
-    shiftEnableSt: state.shift.enable,
   }
 );
 
@@ -166,7 +164,6 @@ Layout.propTypes = {
   hasEdit: PropTypes.bool.isRequired,
   layoutSt: PropTypes.string.isRequired,
   shiftRefSt: PropTypes.object.isRequired,
-  shiftEnableSt: PropTypes.bool.isRequired,
   setShiftRefAct: PropTypes.func.isRequired,
   updateLayoutAct: PropTypes.func.isRequired,
 };

@@ -83,14 +83,14 @@ const restoreTp = (hasEdit, isEdit) => (
 );
 
 const Threshold = ({
-  classes, feature, hasEdit, layoutSt, thresSt,
+  classes, feature, hasEdit,
+  hideThresSt, thresValSt, isEditSt,
   updateThresholdValueAct, resetThresholdValueAct, toggleThresholdIsEditAct,
 }) => {
-  const thresVal = thresSt.value || feature.thresRef;
-  const { isEdit } = thresSt;
+  const thresVal = thresValSt || feature.thresRef;
 
   return (
-    <span className={classes.group}>
+    <span className={classes.groupRight}>
       { setThreshold(classes, thresVal, updateThresholdValueAct) }
       <Tooltip title={<span className="txt-sv-tp">Restore Threshold</span>}>
         <MuButton
@@ -106,10 +106,10 @@ const Threshold = ({
         </MuButton>
       </Tooltip>
       {
-        Cfg.hideCmdThres(layoutSt)
+        hideThresSt
           ? null
           : (
-            <Tooltip title={<span className="txt-sv-tp">{restoreTp(hasEdit, isEdit)}</span>}>
+            <Tooltip title={<span className="txt-sv-tp">{restoreTp(hasEdit, isEditSt)}</span>}>
               <MuButton
                 className={
                   classNames(
@@ -119,7 +119,7 @@ const Threshold = ({
                 disabled={Cfg.btnCmdThres(thresVal)}
                 onClick={toggleThresholdIsEditAct}
               >
-                { restoreIcon(classes, hasEdit, isEdit) }
+                { restoreIcon(classes, hasEdit, isEditSt) }
               </MuButton>
             </Tooltip>
           )
@@ -130,8 +130,9 @@ const Threshold = ({
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
-    layoutSt: state.layout,
-    thresSt: state.threshold,
+    hideThresSt: Cfg.hideCmdThres(state.layout),
+    isEditSt: state.threshold.isEdit,
+    thresValSt: state.threshold.value || 0,
   }
 );
 
@@ -147,8 +148,9 @@ Threshold.propTypes = {
   classes: PropTypes.object.isRequired,
   feature: PropTypes.object.isRequired,
   hasEdit: PropTypes.bool.isRequired,
-  layoutSt: PropTypes.string.isRequired,
-  thresSt: PropTypes.object.isRequired,
+  hideThresSt: PropTypes.bool.isRequired,
+  isEditSt: PropTypes.bool.isRequired,
+  thresValSt: PropTypes.number.isRequired,
   updateThresholdValueAct: PropTypes.func.isRequired,
   resetThresholdValueAct: PropTypes.func.isRequired,
   toggleThresholdIsEditAct: PropTypes.func.isRequired,
