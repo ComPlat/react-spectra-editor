@@ -32,7 +32,7 @@ class ViewerRect extends React.Component {
   componentDidMount() {
     const {
       seed, peak, cLabel, xLabel, yLabel, feature,
-      tTrEndPts, tSfPeaks, uiSt, isHidden,
+      tTrEndPts, tSfPeaks, editPeakSt, uiSt, isHidden,
       resetAllAct,
     } = this.props;
     drawDestroy(this.rootKlass);
@@ -47,6 +47,7 @@ class ViewerRect extends React.Component {
       filterPeak,
       tTrEndPts,
       tSfPeaks,
+      editPeakSt,
       uiSt,
     });
     drawLabel(this.rootKlass, cLabel, xLabel, yLabel);
@@ -56,7 +57,7 @@ class ViewerRect extends React.Component {
   componentDidUpdate(prevProps) {
     const {
       seed, peak,
-      tTrEndPts, tSfPeaks, uiSt, isHidden,
+      tTrEndPts, tSfPeaks, editPeakSt, uiSt, isHidden,
     } = this.props;
     this.normChange(prevProps);
 
@@ -68,6 +69,7 @@ class ViewerRect extends React.Component {
       filterPeak,
       tTrEndPts,
       tSfPeaks,
+      editPeakSt,
       uiSt,
     });
     drawDisplay(this.rootKlass, isHidden);
@@ -98,6 +100,7 @@ const mapStateToProps = (state, props) => (
     peak: Feature2Peak(state, props),
     tTrEndPts: ToThresEndPts(state, props),
     tSfPeaks: ToShiftPeaks(state, props),
+    editPeakSt: state.editPeak.present,
     uiSt: state.ui,
   }
 );
@@ -120,6 +123,7 @@ ViewerRect.propTypes = {
   feature: PropTypes.object.isRequired,
   tTrEndPts: PropTypes.array.isRequired,
   tSfPeaks: PropTypes.array.isRequired,
+  editPeakSt: PropTypes.object.isRequired,
   uiSt: PropTypes.object.isRequired,
   resetAllAct: PropTypes.func.isRequired,
   clickUiTargetAct: PropTypes.func.isRequired,

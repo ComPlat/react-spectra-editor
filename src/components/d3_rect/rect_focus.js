@@ -67,9 +67,14 @@ class RectFocus {
     this.root.call(this.tip);
   }
 
-  setDataParams(data, peaks, tTrEndPts, tSfPeaks) {
+  mergedPeaks(peaks, editPeakSt) {
+    if (!editPeakSt) return this.dataPks;
+    return PksEdit(peaks, editPeakSt);
+  }
+
+  setDataParams(data, peaks, tTrEndPts, tSfPeaks, editPeakSt) {
     this.data = [...data];
-    this.dataPks = [...peaks];
+    this.dataPks = this.mergedPeaks(peaks, editPeakSt);
     this.tTrEndPts = tTrEndPts;
     this.tSfPeaks = tSfPeaks;
   }
@@ -169,14 +174,8 @@ class RectFocus {
       .attr('fill', 'none');
   }
 
-  mergedPeaks(editPeakSt) {
-    if (!editPeakSt) return this.dataPks;
-    this.dataPks = PksEdit(this.dataPks, editPeakSt);
-    return this.dataPks;
-  }
-
   create({
-    filterSeed, filterPeak, tTrEndPts, tSfPeaks, uiSt,
+    filterSeed, filterPeak, tTrEndPts, tSfPeaks, editPeakSt, uiSt,
   }) {
     this.svg = d3.select('.d3Svg');
     MountMainFrame(this, 'focus');
@@ -184,7 +183,7 @@ class RectFocus {
 
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.setTip(LIST_LAYOUT.MS);
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, editPeakSt);
     MountCompass(this);
 
     this.axis = MountAxis(this);
@@ -205,10 +204,10 @@ class RectFocus {
   }
 
   update({
-    filterSeed, filterPeak, tTrEndPts, tSfPeaks, uiSt,
+    filterSeed, filterPeak, tTrEndPts, tSfPeaks, editPeakSt, uiSt,
   }) {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, editPeakSt);
 
     if (this.data && this.data.length > 0) {
       this.setConfig(uiSt);
