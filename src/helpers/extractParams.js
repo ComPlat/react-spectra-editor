@@ -1,43 +1,46 @@
-import { GetFeature } from './chem';
+import Format from './format';
 
-const extractMs = (entity, scanSt) => {
+const getScanIdx = (entity, scanSt) => {
   const { target, isAuto } = scanSt;
-  const defaultFeat = entity.features[0];
+  const defaultFeat = entity.features.editPeak || entity.features.autoPeak;
   const hasEdit = !!defaultFeat.scanEditTarget;
   const defaultIdx = isAuto || !hasEdit
     ? defaultFeat.scanAutoTarget
     : defaultFeat.scanEditTarget;
-  const defaultCount = +defaultFeat.scanCount;
-  let idx = +(target || defaultIdx || 1);
+  const defaultCount = +entity.spectra.length;
+  let idx = +(target || defaultIdx || 0);
   if (idx > defaultCount) { idx = defaultCount; }
-  const feature = entity.features[idx - 1];
-  return (
-    {
-      topic: feature.data[0],
-      feature,
-      hasEdit,
-    }
-  );
+  return idx - 1;
 };
 
-const extractNmrIr = (entity, thresSt) => {
-  const { spectrum, features } = entity;
+const extrShare = (entity, thresSt) => {
+  const { spectra, features } = entity;
   const { autoPeak, editPeak } = features;
   const hasEdit = editPeak && editPeak.data
     ? editPeak.data[0].x.length > 0
     : false;
 
   const feature = hasEdit && thresSt.isEdit ? editPeak : autoPeak;
-  return { topic: spectrum.data[0], feature, hasEdit };
+  return { spectra, feature, hasEdit };
 };
 
-const extractParams = (entity, thresSt, scanSt) => {
-  const defaultFeat = GetFeature(entity);
-  const layout = defaultFeat.dataType;
-  const isMS = layout === 'MASS SPECTRUM';
-  return isMS
-    ? extractMs(entity, scanSt)
-    : extractNmrIr(entity, thresSt);
+const extrMs = (entity, thresSt, scanSt) => {
+  const { spectra, feature, hasEdit } = extrShare(entity, thresSt);
+  const scanIdx = getScanIdx(entity, scanSt);
+  const topic = spectra[scanIdx].data[0];
+  return { topic, feature, hasEdit };
 };
+
+const extrNi = (entity, thresSt) => {
+  const { spectra, feature, hasEdit } = extrShare(entity, thresSt);
+  const topic = spectra[0].data[0];
+  return { topic, feature, hasEdit };
+};
+
+const extractParams = (entity, thresSt, scanSt) => (
+  Format.isMsLayout(entity.layout)
+    ? extrMs(entity, thresSt, scanSt)
+    : extrNi(entity, thresSt)
+);
 
 export { extractParams }; // eslint-disable-line

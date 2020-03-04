@@ -4,6 +4,7 @@ import { createSelector } from 'reselect';
 import { FromManualToOffset } from './shift';
 import Cfg from './cfg';
 import Format from './format';
+import { LIST_LAYOUT } from '../constants/list_layout';
 
 const getTopic = (_, props) => props.topic;
 
@@ -119,42 +120,39 @@ const ToShiftPeaks = createSelector(
 // - - - - - - - - - - - - - - - - - - - - - -
 // ExtractJcamp
 // - - - - - - - - - - - - - - - - - - - - - -
-const getSTyp = (s) => {
-  if (s.dataType) {
-    if (s.dataType.includes('NMR SPECTRUM')) {
-      return 'NMR';
+const readLayout = (jcamp) => {
+  const { xType, spectra } = jcamp;
+  if (xType && Format.isNmrLayout(xType)) return xType;
+  const { dataType } = spectra[0];
+  if (dataType) {
+    if (dataType.includes('INFRARED SPECTRUM')) {
+      return LIST_LAYOUT.IR;
     }
-    if (s.dataType.includes('INFRARED SPECTRUM')) {
-      return 'INFRARED';
+    if (dataType.includes('RAMAN SPECTRUM')) {
+      return LIST_LAYOUT.RAMAN;
     }
-    if (s.dataType.includes('RAMAN SPECTRUM')) {
-      return 'RAMAN';
-    }
-    if (s.dataType.includes('MASS SPECTRUM')) {
-      return 'MS';
+    if (dataType.includes('MASS SPECTRUM')) {
+      return LIST_LAYOUT.MS;
     }
   }
   return false;
 };
 
-const extractSpectrum = (jcamp) => {
-  const subTyp = jcamp.xType ? ` - ${jcamp.xType}` : '';
+const extrSpectraShare = (spectra, layout) => (
+  spectra.map(s => Object.assign({ layout }, s)).filter(r => r != null)
+);
+
+const extrSpectraMs = (jcamp, layout) => {
+  const scanCount = jcamp.info.$CSSCANCOUNT || 1;
+  const spc = extrSpectraShare(jcamp.spectra.slice(0, scanCount), layout);
+  return spc || [];
+};
+
+const extrSpectraNi = (jcamp, layout) => {
   const categorys = jcamp.info.$CSCATEGORY || ['SPECTRUM'];
   const targetIdx = categorys.indexOf('SPECTRUM');
-  const spectrum = jcamp.spectra.map((s) => {
-    const sTyp = getSTyp(s);
-    if (!sTyp) return null;
-    const target = Object.assign(
-      {
-        typ: s.dataType + subTyp,
-        sTyp,
-      },
-      s,
-    );
-    return target;
-  }).filter(r => r != null)[targetIdx];
-
-  return spectrum || jcamp.spectra[0];
+  const spectrum = extrSpectraShare(jcamp.spectra, layout)[targetIdx];
+  return [spectrum] || [jcamp.spectra[0]];
 };
 
 const calcThresRef = (s, peakUp) => {
@@ -190,7 +188,7 @@ const extractShift = (s, jcamp) => {
   };
 };
 
-const buildPeakFeature = (jcamp, sTyp, peakUp, s, thresRef) => {
+const buildPeakFeature = (jcamp, layout, peakUp, s, thresRef) => {
   const { xType, info } = jcamp;
   const subTyp = xType ? ` - ${xType}` : '';
 
@@ -205,7 +203,7 @@ const buildPeakFeature = (jcamp, sTyp, peakUp, s, thresRef) => {
         scanEditTarget: +info.$CSSCANEDITTARGET,
         shift: extractShift(s, jcamp),
         operation: {
-          typ: sTyp,
+          layout,
           nucleus: xType || '',
         },
         observeFrequency: info['.OBSERVEFREQUENCY'],
@@ -325,7 +323,7 @@ const isPeakTable = s => (
   )
 );
 
-const extractFeatures = (jcamp, sTyp, peakUp) => {
+const extrFeaturesNi = (jcamp, layout, peakUp) => {
   const nfs = {};
   const category = jcamp.info.$CSCATEGORY;
   if (category) {
@@ -333,13 +331,13 @@ const extractFeatures = (jcamp, sTyp, peakUp) => {
     if (idxEditPeak >= 0) {
       const sEP = jcamp.spectra[idxEditPeak];
       const thresRef = calcThresRef(sEP, peakUp);
-      nfs.editPeak = buildPeakFeature(jcamp, sTyp, peakUp, sEP, thresRef);
+      nfs.editPeak = buildPeakFeature(jcamp, layout, peakUp, sEP, thresRef);
     }
     const idxAutoPeak = category.indexOf('AUTO_PEAK');
     if (idxAutoPeak >= 0) {
       const sAP = jcamp.spectra[idxAutoPeak];
       const thresRef = calcThresRef(sAP, peakUp);
-      nfs.autoPeak = buildPeakFeature(jcamp, sTyp, peakUp, sAP, thresRef);
+      nfs.autoPeak = buildPeakFeature(jcamp, layout, peakUp, sAP, thresRef);
     }
     nfs.integration = buildIntegFeature(jcamp);
     nfs.multiplicity = buildMpyFeature(jcamp);
@@ -349,7 +347,7 @@ const extractFeatures = (jcamp, sTyp, peakUp) => {
   const features = jcamp.spectra.map((s) => {
     const thresRef = calcThresRef(s, peakUp);
     return isPeakTable(s)
-      ? buildPeakFeature(jcamp, sTyp, peakUp, s, thresRef)
+      ? buildPeakFeature(jcamp, layout, peakUp, s, thresRef)
       : null;
   }).filter(r => r != null);
 
@@ -367,12 +365,31 @@ const getBoundary = (s) => {
   };
 };
 
-const extractMsFeatures = (jcamp, sTyp, peakUp) => {
+const extrFeaturesMs = (jcamp, layout, peakUp) => {
+  const nfs = {};
+  const category = jcamp.info.$CSCATEGORY;
+  const scanCount = parseInt(jcamp.info.$CSSCANCOUNT, 10) - 1;
+  if (category) {
+    const idxEditPeak = category.indexOf('EDIT_PEAK');
+    if (idxEditPeak >= 0) {
+      const sEP = jcamp.spectra[idxEditPeak + scanCount];
+      const thresRef = calcThresRef(sEP, peakUp);
+      nfs.editPeak = buildPeakFeature(jcamp, layout, peakUp, sEP, thresRef);
+    }
+    const idxAutoPeak = category.indexOf('AUTO_PEAK');
+    if (idxAutoPeak >= 0) {
+      const sAP = jcamp.spectra[idxAutoPeak + scanCount];
+      const thresRef = calcThresRef(sAP, peakUp);
+      nfs.autoPeak = buildPeakFeature(jcamp, layout, peakUp, sAP, thresRef);
+    }
+    return nfs;
+  }
+  // workaround for legacy design
   const thresRef = (jcamp.info && jcamp.info.$CSTHRESHOLD * 100) || 5;
   const base = jcamp.spectra[0];
 
   const features = jcamp.spectra.map((s) => {
-    const cpo = buildPeakFeature(jcamp, sTyp, peakUp, s, +thresRef.toFixed(4));
+    const cpo = buildPeakFeature(jcamp, layout, peakUp, s, +thresRef.toFixed(4));
     const bnd = getBoundary(s);
     return Object.assign({}, base, cpo, bnd);
   }).filter(r => r != null);
@@ -388,15 +405,17 @@ const ExtractJcamp = (source) => {
       keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY)/, // eslint-disable-line
     },
   );
-  const spectrum = extractSpectrum(jcamp);
-  const sTyp = spectrum ? spectrum.sTyp : '';
+  const layout = readLayout(jcamp);
+  const peakUp = !Format.isIrLayout(layout);
 
-  const peakUp = !Format.isIrLayout(sTyp);
-  const features = sTyp === 'MS'
-    ? extractMsFeatures(jcamp, sTyp, peakUp)
-    : extractFeatures(jcamp, sTyp, peakUp);
+  const spectra = Format.isMsLayout(layout)
+    ? extrSpectraMs(jcamp, layout)
+    : extrSpectraNi(jcamp, layout);
+  const features = Format.isMsLayout(layout)
+    ? extrFeaturesMs(jcamp, layout, peakUp)
+    : extrFeaturesNi(jcamp, layout, peakUp);
 
-  return { spectrum, features };
+  return { spectra, features, layout };
 };
 
 const Convert2Scan = (feature, scanSt) => {
@@ -412,14 +431,8 @@ const Convert2Thres = (feature, thresSt) => {
   return value;
 };
 
-const GetFeature = entity => (
-  entity.spectrum.sTyp === 'MS'
-    ? entity.features[0]
-    : (entity.features.editPeak || entity.features.autoPeak)
-);
-
 export {
   ExtractJcamp, Topic2Seed, Feature2Peak,
-  ToThresEndPts, ToShiftPeaks, GetFeature,
+  ToThresEndPts, ToShiftPeaks,
   Convert2Peak, Convert2Scan, Convert2Thres,
 };

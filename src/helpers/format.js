@@ -17,39 +17,9 @@ const spectraDigit = (layout) => {
   }
 };
 
-const opToLayout = (operation) => {
-  const { nucleus, typ } = operation;
-  switch (typ + nucleus) {
-    case 'INFRARED':
-      return LIST_LAYOUT.IR;
-    case 'RAMAN':
-      return LIST_LAYOUT.RAMAN;
-    case 'NMR1H':
-      return LIST_LAYOUT.H1;
-    case 'NMR13C':
-      return LIST_LAYOUT.C13;
-    case 'NMR19F':
-      return LIST_LAYOUT.F19;
-    case 'MS':
-      return LIST_LAYOUT.MS;
-    default:
-      return LIST_LAYOUT.PLAIN;
-  }
-};
-
 const fixDigit = (input, precision) => {
   const output = input || 0.0;
   return output.toFixed(precision);
-};
-
-const buildData = (entity) => {
-  if (!entity) return { isExist: false };
-  const sp = entity && entity.spectrum;
-  const xLabel = sp ? `X (${sp.xUnit})` : '';
-  const yLabel = sp ? `Y (${sp.yUnit})` : '';
-  return {
-    entity, xLabel, yLabel, isExist: true,
-  };
 };
 
 const toPeakStr = (peaks) => {
@@ -187,8 +157,6 @@ const peaksWrapper = (layout, shift) => {
   return { head: `${ops.head}${solvTxt} = `, tail: ops.tail };
 };
 
-const isMs = po => po.operation.typ === LIST_LAYOUT.MS;
-
 const isNmrLayout = layoutSt => (
   [LIST_LAYOUT.H1, LIST_LAYOUT.C13, LIST_LAYOUT.F19].indexOf(layoutSt) >= 0
 );
@@ -244,14 +212,12 @@ const formatPeaksByPrediction = (
 
 const Format = {
   toPeakStr,
-  buildData,
   spectraDigit,
   spectraOps,
   peaksBody,
   peaksWrapper,
   rmRef,
   rmShiftFromPeaks,
-  isMs,
   isNmrLayout,
   is13CLayout,
   is1HLayout,
@@ -261,7 +227,6 @@ const Format = {
   isRamanLayout,
   isEmWaveLayout,
   fixDigit,
-  opToLayout,
   formatPeaksByPrediction,
   formatedMS,
   formatedIR,
