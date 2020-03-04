@@ -16,8 +16,25 @@ const MuButton = withStyles({
 })(Button);
 
 const commonStyle = {
+  card: {
+    margin: '0 0 5px 52px',
+    border: '1px solid white',
+    borderRadius: 4,
+  },
   group: {
     display: 'inline-block',
+    margin: '0px 0px 0px 10px',
+    verticalAlign: 'middle',
+  },
+  groupRightMost: {
+    display: 'inline-block',
+    float: 'right',
+    margin: '0px 0px 0px 10px',
+    verticalAlign: 'middle',
+  },
+  groupRight: {
+    display: 'inline-block',
+    float: 'right',
     margin: '0px 0px 0px 10px',
     verticalAlign: 'middle',
   },

@@ -24,27 +24,27 @@ const styles = () => (
 );
 
 const Multiplicity = ({
-  classes, uiSt, layoutSt, multiplicitySt,
+  classes, isFocusAddMpySt, disableAddMpySt, isFocusRmMpySt, disableRmMpySt,
+  isFocusAddPeakSt, isFocusRmPeakSt, disableMpyPeakSt,
   setUiSweepTypeAct, clearMpyAllAct,
 }) => {
-  const { sweepType } = uiSt;
   const onSweepMutAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD);
   const onOneMutAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_RM);
   const onPeakMutAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_ADD);
   const onPeakMutRm = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_RM);
 
   return (
-    <span>
+    <span className={classes.group}>
       <Tooltip title={<span className="txt-sv-tp">Add Multiplicity</span>}>
         <span>
           <MuButton
             className={
               classNames(
-                focusStyle(sweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD, classes),
+                focusStyle(isFocusAddMpySt, classes),
                 'btn-sv-bar-addmpy',
               )
             }
-            disabled={Cfg.btnCmdMpy(layoutSt)}
+            disabled={disableAddMpySt}
             onClick={onSweepMutAdd}
           >
             <span className={classNames(classes.txt, 'txt-sv-bar-addmpy')}>J+</span>
@@ -56,11 +56,11 @@ const Multiplicity = ({
           <MuButton
             className={
               classNames(
-                focusStyle(sweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_RM, classes),
+                focusStyle(isFocusRmMpySt, classes),
                 'btn-sv-bar-rmmpy',
               )
             }
-            disabled={Cfg.btnCmdMpy(layoutSt)}
+            disabled={disableRmMpySt}
             onClick={onOneMutAdd}
           >
             <span className={classNames(classes.txt, 'txt-sv-bar-rmmpy')}>J-</span>
@@ -72,11 +72,11 @@ const Multiplicity = ({
           <MuButton
             className={
               classNames(
-                focusStyle(sweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_ADD, classes),
+                focusStyle(isFocusAddPeakSt, classes),
                 'btn-sv-bar-addpeakmpy',
               )
             }
-            disabled={Cfg.btnCmdMpyPeak(layoutSt, multiplicitySt)}
+            disabled={disableMpyPeakSt}
             onClick={onPeakMutAdd}
           >
             <span className={classNames(classes.txt, 'txt-sv-bar-addpeakmpy')}>JP+</span>
@@ -88,11 +88,11 @@ const Multiplicity = ({
           <MuButton
             className={
               classNames(
-                focusStyle(sweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_REMOVE, classes),
+                focusStyle(isFocusRmPeakSt, classes),
                 'btn-sv-bar-rmpeakmpy',
               )
             }
-            disabled={Cfg.btnCmdMpyPeak(layoutSt, multiplicitySt)}
+            disabled={disableMpyPeakSt}
             onClick={onPeakMutRm}
           >
             <span className={classNames(classes.txt, 'txt-sv-bar-rmpeakmpy')}>JP-</span>
@@ -111,9 +111,13 @@ const Multiplicity = ({
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
-    uiSt: state.ui,
-    layoutSt: state.layout,
-    multiplicitySt: state.multiplicity.present,
+    isFocusAddMpySt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD,
+    disableAddMpySt: Cfg.btnCmdMpy(state.layout),
+    isFocusRmMpySt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_RM,
+    disableRmMpySt: Cfg.btnCmdMpy(state.layout),
+    isFocusAddPeakSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_ADD,
+    isFocusRmPeakSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_REMOVE,
+    disableMpyPeakSt: Cfg.btnCmdMpyPeak(state.layout, state.multiplicity.present),
   }
 );
 
@@ -126,9 +130,13 @@ const mapDispatchToProps = dispatch => (
 
 Multiplicity.propTypes = {
   classes: PropTypes.object.isRequired,
-  uiSt: PropTypes.object.isRequired,
-  layoutSt: PropTypes.string.isRequired,
-  multiplicitySt: PropTypes.object.isRequired,
+  isFocusAddMpySt: PropTypes.bool.isRequired,
+  disableAddMpySt: PropTypes.bool.isRequired,
+  isFocusRmMpySt: PropTypes.bool.isRequired,
+  disableRmMpySt: PropTypes.bool.isRequired,
+  isFocusAddPeakSt: PropTypes.bool.isRequired,
+  isFocusRmPeakSt: PropTypes.bool.isRequired,
+  disableMpyPeakSt: PropTypes.bool.isRequired,
   setUiSweepTypeAct: PropTypes.func.isRequired,
   clearMpyAllAct: PropTypes.func.isRequired,
 };

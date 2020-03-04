@@ -18,7 +18,6 @@ const styles = () => (
   )
 );
 
-
 const UndoRedo = ({
   classes, canUndo, canRedo, onUndoAct, onRedoAct,
 }) => (

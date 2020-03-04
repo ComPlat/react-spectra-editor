@@ -11,7 +11,7 @@ import OutlinedInput from '@material-ui/core/OutlinedInput';
 import InputLabel from '@material-ui/core/InputLabel';
 import { withStyles } from '@material-ui/core/styles';
 
-import Scan from './scan';
+import Scan from './r02_scan';
 import { updateLayout } from '../../actions/layout';
 import { setShiftRef } from '../../actions/shift';
 import { LIST_LAYOUT } from '../../constants/list_layout';
@@ -138,7 +138,7 @@ const Layout = ({
   classes, feature, hasEdit, layoutSt, shiftRefSt, shiftEnableSt,
   setShiftRefAct, updateLayoutAct,
 }) => (
-  <span>
+  <span className={classes.groupRight}>
     { layoutSelect(classes, layoutSt, updateLayoutAct) }
     { shiftSelect(classes, layoutSt, shiftRefSt, shiftEnableSt, setShiftRefAct) }
     <Scan feature={feature} hasEdit={hasEdit} />
