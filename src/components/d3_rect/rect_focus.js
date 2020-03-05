@@ -59,6 +59,7 @@ class RectFocus {
     this.drawThres = this.drawThres.bind(this);
     this.drawGrid = this.drawGrid.bind(this);
     this.mergedPeaks = this.mergedPeaks.bind(this);
+    this.isFirefox = typeof InstallTrigger !== 'undefined';
   }
 
   setTip(typ) {

@@ -7,7 +7,10 @@ const TfRescale = (focus) => {
 };
 
 const fetchPt = (focus, xt) => {
-  const mouseX = xt.invert(d3.mouse(focus.root.node())[0]);
+  const rawMouseX = focus.isFirefox // WORKAROUND d3.mouse firefox compatibility
+    ? d3.event.offsetX
+    : d3.mouse(focus.root.node())[0];
+  const mouseX = xt.invert(rawMouseX);
   const bisectDate = d3.bisector(d => +d.x).left;
   const dt = focus.data;
   const ls = dt.length;
