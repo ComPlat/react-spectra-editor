@@ -72,6 +72,7 @@ class LineFocus {
     this.drawMtply = this.drawMtply.bind(this);
     this.onClickTarget = this.onClickTarget.bind(this);
     this.mergedPeaks = this.mergedPeaks.bind(this);
+    this.isFirefox = typeof InstallTrigger !== 'undefined';
   }
 
   getShouldUpdate(nextEpSt, nextLySt, nextItSt, nextMySt) {
