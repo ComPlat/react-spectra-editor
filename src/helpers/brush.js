@@ -17,7 +17,8 @@ const noBrushTypes = [
 
 const wheeled = (focus) => {
   const { currentExtent, scrollUiWheelAct } = focus;
-  const direction = d3.event.wheelDelta > 0;
+  const wheelEvent = focus.isFirefox ? -d3.event.deltaY : d3.event.wheelDelta; // WORKAROUND: firefox wheel compatibilty
+  const direction = wheelEvent > 0;
   scrollUiWheelAct(Object.assign({}, currentExtent, { direction }));
 };
 
