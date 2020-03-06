@@ -96,9 +96,11 @@ const formatedMS = (peaks, maxY, decimal = 2, isAscend = true) => {
     .join(', ');
 };
 
-const irLevel = (boundary, val) => {
+const emLevel = (boundary, val, lowerIsStronger) => {
   const { maxY, minY } = boundary;
-  const ratio = 100 * (val - minY) / (maxY - minY);
+  const ratio = lowerIsStronger
+    ? 100 * (val - minY) / (maxY - minY)
+    : 100 * (maxY - val) / (maxY - minY);
   if (ratio > 85) return 'vw';
   if (ratio > 60) return 'w';
   if (ratio > 45) return 'm';
@@ -106,9 +108,9 @@ const irLevel = (boundary, val) => {
   return 'vs';
 };
 
-const formatedIR = (
+const formatedEm = (
   peaks, maxY, decimal = 2, isAscend = true,
-  isIntensity = false, boundary = {},
+  isIntensity = false, boundary = {}, lowerIsStronger = false,
 ) => {
   const ascendFunc = (a, b) => parseFloat(a) - parseFloat(b);
   const descendFunc = (a, b) => parseFloat(b) - parseFloat(a);
@@ -127,7 +129,7 @@ const formatedIR = (
     .map(k => ({ x: k, y: ordered[k] }));
 
   if (isIntensity) {
-    return ordered.map(o => `${o.x} (${irLevel(boundary, o.y)})`)
+    return ordered.map(o => `${o.x} (${emLevel(boundary, o.y, lowerIsStronger)})`)
       .join(', ');
   }
   return ordered.map(o => `${o.x}`)
@@ -165,10 +167,10 @@ const peaksBody = ({
     return formatedMS(ordered, maxY, decimal, isAscend);
   }
   if (layout === LIST_LAYOUT.IR) {
-    return formatedIR(ordered, maxY, decimal, isAscend, isIntensity, boundary);
+    return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, true);
   }
   if (layout === LIST_LAYOUT.RAMAN) {
-    return formatedIR(ordered, maxY, decimal, isAscend, isIntensity, boundary);
+    return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
   return ordered.map(o => fixDigit(o.x, decimal)).join(', ');
 };
@@ -264,7 +266,7 @@ const Format = {
   opToLayout,
   formatPeaksByPrediction,
   formatedMS,
-  formatedIR,
+  formatedEm,
   calcMpyCenter,
 };
 
