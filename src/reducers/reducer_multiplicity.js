@@ -41,6 +41,7 @@ const selectMpyType = (state, action) => {
   const { stack } = state;
   const newStack = stack.map((k) => {
     if (k.xExtent.xL === xExtent.xL && k.xExtent.xU === xExtent.xU) {
+      if (mpyType === 'm') return Object.assign({}, k, { mpyType, js: [] });
       return Object.assign({}, k, { mpyType });
     }
     return k;
@@ -51,13 +52,14 @@ const selectMpyType = (state, action) => {
 const updateMpyJ = (state, action) => {
   const { payload } = action;
   const { xExtent, value } = payload;
-  if (!value) return state;
+  if (!value && value !== '') return state;
   const { stack } = state;
   const regx = /[^0-9.,-]/g;
   const js = value.replace(regx, '').split(',').map(j => parseFloat(j)).filter(j => j);
 
   const newStack = stack.map((k) => {
     if (k.xExtent.xL === xExtent.xL && k.xExtent.xU === xExtent.xU) {
+      if (k.mpyType === 'm') return Object.assign({}, k, { js: [] });
       return Object.assign({}, k, { js });
     }
     return k;

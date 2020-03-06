@@ -83,7 +83,7 @@ class MpyCoupling extends React.Component {
   render() {
     const { classes, row } = this.props;
     const { focus, tmpVal } = this.state;
-    const value = focus && tmpVal ? tmpVal : row.jStr;
+    const value = focus && (tmpVal || tmpVal === '') ? tmpVal : row.jStr;
 
     return (
       <div className={classNames(classes.jDiv)}>
