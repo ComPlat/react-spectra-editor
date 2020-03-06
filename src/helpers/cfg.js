@@ -4,9 +4,9 @@ const btnCmdAnaViewer = layoutSt => Format.isMsLayout(layoutSt);
 
 const hideCmdAnaViewer = () => false;
 
-const btnCmdAddPeak = () => false;
+const btnCmdAddPeak = layoutSt => Format.isMsLayout(layoutSt);
 
-const btnCmdRmPeak = () => false;
+const btnCmdRmPeak = layoutSt => Format.isMsLayout(layoutSt);
 
 const btnCmdSetRef = layoutSt => !Format.isNmrLayout(layoutSt);
 
