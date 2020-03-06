@@ -35,7 +35,8 @@ class DemoWriteIr extends React.Component {
     };
 
     this.onClick = this.onClick.bind(this);
-    this.write = this.write.bind(this);
+    this.writeMpy = this.writeMpy.bind(this);
+    this.writePeak = this.writePeak.bind(this);
     this.formatPks = this.formatPks.bind(this);
     this.formatMpy = this.formatMpy.bind(this);
     this.savePeaks = this.savePeaks.bind(this);
@@ -116,20 +117,23 @@ class DemoWriteIr extends React.Component {
     return `${layout} (${freqStr}${solvent}${value} ppm) δ = ${str}.`;
   }
 
-  write({
-    peaks, layout, shift, isAscend, decimal, isIntensity,
+  writeMpy({
+    layout, shift, isAscend, decimal,
     multiplicity, integration,
   }) {
-    let desc = '';
-    if (['1H', '13C', '19F'].indexOf(layout) >= 0) {
-      desc = this.formatMpy({
-        multiplicity, integration, shift, isAscend, decimal, layout,
-      });
-    } else {
-      desc = this.formatPks({
-        peaks, layout, shift, isAscend, decimal, isIntensity,
-      });
-    }
+    if (['1H', '13C', '19F'].indexOf(layout) < 0) return;
+    const desc = this.formatMpy({
+      multiplicity, integration, shift, isAscend, decimal, layout,
+    });
+    this.setState({ desc });
+  }
+
+  writePeak({
+    peaks, layout, shift, isAscend, decimal, isIntensity,
+  }) {
+    const desc = this.formatPks({
+      peaks, layout, shift, isAscend, decimal, isIntensity,
+    });
     this.setState({ desc });
   }
 
@@ -203,12 +207,19 @@ class DemoWriteIr extends React.Component {
 
   render() {
     const { desc, predictions, molecule } = this.state;
+    const entity = this.loadEntity();
 
-    const operations = [
+    let operations = [
+      { name: 'write peaks', value: this.writePeak },
       { name: 'save', value: this.savePeaks },
-      { name: 'write', value: this.write },
       { name: 'predict', value: this.predictOp },
     ].filter(r => r.value);
+    if (['1H', '13C', '19F'].indexOf(entity.layout) >= 0) {
+      operations = [
+        { name: 'write multiplicity', value: this.writeMpy },
+        ...operations,
+      ];
+    }
 
     const forecast = {
       btnCb: this.predictOp,
@@ -216,8 +227,6 @@ class DemoWriteIr extends React.Component {
       molecule: molecule,
       predictions,
     }
-
-    const entity = this.loadEntity();
 
     return (
       <div style={{ width: Math.round(window.innerWidth * 0.96) }}>
