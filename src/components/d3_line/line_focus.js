@@ -90,12 +90,13 @@ class LineFocus {
     const sameDtPk = prevDtPk === this.dataPks.length;
     const sameSfPk = prevSfPk === this.tSfPeaks.length;
     const sameData = prevData === this.data.length;
+    const sameRef = prevEpSt.prevOffset === nextEpSt.prevOffset;
     this.shouldUpdate = Object.assign(
       {},
       this.shouldUpdate,
       {
         sameXY, sameEpSt, sameLySt, sameItSt, sameMySt, // eslint-disable-line
-        sameTePt, sameDtPk, sameSfPk, sameData, // eslint-disable-line
+        sameTePt, sameDtPk, sameSfPk, sameData, sameRef, // eslint-disable-line
       },
     );
   }
@@ -168,8 +169,8 @@ class LineFocus {
   }
 
   drawLine() {
-    const { sameXY } = this.shouldUpdate;
-    if (sameXY) return;
+    const { sameXY, sameRef } = this.shouldUpdate;
+    if (sameXY && sameRef) return;
 
     const { xt, yt } = TfRescale(this);
     this.updatePathCall(xt, yt);
