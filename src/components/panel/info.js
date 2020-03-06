@@ -68,11 +68,12 @@ const styles = () => ({
 });
 
 const InfoPanel = ({
-  classes, expand, feature, layoutSt,
+  classes, expand, feature, layoutSt, shiftNameSt,
   onExapnd,
 }) => {
   if (!feature) return null;
   const { title, observeFrequency, solventName } = feature;
+  const showSolvName = shiftNameSt === '- - -' ? solventName : shiftNameSt;
 
   return (
     <ExpansionPanel
@@ -112,7 +113,7 @@ const InfoPanel = ({
             ? (
               <div className={classNames(classes.rowOdd)}>
                 <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Solv : </span>
-                <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{solventName}</span>
+                <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{showSolvName}</span>
               </div>
             )
             : null
@@ -125,6 +126,7 @@ const InfoPanel = ({
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     layoutSt: state.layout,
+    shiftNameSt: state.shift.ref.name,
   }
 );
 
@@ -138,6 +140,7 @@ InfoPanel.propTypes = {
   expand: PropTypes.bool.isRequired,
   feature: PropTypes.object.isRequired,
   layoutSt: PropTypes.string.isRequired,
+  shiftNameSt: PropTypes.string.isRequired,
   onExapnd: PropTypes.func.isRequired,
 };
 
