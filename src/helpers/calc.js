@@ -68,7 +68,7 @@ const calcMpyCoup = (pks, metaSt) => {
   JAnalyzer.compilePattern(signal);
   const type = signal.multiplicity;
   const js = signal.nmrJs ? signal.nmrJs.map(j => j.coupling).sort() : [];
-  const isWrong = (type === 's' && peaks.length > 1)
+  const isBasicWrong = (type === 's' && peaks.length > 1)
     || (type === 'd' && peaks.length > 2)
     || (type === 't' && peaks.length > 3)
     || (type === 'q' && peaks.length > 4)
@@ -77,7 +77,26 @@ const calcMpyCoup = (pks, metaSt) => {
     || (type === 'sept' && peaks.length > 7)
     || (type === 'o' && peaks.length > 8)
     || (type === 'n' && peaks.length > 9);
-  if (isWrong) {
+  let limit = 1;
+  let mStr = type;
+  limit *= 5 ** (mStr.match(/quint/g) || []).length;
+  mStr = mStr.replace(/quint/g, '');
+  limit *= 7 ** (mStr.match(/sept/g) || []).length;
+  mStr = mStr.replace(/sept/g, '');
+  limit *= 2 ** (mStr.match(/d/g) || []).length;
+  mStr = mStr.replace(/d/g, '');
+  limit *= 3 ** (mStr.match(/t/g) || []).length;
+  mStr = mStr.replace(/t/g, '');
+  limit *= 4 ** (mStr.match(/q/g) || []).length;
+  mStr = mStr.replace(/q/g, '');
+  limit *= 6 ** (mStr.match(/h/g) || []).length;
+  mStr = mStr.replace(/h/g, '');
+  limit *= 8 ** (mStr.match(/o/g) || []).length;
+  mStr = mStr.replace(/o/g, '');
+  limit *= 9 ** (mStr.match(/n/g) || []).length;
+  mStr = mStr.replace(/n/g, '');
+  const isAdvanWrong = peaks.length > limit;
+  if (isBasicWrong || isAdvanWrong) {
     return { type: 'm', js: [] };
   }
   return { type, js };
