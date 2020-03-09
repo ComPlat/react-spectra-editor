@@ -8,12 +8,11 @@ import Tooltip from '@material-ui/core/Tooltip';
 import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import { withStyles } from '@material-ui/core/styles';
 
-import { PksEdit } from '../../helpers/converter';
 import {
-  Convert2Peak, Convert2Scan, Convert2Thres,
+  Convert2Scan, Convert2Thres,
 } from '../../helpers/chem';
-import { FromManualToOffset } from '../../helpers/shift';
 import { MuButton, commonStyle } from './common';
+import { extractPeaksEdit } from '../../helpers/extractPeaksEdit';
 
 const styles = () => (
   Object.assign(
@@ -49,11 +48,7 @@ const BtnSubmit = ({
   editPeakSt, thresSt, layoutSt, shiftSt, scanSt, forecastSt,
   decimalSt, integrationSt, multiplicitySt,
 }) => {
-  const { ref, peak } = shiftSt;
-
-  const offset = FromManualToOffset(ref, peak);
-  const peaks = Convert2Peak(feature, thresSt.value, offset);
-  const peaksEdit = PksEdit(peaks, editPeakSt);
+  const peaksEdit = extractPeaksEdit(feature, editPeakSt, thresSt, shiftSt, layoutSt);
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
   const scan = Convert2Scan(feature, scanSt);
   const thres = Convert2Thres(feature, thresSt);

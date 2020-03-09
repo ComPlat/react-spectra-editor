@@ -65,9 +65,7 @@ class DemoWriteIr extends React.Component {
   }) {
     const entity = this.loadEntity();
     const { features } = entity;
-    const { maxY, minY } = Array.isArray(features)
-      ? features[0]
-      : (features.editPeak || features.autoPeak);
+    const { maxY, minY } = Array.isArray(features) ? {} : (features.editPeak || features.autoPeak);
     const boundary = { maxY, minY };
     const body = FN.peaksBody({
       peaks, layout, decimal, shift, isAscend, isIntensity, boundary,

@@ -132,7 +132,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     hideThresSt: Cfg.hideCmdThres(state.layout),
     isEditSt: state.threshold.isEdit,
-    thresValSt: state.threshold.value || 0,
+    thresValSt: parseFloat(state.threshold.value) || 0,
   }
 );
 
