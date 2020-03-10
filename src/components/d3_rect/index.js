@@ -12,6 +12,7 @@ import RectFocus from './rect_focus';
 import {
   drawMain, drawLabel, drawDisplay, drawDestroy,
 } from '../common/draw';
+import { LIST_UI_SWEEP_TYPE, LIST_NON_BRUSH_TYPES } from '../../constants/list_ui';
 
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.85); // ROI
@@ -32,7 +33,8 @@ class ViewerRect extends React.Component {
   componentDidMount() {
     const {
       seed, peak, cLabel, xLabel, yLabel, feature,
-      tTrEndPts, tSfPeaks, uiSt, isHidden,
+      tTrEndPts, tSfPeaks, isHidden,
+      sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
       resetAllAct,
     } = this.props;
     drawDestroy(this.rootKlass);
@@ -47,7 +49,9 @@ class ViewerRect extends React.Component {
       filterPeak,
       tTrEndPts,
       tSfPeaks,
-      uiSt,
+      sweepExtentSt,
+      isUiAddIntgSt,
+      isUiNoBrushSt,
     });
     drawLabel(this.rootKlass, cLabel, xLabel, yLabel);
     drawDisplay(this.rootKlass, isHidden);
@@ -56,7 +60,8 @@ class ViewerRect extends React.Component {
   componentDidUpdate(prevProps) {
     const {
       seed, peak,
-      tTrEndPts, tSfPeaks, uiSt, isHidden,
+      tTrEndPts, tSfPeaks, isHidden,
+      sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
     } = this.props;
     this.normChange(prevProps);
 
@@ -68,7 +73,9 @@ class ViewerRect extends React.Component {
       filterPeak,
       tTrEndPts,
       tSfPeaks,
-      uiSt,
+      sweepExtentSt,
+      isUiAddIntgSt,
+      isUiNoBrushSt,
     });
     drawDisplay(this.rootKlass, isHidden);
   }
@@ -98,7 +105,9 @@ const mapStateToProps = (state, props) => (
     peak: Feature2Peak(state, props),
     tTrEndPts: ToThresEndPts(state, props),
     tSfPeaks: ToShiftPeaks(state, props),
-    uiSt: state.ui,
+    sweepExtentSt: state.ui.sweepExtent,
+    isUiAddIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
+    isUiNoBrushSt: LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
   }
 );
 
@@ -120,7 +129,9 @@ ViewerRect.propTypes = {
   feature: PropTypes.object.isRequired,
   tTrEndPts: PropTypes.array.isRequired,
   tSfPeaks: PropTypes.array.isRequired,
-  uiSt: PropTypes.object.isRequired,
+  sweepExtentSt: PropTypes.object.isRequired,
+  isUiAddIntgSt: PropTypes.bool.isRequired,
+  isUiNoBrushSt: PropTypes.bool.isRequired,
   resetAllAct: PropTypes.func.isRequired,
   clickUiTargetAct: PropTypes.func.isRequired,
   selectUiSweepAct: PropTypes.func.isRequired,

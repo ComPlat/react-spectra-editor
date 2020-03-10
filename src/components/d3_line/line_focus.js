@@ -137,11 +137,9 @@ class LineFocus {
       .y(d => yt(d.y));
   }
 
-  setConfig(uiSt) {
+  setConfig(sweepExtentSt) {
     // Domain Calculate
-    let { xExtent, yExtent } = uiSt
-      ? uiSt.sweepExtent
-      : { xExtent: false, yExtent: false };
+    let { xExtent, yExtent } = sweepExtentSt || { xExtent: false, yExtent: false };
 
     if (!xExtent || !yExtent) {
       const xes = d3.extent(this.data, d => d.x).sort((a, b) => a - b);
@@ -640,7 +638,8 @@ class LineFocus {
 
   create({
     filterSeed, filterPeak, tTrEndPts, tSfPeaks,
-    editPeakSt, layoutSt, uiSt, integationSt, mtplySt,
+    editPeakSt, layoutSt, integationSt, mtplySt,
+    sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
   }) {
     this.svg = d3.select('.d3Svg');
     MountMainFrame(this, 'focus');
@@ -661,7 +660,7 @@ class LineFocus {
     MountAxisLabelY(this);
 
     if (this.data && this.data.length > 0) {
-      this.setConfig(uiSt);
+      this.setConfig(sweepExtentSt);
       this.drawLine();
       this.drawThres();
       this.drawGrid();
@@ -670,19 +669,20 @@ class LineFocus {
       this.drawInteg(layoutSt, integationSt);
       this.drawMtply(layoutSt, mtplySt);
     }
-    MountBrush(this, uiSt);
+    MountBrush(this, isUiAddIntgSt, isUiNoBrushSt);
     this.resetShouldUpdate(editPeakSt, layoutSt, integationSt, mtplySt);
   }
 
   update({
     filterSeed, filterPeak, tTrEndPts, tSfPeaks,
-    editPeakSt, layoutSt, uiSt, integationSt, mtplySt,
+    editPeakSt, layoutSt, integationSt, mtplySt,
+    sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
   }) {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks);
 
     if (this.data && this.data.length > 0) {
-      this.setConfig(uiSt);
+      this.setConfig(sweepExtentSt);
       this.getShouldUpdate(editPeakSt, layoutSt, integationSt, mtplySt);
       this.drawLine();
       this.drawThres();
@@ -692,7 +692,7 @@ class LineFocus {
       this.drawInteg(layoutSt, integationSt);
       this.drawMtply(layoutSt, mtplySt);
     }
-    MountBrush(this, uiSt);
+    MountBrush(this, isUiAddIntgSt, isUiNoBrushSt);
     this.resetShouldUpdate(editPeakSt, layoutSt, integationSt, mtplySt);
   }
 }

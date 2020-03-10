@@ -12,6 +12,7 @@ import LineFocus from './line_focus';
 import {
   drawMain, drawLabel, drawDisplay, drawDestroy,
 } from '../common/draw';
+import { LIST_UI_SWEEP_TYPE, LIST_NON_BRUSH_TYPES } from '../../constants/list_ui';
 
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.85); // ROI
@@ -32,7 +33,8 @@ class ViewerLine extends React.Component {
   componentDidMount() {
     const {
       seed, peak, cLabel, xLabel, yLabel, feature,
-      tTrEndPts, tSfPeaks, editPeakSt, layoutSt, uiSt, integationSt, mtplySt,
+      tTrEndPts, tSfPeaks, editPeakSt, layoutSt, integationSt, mtplySt,
+      sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
       isHidden,
       resetAllAct,
     } = this.props;
@@ -50,9 +52,11 @@ class ViewerLine extends React.Component {
       tSfPeaks,
       editPeakSt,
       layoutSt,
-      uiSt,
       integationSt,
       mtplySt,
+      sweepExtentSt,
+      isUiAddIntgSt,
+      isUiNoBrushSt,
     });
     drawLabel(this.rootKlass, cLabel, xLabel, yLabel);
     drawDisplay(this.rootKlass, isHidden);
@@ -61,7 +65,8 @@ class ViewerLine extends React.Component {
   componentDidUpdate(prevProps) {
     const {
       seed, peak,
-      tTrEndPts, tSfPeaks, editPeakSt, layoutSt, uiSt, integationSt, mtplySt,
+      tTrEndPts, tSfPeaks, editPeakSt, layoutSt, integationSt, mtplySt,
+      sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
       isHidden,
     } = this.props;
     this.normChange(prevProps);
@@ -76,9 +81,11 @@ class ViewerLine extends React.Component {
       tSfPeaks,
       editPeakSt,
       layoutSt,
-      uiSt,
       integationSt,
       mtplySt,
+      sweepExtentSt,
+      isUiAddIntgSt,
+      isUiNoBrushSt,
     });
     drawDisplay(this.rootKlass, isHidden);
   }
@@ -111,8 +118,10 @@ const mapStateToProps = (state, props) => (
     editPeakSt: state.editPeak.present,
     layoutSt: state.layout,
     integationSt: state.integration.present,
-    uiSt: state.ui,
     mtplySt: state.multiplicity.present,
+    sweepExtentSt: state.ui.sweepExtent,
+    isUiAddIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
+    isUiNoBrushSt: LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
   }
 );
 
@@ -136,9 +145,11 @@ ViewerLine.propTypes = {
   tSfPeaks: PropTypes.array.isRequired,
   editPeakSt: PropTypes.object.isRequired,
   layoutSt: PropTypes.string.isRequired,
-  uiSt: PropTypes.object.isRequired,
   integationSt: PropTypes.object.isRequired,
   mtplySt: PropTypes.object.isRequired,
+  sweepExtentSt: PropTypes.object.isRequired,
+  isUiAddIntgSt: PropTypes.bool.isRequired,
+  isUiNoBrushSt: PropTypes.bool.isRequired,
   resetAllAct: PropTypes.func.isRequired,
   clickUiTargetAct: PropTypes.func.isRequired,
   selectUiSweepAct: PropTypes.func.isRequired,

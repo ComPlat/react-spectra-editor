@@ -80,11 +80,10 @@ class RectFocus {
       .y(d => yt(d.y));
   }
 
-  setConfig(uiSt) {
+  setConfig(sweepExtentSt) {
     // Domain Calculate
-    let { xExtent, yExtent } = uiSt
-      ? uiSt.sweepExtent
-      : { xExtent: false, yExtent: false };
+    let { xExtent, yExtent } = sweepExtentSt || { xExtent: false, yExtent: false };
+
     if (!xExtent || !yExtent) {
       const xes = d3.extent(this.data, d => d.x).sort((a, b) => a - b);
       xExtent = { xL: xes[0] - 10, xU: xes[1] + 10 };
@@ -176,7 +175,8 @@ class RectFocus {
   }
 
   create({
-    filterSeed, filterPeak, tTrEndPts, tSfPeaks, uiSt,
+    filterSeed, filterPeak, tTrEndPts, tSfPeaks,
+    sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
   }) {
     this.svg = d3.select('.d3Svg');
     MountMainFrame(this, 'focus');
@@ -196,27 +196,28 @@ class RectFocus {
     MountAxisLabelY(this);
 
     if (this.data && this.data.length > 0) {
-      this.setConfig(uiSt);
+      this.setConfig(sweepExtentSt);
       this.drawBar();
       this.drawThres();
       this.drawGrid();
     }
-    MountBrush(this, uiSt);
+    MountBrush(this, isUiAddIntgSt, isUiNoBrushSt);
   }
 
   update({
-    filterSeed, filterPeak, tTrEndPts, tSfPeaks, uiSt,
+    filterSeed, filterPeak, tTrEndPts, tSfPeaks,
+    sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
   }) {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks);
 
     if (this.data && this.data.length > 0) {
-      this.setConfig(uiSt);
+      this.setConfig(sweepExtentSt);
       this.drawBar();
       this.drawThres();
       this.drawGrid();
     }
-    MountBrush(this, uiSt);
+    MountBrush(this, isUiAddIntgSt, isUiNoBrushSt);
   }
 }
 

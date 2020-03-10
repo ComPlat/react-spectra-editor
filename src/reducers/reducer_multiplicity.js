@@ -102,7 +102,7 @@ const multiplicityReducer = (state = initialState, action) => {
     case MANAGER.RESETALL:
       return state;
     default:
-      return undoRedoActions.indexOf(action.type)
+      return undoRedoActions.indexOf(action.type) >= 0
         ? Object.assign({}, state)
         : state;
   }

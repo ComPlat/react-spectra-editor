@@ -1,19 +1,6 @@
 import * as d3 from 'd3';
 
-import { LIST_UI_SWEEP_TYPE } from '../constants/list_ui';
 import { MouseMove } from './compass';
-
-const noBrushTypes = [
-  LIST_UI_SWEEP_TYPE.PEAK_ADD,
-  LIST_UI_SWEEP_TYPE.PEAK_DELETE,
-  LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT,
-  LIST_UI_SWEEP_TYPE.INTEGRATION_RM,
-  LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF,
-  LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_ADD,
-  LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_RM,
-  LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_CLICK,
-  LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_RM,
-];
 
 const wheeled = (focus) => {
   const { currentExtent, scrollUiWheelAct } = focus;
@@ -22,7 +9,7 @@ const wheeled = (focus) => {
   scrollUiWheelAct(Object.assign({}, currentExtent, { direction }));
 };
 
-const brushed = (focus, uiSt) => {
+const brushed = (focus, isUiAddIntgSt) => {
   const {
     selectUiSweepAct, data, dataPks, brush, w, h, scales,
   } = focus;
@@ -32,7 +19,7 @@ const brushed = (focus, uiSt) => {
   let yes = [h, 0].map(scales.y.invert).sort((a, b) => a - b);
   let xExtent = { xL: xes[0], xU: xes[1] };
   let yExtent = { yL: yes[0], yU: yes[1] };
-  if (uiSt.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD) {
+  if (isUiAddIntgSt) {
     xes = selection.map(scales.x.invert).sort((a, b) => a - b);
     xExtent = { xL: xes[0], xU: xes[1] };
   } else {
@@ -48,26 +35,24 @@ const brushed = (focus, uiSt) => {
   d3.select('.d3Svg').selectAll('.brush').call(brush.move, null);
 };
 
-const MountBrush = (focus, uiSt) => {
+const MountBrush = (focus, isUiAddIntgSt, isUiNoBrushSt) => {
   const {
     root, svg, brush, brushX, w, h,
   } = focus;
   svg.selectAll('.brush').remove();
   svg.selectAll('.brushX').remove();
 
-  const brushedCb = () => brushed(focus, uiSt);
+  const brushedCb = () => brushed(focus, isUiAddIntgSt);
   const wheeledCb = () => wheeled(focus);
 
-  if (noBrushTypes.indexOf(uiSt.sweepType) < 0) {
-    const target = uiSt.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD
-      ? brushX : brush;
+  if (isUiNoBrushSt) {
+    const target = isUiAddIntgSt ? brushX : brush;
     target.handleSize(10)
       .extent([[0, 0], [w, h]])
       .on('end', brushedCb);
 
     // append brush components
-    const klass = uiSt.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD
-      ? 'brushX' : 'brush';
+    const klass = isUiAddIntgSt ? 'brushX' : 'brush';
     root.append('g')
       .attr('class', klass)
       .on('mousemove', () => MouseMove(focus))
