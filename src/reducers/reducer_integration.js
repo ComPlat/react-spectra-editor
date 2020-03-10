@@ -90,7 +90,7 @@ const integrationReducer = (state = initialState, action) => {
       return setRef(state, action);
     case INTEGRATION.SET_FKR:
       return setFkr(state, action);
-    case INTEGRATION.RESET_ALL:
+    case INTEGRATION.RESET_ALL_RDC:
       return resetAll(state, action);
     case INTEGRATION.CLEAR_ALL:
       return clearAll();

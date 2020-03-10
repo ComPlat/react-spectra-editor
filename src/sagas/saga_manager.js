@@ -28,7 +28,7 @@ function* resetParamsAll(action) {
 
   if (integration) {
     yield put({
-      type: INTEGRATION.RESET_ALL,
+      type: INTEGRATION.RESET_ALL_RDC,
       payload: integration,
     });
   }
