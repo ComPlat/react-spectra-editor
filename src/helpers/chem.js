@@ -5,6 +5,7 @@ import { FromManualToOffset } from './shift';
 import Cfg from './cfg';
 import Format from './format';
 import { LIST_LAYOUT } from '../constants/list_layout';
+import { getArea } from './integration';
 
 const getTopic = (_, props) => props.topic;
 
@@ -18,31 +19,37 @@ const getShiftOffset = (state, _) => { // eslint-disable-line
   return FromManualToOffset(ref, peak);
 };
 
-const convertTopic = (topic, layout, feature, offset) => {
-  const { maxY } = feature;
+const calcXYK = (xs, ys, maxY, offset) => {
   const sp = [];
-  const xs = topic.x;
-  const ys = topic.y;
-
-  const isItgDisable = Cfg.btnCmdIntg(layout);
-  if (!isItgDisable) {
-    let k = 0;
-    for (let i = 0; i < ys.length; i += 1) { // no-downsample
-      const x = xs[i] - offset;
-      const y = ys[i];
-      const cy = y / maxY;
-      if (cy > 0.0) { k += cy; }
-      sp.push({ x, y, k });
-    }
-    return sp;
+  let k = 0;
+  for (let i = 0; i < ys.length; i += 1) { // no-downsample
+    const x = xs[i] - offset;
+    const y = ys[i];
+    const cy = y / maxY;
+    if (cy > 0.0) { k += cy; }
+    sp.push({ x, y, k });
   }
+  return sp;
+};
 
+const calcXY = (xs, ys, maxY, offset) => {
+  const sp = [];
   for (let i = 0; i < ys.length; i += 1) { // no-downsample
     const x = xs[i] - offset;
     const y = ys[i];
     sp.push({ x, y });
   }
   return sp;
+};
+
+const convertTopic = (topic, layout, feature, offset) => {
+  const { maxY } = feature;
+  const xs = topic.x;
+  const ys = topic.y;
+
+  const isItgDisable = Cfg.btnCmdIntg(layout);
+  if (!isItgDisable) return calcXYK(xs, ys, maxY, offset);
+  return calcXY(xs, ys, maxY, offset);
 };
 
 const Topic2Seed = createSelector(
@@ -214,7 +221,21 @@ const buildPeakFeature = (jcamp, layout, peakUp, s, thresRef) => {
   );
 };
 
-const buildIntegFeature = (jcamp) => {
+const calcIntgRefArea = (spectra, stack) => {
+  if (stack.length === 0) return 1;
+  const data = spectra[0].data[0];
+
+  const xs = data.x;
+  const ys = data.y;
+  const maxY = Math.max(...ys);
+  const xyk = calcXYK(xs, ys, maxY, 0);
+  const { xL, xU, area } = stack[1];
+  const rawArea = getArea(xL, xU, xyk);
+  const raw2realRatio = rawArea / area;
+  return { raw2realRatio };
+};
+
+const buildIntegFeature = (jcamp, spectra) => {
   const { $OBSERVEDINTEGRALS, $OBSERVEDMULTIPLETS } = jcamp.info;
   const regx = /[^0-9.,-]/g;
   let stack = [];
@@ -242,13 +263,15 @@ const buildIntegFeature = (jcamp) => {
     });
     stack = [...stack, ...mpStack];
   }
+  const { raw2realRatio } = calcIntgRefArea(spectra, stack);
+  const mStack = stack.map(st => Object.assign({}, st, { area: st.area * raw2realRatio }));
 
   return (
     {
-      refArea: 1,
+      refArea: raw2realRatio,
       refFactor: 1,
       shift: 0,
-      stack,
+      stack: mStack,
     }
   );
 };
@@ -323,7 +346,7 @@ const isPeakTable = s => (
   )
 );
 
-const extrFeaturesNi = (jcamp, layout, peakUp) => {
+const extrFeaturesNi = (jcamp, layout, peakUp, spectra) => {
   const nfs = {};
   const category = jcamp.info.$CSCATEGORY;
   if (category) {
@@ -339,7 +362,7 @@ const extrFeaturesNi = (jcamp, layout, peakUp) => {
       const thresRef = calcThresRef(sAP, peakUp);
       nfs.autoPeak = buildPeakFeature(jcamp, layout, peakUp, sAP, thresRef);
     }
-    nfs.integration = buildIntegFeature(jcamp);
+    nfs.integration = buildIntegFeature(jcamp, spectra);
     nfs.multiplicity = buildMpyFeature(jcamp);
     return nfs;
   }
@@ -413,7 +436,7 @@ const ExtractJcamp = (source) => {
     : extrSpectraNi(jcamp, layout);
   const features = Format.isMsLayout(layout)
     ? extrFeaturesMs(jcamp, layout, peakUp)
-    : extrFeaturesNi(jcamp, layout, peakUp);
+    : extrFeaturesNi(jcamp, layout, peakUp, spectra);
 
   return { spectra, features, layout };
 };
