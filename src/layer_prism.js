@@ -16,7 +16,7 @@ const styles = () => ({
 });
 
 const LayerPrism = ({
-  entity, cLabel, xLabel, yLabel, operations, forecast,
+  entity, cLabel, xLabel, yLabel, operations, forecast, editorOnly,
   thresSt, scanSt, uiSt,
 }) => {
   const { topic, feature, hasEdit } = extractParams(entity, thresSt, scanSt);
@@ -30,6 +30,7 @@ const LayerPrism = ({
           feature={feature}
           hasEdit={hasEdit}
           operations={operations}
+          editorOnly={editorOnly}
         />
         <div className="react-spectrum-editor">
           <Grid container>
@@ -56,6 +57,7 @@ const LayerPrism = ({
         feature={feature}
         hasEdit={hasEdit}
         operations={operations}
+        editorOnly={editorOnly}
       />
       <div className="react-spectrum-editor">
         <Grid container>
@@ -99,6 +101,7 @@ LayerPrism.propTypes = {
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
+  editorOnly: PropTypes.bool.isRequired,
   forecast: PropTypes.object.isRequired,
   operations: PropTypes.array.isRequired,
   thresSt: PropTypes.object.isRequired,

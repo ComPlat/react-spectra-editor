@@ -279,6 +279,7 @@ class DemoWriteIr extends React.Component {
           forecast={forecast}
           operations={operations}
           style={{ fontFamily: 'Helvetica' }}
+          editorOnly={false}
         />
         <Grid container>
           <Grid item xs={10}>

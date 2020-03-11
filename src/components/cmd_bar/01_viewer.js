@@ -68,11 +68,11 @@ const Viewer = ({
   );
 };
 
-const mapStateToProps = (state, _) => ( // eslint-disable-line
+const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     isfocusSpectrumSt: state.ui.viewer === LIST_UI_VIEWER_TYPE.SPECTRUM,
     isfocusAnalysisSt: state.ui.viewer === LIST_UI_VIEWER_TYPE.ANALYSIS,
-    hideCmdAnaViewerSt: Cfg.hideCmdAnaViewer(state.layout),
+    hideCmdAnaViewerSt: Cfg.hideCmdAnaViewer(state.layout) || props.editorOnly,
     disableCmdAnaViewerSt: Cfg.btnCmdAnaViewer(state.layout),
   }
 );

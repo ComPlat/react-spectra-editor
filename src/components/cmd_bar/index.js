@@ -27,10 +27,10 @@ const styles = () => (
 );
 
 const CmdBar = ({
-  classes, feature, hasEdit, operations,
+  classes, feature, hasEdit, operations, editorOnly,
 }) => (
   <div className={classes.card}>
-    <Viewer />
+    <Viewer editorOnly={editorOnly} />
     <Zoom />
     <Peak />
     <Integration />
@@ -62,6 +62,7 @@ CmdBar.propTypes = {
   feature: PropTypes.object.isRequired,
   hasEdit: PropTypes.bool.isRequired,
   operations: PropTypes.array.isRequired,
+  editorOnly: PropTypes.bool.isRequired,
 };
 
 export default compose(
