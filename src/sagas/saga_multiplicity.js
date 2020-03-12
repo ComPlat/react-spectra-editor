@@ -43,27 +43,21 @@ function* addUiPeakToStack(action) {
 
   const { shift, stack, smExtext } = mpySt;
   let { x, y } = action.payload; // eslint-disable-line
-  if (!x || !y) {
-    yield put({
-      type: MULTIPLICITY.PEAK_ADD_BY_UI_RDC,
-      payload: mpySt,
-    });
-  }
+  if (!x || !y) return;
 
   x += shift;
   const newPeak = { x, y };
   const { xL, xU } = smExtext;
-  if (x < xL || xU < x) {
-    yield put({
-      type: MULTIPLICITY.PEAK_ADD_BY_UI_RDC,
-      payload: mpySt,
-    });
-  }
+  if (x < xL || xU < x) return;
 
+  let isDuplicate = false;
   const newStack = stack.map((k) => {
     if (k.xExtent.xL === xL && k.xExtent.xU === xU) {
       const existXs = k.peaks.map(pk => pk.x);
-      if (existXs.indexOf(newPeak.x) >= 0) return k;
+      if (existXs.indexOf(newPeak.x) >= 0) {
+        isDuplicate = true;
+        return k;
+      }
       const newPks = [...k.peaks, newPeak];
       const coupling = calcMpyCoup(newPks, metaSt);
       return Object.assign(
@@ -78,6 +72,7 @@ function* addUiPeakToStack(action) {
     }
     return k;
   });
+  if (isDuplicate) return;
   const payload = Object.assign({}, mpySt, { stack: newStack });
 
   yield put({
@@ -215,7 +210,7 @@ function* resetOne(action) {
 
 const multiplicitySagas = [
   takeEvery(UI.SWEEP.SELECT_MULTIPLICITY, selectMpy),
-  takeEvery(MULTIPLICITY.PEAK_ADD_BY_UI, addUiPeakToStack),
+  takeEvery(MULTIPLICITY.PEAK_ADD_BY_UI_SAG, addUiPeakToStack),
   takeEvery(MULTIPLICITY.PEAK_RM_BY_PANEL, rmPanelPeakFromStack),
   takeEvery(MULTIPLICITY.PEAK_RM_BY_UI, rmUiPeakFromStack),
   takeEvery(MULTIPLICITY.RESET_ONE, resetOne),

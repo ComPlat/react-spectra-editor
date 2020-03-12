@@ -148,9 +148,9 @@ function* clickUiTarget(action) {
         payload: { xL, xU },
       });
     }
-  } else if (uiSweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_ADD && !onPeak) {
+  } else if (uiSweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_ADD) {
     yield put({
-      type: MULTIPLICITY.PEAK_ADD_BY_UI,
+      type: MULTIPLICITY.PEAK_ADD_BY_UI_SAG,
       payload,
     });
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_RM && onPeak) {
