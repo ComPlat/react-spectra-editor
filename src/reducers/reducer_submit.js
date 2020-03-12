@@ -2,7 +2,7 @@ import { SUBMIT, LAYOUT, MANAGER } from '../constants/action_type';
 import Format from '../helpers/format';
 
 const initialState = {
-  isAscend: true,
+  isAscend: false,
   isIntensity: true,
   decimal: 2,
   operation: { name: 'empty' },

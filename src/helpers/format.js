@@ -6,14 +6,15 @@ const spectraDigit = (layout) => {
   switch (layout) {
     case LIST_LAYOUT.IR:
     case LIST_LAYOUT.RAMAN:
+    case LIST_LAYOUT.MS:
       return 0;
+    case LIST_LAYOUT.C13:
+      return 1;
     case LIST_LAYOUT.H1:
     case LIST_LAYOUT.F19:
     case LIST_LAYOUT.PLAIN:
-    case LIST_LAYOUT.MS:
-    case LIST_LAYOUT.C13:
     default:
-      return 3;
+      return 2;
   }
 };
 

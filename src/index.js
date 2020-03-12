@@ -101,20 +101,20 @@ class DemoWriteIr extends React.Component {
       return Object.assign({}, m, { area, center });
     }).sort((a, b) => (isAscend ? a.center - b.center : b.center - a.center));
     const str = macs.map((m) => {
-      const c = m.center.toFixed(decimal);
+      const c = m.center;
       const type = m.mpyType;
       const it = Math.round(m.area);
       const js = m.js.map(j => `J = ${j.toFixed(decimal)} Hz`).join(', ');
       const atomCount = layout === '1H' ? `, ${it}H` : '';
       const xs = m.peaks.map(p => p.x).sort((a, b) => a - b);
-      const location = type === 'm' ? `${xs[0].toFixed(decimal)}-${xs[xs.length - 1].toFixed(decimal)}` : `${c}x`;
+      const location = type === 'm' ? `${xs[0].toFixed(decimal)}–${xs[xs.length - 1].toFixed(decimal)}` : `${c.toFixed(decimal)}`;
       return m.js.length === 0
         ? `${location} (${type}${atomCount})`
         : `${location} (${type}, ${js}${atomCount})`;
     }).join(', ');
     const { label, value, name } = shift.ref;
-    const solvent = label ? `${name}, ` : '';
-    return `${layout} NMR (${freqStr}${solvent}${value} ppm) δ = ${str}.`;
+    const solvent = label ? `${name.split('(')[0].trim()} [${value.toFixed(decimal)} ppm], ` : '';
+    return `${layout} NMR (${freqStr}${solvent}ppm) δ = ${str}.`;
   }
 
   writeMpy({
