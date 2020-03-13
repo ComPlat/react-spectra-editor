@@ -22,6 +22,7 @@ const fetchPt = (focus, xt) => {
 const MouseMove = (focus) => {
   const { xt, yt } = TfRescale(focus);
   const pt = fetchPt(focus, xt);
+  const { freq } = focus;
   if (pt) {
     const tx = xt(pt.x);
     const ty = yt(pt.y);
@@ -32,6 +33,11 @@ const MouseMove = (focus) => {
     focus.root.select('.cursor-txt')
       .attr('transform', `translate(${tx},${10})`)
       .text(pt.x.toFixed(3));
+    if (freq) {
+      focus.root.select('.cursor-txt-hz')
+        .attr('transform', `translate(${tx},${20})`)
+        .text(`${(pt.x * freq).toFixed(3)} Hz`);
+    }
   }
 };
 
@@ -70,6 +76,12 @@ const MountCompass = (focus) => {
     .attr('font-family', 'Helvetica')
     .style('font-size', '12px')
     .style('text-anchor', 'middle');
+  cursor.append('text')
+    .attr('class', 'cursor-txt-hz')
+    .attr('font-family', 'Helvetica')
+    .style('font-size', '12px')
+    .style('text-anchor', 'middle')
+    .style('fill', '#D68910');
 
   overlay
     .on('mousemove', () => MouseMove(focus))

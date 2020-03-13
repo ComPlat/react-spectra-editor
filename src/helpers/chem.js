@@ -60,6 +60,19 @@ const Topic2Seed = createSelector(
   convertTopic,
 );
 
+const convertFrequency = (layout, feature) => {
+  if (['1H', '13C', '19F'].indexOf(layout) < 0) return false;
+  const { observeFrequency } = feature;
+  const freq = Array.isArray(observeFrequency) ? observeFrequency[0] : observeFrequency;
+  return parseFloat(freq) || false;
+};
+
+const ToFrequency = createSelector(
+  getLayout,
+  getFeature,
+  convertFrequency,
+);
+
 const getThreshold = state => (
   state.threshold ? state.threshold.value * 1.0 : false
 );
@@ -456,6 +469,6 @@ const Convert2Thres = (feature, thresSt) => {
 
 export {
   ExtractJcamp, Topic2Seed, Feature2Peak,
-  ToThresEndPts, ToShiftPeaks,
+  ToThresEndPts, ToShiftPeaks, ToFrequency,
   Convert2Peak, Convert2Scan, Convert2Thres,
 };

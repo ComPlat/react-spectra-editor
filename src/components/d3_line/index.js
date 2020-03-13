@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 
 import {
-  Topic2Seed, Feature2Peak, ToThresEndPts, ToShiftPeaks,
+  Topic2Seed, Feature2Peak, ToThresEndPts, ToShiftPeaks, ToFrequency,
 } from '../../helpers/chem';
 import { resetAll } from '../../actions/manager';
 import { selectUiSweep, scrollUiWheel, clickUiTarget } from '../../actions/ui';
@@ -32,7 +32,7 @@ class ViewerLine extends React.Component {
 
   componentDidMount() {
     const {
-      seed, peak, cLabel, xLabel, yLabel, feature,
+      seed, peak, cLabel, xLabel, yLabel, feature, freq,
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt, integationSt, mtplySt,
       sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
       isHidden,
@@ -48,6 +48,7 @@ class ViewerLine extends React.Component {
     this.focus.create({
       filterSeed,
       filterPeak,
+      freq,
       tTrEndPts,
       tSfPeaks,
       editPeakSt,
@@ -64,7 +65,7 @@ class ViewerLine extends React.Component {
 
   componentDidUpdate(prevProps) {
     const {
-      seed, peak,
+      seed, peak, freq,
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt, integationSt, mtplySt,
       sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
       isHidden,
@@ -77,6 +78,7 @@ class ViewerLine extends React.Component {
     this.focus.update({
       filterSeed,
       filterPeak,
+      freq,
       tTrEndPts,
       tSfPeaks,
       editPeakSt,
@@ -113,6 +115,7 @@ const mapStateToProps = (state, props) => (
   {
     seed: Topic2Seed(state, props),
     peak: Feature2Peak(state, props),
+    freq: ToFrequency(state, props),
     tTrEndPts: ToThresEndPts(state, props),
     tSfPeaks: ToShiftPeaks(state, props),
     editPeakSt: state.editPeak.present,

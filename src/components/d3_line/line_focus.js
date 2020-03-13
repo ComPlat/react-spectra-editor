@@ -55,6 +55,7 @@ class LineFocus {
     this.factor = 0.125;
     this.currentExtent = null;
     this.shouldUpdate = {};
+    this.freq = false;
 
     this.getShouldUpdate = this.getShouldUpdate.bind(this);
     this.resetShouldUpdate = this.resetShouldUpdate.bind(this);
@@ -124,11 +125,12 @@ class LineFocus {
     this.root.call(this.tip);
   }
 
-  setDataParams(data, peaks, tTrEndPts, tSfPeaks) {
+  setDataParams(data, peaks, tTrEndPts, tSfPeaks, freq) {
     this.data = [...data];
     this.dataPks = [...peaks];
     this.tTrEndPts = tTrEndPts;
     this.tSfPeaks = tSfPeaks;
+    this.freq = freq;
   }
 
   updatePathCall(xt, yt) {
@@ -298,7 +300,7 @@ class LineFocus {
     // rescale for zoom
     const { xt } = TfRescale(this);
 
-    const dh = 40;
+    const dh = 50;
     const integBar = data => (
       d3.line()([
         [xt(data.xL - shift), dh],
@@ -637,7 +639,7 @@ class LineFocus {
   }
 
   create({
-    filterSeed, filterPeak, tTrEndPts, tSfPeaks,
+    filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq,
     editPeakSt, layoutSt, integationSt, mtplySt,
     sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
   }) {
@@ -647,7 +649,7 @@ class LineFocus {
 
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.setTip(layoutSt);
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq);
     MountCompass(this);
 
     this.axis = MountAxis(this);
@@ -674,12 +676,12 @@ class LineFocus {
   }
 
   update({
-    filterSeed, filterPeak, tTrEndPts, tSfPeaks,
+    filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq,
     editPeakSt, layoutSt, integationSt, mtplySt,
     sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
   }) {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq);
 
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);
