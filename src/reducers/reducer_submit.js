@@ -28,7 +28,7 @@ const submitReducer = (state = initialState, action) => {
     }
     case MANAGER.RESETALL: {
       const decimal = Format.spectraDigit(action.payload.operation.layout);
-      return Object.assign({}, state, { decimal });
+      return Object.assign({}, state, { decimal, isIntensity: true, isAscend: false });
     }
     default:
       return state;
