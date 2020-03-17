@@ -140,6 +140,10 @@ const mapDispatchToProps = dispatch => (
 ViewerLine.propTypes = {
   seed: PropTypes.array.isRequired,
   peak: PropTypes.array.isRequired,
+  freq: PropTypes.oneOfType([
+    PropTypes.bool,
+    PropTypes.number,
+  ]).isRequired,
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
