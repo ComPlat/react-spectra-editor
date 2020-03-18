@@ -7,7 +7,7 @@ import { withStyles } from '@material-ui/core/styles';
 
 import { updateOperation } from './actions/submit';
 import { resetScanAll } from './actions/scan';
-import { resetParamsAll } from './actions/manager';
+import { resetParamsAll, resetInitCommon } from './actions/manager';
 import { updateMetaPeaks } from './actions/meta';
 import LayerPrism from './layer_prism';
 import Format from './helpers/format';
@@ -47,8 +47,10 @@ class LayerInit extends React.Component {
 
   execReset() {
     const {
-      entity, resetScanAllAct, resetParamsAllAct, updateMetaPeaksAct,
+      entity, updateMetaPeaksAct,
+      resetInitCommonAct, resetScanAllAct, resetParamsAllAct,
     } = this.props;
+    resetInitCommonAct();
     const { layout, features } = entity;
     if (Format.isMsLayout(layout)) {
       // const { autoPeak, editPeak } = features; // TBD
@@ -102,6 +104,7 @@ const mapDispatchToProps = dispatch => (
   bindActionCreators({
     resetScanAllAct: resetScanAll,
     resetParamsAllAct: resetParamsAll,
+    resetInitCommonAct: resetInitCommon,
     updateOperationAct: updateOperation,
     updateMetaPeaksAct: updateMetaPeaks,
   }, dispatch)
@@ -117,6 +120,7 @@ LayerInit.propTypes = {
   operations: PropTypes.array.isRequired,
   resetScanAllAct: PropTypes.func.isRequired,
   resetParamsAllAct: PropTypes.func.isRequired,
+  resetInitCommonAct: PropTypes.func.isRequired,
   updateOperationAct: PropTypes.func.isRequired,
   updateMetaPeaksAct: PropTypes.func.isRequired,
 };

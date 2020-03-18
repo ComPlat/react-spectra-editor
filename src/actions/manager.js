@@ -1,5 +1,12 @@
 import { MANAGER } from '../constants/action_type';
 
+const resetInitCommon = payload => (
+  {
+    type: MANAGER.RESETINITCOMMON,
+    payload,
+  }
+);
+
 const resetAll = payload => (
   {
     type: MANAGER.RESETALL,
@@ -15,5 +22,5 @@ const resetParamsAll = payload => (
 );
 
 export {
-  resetAll, resetParamsAll,
+  resetInitCommon, resetAll, resetParamsAll,
 }; // eslint-disable-line
