@@ -1,4 +1,4 @@
-import { SCAN } from '../constants/action_type';
+import { SCAN, MANAGER } from '../constants/action_type';
 
 const initialState = {
   target: false,
@@ -46,7 +46,7 @@ const scanReducer = (state = initialState, action) => {
       return setTarget(state, action.payload);
     case SCAN.TOGGLE_ISAUTO:
       return toggleIsAuto(state);
-    case SCAN.RESET_ALL:
+    case MANAGER.RESET_INIT_MS:
       return resetAll(state, action.payload);
     default:
       return state;

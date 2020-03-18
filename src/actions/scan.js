@@ -14,13 +14,6 @@ const resetScanTarget = () => (
   }
 );
 
-const resetScanAll = payload => (
-  {
-    type: SCAN.RESET_ALL,
-    payload,
-  }
-);
-
 const toggleScanIsAuto = payload => (
   {
     type: SCAN.TOGGLE_ISAUTO,
@@ -29,5 +22,5 @@ const toggleScanIsAuto = payload => (
 );
 
 export {
-  setScanTarget, resetScanTarget, resetScanAll, toggleScanIsAuto,
+  setScanTarget, resetScanTarget, toggleScanIsAuto,
 };

@@ -6,8 +6,7 @@ import { bindActionCreators } from 'redux';
 import { withStyles } from '@material-ui/core/styles';
 
 import { updateOperation } from './actions/submit';
-import { resetScanAll } from './actions/scan';
-import { resetParamsAll, resetInitCommon } from './actions/manager';
+import { resetInitCommon, resetInitNmr, resetInitMs } from './actions/manager';
 import { updateMetaPeaks } from './actions/meta';
 import LayerPrism from './layer_prism';
 import Format from './helpers/format';
@@ -48,7 +47,7 @@ class LayerInit extends React.Component {
   execReset() {
     const {
       entity, updateMetaPeaksAct,
-      resetInitCommonAct, resetScanAllAct, resetParamsAllAct,
+      resetInitCommonAct, resetInitMsAct, resetInitNmrAct,
     } = this.props;
     resetInitCommonAct();
     const { layout, features } = entity;
@@ -57,12 +56,12 @@ class LayerInit extends React.Component {
       const autoPeak = features.autoPeak || features[0];
       const editPeak = features.editPeak || features[0];
       const baseFeat = editPeak || autoPeak;
-      resetScanAllAct(baseFeat);
+      resetInitMsAct(baseFeat);
     }
     if (Format.isNmrLayout(layout)) {
       const { integration, multiplicity } = features;
       updateMetaPeaksAct(entity);
-      resetParamsAllAct({
+      resetInitNmrAct({
         integration, multiplicity,
       });
     }
@@ -102,9 +101,9 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
 
 const mapDispatchToProps = dispatch => (
   bindActionCreators({
-    resetScanAllAct: resetScanAll,
-    resetParamsAllAct: resetParamsAll,
     resetInitCommonAct: resetInitCommon,
+    resetInitNmrAct: resetInitNmr,
+    resetInitMsAct: resetInitMs,
     updateOperationAct: updateOperation,
     updateMetaPeaksAct: updateMetaPeaks,
   }, dispatch)
@@ -118,9 +117,9 @@ LayerInit.propTypes = {
   editorOnly: PropTypes.bool.isRequired,
   forecast: PropTypes.object.isRequired,
   operations: PropTypes.array.isRequired,
-  resetScanAllAct: PropTypes.func.isRequired,
-  resetParamsAllAct: PropTypes.func.isRequired,
   resetInitCommonAct: PropTypes.func.isRequired,
+  resetInitNmrAct: PropTypes.func.isRequired,
+  resetInitMsAct: PropTypes.func.isRequired,
   updateOperationAct: PropTypes.func.isRequired,
   updateMetaPeaksAct: PropTypes.func.isRequired,
 };

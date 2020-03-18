@@ -137,7 +137,7 @@ function* rmUiPeakFromStack(action) {
   });
 }
 
-function* resetParamsAll(action) {
+function* resetInitNmr(action) {
   const { multiplicity } = action.payload;
   const mpySt = yield select(getMultiplicitySt);
 
@@ -214,7 +214,7 @@ const multiplicitySagas = [
   takeEvery(MULTIPLICITY.PEAK_RM_BY_PANEL, rmPanelPeakFromStack),
   takeEvery(MULTIPLICITY.PEAK_RM_BY_UI, rmUiPeakFromStack),
   takeEvery(MULTIPLICITY.RESET_ONE, resetOne),
-  takeEvery(MANAGER.RESETPARAMSALL, resetParamsAll),
+  takeEvery(MANAGER.RESET_INIT_NMR, resetInitNmr),
 ];
 
 export default multiplicitySagas;

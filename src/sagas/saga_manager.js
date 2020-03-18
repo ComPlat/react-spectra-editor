@@ -23,7 +23,7 @@ function* resetShift(action) {
   });
 }
 
-function* resetParamsAll(action) {
+function* resetInitNmr(action) {
   const { integration } = action.payload;
 
   if (integration) {
@@ -36,7 +36,7 @@ function* resetParamsAll(action) {
 
 const managerSagas = [
   takeEvery(MANAGER.RESETALL, resetShift),
-  takeEvery(MANAGER.RESETPARAMSALL, resetParamsAll),
+  takeEvery(MANAGER.RESET_INIT_NMR, resetInitNmr),
 ];
 
 export default managerSagas;

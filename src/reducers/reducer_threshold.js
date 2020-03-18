@@ -13,7 +13,7 @@ const thresholdReducer = (state = initialState, action) => {
       return Object.assign({}, state, { value: action.payload });
     case THRESHOLD.TOGGLE_ISEDIT:
       return Object.assign({}, state, { isEdit: !state.isEdit });
-    case MANAGER.RESETINITCOMMON:
+    case MANAGER.RESET_INIT_COMMON:
       return Object.assign({}, state, { isEdit: true });
     case MANAGER.RESETALL:
       return Object.assign(
