@@ -37,6 +37,9 @@ const MouseMove = (focus) => {
       focus.root.select('.cursor-txt-hz')
         .attr('transform', `translate(${tx},${20})`)
         .text(`${(pt.x * freq).toFixed(3)} Hz`);
+    } else {
+      focus.root.select('.cursor-txt-hz')
+        .text('');
     }
   }
 };
