@@ -110,7 +110,7 @@ class DemoWriteIr extends React.Component {
       const c = m.center;
       const type = m.mpyType;
       const it = Math.round(m.area);
-      const js = m.js.map(j => `J = ${j.toFixed(decimal)} Hz`).join(', ');
+      const js = m.js.map(j => `J = ${j.toFixed(1)} Hz`).join(', ');
       const atomCount = layout === '1H' ? `, ${it}H` : '';
       const location = type === 'm' ? `${m.mxA}–${m.mxB}` : `${c.toFixed(decimal)}`;
       return m.js.length === 0
