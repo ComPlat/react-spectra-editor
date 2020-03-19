@@ -242,7 +242,7 @@ const calcIntgRefArea = (spectra, stack) => {
   const ys = data.y;
   const maxY = Math.max(...ys);
   const xyk = calcXYK(xs, ys, maxY, 0);
-  const { xL, xU, area } = stack[1];
+  const { xL, xU, area } = stack[0];
   const rawArea = getArea(xL, xU, xyk);
   const raw2realRatio = rawArea / area;
   return { raw2realRatio };
