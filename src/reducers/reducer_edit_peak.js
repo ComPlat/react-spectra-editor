@@ -2,6 +2,7 @@ import undoable from 'redux-undo';
 import { EDITPEAK, MANAGER } from '../constants/action_type';
 
 import { undoRedoConfig, undoRedoActions } from './undo_redo_config';
+import { almostEqual } from '../helpers/calc';
 
 const initialState = {
   prevOffset: 0,
@@ -12,16 +13,16 @@ const initialState = {
 const addToPos = (state, action) => {
   const oriPosState = state.pos;
   const oriNegState = state.neg;
-  const idxN = oriNegState.findIndex(n => n.x === action.payload.x);
-  if (idxN >= 0) {
-    const pos = [
-      ...oriPosState.slice(0, idxN),
-      ...oriPosState.slice(idxN + 1),
+  const idxN = oriNegState.findIndex(n => almostEqual(n.x, action.payload.x));
+  if (idxN >= 0) { // rm the peak from oriNegState if it is already deleted.
+    const neg = [
+      ...oriNegState.slice(0, idxN),
+      ...oriNegState.slice(idxN + 1),
     ];
-    return Object.assign({}, state, { pos });
+    return Object.assign({}, state, { neg });
   }
-  const idxP = oriPosState.findIndex(p => p.x === action.payload.x);
-  if (idxP < 0) {
+  const idxP = oriPosState.findIndex(p => almostEqual(p.x, action.payload.x));
+  if (idxP < 0) { // add the peak
     const pos = [...oriPosState, action.payload];
     return Object.assign({}, state, { pos });
   }
