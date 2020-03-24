@@ -36,19 +36,6 @@ const rmFromStack = (state, action) => {
   return Object.assign({}, state, { stack: newStack, smExtext: newSmExtext });
 };
 
-const selectMpyType = (state, action) => {
-  const { mpyType, xExtent } = action.payload;
-  const { stack } = state;
-  const newStack = stack.map((k) => {
-    if (k.xExtent.xL === xExtent.xL && k.xExtent.xU === xExtent.xU) {
-      if (mpyType === 'm') return Object.assign({}, k, { mpyType, js: [] });
-      return Object.assign({}, k, { mpyType });
-    }
-    return k;
-  });
-  return Object.assign({}, state, { stack: newStack });
-};
-
 const updateMpyJ = (state, action) => {
   const { payload } = action;
   const { xExtent, value } = payload;
@@ -90,8 +77,8 @@ const multiplicityReducer = (state = initialState, action) => {
       return action.payload;
     case MULTIPLICITY.UPDATE_J:
       return updateMpyJ(state, action);
-    case MULTIPLICITY.TYPE_SELECT:
-      return selectMpyType(state, action);
+    case MULTIPLICITY.TYPE_SELECT_RDC:
+      return action.payload;
     case MULTIPLICITY.ONE_CLICK:
     case MULTIPLICITY.ONE_CLICK_BY_UI:
       return clickMpyOne(state, action);

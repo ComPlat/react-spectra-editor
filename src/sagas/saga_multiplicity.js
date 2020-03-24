@@ -2,6 +2,7 @@ import { put, takeEvery, select } from 'redux-saga/effects';
 
 import { UI, MULTIPLICITY, MANAGER } from '../constants/action_type';
 import { calcMpyCoup } from '../helpers/calc';
+import { calcMpyJ1, mpyPatterns } from '../helpers/multiplicity';
 
 const getMetaSt = state => state.meta;
 
@@ -208,11 +209,32 @@ function* resetOne(action) {
   });
 }
 
+function* selectMpyType(action) {
+  const mpySt = yield select(getMultiplicitySt);
+  const metaSt = yield select(getMetaSt);
+
+  const { mpyType, xExtent } = action.payload;
+  const { stack } = mpySt;
+  const newStack = stack.map((k) => {
+    if (k.xExtent.xL === xExtent.xL && k.xExtent.xU === xExtent.xU) {
+      if (mpyType === 'm') return Object.assign({}, k, { mpyType, js: [] });
+      if (mpyPatterns.slice(1).indexOf(mpyType) >= 0) return Object.assign({}, k, { mpyType, js: calcMpyJ1(k, metaSt) });  // eslint-disable-line
+      return Object.assign({}, k, { mpyType });
+    }
+    return k;
+  });
+  yield put({
+    type: MULTIPLICITY.TYPE_SELECT_RDC,
+    payload: Object.assign({}, mpySt, { stack: newStack }),
+  });
+}
+
 const multiplicitySagas = [
   takeEvery(UI.SWEEP.SELECT_MULTIPLICITY, selectMpy),
   takeEvery(MULTIPLICITY.PEAK_ADD_BY_UI_SAG, addUiPeakToStack),
   takeEvery(MULTIPLICITY.PEAK_RM_BY_PANEL, rmPanelPeakFromStack),
   takeEvery(MULTIPLICITY.PEAK_RM_BY_UI, rmUiPeakFromStack),
+  takeEvery(MULTIPLICITY.TYPE_SELECT, selectMpyType),
   takeEvery(MULTIPLICITY.RESET_ONE, resetOne),
   takeEvery(MANAGER.RESET_INIT_NMR, resetInitNmr),
 ];

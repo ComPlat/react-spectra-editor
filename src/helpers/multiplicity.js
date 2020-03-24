@@ -1,3 +1,5 @@
+const mpyPatterns = ['s', 'd', 't', 'q', 'quint', 'h', 'sept', 'o', 'n'];
+
 const getInterval = (peaks) => {
   let itvs = [];
   for (let idx = 0; idx < peaks.length - 1; idx += 1) {
@@ -117,4 +119,19 @@ const calcMpyComplat = (origPeaks) => {
   return { type, js };
 };
 
-export { calcMpyComplat }; // eslint-disable-line
+const calcMpyJ1 = (k, metaSt) => {
+  const { observeFrequency } = metaSt.peaks;
+  const freq = observeFrequency || 1.0;
+
+  const { peaks } = k;
+  const pxs = peaks.map(p => p.x).sort((a, b) => b - a);
+  const dxs = pxs.map((x, idx, arr) => idx > 0 && arr[idx - 1] - arr[idx]);
+  const intervals = (dxs.length - 1) || 1;
+  const j1 = freq * dxs.reduce((sum, x) => sum + x) / intervals;
+  return [j1];
+};
+
+export {
+  calcMpyComplat, mpyPatterns,
+  calcMpyJ1,
+};
