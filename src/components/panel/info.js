@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import SvgFileZoomPan from 'react-svg-file-zoom-pan';
 
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
@@ -68,7 +69,7 @@ const styles = () => ({
 });
 
 const InfoPanel = ({
-  classes, expand, feature, layoutSt, shiftNameSt,
+  classes, expand, feature, molSvg, layoutSt, shiftNameSt,
   onExapnd,
 }) => {
   if (!feature) return null;
@@ -118,6 +119,17 @@ const InfoPanel = ({
             )
             : null
         }
+        {
+          !molSvg
+            ? null
+            : (
+              <SvgFileZoomPan
+                svg={molSvg}
+                duration={300}
+                resize
+              />
+            )
+        }
       </div>
     </ExpansionPanel>
   );
@@ -139,6 +151,7 @@ InfoPanel.propTypes = {
   classes: PropTypes.object.isRequired,
   expand: PropTypes.bool.isRequired,
   feature: PropTypes.object.isRequired,
+  molSvg: PropTypes.string.isRequired,
   layoutSt: PropTypes.string.isRequired,
   shiftNameSt: PropTypes.string.isRequired,
   onExapnd: PropTypes.func.isRequired,

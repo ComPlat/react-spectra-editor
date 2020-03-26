@@ -24,7 +24,7 @@ sagaMiddleware.run(sagas);
 
 // - - - React - - -
 const SpectraEditor = ({
-  entity, cLabel, xLabel, yLabel, operations, forecast, editorOnly,
+  entity, cLabel, xLabel, yLabel, operations, forecast, molSvg, editorOnly,
 }) => (
   <Provider store={store}>
     <LayerInit
@@ -34,6 +34,7 @@ const SpectraEditor = ({
       yLabel={yLabel}
       forecast={forecast}
       operations={operations}
+      molSvg={molSvg}
       editorOnly={editorOnly}
     />
   </Provider>
@@ -46,6 +47,7 @@ SpectraEditor.propTypes = {
   yLabel: PropTypes.string,
   forecast: PropTypes.object,
   operations: PropTypes.array,
+  molSvg: PropTypes.string,
   editorOnly: PropTypes.bool,
 };
 
@@ -55,6 +57,7 @@ SpectraEditor.defaultProps = {
   yLabel: '',
   forecast: {},
   operations: [],
+  molSvg: '',
   editorOnly: false,
 };
 

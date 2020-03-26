@@ -50,7 +50,9 @@ class PanelViewer extends React.Component {
 
   render() {
     const { expand } = this.state;
-    const { classes, feature, layoutSt } = this.props;
+    const {
+      classes, feature, molSvg, layoutSt,
+    } = this.props;
     const onExapndInfo = () => this.onExapnd('info');
     const onExapndPeak = () => this.onExapnd('peak');
     const onExapndMpy = () => this.onExapnd('mpy');
@@ -63,6 +65,7 @@ class PanelViewer extends React.Component {
           <InfoPanel
             feature={feature}
             expand={expand === 'info'}
+            molSvg={molSvg}
             onExapnd={onExapndInfo}
           />
           { Cfg.hidePanelPeak(layoutSt) ? null : <PeakPanel expand={expand === 'peak'} onExapnd={onExapndPeak} /> }
@@ -87,6 +90,7 @@ const mapDispatchToProps = dispatch => (
 PanelViewer.propTypes = {
   classes: PropTypes.object.isRequired,
   feature: PropTypes.object.isRequired,
+  molSvg: PropTypes.string.isRequired,
   layoutSt: PropTypes.string.isRequired,
 };
 

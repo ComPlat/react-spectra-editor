@@ -16,7 +16,7 @@ const styles = () => ({
 });
 
 const LayerPrism = ({
-  entity, cLabel, xLabel, yLabel, operations, forecast, editorOnly,
+  entity, cLabel, xLabel, yLabel, operations, forecast, molSvg, editorOnly,
   thresSt, scanSt, uiSt,
 }) => {
   const { topic, feature, hasEdit } = extractParams(entity, thresSt, scanSt);
@@ -75,6 +75,7 @@ const LayerPrism = ({
           <Grid item xs={3} align="center">
             <PanelViewer
               feature={feature}
+              molSvg={molSvg}
             />
           </Grid>
         </Grid>
@@ -101,6 +102,7 @@ LayerPrism.propTypes = {
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
+  molSvg: PropTypes.string.isRequired,
   editorOnly: PropTypes.bool.isRequired,
   forecast: PropTypes.object.isRequired,
   operations: PropTypes.array.isRequired,

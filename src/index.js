@@ -14,6 +14,7 @@ import ramanJcamp from './__tests__/fixtures/raman_jcamp';
 import msJcamp from './__tests__/fixtures/ms_jcamp';
 import nmrResult from './__tests__/fixtures/nmr_result';
 import irResult from './__tests__/fixtures/ir_result';
+import Phenylalanin from './__tests__/fixtures/phenylalanin';
 import './__tests__/style/svg.css';
 
 const nmr1HEntity = FN.ExtractJcamp(nmr1HJcamp);
@@ -211,7 +212,9 @@ class DemoWriteIr extends React.Component {
   }
 
   render() {
-    const { desc, predictions, molecule } = this.state;
+    const {
+      desc, predictions, molecule, typ,
+    } = this.state;
     const entity = this.loadEntity();
 
     let operations = [
@@ -232,6 +235,8 @@ class DemoWriteIr extends React.Component {
       molecule: molecule,
       predictions,
     }
+
+    const molSvg = ['nmr 1h', 'ir'].indexOf(typ) >= 0 ? Phenylalanin.path : '';
 
     return (
       <div style={{ width: Math.round(window.innerWidth * 0.96) }}>
@@ -284,6 +289,7 @@ class DemoWriteIr extends React.Component {
           forecast={forecast}
           operations={operations}
           style={{ fontFamily: 'Helvetica' }}
+          molSvg={molSvg}
           editorOnly={false}
         />
         <Grid container>
