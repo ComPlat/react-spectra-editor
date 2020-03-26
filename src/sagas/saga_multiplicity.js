@@ -219,7 +219,7 @@ function* selectMpyType(action) {
     if (k.xExtent.xL === xExtent.xL && k.xExtent.xU === xExtent.xU) {
       if (mpyType === 'm') return Object.assign({}, k, { mpyType, js: [] });
       if (mpyPatterns.slice(1).indexOf(mpyType) >= 0) return Object.assign({}, k, { mpyType, js: calcMpyJ1(k, metaSt) });  // eslint-disable-line
-      return Object.assign({}, k, { mpyType });
+      return Object.assign({}, k, { mpyType, js: [] });
     }
     return k;
   });
