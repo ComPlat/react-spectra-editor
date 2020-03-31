@@ -33,7 +33,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "compile": "rm -rf dist && NODE_ENV=production babel --ignore tests,stories ./src --out-dir ./dist",
-    "test": "react-scripts test --env=jsdom",
+    "test": "react-scripts test --env=jsdom --verbose --testPathIgnorePatterns=./src/__tests__/fixtures/",
     "eject": "react-scripts eject",
     "storybook": "start-storybook -p 3001 -c .storybook",
     "buildbook": "build-storybook -c .storybook -o .out"

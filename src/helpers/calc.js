@@ -1,4 +1,10 @@
 import JAnalyzer from '../third_party/jAnalyzer';
+import {
+  getInterval,
+  verifyTypeT, verifyTypeQ, verifyTypeQuint, verifyTypeH,
+  verifyTypeSept, verifyTypeO,
+  verifyTypePeakCount,
+} from './multiplicity';
 
 const centerX = (ps, shift) => {
   const pxs = ps.map(p => p.x).sort((a, b) => a - b);
@@ -49,9 +55,9 @@ const calcPeakWidth = (x, metaSt) => {
 
 const calcMpyCoup = (pks, metaSt) => {
   if (pks.length === 0) return { type: '', js: '' };
-  const sortPks = pks.sort((a, b) => b.x - a.x);
+  const orderPks = pks.sort((a, b) => b.x - a.x);
   const { observeFrequency } = metaSt.peaks;
-  const peaks = sortPks.map(p => (
+  const peaks = orderPks.map(p => (
     {
       x: p.x,
       intensity: p.y,
@@ -68,37 +74,19 @@ const calcMpyCoup = (pks, metaSt) => {
   JAnalyzer.compilePattern(signal);
   const type = signal.multiplicity;
   const js = signal.nmrJs ? signal.nmrJs.map(j => j.coupling).sort() : [];
-  const isBasicWrong = (type === 's' && peaks.length > 1)
-    || (type === 'd' && peaks.length > 2)
-    || (type === 't' && peaks.length > 3)
-    || (type === 'q' && peaks.length > 4)
-    || (type === 'quint' && peaks.length > 5)
-    || (type === 'h' && peaks.length > 6)
-    || (type === 'sept' && peaks.length > 7)
-    || (type === 'o' && peaks.length > 8)
-    || (type === 'n' && peaks.length > 9);
-  let limit = 1;
-  let mStr = type;
-  limit *= 5 ** (mStr.match(/quint/g) || []).length;
-  mStr = mStr.replace(/quint/g, '');
-  limit *= 7 ** (mStr.match(/sept/g) || []).length;
-  mStr = mStr.replace(/sept/g, '');
-  limit *= 2 ** (mStr.match(/d/g) || []).length;
-  mStr = mStr.replace(/d/g, '');
-  limit *= 3 ** (mStr.match(/t/g) || []).length;
-  mStr = mStr.replace(/t/g, '');
-  limit *= 4 ** (mStr.match(/q/g) || []).length;
-  mStr = mStr.replace(/q/g, '');
-  limit *= 6 ** (mStr.match(/h/g) || []).length;
-  mStr = mStr.replace(/h/g, '');
-  limit *= 8 ** (mStr.match(/o/g) || []).length;
-  mStr = mStr.replace(/o/g, '');
-  limit *= 9 ** (mStr.match(/n/g) || []).length;
-  mStr = mStr.replace(/n/g, '');
-  const isAdvanWrong = peaks.length > limit;
-  if (isBasicWrong || isAdvanWrong) {
-    return { type: 'm', js: [] };
-  }
+
+  const isTPCMatch = verifyTypePeakCount(type, peaks);
+  if (!isTPCMatch) return { type: 'm', js: [] };
+
+  if (['s', 'm'].indexOf(type) >= 0) return { type, js };
+
+  const oivs = getInterval(orderPks);
+  if (type === 't') return verifyTypeT(type, js, oivs, metaSt);
+  if (type === 'q') return verifyTypeQ(type, js, oivs, metaSt);
+  if (type === 'quint') return verifyTypeQuint(type, js, oivs, metaSt);
+  if (type === 'h') return verifyTypeH(type, js, oivs, metaSt);
+  if (type === 'sept') return verifyTypeSept(type, js, oivs, metaSt);
+  if (type === 'o') return verifyTypeO(type, js, oivs, metaSt);
   return { type, js };
 };
 
