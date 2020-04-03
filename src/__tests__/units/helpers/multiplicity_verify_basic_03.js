@@ -1,11 +1,11 @@
-import { verifyTypeQuint } from '../../../helpers/multiplicity';
+import { verifyTypeT } from '../../../helpers/multiplicity_verify_basic';
 
 const deltaX = 0.0003;
 const observeFrequency = 400;
 
 describe('Multiplicity', () => {
-  describe('Type Quint', () => {
-    const type = 'quint';
+  describe('Type T', () => {
+    const type = 't';
     const js = [10 * deltaX * observeFrequency];
     const metaSt = {
       peaks: {
@@ -14,44 +14,44 @@ describe('Multiplicity', () => {
       },
     };
 
-    describe('has < 4 intervals', () => {
+    describe('has < 2 intervals', () => {
+      const rfv = 5 * deltaX;
+
+      test('return m', () => {
+        const oivs = [rfv];
+        const output = verifyTypeT(type, js, oivs, metaSt);
+        expect(output.type).toEqual('m');
+        expect(output.js.length).toEqual(0);
+      });
+    });
+    describe('has > 2 intervals', () => {
       const rfv = 5 * deltaX;
 
       test('return m', () => {
         const oivs = [rfv, rfv, rfv];
-        const output = verifyTypeQuint(type, js, oivs, metaSt);
+        const output = verifyTypeT(type, js, oivs, metaSt);
         expect(output.type).toEqual('m');
         expect(output.js.length).toEqual(0);
       });
     });
-    describe('has > 4 intervals', () => {
-      const rfv = 5 * deltaX;
-
-      test('return m', () => {
-        const oivs = [rfv, rfv, rfv, rfv, rfv];
-        const output = verifyTypeQuint(type, js, oivs, metaSt);
-        expect(output.type).toEqual('m');
-        expect(output.js.length).toEqual(0);
-      });
-    });
-    describe('has = 4 intervals', () => {
+    describe('has = 2 intervals', () => {
       describe('~ 5 * deltaX', () => {
         const rfv = 5 * deltaX;
 
         describe('< tolerance', () => {
-          test('return quint', () => {
+          test('return t', () => {
             const iv = rfv - 2.1 * deltaX;
-            const oivs = [rfv, iv, iv, iv];
-            const output = verifyTypeQuint(type, js, oivs, metaSt);
-            expect(output.type).toEqual('quint');
+            const oivs = [rfv, iv];
+            const output = verifyTypeT(type, js, oivs, metaSt);
+            expect(output.type).toEqual('t');
             expect(output.js.length).toEqual(1);
           });
         });
         describe('>= tolerance', () => {
           test('return m', () => {
             const iv = rfv - 2.2 * deltaX;
-            const oivs = [rfv, iv, iv, iv];
-            const output = verifyTypeQuint(type, js, oivs, metaSt);
+            const oivs = [rfv, iv];
+            const output = verifyTypeT(type, js, oivs, metaSt);
             expect(output.type).toEqual('m');
             expect(output.js.length).toEqual(0);
           });
@@ -62,19 +62,19 @@ describe('Multiplicity', () => {
         const rfv = 50 * deltaX;
 
         describe('< tolerance', () => {
-          test('return quint', () => {
+          test('return t', () => {
             const iv = rfv * 0.84;
-            const oivs = [rfv, iv, iv, iv];
-            const output = verifyTypeQuint(type, js, oivs, metaSt);
-            expect(output.type).toEqual('quint');
+            const oivs = [rfv, iv];
+            const output = verifyTypeT(type, js, oivs, metaSt);
+            expect(output.type).toEqual('t');
             expect(output.js.length).toEqual(1);
           });
         });
         describe('>= tolerance', () => {
           test('return m', () => {
             const iv = rfv * 0.83;
-            const oivs = [rfv, iv, iv, iv];
-            const output = verifyTypeQuint(type, js, oivs, metaSt);
+            const oivs = [rfv, iv];
+            const output = verifyTypeT(type, js, oivs, metaSt);
             expect(output.type).toEqual('m');
             expect(output.js.length).toEqual(0);
           });

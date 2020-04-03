@@ -1,4 +1,4 @@
-import { verifyTypeSept } from '../../../helpers/multiplicity';
+import { verifyTypeSept } from '../../../helpers/multiplicity_verify_basic';
 
 const deltaX = 0.0003;
 const observeFrequency = 400;

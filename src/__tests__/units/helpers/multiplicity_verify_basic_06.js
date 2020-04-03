@@ -1,4 +1,4 @@
-import { verifyTypeH } from '../../../helpers/multiplicity';
+import { verifyTypeH } from '../../../helpers/multiplicity_verify_basic';
 
 const deltaX = 0.0003;
 const observeFrequency = 400;

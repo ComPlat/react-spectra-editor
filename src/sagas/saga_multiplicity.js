@@ -1,7 +1,7 @@
 import { put, takeEvery, select } from 'redux-saga/effects';
 
 import { UI, MULTIPLICITY, MANAGER } from '../constants/action_type';
-import { calcMpyCoup } from '../helpers/calc';
+import { calcMpyCoup } from '../helpers/multiplicity_calc';
 import { calcMpyJ1, mpyPatterns } from '../helpers/multiplicity';
 
 const getMetaSt = state => state.meta;

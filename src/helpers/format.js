@@ -1,6 +1,6 @@
 import { ToXY, IsSame } from './converter';
 import { LIST_LAYOUT } from '../constants/list_layout';
-import { calcMpyCenter } from './calc';
+import { calcMpyCenter } from './multiplicity_calc';
 
 const spectraDigit = (layout) => {
   switch (layout) {

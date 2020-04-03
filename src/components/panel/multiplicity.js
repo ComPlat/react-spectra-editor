@@ -25,7 +25,7 @@ import {
 } from '../../actions/multiplicity';
 import MpySelect from './multiplicity_select';
 import MpyCoupling from './multiplicity_coupling';
-import { calcMpyCenter, calcJStr } from '../../helpers/calc';
+import { calcMpyCenter, calcMpyJStr } from '../../helpers/multiplicity_calc';
 
 const styles = theme => ({
   panel: {
@@ -137,7 +137,7 @@ const createData = (
     onRefresh,
     peaks,
     center: calcMpyCenter(peaks, shift, mpyType),
-    jStr: calcJStr(js),
+    jStr: calcMpyJStr(js),
     mpyType,
     isCheck: (smExtext.xL === xExtent.xL && smExtext.xU === xExtent.xU),
   }

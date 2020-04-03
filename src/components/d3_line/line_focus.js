@@ -10,7 +10,8 @@ import MountBrush from '../../helpers/brush';
 import { TfRescale, MountCompass } from '../../helpers/compass';
 import { PksEdit } from '../../helpers/converter';
 import { itgIdTag, mpyIdTag } from '../../helpers/focus';
-import { calcMpyCenter, calcArea } from '../../helpers/calc';
+import { calcArea } from '../../helpers/integration';
+import { calcMpyCenter } from '../../helpers/multiplicity_calc';
 import Format from '../../helpers/format';
 import Cfg from '../../helpers/cfg';
 

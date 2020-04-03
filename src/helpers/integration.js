@@ -11,4 +11,8 @@ const getArea = (xL, xU, data) => {
   return Math.abs(data[iU].k - data[iL].k);
 };
 
-export { getArea };  // eslint-disable-line
+const calcArea = (d, refArea, refFactor) => (
+  (d.area * refFactor / refArea).toFixed(2)
+);
+
+export { getArea, calcArea };  // eslint-disable-line
