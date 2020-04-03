@@ -2,7 +2,7 @@ import { put, takeEvery, select } from 'redux-saga/effects';
 
 import { UI, MULTIPLICITY, MANAGER } from '../constants/action_type';
 import { calcMpyCoup } from '../helpers/multiplicity_calc';
-import { calcMpyJ1, mpyPatterns } from '../helpers/multiplicity';
+import { calcMpyManual } from '../helpers/multiplicity_manual';
 
 const getMetaSt = state => state.meta;
 
@@ -216,11 +216,8 @@ function* selectMpyType(action) {
   const { mpyType, xExtent } = action.payload;
   const { stack } = mpySt;
   const newStack = stack.map((k) => {
-    if (k.xExtent.xL === xExtent.xL && k.xExtent.xU === xExtent.xU) {
-      if (mpyType === 'm') return Object.assign({}, k, { mpyType, js: [] });
-      if (mpyPatterns.slice(1).indexOf(mpyType) >= 0) return Object.assign({}, k, { mpyType, js: calcMpyJ1(k, metaSt) });  // eslint-disable-line
-      return Object.assign({}, k, { mpyType, js: [] });
-    }
+    const isTargetStack = k.xExtent.xL === xExtent.xL && k.xExtent.xU === xExtent.xU;
+    if (isTargetStack) return calcMpyManual(k, mpyType, metaSt);
     return k;
   });
   yield put({

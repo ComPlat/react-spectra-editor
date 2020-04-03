@@ -1,4 +1,4 @@
-const mpyPatterns = ['s', 'd', 't', 'q', 'quint', 'h', 'sept', 'o', 'n'];
+const mpyBasicPatterns = ['s', 'd', 't', 'q', 'quint', 'h', 'sept', 'o', 'n'];
 
 const getInterval = (peaks) => {
   let itvs = [];
@@ -30,5 +30,5 @@ const groupInterval = (itvs) => {
 };
 
 export {
-  mpyPatterns, getInterval, groupInterval,
+  mpyBasicPatterns, getInterval, groupInterval,
 };
