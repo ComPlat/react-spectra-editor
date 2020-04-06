@@ -8029,9 +8029,10 @@ iterate-value@^1.0.0:
     es-get-iterator "^1.0.2"
     iterate-iterator "^1.0.1"
 
-"jcampconverter@https://github.com/cheminfo-js/jcampconverter.git":
+jcampconverter@4.1.0:
   version "4.1.0"
-  resolved "https://github.com/cheminfo-js/jcampconverter.git#db88766cf5e8ee725734e8b1c3a3c45ebdbe31be"
+  resolved "https://registry.yarnpkg.com/jcampconverter/-/jcampconverter-4.1.0.tgz#c6d704ea05cbd47ae1482811c3bb83834dd2de5a"
+  integrity sha512-BtNgFjW49AFi9hQYz89CGYkwoxM7BojJ4pPoer5IZQbYpBmUGNY5B2Eg0UK2pV64C81D+hHdJYjh0gTLEX3fhg==
 
 jest-changed-files@^23.4.2:
   version "23.4.2"

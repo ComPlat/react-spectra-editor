@@ -1,6 +1,6 @@
 {
   "name": "react-spectra-editor",
-  "version": "0.6.46",
+  "version": "0.6.49",
   "description": "An editor to View and Edit Chemical Spectra data (NMR, IR and MS).",
   "repository": {
     "type": "git",
@@ -17,7 +17,7 @@
     "d3": "^5.5.0",
     "d3-selection": "^1.3.0",
     "d3-tip": "^0.9.1",
-    "jcampconverter": "https://github.com/cheminfo-js/jcampconverter.git",
+    "jcampconverter": "4.1.0",
     "ml-savitzky-golay-generalized": "1.1.1",
     "prop-types": "^15.6.2",
     "react-redux": "^5.0.7",
