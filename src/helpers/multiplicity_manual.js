@@ -84,6 +84,7 @@ const calcMpyManual = (k, mpyType, metaSt) => {
   const { observeFrequency } = metaSt.peaks;
   const freq = observeFrequency || 1.0;
   const ivs = getInterval(k.peaks);
+  if (ivs.length === 0) return Object.assign({}, k, { mpyType, js: [] });
   if (isTypeM(mpyType)) return outputTypeM(k);
   if (isTypeBasic(mpyType)) return outputTypeBasic(k, mpyType, ivs, freq);
   if (mpyType === 'dd') return outputTypeDD(k, mpyType, ivs, freq);
