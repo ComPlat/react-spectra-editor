@@ -15,6 +15,7 @@ import msJcamp from './__tests__/fixtures/ms_jcamp';
 import nmrResult from './__tests__/fixtures/nmr_result';
 import irResult from './__tests__/fixtures/ir_result';
 import Phenylalanin from './__tests__/fixtures/phenylalanin';
+import { q1H, qIR, q13C } from './__tests__/fixtures/qDescValue';
 import './__tests__/style/svg.css';
 
 const nmr1HEntity = FN.ExtractJcamp(nmr1HJcamp);
@@ -44,6 +45,7 @@ class DemoWriteIr extends React.Component {
     this.predictOp = this.predictOp.bind(this);
     this.updatInput = this.updatInput.bind(this);
     this.loadEntity = this.loadEntity.bind(this);
+    this.loadQuill = this.loadQuill.bind(this);
   }
 
   onClick(typ) {
@@ -211,11 +213,29 @@ class DemoWriteIr extends React.Component {
     }
   }
 
+  loadQuill() {
+    const { typ } = this.state;
+    switch (typ) {
+      case 'nmr 1h':
+        return q1H;
+      case 'nmr 13c':
+        return q13C;
+      case 'ir':
+        return qIR;
+      case 'nmr 19f':
+      case 'raman':
+      case 'ms':
+      default:
+        return false;
+    }
+  }
+
   render() {
     const {
       desc, predictions, molecule, typ,
     } = this.state;
     const entity = this.loadEntity();
+    const qDescVal = this.loadQuill();
 
     let operations = [
       { name: 'write peaks', value: this.writePeak },
@@ -288,6 +308,7 @@ class DemoWriteIr extends React.Component {
           entity={entity}
           forecast={forecast}
           operations={operations}
+          descriptions={qDescVal}
           style={{ fontFamily: 'Helvetica' }}
           molSvg={molSvg}
           editorOnly={false}

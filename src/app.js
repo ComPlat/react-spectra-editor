@@ -22,9 +22,15 @@ const store = compose(
 
 sagaMiddleware.run(sagas);
 
+// - - - helper - - -
+const ensureQuillDelta = (descs) => {
+  const isArr = Array.isArray(descs);
+  return isArr ? descs : [{ insert: descs }];
+};
+
 // - - - React - - -
 const SpectraEditor = ({
-  entity, cLabel, xLabel, yLabel, operations, forecast, molSvg, editorOnly,
+  entity, cLabel, xLabel, yLabel, operations, forecast, molSvg, editorOnly, descriptions,
 }) => (
   <Provider store={store}>
     <LayerInit
@@ -34,6 +40,7 @@ const SpectraEditor = ({
       yLabel={yLabel}
       forecast={forecast}
       operations={operations}
+      descriptions={ensureQuillDelta(descriptions)}
       molSvg={molSvg}
       editorOnly={editorOnly}
     />
@@ -47,6 +54,10 @@ SpectraEditor.propTypes = {
   yLabel: PropTypes.string,
   forecast: PropTypes.object,
   operations: PropTypes.array,
+  descriptions: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.array,
+  ]),
   molSvg: PropTypes.string,
   editorOnly: PropTypes.bool,
 };
@@ -57,6 +68,7 @@ SpectraEditor.defaultProps = {
   yLabel: '',
   forecast: {},
   operations: [],
+  descriptions: [],
   molSvg: '',
   editorOnly: false,
 };

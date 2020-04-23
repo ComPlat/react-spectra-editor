@@ -74,7 +74,8 @@ class LayerInit extends React.Component {
 
   render() {
     const {
-      entity, cLabel, xLabel, yLabel, operations, forecast, molSvg, editorOnly,
+      entity, cLabel, xLabel, yLabel, forecast, operations,
+      descriptions, molSvg, editorOnly,
     } = this.props;
     const target = entity.spectra[0];
 
@@ -89,6 +90,7 @@ class LayerInit extends React.Component {
         yLabel={yyLabel}
         forecast={forecast}
         operations={operations}
+        descriptions={descriptions}
         molSvg={molSvg}
         editorOnly={editorOnly}
       />
@@ -119,6 +121,7 @@ LayerInit.propTypes = {
   editorOnly: PropTypes.bool.isRequired,
   forecast: PropTypes.object.isRequired,
   operations: PropTypes.array.isRequired,
+  descriptions: PropTypes.array.isRequired,
   resetInitCommonAct: PropTypes.func.isRequired,
   resetInitNmrAct: PropTypes.func.isRequired,
   resetInitMsAct: PropTypes.func.isRequired,

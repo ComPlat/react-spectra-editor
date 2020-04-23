@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import SvgFileZoomPan from 'react-svg-file-zoom-pan';
+import ReactQuill from 'react-quill';
 
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
@@ -66,10 +67,19 @@ const styles = () => ({
     fontFamily: 'Helvetica',
     marginRight: 3,
   },
+  quill: {
+    backgroundColor: '#fafafa',
+    border: '1px solid #eee',
+    fontSize: '0.8rem',
+    fontFamily: 'Helvetica',
+    padding: '0 10px 0 10px',
+    textAlign: 'left',
+  },
 });
 
 const InfoPanel = ({
-  classes, expand, feature, molSvg, layoutSt, shiftNameSt,
+  classes, expand, feature, molSvg, descriptions,
+  layoutSt, shiftNameSt,
   onExapnd,
 }) => {
   if (!feature) return null;
@@ -131,6 +141,12 @@ const InfoPanel = ({
             )
         }
       </div>
+      <ReactQuill
+        className={classNames(classes.quill)}
+        value={descriptions}
+        modules={{ toolbar: false }}
+        readOnly
+      />
     </ExpansionPanel>
   );
 };
@@ -152,6 +168,7 @@ InfoPanel.propTypes = {
   expand: PropTypes.bool.isRequired,
   feature: PropTypes.object.isRequired,
   molSvg: PropTypes.string.isRequired,
+  descriptions: PropTypes.array.isRequired,
   layoutSt: PropTypes.string.isRequired,
   shiftNameSt: PropTypes.string.isRequired,
   onExapnd: PropTypes.func.isRequired,
