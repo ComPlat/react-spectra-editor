@@ -14,6 +14,7 @@ import { calcArea } from '../../helpers/integration';
 import { calcMpyCenter } from '../../helpers/multiplicity_calc';
 import Format from '../../helpers/format';
 import Cfg from '../../helpers/cfg';
+import { LIST_LAYOUT } from '../../constants/list_layout';
 
 class LineFocus {
   constructor(props) {
@@ -57,6 +58,7 @@ class LineFocus {
     this.currentExtent = null;
     this.shouldUpdate = {};
     this.freq = false;
+    this.layout = LIST_LAYOUT.H1;
 
     this.getShouldUpdate = this.getShouldUpdate.bind(this);
     this.resetShouldUpdate = this.resetShouldUpdate.bind(this);
@@ -77,7 +79,7 @@ class LineFocus {
     this.isFirefox = typeof InstallTrigger !== 'undefined';
   }
 
-  getShouldUpdate(nextEpSt, nextLySt, nextItSt, nextMySt) {
+  getShouldUpdate(nextEpSt, nextItSt, nextMySt) {
     const {
       prevXt, prevYt, prevEpSt, prevLySt, prevItSt, prevMySt,
       prevTePt, prevDtPk, prevSfPk, prevData,
@@ -85,7 +87,7 @@ class LineFocus {
     const { xt, yt } = TfRescale(this);
     const sameXY = xt(1.1) === prevXt && prevYt === yt(1.1);
     const sameEpSt = prevEpSt === nextEpSt;
-    const sameLySt = prevLySt === nextLySt;
+    const sameLySt = prevLySt === this.layout;
     const sameItSt = prevItSt === nextItSt;
     const sameMySt = prevMySt === nextMySt;
     const sameTePt = prevTePt === this.tTrEndPts.length;
@@ -103,7 +105,7 @@ class LineFocus {
     );
   }
 
-  resetShouldUpdate(prevEpSt, prevLySt, prevItSt, prevMySt) {
+  resetShouldUpdate(prevEpSt, prevItSt, prevMySt) {
     const { xt, yt } = TfRescale(this);
     const prevXt = xt(1.1);
     const prevYt = yt(1.1);
@@ -111,6 +113,7 @@ class LineFocus {
     const prevDtPk = this.dataPks.length;
     const prevSfPk = this.tSfPeaks.length;
     const prevData = this.data.length;
+    const prevLySt = this.layout;
     this.shouldUpdate = Object.assign(
       {},
       this.shouldUpdate,
@@ -121,17 +124,18 @@ class LineFocus {
     );
   }
 
-  setTip(typ) {
-    this.tip = InitTip(typ);
+  setTip() {
+    this.tip = InitTip();
     this.root.call(this.tip);
   }
 
-  setDataParams(data, peaks, tTrEndPts, tSfPeaks, freq) {
+  setDataParams(data, peaks, tTrEndPts, tSfPeaks, freq, layout) {
     this.data = [...data];
     this.dataPks = [...peaks];
     this.tTrEndPts = tTrEndPts;
     this.tSfPeaks = tSfPeaks;
     this.freq = freq;
+    this.layout = layout;
   }
 
   updatePathCall(xt, yt) {
@@ -260,19 +264,21 @@ class LineFocus {
           .attr('stroke-opacity', '1.0');
         d3.select(`#bpt${Math.round(1000 * d.x)}`)
           .style('fill', 'blue');
-        this.tip.show(d, n[i]);
+        const tipParams = { d, layout: this.layout };
+        this.tip.show(tipParams, n[i]);
       })
       .on('mouseout', (d, i, n) => {
         d3.select(`#mpp${Math.round(1000 * d.x)}`)
           .attr('stroke-opacity', '0.0');
         d3.select(`#bpt${Math.round(1000 * d.x)}`)
           .style('fill', 'red');
-        this.tip.hide(d, n[i]);
+        const tipParams = { d, layout: this.layout };
+        this.tip.hide(tipParams, n[i]);
       })
       .on('click', d => this.onClickTarget(d));
   }
 
-  drawInteg(layoutSt, integationSt) {
+  drawInteg(integationSt) {
     const {
       sameXY, sameLySt, sameItSt, sameData,
     } = this.shouldUpdate;
@@ -280,7 +286,7 @@ class LineFocus {
     const {
       stack, refArea, refFactor, shift,
     } = integationSt;
-    const isDisable = Cfg.btnCmdIntg(layoutSt);
+    const isDisable = Cfg.btnCmdIntg(this.layout);
     const itgs = isDisable ? [] : stack;
 
     const igbp = this.tags.igbPath.selectAll('path').data(itgs);
@@ -410,13 +416,13 @@ class LineFocus {
   }
 
 
-  drawMtply(layoutSt, mtplySt) {
+  drawMtply(mtplySt) {
     const { sameXY, sameLySt, sameMySt } = this.shouldUpdate;
     if (sameXY && sameLySt && sameMySt) return;
 
     const { stack, smExtext, shift } = mtplySt;
     const mpys = stack;
-    const isDisable = Cfg.btnCmdMpy(layoutSt);
+    const isDisable = Cfg.btnCmdMpy(this.layout);
     if (mpys === 0 || isDisable) return;
     // rescale for zoom
     const { xt } = TfRescale(this);
@@ -607,7 +613,7 @@ class LineFocus {
       .on('click', d => this.onClickTarget(d));
   }
 
-  drawRef(layoutSt) {
+  drawRef() {
     // rescale for zoom
     const { xt, yt } = TfRescale(this);
 
@@ -624,7 +630,7 @@ class LineFocus {
       { x: 4, y: -20 },
       { x: 0.5, y: 10 },
     ];
-    const faktor = Format.isIrLayout(layoutSt) ? -1 : 1;
+    const faktor = Format.isIrLayout(this.layout) ? -1 : 1;
     const lineSymbol = d3.line()
       .x(d => d.x)
       .y(d => faktor * d.y)(linePath);
@@ -649,8 +655,8 @@ class LineFocus {
     MountClip(this);
 
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
-    this.setTip(layoutSt);
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq);
+    this.setTip();
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt);
     MountCompass(this);
 
     this.axis = MountAxis(this);
@@ -667,13 +673,13 @@ class LineFocus {
       this.drawLine();
       this.drawThres();
       this.drawGrid();
-      this.drawRef(layoutSt);
+      this.drawRef();
       this.drawPeaks(editPeakSt);
-      this.drawInteg(layoutSt, integationSt);
-      this.drawMtply(layoutSt, mtplySt);
+      this.drawInteg(integationSt);
+      this.drawMtply(mtplySt);
     }
     MountBrush(this, isUiAddIntgSt, isUiNoBrushSt);
-    this.resetShouldUpdate(editPeakSt, layoutSt, integationSt, mtplySt);
+    this.resetShouldUpdate(editPeakSt, integationSt, mtplySt);
   }
 
   update({
@@ -682,21 +688,21 @@ class LineFocus {
     sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
   }) {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt);
 
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);
-      this.getShouldUpdate(editPeakSt, layoutSt, integationSt, mtplySt);
+      this.getShouldUpdate(editPeakSt, integationSt, mtplySt);
       this.drawLine();
       this.drawThres();
       this.drawGrid();
-      this.drawRef(layoutSt);
+      this.drawRef();
       this.drawPeaks(editPeakSt);
-      this.drawInteg(layoutSt, integationSt);
-      this.drawMtply(layoutSt, mtplySt);
+      this.drawInteg(integationSt);
+      this.drawMtply(mtplySt);
     }
     MountBrush(this, isUiAddIntgSt, isUiNoBrushSt);
-    this.resetShouldUpdate(editPeakSt, layoutSt, integationSt, mtplySt);
+    this.resetShouldUpdate(editPeakSt, integationSt, mtplySt);
   }
 }
 

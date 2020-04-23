@@ -49,6 +49,7 @@ class RectFocus {
     this.tip = null;
     this.factor = 0.125;
     this.currentExtent = null;
+    this.layout = LIST_LAYOUT.MS;
 
     this.setTip = this.setTip.bind(this);
     this.setDataParams = this.setDataParams.bind(this);
@@ -62,8 +63,8 @@ class RectFocus {
     this.isFirefox = typeof InstallTrigger !== 'undefined';
   }
 
-  setTip(typ) {
-    this.tip = InitTip(typ);
+  setTip() {
+    this.tip = InitTip();
     this.root.call(this.tip);
   }
 
@@ -136,12 +137,27 @@ class RectFocus {
       .append('rect')
       .attr('class', 'enter-bar')
       .attr('width', 1.5)
-      .on('mouseover', this.tip.show)
-      .on('mouseout', this.tip.hide)
       .merge(bars)
       .attr('fill', d => this.barColor(d.y, yRef))
       .attr('height', d => this.posHeight(gnd, yt(d.y)))
-      .attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y)})`);
+      .attr('id', d => `mpp${Math.round(1000 * d.x)}`)
+      .attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y)})`)
+      .on('mouseover', (d, i, n) => {
+        d3.select(`#mpp${Math.round(1000 * d.x)}`)
+          .attr('stroke-opacity', '1.0');
+        d3.select(`#bpt${Math.round(1000 * d.x)}`)
+          .style('fill', 'blue');
+        const tipParams = { d, layout: this.layout };
+        this.tip.show(tipParams, n[i]);
+      })
+      .on('mouseout', (d, i, n) => {
+        d3.select(`#mpp${Math.round(1000 * d.x)}`)
+          .attr('stroke-opacity', '1.0');
+        d3.select(`#bpt${Math.round(1000 * d.x)}`)
+          .style('fill', 'red');
+        const tipParams = { d, layout: this.layout };
+        this.tip.hide(tipParams, n[i]);
+      });
   }
 
   drawThres() {
@@ -183,7 +199,7 @@ class RectFocus {
     MountClip(this);
 
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
-    this.setTip(LIST_LAYOUT.MS);
+    this.setTip();
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks);
     MountCompass(this);
 

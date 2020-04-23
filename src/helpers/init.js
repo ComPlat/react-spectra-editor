@@ -56,12 +56,11 @@ const tpDiv = (d, digits) => (
   `
 );
 
-const InitTip = (typ) => {
+const InitTip = () => {
   d3.select('.peak-tp').remove();
-  const digits = FN.spectraDigit(typ);
   const tip = d3Tip()
     .attr('class', 'd3-tip')
-    .html(d => tpDiv(d, digits));
+    .html(({ d, layout }) => tpDiv(d, FN.spectraDigit(layout)));
   return tip;
 };
 
