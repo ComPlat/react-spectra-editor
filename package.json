@@ -20,6 +20,7 @@
     "jcampconverter": "4.1.0",
     "ml-savitzky-golay-generalized": "1.1.1",
     "prop-types": "^15.6.2",
+    "react-quill": "1.1.0",
     "react-redux": "^5.0.7",
     "react-svg-file-zoom-pan": "^1.0.5",
     "react-svg-inline": "^2.1.1",
