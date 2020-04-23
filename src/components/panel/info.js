@@ -142,7 +142,7 @@ const InfoPanel = ({
         }
       </div>
       <ReactQuill
-        className={classNames(classes.quill)}
+        className={classNames(classes.quill, 'card-sv-quill')}
         value={descriptions}
         modules={{ toolbar: false }}
         readOnly
