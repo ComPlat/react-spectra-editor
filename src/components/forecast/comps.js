@@ -19,7 +19,6 @@ const titleStyle = {
   backgroundColor: '#f5f5f5',
   border: '2px solid #e3e3e3',
   borderRadius: '10px',
-  height: 200,
   lineHeight: '200px',
   marginBottom: 10,
   marginTop: 10,
@@ -147,8 +146,15 @@ const SectionMissMatch = () => (
   <div style={titleStyle}>
     <h2 style={txtStyle}>
       <ErrorOutline style={{ color: 'red', fontSize: 50 }} />
-      <p>Peak & Element count mismatch!</p>
-      <p>Please check peak-picking.</p>
+      <p className="txt-predict-fail">Peak & Element count mismatch!</p>
+      <p className="txt-predict-fail">
+        <sup>1</sup>
+        H multiplicity count should not be more than the proton group count. Multiplicity must be assigned manulally before predictions.
+      </p>
+      <p className="txt-predict-fail">
+        <sup>13</sup>
+        C peak count should not be more than the carbon count, and solvent peaks should be excluded.
+      </p>
     </h2>
   </div>
 );
