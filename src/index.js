@@ -177,7 +177,15 @@ class DemoWriteIr extends React.Component {
     /*eslint-disable */
   }
 
-  predictOp(peaks, layout, _) {
+  predictOp({
+    multiplicity,
+   }) {
+    const { stack, shift } = multiplicity;
+    const targets = stack.map((stk) => {
+      const { mpyType, peaks } = stk;
+      return FN.CalcMpyCenter(peaks, shift, mpyType);
+    })
+    // console.log(targets)
     const { molecule, typ } = this.state;
     const predictions = { running: true };
 
