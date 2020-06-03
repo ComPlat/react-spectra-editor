@@ -7,6 +7,7 @@ import Button from '@material-ui/core/Button';
 
 import { SpectraEditor, FN } from './app';
 import nmr1HJcamp from './__tests__/fixtures/nmr1h_jcamp';
+import nmr13CDeptJcamp from './__tests__/fixtures/nmr13c_dept_jcamp';
 import nmr13CJcamp from './__tests__/fixtures/nmr13c_jcamp';
 import nmr19FJcamp from './__tests__/fixtures/nmr19f_jcamp';
 import irJcamp from './__tests__/fixtures/ir_jcamp';
@@ -20,6 +21,7 @@ import './__tests__/style/svg.css';
 
 const nmr1HEntity = FN.ExtractJcamp(nmr1HJcamp);
 const nmr13CEntity = FN.ExtractJcamp(nmr13CJcamp);
+const nmr13CDeptEntity = FN.ExtractJcamp(nmr13CDeptJcamp);
 const nmr19FEntity = FN.ExtractJcamp(nmr19FJcamp);
 const irEntity = FN.ExtractJcamp(irJcamp);
 const ramanEntity = FN.ExtractJcamp(ramanJcamp);
@@ -209,6 +211,8 @@ class DemoWriteIr extends React.Component {
         return nmr1HEntity;
       case 'nmr 13c':
         return nmr13CEntity;
+        case 'nmr 13c dept':
+          return nmr13CDeptEntity;
       case 'nmr 19f':
         return nmr19FEntity;
       case 'ir':
@@ -227,6 +231,8 @@ class DemoWriteIr extends React.Component {
       case 'nmr 1h':
         return q1H;
       case 'nmr 13c':
+        return q13C;
+      case 'nmr 13c dept':
         return q13C;
       case 'ir':
         return qIR;
@@ -282,6 +288,13 @@ class DemoWriteIr extends React.Component {
             onClick={this.onClick('nmr 13c')}
           >
             NMR 13C
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('nmr 13c dept')}
+          >
+            NMR 13C DEPT
           </Button>
           <Button
             variant="contained"
