@@ -39,7 +39,8 @@ class LineFocus {
 
     this.axis = null;
     this.path = null;
-    this.thresLine = null;
+    this.thresLineUp = null;
+    this.thresLineDw = null;
     this.grid = null;
     this.tags = null;
     this.ref = null;
@@ -184,10 +185,18 @@ class LineFocus {
 
   drawThres() {
     if (this.tTrEndPts.length > 0) {
-      this.thresLine.attr('d', this.pathCall(this.tTrEndPts));
-      this.thresLine.attr('visibility', 'visible');
+      this.thresLineUp.attr('d', this.pathCall(this.tTrEndPts));
+      this.thresLineUp.attr('visibility', 'visible');
+      const [left, right] = this.tTrEndPts;
+      const dwMirrorEndPts = [
+        Object.assign({}, left, { y: -left.y }),
+        Object.assign({}, right, { y: -right.y }),
+      ];
+      this.thresLineDw.attr('d', this.pathCall(dwMirrorEndPts));
+      this.thresLineDw.attr('visibility', 'visible');
     } else {
-      this.thresLine.attr('visibility', 'hidden');
+      this.thresLineUp.attr('visibility', 'hidden');
+      this.thresLineDw.attr('visibility', 'hidden');
     }
   }
 
@@ -661,7 +670,7 @@ class LineFocus {
 
     this.axis = MountAxis(this);
     this.path = MountPath(this, 'steelblue');
-    this.thresLine = MountThresLine(this, 'green');
+    [this.thresLineUp, this.thresLineDw] = MountThresLine(this, 'green');
     this.grid = MountGrid(this);
     this.tags = MountTags(this);
     this.ref = MountRef(this);

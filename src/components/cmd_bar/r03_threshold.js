@@ -62,6 +62,7 @@ const setThreshold = (
       InputProps={{
         endAdornment: txtPercent(),
         className: classNames(classes.txtInput, 'txtfield-sv-bar-input'),
+        inputProps: { min: 0.01 },
       }}
       label={<span className={classNames(classes.txtLabel, 'txtfield-sv-bar-label')}>Threshold</span>}
       onChange={onChange}

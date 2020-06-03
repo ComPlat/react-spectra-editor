@@ -87,7 +87,7 @@ const Convert2Peak = (feature, threshold, offset) => {
   const corrOffset = offset || 0.0;
   for (let i = 0; i < data.y.length; i += 1) {
     const y = data.y[i];
-    const overThres = (peakUp && y >= yThres) || (!peakUp && y <= yThres);
+    const overThres = (peakUp && Math.abs(y) >= yThres) || (!peakUp && Math.abs(y) <= yThres);
     if (overThres) {
       const x = data.x[i] - corrOffset;
       peak.push({ x, y });
@@ -178,7 +178,7 @@ const extrSpectraNi = (jcamp, layout) => {
 const calcThresRef = (s, peakUp) => {
   const ys = s && s.data[0].y;
   if (!ys) return null;
-  const ref = peakUp ? Math.min(...ys) : Math.max(...ys);
+  const ref = peakUp ? Math.min(...ys.map(a => Math.abs(a))) : Math.max(...ys);
   return peakUp
     ? Math.floor(ref * 100 * 100 / s.maxY) / 100
     : Math.ceil(ref * 100 * 100 / s.maxY) / 100;

@@ -204,7 +204,7 @@ class RectFocus {
     MountCompass(this);
 
     this.axis = MountAxis(this);
-    this.thresLine = MountThresLine(this, 'green');
+    [this.thresLine] = MountThresLine(this, 'green');
     this.grid = MountGrid(this);
     this.ref = MountRef(this);
     this.bars = MountBars(this);

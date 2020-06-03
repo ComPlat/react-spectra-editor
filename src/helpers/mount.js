@@ -64,16 +64,25 @@ const MountPath = (target, color) => {
 };
 
 const MountThresLine = (target, color) => {
-  const thresLine = target.root.append('g')
+  const thresLineUp = target.root.append('g')
     .attr('class', 'line-clip')
     .attr('clip-path', 'url(#clip)')
     .append('path')
-    .attr('class', 'threshold')
+    .attr('class', 'thresholdUp')
     .style('stroke-dasharray', ('3, 3'))
     .style('fill', 'none')
     .style('stroke', color)
     .style('stroke-width', 1);
-  return thresLine;
+  const thresLineDw = target.root.append('g')
+    .attr('class', 'line-clip')
+    .attr('clip-path', 'url(#clip)')
+    .append('path')
+    .attr('class', 'thresholdDw')
+    .style('stroke-dasharray', ('3, 3'))
+    .style('fill', 'none')
+    .style('stroke', color)
+    .style('stroke-width', 1);
+  return [thresLineUp, thresLineDw];
 };
 
 const MountGrid = (target) => {
