@@ -27,8 +27,15 @@ const Styles = () => ({
   container: {
     minHeight: '400px',
   },
+  svgRoot: {
+    margin: '10px 40px 0px 40px',
+    height: 'calc(70vh)',
+    overflowY: 'hidden',
+  },
   tableRoot: {
     margin: '10px 40px 0px 40px',
+    maxHeight: 'calc(70vh)',
+    overflowY: 'scroll',
   },
   title: {
     textAlign: 'left',
@@ -81,7 +88,9 @@ const NmrViewer = ({
   <div className={classNames(classes.root, 'card-forecast-viewer')}>
     <Grid className={classNames(classes.container)} container>
       <Grid item xs={4}>
-        { sectionSvg(classes, forecastSt.predictions) }
+        <Paper className={classes.svgRoot}>
+          { sectionSvg(classes, forecastSt.predictions) }
+        </Paper>
       </Grid>
       <Grid item xs={8}>
         { sectionTable(classes, forecastSt.predictions) }
