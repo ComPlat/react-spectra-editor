@@ -1,7 +1,7 @@
 import { put, takeEvery, select } from 'redux-saga/effects';
 
 import {
-  MANAGER, INTEGRATION,
+  MANAGER, INTEGRATION, SIMULATION,
 } from '../constants/action_type';
 
 
@@ -24,12 +24,18 @@ function* resetShift(action) {
 }
 
 function* resetInitNmr(action) {
-  const { integration } = action.payload;
+  const { integration, simulation } = action.payload;
 
   if (integration) {
     yield put({
       type: INTEGRATION.RESET_ALL_RDC,
       payload: integration,
+    });
+  }
+  if (simulation) {
+    yield put({
+      type: SIMULATION.RESET_ALL_RDC,
+      payload: simulation,
     });
   }
 }

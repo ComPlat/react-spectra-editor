@@ -11,6 +11,7 @@ import uiReducer from './reducer_ui';
 import submitReducer from './reducer_submit';
 import integrationReducer from './reducer_integration';
 import multiplicityReducer from './reducer_multiplicity';
+import simulationReducer from './reducer_simulation';
 import metaReducer from './reducer_meta';
 
 const rootReducer = combineReducers({
@@ -26,6 +27,7 @@ const rootReducer = combineReducers({
   submit: submitReducer,
   integration: integrationReducer,
   multiplicity: multiplicityReducer,
+  simulation: simulationReducer,
   meta: metaReducer,
 });
 
