@@ -35,32 +35,36 @@ const styles = () => ({
   table: {
     width: 'auto',
   },
-  rowOdd: {
-    backgroundColor: '#fff',
+  rowRoot: {
     border: '1px solid #eee',
     height: 36,
     lineHeight: '36px',
     overflow: 'hidden',
+    paddingLeft: 24,
     textAlign: 'left',
+  },
+  rowOdd: {
+    backgroundColor: '#fff',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
   },
   rowEven: {
     backgroundColor: '#fafafa',
-    border: '1px solid #eee',
-    height: 36,
-    lineHeight: '36px',
-    overflow: 'hidden',
-    textAlign: 'left',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
+  },
+  rowOddSim: {
+    backgroundColor: '#fff',
+    height: 108,
+    lineHeight: '24px',
+    overflow: 'hidden',
+    overflowWrap: 'word-break',
   },
   tHead: {
     fontWeight: 'bold',
     float: 'left',
     fontSize: '0.8rem',
     fontFamily: 'Helvetica',
-    marginLeft: 24,
   },
   tTxt: {
     fontSize: '0.8rem',
@@ -77,9 +81,19 @@ const styles = () => ({
   },
 });
 
+const simTitle = (layoutSt, peaks) => (
+  Format.is13CLayout(layoutSt)
+    ? `Simulation Peaks (${peaks.length})`
+    : `Simulation Multiplicity Centers (${peaks.length})`
+);
+
+const simContent = nmrSimPeaks => (
+  nmrSimPeaks && nmrSimPeaks.join(', ')
+);
+
 const InfoPanel = ({
   classes, expand, feature, molSvg, descriptions,
-  layoutSt, shiftNameSt,
+  layoutSt, simulationSt, shiftNameSt,
   onExapnd,
 }) => {
   if (!feature) return null;
@@ -105,14 +119,14 @@ const InfoPanel = ({
       </ExpansionPanelSummary>
       <Divider />
       <div className={classNames(classes.panelDetail)}>
-        <div className={classNames(classes.rowOdd)}>
+        <div className={classNames(classes.rowRoot, classes.rowOdd)}>
           <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Title : </span>
           <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{ title }</span>
         </div>
         {
           Format.isNmrLayout(layoutSt)
             ? (
-              <div className={classNames(classes.rowEven)}>
+              <div className={classNames(classes.rowRoot, classes.rowEven)}>
                 <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Freq : </span>
                 <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{ parseInt(observeFrequency, 10) || ' - ' }</span>
               </div>
@@ -122,7 +136,7 @@ const InfoPanel = ({
         {
           Format.isNmrLayout(layoutSt)
             ? (
-              <div className={classNames(classes.rowOdd)}>
+              <div className={classNames(classes.rowRoot, classes.rowOdd)}>
                 <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Solv : </span>
                 <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{showSolvName}</span>
               </div>
@@ -147,6 +161,24 @@ const InfoPanel = ({
         modules={{ toolbar: false }}
         readOnly
       />
+      <div>
+        {
+            Format.isNmrLayout(layoutSt)
+              ? (
+                <div className={classNames(classes.rowRoot, classes.rowOddSim)}>
+                  <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>
+                    { simTitle(layoutSt, simulationSt.nmrSimPeaks) }
+                    :
+                  </span>
+                  <br />
+                  <span className={classNames(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt')}>
+                    { simContent(simulationSt.nmrSimPeaks) }
+                  </span>
+                </div>
+              )
+              : null
+          }
+      </div>
     </ExpansionPanel>
   );
 };
@@ -154,6 +186,7 @@ const InfoPanel = ({
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     layoutSt: state.layout,
+    simulationSt: state.simulation,
     shiftNameSt: state.shift.ref.name,
   }
 );
@@ -170,6 +203,7 @@ InfoPanel.propTypes = {
   molSvg: PropTypes.string.isRequired,
   descriptions: PropTypes.array.isRequired,
   layoutSt: PropTypes.string.isRequired,
+  simulationSt: PropTypes.array.isRequired,
   shiftNameSt: PropTypes.string.isRequired,
   onExapnd: PropTypes.func.isRequired,
 };

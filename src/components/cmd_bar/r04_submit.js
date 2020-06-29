@@ -16,6 +16,7 @@ import {
   updateOperation, updateDecimal,
 } from '../../actions/submit';
 import BtnSubmit from './r05_submit_btn';
+import BtnPredict from './r06_predict_btn';
 import { commonStyle } from './common';
 import Format from '../../helpers/format';
 
@@ -206,7 +207,7 @@ const selectOperation = (name, operations, updateOperationAct) => {
 };
 
 const Submit = ({
-  operations, classes, feature, hideSwitch, disabled,
+  operations, classes, feature, forecast, hideSwitch, disabled,
   isAscendSt, isIntensitySt, operationSt, decimalSt, isEmWaveSt,
   toggleIsAscendAct, toggleIsIntensityAct,
   updateOperationAct, updateDecimalAct,
@@ -234,6 +235,10 @@ const Submit = ({
           classes, hideSwitch, decimalSt, updateDecimalAct,
         )
       }
+      <BtnPredict
+        feature={feature}
+        forecast={forecast}
+      />
       {
         operationSelect(
           classes, operations, operationSt, onChangeSelect,
@@ -272,6 +277,7 @@ const mapDispatchToProps = dispatch => (
 Submit.propTypes = {
   classes: PropTypes.object.isRequired,
   feature: PropTypes.object.isRequired,
+  forecast: PropTypes.object.isRequired,
   operations: PropTypes.array.isRequired,
   operationSt: PropTypes.object.isRequired,
   hideSwitch: PropTypes.bool.isRequired,

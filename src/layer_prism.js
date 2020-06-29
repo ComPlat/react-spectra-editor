@@ -30,6 +30,7 @@ const LayerPrism = ({
         <CmdBar
           feature={feature}
           hasEdit={hasEdit}
+          forecast={forecast}
           operations={operations}
           editorOnly={editorOnly}
         />
@@ -57,6 +58,7 @@ const LayerPrism = ({
       <CmdBar
         feature={feature}
         hasEdit={hasEdit}
+        forecast={forecast}
         operations={operations}
         editorOnly={editorOnly}
       />

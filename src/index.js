@@ -254,7 +254,6 @@ class DemoWriteIr extends React.Component {
     let operations = [
       { name: 'write peaks', value: this.writePeak },
       { name: 'save', value: this.savePeaks },
-      { name: 'predict', value: this.predictOp },
     ].filter(r => r.value);
     if (['1H', '13C', '19F'].indexOf(entity.layout) >= 0) {
       operations = [

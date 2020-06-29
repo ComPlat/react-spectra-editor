@@ -298,6 +298,15 @@ const range = (head, tail, length) => {
 };
 */
 
+const buildSimFeature = (jcamp) => {
+  const { $CSSIMULATIONPEAKS } = jcamp.info;
+  let nmrSimPeaks = $CSSIMULATIONPEAKS ? $CSSIMULATIONPEAKS.split('\n') : [];
+  nmrSimPeaks = nmrSimPeaks.map(x => parseFloat(x).toFixed(2));
+  return {
+    nmrSimPeaks,
+  };
+};
+
 const buildMpyFeature = (jcamp) => {
   const { $OBSERVEDMULTIPLETS, $OBSERVEDMULTIPLETSPEAKS } = jcamp.info;
   const regx = /[^A-Za-z0-9.,-]/g;
@@ -377,6 +386,7 @@ const extrFeaturesNi = (jcamp, layout, peakUp, spectra) => {
     }
     nfs.integration = buildIntegFeature(jcamp, spectra);
     nfs.multiplicity = buildMpyFeature(jcamp);
+    nfs.simulation = buildSimFeature(jcamp);
     return nfs;
   }
   // workaround for legacy design
@@ -438,7 +448,7 @@ const ExtractJcamp = (source) => {
     source,
     {
       xy: true,
-      keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY)/, // eslint-disable-line
+      keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS)/, // eslint-disable-line
     },
   );
   const layout = readLayout(jcamp);

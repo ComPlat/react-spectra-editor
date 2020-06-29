@@ -27,7 +27,7 @@ const styles = () => (
 );
 
 const CmdBar = ({
-  classes, feature, hasEdit, operations, editorOnly,
+  classes, feature, hasEdit, forecast, operations, editorOnly,
 }) => (
   <div className={classes.card}>
     <Viewer editorOnly={editorOnly} />
@@ -39,6 +39,7 @@ const CmdBar = ({
     <Submit
       operations={operations}
       feature={feature}
+      forecast={forecast}
       hideSwitch={false}
       disabled={false}
     />
@@ -60,6 +61,7 @@ const mapDispatchToProps = dispatch => (
 CmdBar.propTypes = {
   classes: PropTypes.object.isRequired,
   feature: PropTypes.object.isRequired,
+  forecast: PropTypes.object.isRequired,
   hasEdit: PropTypes.bool.isRequired,
   operations: PropTypes.array.isRequired,
   editorOnly: PropTypes.bool.isRequired,

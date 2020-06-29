@@ -59,10 +59,10 @@ class LayerInit extends React.Component {
       resetInitMsAct(baseFeat);
     }
     if (Format.isNmrLayout(layout)) {
-      const { integration, multiplicity } = features;
+      const { integration, multiplicity, simulation } = features;
       updateMetaPeaksAct(entity);
       resetInitNmrAct({
-        integration, multiplicity,
+        integration, multiplicity, simulation,
       });
     }
   }
