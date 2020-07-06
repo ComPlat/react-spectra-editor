@@ -50,8 +50,8 @@ class ForecastViewer extends React.Component {
     const { forecast, initForecastStatusAct, setUiViewerTypeAct } = this.props;
     initForecastStatusAct(forecast);
     if (forecast && forecast.predictions) {
-      const { running } = forecast.predictions;
-      if (running) setUiViewerTypeAct(LIST_UI_VIEWER_TYPE.ANALYSIS);
+      const { running, refreshed } = forecast.predictions;
+      if (running || refreshed) setUiViewerTypeAct(LIST_UI_VIEWER_TYPE.ANALYSIS);
     }
   }
 

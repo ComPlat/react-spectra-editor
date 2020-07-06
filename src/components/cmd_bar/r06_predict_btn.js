@@ -6,6 +6,7 @@ import { bindActionCreators, compose } from 'redux';
 
 import Tooltip from '@material-ui/core/Tooltip';
 import GpsFixedOutlinedIcon from '@material-ui/icons/GpsFixedOutlined';
+import HelpOutlineOutlinedIcon from '@material-ui/icons/HelpOutlineOutlined';
 import Button from '@material-ui/core/Button';
 import { withStyles } from '@material-ui/core/styles';
 
@@ -14,6 +15,7 @@ import Format from '../../helpers/format';
 import { extractPeaksEdit } from '../../helpers/extractPeaksEdit';
 import { setUiViewerType } from '../../actions/ui';
 import { LIST_UI_VIEWER_TYPE } from '../../constants/list_ui';
+import { Convert2Scan, Convert2Thres } from '../../helpers/chem';
 
 
 const styles = () => (
@@ -25,6 +27,10 @@ const styles = () => (
         fontSize: '0.8rem',
         fontFamily: 'Helvetica',
         marginRight: 5,
+      },
+      btnWidthUnknown: {
+        minWidth: 30,
+        width: 30,
       },
       btnWidthIr: {
         minWidth: 30,
@@ -57,9 +63,13 @@ const onClickFail = (layoutSt, simuCount, realCount) => {
 };
 
 const onClickReady = (
-  forecast, peaksEdit, layoutSt, shiftSt, multiplicitySt, setUiViewerTypeAct,
+  forecast, peaksEdit, layoutSt, scan, shiftSt, thres,
+  analysis, integrationSt, multiplicitySt, setUiViewerTypeAct,
 ) => {
   const { btnCb } = forecast;
+  if (!btnCb) {
+    return () => alert('[Developer Warning] You need to implement btnCb in forecast!'); // eslint-disable-line
+  }
 
   return () => {
     setUiViewerTypeAct(LIST_UI_VIEWER_TYPE.ANALYSIS);
@@ -68,11 +78,38 @@ const onClickReady = (
       btnCb({
         peaks: peaksEdit,
         layout: layoutSt,
-        shift: shiftSt,
+        scan,
+        thres,
+        analysis,
+        integration: integrationSt,
         multiplicity: multiplicitySt,
+        shift: shiftSt,
       })
     );
   };
+};
+
+const onClicUnknown = (
+  feature, forecast, peaksEdit, layoutSt, scan, shiftSt, thres,
+  analysis, integrationSt, multiplicitySt,
+) => {
+  const { refreshCb } = forecast;
+  if (!refreshCb) {
+    return () => alert('[Developer Warning] You need to implement refreshCb in forecast!'); // eslint-disable-line
+  }
+
+  return () => (
+    refreshCb({
+      peaks: peaksEdit,
+      layout: layoutSt,
+      scan,
+      shift: shiftSt,
+      thres,
+      analysis,
+      integration: integrationSt,
+      multiplicity: multiplicitySt,
+    })
+  );
 };
 
 const counterText = (classes, isIr, realCount, simuCount) => (
@@ -85,59 +122,119 @@ const counterText = (classes, isIr, realCount, simuCount) => (
     )
 );
 
+const renderBtnPredict = (
+  classes, isIr, realCount, simuCount, color, btnWidthCls, onClick,
+) => (
+  <Tooltip
+    title={
+      (
+        <div>
+          <span className="txt-sv-tp">Predict</span>
+          <br />
+          <span className="txt-sv-tp">
+            - Selected features must be eqal or less than simulated features.
+          </span>
+        </div>
+      )
+    }
+  >
+    <MuPredictButton
+      className={
+        classNames(
+          'btn-sv-bar-submit', btnWidthCls,
+        )
+      }
+      style={{ color }}
+      onClick={onClick}
+    >
+      {
+        counterText(classes, isIr, realCount, simuCount)
+      }
+      <GpsFixedOutlinedIcon className={classes.icon} />
+    </MuPredictButton>
+  </Tooltip>
+);
+
+const renderBtnUnknown = (
+  classes, onClick,
+) => (
+  <Tooltip
+    title={
+      (
+        <div>
+          <span className="txt-sv-tp">Refresh Simulation</span>
+          <br />
+          <span className="txt-sv-tp">
+            - Simulation must be refreshed before making a prediction.
+          </span>
+          <br />
+          <span className="txt-sv-tp">
+            - If you continue to see this button after clicking it, the server is not ready. Please wait for a while.
+          </span>
+        </div>
+      )
+    }
+  >
+    <MuPredictButton
+      className={
+        classNames(
+          'btn-sv-bar-submit', classes.btnWidthUnknown,
+        )
+      }
+      style={{ color: 'orange' }}
+      onClick={onClick}
+    >
+      <HelpOutlineOutlinedIcon className={classes.icon} />
+    </MuPredictButton>
+  </Tooltip>
+);
+
+
 const BtnPredict = ({
   classes, feature, forecast,
-  layoutSt, simulationSt, editPeakSt, thresSt, shiftSt, multiplicitySt,
+  layoutSt, simulationSt, editPeakSt, scanSt, shiftSt, thresSt,
+  integrationSt, multiplicitySt,
   setUiViewerTypeAct,
 }) => {
   const is13Cor1H = Format.is13CLayout(layoutSt) || Format.is1HLayout(layoutSt);
   const isIr = Format.isIrLayout(layoutSt);
   if (!(is13Cor1H || isIr)) return null;
 
-  const peaksEdit = extractPeaksEdit(feature, editPeakSt, thresSt, shiftSt, layoutSt);
+  const oriPeaksEdit = extractPeaksEdit(feature, editPeakSt, thresSt, shiftSt, layoutSt);
+  const peaksEdit = Format.rmShiftFromPeaks(oriPeaksEdit, shiftSt);
+  const scan = Convert2Scan(feature, scanSt);
+  const thres = Convert2Thres(feature, thresSt);
   const simuCount = simulationSt.nmrSimPeaks.length;
   const realCount = Format.is13CLayout(layoutSt)
     ? peaksEdit.length
     : multiplicitySt.stack.length;
 
+  if (is13Cor1H && simuCount === 0) {
+    const onClickUnknownCb = onClicUnknown(
+      feature, forecast, peaksEdit, layoutSt, scan, shiftSt, thres,
+      forecast.predictions, integrationSt, multiplicitySt,
+    );
+    return renderBtnUnknown(classes, onClickUnknownCb);
+  }
+
   const predictable = isIr || (simuCount >= realCount && realCount > 0);
   const color = predictable ? 'green' : 'red';
 
   const onClick = predictable
-    ? onClickReady(forecast, peaksEdit, layoutSt, shiftSt, multiplicitySt, setUiViewerTypeAct)
+    ? (
+      onClickReady(
+        forecast, peaksEdit, layoutSt, scan, shiftSt, thres,
+        forecast.predictions, integrationSt, multiplicitySt, setUiViewerTypeAct,
+      )
+    )
     : onClickFail(layoutSt, simuCount, realCount);
 
   const btnWidthCls = isIr ? classes.btnWidthIr : classes.btnWidthNmr;
 
   return (
-    <Tooltip
-      title={
-        (
-          <div>
-            <span className="txt-sv-tp">Predict</span>
-            <br />
-            <span className="txt-sv-tp">
-              - Selected features must be eqal or less than simulated features.
-            </span>
-          </div>
-        )
-      }
-    >
-      <MuPredictButton
-        className={
-          classNames(
-            'btn-sv-bar-submit', btnWidthCls,
-          )
-        }
-        style={{ color }}
-        onClick={onClick}
-      >
-        {
-          counterText(classes, isIr, realCount, simuCount)
-        }
-        <GpsFixedOutlinedIcon className={classes.icon} />
-      </MuPredictButton>
-    </Tooltip>
+    renderBtnPredict(
+      classes, isIr, realCount, simuCount, color, btnWidthCls, onClick,
+    )
   );
 };
 
@@ -146,8 +243,10 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     layoutSt: state.layout,
     simulationSt: state.simulation,
     editPeakSt: state.editPeak.present,
-    thresSt: state.threshold,
+    scanSt: state.scan,
     shiftSt: state.shift,
+    thresSt: state.threshold,
+    integrationSt: state.integration.present,
     multiplicitySt: state.multiplicity.present,
   }
 );
@@ -165,8 +264,10 @@ BtnPredict.propTypes = {
   layoutSt: PropTypes.string.isRequired,
   simulationSt: PropTypes.array.isRequired,
   editPeakSt: PropTypes.object.isRequired,
-  thresSt: PropTypes.object.isRequired,
+  scanSt: PropTypes.object.isRequired,
   shiftSt: PropTypes.object.isRequired,
+  thresSt: PropTypes.object.isRequired,
+  integrationSt: PropTypes.object.isRequired,
   multiplicitySt: PropTypes.object.isRequired,
   setUiViewerTypeAct: PropTypes.func.isRequired,
 };

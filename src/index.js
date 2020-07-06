@@ -262,8 +262,11 @@ class DemoWriteIr extends React.Component {
       ];
     }
 
+    const refreshCb = () => alert('Refresch simulation!');
+
     const forecast = {
       btnCb: this.predictOp,
+      refreshCb,
       inputCb: this.updatInput,
       molecule: molecule,
       predictions,
