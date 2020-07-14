@@ -88,7 +88,7 @@ const simTitle = (layoutSt, peaks) => (
 );
 
 const simContent = nmrSimPeaks => (
-  nmrSimPeaks && nmrSimPeaks.join(', ')
+  nmrSimPeaks && nmrSimPeaks.sort((a, b) => a - b).join(', ')
 );
 
 const InfoPanel = ({
