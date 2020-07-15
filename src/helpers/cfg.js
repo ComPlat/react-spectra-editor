@@ -1,6 +1,10 @@
 import Format from './format';
 
-const btnCmdAnaViewer = layoutSt => Format.isMsLayout(layoutSt);
+const btnCmdAnaViewer = layoutSt => (
+  Format.isMsLayout(layoutSt)
+    || Format.isRamanLayout(layoutSt)
+    || Format.is19FLayout(layoutSt)
+);
 
 const hideCmdAnaViewer = () => false;
 

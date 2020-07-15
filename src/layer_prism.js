@@ -78,6 +78,7 @@ const LayerPrism = ({
           <Grid item xs={3} align="center">
             <PanelViewer
               feature={feature}
+              editorOnly={editorOnly}
               molSvg={molSvg}
               descriptions={descriptions}
             />

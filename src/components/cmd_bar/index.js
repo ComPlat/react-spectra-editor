@@ -40,6 +40,7 @@ const CmdBar = ({
       operations={operations}
       feature={feature}
       forecast={forecast}
+      editorOnly={editorOnly}
       hideSwitch={false}
       disabled={false}
     />

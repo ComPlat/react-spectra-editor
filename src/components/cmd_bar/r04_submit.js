@@ -207,7 +207,7 @@ const selectOperation = (name, operations, updateOperationAct) => {
 };
 
 const Submit = ({
-  operations, classes, feature, forecast, hideSwitch, disabled,
+  operations, classes, feature, forecast, editorOnly ,hideSwitch, disabled,
   isAscendSt, isIntensitySt, operationSt, decimalSt, isEmWaveSt,
   toggleIsAscendAct, toggleIsIntensityAct,
   updateOperationAct, updateDecimalAct,
@@ -235,10 +235,16 @@ const Submit = ({
           classes, hideSwitch, decimalSt, updateDecimalAct,
         )
       }
-      <BtnPredict
-        feature={feature}
-        forecast={forecast}
-      />
+      {
+        editorOnly
+          ? null
+          : (
+            <BtnPredict
+              feature={feature}
+              forecast={forecast}
+            />
+          )
+      }
       {
         operationSelect(
           classes, operations, operationSt, onChangeSelect,
@@ -278,6 +284,7 @@ Submit.propTypes = {
   classes: PropTypes.object.isRequired,
   feature: PropTypes.object.isRequired,
   forecast: PropTypes.object.isRequired,
+  editorOnly: PropTypes.bool.isRequired,
   operations: PropTypes.array.isRequired,
   operationSt: PropTypes.object.isRequired,
   hideSwitch: PropTypes.bool.isRequired,

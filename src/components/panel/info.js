@@ -92,7 +92,7 @@ const simContent = nmrSimPeaks => (
 );
 
 const InfoPanel = ({
-  classes, expand, feature, molSvg, descriptions,
+  classes, expand, feature, editorOnly, molSvg, descriptions,
   layoutSt, simulationSt, shiftNameSt,
   onExapnd,
 }) => {
@@ -163,7 +163,7 @@ const InfoPanel = ({
       />
       <div>
         {
-            Format.isNmrLayout(layoutSt)
+            !editorOnly && Format.isNmrLayout(layoutSt)
               ? (
                 <div className={classNames(classes.rowRoot, classes.rowOddSim)}>
                   <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>
@@ -200,6 +200,7 @@ InfoPanel.propTypes = {
   classes: PropTypes.object.isRequired,
   expand: PropTypes.bool.isRequired,
   feature: PropTypes.object.isRequired,
+  editorOnly: PropTypes.bool.isRequired,
   molSvg: PropTypes.string.isRequired,
   descriptions: PropTypes.array.isRequired,
   layoutSt: PropTypes.string.isRequired,
