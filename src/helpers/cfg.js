@@ -32,6 +32,8 @@ const hidePanelPeak = layoutSt => true;  // eslint-disable-line
 
 const hidePanelMpy = layoutSt => !Format.isNmrLayout(layoutSt);
 
+const hidePanelCompare = layoutSt => !Format.isIrLayout(layoutSt);
+
 const hideSolvent = layoutSt => !Format.isNmrLayout(layoutSt);
 
 const Config = {
@@ -47,6 +49,7 @@ const Config = {
   btnCmdThres,
   hidePanelPeak,
   hidePanelMpy,
+  hidePanelCompare,
   hideSolvent,
 };
 

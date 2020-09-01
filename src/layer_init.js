@@ -74,7 +74,7 @@ class LayerInit extends React.Component {
 
   render() {
     const {
-      entity, cLabel, xLabel, yLabel, forecast, operations,
+      entity, others, cLabel, xLabel, yLabel, forecast, operations,
       descriptions, molSvg, editorOnly,
     } = this.props;
     const target = entity.spectra[0];
@@ -85,6 +85,7 @@ class LayerInit extends React.Component {
     return (
       <LayerPrism
         entity={entity}
+        others={others}
         cLabel={cLabel}
         xLabel={xxLabel}
         yLabel={yyLabel}
@@ -114,6 +115,7 @@ const mapDispatchToProps = dispatch => (
 
 LayerInit.propTypes = {
   entity: PropTypes.object.isRequired,
+  others: PropTypes.array.isRequired,
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,

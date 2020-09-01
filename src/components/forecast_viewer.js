@@ -58,7 +58,7 @@ class ForecastViewer extends React.Component {
   render() {
     const {
       classes, topic, feature, cLabel, xLabel, yLabel, forecast,
-      isNmr, isIr, uiSt,
+      comparisons, isNmr, isIr, uiSt,
     } = this.props;
     const { viewer } = uiSt;
     const {
@@ -70,6 +70,7 @@ class ForecastViewer extends React.Component {
         <ViewerLine
           topic={topic}
           feature={feature}
+          comparisons={comparisons}
           cLabel={cLabel}
           xLabel={xLabel}
           yLabel={yLabel}
@@ -113,6 +114,7 @@ ForecastViewer.propTypes = {
   classes: PropTypes.object.isRequired,
   topic: PropTypes.object.isRequired,
   feature: PropTypes.object.isRequired,
+  comparisons: PropTypes.array.isRequired,
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,

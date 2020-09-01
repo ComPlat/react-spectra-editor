@@ -32,7 +32,7 @@ class ViewerLine extends React.Component {
 
   componentDidMount() {
     const {
-      seed, peak, cLabel, xLabel, yLabel, feature, freq,
+      seed, peak, cLabel, xLabel, yLabel, feature, freq, comparisons,
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt, integationSt, mtplySt,
       sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
       isHidden,
@@ -49,6 +49,7 @@ class ViewerLine extends React.Component {
       filterSeed,
       filterPeak,
       freq,
+      comparisons,
       tTrEndPts,
       tSfPeaks,
       editPeakSt,
@@ -65,7 +66,7 @@ class ViewerLine extends React.Component {
 
   componentDidUpdate(prevProps) {
     const {
-      seed, peak, freq,
+      seed, peak, freq, comparisons,
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt, integationSt, mtplySt,
       sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
       isHidden,
@@ -79,6 +80,7 @@ class ViewerLine extends React.Component {
       filterSeed,
       filterPeak,
       freq,
+      comparisons,
       tTrEndPts,
       tSfPeaks,
       editPeakSt,
@@ -148,6 +150,7 @@ ViewerLine.propTypes = {
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
   feature: PropTypes.object.isRequired,
+  comparisons: PropTypes.array.isRequired,
   tTrEndPts: PropTypes.array.isRequired,
   tSfPeaks: PropTypes.array.isRequired,
   editPeakSt: PropTypes.object.isRequired,
