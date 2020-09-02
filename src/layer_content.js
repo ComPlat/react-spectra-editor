@@ -21,7 +21,7 @@ const extractLayout = (forecast, layoutSt) => {
 };
 
 const Content = ({
-  topic, feature, cLabel, xLabel, yLabel, forecast, operations, comparisons,
+  topic, feature, cLabel, xLabel, yLabel, forecast, operations,
   layoutSt,
 }) => {
   const {
@@ -36,7 +36,6 @@ const Content = ({
         xLabel={xLabel}
         yLabel={yLabel}
         feature={feature}
-        comparisons={comparisons}
         forecast={forecast}
         isNmr={isNmr}
         isIr={isIr}
@@ -53,7 +52,6 @@ const Content = ({
         xLabel={xLabel}
         yLabel={yLabel}
         feature={feature}
-        comparisons={comparisons}
         isHidden={false}
       />
     );
@@ -66,7 +64,6 @@ const Content = ({
       xLabel={xLabel}
       yLabel={yLabel}
       feature={feature}
-      comparisons={comparisons}
       isHidden={false}
     />
   );
@@ -86,7 +83,6 @@ const mapDispatchToProps = dispatch => (
 Content.propTypes = {
   topic: PropTypes.object.isRequired,
   feature: PropTypes.object.isRequired,
-  comparisons: PropTypes.array.isRequired,
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,

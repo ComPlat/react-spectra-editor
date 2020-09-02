@@ -150,7 +150,6 @@ ViewerLine.propTypes = {
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
   feature: PropTypes.object.isRequired,
-  comparisons: PropTypes.array.isRequired,
   tTrEndPts: PropTypes.array.isRequired,
   tSfPeaks: PropTypes.array.isRequired,
   editPeakSt: PropTypes.object.isRequired,

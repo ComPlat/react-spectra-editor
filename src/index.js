@@ -25,7 +25,7 @@ const nmr13CEntity = FN.ExtractJcamp(nmr13CJcamp);
 const nmr13CDeptEntity = FN.ExtractJcamp(nmr13CDeptJcamp);
 const nmr19FEntity = FN.ExtractJcamp(nmr19FJcamp);
 const irEntity = FN.ExtractJcamp(irJcamp);
-const compareIrEntity = FN.ExtractJcamp(compareIrJcamp);
+const otherIrEntity = FN.ExtractJcamp(compareIrJcamp);
 const ramanEntity = FN.ExtractJcamp(ramanJcamp);
 const msEntity = FN.ExtractJcamp(msJcamp);
 
@@ -38,6 +38,7 @@ class DemoWriteIr extends React.Component {
       desc: '',
       predictions: false,
       molecule: '',
+      showOthers: false,
     };
 
     this.onClick = this.onClick.bind(this);
@@ -50,6 +51,8 @@ class DemoWriteIr extends React.Component {
     this.updatInput = this.updatInput.bind(this);
     this.loadEntity = this.loadEntity.bind(this);
     this.loadQuill = this.loadQuill.bind(this);
+    this.onShowOthers = this.onShowOthers.bind(this);
+    this.loadOthers = this.loadOthers.bind(this);
   }
 
   onClick(typ) {
@@ -246,6 +249,19 @@ class DemoWriteIr extends React.Component {
     }
   }
 
+  onShowOthers() {
+    return () => this.setState({ showOthers: true })
+  }
+
+  loadOthers() {
+    const { showOthers } = this.state;
+    const jcamps = showOthers ? [otherIrEntity] : [];
+    return {
+      jcamps,
+      cb: this.onShowOthers,
+    };
+  }
+
   render() {
     const {
       desc, predictions, molecule, typ,
@@ -275,6 +291,7 @@ class DemoWriteIr extends React.Component {
     }
 
     const molSvg = ['nmr 1h', 'ir'].indexOf(typ) >= 0 ? Phenylalanin.path : '';
+    const others = this.loadOthers();
 
     return (
       <div style={{ width: Math.round(window.innerWidth * 0.96) }}>
@@ -331,7 +348,7 @@ class DemoWriteIr extends React.Component {
         </div>
         <SpectraEditor
           entity={entity}
-          others={[compareIrEntity]}
+          others={others}
           forecast={forecast}
           operations={operations}
           descriptions={qDescVal}

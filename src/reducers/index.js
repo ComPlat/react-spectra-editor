@@ -13,6 +13,7 @@ import integrationReducer from './reducer_integration';
 import multiplicityReducer from './reducer_multiplicity';
 import simulationReducer from './reducer_simulation';
 import metaReducer from './reducer_meta';
+import jcampReducer from './reducer_jcamp';
 
 const rootReducer = combineReducers({
   threshold: thresholdReducer,
@@ -29,6 +30,7 @@ const rootReducer = combineReducers({
   multiplicity: multiplicityReducer,
   simulation: simulationReducer,
   meta: metaReducer,
+  jcamp: jcampReducer,
 });
 
 export default rootReducer;

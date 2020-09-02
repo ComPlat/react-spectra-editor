@@ -16,13 +16,12 @@ const styles = () => ({
 });
 
 const LayerPrism = ({
-  entity, others, cLabel, xLabel, yLabel, forecast, operations,
+  entity, cLabel, xLabel, yLabel, forecast, operations,
   descriptions, molSvg, editorOnly,
   thresSt, scanSt, uiSt,
 }) => {
   const { topic, feature, hasEdit } = extractParams(entity, thresSt, scanSt);
   if (!topic) return null;
-  const comparisons = others.map(o => extractParams(o, thresSt, scanSt));
 
   const { viewer } = uiSt;
   if (viewer === LIST_UI_VIEWER_TYPE.ANALYSIS) {
@@ -46,7 +45,6 @@ const LayerPrism = ({
                 yLabel={yLabel}
                 forecast={forecast}
                 operations={operations}
-                comparisons={comparisons}
               />
             </Grid>
           </Grid>
@@ -75,7 +73,6 @@ const LayerPrism = ({
               yLabel={yLabel}
               forecast={forecast}
               operations={operations}
-              comparisons={comparisons}
             />
           </Grid>
           <Grid item xs={3} align="center">
@@ -107,7 +104,6 @@ const mapDispatchToProps = dispatch => (
 
 LayerPrism.propTypes = {
   entity: PropTypes.object.isRequired,
-  others: PropTypes.array.isRequired,
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,

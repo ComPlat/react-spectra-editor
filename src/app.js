@@ -51,7 +51,7 @@ const SpectraEditor = ({
 
 SpectraEditor.propTypes = {
   entity: PropTypes.object.isRequired,
-  others: PropTypes.array,
+  others: PropTypes.object,
   cLabel: PropTypes.string,
   xLabel: PropTypes.string,
   yLabel: PropTypes.string,
@@ -66,7 +66,7 @@ SpectraEditor.propTypes = {
 };
 
 SpectraEditor.defaultProps = {
-  others: [],
+  others: { jcamps: [], cb: false },
   cLabel: '',
   xLabel: '',
   yLabel: '',

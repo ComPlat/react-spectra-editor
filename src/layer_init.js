@@ -8,6 +8,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { updateOperation } from './actions/submit';
 import { resetInitCommon, resetInitNmr, resetInitMs } from './actions/manager';
 import { updateMetaPeaks } from './actions/meta';
+import { addOthers } from './actions/jcamp';
 import LayerPrism from './layer_prism';
 import Format from './helpers/format';
 
@@ -46,7 +47,7 @@ class LayerInit extends React.Component {
 
   execReset() {
     const {
-      entity, updateMetaPeaksAct,
+      entity, others, addOthersAct, updateMetaPeaksAct,
       resetInitCommonAct, resetInitMsAct, resetInitNmrAct,
     } = this.props;
     resetInitCommonAct();
@@ -65,6 +66,9 @@ class LayerInit extends React.Component {
         integration, multiplicity, simulation,
       });
     }
+    if (Format.isIrLayout(layout)) {
+      addOthersAct(others);
+    }
   }
 
   initReducer() {
@@ -74,7 +78,7 @@ class LayerInit extends React.Component {
 
   render() {
     const {
-      entity, others, cLabel, xLabel, yLabel, forecast, operations,
+      entity, cLabel, xLabel, yLabel, forecast, operations,
       descriptions, molSvg, editorOnly,
     } = this.props;
     const target = entity.spectra[0];
@@ -85,7 +89,6 @@ class LayerInit extends React.Component {
     return (
       <LayerPrism
         entity={entity}
-        others={others}
         cLabel={cLabel}
         xLabel={xxLabel}
         yLabel={yyLabel}
@@ -110,12 +113,13 @@ const mapDispatchToProps = dispatch => (
     resetInitMsAct: resetInitMs,
     updateOperationAct: updateOperation,
     updateMetaPeaksAct: updateMetaPeaks,
+    addOthersAct: addOthers,
   }, dispatch)
 );
 
 LayerInit.propTypes = {
   entity: PropTypes.object.isRequired,
-  others: PropTypes.array.isRequired,
+  others: PropTypes.object.isRequired,
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
@@ -129,6 +133,7 @@ LayerInit.propTypes = {
   resetInitMsAct: PropTypes.func.isRequired,
   updateOperationAct: PropTypes.func.isRequired,
   updateMetaPeaksAct: PropTypes.func.isRequired,
+  addOthersAct: PropTypes.func.isRequired,
 };
 
 export default connect(
