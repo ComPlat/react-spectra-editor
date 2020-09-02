@@ -2,11 +2,10 @@ import { JCAMP } from '../constants/action_type';
 
 const initialState = {
   others: [],
+  addOthersCb: false,
 };
 
-const addOthers = (payload) => {
-  return initialState;
-};
+const addOthers = ({ others, cb }) => ({ others, addOthersCb: cb });
 
 const layoutReducer = (state = initialState, action) => {
   switch (action.type) {

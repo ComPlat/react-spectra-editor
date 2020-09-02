@@ -659,11 +659,7 @@ class LineFocus {
     if (!comparisons) return null;
     comparisons.forEach((c, idx) => {
       const path = MountComparePath(this, 'purple', idx); // #D5D8DC
-      const [xs, ys] = [c.topic.x, c.topic.y];
-      const [maxY, minY] = [Math.max(...ys), Math.min(...ys)];
-      const h = maxY - minY;
-      const data = xs.map((x, i) => ({ x, y: 1.5 * (ys[i] - minY) / h }));
-      path.attr('d', this.pathCall(data));
+      path.attr('d', this.pathCall(c));
     });
     return null;
   }

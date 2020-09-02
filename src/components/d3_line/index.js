@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 
 import {
   Topic2Seed, Feature2Peak, ToThresEndPts, ToShiftPeaks, ToFrequency,
+  GetComparisons,
 } from '../../helpers/chem';
 import { resetAll } from '../../actions/manager';
 import { selectUiSweep, scrollUiWheel, clickUiTarget } from '../../actions/ui';
@@ -43,7 +44,6 @@ class ViewerLine extends React.Component {
 
     const filterSeed = seed;
     const filterPeak = peak;
-
     drawMain(this.rootKlass, W, H);
     this.focus.create({
       filterSeed,
@@ -118,6 +118,7 @@ const mapStateToProps = (state, props) => (
     seed: Topic2Seed(state, props),
     peak: Feature2Peak(state, props),
     freq: ToFrequency(state, props),
+    comparisons: GetComparisons(state, props),
     tTrEndPts: ToThresEndPts(state, props),
     tSfPeaks: ToShiftPeaks(state, props),
     editPeakSt: state.editPeak.present,
@@ -146,6 +147,7 @@ ViewerLine.propTypes = {
     PropTypes.bool,
     PropTypes.number,
   ]).isRequired,
+  comparisons: PropTypes.array.isRequired,
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,

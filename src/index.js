@@ -38,7 +38,7 @@ class DemoWriteIr extends React.Component {
       desc: '',
       predictions: false,
       molecule: '',
-      showOthers: false,
+      showOthers: true,
     };
 
     this.onClick = this.onClick.bind(this);
@@ -255,9 +255,10 @@ class DemoWriteIr extends React.Component {
 
   loadOthers() {
     const { showOthers } = this.state;
-    const jcamps = showOthers ? [otherIrEntity] : [];
+    const others = showOthers ? [otherIrEntity] : [];
+    console.log(others)
     return {
-      jcamps,
+      others,
       cb: this.onShowOthers,
     };
   }
