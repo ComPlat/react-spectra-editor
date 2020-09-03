@@ -58,7 +58,7 @@ class ForecastViewer extends React.Component {
   render() {
     const {
       classes, topic, feature, cLabel, xLabel, yLabel, forecast,
-      isNmr, isIr, uiSt,
+      isNmr, isIr, uiSt, comparisonsSt,
     } = this.props;
     const { viewer } = uiSt;
     const {
@@ -73,6 +73,7 @@ class ForecastViewer extends React.Component {
           cLabel={cLabel}
           xLabel={xLabel}
           yLabel={yLabel}
+          comparisons={comparisonsSt}
           isHidden={viewer !== LIST_UI_VIEWER_TYPE.SPECTRUM}
         />
         {
@@ -99,6 +100,7 @@ class ForecastViewer extends React.Component {
 const mapStateToProps = (state, _) => ( // eslint-disable-line
   {
     uiSt: state.ui,
+    comparisonsSt: state.jcamp.others,
   }
 );
 
@@ -120,6 +122,7 @@ ForecastViewer.propTypes = {
   isNmr: PropTypes.bool.isRequired,
   isIr: PropTypes.bool.isRequired,
   uiSt: PropTypes.object.isRequired,
+  comparisonsSt: PropTypes.array.isRequired,
   initForecastStatusAct: PropTypes.func.isRequired,
   setUiViewerTypeAct: PropTypes.func.isRequired,
 };

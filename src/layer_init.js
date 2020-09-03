@@ -8,6 +8,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { updateOperation } from './actions/submit';
 import { resetInitCommon, resetInitNmr, resetInitMs } from './actions/manager';
 import { updateMetaPeaks } from './actions/meta';
+import { addOthers } from './actions/jcamp';
 import LayerPrism from './layer_prism';
 import Format from './helpers/format';
 
@@ -21,15 +22,18 @@ class LayerInit extends React.Component {
     this.normChange = this.normChange.bind(this);
     this.execReset = this.execReset.bind(this);
     this.initReducer = this.initReducer.bind(this);
+    this.updateOthers = this.updateOthers.bind(this);
   }
 
   componentDidMount() {
     this.execReset();
     this.initReducer();
+    this.updateOthers();
   }
 
   componentDidUpdate(prevProps) {
     this.normChange(prevProps);
+    this.updateOthers();
   }
 
   normChange(prevProps) {
@@ -72,6 +76,11 @@ class LayerInit extends React.Component {
     updateOperationAct(operations[0]);
   }
 
+  updateOthers() {
+    const { others, addOthersAct } = this.props;
+    addOthersAct(others);
+  }
+
   render() {
     const {
       entity, cLabel, xLabel, yLabel, forecast, operations,
@@ -109,11 +118,13 @@ const mapDispatchToProps = dispatch => (
     resetInitMsAct: resetInitMs,
     updateOperationAct: updateOperation,
     updateMetaPeaksAct: updateMetaPeaks,
+    addOthersAct: addOthers,
   }, dispatch)
 );
 
 LayerInit.propTypes = {
   entity: PropTypes.object.isRequired,
+  others: PropTypes.object.isRequired,
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
@@ -127,6 +138,7 @@ LayerInit.propTypes = {
   resetInitMsAct: PropTypes.func.isRequired,
   updateOperationAct: PropTypes.func.isRequired,
   updateMetaPeaksAct: PropTypes.func.isRequired,
+  addOthersAct: PropTypes.func.isRequired,
 };
 
 export default connect(

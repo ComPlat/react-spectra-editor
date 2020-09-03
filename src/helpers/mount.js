@@ -63,6 +63,21 @@ const MountPath = (target, color) => {
   return path;
 };
 
+const MountComparePath = (target, color, id) => {
+  const path = target.root.append('g')
+    .attr('class', 'line-clip-compare')
+    .attr('id', id)
+    .attr('clip-path', 'url(#clip)')
+    .append('path')
+    .attr('class', 'line')
+    .style('fill', 'none')
+    .style('stroke', color)
+    .style('stroke-width', 1)
+    .style('stroke-dasharray', ('30, 3'))
+    .on('click', () => ClickCompass(target));
+  return path;
+};
+
 const MountThresLine = (target, color) => {
   const thresLineUp = target.root.append('g')
     .attr('class', 'line-clip')
@@ -165,6 +180,6 @@ const MountMainFrame = (target, name) => {
 
 export {
   MountTags, MountRef, MountPath, MountThresLine, MountGrid, MountAxis,
-  MountAxisLabelX, MountAxisLabelY,
+  MountComparePath, MountAxisLabelX, MountAxisLabelY,
   MountMarker, MountClip, MountMainFrame, MountBars,
 };

@@ -60,6 +60,40 @@ const Topic2Seed = createSelector(
   convertTopic,
 );
 
+const getOthers = (_, props) => props.comparisons;
+
+const calcRescaleXY = (xs, ys, minY, maxY, show) => {
+  const sp = [];
+  if (xs.length < 1) return sp;
+  const [lowerY, upperY] = [Math.min(...ys), Math.max(...ys)];
+  const faktor = (maxY - minY) / (upperY - lowerY);
+  for (let i = 0; i < ys.length; i += 2) { // downsample
+    const x = xs[i];
+    const y = (ys[i] - lowerY) * faktor + minY;
+    sp.push({ x, y });
+  }
+  return { data: sp, show };
+};
+
+const convertComparisons = (layout, comparisons, feature) => {
+  const { minY, maxY } = feature;
+  if (!comparisons || !Format.isIrLayout(layout)) return [];
+  return comparisons.map((c) => {
+    const { spectra, show } = c;
+    const topic = spectra[0].data[0];
+    const xs = topic.x;
+    const ys = topic.y;
+    return calcRescaleXY(xs, ys, minY, maxY, show);
+  });
+};
+
+const GetComparisons = createSelector(
+  getLayout,
+  getOthers,
+  getFeature,
+  convertComparisons,
+);
+
 const convertFrequency = (layout, feature) => {
   if (['1H', '13C', '19F'].indexOf(layout) < 0) return false;
   const { observeFrequency } = feature;
@@ -481,4 +515,5 @@ export {
   ExtractJcamp, Topic2Seed, Feature2Peak,
   ToThresEndPts, ToShiftPeaks, ToFrequency,
   Convert2Peak, Convert2Scan, Convert2Thres,
+  GetComparisons,
 };

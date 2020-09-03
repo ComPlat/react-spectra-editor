@@ -11,6 +11,8 @@ import nmr13CDeptJcamp from './__tests__/fixtures/nmr13c_dept_jcamp';
 import nmr13CJcamp from './__tests__/fixtures/nmr13c_jcamp';
 import nmr19FJcamp from './__tests__/fixtures/nmr19f_jcamp';
 import irJcamp from './__tests__/fixtures/ir_jcamp';
+import compareIr1Jcamp from './__tests__/fixtures/compare_ir_1_jcamp';
+import compareIr2Jcamp from './__tests__/fixtures/compare_ir_2_jcamp';
 import ramanJcamp from './__tests__/fixtures/raman_jcamp';
 import msJcamp from './__tests__/fixtures/ms_jcamp';
 import nmrResult from './__tests__/fixtures/nmr_result';
@@ -24,6 +26,8 @@ const nmr13CEntity = FN.ExtractJcamp(nmr13CJcamp);
 const nmr13CDeptEntity = FN.ExtractJcamp(nmr13CDeptJcamp);
 const nmr19FEntity = FN.ExtractJcamp(nmr19FJcamp);
 const irEntity = FN.ExtractJcamp(irJcamp);
+const compIr1Entity = FN.ExtractJcamp(compareIr1Jcamp);
+const compIr2Entity = FN.ExtractJcamp(compareIr2Jcamp);
 const ramanEntity = FN.ExtractJcamp(ramanJcamp);
 const msEntity = FN.ExtractJcamp(msJcamp);
 
@@ -36,6 +40,7 @@ class DemoWriteIr extends React.Component {
       desc: '',
       predictions: false,
       molecule: '',
+      showOthers: false,
     };
 
     this.onClick = this.onClick.bind(this);
@@ -48,6 +53,8 @@ class DemoWriteIr extends React.Component {
     this.updatInput = this.updatInput.bind(this);
     this.loadEntity = this.loadEntity.bind(this);
     this.loadQuill = this.loadQuill.bind(this);
+    this.onShowOthers = this.onShowOthers.bind(this);
+    this.loadOthers = this.loadOthers.bind(this);
   }
 
   onClick(typ) {
@@ -244,6 +251,20 @@ class DemoWriteIr extends React.Component {
     }
   }
 
+  onShowOthers(jcamp) {
+    this.setState({ showOthers: true });
+  }
+
+  loadOthers() {
+    const { showOthers } = this.state;
+    const others = showOthers ? [compIr1Entity, compIr2Entity] : [];
+
+    return {
+      others,
+      addOthersCb: this.onShowOthers,
+    };
+  }
+
   render() {
     const {
       desc, predictions, molecule, typ,
@@ -273,6 +294,7 @@ class DemoWriteIr extends React.Component {
     }
 
     const molSvg = ['nmr 1h', 'ir'].indexOf(typ) >= 0 ? Phenylalanin.path : '';
+    const others = this.loadOthers();
 
     return (
       <div style={{ width: Math.round(window.innerWidth * 0.96) }}>
@@ -329,6 +351,7 @@ class DemoWriteIr extends React.Component {
         </div>
         <SpectraEditor
           entity={entity}
+          others={others}
           forecast={forecast}
           operations={operations}
           descriptions={qDescVal}

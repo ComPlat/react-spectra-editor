@@ -10,6 +10,7 @@ import {
 
 import InfoPanel from './info';
 import PeakPanel from './peaks';
+import ComparePanel from './compare';
 import MultiplicityPanel from './multiplicity';
 import Cfg from '../../helpers/cfg';
 
@@ -56,6 +57,7 @@ class PanelViewer extends React.Component {
     const onExapndInfo = () => this.onExapnd('info');
     const onExapndPeak = () => this.onExapnd('peak');
     const onExapndMpy = () => this.onExapnd('mpy');
+    const onExapndCompare = () => this.onExapnd('compare');
 
     return (
       <div className={classNames(classes.panels)}>
@@ -72,6 +74,7 @@ class PanelViewer extends React.Component {
           />
           { Cfg.hidePanelPeak(layoutSt) ? null : <PeakPanel expand={expand === 'peak'} onExapnd={onExapndPeak} /> }
           { Cfg.hidePanelMpy(layoutSt) ? null : <MultiplicityPanel expand={expand === 'mpy'} onExapnd={onExapndMpy} /> }
+          { Cfg.hidePanelCompare(layoutSt) ? null : <ComparePanel expand={expand === 'compare'} onExapnd={onExapndCompare} /> }
         </MuiThemeProvider>
       </div>
     );

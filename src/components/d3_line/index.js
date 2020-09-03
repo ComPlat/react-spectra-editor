@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 
 import {
   Topic2Seed, Feature2Peak, ToThresEndPts, ToShiftPeaks, ToFrequency,
+  GetComparisons,
 } from '../../helpers/chem';
 import { resetAll } from '../../actions/manager';
 import { selectUiSweep, scrollUiWheel, clickUiTarget } from '../../actions/ui';
@@ -32,7 +33,7 @@ class ViewerLine extends React.Component {
 
   componentDidMount() {
     const {
-      seed, peak, cLabel, xLabel, yLabel, feature, freq,
+      seed, peak, cLabel, xLabel, yLabel, feature, freq, comparisons,
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt, integationSt, mtplySt,
       sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
       isHidden,
@@ -49,6 +50,7 @@ class ViewerLine extends React.Component {
       filterSeed,
       filterPeak,
       freq,
+      comparisons,
       tTrEndPts,
       tSfPeaks,
       editPeakSt,
@@ -65,7 +67,7 @@ class ViewerLine extends React.Component {
 
   componentDidUpdate(prevProps) {
     const {
-      seed, peak, freq,
+      seed, peak, freq, comparisons,
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt, integationSt, mtplySt,
       sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
       isHidden,
@@ -79,6 +81,7 @@ class ViewerLine extends React.Component {
       filterSeed,
       filterPeak,
       freq,
+      comparisons,
       tTrEndPts,
       tSfPeaks,
       editPeakSt,
@@ -116,6 +119,7 @@ const mapStateToProps = (state, props) => (
     seed: Topic2Seed(state, props),
     peak: Feature2Peak(state, props),
     freq: ToFrequency(state, props),
+    comparisons: GetComparisons(state, props),
     tTrEndPts: ToThresEndPts(state, props),
     tSfPeaks: ToShiftPeaks(state, props),
     editPeakSt: state.editPeak.present,
@@ -144,6 +148,7 @@ ViewerLine.propTypes = {
     PropTypes.bool,
     PropTypes.number,
   ]).isRequired,
+  comparisons: PropTypes.array.isRequired,
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,

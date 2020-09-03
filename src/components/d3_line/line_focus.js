@@ -4,7 +4,7 @@ import {
 } from '../../helpers/init';
 import {
   MountPath, MountGrid, MountAxis, MountAxisLabelX, MountAxisLabelY, MountRef,
-  MountClip, MountMainFrame, MountTags, MountThresLine,
+  MountClip, MountMainFrame, MountTags, MountThresLine, MountComparePath,
 } from '../../helpers/mount';
 import MountBrush from '../../helpers/brush';
 import { TfRescale, MountCompass } from '../../helpers/compass';
@@ -75,6 +75,7 @@ class LineFocus {
     this.drawRef = this.drawRef.bind(this);
     this.drawInteg = this.drawInteg.bind(this);
     this.drawMtply = this.drawMtply.bind(this);
+    this.drawComparisons = this.drawComparisons.bind(this);
     this.onClickTarget = this.onClickTarget.bind(this);
     this.mergedPeaks = this.mergedPeaks.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
@@ -654,8 +655,19 @@ class LineFocus {
       .attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y)})`);
   }
 
+  drawComparisons(comparisons) {
+    d3.selectAll('.line-clip-compare').remove();
+    if (!comparisons) return null;
+    comparisons.forEach((c, idx) => {
+      if (!c.show) return;
+      const path = MountComparePath(this, Format.compareColors(idx), idx); // #D5D8DC
+      path.attr('d', this.pathCall(c.data));
+    });
+    return null;
+  }
+
   create({
-    filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq,
+    filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, comparisons,
     editPeakSt, layoutSt, integationSt, mtplySt,
     sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
   }) {
@@ -686,13 +698,14 @@ class LineFocus {
       this.drawPeaks(editPeakSt);
       this.drawInteg(integationSt);
       this.drawMtply(mtplySt);
+      this.drawComparisons(comparisons);
     }
     MountBrush(this, isUiAddIntgSt, isUiNoBrushSt);
     this.resetShouldUpdate(editPeakSt, integationSt, mtplySt);
   }
 
   update({
-    filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq,
+    filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, comparisons,
     editPeakSt, layoutSt, integationSt, mtplySt,
     sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
   }) {
@@ -709,6 +722,7 @@ class LineFocus {
       this.drawPeaks(editPeakSt);
       this.drawInteg(integationSt);
       this.drawMtply(mtplySt);
+      this.drawComparisons(comparisons);
     }
     MountBrush(this, isUiAddIntgSt, isUiNoBrushSt);
     this.resetShouldUpdate(editPeakSt, integationSt, mtplySt);

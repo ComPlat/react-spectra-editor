@@ -223,6 +223,8 @@ const formatPeaksByPrediction = (
   return body;
 };
 
+const compareColors = idx => ['#ABB2B9', '#EDBB99', '#ABEBC6', '#D2B4DE', '#F9E79F'][idx % 5];
+
 const Format = {
   toPeakStr,
   buildData,
@@ -245,6 +247,7 @@ const Format = {
   formatedMS,
   formatedEm,
   calcMpyCenter,
+  compareColors,
 };
 
 export default Format;
