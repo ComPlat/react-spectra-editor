@@ -64,7 +64,7 @@ using the standalone server as an example
 
 ##### [3-5] Solvent selection
 
-1. There are 2 actions for solvent selection: 
+1. There are 2 actions for solvent selection:
     - Click __Set Reference__ and select on an added peak.
     - Select a pre-defined solvent.
 
@@ -101,3 +101,29 @@ using the standalone server as an example
 1. Please select __Ascend__ or __Descend__ and proper __Decimal__, and select writing peaks or multiplictity, then click __Submit__. You will see the information at the bottom of the page.
 
 <img src="https://github.com/ComPlat/react-spectra-editor/blob/master/stories/demo/usage/8_write.gif" width="800">
+
+
+##### [3-9] Compare spectra (IR only)
+
+1. Click __Spectra Comparisons__ to upload spectra.
+
+2. Click icons to hide/show or remove spectra.
+
+3. _Compared spectra will not be exported!_
+
+<img src="https://github.com/ComPlat/react-spectra-editor/blob/master/stories/demo/usage/9_ir_compare.gif" width="800">
+
+
+##### [3-10] Export results
+
+1. Select __Save__ and click __Submit__ to export results.
+
+2. There will be 3 files in the exported zip file.
+
+- original file (orig_your_filename.ext)
+- edited jcamp file (your_filename.ext)
+- edited image (your_filename.png)
+
+<img src="https://github.com/ComPlat/react-spectra-editor/blob/master/stories/demo/usage/10_export.gif" width="800">
+
+
