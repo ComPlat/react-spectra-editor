@@ -86,6 +86,7 @@ function* scrollUiWheel(action) {
       [nytL, nytU] = [nyeL - 0.125 * h, nyeU + 0.125 * h];
       nextExtent = { xExtent, yExtent: { yL: nytL, yU: nytU } };
       break;
+    case LIST_LAYOUT.UVVIS:
     default:
       [nyeL, nyeU] = [yeL, yeL + (yeU - yeL) * scale];
       h = nyeU - nyeL;

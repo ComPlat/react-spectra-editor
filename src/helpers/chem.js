@@ -138,12 +138,11 @@ const Feature2Peak = createSelector(
 );
 
 const convertThresEndPts = (feature, threshold) => {
-  if (!feature.thresRef) return [{ x: false, y: false }, { x: false, y: false }];
   const {
     maxY, maxX, minX, thresRef,
   } = feature;
 
-  const thresVal = threshold || thresRef;
+  const thresVal = threshold || thresRef || 0;
   if (!thresVal || !feature.data) return [];
   const yThres = thresVal * maxY / 100.0;
   const endPts = [{ x: minX - 200, y: yThres }, { x: maxX + 200, y: yThres }];
@@ -184,6 +183,9 @@ const readLayout = (jcamp) => {
     }
     if (dataType.includes('RAMAN SPECTRUM')) {
       return LIST_LAYOUT.RAMAN;
+    }
+    if (dataType.includes('UV/VIS SPECTRUM')) {
+      return LIST_LAYOUT.UVVIS;
     }
     if (dataType.includes('MASS SPECTRUM')) {
       return LIST_LAYOUT.MS;

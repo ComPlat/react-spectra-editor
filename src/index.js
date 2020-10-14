@@ -18,6 +18,7 @@ import msJcamp from './__tests__/fixtures/ms_jcamp';
 import nmrResult from './__tests__/fixtures/nmr_result';
 import irResult from './__tests__/fixtures/ir_result';
 import Phenylalanin from './__tests__/fixtures/phenylalanin';
+import uvVisJcamp from './__tests__/fixtures/uv_vis_jcamp';
 import { q1H, qIR, q13C } from './__tests__/fixtures/qDescValue';
 import './__tests__/style/svg.css';
 
@@ -30,6 +31,7 @@ const compIr1Entity = FN.ExtractJcamp(compareIr1Jcamp);
 const compIr2Entity = FN.ExtractJcamp(compareIr2Jcamp);
 const ramanEntity = FN.ExtractJcamp(ramanJcamp);
 const msEntity = FN.ExtractJcamp(msJcamp);
+const uvVisEntity = FN.ExtractJcamp(uvVisJcamp);
 
 class DemoWriteIr extends React.Component {
   constructor(props) {
@@ -226,6 +228,8 @@ class DemoWriteIr extends React.Component {
         return irEntity;
       case 'raman':
         return ramanEntity;
+      case 'uv/vis':
+        return uvVisEntity;
       case 'ms':
       default:
         return msEntity;
@@ -245,6 +249,7 @@ class DemoWriteIr extends React.Component {
         return qIR;
       case 'nmr 19f':
       case 'raman':
+      case 'uv/vis':
       case 'ms':
       default:
         return false;
@@ -340,6 +345,13 @@ class DemoWriteIr extends React.Component {
             onClick={this.onClick('raman')}
           >
             RAMAN
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('uv/vis')}
+          >
+            UV/VIS
           </Button>
           <Button
             variant="contained"

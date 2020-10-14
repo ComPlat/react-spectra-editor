@@ -53,11 +53,10 @@ const setThreshold = (
   return (
     <TextField
       className={classes.field}
-      disabled={Cfg.btnCmdThres(thresVal)}
       id="outlined-name"
       placeholder="N.A."
       type="number"
-      value={thresVal || false}
+      value={thresVal || 0.01}
       margin="none"
       InputProps={{
         endAdornment: txtPercent(),
