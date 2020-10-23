@@ -187,6 +187,9 @@ const readLayout = (jcamp) => {
     if (dataType.includes('UV/VIS SPECTRUM')) {
       return LIST_LAYOUT.UVVIS;
     }
+    if (dataType.includes('THERMOGRAVIMETRIC ANALYSIS')) {
+      return LIST_LAYOUT.TGA;
+    }
     if (dataType.includes('MASS SPECTRUM')) {
       return LIST_LAYOUT.MS;
     }

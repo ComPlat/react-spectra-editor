@@ -5,6 +5,7 @@ const btnCmdAnaViewer = layoutSt => (
     || Format.isRamanLayout(layoutSt)
     || Format.is19FLayout(layoutSt)
     || Format.isUvVisLayout(layoutSt)
+    || Format.isTGALayout(layoutSt)
 );
 
 const hideCmdAnaViewer = () => false;

@@ -7,6 +7,7 @@ const spectraDigit = (layout) => {
     case LIST_LAYOUT.IR:
     case LIST_LAYOUT.RAMAN:
     case LIST_LAYOUT.UVVIS:
+    case LIST_LAYOUT.TGA:
     case LIST_LAYOUT.MS:
       return 0;
     case LIST_LAYOUT.C13:
@@ -48,6 +49,7 @@ const spectraOps = {
   [LIST_LAYOUT.IR]: { head: 'IR', tail: ' cm-1' },
   [LIST_LAYOUT.RAMAN]: { head: 'RAMAN', tail: ' cm-1' },
   [LIST_LAYOUT.UVVIS]: { head: 'UV/VIS', tail: ' cm-1' },
+  [LIST_LAYOUT.TGA]: { head: 'THERMOGRAVIMETRIC ANALYSIS', tail: ' SECONDS' },
   [LIST_LAYOUT.MS]: { head: 'MASS', tail: ' m/z' },
 };
 
@@ -158,6 +160,9 @@ const peaksBody = ({
   if (layout === LIST_LAYOUT.UVVIS) {
     return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
+  if (layout === LIST_LAYOUT.TGA) {
+    return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
+  }
   return ordered.map(o => fixDigit(o.x, decimal)).join(', ');
 };
 
@@ -185,6 +190,7 @@ const isMsLayout = layoutSt => (LIST_LAYOUT.MS === layoutSt);
 const isIrLayout = layoutSt => ([LIST_LAYOUT.IR, 'INFRARED'].indexOf(layoutSt) >= 0);
 const isRamanLayout = layoutSt => (LIST_LAYOUT.RAMAN === layoutSt);
 const isUvVisLayout = layoutSt => (LIST_LAYOUT.UVVIS === layoutSt);
+const isTGALayout = layoutSt => (LIST_LAYOUT.TGA === layoutSt);
 const isEmWaveLayout = layoutSt => (
   [LIST_LAYOUT.IR, LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS].indexOf(layoutSt) >= 0
 );
@@ -250,6 +256,7 @@ const Format = {
   isIrLayout,
   isRamanLayout,
   isUvVisLayout,
+  isTGALayout,
   isEmWaveLayout,
   fixDigit,
   formatPeaksByPrediction,

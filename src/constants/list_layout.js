@@ -7,6 +7,7 @@ const LIST_LAYOUT = {
   C13: '13C',
   F19: '19F',
   MS: 'MS',
+  TGA: 'THERMOGRAVIMETRIC ANALYSIS',
 };
 
 export {
