@@ -48,7 +48,7 @@ const spectraOps = {
   [LIST_LAYOUT.F19]: { head: '19F', tail: '.' },
   [LIST_LAYOUT.IR]: { head: 'IR', tail: ' cm-1' },
   [LIST_LAYOUT.RAMAN]: { head: 'RAMAN', tail: ' cm-1' },
-  [LIST_LAYOUT.UVVIS]: { head: 'UV/VIS', tail: ' cm-1' },
+  [LIST_LAYOUT.UVVIS]: { head: 'UV/VIS (transmittance)', tail: ' nm' },
   [LIST_LAYOUT.TGA]: { head: 'THERMOGRAVIMETRIC ANALYSIS', tail: ' SECONDS' },
   [LIST_LAYOUT.MS]: { head: 'MASS', tail: ' m/z' },
 };
@@ -121,6 +121,29 @@ const formatedEm = (
     .join(', ');
 };
 
+const formatedUvVis = (
+  peaks, maxY, decimal = 2, isAscend = true,
+  isIntensity = false, boundary = {}, lowerIsStronger = false,
+) => {
+  const ascendFunc = (a, b) => parseFloat(a) - parseFloat(b);
+  const descendFunc = (a, b) => parseFloat(b) - parseFloat(a);
+  const sortFunc = isAscend ? ascendFunc : descendFunc;
+  let ordered = {};
+
+  peaks.forEach((p) => {
+    const x = fixDigit(p.x, decimal);
+    const better = !ordered[x] || (p.y > ordered[x]);
+    if (better) {
+      ordered = Object.assign({}, ordered, { [x]: p.y });
+    }
+  });
+
+  ordered = Object.keys(ordered).sort(sortFunc)
+    .map(k => ({ x: k, y: ordered[k] }));
+
+  return ordered.map(o => `${o.x} (${o.y.toFixed(2)})`)
+    .join(', ');
+};
 
 const rmShiftFromPeaks = (peaks, shift) => {
   const peaksXY = ToXY(peaks);
@@ -158,7 +181,7 @@ const peaksBody = ({
     return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
   if (layout === LIST_LAYOUT.UVVIS) {
-    return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
+    return formatedUvVis(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
   if (layout === LIST_LAYOUT.TGA) {
     return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
