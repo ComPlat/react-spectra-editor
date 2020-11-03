@@ -665,6 +665,10 @@ class LineFocus {
     return null;
   }
 
+  reverseXAxis(layoutSt) {
+    return [LIST_LAYOUT.UVVIS, LIST_LAYOUT.TGA].indexOf(layoutSt) < 0;
+  }
+
   create({
     filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, comparisons,
     editPeakSt, layoutSt, integationSt, mtplySt,
@@ -675,7 +679,7 @@ class LineFocus {
     MountClip(this);
 
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
-    this.scales = InitScale(this, layoutSt !== LIST_LAYOUT.UVVIS);
+    this.scales = InitScale(this, this.reverseXAxis(layoutSt));
     this.setTip();
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt);
     MountCompass(this);
@@ -710,7 +714,7 @@ class LineFocus {
     sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
   }) {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
-    this.scales = InitScale(this, layoutSt !== LIST_LAYOUT.UVVIS);
+    this.scales = InitScale(this, this.reverseXAxis(layoutSt));
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt);
 
     if (this.data && this.data.length > 0) {
