@@ -57,7 +57,7 @@ const styles = () => ({
     backgroundColor: '#fff',
     height: 108,
     lineHeight: '24px',
-    overflow: 'hidden',
+    overflowY: 'scroll',
     overflowWrap: 'word-break',
   },
   tHead: {
@@ -81,10 +81,8 @@ const styles = () => ({
   },
 });
 
-const simTitle = (layoutSt, peaks) => (
-  Format.is13CLayout(layoutSt)
-    ? `Simulation Peaks (${peaks.length})`
-    : `Simulation Multiplicity Centers (${peaks.length})`
+const simTitle = () => (
+  'Simulated signals from NMRshiftDB'
 );
 
 const simContent = nmrSimPeaks => (
@@ -167,7 +165,7 @@ const InfoPanel = ({
               ? (
                 <div className={classNames(classes.rowRoot, classes.rowOddSim)}>
                   <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>
-                    { simTitle(layoutSt, simulationSt.nmrSimPeaks) }
+                    { simTitle() }
                     :
                   </span>
                   <br />
