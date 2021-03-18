@@ -18,7 +18,8 @@ const styles = () => ({
 const LayerPrism = ({
   entity, cLabel, xLabel, yLabel, forecast, operations,
   descriptions, molSvg, editorOnly,
-  thresSt, scanSt, uiSt,
+  thresSt, scanSt, uiSt, 
+  canChangeDescription, onDescriptionChanged
 }) => {
   const { topic, feature, hasEdit } = extractParams(entity, thresSt, scanSt);
   if (!topic) return null;
@@ -81,6 +82,8 @@ const LayerPrism = ({
               editorOnly={editorOnly}
               molSvg={molSvg}
               descriptions={descriptions}
+              canChangeDescription={canChangeDescription}
+              onDescriptionChanged={onDescriptionChanged}
             />
           </Grid>
         </Grid>
@@ -115,6 +118,8 @@ LayerPrism.propTypes = {
   thresSt: PropTypes.object.isRequired,
   scanSt: PropTypes.object.isRequired,
   uiSt: PropTypes.object.isRequired,
+  canChangeDescription: PropTypes.bool.isRequired,
+  onDescriptionChanged: PropTypes.func
 };
 
 export default connect(

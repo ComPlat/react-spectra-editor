@@ -92,12 +92,12 @@ const simContent = nmrSimPeaks => (
 const InfoPanel = ({
   classes, expand, feature, editorOnly, molSvg, descriptions,
   layoutSt, simulationSt, shiftNameSt,
-  onExapnd,
+  onExapnd, canChangeDescription, onDescriptionChanged
 }) => {
   if (!feature) return null;
   const { title, observeFrequency, solventName } = feature;
   const showSolvName = shiftNameSt === '- - -' ? solventName : shiftNameSt;
-
+  
   return (
     <ExpansionPanel
       expanded={expand}
@@ -153,11 +153,18 @@ const InfoPanel = ({
             )
         }
       </div>
-      <ReactQuill
+      {/* <ReactQuill
         className={classNames(classes.quill, 'card-sv-quill')}
         value={descriptions}
         modules={{ toolbar: false }}
         readOnly
+      /> */}
+      <ReactQuill
+        className={classNames(classes.quill, 'card-sv-quill')}
+        value={descriptions}
+        modules={{ toolbar: false }}
+        onChange={onDescriptionChanged}
+        readOnly={canChangeDescription !== undefined ? !canChangeDescription : true}
       />
       <div>
         {
@@ -205,8 +212,10 @@ InfoPanel.propTypes = {
   simulationSt: PropTypes.array.isRequired,
   shiftNameSt: PropTypes.string.isRequired,
   onExapnd: PropTypes.func.isRequired,
+  canChangeDescription: PropTypes.bool.isRequired,
+  onDescriptionChanged: PropTypes.func
 };
 
 export default connect(
-  mapStateToProps, mapDispatchToProps,
+  mapStateToProps, mapDispatchToProps
 )(withStyles(styles)(InfoPanel));
