@@ -59,6 +59,7 @@ class DemoWriteIr extends React.Component {
     this.loadQuill = this.loadQuill.bind(this);
     this.onShowOthers = this.onShowOthers.bind(this);
     this.loadOthers = this.loadOthers.bind(this);
+    this.onDescriptionChanged = this.onDescriptionChanged.bind(this);
   }
 
   onClick(typ) {
@@ -275,6 +276,10 @@ class DemoWriteIr extends React.Component {
     };
   }
 
+  onDescriptionChanged(content) {
+    console.log(content)
+  }
+
   render() {
     const {
       desc, predictions, molecule, typ,
@@ -382,6 +387,8 @@ class DemoWriteIr extends React.Component {
           style={{ fontFamily: 'Helvetica' }}
           molSvg={molSvg}
           editorOnly={false}
+          canChangeDescription={false}
+          onDescriptionChanged={this.onDescriptionChanged}
         />
         <Grid container>
           <Grid item xs={10}>

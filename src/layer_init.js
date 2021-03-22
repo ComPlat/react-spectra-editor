@@ -85,6 +85,7 @@ class LayerInit extends React.Component {
     const {
       entity, cLabel, xLabel, yLabel, forecast, operations,
       descriptions, molSvg, editorOnly,
+      canChangeDescription, onDescriptionChanged
     } = this.props;
     const target = entity.spectra[0];
 
@@ -102,6 +103,8 @@ class LayerInit extends React.Component {
         descriptions={descriptions}
         molSvg={molSvg}
         editorOnly={editorOnly}
+        canChangeDescription={canChangeDescription}
+        onDescriptionChanged={onDescriptionChanged}
       />
     );
   }
@@ -139,6 +142,8 @@ LayerInit.propTypes = {
   updateOperationAct: PropTypes.func.isRequired,
   updateMetaPeaksAct: PropTypes.func.isRequired,
   addOthersAct: PropTypes.func.isRequired,
+  canChangeDescription: PropTypes.bool.isRequired,
+  onDescriptionChanged: PropTypes.func
 };
 
 export default connect(
