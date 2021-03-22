@@ -24,4 +24,4 @@ yarn-error.log*
 
 .nvmrc
 
-/dist
+#/dist

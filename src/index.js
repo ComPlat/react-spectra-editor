@@ -5,6 +5,8 @@ import InputBase from '@material-ui/core/InputBase';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 
+import ReactQuill from 'react-quill';
+
 import { SpectraEditor, FN } from './app';
 import nmr1HJcamp from './__tests__/fixtures/nmr1h_jcamp';
 import nmr13CDeptJcamp from './__tests__/fixtures/nmr13c_dept_jcamp';
@@ -45,6 +47,7 @@ class DemoWriteIr extends React.Component {
       predictions: false,
       molecule: '',
       showOthers: false,
+      descChanged: ''
     };
 
     this.onClick = this.onClick.bind(this);
@@ -277,7 +280,8 @@ class DemoWriteIr extends React.Component {
   }
 
   onDescriptionChanged(content) {
-    console.log(content)
+    // console.log(content)
+    this.setState({descChanged: content})
   }
 
   render() {
@@ -387,9 +391,18 @@ class DemoWriteIr extends React.Component {
           style={{ fontFamily: 'Helvetica' }}
           molSvg={molSvg}
           editorOnly={false}
-          canChangeDescription={false}
+          canChangeDescription={true}
           onDescriptionChanged={this.onDescriptionChanged}
         />
+        <div>
+          <span>Description Changed</span>
+          <ReactQuill
+            className={'card-sv-quill'}
+            value={this.state.descChanged}
+            modules={{ toolbar: false }}
+            readOnly
+          />
+        </div>
         <Grid container>
           <Grid item xs={10}>
             <InputBase
