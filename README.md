@@ -20,7 +20,11 @@ $ npm i react-spectra-editor
 $ yarn add https://github.com/ComPlat/react-spectra-editor
 ```
 
-### Run Demo
+#### Allows users manual edit spectra's description
+1. Set *canChangeDescription* to be ***true***
+2. Handle changed value on function *onDescriptionChanged*. The content is formatted with [Delta Object](https://quilljs.com/docs/delta/)
+
+#### Running Demo
 ```
 $ yarn install
 
