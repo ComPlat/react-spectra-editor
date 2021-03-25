@@ -7,12 +7,12 @@ An editor to View and Edit Chemical Spectra data (NMR, IR and MS).
 #### Installing from npm
 With yarn
 ```
-$ yarn add react-spectra-editor
+$ yarn add @complat/react-spectra-editor
 ```
 
 Or with npm
 ```
-$ npm i react-spectra-editor
+$ npm i @complat/react-spectra-editor
 ```
 
 #### Installing from github source

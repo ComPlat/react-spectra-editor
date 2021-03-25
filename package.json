@@ -1,5 +1,5 @@
 {
-  "name": "react-spectra-editor",
+  "name": "@complat/react-spectra-editor",
   "version": "0.10.11",
   "description": "An editor to View and Edit Chemical Spectra data (NMR, IR and MS).",
   "repository": {
@@ -69,5 +69,8 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
 }
