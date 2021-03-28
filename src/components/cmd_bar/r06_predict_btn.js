@@ -57,7 +57,7 @@ const MuPredictButton = withStyles({
 })(Button);
 
 const onClickFail = (layoutSt, simuCount, realCount) => {
-  const feature = 'multiplet';
+  const feature = Format.is13CLayout(layoutSt) ? 'peak' : 'multiplet';
 
   return () => alert(`Selected ${feature} count (${realCount}) must be larger than 0, and must be eqal or less than simulated count (${simuCount}).`); // eslint-disable-line
 };
@@ -205,7 +205,9 @@ const BtnPredict = ({
   const scan = Convert2Scan(feature, scanSt);
   const thres = Convert2Thres(feature, thresSt);
   const simuCount = simulationSt.nmrSimPeaks.length;
-  const realCount = multiplicitySt.stack.length;
+  const realCount = Format.is13CLayout(layoutSt)
+    ? peaksEdit.length
+    : multiplicitySt.stack.length;
 
   if (is13Cor1H && simuCount === 0) {
     const onClickUnknownCb = onClicUnknown(
