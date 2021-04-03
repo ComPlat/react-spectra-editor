@@ -12,6 +12,7 @@ import { withStyles } from '@material-ui/core/styles';
 
 import { commonStyle } from './common';
 import Format from '../../helpers/format';
+import { carbonFeatures } from '../../helpers/carbonFeatures';
 import { extractPeaksEdit } from '../../helpers/extractPeaksEdit';
 import { setUiViewerType } from '../../actions/ui';
 import { LIST_UI_VIEWER_TYPE } from '../../constants/list_ui';
@@ -206,7 +207,7 @@ const BtnPredict = ({
   const thres = Convert2Thres(feature, thresSt);
   const simuCount = simulationSt.nmrSimPeaks.length;
   const realCount = Format.is13CLayout(layoutSt)
-    ? peaksEdit.length
+    ? carbonFeatures(peaksEdit, multiplicitySt).length
     : multiplicitySt.stack.length;
 
   if (is13Cor1H && simuCount === 0) {
