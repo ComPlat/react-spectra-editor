@@ -113,18 +113,18 @@ const onClicUnknown = (
   );
 };
 
-const counterText = (classes, isIr, realCount, simuCount) => (
+const counterText = (classes, isIr, realCount, uniqCount, simuCount) => (
   isIr
     ? null
     : (
       <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>
-        { `${realCount}/${simuCount}` }
+        { `${realCount}/${uniqCount}/${simuCount}` }
       </span>
     )
 );
 
 const renderBtnPredict = (
-  classes, isIr, realCount, simuCount, color, btnWidthCls, onClick,
+  classes, isIr, realCount, uniqCount, simuCount, color, btnWidthCls, onClick,
 ) => (
   <Tooltip
     title={
@@ -149,7 +149,7 @@ const renderBtnPredict = (
       onClick={onClick}
     >
       {
-        counterText(classes, isIr, realCount, simuCount)
+        counterText(classes, isIr, realCount, uniqCount, simuCount)
       }
       <GpsFixedOutlinedIcon className={classes.icon} />
     </MuPredictButton>
@@ -206,6 +206,7 @@ const BtnPredict = ({
   const scan = Convert2Scan(feature, scanSt);
   const thres = Convert2Thres(feature, thresSt);
   const simuCount = simulationSt.nmrSimPeaks.length;
+  const uniqCount = [...new Set(simulationSt.nmrSimPeaks)].length;
   const realCount = Format.is13CLayout(layoutSt)
     ? carbonFeatures(peaksEdit, multiplicitySt).length
     : multiplicitySt.stack.length;
@@ -234,7 +235,7 @@ const BtnPredict = ({
 
   return (
     renderBtnPredict(
-      classes, isIr, realCount, simuCount, color, btnWidthCls, onClick,
+      classes, isIr, realCount, uniqCount, simuCount, color, btnWidthCls, onClick,
     )
   );
 };
