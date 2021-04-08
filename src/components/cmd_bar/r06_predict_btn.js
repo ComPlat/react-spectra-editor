@@ -12,6 +12,7 @@ import { withStyles } from '@material-ui/core/styles';
 
 import { commonStyle } from './common';
 import Format from '../../helpers/format';
+import { carbonFeatures } from '../../helpers/carbonFeatures';
 import { extractPeaksEdit } from '../../helpers/extractPeaksEdit';
 import { setUiViewerType } from '../../actions/ui';
 import { LIST_UI_VIEWER_TYPE } from '../../constants/list_ui';
@@ -57,7 +58,7 @@ const MuPredictButton = withStyles({
 })(Button);
 
 const onClickFail = (layoutSt, simuCount, realCount) => {
-  const feature = 'multiplet';
+  const feature = Format.is13CLayout(layoutSt) ? 'peak' : 'multiplet';
 
   return () => alert(`Selected ${feature} count (${realCount}) must be larger than 0, and must be eqal or less than simulated count (${simuCount}).`); // eslint-disable-line
 };
@@ -112,18 +113,18 @@ const onClicUnknown = (
   );
 };
 
-const counterText = (classes, isIr, realCount, simuCount) => (
+const counterText = (classes, isIr, realCount, uniqCount, simuCount) => (
   isIr
     ? null
     : (
       <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>
-        { `${realCount}/${simuCount}` }
+        { `${realCount}/${uniqCount}/${simuCount}` }
       </span>
     )
 );
 
 const renderBtnPredict = (
-  classes, isIr, realCount, simuCount, color, btnWidthCls, onClick,
+  classes, isIr, realCount, uniqCount, simuCount, color, btnWidthCls, onClick,
 ) => (
   <Tooltip
     title={
@@ -148,7 +149,7 @@ const renderBtnPredict = (
       onClick={onClick}
     >
       {
-        counterText(classes, isIr, realCount, simuCount)
+        counterText(classes, isIr, realCount, uniqCount, simuCount)
       }
       <GpsFixedOutlinedIcon className={classes.icon} />
     </MuPredictButton>
@@ -205,7 +206,10 @@ const BtnPredict = ({
   const scan = Convert2Scan(feature, scanSt);
   const thres = Convert2Thres(feature, thresSt);
   const simuCount = simulationSt.nmrSimPeaks.length;
-  const realCount = multiplicitySt.stack.length;
+  const uniqCount = [...new Set(simulationSt.nmrSimPeaks)].length;
+  const realCount = Format.is13CLayout(layoutSt)
+    ? carbonFeatures(peaksEdit, multiplicitySt).length
+    : multiplicitySt.stack.length;
 
   if (is13Cor1H && simuCount === 0) {
     const onClickUnknownCb = onClicUnknown(
@@ -231,7 +235,7 @@ const BtnPredict = ({
 
   return (
     renderBtnPredict(
-      classes, isIr, realCount, simuCount, color, btnWidthCls, onClick,
+      classes, isIr, realCount, uniqCount, simuCount, color, btnWidthCls, onClick,
     )
   );
 };
