@@ -44,6 +44,8 @@ var _format = require('../../helpers/format');
 
 var _format2 = _interopRequireDefault(_format);
 
+var _carbonFeatures = require('../../helpers/carbonFeatures');
+
 var _extractPeaksEdit = require('../../helpers/extractPeaksEdit');
 
 var _ui = require('../../actions/ui');
@@ -53,6 +55,8 @@ var _list_ui = require('../../constants/list_ui');
 var _chem = require('../../helpers/chem');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 var styles = function styles() {
   return Object.assign({}, _common.commonStyle, {
@@ -89,7 +93,7 @@ var MuPredictButton = (0, _styles.withStyles)({
 })(_Button2.default);
 
 var onClickFail = function onClickFail(layoutSt, simuCount, realCount) {
-  var feature = 'multiplet';
+  var feature = _format2.default.is13CLayout(layoutSt) ? 'peak' : 'multiplet';
 
   return function () {
     return alert('Selected ' + feature + ' count (' + realCount + ') must be larger than 0, and must be eqal or less than simulated count (' + simuCount + ').');
@@ -144,15 +148,15 @@ var onClicUnknown = function onClicUnknown(feature, forecast, peaksEdit, layoutS
   };
 };
 
-var counterText = function counterText(classes, isIr, realCount, simuCount) {
+var counterText = function counterText(classes, isIr, realCount, uniqCount, simuCount) {
   return isIr ? null : _react2.default.createElement(
     'span',
     { className: (0, _classnames2.default)(classes.tTxt, 'txt-sv-panel-txt') },
-    realCount + '/' + simuCount
+    realCount + '/' + uniqCount + '/' + simuCount
   );
 };
 
-var renderBtnPredict = function renderBtnPredict(classes, isIr, realCount, simuCount, color, btnWidthCls, onClick) {
+var renderBtnPredict = function renderBtnPredict(classes, isIr, realCount, uniqCount, simuCount, color, btnWidthCls, onClick) {
   return _react2.default.createElement(
     _Tooltip2.default,
     {
@@ -179,7 +183,7 @@ var renderBtnPredict = function renderBtnPredict(classes, isIr, realCount, simuC
         style: { color: color },
         onClick: onClick
       },
-      counterText(classes, isIr, realCount, simuCount),
+      counterText(classes, isIr, realCount, uniqCount, simuCount),
       _react2.default.createElement(_GpsFixedOutlined2.default, { className: classes.icon })
     )
   );
@@ -246,7 +250,8 @@ var BtnPredict = function BtnPredict(_ref) {
   var scan = (0, _chem.Convert2Scan)(feature, scanSt);
   var thres = (0, _chem.Convert2Thres)(feature, thresSt);
   var simuCount = simulationSt.nmrSimPeaks.length;
-  var realCount = multiplicitySt.stack.length;
+  var uniqCount = [].concat(_toConsumableArray(new Set(simulationSt.nmrSimPeaks))).length;
+  var realCount = _format2.default.is13CLayout(layoutSt) ? (0, _carbonFeatures.carbonFeatures)(peaksEdit, multiplicitySt).length : multiplicitySt.stack.length;
 
   if (is13Cor1H && simuCount === 0) {
     var onClickUnknownCb = onClicUnknown(feature, forecast, peaksEdit, layoutSt, scan, shiftSt, thres, forecast.predictions, integrationSt, multiplicitySt);
@@ -260,7 +265,7 @@ var BtnPredict = function BtnPredict(_ref) {
 
   var btnWidthCls = isIr ? classes.btnWidthIr : classes.btnWidthNmr;
 
-  return renderBtnPredict(classes, isIr, realCount, simuCount, color, btnWidthCls, onClick);
+  return renderBtnPredict(classes, isIr, realCount, uniqCount, simuCount, color, btnWidthCls, onClick);
 };
 
 var mapStateToProps = function mapStateToProps(state, props) {
