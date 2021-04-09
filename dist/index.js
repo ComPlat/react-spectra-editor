@@ -24,6 +24,10 @@ var _Button = require('@material-ui/core/Button');
 
 var _Button2 = _interopRequireDefault(_Button);
 
+var _reactQuill = require('react-quill');
+
+var _reactQuill2 = _interopRequireDefault(_reactQuill);
+
 var _app = require('./app');
 
 var _nmr1h_jcamp = require('./__tests__/fixtures/nmr1h_jcamp');
@@ -121,7 +125,8 @@ var DemoWriteIr = function (_React$Component) {
       desc: '',
       predictions: false,
       molecule: '',
-      showOthers: false
+      showOthers: false,
+      descChanged: ''
     };
 
     _this.onClick = _this.onClick.bind(_this);
@@ -433,7 +438,8 @@ var DemoWriteIr = function (_React$Component) {
   }, {
     key: 'onDescriptionChanged',
     value: function onDescriptionChanged(content) {
-      console.log(content);
+      // console.log(content)
+      this.setState({ descChanged: content });
     }
   }, {
     key: 'render',
@@ -566,9 +572,24 @@ var DemoWriteIr = function (_React$Component) {
           style: { fontFamily: 'Helvetica' },
           molSvg: molSvg,
           editorOnly: false,
-          canChangeDescription: false,
+          canChangeDescription: true,
           onDescriptionChanged: this.onDescriptionChanged
         }),
+        _react2.default.createElement(
+          'div',
+          null,
+          _react2.default.createElement(
+            'span',
+            null,
+            'Description Changed'
+          ),
+          _react2.default.createElement(_reactQuill2.default, {
+            className: 'card-sv-quill',
+            value: this.state.descChanged,
+            modules: { toolbar: false },
+            readOnly: true
+          })
+        ),
         _react2.default.createElement(
           _Grid2.default,
           { container: true },
