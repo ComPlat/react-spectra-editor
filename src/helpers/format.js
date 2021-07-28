@@ -14,6 +14,7 @@ const spectraDigit = (layout) => {
       return 1;
     case LIST_LAYOUT.H1:
     case LIST_LAYOUT.F19:
+    case LIST_LAYOUT.N15:
     case LIST_LAYOUT.PLAIN:
     default:
       return 2;
@@ -46,6 +47,7 @@ const spectraOps = {
   [LIST_LAYOUT.H1]: { head: '1H', tail: '.' },
   [LIST_LAYOUT.C13]: { head: '13C', tail: '.' },
   [LIST_LAYOUT.F19]: { head: '19F', tail: '.' },
+  [LIST_LAYOUT.N15]: { head: '15N', tail: '.' },
   [LIST_LAYOUT.IR]: { head: 'IR', tail: ' cm-1' },
   [LIST_LAYOUT.RAMAN]: { head: 'RAMAN', tail: ' cm-1' },
   [LIST_LAYOUT.UVVIS]: { head: 'UV/VIS (transmittance)', tail: ' nm' },
@@ -204,8 +206,9 @@ const peaksWrapper = (layout, shift) => {
 };
 
 const isNmrLayout = layoutSt => (
-  [LIST_LAYOUT.H1, LIST_LAYOUT.C13, LIST_LAYOUT.F19].indexOf(layoutSt) >= 0
+  [LIST_LAYOUT.H1, LIST_LAYOUT.C13, LIST_LAYOUT.F19, LIST_LAYOUT.N15].indexOf(layoutSt) >= 0
 );
+const is15NLayout = layoutSt => (LIST_LAYOUT.N15 === layoutSt);
 const is19FLayout = layoutSt => (LIST_LAYOUT.F19 === layoutSt);
 const is13CLayout = layoutSt => (LIST_LAYOUT.C13 === layoutSt);
 const is1HLayout = layoutSt => (LIST_LAYOUT.H1 === layoutSt);
@@ -226,6 +229,8 @@ const getNmrTyp = (layout) => {
       return 'C';
     case LIST_LAYOUT.F19:
       return 'F';
+    case LIST_LAYOUT.N15:
+      return 'N';
     default:
       return '';
   }
@@ -275,6 +280,7 @@ const Format = {
   is13CLayout,
   is1HLayout,
   is19FLayout,
+  is15NLayout,
   isMsLayout,
   isIrLayout,
   isRamanLayout,

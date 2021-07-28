@@ -256,6 +256,7 @@ class DemoWriteIr extends React.Component {
       case 'ir':
         return qIR;
       case 'nmr 19f':
+      case 'nmr 15n':
       case 'raman':
       case 'uv/vis':
       case 'tga':
@@ -345,6 +346,13 @@ class DemoWriteIr extends React.Component {
             onClick={this.onClick('nmr 19f')}
           >
             NMR 19F
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('nmr 15n')}
+          >
+            NMR 15N
           </Button>
           <Button
             variant="contained"

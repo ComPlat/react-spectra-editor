@@ -6,6 +6,7 @@ const LIST_LAYOUT = {
   H1: '1H',
   C13: '13C',
   F19: '19F',
+  N15: '15N',
   MS: 'MS',
   TGA: 'THERMOGRAVIMETRIC ANALYSIS',
 };
