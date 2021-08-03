@@ -22,6 +22,7 @@ var spectraDigit = function spectraDigit(layout) {
     case _list_layout.LIST_LAYOUT.RAMAN:
     case _list_layout.LIST_LAYOUT.UVVIS:
     case _list_layout.LIST_LAYOUT.TGA:
+    case _list_layout.LIST_LAYOUT.XRD:
     case _list_layout.LIST_LAYOUT.MS:
       return 0;
     case _list_layout.LIST_LAYOUT.C13:
@@ -57,7 +58,7 @@ var toPeakStr = function toPeakStr(peaks) {
   return str;
 };
 
-var spectraOps = (_spectraOps = {}, _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.PLAIN, { head: '', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.H1, { head: '1H', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.C13, { head: '13C', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.F19, { head: '19F', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.IR, { head: 'IR', tail: ' cm-1' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.RAMAN, { head: 'RAMAN', tail: ' cm-1' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.UVVIS, { head: 'UV/VIS (transmittance)', tail: ' nm' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.TGA, { head: 'THERMOGRAVIMETRIC ANALYSIS', tail: ' SECONDS' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.MS, { head: 'MASS', tail: ' m/z' }), _spectraOps);
+var spectraOps = (_spectraOps = {}, _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.PLAIN, { head: '', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.H1, { head: '1H', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.C13, { head: '13C', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.F19, { head: '19F', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.IR, { head: 'IR', tail: ' cm-1' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.RAMAN, { head: 'RAMAN', tail: ' cm-1' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.UVVIS, { head: 'UV/VIS (transmittance)', tail: ' nm' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.TGA, { head: 'THERMOGRAVIMETRIC ANALYSIS', tail: ' SECONDS' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.MS, { head: 'MASS', tail: ' m/z' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.XRD, { head: 'X-RAY DIFFRACTION', tail: '.' }), _spectraOps);
 
 var rmRef = function rmRef(peaks, shift) {
   var refValue = shift.ref.value || shift.peak.x;
@@ -237,6 +238,9 @@ var peaksBody = function peaksBody(_ref) {
   if (layout === _list_layout.LIST_LAYOUT.TGA) {
     return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
+  if (layout === _list_layout.LIST_LAYOUT.XRD) {
+    return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
+  }
   return ordered.map(function (o) {
     return fixDigit(o.x, decimal);
   }).join(', ');
@@ -282,6 +286,9 @@ var isUvVisLayout = function isUvVisLayout(layoutSt) {
 };
 var isTGALayout = function isTGALayout(layoutSt) {
   return _list_layout.LIST_LAYOUT.TGA === layoutSt;
+};
+var isXRDLayout = function isXRDLayout(layoutSt) {
+  return _list_layout.LIST_LAYOUT.XRD === layoutSt;
 };
 var isEmWaveLayout = function isEmWaveLayout(layoutSt) {
   return [_list_layout.LIST_LAYOUT.IR, _list_layout.LIST_LAYOUT.RAMAN, _list_layout.LIST_LAYOUT.UVVIS].indexOf(layoutSt) >= 0;
@@ -357,6 +364,7 @@ var Format = {
   isRamanLayout: isRamanLayout,
   isUvVisLayout: isUvVisLayout,
   isTGALayout: isTGALayout,
+  isXRDLayout: isXRDLayout,
   isEmWaveLayout: isEmWaveLayout,
   fixDigit: fixDigit,
   formatPeaksByPrediction: formatPeaksByPrediction,

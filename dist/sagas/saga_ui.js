@@ -149,7 +149,7 @@ function scrollUiWheel(action) {
           nextExtent = { xExtent: false, yExtent: false };
           nyeL = 0, nyeU = 1, h = 1, nytL = 0, nytU = 1;
           _context2.t0 = layoutSt;
-          _context2.next = _context2.t0 === _list_layout.LIST_LAYOUT.IR ? 13 : _context2.t0 === _list_layout.LIST_LAYOUT.RAMAN ? 13 : _context2.t0 === _list_layout.LIST_LAYOUT.MS ? 20 : _context2.t0 === _list_layout.LIST_LAYOUT.UVVIS ? 27 : _context2.t0 === _list_layout.LIST_LAYOUT.TGA ? 27 : 27;
+          _context2.next = _context2.t0 === _list_layout.LIST_LAYOUT.IR ? 13 : _context2.t0 === _list_layout.LIST_LAYOUT.RAMAN ? 13 : _context2.t0 === _list_layout.LIST_LAYOUT.MS ? 20 : _context2.t0 === _list_layout.LIST_LAYOUT.UVVIS ? 27 : _context2.t0 === _list_layout.LIST_LAYOUT.TGA ? 27 : _context2.t0 === _list_layout.LIST_LAYOUT.XRD ? 27 : 27;
           break;
 
         case 13:

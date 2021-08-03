@@ -86,6 +86,14 @@ var _tga_jcamp = require('./__tests__/fixtures/tga_jcamp');
 
 var _tga_jcamp2 = _interopRequireDefault(_tga_jcamp);
 
+var _xrd_jcamp_ = require('./__tests__/fixtures/xrd_jcamp_1');
+
+var _xrd_jcamp_2 = _interopRequireDefault(_xrd_jcamp_);
+
+var _xrd_jcamp_3 = require('./__tests__/fixtures/xrd_jcamp_2');
+
+var _xrd_jcamp_4 = _interopRequireDefault(_xrd_jcamp_3);
+
 var _qDescValue = require('./__tests__/fixtures/qDescValue');
 
 require('./__tests__/style/svg.css');
@@ -111,6 +119,8 @@ var ramanEntity = _app.FN.ExtractJcamp(_raman_jcamp2.default);
 var msEntity = _app.FN.ExtractJcamp(_ms_jcamp2.default);
 var uvVisEntity = _app.FN.ExtractJcamp(_uv_vis_jcamp2.default);
 var tgaEntity = _app.FN.ExtractJcamp(_tga_jcamp2.default);
+var xrdEntity1 = _app.FN.ExtractJcamp(_xrd_jcamp_2.default);
+var xrdEntity2 = _app.FN.ExtractJcamp(_xrd_jcamp_4.default);
 
 var DemoWriteIr = function (_React$Component) {
   _inherits(DemoWriteIr, _React$Component);
@@ -390,6 +400,8 @@ var DemoWriteIr = function (_React$Component) {
           return uvVisEntity;
         case 'tga':
           return tgaEntity;
+        case 'xrd':
+          return xrdEntity2;
         case 'ms':
         default:
           return msEntity;
@@ -413,6 +425,7 @@ var DemoWriteIr = function (_React$Component) {
         case 'raman':
         case 'uv/vis':
         case 'tga':
+        case 'xrd':
         case 'ms':
         default:
           return false;
@@ -552,6 +565,15 @@ var DemoWriteIr = function (_React$Component) {
               onClick: this.onClick('tga')
             },
             'TGA'
+          ),
+          _react2.default.createElement(
+            _Button2.default,
+            {
+              variant: 'contained',
+              style: { margin: '0 10px 0 10px' },
+              onClick: this.onClick('xrd')
+            },
+            'XRD'
           ),
           _react2.default.createElement(
             _Button2.default,

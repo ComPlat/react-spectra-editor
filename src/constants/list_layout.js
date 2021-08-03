@@ -8,6 +8,7 @@ const LIST_LAYOUT = {
   F19: '19F',
   MS: 'MS',
   TGA: 'THERMOGRAVIMETRIC ANALYSIS',
+  XRD: 'X-RAY DIFFRACTION'
 };
 
 export {

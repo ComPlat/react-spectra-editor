@@ -655,7 +655,7 @@ var LineFocus = function () {
   }, {
     key: 'reverseXAxis',
     value: function reverseXAxis(layoutSt) {
-      return [_list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.TGA].indexOf(layoutSt) < 0;
+      return [_list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.TGA, _list_layout.LIST_LAYOUT.XRD].indexOf(layoutSt) < 0;
     }
   }, {
     key: 'create',
