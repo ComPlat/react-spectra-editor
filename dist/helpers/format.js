@@ -29,6 +29,9 @@ var spectraDigit = function spectraDigit(layout) {
       return 1;
     case _list_layout.LIST_LAYOUT.H1:
     case _list_layout.LIST_LAYOUT.F19:
+    case _list_layout.LIST_LAYOUT.P31:
+    case _list_layout.LIST_LAYOUT.N15:
+    case _list_layout.LIST_LAYOUT.Si29:
     case _list_layout.LIST_LAYOUT.PLAIN:
     default:
       return 2;
@@ -57,6 +60,7 @@ var toPeakStr = function toPeakStr(peaks) {
   var str = arr.join('#');
   return str;
 };
+
 
 var spectraOps = (_spectraOps = {}, _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.PLAIN, { head: '', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.H1, { head: '1H', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.C13, { head: '13C', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.F19, { head: '19F', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.IR, { head: 'IR', tail: ' cm-1' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.RAMAN, { head: 'RAMAN', tail: ' cm-1' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.UVVIS, { head: 'UV/VIS (transmittance)', tail: ' nm' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.TGA, { head: 'THERMOGRAVIMETRIC ANALYSIS', tail: ' SECONDS' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.MS, { head: 'MASS', tail: ' m/z' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.XRD, { head: 'X-RAY DIFFRACTION', tail: '.' }), _spectraOps);
 
@@ -261,7 +265,16 @@ var peaksWrapper = function peaksWrapper(layout, shift) {
 };
 
 var isNmrLayout = function isNmrLayout(layoutSt) {
-  return [_list_layout.LIST_LAYOUT.H1, _list_layout.LIST_LAYOUT.C13, _list_layout.LIST_LAYOUT.F19].indexOf(layoutSt) >= 0;
+  return [_list_layout.LIST_LAYOUT.H1, _list_layout.LIST_LAYOUT.C13, _list_layout.LIST_LAYOUT.F19, _list_layout.LIST_LAYOUT.P31, _list_layout.LIST_LAYOUT.N15, _list_layout.LIST_LAYOUT.Si29].indexOf(layoutSt) >= 0;
+};
+var is29SiLayout = function is29SiLayout(layoutSt) {
+  return _list_layout.LIST_LAYOUT.Si29 === layoutSt;
+};
+var is15NLayout = function is15NLayout(layoutSt) {
+  return _list_layout.LIST_LAYOUT.N15 === layoutSt;
+};
+var is31PLayout = function is31PLayout(layoutSt) {
+  return _list_layout.LIST_LAYOUT.P31 === layoutSt;
 };
 var is19FLayout = function is19FLayout(layoutSt) {
   return _list_layout.LIST_LAYOUT.F19 === layoutSt;
@@ -302,6 +315,12 @@ var getNmrTyp = function getNmrTyp(layout) {
       return 'C';
     case _list_layout.LIST_LAYOUT.F19:
       return 'F';
+    case _list_layout.LIST_LAYOUT.P31:
+      return 'P';
+    case _list_layout.LIST_LAYOUT.N15:
+      return 'N';
+    case _list_layout.LIST_LAYOUT.Si29:
+      return 'Si';
     default:
       return '';
   }
@@ -359,6 +378,9 @@ var Format = {
   is13CLayout: is13CLayout,
   is1HLayout: is1HLayout,
   is19FLayout: is19FLayout,
+  is31PLayout: is31PLayout,
+  is15NLayout: is15NLayout,
+  is29SiLayout: is29SiLayout,
   isMsLayout: isMsLayout,
   isIrLayout: isIrLayout,
   isRamanLayout: isRamanLayout,

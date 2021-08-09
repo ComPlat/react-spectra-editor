@@ -243,6 +243,48 @@ var layoutSelect = function layoutSelect(classes, layoutSt, updateLayoutAct) {
       ),
       _react2.default.createElement(
         _MenuItem2.default,
+        { value: _list_layout.LIST_LAYOUT.P31 },
+        _react2.default.createElement(
+          'span',
+          { className: (0, _classnames2.default)(classes.txtOpt, 'option-sv-bar-layout') },
+          _react2.default.createElement(
+            'sup',
+            null,
+            '31'
+          ),
+          'P'
+        )
+      ),
+      _react2.default.createElement(
+        _MenuItem2.default,
+        { value: _list_layout.LIST_LAYOUT.N15 },
+        _react2.default.createElement(
+          'span',
+          { className: (0, _classnames2.default)(classes.txtOpt, 'option-sv-bar-layout') },
+          _react2.default.createElement(
+            'sup',
+            null,
+            '15'
+          ),
+          'N'
+        )
+      ),
+      _react2.default.createElement(
+        _MenuItem2.default,
+        { value: _list_layout.LIST_LAYOUT.Si29 },
+        _react2.default.createElement(
+          'span',
+          { className: (0, _classnames2.default)(classes.txtOpt, 'option-sv-bar-layout') },
+          _react2.default.createElement(
+            'sup',
+            null,
+            '29'
+          ),
+          'Si'
+        )
+      ),
+      _react2.default.createElement(
+        _MenuItem2.default,
         { value: _list_layout.LIST_LAYOUT.MS },
         _react2.default.createElement(
           'span',

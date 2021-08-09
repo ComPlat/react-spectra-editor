@@ -95,7 +95,7 @@ const GetComparisons = createSelector(
 );
 
 const convertFrequency = (layout, feature) => {
-  if (['1H', '13C', '19F'].indexOf(layout) < 0) return false;
+  if (['1H', '13C', '19F', '31P', '15N', '29Si'].indexOf(layout) < 0) return false;
   const { observeFrequency } = feature;
   const freq = Array.isArray(observeFrequency) ? observeFrequency[0] : observeFrequency;
   return parseFloat(freq) || false;

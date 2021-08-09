@@ -12,6 +12,9 @@ import nmr1HJcamp from './__tests__/fixtures/nmr1h_jcamp';
 import nmr13CDeptJcamp from './__tests__/fixtures/nmr13c_dept_jcamp';
 import nmr13CJcamp from './__tests__/fixtures/nmr13c_jcamp';
 import nmr19FJcamp from './__tests__/fixtures/nmr19f_jcamp';
+import nmr31PJcamp from './__tests__/fixtures/nmr31p_jcamp';
+import nmr15NJcamp from './__tests__/fixtures/nmr15n_jcamp';
+import nmr29SiJcamp from './__tests__/fixtures/nmr29si_jcamp';
 import irJcamp from './__tests__/fixtures/ir_jcamp';
 import compareIr1Jcamp from './__tests__/fixtures/compare_ir_1_jcamp';
 import compareIr2Jcamp from './__tests__/fixtures/compare_ir_2_jcamp';
@@ -31,6 +34,9 @@ const nmr1HEntity = FN.ExtractJcamp(nmr1HJcamp);
 const nmr13CEntity = FN.ExtractJcamp(nmr13CJcamp);
 const nmr13CDeptEntity = FN.ExtractJcamp(nmr13CDeptJcamp);
 const nmr19FEntity = FN.ExtractJcamp(nmr19FJcamp);
+const nmr31PEntity = FN.ExtractJcamp(nmr31PJcamp);
+const nmr15NEntity = FN.ExtractJcamp(nmr15NJcamp);
+const nmr29SiEntity = FN.ExtractJcamp(nmr29SiJcamp);
 const irEntity = FN.ExtractJcamp(irJcamp);
 const compIr1Entity = FN.ExtractJcamp(compareIr1Jcamp);
 const compIr2Entity = FN.ExtractJcamp(compareIr2Jcamp);
@@ -234,6 +240,12 @@ class DemoWriteIr extends React.Component {
           return nmr13CDeptEntity;
       case 'nmr 19f':
         return nmr19FEntity;
+      case 'nmr 31p':
+        return nmr31PEntity;
+      case 'nmr 15n':
+        return nmr15NEntity;
+      case 'nmr 29si':
+        return nmr29SiEntity;
       case 'ir':
         return irEntity;
       case 'raman':
@@ -262,6 +274,9 @@ class DemoWriteIr extends React.Component {
       case 'ir':
         return qIR;
       case 'nmr 19f':
+      case 'nmr 31p':
+      case 'nmr 15n':
+      case 'nmr 29si':
       case 'raman':
       case 'uv/vis':
       case 'tga':
@@ -302,7 +317,7 @@ class DemoWriteIr extends React.Component {
       { name: 'write peaks', value: this.writePeak },
       { name: 'save', value: this.savePeaks },
     ].filter(r => r.value);
-    if (['1H', '13C', '19F'].indexOf(entity.layout) >= 0) {
+    if (['1H', '13C', '19F', '31P', '15N', '29Si'].indexOf(entity.layout) >= 0) {
       operations = [
         { name: 'write multiplicity', value: this.writeMpy },
         ...operations,
@@ -352,6 +367,27 @@ class DemoWriteIr extends React.Component {
             onClick={this.onClick('nmr 19f')}
           >
             NMR 19F
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('nmr 31p')}
+          >
+            NMR 31P
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('nmr 15n')}
+          >
+            NMR 15N
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('nmr 29si')}
+          >
+            NMR 29Si
           </Button>
           <Button
             variant="contained"
