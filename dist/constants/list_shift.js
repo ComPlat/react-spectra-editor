@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getListShift = exports.LIST_SHIFT_19F = exports.LIST_SHIFT_1H = exports.LIST_SHIFT_13C = undefined;
+exports.getListShift = exports.LIST_SHIFT_29Si = exports.LIST_SHIFT_15N = exports.LIST_SHIFT_31P = exports.LIST_SHIFT_19F = exports.LIST_SHIFT_1H = exports.LIST_SHIFT_13C = undefined;
 
 var _list_layout = require('./list_layout');
 
@@ -448,6 +448,10 @@ var LIST_SHIFT_1H = [noReference, hActicAcidD4Quin, hActicAcidD4S, hAcetoneD6Qui
 
 var LIST_SHIFT_19F = [];
 
+var LIST_SHIFT_31P = [];
+var LIST_SHIFT_15N = [];
+var LIST_SHIFT_29Si = [];
+
 var getListShift = function getListShift(layoutSt) {
   switch (layoutSt) {
     case _list_layout.LIST_LAYOUT.H1:
@@ -456,6 +460,12 @@ var getListShift = function getListShift(layoutSt) {
       return LIST_SHIFT_13C;
     case _list_layout.LIST_LAYOUT.F19:
       return LIST_SHIFT_19F;
+    case _list_layout.LIST_LAYOUT.P31:
+      return LIST_SHIFT_31P;
+    case _list_layout.LIST_LAYOUT.N15:
+      return LIST_SHIFT_15N;
+    case _list_layout.LIST_LAYOUT.Si29:
+      return LIST_SHIFT_29Si;
     default:
       return [];
   }
@@ -464,4 +474,7 @@ var getListShift = function getListShift(layoutSt) {
 exports.LIST_SHIFT_13C = LIST_SHIFT_13C;
 exports.LIST_SHIFT_1H = LIST_SHIFT_1H;
 exports.LIST_SHIFT_19F = LIST_SHIFT_19F;
+exports.LIST_SHIFT_31P = LIST_SHIFT_31P;
+exports.LIST_SHIFT_15N = LIST_SHIFT_15N;
+exports.LIST_SHIFT_29Si = LIST_SHIFT_29Si;
 exports.getListShift = getListShift;

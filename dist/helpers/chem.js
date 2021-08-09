@@ -130,7 +130,7 @@ var convertComparisons = function convertComparisons(layout, comparisons, featur
 var GetComparisons = (0, _reselect.createSelector)(getLayout, getOthers, getFeature, convertComparisons);
 
 var convertFrequency = function convertFrequency(layout, feature) {
-  if (['1H', '13C', '19F'].indexOf(layout) < 0) return false;
+  if (['1H', '13C', '19F', '31P', '15N', '29Si'].indexOf(layout) < 0) return false;
   var observeFrequency = feature.observeFrequency;
 
   var freq = Array.isArray(observeFrequency) ? observeFrequency[0] : observeFrequency;

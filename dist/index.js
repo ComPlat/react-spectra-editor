@@ -46,6 +46,18 @@ var _nmr19f_jcamp = require('./__tests__/fixtures/nmr19f_jcamp');
 
 var _nmr19f_jcamp2 = _interopRequireDefault(_nmr19f_jcamp);
 
+var _nmr31p_jcamp = require('./__tests__/fixtures/nmr31p_jcamp');
+
+var _nmr31p_jcamp2 = _interopRequireDefault(_nmr31p_jcamp);
+
+var _nmr15n_jcamp = require('./__tests__/fixtures/nmr15n_jcamp');
+
+var _nmr15n_jcamp2 = _interopRequireDefault(_nmr15n_jcamp);
+
+var _nmr29si_jcamp = require('./__tests__/fixtures/nmr29si_jcamp');
+
+var _nmr29si_jcamp2 = _interopRequireDefault(_nmr29si_jcamp);
+
 var _ir_jcamp = require('./__tests__/fixtures/ir_jcamp');
 
 var _ir_jcamp2 = _interopRequireDefault(_ir_jcamp);
@@ -104,6 +116,9 @@ var nmr1HEntity = _app.FN.ExtractJcamp(_nmr1h_jcamp2.default);
 var nmr13CEntity = _app.FN.ExtractJcamp(_nmr13c_jcamp2.default);
 var nmr13CDeptEntity = _app.FN.ExtractJcamp(_nmr13c_dept_jcamp2.default);
 var nmr19FEntity = _app.FN.ExtractJcamp(_nmr19f_jcamp2.default);
+var nmr31PEntity = _app.FN.ExtractJcamp(_nmr31p_jcamp2.default);
+var nmr15NEntity = _app.FN.ExtractJcamp(_nmr15n_jcamp2.default);
+var nmr29SiEntity = _app.FN.ExtractJcamp(_nmr29si_jcamp2.default);
 var irEntity = _app.FN.ExtractJcamp(_ir_jcamp2.default);
 var compIr1Entity = _app.FN.ExtractJcamp(_compare_ir_1_jcamp2.default);
 var compIr2Entity = _app.FN.ExtractJcamp(_compare_ir_2_jcamp2.default);
@@ -382,6 +397,12 @@ var DemoWriteIr = function (_React$Component) {
           return nmr13CDeptEntity;
         case 'nmr 19f':
           return nmr19FEntity;
+        case 'nmr 31p':
+          return nmr31PEntity;
+        case 'nmr 15n':
+          return nmr15NEntity;
+        case 'nmr 29si':
+          return nmr29SiEntity;
         case 'ir':
           return irEntity;
         case 'raman':
@@ -410,6 +431,9 @@ var DemoWriteIr = function (_React$Component) {
         case 'ir':
           return _qDescValue.qIR;
         case 'nmr 19f':
+        case 'nmr 31p':
+        case 'nmr 15n':
+        case 'nmr 29si':
         case 'raman':
         case 'uv/vis':
         case 'tga':
@@ -456,7 +480,7 @@ var DemoWriteIr = function (_React$Component) {
       var operations = [{ name: 'write peaks', value: this.writePeak }, { name: 'save', value: this.savePeaks }].filter(function (r) {
         return r.value;
       });
-      if (['1H', '13C', '19F'].indexOf(entity.layout) >= 0) {
+      if (['1H', '13C', '19F', '31P', '15N', '29Si'].indexOf(entity.layout) >= 0) {
         operations = [{ name: 'write multiplicity', value: this.writeMpy }].concat(_toConsumableArray(operations));
       }
 
@@ -516,6 +540,33 @@ var DemoWriteIr = function (_React$Component) {
               onClick: this.onClick('nmr 19f')
             },
             'NMR 19F'
+          ),
+          _react2.default.createElement(
+            _Button2.default,
+            {
+              variant: 'contained',
+              style: { margin: '0 10px 0 10px' },
+              onClick: this.onClick('nmr 31p')
+            },
+            'NMR 31P'
+          ),
+          _react2.default.createElement(
+            _Button2.default,
+            {
+              variant: 'contained',
+              style: { margin: '0 10px 0 10px' },
+              onClick: this.onClick('nmr 15n')
+            },
+            'NMR 15N'
+          ),
+          _react2.default.createElement(
+            _Button2.default,
+            {
+              variant: 'contained',
+              style: { margin: '0 10px 0 10px' },
+              onClick: this.onClick('nmr 29si')
+            },
+            'NMR 29Si'
           ),
           _react2.default.createElement(
             _Button2.default,

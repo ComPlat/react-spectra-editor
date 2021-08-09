@@ -131,6 +131,24 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
             F
           </span>
         </MenuItem>
+        <MenuItem value={LIST_LAYOUT.P31}>
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>
+            <sup>31</sup>
+            P
+          </span>
+        </MenuItem>
+        <MenuItem value={LIST_LAYOUT.N15}>
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>
+            <sup>15</sup>
+            N
+          </span>
+        </MenuItem>
+        <MenuItem value={LIST_LAYOUT.Si29}>
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>
+            <sup>29</sup>
+            Si
+          </span>
+        </MenuItem>
         <MenuItem value={LIST_LAYOUT.MS}>
           <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>MS</span>
         </MenuItem>
