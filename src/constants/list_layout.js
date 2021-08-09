@@ -11,6 +11,7 @@ const LIST_LAYOUT = {
   Si29: '29Si',
   MS: 'MS',
   TGA: 'THERMOGRAVIMETRIC ANALYSIS',
+  XRD: 'X-RAY DIFFRACTION'
 };
 
 export {

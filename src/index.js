@@ -25,6 +25,8 @@ import irResult from './__tests__/fixtures/ir_result';
 import Phenylalanin from './__tests__/fixtures/phenylalanin';
 import uvVisJcamp from './__tests__/fixtures/uv_vis_jcamp';
 import tgaJcamp from './__tests__/fixtures/tga_jcamp';
+import xrdJcamp1 from './__tests__/fixtures/xrd_jcamp_1';
+import xrdJcamp2 from './__tests__/fixtures/xrd_jcamp_2';
 import { q1H, qIR, q13C } from './__tests__/fixtures/qDescValue';
 import './__tests__/style/svg.css';
 
@@ -42,6 +44,8 @@ const ramanEntity = FN.ExtractJcamp(ramanJcamp);
 const msEntity = FN.ExtractJcamp(msJcamp);
 const uvVisEntity = FN.ExtractJcamp(uvVisJcamp);
 const tgaEntity = FN.ExtractJcamp(tgaJcamp);
+const xrdEntity1 = FN.ExtractJcamp(xrdJcamp1);
+const xrdEntity2 = FN.ExtractJcamp(xrdJcamp2);
 
 class DemoWriteIr extends React.Component {
   constructor(props) {
@@ -250,6 +254,8 @@ class DemoWriteIr extends React.Component {
         return uvVisEntity;
       case 'tga':
         return tgaEntity;
+      case 'xrd':
+        return xrdEntity2;
       case 'ms':
       default:
         return msEntity;
@@ -274,6 +280,7 @@ class DemoWriteIr extends React.Component {
       case 'raman':
       case 'uv/vis':
       case 'tga':
+      case 'xrd':
       case 'ms':
       default:
         return false;
@@ -409,6 +416,13 @@ class DemoWriteIr extends React.Component {
             onClick={this.onClick('tga')}
           >
             TGA
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('xrd')}
+          >
+            XRD
           </Button>
           <Button
             variant="contained"
