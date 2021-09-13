@@ -56,6 +56,10 @@ var _r04_submit = require('./r04_submit');
 
 var _r04_submit2 = _interopRequireDefault(_r04_submit);
 
+var _r07_wavelength_btn = require('./r07_wavelength_btn');
+
+var _r07_wavelength_btn2 = _interopRequireDefault(_r07_wavelength_btn);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var styles = function styles() {
@@ -87,7 +91,8 @@ var CmdBar = function CmdBar(_ref) {
       disabled: false
     }),
     _react2.default.createElement(_r03_threshold2.default, { feature: feature, hasEdit: hasEdit }),
-    _react2.default.createElement(_r01_layout2.default, { feature: feature, hasEdit: hasEdit })
+    _react2.default.createElement(_r01_layout2.default, { feature: feature, hasEdit: hasEdit }),
+    _react2.default.createElement(_r07_wavelength_btn2.default, null)
   );
 };
 

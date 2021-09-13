@@ -77,7 +77,7 @@ const calcRescaleXY = (xs, ys, minY, maxY, show) => {
 
 const convertComparisons = (layout, comparisons, feature) => {
   const { minY, maxY } = feature;
-  if (!comparisons || !(Format.isIrLayout(layout) || Format.isHplcUvVisLayout(layout))) return [];
+  if (!comparisons || !(Format.isIrLayout(layout) || Format.isHplcUvVisLayout(layout) || Format.isXRDLayout(layout))) return [];
   return comparisons.map((c) => {
     const { spectra, show } = c;
     const topic = spectra[0].data[0];
@@ -541,9 +541,16 @@ const Convert2Thres = (feature, thresSt) => {
   return value;
 };
 
+const Convert2DValue = (doubleTheta, lambda=0.15406) => {
+  const theta = doubleTheta/2;
+  const sinTheta = Math.sin(theta);
+  const dValue = lambda/(2*sinTheta);
+  return dValue;
+};
+
 export {
   ExtractJcamp, Topic2Seed, Feature2Peak,
   ToThresEndPts, ToShiftPeaks, ToFrequency,
   Convert2Peak, Convert2Scan, Convert2Thres,
-  GetComparisons,
+  GetComparisons, Convert2DValue
 };

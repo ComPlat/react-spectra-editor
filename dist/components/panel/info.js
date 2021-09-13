@@ -180,6 +180,11 @@ var InfoPanel = function InfoPanel(_ref) {
 
   var showSolvName = shiftNameSt === '- - -' ? solventName : shiftNameSt;
 
+  var originStack = null;
+  if (integration) {
+    originStack = integration.originStack;
+  }
+
   return _react2.default.createElement(
     _ExpansionPanel2.default,
     {

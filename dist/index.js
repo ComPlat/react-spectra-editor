@@ -327,7 +327,8 @@ var DemoWriteIr = function (_React$Component) {
           isAscend = _ref8.isAscend,
           decimal = _ref8.decimal,
           isIntensity = _ref8.isIntensity,
-          integration = _ref8.integration;
+          integration = _ref8.integration,
+          waveLength = _ref8.waveLength;
 
       var desc = this.formatPks({
         peaks: peaks, layout: layout, shift: shift, isAscend: isAscend, decimal: decimal, isIntensity: isIntensity, integration: integration
@@ -436,7 +437,7 @@ var DemoWriteIr = function (_React$Component) {
         case 'tga':
           return tgaEntity;
         case 'xrd':
-          return xrdEntity2;
+          return xrdEntity1;
         case 'ms':
         default:
           return msEntity;
@@ -483,7 +484,8 @@ var DemoWriteIr = function (_React$Component) {
           typ = _state2.typ;
 
       var isIr = typ === 'ir';
-      var others = showOthers ? isIr ? [compIr1Entity, compIr2Entity] : [compUvVisEntity] : [];
+      var isXRD = typ === 'xrd';
+      var others = showOthers ? isIr ? [compIr1Entity, compIr2Entity] : isXRD ? [xrdEntity2] : [compUvVisEntity] : [];
 
       return {
         others: others,

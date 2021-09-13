@@ -168,7 +168,7 @@ class DemoWriteIr extends React.Component {
   }
 
   writePeak({
-    peaks, layout, shift, isAscend, decimal, isIntensity, integration
+    peaks, layout, shift, isAscend, decimal, isIntensity, integration, waveLength
   }) {
     const desc = this.formatPks({
       peaks, layout, shift, isAscend, decimal, isIntensity, integration
@@ -261,7 +261,7 @@ class DemoWriteIr extends React.Component {
       case 'tga':
         return tgaEntity;
       case 'xrd':
-        return xrdEntity2;
+        return xrdEntity1;
       case 'ms':
       default:
         return msEntity;
@@ -301,8 +301,10 @@ class DemoWriteIr extends React.Component {
   loadOthers() {
     const { showOthers, typ } = this.state;
     const isIr = typ === 'ir';
+    const isXRD = typ === 'xrd';
     const others = showOthers ? (
-      isIr ? [compIr1Entity, compIr2Entity] : [compUvVisEntity]) : [];
+      isIr ? [compIr1Entity, compIr2Entity] : (
+        isXRD ? [xrdEntity2] : [compUvVisEntity])) : [];
 
     return {
       others,

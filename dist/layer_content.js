@@ -40,9 +40,10 @@ var extractLayout = function extractLayout(forecast, layoutSt) {
   var isMs = _format2.default.isMsLayout(layoutSt);
   var isIr = _format2.default.isIrLayout(layoutSt);
   var isUvvis = _format2.default.isUvVisLayout(layoutSt) || _format2.default.isHplcUvVisLayout(layoutSt);
-  var showForecast = !isEmpty && (isNmr || isIr || isUvvis);
+  var isXRD = _format2.default.isXRDLayout(layoutSt);
+  var showForecast = !isEmpty && (isNmr || isIr || isUvvis || isXRD);
   return {
-    showForecast: showForecast, isNmr: isNmr, isIr: isIr, isMs: isMs, isUvvis: isUvvis
+    showForecast: showForecast, isNmr: isNmr, isIr: isIr, isMs: isMs, isUvvis: isUvvis, isXRD: isXRD
   };
 };
 
@@ -61,7 +62,8 @@ var Content = function Content(_ref) {
       isNmr = _extractLayout.isNmr,
       isIr = _extractLayout.isIr,
       isMs = _extractLayout.isMs,
-      isUvvis = _extractLayout.isUvvis;
+      isUvvis = _extractLayout.isUvvis,
+      isXRD = _extractLayout.isXRD;
 
   if (showForecast) {
     return _react2.default.createElement(_forecast_viewer2.default, {
@@ -74,6 +76,7 @@ var Content = function Content(_ref) {
       isNmr: isNmr,
       isIr: isIr,
       isUvvis: isUvvis,
+      isXRD: isXRD,
       operations: operations
     });
   }

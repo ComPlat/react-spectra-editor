@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 import {
   Topic2Seed, Feature2Peak, ToThresEndPts, ToShiftPeaks, ToFrequency,
-  GetComparisons,
+  GetComparisons
 } from '../../helpers/chem';
 import { resetAll } from '../../actions/manager';
 import { selectUiSweep, scrollUiWheel, clickUiTarget } from '../../actions/ui';
@@ -36,7 +36,7 @@ class ViewerLine extends React.Component {
       seed, peak, cLabel, xLabel, yLabel, feature, freq, comparisons,
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt, integationSt, mtplySt,
       sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
-      isHidden,
+      isHidden, wavelength,
       resetAllAct,
     } = this.props;
     drawDestroy(this.rootKlass);
@@ -60,6 +60,7 @@ class ViewerLine extends React.Component {
       sweepExtentSt,
       isUiAddIntgSt,
       isUiNoBrushSt,
+      wavelength,
     });
     drawLabel(this.rootKlass, cLabel, xLabel, yLabel);
     drawDisplay(this.rootKlass, isHidden);
@@ -67,10 +68,10 @@ class ViewerLine extends React.Component {
 
   componentDidUpdate(prevProps) {
     const {
-      seed, peak, freq, comparisons,
+      seed, peak, cLabel, xLabel, yLabel, freq, comparisons,
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt, integationSt, mtplySt,
       sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
-      isHidden,
+      isHidden, wavelength
     } = this.props;
     this.normChange(prevProps);
 
@@ -91,7 +92,9 @@ class ViewerLine extends React.Component {
       sweepExtentSt,
       isUiAddIntgSt,
       isUiNoBrushSt,
+      wavelength
     });
+    drawLabel(this.rootKlass, cLabel, xLabel, yLabel);
     drawDisplay(this.rootKlass, isHidden);
   }
 
@@ -129,6 +132,7 @@ const mapStateToProps = (state, props) => (
     sweepExtentSt: state.ui.sweepExtent,
     isUiAddIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
     isUiNoBrushSt: LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
+    wavelength: state.wavelength,
   }
 );
 
@@ -167,6 +171,7 @@ ViewerLine.propTypes = {
   selectUiSweepAct: PropTypes.func.isRequired,
   scrollUiWheelAct: PropTypes.func.isRequired,
   isHidden: PropTypes.bool.isRequired,
+  wavelength: PropTypes.object.isRequired
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ViewerLine);
