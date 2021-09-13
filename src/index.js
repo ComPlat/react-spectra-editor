@@ -12,6 +12,9 @@ import nmr1HJcamp from './__tests__/fixtures/nmr1h_jcamp';
 import nmr13CDeptJcamp from './__tests__/fixtures/nmr13c_dept_jcamp';
 import nmr13CJcamp from './__tests__/fixtures/nmr13c_jcamp';
 import nmr19FJcamp from './__tests__/fixtures/nmr19f_jcamp';
+import nmr31PJcamp from './__tests__/fixtures/nmr31p_jcamp';
+import nmr15NJcamp from './__tests__/fixtures/nmr15n_jcamp';
+import nmr29SiJcamp from './__tests__/fixtures/nmr29si_jcamp';
 import irJcamp from './__tests__/fixtures/ir_jcamp';
 import compareIr1Jcamp from './__tests__/fixtures/compare_ir_1_jcamp';
 import compareIr2Jcamp from './__tests__/fixtures/compare_ir_2_jcamp';
@@ -22,6 +25,8 @@ import irResult from './__tests__/fixtures/ir_result';
 import Phenylalanin from './__tests__/fixtures/phenylalanin';
 import uvVisJcamp from './__tests__/fixtures/uv_vis_jcamp';
 import tgaJcamp from './__tests__/fixtures/tga_jcamp';
+import xrdJcamp1 from './__tests__/fixtures/xrd_jcamp_1';
+import xrdJcamp2 from './__tests__/fixtures/xrd_jcamp_2';
 import { q1H, qIR, q13C } from './__tests__/fixtures/qDescValue';
 import './__tests__/style/svg.css';
 
@@ -29,6 +34,9 @@ const nmr1HEntity = FN.ExtractJcamp(nmr1HJcamp);
 const nmr13CEntity = FN.ExtractJcamp(nmr13CJcamp);
 const nmr13CDeptEntity = FN.ExtractJcamp(nmr13CDeptJcamp);
 const nmr19FEntity = FN.ExtractJcamp(nmr19FJcamp);
+const nmr31PEntity = FN.ExtractJcamp(nmr31PJcamp);
+const nmr15NEntity = FN.ExtractJcamp(nmr15NJcamp);
+const nmr29SiEntity = FN.ExtractJcamp(nmr29SiJcamp);
 const irEntity = FN.ExtractJcamp(irJcamp);
 const compIr1Entity = FN.ExtractJcamp(compareIr1Jcamp);
 const compIr2Entity = FN.ExtractJcamp(compareIr2Jcamp);
@@ -36,6 +44,8 @@ const ramanEntity = FN.ExtractJcamp(ramanJcamp);
 const msEntity = FN.ExtractJcamp(msJcamp);
 const uvVisEntity = FN.ExtractJcamp(uvVisJcamp);
 const tgaEntity = FN.ExtractJcamp(tgaJcamp);
+const xrdEntity1 = FN.ExtractJcamp(xrdJcamp1);
+const xrdEntity2 = FN.ExtractJcamp(xrdJcamp2);
 
 class DemoWriteIr extends React.Component {
   constructor(props) {
@@ -230,6 +240,12 @@ class DemoWriteIr extends React.Component {
           return nmr13CDeptEntity;
       case 'nmr 19f':
         return nmr19FEntity;
+      case 'nmr 31p':
+        return nmr31PEntity;
+      case 'nmr 15n':
+        return nmr15NEntity;
+      case 'nmr 29si':
+        return nmr29SiEntity;
       case 'ir':
         return irEntity;
       case 'raman':
@@ -238,6 +254,8 @@ class DemoWriteIr extends React.Component {
         return uvVisEntity;
       case 'tga':
         return tgaEntity;
+      case 'xrd':
+        return xrdEntity2;
       case 'ms':
       default:
         return msEntity;
@@ -256,9 +274,13 @@ class DemoWriteIr extends React.Component {
       case 'ir':
         return qIR;
       case 'nmr 19f':
+      case 'nmr 31p':
+      case 'nmr 15n':
+      case 'nmr 29si':
       case 'raman':
       case 'uv/vis':
       case 'tga':
+      case 'xrd':
       case 'ms':
       default:
         return false;
@@ -295,7 +317,7 @@ class DemoWriteIr extends React.Component {
       { name: 'write peaks', value: this.writePeak },
       { name: 'save', value: this.savePeaks },
     ].filter(r => r.value);
-    if (['1H', '13C', '19F'].indexOf(entity.layout) >= 0) {
+    if (['1H', '13C', '19F', '31P', '15N', '29Si'].indexOf(entity.layout) >= 0) {
       operations = [
         { name: 'write multiplicity', value: this.writeMpy },
         ...operations,
@@ -349,6 +371,27 @@ class DemoWriteIr extends React.Component {
           <Button
             variant="contained"
             style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('nmr 31p')}
+          >
+            NMR 31P
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('nmr 15n')}
+          >
+            NMR 15N
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('nmr 29si')}
+          >
+            NMR 29Si
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
             onClick={this.onClick('ir')}
           >
             IR
@@ -373,6 +416,13 @@ class DemoWriteIr extends React.Component {
             onClick={this.onClick('tga')}
           >
             TGA
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('xrd')}
+          >
+            XRD
           </Button>
           <Button
             variant="contained"

@@ -460,6 +460,10 @@ const LIST_SHIFT_1H = [
 
 const LIST_SHIFT_19F = [];
 
+const LIST_SHIFT_31P = [];
+const LIST_SHIFT_15N = [];
+const LIST_SHIFT_29Si = [];
+
 const getListShift = (layoutSt) => {
   switch (layoutSt) {
     case LIST_LAYOUT.H1:
@@ -468,6 +472,12 @@ const getListShift = (layoutSt) => {
       return LIST_SHIFT_13C;
     case LIST_LAYOUT.F19:
       return LIST_SHIFT_19F;
+    case LIST_LAYOUT.P31:
+      return LIST_SHIFT_31P;
+    case LIST_LAYOUT.N15:
+      return LIST_SHIFT_15N;
+    case LIST_LAYOUT.Si29:
+      return LIST_SHIFT_29Si;
     default:
       return [];
   }
@@ -477,5 +487,8 @@ export {
   LIST_SHIFT_13C,
   LIST_SHIFT_1H,
   LIST_SHIFT_19F,
+  LIST_SHIFT_31P,
+  LIST_SHIFT_15N,
+  LIST_SHIFT_29Si,
   getListShift,
 };

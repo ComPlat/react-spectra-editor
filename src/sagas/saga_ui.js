@@ -88,6 +88,7 @@ function* scrollUiWheel(action) {
       break;
     case LIST_LAYOUT.UVVIS:
     case LIST_LAYOUT.TGA:
+    case LIST_LAYOUT.XRD:
     default:
       [nyeL, nyeU] = [yeL, yeL + (yeU - yeL) * scale];
       h = nyeU - nyeL;

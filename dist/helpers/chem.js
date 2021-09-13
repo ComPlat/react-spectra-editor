@@ -130,7 +130,7 @@ var convertComparisons = function convertComparisons(layout, comparisons, featur
 var GetComparisons = (0, _reselect.createSelector)(getLayout, getOthers, getFeature, convertComparisons);
 
 var convertFrequency = function convertFrequency(layout, feature) {
-  if (['1H', '13C', '19F'].indexOf(layout) < 0) return false;
+  if (['1H', '13C', '19F', '31P', '15N', '29Si'].indexOf(layout) < 0) return false;
   var observeFrequency = feature.observeFrequency;
 
   var freq = Array.isArray(observeFrequency) ? observeFrequency[0] : observeFrequency;
@@ -216,6 +216,9 @@ var readLayout = function readLayout(jcamp) {
     }
     if (dataType.includes('THERMOGRAVIMETRIC ANALYSIS')) {
       return _list_layout.LIST_LAYOUT.TGA;
+    }
+    if (dataType.includes('X-RAY DIFFRACTION')) {
+      return _list_layout.LIST_LAYOUT.XRD;
     }
     if (dataType.includes('MASS SPECTRUM')) {
       return _list_layout.LIST_LAYOUT.MS;
@@ -480,6 +483,20 @@ var extrFeaturesNi = function extrFeaturesNi(jcamp, layout, peakUp, spectra) {
   return { editPeak: features[0], autoPeak: features[1] };
 };
 
+var extrFeaturesXrd = function extrFeaturesXrd(jcamp, layout, peakUp) {
+  var base = jcamp.spectra[0];
+
+  var features = jcamp.spectra.map(function (s) {
+    var cpo = buildPeakFeature(jcamp, layout, peakUp, s, 100);
+    var bnd = getBoundary(s);
+    return Object.assign({}, base, cpo, bnd);
+  }).filter(function (r) {
+    return r != null;
+  });
+
+  return features;
+};
+
 var getBoundary = function getBoundary(s) {
   var _s$data$ = s.data[0],
       x = _s$data$.x,
@@ -537,7 +554,10 @@ var ExtractJcamp = function ExtractJcamp(source) {
   var peakUp = !_format2.default.isIrLayout(layout);
 
   var spectra = _format2.default.isMsLayout(layout) ? extrSpectraMs(jcamp, layout) : extrSpectraNi(jcamp, layout);
-  var features = _format2.default.isMsLayout(layout) ? extrFeaturesMs(jcamp, layout, peakUp) : extrFeaturesNi(jcamp, layout, peakUp, spectra);
+  // const features = Format.isMsLayout(layout)
+  //   ? extrFeaturesMs(jcamp, layout, peakUp)
+  //   : extrFeaturesNi(jcamp, layout, peakUp, spectra);
+  var features = _format2.default.isMsLayout(layout) ? extrFeaturesMs(jcamp, layout, peakUp) : _format2.default.isXRDLayout(layout) ? extrFeaturesXrd(jcamp, layout, peakUp) : extrFeaturesNi(jcamp, layout, peakUp, spectra);
 
   return { spectra: spectra, features: features, layout: layout };
 };

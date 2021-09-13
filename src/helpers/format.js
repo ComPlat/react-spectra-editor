@@ -8,12 +8,16 @@ const spectraDigit = (layout) => {
     case LIST_LAYOUT.RAMAN:
     case LIST_LAYOUT.UVVIS:
     case LIST_LAYOUT.TGA:
+    case LIST_LAYOUT.XRD:
     case LIST_LAYOUT.MS:
       return 0;
     case LIST_LAYOUT.C13:
       return 1;
     case LIST_LAYOUT.H1:
     case LIST_LAYOUT.F19:
+    case LIST_LAYOUT.P31:
+    case LIST_LAYOUT.N15:
+    case LIST_LAYOUT.Si29:
     case LIST_LAYOUT.PLAIN:
     default:
       return 2;
@@ -46,11 +50,15 @@ const spectraOps = {
   [LIST_LAYOUT.H1]: { head: '1H', tail: '.' },
   [LIST_LAYOUT.C13]: { head: '13C', tail: '.' },
   [LIST_LAYOUT.F19]: { head: '19F', tail: '.' },
+  [LIST_LAYOUT.P31]: { head: '31P', tail: '.' },
+  [LIST_LAYOUT.N15]: { head: '15N', tail: '.' },
+  [LIST_LAYOUT.Si29]: { head: '29Si', tail: '.' },
   [LIST_LAYOUT.IR]: { head: 'IR', tail: ' cm-1' },
   [LIST_LAYOUT.RAMAN]: { head: 'RAMAN', tail: ' cm-1' },
   [LIST_LAYOUT.UVVIS]: { head: 'UV/VIS (transmittance)', tail: ' nm' },
   [LIST_LAYOUT.TGA]: { head: 'THERMOGRAVIMETRIC ANALYSIS', tail: ' SECONDS' },
   [LIST_LAYOUT.MS]: { head: 'MASS', tail: ' m/z' },
+  [LIST_LAYOUT.XRD]: { head: 'X-RAY DIFFRACTION', tail: '.' },
 };
 
 const rmRef = (peaks, shift) => {
@@ -186,6 +194,9 @@ const peaksBody = ({
   if (layout === LIST_LAYOUT.TGA) {
     return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
+  if (layout === LIST_LAYOUT.XRD) {
+    return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
+  }
   return ordered.map(o => fixDigit(o.x, decimal)).join(', ');
 };
 
@@ -204,8 +215,11 @@ const peaksWrapper = (layout, shift) => {
 };
 
 const isNmrLayout = layoutSt => (
-  [LIST_LAYOUT.H1, LIST_LAYOUT.C13, LIST_LAYOUT.F19].indexOf(layoutSt) >= 0
+  [LIST_LAYOUT.H1, LIST_LAYOUT.C13, LIST_LAYOUT.F19, LIST_LAYOUT.P31, LIST_LAYOUT.N15, LIST_LAYOUT.Si29].indexOf(layoutSt) >= 0
 );
+const is29SiLayout = layoutSt => (LIST_LAYOUT.Si29 === layoutSt);
+const is15NLayout = layoutSt => (LIST_LAYOUT.N15 === layoutSt);
+const is31PLayout = layoutSt => (LIST_LAYOUT.P31 === layoutSt);
 const is19FLayout = layoutSt => (LIST_LAYOUT.F19 === layoutSt);
 const is13CLayout = layoutSt => (LIST_LAYOUT.C13 === layoutSt);
 const is1HLayout = layoutSt => (LIST_LAYOUT.H1 === layoutSt);
@@ -214,6 +228,7 @@ const isIrLayout = layoutSt => ([LIST_LAYOUT.IR, 'INFRARED'].indexOf(layoutSt) >
 const isRamanLayout = layoutSt => (LIST_LAYOUT.RAMAN === layoutSt);
 const isUvVisLayout = layoutSt => (LIST_LAYOUT.UVVIS === layoutSt);
 const isTGALayout = layoutSt => (LIST_LAYOUT.TGA === layoutSt);
+const isXRDLayout = layoutSt => (LIST_LAYOUT.XRD === layoutSt);
 const isEmWaveLayout = layoutSt => (
   [LIST_LAYOUT.IR, LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS].indexOf(layoutSt) >= 0
 );
@@ -226,6 +241,12 @@ const getNmrTyp = (layout) => {
       return 'C';
     case LIST_LAYOUT.F19:
       return 'F';
+    case LIST_LAYOUT.P31:
+      return 'P';
+    case LIST_LAYOUT.N15:
+      return 'N';
+    case LIST_LAYOUT.Si29:
+      return 'Si';
     default:
       return '';
   }
@@ -275,11 +296,15 @@ const Format = {
   is13CLayout,
   is1HLayout,
   is19FLayout,
+  is31PLayout,
+  is15NLayout,
+  is29SiLayout,
   isMsLayout,
   isIrLayout,
   isRamanLayout,
   isUvVisLayout,
   isTGALayout,
+  isXRDLayout,
   isEmWaveLayout,
   fixDigit,
   formatPeaksByPrediction,
