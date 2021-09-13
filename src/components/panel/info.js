@@ -89,14 +89,39 @@ const simContent = nmrSimPeaks => (
   nmrSimPeaks && nmrSimPeaks.sort((a, b) => a - b).join(', ')
 );
 
+const aucValue = stackIntegration => {
+  let values = []
+  if (Array.isArray(stackIntegration)) {
+    let sumVal = 0.0
+    stackIntegration.forEach(inte => {
+      if (inte.area) {
+        sumVal += inte.area
+      }
+    })
+    sumVal = sumVal.toFixed(2)
+    stackIntegration.forEach(inte => {
+      const areaVal = inte.area.toFixed(2)
+      const percent = (areaVal*100/sumVal).toFixed(2)
+      const valStr = areaVal + " (" + percent + "%)"
+      values.push(valStr)
+    })
+  }
+  return values.join(", ")
+}
+
 const InfoPanel = ({
-  classes, expand, feature, editorOnly, molSvg, descriptions,
+  classes, expand, feature, integration, editorOnly, molSvg, descriptions,
   layoutSt, simulationSt, shiftNameSt,
   onExapnd, canChangeDescription, onDescriptionChanged
 }) => {
   if (!feature) return null;
   const { title, observeFrequency, solventName } = feature;
   const showSolvName = shiftNameSt === '- - -' ? solventName : shiftNameSt;
+
+  let originStack = null;
+  if (integration) {
+    originStack = integration.originStack;
+  }
   
   return (
     <ExpansionPanel
@@ -152,6 +177,20 @@ const InfoPanel = ({
               />
             )
         }
+        {
+          (Format.isUvVisLayout(layoutSt) || Format.isHplcUvVisLayout) ? (
+            <div className={classNames(classes.rowRoot, classes.rowOddSim)}>
+              <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>
+                Area under curve (AUC):
+              </span>
+              <br />
+              <span className={classNames(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt')}>
+              {aucValue(originStack)}
+              </span>
+            </div>
+          )
+          : null
+        }
       </div>
       {/* <ReactQuill
         className={classNames(classes.quill, 'card-sv-quill')}
@@ -205,6 +244,7 @@ InfoPanel.propTypes = {
   classes: PropTypes.object.isRequired,
   expand: PropTypes.bool.isRequired,
   feature: PropTypes.object.isRequired,
+  integration: PropTypes.object.isRequired,
   editorOnly: PropTypes.bool.isRequired,
   molSvg: PropTypes.string.isRequired,
   descriptions: PropTypes.array.isRequired,

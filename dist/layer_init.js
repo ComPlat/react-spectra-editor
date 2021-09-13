@@ -98,7 +98,8 @@ var LayerInit = function (_React$Component) {
           updateMetaPeaksAct = _props.updateMetaPeaksAct,
           resetInitCommonAct = _props.resetInitCommonAct,
           resetInitMsAct = _props.resetInitMsAct,
-          resetInitNmrAct = _props.resetInitNmrAct;
+          resetInitNmrAct = _props.resetInitNmrAct,
+          resetInitCommonWithIntergationAct = _props.resetInitCommonWithIntergationAct;
 
       resetInitCommonAct();
       var layout = entity.layout,
@@ -119,6 +120,13 @@ var LayerInit = function (_React$Component) {
         updateMetaPeaksAct(entity);
         resetInitNmrAct({
           integration: integration, multiplicity: multiplicity, simulation: simulation
+        });
+      } else if (_format2.default.isUvVisLayout(layout) || _format2.default.isHplcUvVisLayout(layout)) {
+        var _integration = features.integration;
+
+        updateMetaPeaksAct(entity);
+        resetInitCommonWithIntergationAct({
+          integration: _integration
         });
       }
     }
@@ -191,6 +199,7 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
     resetInitCommonAct: _manager.resetInitCommon,
     resetInitNmrAct: _manager.resetInitNmr,
     resetInitMsAct: _manager.resetInitMs,
+    resetInitCommonWithIntergationAct: _manager.resetInitCommonWithIntergation,
     updateOperationAct: _submit.updateOperation,
     updateMetaPeaksAct: _meta.updateMetaPeaks,
     addOthersAct: _jcamp.addOthers
@@ -211,6 +220,7 @@ LayerInit.propTypes = {
   resetInitCommonAct: _propTypes2.default.func.isRequired,
   resetInitNmrAct: _propTypes2.default.func.isRequired,
   resetInitMsAct: _propTypes2.default.func.isRequired,
+  resetInitCommonWithIntergationAct: _propTypes2.default.func.isRequired,
   updateOperationAct: _propTypes2.default.func.isRequired,
   updateMetaPeaksAct: _propTypes2.default.func.isRequired,
   addOthersAct: _propTypes2.default.func.isRequired,

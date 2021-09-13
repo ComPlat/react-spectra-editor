@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.resetInitMs = exports.resetInitNmr = exports.resetInitCommon = exports.resetAll = undefined;
+exports.resetInitCommonWithIntergation = exports.resetInitMs = exports.resetInitNmr = exports.resetInitCommon = exports.resetAll = undefined;
 
 var _action_type = require('../constants/action_type');
 
@@ -35,7 +35,15 @@ var resetInitMs = function resetInitMs(payload) {
   };
 };
 
+var resetInitCommonWithIntergation = function resetInitCommonWithIntergation(payload) {
+  return {
+    type: _action_type.MANAGER.RESET_INIT_COMMON_WITH_INTERGATION,
+    payload: payload
+  };
+};
+
 exports.resetAll = resetAll;
 exports.resetInitCommon = resetInitCommon;
 exports.resetInitNmr = resetInitNmr;
-exports.resetInitMs = resetInitMs; // eslint-disable-line
+exports.resetInitMs = resetInitMs;
+exports.resetInitCommonWithIntergation = resetInitCommonWithIntergation; // eslint-disable-line

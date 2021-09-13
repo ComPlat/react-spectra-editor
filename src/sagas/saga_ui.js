@@ -87,6 +87,7 @@ function* scrollUiWheel(action) {
       nextExtent = { xExtent, yExtent: { yL: nytL, yU: nytU } };
       break;
     case LIST_LAYOUT.UVVIS:
+    case LIST_LAYOUT.HPLC_UVVIS:
     case LIST_LAYOUT.TGA:
     case LIST_LAYOUT.XRD:
     default:

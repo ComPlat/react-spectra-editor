@@ -11,7 +11,7 @@ var _format2 = _interopRequireDefault(_format);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var btnCmdAnaViewer = function btnCmdAnaViewer(layoutSt) {
-  return _format2.default.isMsLayout(layoutSt) || _format2.default.isRamanLayout(layoutSt) || _format2.default.is19FLayout(layoutSt) || _format2.default.isUvVisLayout(layoutSt) || _format2.default.isTGALayout(layoutSt) || _format2.default.isXRDLayout(layoutSt);
+  return _format2.default.isMsLayout(layoutSt) || _format2.default.isRamanLayout(layoutSt) || _format2.default.is19FLayout(layoutSt) || _format2.default.isUvVisLayout(layoutSt) || _format2.default.isHplcUvVisLayout(layoutSt) || _format2.default.isTGALayout(layoutSt) || _format2.default.isXRDLayout(layoutSt);
 };
 
 var hideCmdAnaViewer = function hideCmdAnaViewer() {
@@ -31,7 +31,7 @@ var btnCmdSetRef = function btnCmdSetRef(layoutSt) {
 };
 
 var btnCmdIntg = function btnCmdIntg(layoutSt) {
-  return !_format2.default.isNmrLayout(layoutSt);
+  return !(_format2.default.isNmrLayout(layoutSt) || _format2.default.isUvVisLayout(layoutSt) || _format2.default.isHplcUvVisLayout(layoutSt));
 };
 
 var btnCmdMpy = function btnCmdMpy(layoutSt) {
@@ -62,7 +62,7 @@ var hidePanelMpy = function hidePanelMpy(layoutSt) {
 };
 
 var hidePanelCompare = function hidePanelCompare(layoutSt) {
-  return !_format2.default.isIrLayout(layoutSt);
+  return !(_format2.default.isIrLayout(layoutSt) || _format2.default.isUvVisLayout(layoutSt) || _format2.default.isHplcUvVisLayout(layoutSt));
 };
 
 var hideSolvent = function hideSolvent(layoutSt) {

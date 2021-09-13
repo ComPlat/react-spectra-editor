@@ -40,9 +40,21 @@ function* resetInitNmr(action) {
   }
 }
 
+function* resetInitCommonWithIntergation(action) {
+  const { integration } = action.payload;
+
+  if (integration) {
+    yield put({
+      type: INTEGRATION.RESET_ALL_RDC,
+      payload: integration,
+    });
+  }
+}
+
 const managerSagas = [
   takeEvery(MANAGER.RESETALL, resetShift),
   takeEvery(MANAGER.RESET_INIT_NMR, resetInitNmr),
+  takeEvery(MANAGER.RESET_INIT_COMMON_WITH_INTERGATION, resetInitCommonWithIntergation),
 ];
 
 export default managerSagas;

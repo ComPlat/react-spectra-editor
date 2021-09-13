@@ -6,7 +6,7 @@ import { bindActionCreators } from 'redux';
 import { withStyles } from '@material-ui/core/styles';
 
 import { updateOperation } from './actions/submit';
-import { resetInitCommon, resetInitNmr, resetInitMs } from './actions/manager';
+import { resetInitCommon, resetInitNmr, resetInitMs, resetInitCommonWithIntergation } from './actions/manager';
 import { updateMetaPeaks } from './actions/meta';
 import { addOthers } from './actions/jcamp';
 import LayerPrism from './layer_prism';
@@ -51,7 +51,7 @@ class LayerInit extends React.Component {
   execReset() {
     const {
       entity, updateMetaPeaksAct,
-      resetInitCommonAct, resetInitMsAct, resetInitNmrAct,
+      resetInitCommonAct, resetInitMsAct, resetInitNmrAct, resetInitCommonWithIntergationAct
     } = this.props;
     resetInitCommonAct();
     const { layout, features } = entity;
@@ -67,6 +67,13 @@ class LayerInit extends React.Component {
       updateMetaPeaksAct(entity);
       resetInitNmrAct({
         integration, multiplicity, simulation,
+      });
+    }
+    else if (Format.isUvVisLayout(layout) || Format.isHplcUvVisLayout(layout)) {
+      const { integration } = features;
+      updateMetaPeaksAct(entity);
+      resetInitCommonWithIntergationAct({
+        integration
       });
     }
   }
@@ -119,6 +126,7 @@ const mapDispatchToProps = dispatch => (
     resetInitCommonAct: resetInitCommon,
     resetInitNmrAct: resetInitNmr,
     resetInitMsAct: resetInitMs,
+    resetInitCommonWithIntergationAct: resetInitCommonWithIntergation,
     updateOperationAct: updateOperation,
     updateMetaPeaksAct: updateMetaPeaks,
     addOthersAct: addOthers,
@@ -139,6 +147,7 @@ LayerInit.propTypes = {
   resetInitCommonAct: PropTypes.func.isRequired,
   resetInitNmrAct: PropTypes.func.isRequired,
   resetInitMsAct: PropTypes.func.isRequired,
+  resetInitCommonWithIntergationAct: PropTypes.func.isRequired,
   updateOperationAct: PropTypes.func.isRequired,
   updateMetaPeaksAct: PropTypes.func.isRequired,
   addOthersAct: PropTypes.func.isRequired,

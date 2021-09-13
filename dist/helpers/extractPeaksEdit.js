@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.extractPeaksEdit = undefined;
+exports.extractAreaUnderCurve = exports.extractPeaksEdit = undefined;
 
 var _converter = require('./converter');
 
@@ -14,6 +14,8 @@ var _shift = require('./shift');
 var _format = require('./format');
 
 var _format2 = _interopRequireDefault(_format);
+
+var _integration = require('./integration');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -36,4 +38,32 @@ var extractPeaksEdit = function extractPeaksEdit(feature, editPeakSt, thresSt, s
   return peaksEdit;
 };
 
-exports.extractPeaksEdit = extractPeaksEdit; // eslint-disable-line
+var getAUCValue = function getAUCValue(integrationSt) {
+  var refArea = integrationSt.refArea,
+      refFactor = integrationSt.refFactor,
+      stack = integrationSt.stack;
+
+  if (Array.isArray(stack) && stack.length > 0) {
+    var data = stack.at(-1);
+    return (0, _integration.calcArea)(data, refArea, refFactor);
+  }
+  return 0;
+};
+
+var extractAreaUnderCurve = function extractAreaUnderCurve(allIntegrationSt, presentIntegrationSt, layoutSt) {
+  if ((_format2.default.isUvVisLayout(layoutSt) || _format2.default.isHplcUvVisLayout(layoutSt)) && Array.isArray(allIntegrationSt) && presentIntegrationSt) {
+    if (!presentIntegrationSt.refArea) {
+      return null;
+    }
+    var results = [];
+    allIntegrationSt.forEach(function (inte) {
+      var aucVal = getAUCValue(inte);
+      results.push(aucVal);
+    });
+    return results;
+  }
+  return null;
+};
+
+exports.extractPeaksEdit = extractPeaksEdit;
+exports.extractAreaUnderCurve = extractAreaUnderCurve; // eslint-disable-line

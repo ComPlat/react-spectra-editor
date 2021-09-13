@@ -21,6 +21,7 @@ var spectraDigit = function spectraDigit(layout) {
     case _list_layout.LIST_LAYOUT.IR:
     case _list_layout.LIST_LAYOUT.RAMAN:
     case _list_layout.LIST_LAYOUT.UVVIS:
+    case _list_layout.LIST_LAYOUT.HPLC_UVVIS:
     case _list_layout.LIST_LAYOUT.TGA:
     case _list_layout.LIST_LAYOUT.XRD:
     case _list_layout.LIST_LAYOUT.MS:
@@ -235,7 +236,7 @@ var peaksBody = function peaksBody(_ref) {
   if (layout === _list_layout.LIST_LAYOUT.RAMAN) {
     return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
-  if (layout === _list_layout.LIST_LAYOUT.UVVIS) {
+  if (layout === _list_layout.LIST_LAYOUT.UVVIS || layout === _list_layout.LIST_LAYOUT.HPLC_UVVIS) {
     return formatedUvVis(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
   if (layout === _list_layout.LIST_LAYOUT.TGA) {
@@ -296,6 +297,9 @@ var isRamanLayout = function isRamanLayout(layoutSt) {
 var isUvVisLayout = function isUvVisLayout(layoutSt) {
   return _list_layout.LIST_LAYOUT.UVVIS === layoutSt;
 };
+var isHplcUvVisLayout = function isHplcUvVisLayout(layoutSt) {
+  return _list_layout.LIST_LAYOUT.HPLC_UVVIS === layoutSt;
+};
 var isTGALayout = function isTGALayout(layoutSt) {
   return _list_layout.LIST_LAYOUT.TGA === layoutSt;
 };
@@ -303,7 +307,7 @@ var isXRDLayout = function isXRDLayout(layoutSt) {
   return _list_layout.LIST_LAYOUT.XRD === layoutSt;
 };
 var isEmWaveLayout = function isEmWaveLayout(layoutSt) {
-  return [_list_layout.LIST_LAYOUT.IR, _list_layout.LIST_LAYOUT.RAMAN, _list_layout.LIST_LAYOUT.UVVIS].indexOf(layoutSt) >= 0;
+  return [_list_layout.LIST_LAYOUT.IR, _list_layout.LIST_LAYOUT.RAMAN, _list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS].indexOf(layoutSt) >= 0;
 };
 
 var getNmrTyp = function getNmrTyp(layout) {
@@ -384,6 +388,7 @@ var Format = {
   isIrLayout: isIrLayout,
   isRamanLayout: isRamanLayout,
   isUvVisLayout: isUvVisLayout,
+  isHplcUvVisLayout: isHplcUvVisLayout,
   isTGALayout: isTGALayout,
   isXRDLayout: isXRDLayout,
   isEmWaveLayout: isEmWaveLayout,

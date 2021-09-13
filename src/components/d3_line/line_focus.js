@@ -362,6 +362,11 @@ class LineFocus {
       const kMax = this.data[this.data.length - 1].k;
       if (!ps[0]) return null;
       const kRef = ps[0].k;
+      if (!this.reverseXAxis(this.layout)) {
+        return d3.line()
+        .x(d => xt(d.x))
+        .y(d => 100 - (kRef - d.k) * 400 / kMax)(ps);
+      }
       return d3.line()
         .x(d => xt(d.x))
         .y(d => 300 - (d.k - kRef) * 400 / kMax)(ps);
@@ -666,7 +671,7 @@ class LineFocus {
   }
 
   reverseXAxis(layoutSt) {
-    return [LIST_LAYOUT.UVVIS, LIST_LAYOUT.TGA, LIST_LAYOUT.XRD].indexOf(layoutSt) < 0;
+    return [LIST_LAYOUT.UVVIS, LIST_LAYOUT.HPLC_UVVIS, LIST_LAYOUT.TGA, LIST_LAYOUT.XRD].indexOf(layoutSt) < 0;
   }
 
   create({
