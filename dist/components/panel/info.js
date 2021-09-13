@@ -134,10 +134,35 @@ var simContent = function simContent(nmrSimPeaks) {
   }).join(', ');
 };
 
+var aucValue = function aucValue(integration) {
+  if (!integration) {
+    return "";
+  }
+  var values = [];
+  var stackIntegration = integration.stack;
+  if (Array.isArray(stackIntegration)) {
+    var sumVal = 0.0;
+    stackIntegration.forEach(function (inte) {
+      if (inte.absoluteArea) {
+        sumVal += inte.absoluteArea;
+      }
+    });
+    sumVal = sumVal.toFixed(2);
+    stackIntegration.forEach(function (inte) {
+      var areaVal = inte.absoluteArea.toFixed(2);
+      var percent = (areaVal * 100 / sumVal).toFixed(2);
+      var valStr = areaVal + " (" + percent + "%)";
+      values.push(valStr);
+    });
+  }
+  return values.join(", ");
+};
+
 var InfoPanel = function InfoPanel(_ref) {
   var classes = _ref.classes,
       expand = _ref.expand,
       feature = _ref.feature,
+      integration = _ref.integration,
       editorOnly = _ref.editorOnly,
       molSvg = _ref.molSvg,
       descriptions = _ref.descriptions,
@@ -229,7 +254,22 @@ var InfoPanel = function InfoPanel(_ref) {
         svg: molSvg,
         duration: 300,
         resize: true
-      })
+      }),
+      _format2.default.isHplcUvVisLayout(layoutSt) ? _react2.default.createElement(
+        'div',
+        { className: (0, _classnames2.default)(classes.rowRoot, classes.rowOddSim) },
+        _react2.default.createElement(
+          'span',
+          { className: (0, _classnames2.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt') },
+          'Area under curve (AUC):'
+        ),
+        _react2.default.createElement('br', null),
+        _react2.default.createElement(
+          'span',
+          { className: (0, _classnames2.default)(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt') },
+          aucValue(integration)
+        )
+      ) : null
     ),
     _react2.default.createElement(_reactQuill2.default, {
       className: (0, _classnames2.default)(classes.quill, 'card-sv-quill'),
@@ -279,6 +319,7 @@ InfoPanel.propTypes = {
   classes: _propTypes2.default.object.isRequired,
   expand: _propTypes2.default.bool.isRequired,
   feature: _propTypes2.default.object.isRequired,
+  integration: _propTypes2.default.object.isRequired,
   editorOnly: _propTypes2.default.bool.isRequired,
   molSvg: _propTypes2.default.string.isRequired,
   descriptions: _propTypes2.default.array.isRequired,

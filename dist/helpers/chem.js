@@ -115,7 +115,7 @@ var convertComparisons = function convertComparisons(layout, comparisons, featur
   var minY = feature.minY,
       maxY = feature.maxY;
 
-  if (!comparisons || !_format2.default.isIrLayout(layout)) return [];
+  if (!comparisons || !(_format2.default.isIrLayout(layout) || _format2.default.isHplcUvVisLayout(layout))) return [];
   return comparisons.map(function (c) {
     var spectra = c.spectra,
         show = c.show;
@@ -212,6 +212,9 @@ var readLayout = function readLayout(jcamp) {
       return _list_layout.LIST_LAYOUT.RAMAN;
     }
     if (dataType.includes('UV/VIS SPECTRUM')) {
+      if (dataType.includes('HPLC')) {
+        return _list_layout.LIST_LAYOUT.HPLC_UVVIS;
+      }
       return _list_layout.LIST_LAYOUT.UVVIS;
     }
     if (dataType.includes('THERMOGRAVIMETRIC ANALYSIS')) {
@@ -336,7 +339,8 @@ var buildIntegFeature = function buildIntegFeature(jcamp, spectra) {
       return {
         xL: parseFloat(ts[0]),
         xU: parseFloat(ts[1]),
-        area: parseFloat(ts[2])
+        area: parseFloat(ts[2]),
+        absoluteArea: parseFloat(ts[3])
       };
     });
     stack = [].concat(_toConsumableArray(stack), _toConsumableArray(itStack));
@@ -365,7 +369,8 @@ var buildIntegFeature = function buildIntegFeature(jcamp, spectra) {
     refArea: raw2realRatio,
     refFactor: 1,
     shift: 0,
-    stack: mStack
+    stack: mStack,
+    originStack: stack
   };
 };
 

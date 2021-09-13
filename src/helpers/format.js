@@ -7,6 +7,7 @@ const spectraDigit = (layout) => {
     case LIST_LAYOUT.IR:
     case LIST_LAYOUT.RAMAN:
     case LIST_LAYOUT.UVVIS:
+    case LIST_LAYOUT.HPLC_UVVIS:
     case LIST_LAYOUT.TGA:
     case LIST_LAYOUT.XRD:
     case LIST_LAYOUT.MS:
@@ -56,6 +57,7 @@ const spectraOps = {
   [LIST_LAYOUT.IR]: { head: 'IR', tail: ' cm-1' },
   [LIST_LAYOUT.RAMAN]: { head: 'RAMAN', tail: ' cm-1' },
   [LIST_LAYOUT.UVVIS]: { head: 'UV/VIS (transmittance)', tail: ' nm' },
+  [LIST_LAYOUT.HPLC_UVVIS]: { head: 'HPLC UV/VIS (transmittance)', tail: '' },
   [LIST_LAYOUT.TGA]: { head: 'THERMOGRAVIMETRIC ANALYSIS', tail: ' SECONDS' },
   [LIST_LAYOUT.MS]: { head: 'MASS', tail: ' m/z' },
   [LIST_LAYOUT.XRD]: { head: 'X-RAY DIFFRACTION', tail: '.' },
@@ -153,6 +155,45 @@ const formatedUvVis = (
     .join(', ');
 };
 
+const formatedHplcUvVis = (
+  peaks, decimal = 2, integration
+) => {
+
+  let stack = [];
+  if (integration) {
+    stack = integration.stack;
+  }
+  
+  let ordered = {};
+
+  peaks.forEach((p) => {
+    const x = fixDigit(p.x, decimal);
+    const better = !ordered[x] || (p.y > ordered[x]);
+    if (better) {
+      ordered = Object.assign({}, ordered, { [x]: p.y });
+    }
+  });
+
+  ordered = Object.keys(ordered)
+    .map(k => ({ x: k, y: ordered[k] }));
+
+  
+  let arrResult = [];
+  ordered.forEach(o => {
+    let pStr = `${o.x} (${o.y.toFixed(2)})`
+    if (stack) {
+      stack.forEach(s => {
+        if (s.xL <= o.x && s.xU >= o.x) {
+          pStr = `${o.x} (${o.y.toFixed(2)}, AUC=${s.absoluteArea})`;
+        }
+      });
+    }
+    arrResult.push(pStr);
+  })
+
+  return arrResult.join(', ')
+};
+
 const rmShiftFromPeaks = (peaks, shift) => {
   const peaksXY = ToXY(peaks);
   // const digit = spectraDigit(layout);
@@ -170,6 +211,7 @@ const rmShiftFromPeaks = (peaks, shift) => {
 const peaksBody = ({
   peaks, layout, decimal, shift, isAscend,
   isIntensity = false, boundary = {},
+  integration
 }) => {
   const result = rmShiftFromPeaks(peaks, shift);
 
@@ -190,6 +232,9 @@ const peaksBody = ({
   }
   if (layout === LIST_LAYOUT.UVVIS) {
     return formatedUvVis(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
+  }
+  if (layout === LIST_LAYOUT.HPLC_UVVIS) {
+    return formatedHplcUvVis(ordered, decimal, integration);
   }
   if (layout === LIST_LAYOUT.TGA) {
     return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
@@ -227,10 +272,11 @@ const isMsLayout = layoutSt => (LIST_LAYOUT.MS === layoutSt);
 const isIrLayout = layoutSt => ([LIST_LAYOUT.IR, 'INFRARED'].indexOf(layoutSt) >= 0);
 const isRamanLayout = layoutSt => (LIST_LAYOUT.RAMAN === layoutSt);
 const isUvVisLayout = layoutSt => (LIST_LAYOUT.UVVIS === layoutSt);
+const isHplcUvVisLayout = layoutSt => (LIST_LAYOUT.HPLC_UVVIS === layoutSt);
 const isTGALayout = layoutSt => (LIST_LAYOUT.TGA === layoutSt);
 const isXRDLayout = layoutSt => (LIST_LAYOUT.XRD === layoutSt);
 const isEmWaveLayout = layoutSt => (
-  [LIST_LAYOUT.IR, LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS].indexOf(layoutSt) >= 0
+  [LIST_LAYOUT.IR, LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS, LIST_LAYOUT.HPLC_UVVIS].indexOf(layoutSt) >= 0
 );
 
 const getNmrTyp = (layout) => {
@@ -303,6 +349,7 @@ const Format = {
   isIrLayout,
   isRamanLayout,
   isUvVisLayout,
+  isHplcUvVisLayout,
   isTGALayout,
   isXRDLayout,
   isEmWaveLayout,

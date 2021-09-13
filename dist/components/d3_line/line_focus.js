@@ -40,6 +40,8 @@ var _cfg2 = _interopRequireDefault(_cfg);
 
 var _list_layout = require('../../constants/list_layout');
 
+var _calc = require('../../helpers/calc');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
@@ -107,6 +109,7 @@ var LineFocus = function () {
     this.drawLine = this.drawLine.bind(this);
     this.drawThres = this.drawThres.bind(this);
     this.drawGrid = this.drawGrid.bind(this);
+    this.drawAUC = this.drawAUC.bind(this);
     this.drawPeaks = this.drawPeaks.bind(this);
     this.drawRef = this.drawRef.bind(this);
     this.drawInteg = this.drawInteg.bind(this);
@@ -301,9 +304,66 @@ var LineFocus = function () {
       return this.dataPks;
     }
   }, {
+    key: 'drawAUC',
+    value: function drawAUC(stack) {
+      var _this = this;
+
+      var _TfRescale5 = (0, _compass.TfRescale)(this),
+          xt = _TfRescale5.xt,
+          yt = _TfRescale5.yt;
+
+      var auc = this.tags.aucPath.selectAll('path').data(stack);
+      auc.exit().attr('class', 'exit').remove();
+
+      var integCurve = function integCurve(border) {
+        var xL = border.xL,
+            xU = border.xU;
+
+        var ps = _this.data.filter(function (d) {
+          return d.x > xL && d.x < xU;
+        });
+        if (!ps[0]) return null;
+
+        var point1 = ps[0];
+        var point2 = ps[ps.length - 1];
+        var slope = (0, _calc.calcSlope)(point1.x, point1.y, point2.x, point2.y);
+        var lastDY = point1.y;
+
+        return d3.area().x(function (d) {
+          return xt(d.x);
+        }).y0(function (d, index) {
+          if (index > 0) {
+            var lastD = ps[index - 1];
+            var y = slope * (d.x - lastD.x) + lastDY;
+            lastDY = y;
+            return yt(y);
+          }
+          return yt(0);
+        }).y1(function (d) {
+          return yt(d.y);
+        })(ps);
+      };
+
+      auc.enter().append('path').attr('class', 'auc').attr('fill', 'red').attr('stroke', 'none').attr('fill-opacity', 0.2).attr('stroke-width', 2).merge(auc).attr('d', function (d) {
+        return integCurve(d);
+      }).attr('id', function (d) {
+        return 'auc' + (0, _focus.itgIdTag)(d);
+      }).on('mouseover', function (d) {
+        d3.select('#auc' + (0, _focus.itgIdTag)(d)).attr('stroke', 'blue');
+        d3.select('#auc' + (0, _focus.itgIdTag)(d)).attr('stroke', 'blue');
+        d3.select('#auc' + (0, _focus.itgIdTag)(d)).style('fill', 'blue');
+      }).on('mouseout', function (d) {
+        d3.select('#auc' + (0, _focus.itgIdTag)(d)).attr('stroke', 'none');
+        d3.select('#auc' + (0, _focus.itgIdTag)(d)).style('fill', 'red');
+        d3.select('#auc' + (0, _focus.itgIdTag)(d)).style('fill-opacity', 0.2);
+      }).on('click', function (d) {
+        return _this.onClickTarget(d);
+      });
+    }
+  }, {
     key: 'drawPeaks',
     value: function drawPeaks(editPeakSt) {
-      var _this = this;
+      var _this2 = this;
 
       var _shouldUpdate3 = this.shouldUpdate,
           sameXY = _shouldUpdate3.sameXY,
@@ -315,9 +375,9 @@ var LineFocus = function () {
 
       // rescale for zoom
 
-      var _TfRescale5 = (0, _compass.TfRescale)(this),
-          xt = _TfRescale5.xt,
-          yt = _TfRescale5.yt;
+      var _TfRescale6 = (0, _compass.TfRescale)(this),
+          xt = _TfRescale6.xt,
+          yt = _TfRescale6.yt;
 
       var dPks = this.mergedPeaks(editPeakSt);
 
@@ -339,21 +399,37 @@ var LineFocus = function () {
       }).on('mouseover', function (d, i, n) {
         d3.select('#mpp' + Math.round(1000 * d.x)).attr('stroke-opacity', '1.0');
         d3.select('#bpt' + Math.round(1000 * d.x)).style('fill', 'blue');
-        var tipParams = { d: d, layout: _this.layout };
-        _this.tip.show(tipParams, n[i]);
+        var tipParams = { d: d, layout: _this2.layout };
+        _this2.tip.show(tipParams, n[i]);
       }).on('mouseout', function (d, i, n) {
         d3.select('#mpp' + Math.round(1000 * d.x)).attr('stroke-opacity', '0.0');
         d3.select('#bpt' + Math.round(1000 * d.x)).style('fill', 'red');
-        var tipParams = { d: d, layout: _this.layout };
-        _this.tip.hide(tipParams, n[i]);
+        var tipParams = { d: d, layout: _this2.layout };
+        _this2.tip.hide(tipParams, n[i]);
       }).on('click', function (d) {
-        return _this.onClickTarget(d);
+        return _this2.onClickTarget(d);
       });
+
+      var ignoreRef = _format2.default.isHplcUvVisLayout(this.layout);
+      if (ignoreRef) {
+        var bpTxt = this.tags.bpTxt.selectAll('text').data(dPks);
+        bpTxt.exit().attr('class', 'exit').remove();
+
+        bpTxt.enter().append('text').attr('class', 'peak-text').attr('font-family', 'Helvetica').style('font-size', '12px').attr('fill', '#228B22').style('text-anchor', 'middle').merge(bpTxt).attr('id', function (d) {
+          return 'mpp' + Math.round(1000 * d.x);
+        }).text(function (d) {
+          return d.x.toFixed(2);
+        }).attr('transform', function (d) {
+          return 'translate(' + xt(d.x) + ', ' + (yt(d.y) - 25) + ')';
+        }).on('click', function (d) {
+          return _this2.onClickTarget(d);
+        });
+      }
     }
   }, {
     key: 'drawInteg',
     value: function drawInteg(integationSt) {
-      var _this2 = this;
+      var _this3 = this;
 
       var _shouldUpdate4 = this.shouldUpdate,
           sameXY = _shouldUpdate4.sameXY,
@@ -368,7 +444,16 @@ var LineFocus = function () {
           shift = integationSt.shift;
 
       var isDisable = _cfg2.default.btnCmdIntg(this.layout);
+      var ignoreRef = _format2.default.isHplcUvVisLayout(this.layout);
       var itgs = isDisable ? [] : stack;
+
+      if (itgs.length === 0 || isDisable) {
+        // remove drawn are under curve
+        var auc = this.tags.aucPath.selectAll('path').data(stack);
+        auc.exit().attr('class', 'exit').remove();
+        auc.merge(auc);
+        return;
+      }
 
       var igbp = this.tags.igbPath.selectAll('path').data(itgs);
       igbp.exit().attr('class', 'exit').remove();
@@ -378,91 +463,101 @@ var LineFocus = function () {
       var igtp = this.tags.igtPath.selectAll('text').data(itgs);
       igtp.exit().attr('class', 'exit').remove();
 
-      if (itgs.length === 0 || isDisable) return;
-      // rescale for zoom
+      if (ignoreRef) {
+        this.drawAUC(stack);
+      } else {
 
-      var _TfRescale6 = (0, _compass.TfRescale)(this),
-          xt = _TfRescale6.xt;
+        // rescale for zoom
+        var _TfRescale7 = (0, _compass.TfRescale)(this),
+            xt = _TfRescale7.xt;
 
-      var dh = 50;
-      var integBar = function integBar(data) {
-        return d3.line()([[xt(data.xL - shift), dh], [xt(data.xL - shift), dh - 10], [xt(data.xL - shift), dh - 5], [xt(data.xU - shift), dh - 5], [xt(data.xU - shift), dh - 10], [xt(data.xU - shift), dh]]);
-      };
+        var dh = 50;
+        var integBar = function integBar(data) {
+          return d3.line()([[xt(data.xL - shift), dh], [xt(data.xL - shift), dh - 10], [xt(data.xL - shift), dh - 5], [xt(data.xU - shift), dh - 5], [xt(data.xU - shift), dh - 10], [xt(data.xU - shift), dh]]);
+        };
 
-      igbp.enter().append('path').attr('class', 'igbp').attr('fill', 'none').attr('stroke', '#228B22').attr('stroke-width', 2).merge(igbp).attr('id', function (d) {
-        return 'igbp' + (0, _focus.itgIdTag)(d);
-      }).attr('d', function (d) {
-        return integBar(d);
-      }).on('mouseover', function (d) {
-        d3.select('#igbp' + (0, _focus.itgIdTag)(d)).attr('stroke', 'blue');
-        d3.select('#igbc' + (0, _focus.itgIdTag)(d)).attr('stroke', 'blue');
-        d3.select('#igtp' + (0, _focus.itgIdTag)(d)).style('fill', 'blue');
-      }).on('mouseout', function (d) {
-        d3.select('#igbp' + (0, _focus.itgIdTag)(d)).attr('stroke', '#228B22');
-        d3.select('#igbc' + (0, _focus.itgIdTag)(d)).attr('stroke', '#228B22');
-        d3.select('#igtp' + (0, _focus.itgIdTag)(d)).style('fill', '#228B22');
-      }).on('click', function (d) {
-        return _this2.onClickTarget(d);
-      });
-
-      var integCurve = function integCurve(border) {
-        var xL = border.xL,
-            xU = border.xU;
-        var nXL = xL - shift,
-            nXU = xU - shift;
-
-        var ps = _this2.data.filter(function (d) {
-          return d.x > nXL && d.x < nXU;
+        igbp.enter().append('path').attr('class', 'igbp').attr('fill', 'none').attr('stroke', '#228B22').attr('stroke-width', 2).merge(igbp).attr('id', function (d) {
+          return 'igbp' + (0, _focus.itgIdTag)(d);
+        }).attr('d', function (d) {
+          return integBar(d);
+        }).on('mouseover', function (d) {
+          d3.select('#igbp' + (0, _focus.itgIdTag)(d)).attr('stroke', 'blue');
+          d3.select('#igbc' + (0, _focus.itgIdTag)(d)).attr('stroke', 'blue');
+          d3.select('#igtp' + (0, _focus.itgIdTag)(d)).style('fill', 'blue');
+        }).on('mouseout', function (d) {
+          d3.select('#igbp' + (0, _focus.itgIdTag)(d)).attr('stroke', '#228B22');
+          d3.select('#igbc' + (0, _focus.itgIdTag)(d)).attr('stroke', '#228B22');
+          d3.select('#igtp' + (0, _focus.itgIdTag)(d)).style('fill', '#228B22');
+        }).on('click', function (d) {
+          return _this3.onClickTarget(d);
         });
-        var kMax = _this2.data[_this2.data.length - 1].k;
-        if (!ps[0]) return null;
-        var kRef = ps[0].k;
-        return d3.line().x(function (d) {
-          return xt(d.x);
-        }).y(function (d) {
-          return 300 - (d.k - kRef) * 400 / kMax;
-        })(ps);
-      };
 
-      igcp.enter().append('path').attr('class', 'igcp').attr('fill', 'none').attr('stroke', '#228B22').attr('stroke-width', 2).merge(igcp).attr('id', function (d) {
-        return 'igbc' + (0, _focus.itgIdTag)(d);
-      }).attr('d', function (d) {
-        return integCurve(d);
-      }).on('mouseover', function (d) {
-        d3.select('#igbp' + (0, _focus.itgIdTag)(d)).attr('stroke', 'blue');
-        d3.select('#igbc' + (0, _focus.itgIdTag)(d)).attr('stroke', 'blue');
-        d3.select('#igtp' + (0, _focus.itgIdTag)(d)).style('fill', 'blue');
-      }).on('mouseout', function (d) {
-        d3.select('#igbp' + (0, _focus.itgIdTag)(d)).attr('stroke', '#228B22');
-        d3.select('#igbc' + (0, _focus.itgIdTag)(d)).attr('stroke', '#228B22');
-        d3.select('#igtp' + (0, _focus.itgIdTag)(d)).style('fill', '#228B22');
-      }).on('click', function (d) {
-        return _this2.onClickTarget(d);
-      });
+        var integCurve = function integCurve(border) {
+          var xL = border.xL,
+              xU = border.xU;
+          var nXL = xL - shift,
+              nXU = xU - shift;
 
-      igtp.enter().append('text').attr('class', 'igtp').attr('font-family', 'Helvetica').style('font-size', '12px').attr('fill', '#228B22').style('text-anchor', 'middle').merge(igtp).attr('id', function (d) {
-        return 'igtp' + (0, _focus.itgIdTag)(d);
-      }).text(function (d) {
-        return (0, _integration.calcArea)(d, refArea, refFactor);
-      }).attr('transform', function (d) {
-        return 'translate(' + xt((d.xL + d.xU) / 2 - shift) + ', ' + (dh - 12) + ')';
-      }).on('mouseover', function (d) {
-        d3.select('#igbp' + (0, _focus.itgIdTag)(d)).attr('stroke', 'blue');
-        d3.select('#igbc' + (0, _focus.itgIdTag)(d)).attr('stroke', 'blue');
-        d3.select('#igtp' + (0, _focus.itgIdTag)(d)).style('fill', 'blue');
-      }).on('mouseout', function (d) {
-        d3.select('#igbp' + (0, _focus.itgIdTag)(d)).attr('stroke', '#228B22');
-        d3.select('#igbc' + (0, _focus.itgIdTag)(d)).attr('stroke', '#228B22');
-        d3.select('#igtp' + (0, _focus.itgIdTag)(d)).style('fill', '#228B22');
-      }).on('click', function (d) {
-        return _this2.onClickTarget(d);
-      });
+          var ps = _this3.data.filter(function (d) {
+            return d.x > nXL && d.x < nXU;
+          });
+          var kMax = _this3.data[_this3.data.length - 1].k;
+          if (!ps[0]) return null;
+          var kRef = ps[0].k;
+          if (!_this3.reverseXAxis(_this3.layout)) {
+            return d3.line().x(function (d) {
+              return xt(d.x);
+            }).y(function (d) {
+              return 100 - (kRef - d.k) * 400 / kMax;
+            })(ps);
+          }
+          return d3.line().x(function (d) {
+            return xt(d.x);
+          }).y(function (d) {
+            return 300 - (d.k - kRef) * 400 / kMax;
+          })(ps);
+        };
+
+        igcp.enter().append('path').attr('class', 'igcp').attr('fill', 'none').attr('stroke', '#228B22').attr('stroke-width', 2).merge(igcp).attr('id', function (d) {
+          return 'igbc' + (0, _focus.itgIdTag)(d);
+        }).attr('d', function (d) {
+          return integCurve(d);
+        }).on('mouseover', function (d) {
+          d3.select('#igbp' + (0, _focus.itgIdTag)(d)).attr('stroke', 'blue');
+          d3.select('#igbc' + (0, _focus.itgIdTag)(d)).attr('stroke', 'blue');
+          d3.select('#igtp' + (0, _focus.itgIdTag)(d)).style('fill', 'blue');
+        }).on('mouseout', function (d) {
+          d3.select('#igbp' + (0, _focus.itgIdTag)(d)).attr('stroke', '#228B22');
+          d3.select('#igbc' + (0, _focus.itgIdTag)(d)).attr('stroke', '#228B22');
+          d3.select('#igtp' + (0, _focus.itgIdTag)(d)).style('fill', '#228B22');
+        }).on('click', function (d) {
+          return _this3.onClickTarget(d);
+        });
+
+        igtp.enter().append('text').attr('class', 'igtp').attr('font-family', 'Helvetica').style('font-size', '12px').attr('fill', '#228B22').style('text-anchor', 'middle').merge(igtp).attr('id', function (d) {
+          return 'igtp' + (0, _focus.itgIdTag)(d);
+        }).text(function (d) {
+          return (0, _integration.calcArea)(d, refArea, refFactor, ignoreRef);
+        }).attr('transform', function (d) {
+          return 'translate(' + xt((d.xL + d.xU) / 2 - shift) + ', ' + (dh - 12) + ')';
+        }).on('mouseover', function (d) {
+          d3.select('#igbp' + (0, _focus.itgIdTag)(d)).attr('stroke', 'blue');
+          d3.select('#igbc' + (0, _focus.itgIdTag)(d)).attr('stroke', 'blue');
+          d3.select('#igtp' + (0, _focus.itgIdTag)(d)).style('fill', 'blue');
+        }).on('mouseout', function (d) {
+          d3.select('#igbp' + (0, _focus.itgIdTag)(d)).attr('stroke', '#228B22');
+          d3.select('#igbc' + (0, _focus.itgIdTag)(d)).attr('stroke', '#228B22');
+          d3.select('#igtp' + (0, _focus.itgIdTag)(d)).style('fill', '#228B22');
+        }).on('click', function (d) {
+          return _this3.onClickTarget(d);
+        });
+      }
     }
   }, {
     key: 'drawMtply',
     value: function drawMtply(mtplySt) {
       var _ref2,
-          _this3 = this;
+          _this4 = this;
 
       var _shouldUpdate5 = this.shouldUpdate,
           sameXY = _shouldUpdate5.sameXY,
@@ -480,8 +575,8 @@ var LineFocus = function () {
       if (mpys === 0 || isDisable) return;
       // rescale for zoom
 
-      var _TfRescale7 = (0, _compass.TfRescale)(this),
-          xt = _TfRescale7.xt;
+      var _TfRescale8 = (0, _compass.TfRescale)(this),
+          xt = _TfRescale8.xt;
 
       var mpyb = this.tags.mpybPath.selectAll('path').data(mpys);
       mpyb.exit().attr('class', 'exit').remove();
@@ -533,7 +628,7 @@ var LineFocus = function () {
         d3.selectAll('#mpyt2' + (0, _focus.mpyIdTag)(d)).style('fill', dColor);
         d3.selectAll('#mpyp' + (0, _focus.mpyIdTag)(d)).attr('stroke', dColor);
       }).on('click', function (d) {
-        return _this3.onClickTarget(d);
+        return _this4.onClickTarget(d);
       });
 
       mpyt1.enter().append('text').attr('class', 'mpyt1').attr('font-family', 'Helvetica').style('font-size', '12px').style('text-anchor', 'middle').merge(mpyt1).attr('fill', function (d) {
@@ -556,7 +651,7 @@ var LineFocus = function () {
         d3.selectAll('#mpyt2' + (0, _focus.mpyIdTag)(d)).style('fill', dColor);
         d3.selectAll('#mpyp' + (0, _focus.mpyIdTag)(d)).attr('stroke', dColor);
       }).on('click', function (d) {
-        return _this3.onClickTarget(d);
+        return _this4.onClickTarget(d);
       });
 
       mpyt2.enter().append('text').attr('class', 'mpyt2').attr('font-family', 'Helvetica').style('font-size', '12px').style('text-anchor', 'middle').merge(mpyt2).attr('fill', function (d) {
@@ -579,7 +674,7 @@ var LineFocus = function () {
         d3.selectAll('#mpyt2' + (0, _focus.mpyIdTag)(d)).style('fill', dColor);
         d3.selectAll('#mpyp' + (0, _focus.mpyIdTag)(d)).attr('stroke', dColor);
       }).on('click', function (d) {
-        return _this3.onClickTarget(d);
+        return _this4.onClickTarget(d);
       });
 
       var mpypH = height - dh;
@@ -611,16 +706,16 @@ var LineFocus = function () {
         d3.selectAll('#mpyt2' + (0, _focus.mpyIdTag)(d)).style('fill', dColor);
         d3.selectAll('#mpyp' + (0, _focus.mpyIdTag)(d)).attr('stroke', dColor);
       }).on('click', function (d) {
-        return _this3.onClickTarget(d);
+        return _this4.onClickTarget(d);
       });
     }
   }, {
     key: 'drawRef',
     value: function drawRef() {
       // rescale for zoom
-      var _TfRescale8 = (0, _compass.TfRescale)(this),
-          xt = _TfRescale8.xt,
-          yt = _TfRescale8.yt;
+      var _TfRescale9 = (0, _compass.TfRescale)(this),
+          xt = _TfRescale9.xt,
+          yt = _TfRescale9.yt;
 
       var ccp = this.ref.selectAll('path').data(this.tSfPeaks);
 
@@ -641,21 +736,21 @@ var LineFocus = function () {
   }, {
     key: 'drawComparisons',
     value: function drawComparisons(comparisons) {
-      var _this4 = this;
+      var _this5 = this;
 
       d3.selectAll('.line-clip-compare').remove();
       if (!comparisons) return null;
       comparisons.forEach(function (c, idx) {
         if (!c.show) return;
-        var path = (0, _mount.MountComparePath)(_this4, _format2.default.compareColors(idx), idx); // #D5D8DC
-        path.attr('d', _this4.pathCall(c.data));
+        var path = (0, _mount.MountComparePath)(_this5, _format2.default.compareColors(idx), idx); // #D5D8DC
+        path.attr('d', _this5.pathCall(c.data));
       });
       return null;
     }
   }, {
     key: 'reverseXAxis',
     value: function reverseXAxis(layoutSt) {
-      return [_list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.TGA, _list_layout.LIST_LAYOUT.XRD].indexOf(layoutSt) < 0;
+      return [_list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS, _list_layout.LIST_LAYOUT.TGA, _list_layout.LIST_LAYOUT.XRD].indexOf(layoutSt) < 0;
     }
   }, {
     key: 'create',

@@ -109,7 +109,7 @@ var TriBtn = function (_React$Component) {
             _common.MuButton,
             {
               className: (0, _classnames2.default)('btn-sv-bar-one'),
-              disabled: _cfg2.default.btnCmdMpy(layoutSt),
+              disabled: _cfg2.default.btnCmdMpy(layoutSt) && _cfg2.default.btnCmdIntg(layoutSt),
               onClick: this.onToggle
             },
             children
@@ -134,7 +134,7 @@ var TriBtn = function (_React$Component) {
 
       return _react2.default.createElement(
         'span',
-        { disabled: _cfg2.default.btnCmdMpy(layoutSt) },
+        { disabled: _cfg2.default.btnCmdMpy(layoutSt) && _cfg2.default.btnCmdIntg(layoutSt) },
         _react2.default.createElement(
           'span',
           { className: (0, _classnames2.default)(classes.txtLabel, 'txt-sv-bar-desc') },

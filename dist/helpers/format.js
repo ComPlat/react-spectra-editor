@@ -21,6 +21,7 @@ var spectraDigit = function spectraDigit(layout) {
     case _list_layout.LIST_LAYOUT.IR:
     case _list_layout.LIST_LAYOUT.RAMAN:
     case _list_layout.LIST_LAYOUT.UVVIS:
+    case _list_layout.LIST_LAYOUT.HPLC_UVVIS:
     case _list_layout.LIST_LAYOUT.TGA:
     case _list_layout.LIST_LAYOUT.XRD:
     case _list_layout.LIST_LAYOUT.MS:
@@ -61,7 +62,7 @@ var toPeakStr = function toPeakStr(peaks) {
   return str;
 };
 
-var spectraOps = (_spectraOps = {}, _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.PLAIN, { head: '', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.H1, { head: '1H', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.C13, { head: '13C', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.F19, { head: '19F', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.P31, { head: '31P', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.N15, { head: '15N', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.Si29, { head: '29Si', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.IR, { head: 'IR', tail: ' cm-1' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.RAMAN, { head: 'RAMAN', tail: ' cm-1' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.UVVIS, { head: 'UV/VIS (transmittance)', tail: ' nm' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.TGA, { head: 'THERMOGRAVIMETRIC ANALYSIS', tail: ' SECONDS' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.MS, { head: 'MASS', tail: ' m/z' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.XRD, { head: 'X-RAY DIFFRACTION', tail: '.' }), _spectraOps);
+var spectraOps = (_spectraOps = {}, _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.PLAIN, { head: '', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.H1, { head: '1H', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.C13, { head: '13C', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.F19, { head: '19F', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.P31, { head: '31P', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.N15, { head: '15N', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.Si29, { head: '29Si', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.IR, { head: 'IR', tail: ' cm-1' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.RAMAN, { head: 'RAMAN', tail: ' cm-1' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.UVVIS, { head: 'UV/VIS (transmittance)', tail: ' nm' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.HPLC_UVVIS, { head: 'HPLC UV/VIS (transmittance)', tail: '' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.TGA, { head: 'THERMOGRAVIMETRIC ANALYSIS', tail: ' SECONDS' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.MS, { head: 'MASS', tail: ' m/z' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.XRD, { head: 'X-RAY DIFFRACTION', tail: '.' }), _spectraOps);
 
 var rmRef = function rmRef(peaks, shift) {
   var refValue = shift.ref.value || shift.peak.x;
@@ -185,6 +186,46 @@ var formatedUvVis = function formatedUvVis(peaks, maxY) {
   }).join(', ');
 };
 
+var formatedHplcUvVis = function formatedHplcUvVis(peaks) {
+  var decimal = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
+  var integration = arguments[2];
+
+
+  var stack = [];
+  if (integration) {
+    stack = integration.stack;
+  }
+
+  var ordered = {};
+
+  peaks.forEach(function (p) {
+    var x = fixDigit(p.x, decimal);
+    var better = !ordered[x] || p.y > ordered[x];
+    if (better) {
+      ordered = Object.assign({}, ordered, _defineProperty({}, x, p.y));
+    }
+  });
+
+  ordered = Object.keys(ordered).map(function (k) {
+    return { x: k, y: ordered[k] };
+  });
+
+  var arrResult = [];
+  ordered.forEach(function (o) {
+    var pStr = o.x + ' (' + o.y.toFixed(2) + ')';
+    if (stack) {
+      stack.forEach(function (s) {
+        if (s.xL <= o.x && s.xU >= o.x) {
+          pStr = o.x + ' (' + o.y.toFixed(2) + ', AUC=' + s.absoluteArea + ')';
+        }
+      });
+    }
+    arrResult.push(pStr);
+  });
+
+  return arrResult.join(', ');
+};
+
 var rmShiftFromPeaks = function rmShiftFromPeaks(peaks, shift) {
   var peaksXY = (0, _converter.ToXY)(peaks);
   // const digit = spectraDigit(layout);
@@ -210,7 +251,8 @@ var peaksBody = function peaksBody(_ref) {
       _ref$isIntensity = _ref.isIntensity,
       isIntensity = _ref$isIntensity === undefined ? false : _ref$isIntensity,
       _ref$boundary = _ref.boundary,
-      boundary = _ref$boundary === undefined ? {} : _ref$boundary;
+      boundary = _ref$boundary === undefined ? {} : _ref$boundary,
+      integration = _ref.integration;
 
   var result = rmShiftFromPeaks(peaks, shift);
 
@@ -237,6 +279,9 @@ var peaksBody = function peaksBody(_ref) {
   }
   if (layout === _list_layout.LIST_LAYOUT.UVVIS) {
     return formatedUvVis(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
+  }
+  if (layout === _list_layout.LIST_LAYOUT.HPLC_UVVIS) {
+    return formatedHplcUvVis(ordered, decimal, integration);
   }
   if (layout === _list_layout.LIST_LAYOUT.TGA) {
     return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
@@ -296,6 +341,9 @@ var isRamanLayout = function isRamanLayout(layoutSt) {
 var isUvVisLayout = function isUvVisLayout(layoutSt) {
   return _list_layout.LIST_LAYOUT.UVVIS === layoutSt;
 };
+var isHplcUvVisLayout = function isHplcUvVisLayout(layoutSt) {
+  return _list_layout.LIST_LAYOUT.HPLC_UVVIS === layoutSt;
+};
 var isTGALayout = function isTGALayout(layoutSt) {
   return _list_layout.LIST_LAYOUT.TGA === layoutSt;
 };
@@ -303,7 +351,7 @@ var isXRDLayout = function isXRDLayout(layoutSt) {
   return _list_layout.LIST_LAYOUT.XRD === layoutSt;
 };
 var isEmWaveLayout = function isEmWaveLayout(layoutSt) {
-  return [_list_layout.LIST_LAYOUT.IR, _list_layout.LIST_LAYOUT.RAMAN, _list_layout.LIST_LAYOUT.UVVIS].indexOf(layoutSt) >= 0;
+  return [_list_layout.LIST_LAYOUT.IR, _list_layout.LIST_LAYOUT.RAMAN, _list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS].indexOf(layoutSt) >= 0;
 };
 
 var getNmrTyp = function getNmrTyp(layout) {
@@ -384,6 +432,7 @@ var Format = {
   isIrLayout: isIrLayout,
   isRamanLayout: isRamanLayout,
   isUvVisLayout: isUvVisLayout,
+  isHplcUvVisLayout: isHplcUvVisLayout,
   isTGALayout: isTGALayout,
   isXRDLayout: isXRDLayout,
   isEmWaveLayout: isEmWaveLayout,

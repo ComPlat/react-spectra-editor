@@ -21,7 +21,7 @@ const LayerPrism = ({
   thresSt, scanSt, uiSt, 
   canChangeDescription, onDescriptionChanged
 }) => {
-  const { topic, feature, hasEdit } = extractParams(entity, thresSt, scanSt);
+  const { topic, feature, hasEdit, integration } = extractParams(entity, thresSt, scanSt);
   if (!topic) return null;
 
   const { viewer } = uiSt;
@@ -79,6 +79,7 @@ const LayerPrism = ({
           <Grid item xs={3} align="center">
             <PanelViewer
               feature={feature}
+              integration={integration}
               editorOnly={editorOnly}
               molSvg={molSvg}
               descriptions={descriptions}

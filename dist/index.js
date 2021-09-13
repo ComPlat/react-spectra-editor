@@ -90,9 +90,17 @@ var _phenylalanin = require('./__tests__/fixtures/phenylalanin');
 
 var _phenylalanin2 = _interopRequireDefault(_phenylalanin);
 
+var _compare_uv_vis_jcamp = require('./__tests__/fixtures/compare_uv_vis_jcamp');
+
+var _compare_uv_vis_jcamp2 = _interopRequireDefault(_compare_uv_vis_jcamp);
+
 var _uv_vis_jcamp = require('./__tests__/fixtures/uv_vis_jcamp');
 
 var _uv_vis_jcamp2 = _interopRequireDefault(_uv_vis_jcamp);
+
+var _hplc_uvvis_jcamp = require('./__tests__/fixtures/hplc_uvvis_jcamp');
+
+var _hplc_uvvis_jcamp2 = _interopRequireDefault(_hplc_uvvis_jcamp);
 
 var _tga_jcamp = require('./__tests__/fixtures/tga_jcamp');
 
@@ -133,6 +141,8 @@ var compIr2Entity = _app.FN.ExtractJcamp(_compare_ir_2_jcamp2.default);
 var ramanEntity = _app.FN.ExtractJcamp(_raman_jcamp2.default);
 var msEntity = _app.FN.ExtractJcamp(_ms_jcamp2.default);
 var uvVisEntity = _app.FN.ExtractJcamp(_uv_vis_jcamp2.default);
+var compUvVisEntity = _app.FN.ExtractJcamp(_compare_uv_vis_jcamp2.default);
+var hplcUVVisEntity = _app.FN.ExtractJcamp(_hplc_uvvis_jcamp2.default);
 var tgaEntity = _app.FN.ExtractJcamp(_tga_jcamp2.default);
 var xrdEntity1 = _app.FN.ExtractJcamp(_xrd_jcamp_2.default);
 var xrdEntity2 = _app.FN.ExtractJcamp(_xrd_jcamp_4.default);
@@ -197,7 +207,8 @@ var DemoWriteIr = function (_React$Component) {
           shift = _ref.shift,
           isAscend = _ref.isAscend,
           decimal = _ref.decimal,
-          isIntensity = _ref.isIntensity;
+          isIntensity = _ref.isIntensity,
+          integration = _ref.integration;
 
       var entity = this.loadEntity();
       var features = entity.features;
@@ -208,7 +219,7 @@ var DemoWriteIr = function (_React$Component) {
 
       var boundary = { maxY: maxY, minY: minY };
       var body = _app.FN.peaksBody({
-        peaks: peaks, layout: layout, decimal: decimal, shift: shift, isAscend: isAscend, isIntensity: isIntensity, boundary: boundary
+        peaks: peaks, layout: layout, decimal: decimal, shift: shift, isAscend: isAscend, isIntensity: isIntensity, boundary: boundary, integration: integration
       });
       var wrapper = _app.FN.peaksWrapper(layout, shift);
       var desc = this.rmDollarSign(wrapper.head) + body + wrapper.tail;
@@ -315,10 +326,11 @@ var DemoWriteIr = function (_React$Component) {
           shift = _ref8.shift,
           isAscend = _ref8.isAscend,
           decimal = _ref8.decimal,
-          isIntensity = _ref8.isIntensity;
+          isIntensity = _ref8.isIntensity,
+          integration = _ref8.integration;
 
       var desc = this.formatPks({
-        peaks: peaks, layout: layout, shift: shift, isAscend: isAscend, decimal: decimal, isIntensity: isIntensity
+        peaks: peaks, layout: layout, shift: shift, isAscend: isAscend, decimal: decimal, isIntensity: isIntensity, integration: integration
       });
       this.setState({ desc: desc });
     }
@@ -419,6 +431,8 @@ var DemoWriteIr = function (_React$Component) {
           return ramanEntity;
         case 'uv/vis':
           return uvVisEntity;
+        case 'hplc uv/vis':
+          return hplcUVVisEntity;
         case 'tga':
           return tgaEntity;
         case 'xrd':
@@ -448,6 +462,7 @@ var DemoWriteIr = function (_React$Component) {
         case 'nmr 29si':
         case 'raman':
         case 'uv/vis':
+        case 'hplc uv/vis':
         case 'tga':
         case 'xrd':
         case 'ms':
@@ -463,9 +478,12 @@ var DemoWriteIr = function (_React$Component) {
   }, {
     key: 'loadOthers',
     value: function loadOthers() {
-      var showOthers = this.state.showOthers;
+      var _state2 = this.state,
+          showOthers = _state2.showOthers,
+          typ = _state2.typ;
 
-      var others = showOthers ? [compIr1Entity, compIr2Entity] : [];
+      var isIr = typ === 'ir';
+      var others = showOthers ? isIr ? [compIr1Entity, compIr2Entity] : [compUvVisEntity] : [];
 
       return {
         others: others,
@@ -481,11 +499,11 @@ var DemoWriteIr = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _state2 = this.state,
-          desc = _state2.desc,
-          predictions = _state2.predictions,
-          molecule = _state2.molecule,
-          typ = _state2.typ;
+      var _state3 = this.state,
+          desc = _state3.desc,
+          predictions = _state3.predictions,
+          molecule = _state3.molecule,
+          typ = _state3.typ;
 
       var entity = this.loadEntity();
       var qDescVal = this.loadQuill();
@@ -607,6 +625,15 @@ var DemoWriteIr = function (_React$Component) {
               onClick: this.onClick('uv/vis')
             },
             'UV/VIS'
+          ),
+          _react2.default.createElement(
+            _Button2.default,
+            {
+              variant: 'contained',
+              style: { margin: '0 10px 0 10px' },
+              onClick: this.onClick('hplc uv/vis')
+            },
+            'HPLC UV/VIS'
           ),
           _react2.default.createElement(
             _Button2.default,

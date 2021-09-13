@@ -2,7 +2,7 @@ import undoable from 'redux-undo';
 import {
   UI, INTEGRATION, EDITPEAK, MANAGER,
 } from '../constants/action_type';
-import { getArea } from '../helpers/integration';
+import { getArea, getAbsoluteArea } from '../helpers/integration';
 import { undoRedoConfig, undoRedoActions } from './undo_redo_config';
 
 const initialState = {
@@ -20,7 +20,8 @@ const addToStack = (state, action) => {
   if (!xL || !xU || (xU - xL) === 0) { return state; }
   const area = getArea(xL, xU, data);
   const defaultRefArea = stack.length === 0 ? area : refArea;
-  const newStack = [...stack, { xL: xL + shift, xU: xU + shift, area }];
+  const absoluteArea = getAbsoluteArea(xL, xU, data); //area depends on y baseline
+  const newStack = [...stack, { xL: xL + shift, xU: xU + shift, area, absoluteArea }];
   return Object.assign({}, state, { stack: newStack, refArea: defaultRefArea });
 };
 

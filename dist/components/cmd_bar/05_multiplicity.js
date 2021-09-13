@@ -176,7 +176,7 @@ var Multiplicity = function Multiplicity(_ref) {
         )
       )
     ),
-    _react2.default.createElement(
+    disableAddMpySt ? null : _react2.default.createElement(
       _tri_btn2.default,
       {
         content: { tp: 'Clear All Multiplicity' },
