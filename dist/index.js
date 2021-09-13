@@ -90,6 +90,10 @@ var _phenylalanin = require('./__tests__/fixtures/phenylalanin');
 
 var _phenylalanin2 = _interopRequireDefault(_phenylalanin);
 
+var _compare_uv_vis_jcamp = require('./__tests__/fixtures/compare_uv_vis_jcamp');
+
+var _compare_uv_vis_jcamp2 = _interopRequireDefault(_compare_uv_vis_jcamp);
+
 var _uv_vis_jcamp = require('./__tests__/fixtures/uv_vis_jcamp');
 
 var _uv_vis_jcamp2 = _interopRequireDefault(_uv_vis_jcamp);
@@ -109,6 +113,10 @@ var _xrd_jcamp_4 = _interopRequireDefault(_xrd_jcamp_3);
 var _qDescValue = require('./__tests__/fixtures/qDescValue');
 
 require('./__tests__/style/svg.css');
+
+var _format = require('./helpers/format');
+
+var _format2 = _interopRequireDefault(_format);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -133,6 +141,7 @@ var compIr2Entity = _app.FN.ExtractJcamp(_compare_ir_2_jcamp2.default);
 var ramanEntity = _app.FN.ExtractJcamp(_raman_jcamp2.default);
 var msEntity = _app.FN.ExtractJcamp(_ms_jcamp2.default);
 var uvVisEntity = _app.FN.ExtractJcamp(_uv_vis_jcamp2.default);
+var compUvVisEntity = _app.FN.ExtractJcamp(_compare_uv_vis_jcamp2.default);
 var tgaEntity = _app.FN.ExtractJcamp(_tga_jcamp2.default);
 var xrdEntity1 = _app.FN.ExtractJcamp(_xrd_jcamp_2.default);
 var xrdEntity2 = _app.FN.ExtractJcamp(_xrd_jcamp_4.default);
@@ -463,9 +472,12 @@ var DemoWriteIr = function (_React$Component) {
   }, {
     key: 'loadOthers',
     value: function loadOthers() {
-      var showOthers = this.state.showOthers;
+      var _state2 = this.state,
+          showOthers = _state2.showOthers,
+          typ = _state2.typ;
 
-      var others = showOthers ? [compIr1Entity, compIr2Entity] : [];
+      var isIr = typ === 'ir';
+      var others = showOthers ? isIr ? [compIr1Entity, compIr2Entity] : [compUvVisEntity] : [];
 
       return {
         others: others,
@@ -481,11 +493,11 @@ var DemoWriteIr = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _state2 = this.state,
-          desc = _state2.desc,
-          predictions = _state2.predictions,
-          molecule = _state2.molecule,
-          typ = _state2.typ;
+      var _state3 = this.state,
+          desc = _state3.desc,
+          predictions = _state3.predictions,
+          molecule = _state3.molecule,
+          typ = _state3.typ;
 
       var entity = this.loadEntity();
       var qDescVal = this.loadQuill();

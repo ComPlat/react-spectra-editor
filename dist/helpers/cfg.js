@@ -31,7 +31,7 @@ var btnCmdSetRef = function btnCmdSetRef(layoutSt) {
 };
 
 var btnCmdIntg = function btnCmdIntg(layoutSt) {
-  return !_format2.default.isNmrLayout(layoutSt);
+  return !(_format2.default.isNmrLayout(layoutSt) || _format2.default.isUvVisLayout(layoutSt));
 };
 
 var btnCmdMpy = function btnCmdMpy(layoutSt) {
@@ -62,7 +62,7 @@ var hidePanelMpy = function hidePanelMpy(layoutSt) {
 };
 
 var hidePanelCompare = function hidePanelCompare(layoutSt) {
-  return !_format2.default.isIrLayout(layoutSt);
+  return !(_format2.default.isIrLayout(layoutSt) || _format2.default.isUvVisLayout(layoutSt));
 };
 
 var hideSolvent = function hideSolvent(layoutSt) {

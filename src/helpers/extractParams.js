@@ -24,7 +24,9 @@ const extrShare = (entity, thresSt, scanIdx = 0) => {
     : false;
 
   const feature = hasEdit && thresSt.isEdit ? editPeak : autoPeak;
-  return { spectra, feature, hasEdit };
+  const integration = features.integration;
+  const multiplicity = features.multiplicity;
+  return { spectra, feature, hasEdit, integration, multiplicity };
 };
 
 const extrMs = (entity, thresSt, scanSt) => {
@@ -36,9 +38,9 @@ const extrMs = (entity, thresSt, scanSt) => {
 
 const extrNi = (entity, thresSt) => {
   const scanIdx = 0;
-  const { spectra, feature, hasEdit } = extrShare(entity, thresSt, scanIdx);
+  const { spectra, feature, hasEdit, integration, multiplicity } = extrShare(entity, thresSt, scanIdx);
   const topic = spectra[0].data[0];
-  return { topic, feature, hasEdit };
+  return { topic, feature, hasEdit, integration, multiplicity };
 };
 
 const extractParams = (entity, thresSt, scanSt) => (

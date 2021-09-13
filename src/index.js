@@ -23,12 +23,14 @@ import msJcamp from './__tests__/fixtures/ms_jcamp';
 import nmrResult from './__tests__/fixtures/nmr_result';
 import irResult from './__tests__/fixtures/ir_result';
 import Phenylalanin from './__tests__/fixtures/phenylalanin';
+import compareUvVisJcamp from './__tests__/fixtures/compare_uv_vis_jcamp';
 import uvVisJcamp from './__tests__/fixtures/uv_vis_jcamp';
 import tgaJcamp from './__tests__/fixtures/tga_jcamp';
 import xrdJcamp1 from './__tests__/fixtures/xrd_jcamp_1';
 import xrdJcamp2 from './__tests__/fixtures/xrd_jcamp_2';
 import { q1H, qIR, q13C } from './__tests__/fixtures/qDescValue';
 import './__tests__/style/svg.css';
+import Format from './helpers/format';
 
 const nmr1HEntity = FN.ExtractJcamp(nmr1HJcamp);
 const nmr13CEntity = FN.ExtractJcamp(nmr13CJcamp);
@@ -43,6 +45,7 @@ const compIr2Entity = FN.ExtractJcamp(compareIr2Jcamp);
 const ramanEntity = FN.ExtractJcamp(ramanJcamp);
 const msEntity = FN.ExtractJcamp(msJcamp);
 const uvVisEntity = FN.ExtractJcamp(uvVisJcamp);
+const compUvVisEntity = FN.ExtractJcamp(compareUvVisJcamp);
 const tgaEntity = FN.ExtractJcamp(tgaJcamp);
 const xrdEntity1 = FN.ExtractJcamp(xrdJcamp1);
 const xrdEntity2 = FN.ExtractJcamp(xrdJcamp2);
@@ -292,8 +295,10 @@ class DemoWriteIr extends React.Component {
   }
 
   loadOthers() {
-    const { showOthers } = this.state;
-    const others = showOthers ? [compIr1Entity, compIr2Entity] : [];
+    const { showOthers, typ } = this.state;
+    const isIr = typ === 'ir';
+    const others = showOthers ? (
+      isIr ? [compIr1Entity, compIr2Entity] : [compUvVisEntity]) : [];
 
     return {
       others,

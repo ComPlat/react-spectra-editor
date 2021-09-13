@@ -115,7 +115,7 @@ var convertComparisons = function convertComparisons(layout, comparisons, featur
   var minY = feature.minY,
       maxY = feature.maxY;
 
-  if (!comparisons || !_format2.default.isIrLayout(layout)) return [];
+  if (!comparisons || !(_format2.default.isIrLayout(layout) || _format2.default.isUvVisLayout(layout))) return [];
   return comparisons.map(function (c) {
     var spectra = c.spectra,
         show = c.show;
@@ -365,7 +365,8 @@ var buildIntegFeature = function buildIntegFeature(jcamp, spectra) {
     refArea: raw2realRatio,
     refFactor: 1,
     shift: 0,
-    stack: mStack
+    stack: mStack,
+    originStack: stack
   };
 };
 

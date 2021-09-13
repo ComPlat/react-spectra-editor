@@ -417,6 +417,13 @@ var LineFocus = function () {
         var kMax = _this2.data[_this2.data.length - 1].k;
         if (!ps[0]) return null;
         var kRef = ps[0].k;
+        if (!_this2.reverseXAxis(_this2.layout)) {
+          return d3.line().x(function (d) {
+            return xt(d.x);
+          }).y(function (d) {
+            return 100 - (kRef - d.k) * 400 / kMax;
+          })(ps);
+        }
         return d3.line().x(function (d) {
           return xt(d.x);
         }).y(function (d) {

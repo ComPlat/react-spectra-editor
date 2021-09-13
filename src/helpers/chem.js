@@ -77,7 +77,7 @@ const calcRescaleXY = (xs, ys, minY, maxY, show) => {
 
 const convertComparisons = (layout, comparisons, feature) => {
   const { minY, maxY } = feature;
-  if (!comparisons || !Format.isIrLayout(layout)) return [];
+  if (!comparisons || !(Format.isIrLayout(layout) || (Format.isUvVisLayout(layout)))) return [];
   return comparisons.map((c) => {
     const { spectra, show } = c;
     const topic = spectra[0].data[0];
@@ -327,6 +327,7 @@ const buildIntegFeature = (jcamp, spectra) => {
       refFactor: 1,
       shift: 0,
       stack: mStack,
+      originStack: stack
     }
   );
 };
