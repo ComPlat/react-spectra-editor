@@ -77,7 +77,7 @@ const calcRescaleXY = (xs, ys, minY, maxY, show) => {
 
 const convertComparisons = (layout, comparisons, feature) => {
   const { minY, maxY } = feature;
-  if (!comparisons || !(Format.isIrLayout(layout) || Format.isHplcUvVisLayout(layout) || (Format.isUvVisLayout(layout)))) return [];
+  if (!comparisons || !(Format.isIrLayout(layout) || Format.isHplcUvVisLayout(layout) || (Format.isUvVisLayout(layout) || Format.isXRDLayout(layout)))) return [];
   return comparisons.map((c) => {
     const { spectra, show } = c;
     const topic = spectra[0].data[0];

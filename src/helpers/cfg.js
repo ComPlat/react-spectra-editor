@@ -36,7 +36,7 @@ const hidePanelPeak = layoutSt => true;  // eslint-disable-line
 
 const hidePanelMpy = layoutSt => !Format.isNmrLayout(layoutSt);
 
-const hidePanelCompare = layoutSt => !(Format.isIrLayout(layoutSt) || Format.isUvVisLayout(layoutSt) || Format.isHplcUvVisLayout(layoutSt));
+const hidePanelCompare = layoutSt => !(Format.isIrLayout(layoutSt) || Format.isUvVisLayout(layoutSt) || Format.isHplcUvVisLayout(layoutSt) || Format.isXRDLayout(layoutSt));
 
 const hideSolvent = layoutSt => !Format.isNmrLayout(layoutSt);
 
