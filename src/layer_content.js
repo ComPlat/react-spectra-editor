@@ -16,8 +16,10 @@ const extractLayout = (forecast, layoutSt) => {
   const isIr = Format.isIrLayout(layoutSt);
   const isUvvis = Format.isUvVisLayout(layoutSt) || Format.isHplcUvVisLayout(layoutSt);
   const showForecast = !isEmpty && (isNmr || isIr || isUvvis);
+  const isXRD = Format.isXRDLayout(layoutSt);
+  const showForecast = !isEmpty && (isNmr || isIr || isUvvis || isXRD);
   return {
-    showForecast, isNmr, isIr, isMs, isUvvis
+    showForecast, isNmr, isIr, isMs, isUvvis, isXRD
   };
 };
 
@@ -25,7 +27,7 @@ const Content = ({
   topic, feature, cLabel, xLabel, yLabel, forecast, operations, layoutSt,
 }) => {
   const {
-    showForecast, isNmr, isIr, isMs, isUvvis
+    showForecast, isNmr, isIr, isMs, isUvvis, isXRD
   } = extractLayout(forecast, layoutSt);
 
   if (showForecast) {
@@ -40,6 +42,7 @@ const Content = ({
         isNmr={isNmr}
         isIr={isIr}
         isUvvis={isUvvis}
+        isXRD={isXRD}
         operations={operations}
       />
     );

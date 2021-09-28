@@ -122,6 +122,7 @@ ForecastViewer.propTypes = {
   isNmr: PropTypes.bool.isRequired,
   isIr: PropTypes.bool.isRequired,
   isUvvis: PropTypes.bool.isRequired,
+  isXRD: PropTypes.bool.isRequired,
   uiSt: PropTypes.object.isRequired,
   comparisonsSt: PropTypes.array.isRequired,
   initForecastStatusAct: PropTypes.func.isRequired,

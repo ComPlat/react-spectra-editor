@@ -30,7 +30,6 @@ import xrdJcamp1 from './__tests__/fixtures/xrd_jcamp_1';
 import xrdJcamp2 from './__tests__/fixtures/xrd_jcamp_2';
 import { q1H, qIR, q13C } from './__tests__/fixtures/qDescValue';
 import './__tests__/style/svg.css';
-import Format from './helpers/format';
 
 const nmr1HEntity = FN.ExtractJcamp(nmr1HJcamp);
 const nmr13CEntity = FN.ExtractJcamp(nmr13CJcamp);
@@ -258,7 +257,7 @@ class DemoWriteIr extends React.Component {
       case 'tga':
         return tgaEntity;
       case 'xrd':
-        return xrdEntity2;
+        return xrdEntity1;
       case 'ms':
       default:
         return msEntity;
@@ -297,8 +296,10 @@ class DemoWriteIr extends React.Component {
   loadOthers() {
     const { showOthers, typ } = this.state;
     const isIr = typ === 'ir';
+    const isXRD = typ === 'xrd';
     const others = showOthers ? (
-      isIr ? [compIr1Entity, compIr2Entity] : [compUvVisEntity]) : [];
+      isIr ? [compIr1Entity, compIr2Entity] : (
+        isXRD ? [xrdEntity2] : [compUvVisEntity])) : [];
 
     return {
       others,
