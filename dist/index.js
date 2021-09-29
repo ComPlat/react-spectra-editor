@@ -114,10 +114,6 @@ var _qDescValue = require('./__tests__/fixtures/qDescValue');
 
 require('./__tests__/style/svg.css');
 
-var _format = require('./helpers/format');
-
-var _format2 = _interopRequireDefault(_format);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
@@ -431,7 +427,7 @@ var DemoWriteIr = function (_React$Component) {
         case 'tga':
           return tgaEntity;
         case 'xrd':
-          return xrdEntity2;
+          return xrdEntity1;
         case 'ms':
         default:
           return msEntity;
@@ -477,7 +473,8 @@ var DemoWriteIr = function (_React$Component) {
           typ = _state2.typ;
 
       var isIr = typ === 'ir';
-      var others = showOthers ? isIr ? [compIr1Entity, compIr2Entity] : [compUvVisEntity] : [];
+      var isXRD = typ === 'xrd';
+      var others = showOthers ? isIr ? [compIr1Entity, compIr2Entity] : isXRD ? [xrdEntity2] : [compUvVisEntity] : [];
 
       return {
         others: others,
