@@ -115,7 +115,7 @@ var convertComparisons = function convertComparisons(layout, comparisons, featur
   var minY = feature.minY,
       maxY = feature.maxY;
 
-  if (!comparisons || !(_format2.default.isIrLayout(layout) || _format2.default.isHplcUvVisLayout(layout) || _format2.default.isUvVisLayout(layout))) return [];
+  if (!comparisons || !(_format2.default.isIrLayout(layout) || _format2.default.isHplcUvVisLayout(layout) || _format2.default.isUvVisLayout(layout) || _format2.default.isXRDLayout(layout))) return [];
   return comparisons.map(function (c) {
     var spectra = c.spectra,
         show = c.show;
