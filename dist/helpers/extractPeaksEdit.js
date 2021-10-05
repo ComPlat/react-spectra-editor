@@ -51,7 +51,7 @@ var getAUCValue = function getAUCValue(integrationSt) {
 };
 
 var extractAreaUnderCurve = function extractAreaUnderCurve(allIntegrationSt, presentIntegrationSt, layoutSt) {
-  if (_format2.default.isUvVisLayout(layoutSt) && Array.isArray(allIntegrationSt) && presentIntegrationSt) {
+  if ((_format2.default.isUvVisLayout(layoutSt) || _format2.default.isHplcUvVisLayout(layoutSt)) && Array.isArray(allIntegrationSt) && presentIntegrationSt) {
     if (!presentIntegrationSt.refArea) {
       return null;
     }

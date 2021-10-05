@@ -121,7 +121,7 @@ var LayerInit = function (_React$Component) {
         resetInitNmrAct({
           integration: integration, multiplicity: multiplicity, simulation: simulation
         });
-      } else if (_format2.default.isUvVisLayout(layout)) {
+      } else if (_format2.default.isUvVisLayout(layout) || _format2.default.isHplcUvVisLayout(layout)) {
         var _integration = features.integration;
 
         updateMetaPeaksAct(entity);

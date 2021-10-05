@@ -110,6 +110,9 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
         <MenuItem value={LIST_LAYOUT.UVVIS}>
           <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>UV/VIS</span>
         </MenuItem>
+        <MenuItem value={LIST_LAYOUT.HPLC_UVVIS}>
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>HPLC UV/VIS</span>
+        </MenuItem>
         <MenuItem value={LIST_LAYOUT.TGA}>
           <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>TGA (THERMOGRAVIMETRIC ANALYSIS)</span>
         </MenuItem>

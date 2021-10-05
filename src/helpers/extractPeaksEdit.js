@@ -29,7 +29,7 @@ const getAUCValue = (integrationSt) => {
 }
 
 const extractAreaUnderCurve = (allIntegrationSt, presentIntegrationSt, layoutSt) => {
-  if (Format.isUvVisLayout(layoutSt) && Array.isArray(allIntegrationSt) && presentIntegrationSt) {
+  if ((Format.isUvVisLayout(layoutSt) || Format.isHplcUvVisLayout(layoutSt)) && Array.isArray(allIntegrationSt) && presentIntegrationSt) {
     if (!presentIntegrationSt.refArea) {
       return null;
     }

@@ -77,7 +77,7 @@ const calcRescaleXY = (xs, ys, minY, maxY, show) => {
 
 const convertComparisons = (layout, comparisons, feature) => {
   const { minY, maxY } = feature;
-  if (!comparisons || !(Format.isIrLayout(layout) || (Format.isUvVisLayout(layout)))) return [];
+  if (!comparisons || !(Format.isIrLayout(layout) || Format.isHplcUvVisLayout(layout) || (Format.isUvVisLayout(layout)))) return [];
   return comparisons.map((c) => {
     const { spectra, show } = c;
     const topic = spectra[0].data[0];
@@ -185,6 +185,9 @@ const readLayout = (jcamp) => {
       return LIST_LAYOUT.RAMAN;
     }
     if (dataType.includes('UV/VIS SPECTRUM')) {
+      if (dataType.includes('HPLC')) {
+        return LIST_LAYOUT.HPLC_UVVIS;
+      }
       return LIST_LAYOUT.UVVIS;
     }
     if (dataType.includes('THERMOGRAVIMETRIC ANALYSIS')) {
@@ -214,7 +217,12 @@ const extrSpectraNi = (jcamp, layout) => {
   const categorys = jcamp.info.$CSCATEGORY || ['SPECTRUM'];
   const targetIdx = categorys.indexOf('SPECTRUM');
   const spectrum = extrSpectraShare(jcamp.spectra, layout)[targetIdx];
-  return [spectrum] || [jcamp.spectra[0]];
+  let extractedSpectrum = spectrum || jcamp.spectra[0];
+  if (Format.isHplcUvVisLayout(layout) || Format.isUvVisLayout(layout)) {
+    extractedSpectrum['yUnit'] = 'mAU'
+  }
+  return [extractedSpectrum];
+  // return [spectrum] || [jcamp.spectra[0]];
 };
 
 const calcThresRef = (s, peakUp) => {

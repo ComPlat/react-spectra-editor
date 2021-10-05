@@ -7,6 +7,7 @@ const spectraDigit = (layout) => {
     case LIST_LAYOUT.IR:
     case LIST_LAYOUT.RAMAN:
     case LIST_LAYOUT.UVVIS:
+    case LIST_LAYOUT.HPLC_UVVIS:
     case LIST_LAYOUT.TGA:
     case LIST_LAYOUT.XRD:
     case LIST_LAYOUT.MS:
@@ -188,7 +189,7 @@ const peaksBody = ({
   if (layout === LIST_LAYOUT.RAMAN) {
     return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
-  if (layout === LIST_LAYOUT.UVVIS) {
+  if (layout === LIST_LAYOUT.UVVIS || layout === LIST_LAYOUT.HPLC_UVVIS) {
     return formatedUvVis(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
   if (layout === LIST_LAYOUT.TGA) {
@@ -227,10 +228,11 @@ const isMsLayout = layoutSt => (LIST_LAYOUT.MS === layoutSt);
 const isIrLayout = layoutSt => ([LIST_LAYOUT.IR, 'INFRARED'].indexOf(layoutSt) >= 0);
 const isRamanLayout = layoutSt => (LIST_LAYOUT.RAMAN === layoutSt);
 const isUvVisLayout = layoutSt => (LIST_LAYOUT.UVVIS === layoutSt);
+const isHplcUvVisLayout = layoutSt => (LIST_LAYOUT.HPLC_UVVIS === layoutSt);
 const isTGALayout = layoutSt => (LIST_LAYOUT.TGA === layoutSt);
 const isXRDLayout = layoutSt => (LIST_LAYOUT.XRD === layoutSt);
 const isEmWaveLayout = layoutSt => (
-  [LIST_LAYOUT.IR, LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS].indexOf(layoutSt) >= 0
+  [LIST_LAYOUT.IR, LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS, LIST_LAYOUT.HPLC_UVVIS].indexOf(layoutSt) >= 0
 );
 
 const getNmrTyp = (layout) => {
@@ -303,6 +305,7 @@ const Format = {
   isIrLayout,
   isRamanLayout,
   isUvVisLayout,
+  isHplcUvVisLayout,
   isTGALayout,
   isXRDLayout,
   isEmWaveLayout,

@@ -671,7 +671,7 @@ class LineFocus {
   }
 
   reverseXAxis(layoutSt) {
-    return [LIST_LAYOUT.UVVIS, LIST_LAYOUT.TGA, LIST_LAYOUT.XRD].indexOf(layoutSt) < 0;
+    return [LIST_LAYOUT.UVVIS, LIST_LAYOUT.HPLC_UVVIS, LIST_LAYOUT.TGA, LIST_LAYOUT.XRD].indexOf(layoutSt) < 0;
   }
 
   create({

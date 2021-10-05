@@ -39,7 +39,7 @@ var extractLayout = function extractLayout(forecast, layoutSt) {
   var isNmr = _format2.default.isNmrLayout(layoutSt);
   var isMs = _format2.default.isMsLayout(layoutSt);
   var isIr = _format2.default.isIrLayout(layoutSt);
-  var isUvvis = _format2.default.isUvVisLayout(layoutSt);
+  var isUvvis = _format2.default.isUvVisLayout(layoutSt) || _format2.default.isHplcUvVisLayout(layoutSt);
   var showForecast = !isEmpty && (isNmr || isIr || isUvvis);
   return {
     showForecast: showForecast, isNmr: isNmr, isIr: isIr, isMs: isMs, isUvvis: isUvvis

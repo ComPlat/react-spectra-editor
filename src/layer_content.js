@@ -14,7 +14,7 @@ const extractLayout = (forecast, layoutSt) => {
   const isNmr = Format.isNmrLayout(layoutSt);
   const isMs = Format.isMsLayout(layoutSt);
   const isIr = Format.isIrLayout(layoutSt);
-  const isUvvis = Format.isUvVisLayout(layoutSt);
+  const isUvvis = Format.isUvVisLayout(layoutSt) || Format.isHplcUvVisLayout(layoutSt);
   const showForecast = !isEmpty && (isNmr || isIr || isUvvis);
   return {
     showForecast, isNmr, isIr, isMs, isUvvis

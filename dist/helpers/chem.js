@@ -115,7 +115,7 @@ var convertComparisons = function convertComparisons(layout, comparisons, featur
   var minY = feature.minY,
       maxY = feature.maxY;
 
-  if (!comparisons || !(_format2.default.isIrLayout(layout) || _format2.default.isUvVisLayout(layout))) return [];
+  if (!comparisons || !(_format2.default.isIrLayout(layout) || _format2.default.isHplcUvVisLayout(layout) || _format2.default.isUvVisLayout(layout))) return [];
   return comparisons.map(function (c) {
     var spectra = c.spectra,
         show = c.show;
@@ -212,6 +212,9 @@ var readLayout = function readLayout(jcamp) {
       return _list_layout.LIST_LAYOUT.RAMAN;
     }
     if (dataType.includes('UV/VIS SPECTRUM')) {
+      if (dataType.includes('HPLC')) {
+        return _list_layout.LIST_LAYOUT.HPLC_UVVIS;
+      }
       return _list_layout.LIST_LAYOUT.UVVIS;
     }
     if (dataType.includes('THERMOGRAVIMETRIC ANALYSIS')) {
@@ -245,7 +248,12 @@ var extrSpectraNi = function extrSpectraNi(jcamp, layout) {
   var categorys = jcamp.info.$CSCATEGORY || ['SPECTRUM'];
   var targetIdx = categorys.indexOf('SPECTRUM');
   var spectrum = extrSpectraShare(jcamp.spectra, layout)[targetIdx];
-  return [spectrum] || [jcamp.spectra[0]];
+  var extractedSpectrum = spectrum || jcamp.spectra[0];
+  if (_format2.default.isHplcUvVisLayout(layout) || _format2.default.isUvVisLayout(layout)) {
+    extractedSpectrum['yUnit'] = 'mAU';
+  }
+  return [extractedSpectrum];
+  // return [spectrum] || [jcamp.spectra[0]];
 };
 
 var calcThresRef = function calcThresRef(s, peakUp) {

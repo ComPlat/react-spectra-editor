@@ -69,7 +69,7 @@ class LayerInit extends React.Component {
         integration, multiplicity, simulation,
       });
     }
-    else if (Format.isUvVisLayout(layout)) {
+    else if (Format.isUvVisLayout(layout) || Format.isHplcUvVisLayout(layout)) {
       const { integration } = features;
       updateMetaPeaksAct(entity);
       resetInitCommonWithIntergationAct({
