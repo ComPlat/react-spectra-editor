@@ -248,7 +248,12 @@ var extrSpectraNi = function extrSpectraNi(jcamp, layout) {
   var categorys = jcamp.info.$CSCATEGORY || ['SPECTRUM'];
   var targetIdx = categorys.indexOf('SPECTRUM');
   var spectrum = extrSpectraShare(jcamp.spectra, layout)[targetIdx];
-  return [spectrum] || [jcamp.spectra[0]];
+  var extractedSpectrum = spectrum || jcamp.spectra[0];
+  if (_format2.default.isHplcUvVisLayout(layout) || _format2.default.isUvVisLayout(layout)) {
+    extractedSpectrum['yUnit'] = 'mAU';
+  }
+  return [extractedSpectrum];
+  // return [spectrum] || [jcamp.spectra[0]];
 };
 
 var calcThresRef = function calcThresRef(s, peakUp) {

@@ -217,7 +217,12 @@ const extrSpectraNi = (jcamp, layout) => {
   const categorys = jcamp.info.$CSCATEGORY || ['SPECTRUM'];
   const targetIdx = categorys.indexOf('SPECTRUM');
   const spectrum = extrSpectraShare(jcamp.spectra, layout)[targetIdx];
-  return [spectrum] || [jcamp.spectra[0]];
+  let extractedSpectrum = spectrum || jcamp.spectra[0];
+  if (Format.isHplcUvVisLayout(layout) || Format.isUvVisLayout(layout)) {
+    extractedSpectrum['yUnit'] = 'mAU'
+  }
+  return [extractedSpectrum];
+  // return [spectrum] || [jcamp.spectra[0]];
 };
 
 const calcThresRef = (s, peakUp) => {
