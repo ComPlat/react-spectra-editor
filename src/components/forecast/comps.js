@@ -1,6 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
-import SvgFileZoomPan from 'react-svg-file-zoom-pan';
+import SvgFileZoomPan from '@complat/react-svg-file-zoom-pan';
 
 import CheckCircleOutline from '@material-ui/icons/CheckCircleOutline';
 import ErrorOutline from '@material-ui/icons/ErrorOutline';
