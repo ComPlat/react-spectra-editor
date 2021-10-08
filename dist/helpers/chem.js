@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.GetComparisons = exports.Convert2Thres = exports.Convert2Scan = exports.Convert2Peak = exports.ToFrequency = exports.ToShiftPeaks = exports.ToThresEndPts = exports.Feature2Peak = exports.Topic2Seed = exports.ExtractJcamp = undefined;
+exports.Convert2DValue = exports.GetComparisons = exports.Convert2Thres = exports.Convert2Scan = exports.Convert2Peak = exports.ToFrequency = exports.ToShiftPeaks = exports.ToThresEndPts = exports.Feature2Peak = exports.Topic2Seed = exports.ExtractJcamp = undefined;
 
 var _jcampconverter = require('jcampconverter');
 
@@ -582,6 +582,15 @@ var Convert2Thres = function Convert2Thres(feature, thresSt) {
   return value;
 };
 
+var Convert2DValue = function Convert2DValue(doubleTheta) {
+  var lambda = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.15406;
+
+  var theta = doubleTheta / 2;
+  var sinTheta = Math.sin(theta);
+  var dValue = lambda / (2 * sinTheta);
+  return dValue;
+};
+
 exports.ExtractJcamp = ExtractJcamp;
 exports.Topic2Seed = Topic2Seed;
 exports.Feature2Peak = Feature2Peak;
@@ -592,3 +601,4 @@ exports.Convert2Peak = Convert2Peak;
 exports.Convert2Scan = Convert2Scan;
 exports.Convert2Thres = Convert2Thres;
 exports.GetComparisons = GetComparisons;
+exports.Convert2DValue = Convert2DValue;

@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 import {
   Topic2Seed, Feature2Peak, ToThresEndPts, ToShiftPeaks, ToFrequency,
-  GetComparisons,
+  GetComparisons
 } from '../../helpers/chem';
 import { resetAll } from '../../actions/manager';
 import { selectUiSweep, scrollUiWheel, clickUiTarget } from '../../actions/ui';

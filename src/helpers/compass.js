@@ -1,4 +1,6 @@
 import * as d3 from 'd3';
+import Format from './format';
+import { Convert2DValue } from './chem';
 
 const TfRescale = (focus) => {
   const xt = focus.scales.x;
@@ -22,7 +24,7 @@ const fetchPt = (focus, xt) => {
 const MouseMove = (focus) => {
   const { xt, yt } = TfRescale(focus);
   const pt = fetchPt(focus, xt);
-  const { freq } = focus;
+  const { freq, layout } = focus;
   if (pt) {
     const tx = xt(pt.x);
     const ty = yt(pt.y);
@@ -30,16 +32,24 @@ const MouseMove = (focus) => {
     focus.root.select('.x-hover-line')
       .attr('y1', 0 - ty)
       .attr('y2', focus.h - ty);
-    focus.root.select('.cursor-txt')
+    if (Format.isXRDLayout(layout)) {
+      const dValue = Convert2DValue(pt.x).toFixed(4);
+      focus.root.select('.cursor-txt-hz')
+        .attr('transform', `translate(${tx},${ty-30})`)
+        .text(`2Theta: ${pt.x}, d-value: ${dValue}`);
+    }
+    else {
+      focus.root.select('.cursor-txt')
       .attr('transform', `translate(${tx},${10})`)
       .text(pt.x.toFixed(3));
-    if (freq) {
-      focus.root.select('.cursor-txt-hz')
-        .attr('transform', `translate(${tx},${20})`)
-        .text(`${(pt.x * freq).toFixed(3)} Hz`);
-    } else {
-      focus.root.select('.cursor-txt-hz')
-        .text('');
+      if (freq) {
+        focus.root.select('.cursor-txt-hz')
+          .attr('transform', `translate(${tx},${20})`)
+          .text(`${(pt.x * freq).toFixed(3)} Hz`);
+      } else {
+        focus.root.select('.cursor-txt-hz')
+          .text('');
+      }
     }
   }
 };
