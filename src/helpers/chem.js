@@ -540,9 +540,16 @@ const Convert2Thres = (feature, thresSt) => {
   return value;
 };
 
+const Convert2DValue = (doubleTheta, lambda=0.15406) => {
+  const theta = doubleTheta/2;
+  const sinTheta = Math.sin(theta);
+  const dValue = lambda/(2*sinTheta);
+  return dValue;
+};
+
 export {
   ExtractJcamp, Topic2Seed, Feature2Peak,
   ToThresEndPts, ToShiftPeaks, ToFrequency,
   Convert2Peak, Convert2Scan, Convert2Thres,
-  GetComparisons,
+  GetComparisons, Convert2DValue
 };
