@@ -320,7 +320,8 @@ var DemoWriteIr = function (_React$Component) {
           shift = _ref8.shift,
           isAscend = _ref8.isAscend,
           decimal = _ref8.decimal,
-          isIntensity = _ref8.isIntensity;
+          isIntensity = _ref8.isIntensity,
+          waveLength = _ref8.waveLength;
 
       var desc = this.formatPks({
         peaks: peaks, layout: layout, shift: shift, isAscend: isAscend, decimal: decimal, isIntensity: isIntensity

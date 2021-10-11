@@ -46,7 +46,8 @@ var MouseMove = function MouseMove(focus) {
 
   var pt = fetchPt(focus, xt);
   var freq = focus.freq,
-      layout = focus.layout;
+      layout = focus.layout,
+      wavelength = focus.wavelength;
 
   if (pt) {
     var tx = xt(pt.x);
@@ -54,7 +55,12 @@ var MouseMove = function MouseMove(focus) {
     focus.root.select('.compass').attr('transform', 'translate(' + tx + ',' + ty + ')');
     focus.root.select('.x-hover-line').attr('y1', 0 - ty).attr('y2', focus.h - ty);
     if (_format2.default.isXRDLayout(layout)) {
-      var dValue = (0, _chem.Convert2DValue)(pt.x).toFixed(4);
+      var dValue = 0.0;
+      if (wavelength) {
+        dValue = (0, _chem.Convert2DValue)(pt.x, wavelength.value).toFixed(4);
+      } else {
+        dValue = (0, _chem.Convert2DValue)(pt.x).toFixed(4);
+      }
       focus.root.select('.cursor-txt-hz').attr('transform', 'translate(' + tx + ',' + (ty - 30) + ')').text('2Theta: ' + pt.x + ', d-value: ' + dValue);
     } else {
       focus.root.select('.cursor-txt').attr('transform', 'translate(' + tx + ',' + 10 + ')').text(pt.x.toFixed(3));

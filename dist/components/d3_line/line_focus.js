@@ -115,6 +115,8 @@ var LineFocus = function () {
     this.onClickTarget = this.onClickTarget.bind(this);
     this.mergedPeaks = this.mergedPeaks.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
+
+    this.wavelength = null;
   }
 
   _createClass(LineFocus, [{
@@ -178,13 +180,14 @@ var LineFocus = function () {
     }
   }, {
     key: 'setDataParams',
-    value: function setDataParams(data, peaks, tTrEndPts, tSfPeaks, freq, layout) {
+    value: function setDataParams(data, peaks, tTrEndPts, tSfPeaks, freq, layout, wavelength) {
       this.data = [].concat(_toConsumableArray(data));
       this.dataPks = [].concat(_toConsumableArray(peaks));
       this.tTrEndPts = tTrEndPts;
       this.tSfPeaks = tSfPeaks;
       this.freq = freq;
       this.layout = layout;
+      this.wavelength = wavelength;
     }
   }, {
     key: 'updatePathCall',
@@ -679,7 +682,8 @@ var LineFocus = function () {
           mtplySt = _ref3.mtplySt,
           sweepExtentSt = _ref3.sweepExtentSt,
           isUiAddIntgSt = _ref3.isUiAddIntgSt,
-          isUiNoBrushSt = _ref3.isUiNoBrushSt;
+          isUiNoBrushSt = _ref3.isUiNoBrushSt,
+          wavelength = _ref3.wavelength;
 
       this.svg = d3.select('.d3Svg');
       (0, _mount.MountMainFrame)(this, 'focus');
@@ -688,7 +692,7 @@ var LineFocus = function () {
       this.root = d3.select(this.rootKlass).selectAll('.focus-main');
       this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt));
       this.setTip();
-      this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt);
+      this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt, wavelength);
       (0, _compass.MountCompass)(this);
 
       this.axis = (0, _mount.MountAxis)(this);
@@ -736,11 +740,12 @@ var LineFocus = function () {
           mtplySt = _ref4.mtplySt,
           sweepExtentSt = _ref4.sweepExtentSt,
           isUiAddIntgSt = _ref4.isUiAddIntgSt,
-          isUiNoBrushSt = _ref4.isUiNoBrushSt;
+          isUiNoBrushSt = _ref4.isUiNoBrushSt,
+          wavelength = _ref4.wavelength;
 
       this.root = d3.select(this.rootKlass).selectAll('.focus-main');
       this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt));
-      this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt);
+      this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt, wavelength);
 
       if (this.data && this.data.length > 0) {
         this.setConfig(sweepExtentSt);

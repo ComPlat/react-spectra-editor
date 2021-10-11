@@ -66,6 +66,10 @@ var _reducer_jcamp = require('./reducer_jcamp');
 
 var _reducer_jcamp2 = _interopRequireDefault(_reducer_jcamp);
 
+var _reducer_wavelength = require('./reducer_wavelength');
+
+var _reducer_wavelength2 = _interopRequireDefault(_reducer_wavelength);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var rootReducer = (0, _redux.combineReducers)({
@@ -83,7 +87,8 @@ var rootReducer = (0, _redux.combineReducers)({
   multiplicity: _reducer_multiplicity2.default,
   simulation: _reducer_simulation2.default,
   meta: _reducer_meta2.default,
-  jcamp: _reducer_jcamp2.default
+  jcamp: _reducer_jcamp2.default,
+  wavelength: _reducer_wavelength2.default
 });
 
 exports.default = rootReducer;

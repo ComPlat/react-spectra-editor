@@ -178,7 +178,7 @@ const InfoPanel = ({
             )
         }
         {
-          (Format.isUvVisLayout(layoutSt) || Format.isHplcUvVisLayout) ? (
+          (Format.isUvVisLayout(layoutSt) || Format.isHplcUvVisLayout(layoutSt)) ? (
             <div className={classNames(classes.rowRoot, classes.rowOddSim)}>
               <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>
                 Area under curve (AUC):

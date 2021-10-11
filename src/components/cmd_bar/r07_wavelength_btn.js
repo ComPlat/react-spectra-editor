@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
-import { bindActionCreators, compose } from 'redux';
+import { bindActionCreators } from 'redux';
 
 import { FormControl, InputLabel, Select, OutlinedInput, MenuItem } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
@@ -27,6 +27,13 @@ const styles = () => (
 );
 
 const wavelengthSelect = (classes, waveLengthSt, layoutSt, updateWaveLengthAct) => {
+
+  if (!Format.isXRDLayout(layoutSt)) {
+    return (
+      <i></i>
+    );
+  } 
+
   const onChange = e => updateWaveLengthAct(e.target.value);
 
   return (
@@ -49,9 +56,16 @@ const wavelengthSelect = (classes, waveLengthSt, layoutSt, updateWaveLengthAct) 
           )
         }
       >
-        <MenuItem value={LIST_WAVE_LENGTH[0]}>
-          <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>{LIST_WAVE_LENGTH[0].label}</span>
-        </MenuItem>
+        {
+          LIST_WAVE_LENGTH.map(item => {
+            return (
+              <MenuItem value={item}>
+                <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>{item.label} ({item.value} {item.unit})</span>
+              </MenuItem>
+            )
+          })
+        }
+        
       </Select>
     </FormControl>
   );

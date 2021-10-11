@@ -121,7 +121,9 @@ var ForecastViewer = function (_React$Component) {
           isNmr = _props2.isNmr,
           isIr = _props2.isIr,
           uiSt = _props2.uiSt,
-          comparisonsSt = _props2.comparisonsSt;
+          comparisonsSt = _props2.comparisonsSt,
+          isXRD = _props2.isXRD,
+          wavelength = _props2.wavelength;
       var viewer = uiSt.viewer;
       var inputCb = forecast.inputCb,
           molecule = forecast.molecule;
@@ -134,7 +136,7 @@ var ForecastViewer = function (_React$Component) {
           topic: topic,
           feature: feature,
           cLabel: cLabel,
-          xLabel: xLabel,
+          xLabel: isXRD && wavelength ? xLabel + ', WL=' + wavelength.value + ' ' + wavelength.unit : xLabel,
           yLabel: yLabel,
           comparisons: comparisonsSt,
           isHidden: viewer !== _list_ui.LIST_UI_VIEWER_TYPE.SPECTRUM
@@ -158,7 +160,8 @@ var mapStateToProps = function mapStateToProps(state, _) {
   return (// eslint-disable-line
     {
       uiSt: state.ui,
-      comparisonsSt: state.jcamp.others
+      comparisonsSt: state.jcamp.others,
+      wavelength: state.wavelength
     }
   );
 };
@@ -185,7 +188,8 @@ ForecastViewer.propTypes = {
   uiSt: _propTypes2.default.object.isRequired,
   comparisonsSt: _propTypes2.default.array.isRequired,
   initForecastStatusAct: _propTypes2.default.func.isRequired,
-  setUiViewerTypeAct: _propTypes2.default.func.isRequired
+  setUiViewerTypeAct: _propTypes2.default.func.isRequired,
+  wavelength: _propTypes2.default.object.isRequired
 };
 
 exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(ForecastViewer);

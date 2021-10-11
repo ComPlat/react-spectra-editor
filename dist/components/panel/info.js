@@ -256,7 +256,7 @@ var InfoPanel = function InfoPanel(_ref) {
         duration: 300,
         resize: true
       }),
-      _format2.default.isUvVisLayout(layoutSt) || _format2.default.isHplcUvVisLayout ? _react2.default.createElement(
+      _format2.default.isUvVisLayout(layoutSt) || _format2.default.isHplcUvVisLayout(layoutSt) ? _react2.default.createElement(
         'div',
         { className: (0, _classnames2.default)(classes.rowRoot, classes.rowOddSim) },
         _react2.default.createElement(

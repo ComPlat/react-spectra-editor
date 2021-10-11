@@ -166,7 +166,7 @@ class DemoWriteIr extends React.Component {
   }
 
   writePeak({
-    peaks, layout, shift, isAscend, decimal, isIntensity,
+    peaks, layout, shift, isAscend, decimal, isIntensity, waveLength
   }) {
     const desc = this.formatPks({
       peaks, layout, shift, isAscend, decimal, isIntensity,

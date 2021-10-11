@@ -68,7 +68,7 @@ class ViewerLine extends React.Component {
 
   componentDidUpdate(prevProps) {
     const {
-      seed, peak, freq, comparisons,
+      seed, peak, cLabel, xLabel, yLabel, freq, comparisons,
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt, integationSt, mtplySt,
       sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
       isHidden, wavelength
@@ -94,6 +94,7 @@ class ViewerLine extends React.Component {
       isUiNoBrushSt,
       wavelength
     });
+    drawLabel(this.rootKlass, cLabel, xLabel, yLabel);
     drawDisplay(this.rootKlass, isHidden);
   }
 
