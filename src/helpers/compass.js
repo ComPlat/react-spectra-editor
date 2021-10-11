@@ -24,7 +24,7 @@ const fetchPt = (focus, xt) => {
 const MouseMove = (focus) => {
   const { xt, yt } = TfRescale(focus);
   const pt = fetchPt(focus, xt);
-  const { freq, layout } = focus;
+  const { freq, layout, wavelength } = focus;
   if (pt) {
     const tx = xt(pt.x);
     const ty = yt(pt.y);
@@ -33,7 +33,13 @@ const MouseMove = (focus) => {
       .attr('y1', 0 - ty)
       .attr('y2', focus.h - ty);
     if (Format.isXRDLayout(layout)) {
-      const dValue = Convert2DValue(pt.x).toFixed(4);
+      let dValue = 0.0;
+      if (wavelength) {
+        dValue = Convert2DValue(pt.x, wavelength.value).toFixed(4);
+      }
+      else {
+        dValue = Convert2DValue(pt.x).toFixed(4);
+      }
       focus.root.select('.cursor-txt-hz')
         .attr('transform', `translate(${tx},${ty-30})`)
         .text(`2Theta: ${pt.x}, d-value: ${dValue}`);

@@ -78,6 +78,8 @@ class LineFocus {
     this.onClickTarget = this.onClickTarget.bind(this);
     this.mergedPeaks = this.mergedPeaks.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
+
+    this.wavelength = null;
   }
 
   getShouldUpdate(nextEpSt, nextItSt, nextMySt) {
@@ -130,13 +132,14 @@ class LineFocus {
     this.root.call(this.tip);
   }
 
-  setDataParams(data, peaks, tTrEndPts, tSfPeaks, freq, layout) {
+  setDataParams(data, peaks, tTrEndPts, tSfPeaks, freq, layout, wavelength) {
     this.data = [...data];
     this.dataPks = [...peaks];
     this.tTrEndPts = tTrEndPts;
     this.tSfPeaks = tSfPeaks;
     this.freq = freq;
     this.layout = layout;
+    this.wavelength = wavelength;
   }
 
   updatePathCall(xt, yt) {
@@ -678,6 +681,7 @@ class LineFocus {
     filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, comparisons,
     editPeakSt, layoutSt, integationSt, mtplySt,
     sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
+    wavelength,
   }) {
     this.svg = d3.select('.d3Svg');
     MountMainFrame(this, 'focus');
@@ -686,7 +690,7 @@ class LineFocus {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, this.reverseXAxis(layoutSt));
     this.setTip();
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt, wavelength);
     MountCompass(this);
 
     this.axis = MountAxis(this);
@@ -717,10 +721,11 @@ class LineFocus {
     filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, comparisons,
     editPeakSt, layoutSt, integationSt, mtplySt,
     sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
+    wavelength
   }) {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, this.reverseXAxis(layoutSt));
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt, wavelength);
 
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);

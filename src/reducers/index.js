@@ -14,6 +14,7 @@ import multiplicityReducer from './reducer_multiplicity';
 import simulationReducer from './reducer_simulation';
 import metaReducer from './reducer_meta';
 import jcampReducer from './reducer_jcamp';
+import wavelengthReducer from './reducer_wavelength';
 
 const rootReducer = combineReducers({
   threshold: thresholdReducer,
@@ -31,6 +32,7 @@ const rootReducer = combineReducers({
   simulation: simulationReducer,
   meta: metaReducer,
   jcamp: jcampReducer,
+  wavelength: wavelengthReducer,
 });
 
 export default rootReducer;
