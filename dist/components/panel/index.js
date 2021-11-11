@@ -114,6 +114,7 @@ var PanelViewer = function (_React$Component) {
       var _props = this.props,
           classes = _props.classes,
           feature = _props.feature,
+          integration = _props.integration,
           editorOnly = _props.editorOnly,
           molSvg = _props.molSvg,
           descriptions = _props.descriptions,
@@ -143,6 +144,7 @@ var PanelViewer = function (_React$Component) {
           },
           _react2.default.createElement(_info2.default, {
             feature: feature,
+            integration: integration,
             editorOnly: editorOnly,
             expand: expand === 'info',
             molSvg: molSvg,
@@ -177,6 +179,7 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
 PanelViewer.propTypes = {
   classes: _propTypes2.default.object.isRequired,
   feature: _propTypes2.default.object.isRequired,
+  integration: _propTypes2.default.object.isRequired,
   editorOnly: _propTypes2.default.bool.isRequired,
   molSvg: _propTypes2.default.string.isRequired,
   descriptions: _propTypes2.default.array.isRequired,

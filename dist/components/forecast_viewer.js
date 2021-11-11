@@ -180,6 +180,7 @@ ForecastViewer.propTypes = {
   forecast: _propTypes2.default.object.isRequired,
   isNmr: _propTypes2.default.bool.isRequired,
   isIr: _propTypes2.default.bool.isRequired,
+  isUvvis: _propTypes2.default.bool.isRequired,
   uiSt: _propTypes2.default.object.isRequired,
   comparisonsSt: _propTypes2.default.array.isRequired,
   initForecastStatusAct: _propTypes2.default.func.isRequired,

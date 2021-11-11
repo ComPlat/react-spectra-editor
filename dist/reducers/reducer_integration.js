@@ -41,7 +41,8 @@ var addToStack = function addToStack(state, action) {
   }
   var area = (0, _integration.getArea)(xL, xU, data);
   var defaultRefArea = stack.length === 0 ? area : refArea;
-  var newStack = [].concat(_toConsumableArray(stack), [{ xL: xL + shift, xU: xU + shift, area: area }]);
+  var absoluteArea = (0, _integration.getAbsoluteArea)(xL, xU, data); //area depends on y baseline
+  var newStack = [].concat(_toConsumableArray(stack), [{ xL: xL + shift, xU: xU + shift, area: area, absoluteArea: absoluteArea }]);
   return Object.assign({}, state, { stack: newStack, refArea: defaultRefArea });
 };
 

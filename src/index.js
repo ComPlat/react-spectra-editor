@@ -23,7 +23,9 @@ import msJcamp from './__tests__/fixtures/ms_jcamp';
 import nmrResult from './__tests__/fixtures/nmr_result';
 import irResult from './__tests__/fixtures/ir_result';
 import Phenylalanin from './__tests__/fixtures/phenylalanin';
+import compareUvVisJcamp from './__tests__/fixtures/compare_uv_vis_jcamp';
 import uvVisJcamp from './__tests__/fixtures/uv_vis_jcamp';
+import hplcUVVisJcamp from './__tests__/fixtures/hplc_uvvis_jcamp';
 import tgaJcamp from './__tests__/fixtures/tga_jcamp';
 import xrdJcamp1 from './__tests__/fixtures/xrd_jcamp_1';
 import xrdJcamp2 from './__tests__/fixtures/xrd_jcamp_2';
@@ -43,6 +45,8 @@ const compIr2Entity = FN.ExtractJcamp(compareIr2Jcamp);
 const ramanEntity = FN.ExtractJcamp(ramanJcamp);
 const msEntity = FN.ExtractJcamp(msJcamp);
 const uvVisEntity = FN.ExtractJcamp(uvVisJcamp);
+const compUvVisEntity = FN.ExtractJcamp(compareUvVisJcamp);
+const hplcUVVisEntity = FN.ExtractJcamp(hplcUVVisJcamp);
 const tgaEntity = FN.ExtractJcamp(tgaJcamp);
 const xrdEntity1 = FN.ExtractJcamp(xrdJcamp1);
 const xrdEntity2 = FN.ExtractJcamp(xrdJcamp2);
@@ -91,14 +95,14 @@ class DemoWriteIr extends React.Component {
   }
 
   formatPks({
-    peaks, layout, shift, isAscend, decimal, isIntensity,
+    peaks, layout, shift, isAscend, decimal, isIntensity, integration
   }) {
     const entity = this.loadEntity();
     const { features } = entity;
     const { maxY, minY } = Array.isArray(features) ? {} : (features.editPeak || features.autoPeak);
     const boundary = { maxY, minY };
     const body = FN.peaksBody({
-      peaks, layout, decimal, shift, isAscend, isIntensity, boundary,
+      peaks, layout, decimal, shift, isAscend, isIntensity, boundary, integration
     });
     const wrapper = FN.peaksWrapper(layout, shift);
     const desc = this.rmDollarSign(wrapper.head) + body + wrapper.tail;
@@ -164,10 +168,10 @@ class DemoWriteIr extends React.Component {
   }
 
   writePeak({
-    peaks, layout, shift, isAscend, decimal, isIntensity,
+    peaks, layout, shift, isAscend, decimal, isIntensity, integration
   }) {
     const desc = this.formatPks({
-      peaks, layout, shift, isAscend, decimal, isIntensity,
+      peaks, layout, shift, isAscend, decimal, isIntensity, integration
     });
     this.setState({ desc });
   }
@@ -252,6 +256,8 @@ class DemoWriteIr extends React.Component {
         return ramanEntity;
       case 'uv/vis':
         return uvVisEntity;
+      case 'hplc uv/vis':
+        return hplcUVVisEntity;
       case 'tga':
         return tgaEntity;
       case 'xrd':
@@ -279,6 +285,7 @@ class DemoWriteIr extends React.Component {
       case 'nmr 29si':
       case 'raman':
       case 'uv/vis':
+      case 'hplc uv/vis':
       case 'tga':
       case 'xrd':
       case 'ms':
@@ -292,8 +299,10 @@ class DemoWriteIr extends React.Component {
   }
 
   loadOthers() {
-    const { showOthers } = this.state;
-    const others = showOthers ? [compIr1Entity, compIr2Entity] : [];
+    const { showOthers, typ } = this.state;
+    const isIr = typ === 'ir';
+    const others = showOthers ? (
+      isIr ? [compIr1Entity, compIr2Entity] : [compUvVisEntity]) : [];
 
     return {
       others,
@@ -409,6 +418,13 @@ class DemoWriteIr extends React.Component {
             onClick={this.onClick('uv/vis')}
           >
             UV/VIS
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('hplc uv/vis')}
+          >
+            HPLC UV/VIS
           </Button>
           <Button
             variant="contained"

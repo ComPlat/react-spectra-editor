@@ -77,7 +77,7 @@ const calcRescaleXY = (xs, ys, minY, maxY, show) => {
 
 const convertComparisons = (layout, comparisons, feature) => {
   const { minY, maxY } = feature;
-  if (!comparisons || !Format.isIrLayout(layout)) return [];
+  if (!comparisons || !(Format.isIrLayout(layout) || Format.isHplcUvVisLayout(layout))) return [];
   return comparisons.map((c) => {
     const { spectra, show } = c;
     const topic = spectra[0].data[0];
@@ -185,6 +185,9 @@ const readLayout = (jcamp) => {
       return LIST_LAYOUT.RAMAN;
     }
     if (dataType.includes('UV/VIS SPECTRUM')) {
+      if (dataType.includes('HPLC')) {
+        return LIST_LAYOUT.HPLC_UVVIS;
+      }
       return LIST_LAYOUT.UVVIS;
     }
     if (dataType.includes('THERMOGRAVIMETRIC ANALYSIS')) {
@@ -302,6 +305,7 @@ const buildIntegFeature = (jcamp, spectra) => {
         xL: parseFloat(ts[0]),
         xU: parseFloat(ts[1]),
         area: parseFloat(ts[2]),
+        absoluteArea: parseFloat(ts[3]),
       };
     });
     stack = [...stack, ...itStack];
@@ -327,6 +331,7 @@ const buildIntegFeature = (jcamp, spectra) => {
       refFactor: 1,
       shift: 0,
       stack: mStack,
+      originStack: stack
     }
   );
 };

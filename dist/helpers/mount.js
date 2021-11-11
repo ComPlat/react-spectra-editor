@@ -18,8 +18,9 @@ var MountTags = function MountTags(target) {
   var mpyt1Path = target.root.append('g').attr('class', 'mpyt1Path-clip').attr('clip-path', 'url(#clip)');
   var mpyt2Path = target.root.append('g').attr('class', 'mpyt2Path-clip').attr('clip-path', 'url(#clip)');
   var mpypPath = target.root.append('g').attr('class', 'mpypPath-clip').attr('clip-path', 'url(#clip)');
+  var aucPath = target.root.append('g').attr('class', 'aucPath-clip').attr('clip-path', 'url(#clip)');
   return {
-    pPath: pPath, bpPath: bpPath, bpTxt: bpTxt, igbPath: igbPath, igcPath: igcPath, igtPath: igtPath, mpybPath: mpybPath, mpyt1Path: mpyt1Path, mpyt2Path: mpyt2Path, mpypPath: mpypPath
+    pPath: pPath, bpPath: bpPath, bpTxt: bpTxt, igbPath: igbPath, igcPath: igcPath, igtPath: igtPath, mpybPath: mpybPath, mpyt1Path: mpyt1Path, mpyt2Path: mpyt2Path, mpypPath: mpypPath, aucPath: aucPath
   };
 };
 

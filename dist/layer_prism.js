@@ -63,7 +63,8 @@ var LayerPrism = function LayerPrism(_ref) {
   var _extractParams = (0, _extractParams2.extractParams)(entity, thresSt, scanSt),
       topic = _extractParams.topic,
       feature = _extractParams.feature,
-      hasEdit = _extractParams.hasEdit;
+      hasEdit = _extractParams.hasEdit,
+      integration = _extractParams.integration;
 
   if (!topic) return null;
 
@@ -138,6 +139,7 @@ var LayerPrism = function LayerPrism(_ref) {
           { item: true, xs: 3, align: 'center' },
           _react2.default.createElement(_index2.default, {
             feature: feature,
+            integration: integration,
             editorOnly: editorOnly,
             molSvg: molSvg,
             descriptions: descriptions,
