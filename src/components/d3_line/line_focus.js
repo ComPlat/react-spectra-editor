@@ -15,6 +15,7 @@ import { calcMpyCenter } from '../../helpers/multiplicity_calc';
 import Format from '../../helpers/format';
 import Cfg from '../../helpers/cfg';
 import { LIST_LAYOUT } from '../../constants/list_layout';
+import { calcSlope } from '../../helpers/calc';
 
 class LineFocus {
   constructor(props) {
@@ -70,6 +71,7 @@ class LineFocus {
     this.drawLine = this.drawLine.bind(this);
     this.drawThres = this.drawThres.bind(this);
     this.drawGrid = this.drawGrid.bind(this);
+    this.drawAUC = this.drawAUC.bind(this);
     this.drawPeaks = this.drawPeaks.bind(this);
     this.drawRef = this.drawRef.bind(this);
     this.drawInteg = this.drawInteg.bind(this);
@@ -78,6 +80,8 @@ class LineFocus {
     this.onClickTarget = this.onClickTarget.bind(this);
     this.mergedPeaks = this.mergedPeaks.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
+
+    this.wavelength = null;
   }
 
   getShouldUpdate(nextEpSt, nextItSt, nextMySt) {
@@ -130,13 +134,14 @@ class LineFocus {
     this.root.call(this.tip);
   }
 
-  setDataParams(data, peaks, tTrEndPts, tSfPeaks, freq, layout) {
+  setDataParams(data, peaks, tTrEndPts, tSfPeaks, freq, layout, wavelength) {
     this.data = [...data];
     this.dataPks = [...peaks];
     this.tTrEndPts = tTrEndPts;
     this.tSfPeaks = tSfPeaks;
     this.freq = freq;
     this.layout = layout;
+    this.wavelength = wavelength;
   }
 
   updatePathCall(xt, yt) {
@@ -231,6 +236,68 @@ class LineFocus {
     return this.dataPks;
   }
 
+  drawAUC(stack) {
+    const { xt, yt } = TfRescale(this);
+    const auc = this.tags.aucPath.selectAll('path').data(stack);
+    auc.exit()
+      .attr('class', 'exit')
+      .remove();
+
+    const integCurve = (border) => {
+      const { xL, xU } = border;
+      const ps = this.data.filter(d => d.x > xL && d.x < xU);
+      if (!ps[0]) return null;
+      
+      
+      const point1 = ps[0]
+      const point2  = ps[ps.length-1]
+      const slope = calcSlope(point1.x, point1.y, point2.x, point2.y)
+      let lastDY = point1.y;
+      
+      return d3.area()
+        .x((d) => xt(d.x))
+        .y0((d, index) => {
+          if (index > 0) {
+            const lastD = ps[index-1]
+            const y = slope*(d.x-lastD.x) + lastDY
+            lastDY = y
+            return yt(y)
+          }
+          return yt(0)
+        })
+        .y1((d) => yt(d.y))(ps);
+    };
+
+    auc.enter()
+      .append('path')
+      .attr('class', 'auc')
+      .attr('fill', 'red')
+      .attr('stroke', 'none')
+      .attr('fill-opacity', 0.2)
+      .attr('stroke-width', 2)
+      .merge(auc)
+      .attr('d', d => integCurve(d))
+      .attr('id', d => `auc${itgIdTag(d)}`)
+      .on('mouseover', (d) => {
+        d3.select(`#auc${itgIdTag(d)}`)
+          .attr('stroke', 'blue');
+        d3.select(`#auc${itgIdTag(d)}`)
+          .attr('stroke', 'blue');
+        d3.select(`#auc${itgIdTag(d)}`)
+          .style('fill', 'blue');
+      })
+      .on('mouseout', (d) => {
+        d3.select(`#auc${itgIdTag(d)}`)
+          .attr('stroke', 'none');
+        d3.select(`#auc${itgIdTag(d)}`)
+          .style('fill', 'red');
+        d3.select(`#auc${itgIdTag(d)}`)
+          .style('fill-opacity', 0.2);
+      })
+      .on('click', d => this.onClickTarget(d));
+      
+  }
+
   drawPeaks(editPeakSt) {
     const {
       sameXY, sameEpSt, sameDtPk, sameSfPk,
@@ -285,6 +352,28 @@ class LineFocus {
         this.tip.hide(tipParams, n[i]);
       })
       .on('click', d => this.onClickTarget(d));
+
+    
+    const ignoreRef = Format.isHplcUvVisLayout(this.layout);
+    if (ignoreRef) {
+      const bpTxt = this.tags.bpTxt.selectAll('text').data(dPks);
+      bpTxt.exit()
+        .attr('class', 'exit')
+        .remove();
+  
+      bpTxt.enter()
+      .append('text')
+      .attr('class', 'peak-text')
+      .attr('font-family', 'Helvetica')
+      .style('font-size', '12px')
+      .attr('fill', '#228B22')
+      .style('text-anchor', 'middle')
+      .merge(bpTxt)
+      .attr('id', d => `mpp${Math.round(1000 * d.x)}`)
+      .text(d => d.x.toFixed(2))
+      .attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y)-25})`)
+      .on('click', d => this.onClickTarget(d));
+    }
   }
 
   drawInteg(integationSt) {
@@ -296,7 +385,18 @@ class LineFocus {
       stack, refArea, refFactor, shift,
     } = integationSt;
     const isDisable = Cfg.btnCmdIntg(this.layout);
+    const ignoreRef = Format.isHplcUvVisLayout(this.layout);
     const itgs = isDisable ? [] : stack;
+
+    if (itgs.length === 0 || isDisable) {
+      // remove drawn are under curve
+      const auc = this.tags.aucPath.selectAll('path').data(stack);
+      auc.exit()
+        .attr('class', 'exit')
+        .remove();
+      auc.merge(auc)
+      return;
+    }
 
     const igbp = this.tags.igbPath.selectAll('path').data(itgs);
     igbp.exit()
@@ -312,116 +412,136 @@ class LineFocus {
       .attr('class', 'exit')
       .remove();
 
-    if (itgs.length === 0 || isDisable) return;
-    // rescale for zoom
-    const { xt } = TfRescale(this);
+    if (itgs.length === 0 || isDisable) {
+      // remove drawn are under curve
+      const auc = this.tags.aucPath.selectAll('path').data(stack);
+      auc.exit()
+        .attr('class', 'exit')
+        .remove();
+      auc.merge(auc)
+      return;
+    }
 
-    const dh = 50;
-    const integBar = data => (
-      d3.line()([
-        [xt(data.xL - shift), dh],
-        [xt(data.xL - shift), dh - 10],
-        [xt(data.xL - shift), dh - 5],
-        [xt(data.xU - shift), dh - 5],
-        [xt(data.xU - shift), dh - 10],
-        [xt(data.xU - shift), dh],
-      ])
-    );
+    if (ignoreRef) {
+      this.drawAUC(stack);
+    }
+    else {
+      
+      // rescale for zoom
+      const { xt } = TfRescale(this);
 
-    igbp.enter()
-      .append('path')
-      .attr('class', 'igbp')
-      .attr('fill', 'none')
-      .attr('stroke', '#228B22')
-      .attr('stroke-width', 2)
-      .merge(igbp)
-      .attr('id', d => `igbp${itgIdTag(d)}`)
-      .attr('d', d => integBar(d))
-      .on('mouseover', (d) => {
-        d3.select(`#igbp${itgIdTag(d)}`)
-          .attr('stroke', 'blue');
-        d3.select(`#igbc${itgIdTag(d)}`)
-          .attr('stroke', 'blue');
-        d3.select(`#igtp${itgIdTag(d)}`)
-          .style('fill', 'blue');
-      })
-      .on('mouseout', (d) => {
-        d3.select(`#igbp${itgIdTag(d)}`)
-          .attr('stroke', '#228B22');
-        d3.select(`#igbc${itgIdTag(d)}`)
-          .attr('stroke', '#228B22');
-        d3.select(`#igtp${itgIdTag(d)}`)
-          .style('fill', '#228B22');
-      })
-      .on('click', d => this.onClickTarget(d));
+      const dh = 50;
+      const integBar = data => (
+        d3.line()([
+          [xt(data.xL - shift), dh],
+          [xt(data.xL - shift), dh - 10],
+          [xt(data.xL - shift), dh - 5],
+          [xt(data.xU - shift), dh - 5],
+          [xt(data.xU - shift), dh - 10],
+          [xt(data.xU - shift), dh],
+        ])
+      );
 
-    const integCurve = (border) => {
-      const { xL, xU } = border;
-      const [nXL, nXU] = [xL - shift, xU - shift];
-      const ps = this.data.filter(d => d.x > nXL && d.x < nXU);
-      const kMax = this.data[this.data.length - 1].k;
-      if (!ps[0]) return null;
-      const kRef = ps[0].k;
-      return d3.line()
-        .x(d => xt(d.x))
-        .y(d => 300 - (d.k - kRef) * 400 / kMax)(ps);
-    };
+      igbp.enter()
+        .append('path')
+        .attr('class', 'igbp')
+        .attr('fill', 'none')
+        .attr('stroke', '#228B22')
+        .attr('stroke-width', 2)
+        .merge(igbp)
+        .attr('id', d => `igbp${itgIdTag(d)}`)
+        .attr('d', d => integBar(d))
+        .on('mouseover', (d) => {
+          d3.select(`#igbp${itgIdTag(d)}`)
+            .attr('stroke', 'blue');
+          d3.select(`#igbc${itgIdTag(d)}`)
+            .attr('stroke', 'blue');
+          d3.select(`#igtp${itgIdTag(d)}`)
+            .style('fill', 'blue');
+        })
+        .on('mouseout', (d) => {
+          d3.select(`#igbp${itgIdTag(d)}`)
+            .attr('stroke', '#228B22');
+          d3.select(`#igbc${itgIdTag(d)}`)
+            .attr('stroke', '#228B22');
+          d3.select(`#igtp${itgIdTag(d)}`)
+            .style('fill', '#228B22');
+        })
+        .on('click', d => this.onClickTarget(d));
 
-    igcp.enter()
-      .append('path')
-      .attr('class', 'igcp')
-      .attr('fill', 'none')
-      .attr('stroke', '#228B22')
-      .attr('stroke-width', 2)
-      .merge(igcp)
-      .attr('id', d => `igbc${itgIdTag(d)}`)
-      .attr('d', d => integCurve(d))
-      .on('mouseover', (d) => {
-        d3.select(`#igbp${itgIdTag(d)}`)
-          .attr('stroke', 'blue');
-        d3.select(`#igbc${itgIdTag(d)}`)
-          .attr('stroke', 'blue');
-        d3.select(`#igtp${itgIdTag(d)}`)
-          .style('fill', 'blue');
-      })
-      .on('mouseout', (d) => {
-        d3.select(`#igbp${itgIdTag(d)}`)
-          .attr('stroke', '#228B22');
-        d3.select(`#igbc${itgIdTag(d)}`)
-          .attr('stroke', '#228B22');
-        d3.select(`#igtp${itgIdTag(d)}`)
-          .style('fill', '#228B22');
-      })
-      .on('click', d => this.onClickTarget(d));
+      const integCurve = (border) => {
+        const { xL, xU } = border;
+        const [nXL, nXU] = [xL - shift, xU - shift];
+        const ps = this.data.filter(d => d.x > nXL && d.x < nXU);
+        const kMax = this.data[this.data.length - 1].k;
+        if (!ps[0]) return null;
+        const kRef = ps[0].k;
+        if (!this.reverseXAxis(this.layout)) {
+          return d3.line()
+          .x(d => xt(d.x))
+          .y(d => 100 - (kRef - d.k) * 400 / kMax)(ps);
+        }
+        return d3.line()
+          .x(d => xt(d.x))
+          .y(d => 300 - (d.k - kRef) * 400 / kMax)(ps);
+      };
 
-    igtp.enter()
-      .append('text')
-      .attr('class', 'igtp')
-      .attr('font-family', 'Helvetica')
-      .style('font-size', '12px')
-      .attr('fill', '#228B22')
-      .style('text-anchor', 'middle')
-      .merge(igtp)
-      .attr('id', d => `igtp${itgIdTag(d)}`)
-      .text(d => calcArea(d, refArea, refFactor))
-      .attr('transform', d => `translate(${xt((d.xL + d.xU) / 2 - shift)}, ${dh - 12})`)
-      .on('mouseover', (d) => {
-        d3.select(`#igbp${itgIdTag(d)}`)
-          .attr('stroke', 'blue');
-        d3.select(`#igbc${itgIdTag(d)}`)
-          .attr('stroke', 'blue');
-        d3.select(`#igtp${itgIdTag(d)}`)
-          .style('fill', 'blue');
-      })
-      .on('mouseout', (d) => {
-        d3.select(`#igbp${itgIdTag(d)}`)
-          .attr('stroke', '#228B22');
-        d3.select(`#igbc${itgIdTag(d)}`)
-          .attr('stroke', '#228B22');
-        d3.select(`#igtp${itgIdTag(d)}`)
-          .style('fill', '#228B22');
-      })
-      .on('click', d => this.onClickTarget(d));
+      igcp.enter()
+        .append('path')
+        .attr('class', 'igcp')
+        .attr('fill', 'none')
+        .attr('stroke', '#228B22')
+        .attr('stroke-width', 2)
+        .merge(igcp)
+        .attr('id', d => `igbc${itgIdTag(d)}`)
+        .attr('d', d => integCurve(d))
+        .on('mouseover', (d) => {
+          d3.select(`#igbp${itgIdTag(d)}`)
+            .attr('stroke', 'blue');
+          d3.select(`#igbc${itgIdTag(d)}`)
+            .attr('stroke', 'blue');
+          d3.select(`#igtp${itgIdTag(d)}`)
+            .style('fill', 'blue');
+        })
+        .on('mouseout', (d) => {
+          d3.select(`#igbp${itgIdTag(d)}`)
+            .attr('stroke', '#228B22');
+          d3.select(`#igbc${itgIdTag(d)}`)
+            .attr('stroke', '#228B22');
+          d3.select(`#igtp${itgIdTag(d)}`)
+            .style('fill', '#228B22');
+        })
+        .on('click', d => this.onClickTarget(d));
+
+      igtp.enter()
+        .append('text')
+        .attr('class', 'igtp')
+        .attr('font-family', 'Helvetica')
+        .style('font-size', '12px')
+        .attr('fill', '#228B22')
+        .style('text-anchor', 'middle')
+        .merge(igtp)
+        .attr('id', d => `igtp${itgIdTag(d)}`)
+        .text(d => calcArea(d, refArea, refFactor, ignoreRef))
+        .attr('transform', d => `translate(${xt((d.xL + d.xU) / 2 - shift)}, ${dh - 12})`)
+        .on('mouseover', (d) => {
+          d3.select(`#igbp${itgIdTag(d)}`)
+            .attr('stroke', 'blue');
+          d3.select(`#igbc${itgIdTag(d)}`)
+            .attr('stroke', 'blue');
+          d3.select(`#igtp${itgIdTag(d)}`)
+            .style('fill', 'blue');
+        })
+        .on('mouseout', (d) => {
+          d3.select(`#igbp${itgIdTag(d)}`)
+            .attr('stroke', '#228B22');
+          d3.select(`#igbc${itgIdTag(d)}`)
+            .attr('stroke', '#228B22');
+          d3.select(`#igtp${itgIdTag(d)}`)
+            .style('fill', '#228B22');
+        })
+        .on('click', d => this.onClickTarget(d));
+    }
   }
 
 
@@ -666,13 +786,14 @@ class LineFocus {
   }
 
   reverseXAxis(layoutSt) {
-    return [LIST_LAYOUT.UVVIS, LIST_LAYOUT.TGA].indexOf(layoutSt) < 0;
+    return [LIST_LAYOUT.UVVIS, LIST_LAYOUT.HPLC_UVVIS, LIST_LAYOUT.TGA, LIST_LAYOUT.XRD].indexOf(layoutSt) < 0;
   }
 
   create({
     filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, comparisons,
     editPeakSt, layoutSt, integationSt, mtplySt,
     sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
+    wavelength,
   }) {
     this.svg = d3.select('.d3Svg');
     MountMainFrame(this, 'focus');
@@ -681,7 +802,7 @@ class LineFocus {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, this.reverseXAxis(layoutSt));
     this.setTip();
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt, wavelength);
     MountCompass(this);
 
     this.axis = MountAxis(this);
@@ -712,10 +833,11 @@ class LineFocus {
     filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, comparisons,
     editPeakSt, layoutSt, integationSt, mtplySt,
     sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
+    wavelength
   }) {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, this.reverseXAxis(layoutSt));
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt, wavelength);
 
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);

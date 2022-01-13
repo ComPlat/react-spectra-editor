@@ -110,8 +110,14 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
         <MenuItem value={LIST_LAYOUT.UVVIS}>
           <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>UV/VIS</span>
         </MenuItem>
+        <MenuItem value={LIST_LAYOUT.HPLC_UVVIS}>
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>HPLC UV/VIS</span>
+        </MenuItem>
         <MenuItem value={LIST_LAYOUT.TGA}>
           <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>TGA (THERMOGRAVIMETRIC ANALYSIS)</span>
+        </MenuItem>
+        <MenuItem value={LIST_LAYOUT.XRD}>
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>XRD (X-RAY DIFFRACTION)</span>
         </MenuItem>
         <MenuItem value={LIST_LAYOUT.H1}>
           <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>
@@ -129,6 +135,24 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
           <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>
             <sup>19</sup>
             F
+          </span>
+        </MenuItem>
+        <MenuItem value={LIST_LAYOUT.P31}>
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>
+            <sup>31</sup>
+            P
+          </span>
+        </MenuItem>
+        <MenuItem value={LIST_LAYOUT.N15}>
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>
+            <sup>15</sup>
+            N
+          </span>
+        </MenuItem>
+        <MenuItem value={LIST_LAYOUT.Si29}>
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>
+            <sup>29</sup>
+            Si
           </span>
         </MenuItem>
         <MenuItem value={LIST_LAYOUT.MS}>

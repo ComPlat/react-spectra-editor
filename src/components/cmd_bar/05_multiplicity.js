@@ -99,12 +99,18 @@ const Multiplicity = ({
           </MuButton>
         </span>
       </Tooltip>
-      <TriBtn
-        content={{ tp: 'Clear All Multiplicity' }}
-        cb={clearMpyAllAct}
-      >
-        <span className={classNames(classes.txt, 'txt-sv-bar-rmallmpy')}>Jx</span>
-      </TriBtn>
+      {
+        disableAddMpySt ? null : 
+        (
+          <TriBtn
+            content={{ tp: 'Clear All Multiplicity' }}
+            cb={clearMpyAllAct}
+          >
+            <span className={classNames(classes.txt, 'txt-sv-bar-rmallmpy')}>Jx</span>
+          </TriBtn>
+        )
+      }
+      
     </span>
   );
 };

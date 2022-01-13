@@ -9,7 +9,8 @@ var _effects = require('redux-saga/effects');
 var _action_type = require('../constants/action_type');
 
 var _marked = /*#__PURE__*/regeneratorRuntime.mark(resetShift),
-    _marked2 = /*#__PURE__*/regeneratorRuntime.mark(resetInitNmr);
+    _marked2 = /*#__PURE__*/regeneratorRuntime.mark(resetInitNmr),
+    _marked3 = /*#__PURE__*/regeneratorRuntime.mark(resetInitCommonWithIntergation);
 
 var getLayout = function getLayout(state) {
   return state.layout;
@@ -83,6 +84,33 @@ function resetInitNmr(action) {
   }, _marked2);
 }
 
-var managerSagas = [(0, _effects.takeEvery)(_action_type.MANAGER.RESETALL, resetShift), (0, _effects.takeEvery)(_action_type.MANAGER.RESET_INIT_NMR, resetInitNmr)];
+function resetInitCommonWithIntergation(action) {
+  var integration;
+  return regeneratorRuntime.wrap(function resetInitCommonWithIntergation$(_context3) {
+    while (1) {
+      switch (_context3.prev = _context3.next) {
+        case 0:
+          integration = action.payload.integration;
+
+          if (!integration) {
+            _context3.next = 4;
+            break;
+          }
+
+          _context3.next = 4;
+          return (0, _effects.put)({
+            type: _action_type.INTEGRATION.RESET_ALL_RDC,
+            payload: integration
+          });
+
+        case 4:
+        case 'end':
+          return _context3.stop();
+      }
+    }
+  }, _marked3);
+}
+
+var managerSagas = [(0, _effects.takeEvery)(_action_type.MANAGER.RESETALL, resetShift), (0, _effects.takeEvery)(_action_type.MANAGER.RESET_INIT_NMR, resetInitNmr), (0, _effects.takeEvery)(_action_type.MANAGER.RESET_INIT_COMMON_WITH_INTERGATION, resetInitCommonWithIntergation)];
 
 exports.default = managerSagas;

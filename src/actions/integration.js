@@ -24,5 +24,5 @@ const clearIntegrationAll = payload => (
 export {
   sweepIntegration,
   setIntegrationFkr,
-  clearIntegrationAll,
+  clearIntegrationAll
 }; // eslint-disable-line

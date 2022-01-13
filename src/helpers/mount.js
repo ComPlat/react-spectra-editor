@@ -31,8 +31,11 @@ const MountTags = (target) => {
   const mpypPath = target.root.append('g')
     .attr('class', 'mpypPath-clip')
     .attr('clip-path', 'url(#clip)');
+  const aucPath = target.root.append('g')
+    .attr('class', 'aucPath-clip')
+    .attr('clip-path', 'url(#clip)');
   return {
-    pPath, bpPath, bpTxt, igbPath, igcPath, igtPath, mpybPath, mpyt1Path, mpyt2Path, mpypPath,
+    pPath, bpPath, bpTxt, igbPath, igcPath, igtPath, mpybPath, mpyt1Path, mpyt2Path, mpypPath, aucPath,
   };
 };
 

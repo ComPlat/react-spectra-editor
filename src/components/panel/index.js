@@ -60,7 +60,7 @@ class PanelViewer extends React.Component {
   render() {
     const { expand } = this.state;
     const {
-      classes, feature, editorOnly, molSvg, descriptions, layoutSt, canChangeDescription,
+      classes, feature, integration, editorOnly, molSvg, descriptions, layoutSt, canChangeDescription,
     } = this.props;
     const onExapndInfo = () => this.onExapnd('info');
     const onExapndPeak = () => this.onExapnd('peak');
@@ -74,6 +74,7 @@ class PanelViewer extends React.Component {
         >
           <InfoPanel
             feature={feature}
+            integration={integration}
             editorOnly={editorOnly}
             expand={expand === 'info'}
             molSvg={molSvg}
@@ -105,6 +106,7 @@ const mapDispatchToProps = dispatch => (
 PanelViewer.propTypes = {
   classes: PropTypes.object.isRequired,
   feature: PropTypes.object.isRequired,
+  integration: PropTypes.object.isRequired,
   editorOnly: PropTypes.bool.isRequired,
   molSvg: PropTypes.string.isRequired,
   descriptions: PropTypes.array.isRequired,

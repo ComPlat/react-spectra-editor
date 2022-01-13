@@ -28,6 +28,13 @@ const resetInitMs = payload => (
   }
 );
 
+const resetInitCommonWithIntergation = payload => (
+  {
+    type: MANAGER.RESET_INIT_COMMON_WITH_INTERGATION,
+    payload,
+  }
+);
+
 export {
-  resetAll, resetInitCommon, resetInitNmr, resetInitMs,
+  resetAll, resetInitCommon, resetInitNmr, resetInitMs, resetInitCommonWithIntergation,
 }; // eslint-disable-line

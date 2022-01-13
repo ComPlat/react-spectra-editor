@@ -58,7 +58,7 @@ class ForecastViewer extends React.Component {
   render() {
     const {
       classes, topic, feature, cLabel, xLabel, yLabel, forecast,
-      isNmr, isIr, uiSt, comparisonsSt,
+      isNmr, isIr, uiSt, comparisonsSt, isXRD, wavelength
     } = this.props;
     const { viewer } = uiSt;
     const {
@@ -71,7 +71,7 @@ class ForecastViewer extends React.Component {
           topic={topic}
           feature={feature}
           cLabel={cLabel}
-          xLabel={xLabel}
+          xLabel={(isXRD && wavelength) ? (`${xLabel}, WL=${wavelength.value} ${wavelength.unit}`) : xLabel}
           yLabel={yLabel}
           comparisons={comparisonsSt}
           isHidden={viewer !== LIST_UI_VIEWER_TYPE.SPECTRUM}
@@ -101,6 +101,7 @@ const mapStateToProps = (state, _) => ( // eslint-disable-line
   {
     uiSt: state.ui,
     comparisonsSt: state.jcamp.others,
+    wavelength: state.wavelength,
   }
 );
 
@@ -121,10 +122,13 @@ ForecastViewer.propTypes = {
   forecast: PropTypes.object.isRequired,
   isNmr: PropTypes.bool.isRequired,
   isIr: PropTypes.bool.isRequired,
+  isUvvis: PropTypes.bool.isRequired,
+  isXRD: PropTypes.bool.isRequired,
   uiSt: PropTypes.object.isRequired,
   comparisonsSt: PropTypes.array.isRequired,
   initForecastStatusAct: PropTypes.func.isRequired,
   setUiViewerTypeAct: PropTypes.func.isRequired,
+  wavelength: PropTypes.object.isRequired
 };
 
 export default compose(

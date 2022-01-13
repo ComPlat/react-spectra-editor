@@ -12,7 +12,7 @@ import {
   Convert2Scan, Convert2Thres,
 } from '../../helpers/chem';
 import { MuButton, commonStyle } from './common';
-import { extractPeaksEdit } from '../../helpers/extractPeaksEdit';
+import { extractPeaksEdit, extractAreaUnderCurve } from '../../helpers/extractPeaksEdit';
 
 const styles = () => (
   Object.assign(
@@ -24,7 +24,7 @@ const styles = () => (
 const onClickCb = (
   operation, peaksEdit, isAscend, isIntensity,
   scan, thres, layoutSt, shiftSt, analysis, decimalSt,
-  integrationSt, multiplicitySt,
+  integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt
 ) => (
   () => {
     operation({
@@ -39,6 +39,9 @@ const onClickCb = (
       decimal: decimalSt,
       integration: integrationSt,
       multiplicity: multiplicitySt,
+      allIntegration: allIntegrationSt,
+      aucValues: aucValues,
+      waveLength: waveLengthSt
     });
   }
 );
@@ -46,12 +49,14 @@ const onClickCb = (
 const BtnSubmit = ({
   classes, operation, feature, isAscend, isIntensity,
   editPeakSt, thresSt, layoutSt, shiftSt, scanSt, forecastSt,
-  decimalSt, integrationSt, multiplicitySt,
+  decimalSt, integrationSt, multiplicitySt, allIntegrationSt,
+  waveLengthSt
 }) => {
   const peaksEdit = extractPeaksEdit(feature, editPeakSt, thresSt, shiftSt, layoutSt);
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
   const scan = Convert2Scan(feature, scanSt);
   const thres = Convert2Thres(feature, thresSt);
+  const aucValues = extractAreaUnderCurve(allIntegrationSt, integrationSt, layoutSt);
 
   if (!operation) return null;
 
@@ -67,7 +72,7 @@ const BtnSubmit = ({
         onClick={onClickCb(
           operation.value, peaksEdit, isAscend, isIntensity,
           scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt,
-          integrationSt, multiplicitySt,
+          integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt
         )}
       >
         <PlayCircleOutlineIcon className={classes.icon} />
@@ -87,6 +92,8 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     decimalSt: state.submit.decimal,
     integrationSt: state.integration.present,
     multiplicitySt: state.multiplicity.present,
+    allIntegrationSt: state.integration.past.concat(state.integration.present),
+    waveLengthSt: state.wavelength,
   }
 );
 
@@ -115,6 +122,8 @@ BtnSubmit.propTypes = {
   decimalSt: PropTypes.number.isRequired,
   integrationSt: PropTypes.object.isRequired,
   multiplicitySt: PropTypes.object.isRequired,
+  allIntegrationSt: PropTypes.object.isRequired,
+  waveLengthSt: PropTypes.object.isRequired,
 };
 
 export default compose(

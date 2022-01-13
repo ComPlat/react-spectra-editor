@@ -39,7 +39,9 @@ var extrShare = function extrShare(entity, thresSt) {
   var hasEdit = editPeak && editPeak.data ? editPeak.data[0].x.length > 0 : false;
 
   var feature = hasEdit && thresSt.isEdit ? editPeak : autoPeak;
-  return { spectra: spectra, feature: feature, hasEdit: hasEdit };
+  var integration = features.integration;
+  var multiplicity = features.multiplicity;
+  return { spectra: spectra, feature: feature, hasEdit: hasEdit, integration: integration, multiplicity: multiplicity };
 };
 
 var extrMs = function extrMs(entity, thresSt, scanSt) {
@@ -60,10 +62,12 @@ var extrNi = function extrNi(entity, thresSt) {
   var _extrShare2 = extrShare(entity, thresSt, scanIdx),
       spectra = _extrShare2.spectra,
       feature = _extrShare2.feature,
-      hasEdit = _extrShare2.hasEdit;
+      hasEdit = _extrShare2.hasEdit,
+      integration = _extrShare2.integration,
+      multiplicity = _extrShare2.multiplicity;
 
   var topic = spectra[0].data[0];
-  return { topic: topic, feature: feature, hasEdit: hasEdit };
+  return { topic: topic, feature: feature, hasEdit: hasEdit, integration: integration, multiplicity: multiplicity };
 };
 
 var extractParams = function extractParams(entity, thresSt, scanSt) {

@@ -42,7 +42,7 @@ var styles = function styles() {
   return Object.assign({}, _common.commonStyle);
 };
 
-var onClickCb = function onClickCb(operation, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, analysis, decimalSt, integrationSt, multiplicitySt) {
+var onClickCb = function onClickCb(operation, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, analysis, decimalSt, integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt) {
   return function () {
     operation({
       peaks: peaksEdit,
@@ -55,7 +55,10 @@ var onClickCb = function onClickCb(operation, peaksEdit, isAscend, isIntensity, 
       analysis: analysis,
       decimal: decimalSt,
       integration: integrationSt,
-      multiplicity: multiplicitySt
+      multiplicity: multiplicitySt,
+      allIntegration: allIntegrationSt,
+      aucValues: aucValues,
+      waveLength: waveLengthSt
     });
   };
 };
@@ -74,12 +77,15 @@ var BtnSubmit = function BtnSubmit(_ref) {
       forecastSt = _ref.forecastSt,
       decimalSt = _ref.decimalSt,
       integrationSt = _ref.integrationSt,
-      multiplicitySt = _ref.multiplicitySt;
+      multiplicitySt = _ref.multiplicitySt,
+      allIntegrationSt = _ref.allIntegrationSt,
+      waveLengthSt = _ref.waveLengthSt;
 
   var peaksEdit = (0, _extractPeaksEdit.extractPeaksEdit)(feature, editPeakSt, thresSt, shiftSt, layoutSt);
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
   var scan = (0, _chem.Convert2Scan)(feature, scanSt);
   var thres = (0, _chem.Convert2Thres)(feature, thresSt);
+  var aucValues = (0, _extractPeaksEdit.extractAreaUnderCurve)(allIntegrationSt, integrationSt, layoutSt);
 
   if (!operation) return null;
 
@@ -95,7 +101,7 @@ var BtnSubmit = function BtnSubmit(_ref) {
       {
         className: (0, _classnames2.default)('btn-sv-bar-submit'),
         color: 'primary',
-        onClick: onClickCb(operation.value, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt, integrationSt, multiplicitySt)
+        onClick: onClickCb(operation.value, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt, integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt)
       },
       _react2.default.createElement(_PlayCircleOutline2.default, { className: classes.icon })
     )
@@ -113,7 +119,9 @@ var mapStateToProps = function mapStateToProps(state, props) {
       forecastSt: state.forecast,
       decimalSt: state.submit.decimal,
       integrationSt: state.integration.present,
-      multiplicitySt: state.multiplicity.present
+      multiplicitySt: state.multiplicity.present,
+      allIntegrationSt: state.integration.past.concat(state.integration.present),
+      waveLengthSt: state.wavelength
     }
   );
 };
@@ -136,7 +144,9 @@ BtnSubmit.propTypes = {
   forecastSt: _propTypes2.default.object.isRequired,
   decimalSt: _propTypes2.default.number.isRequired,
   integrationSt: _propTypes2.default.object.isRequired,
-  multiplicitySt: _propTypes2.default.object.isRequired
+  multiplicitySt: _propTypes2.default.object.isRequired,
+  allIntegrationSt: _propTypes2.default.object.isRequired,
+  waveLengthSt: _propTypes2.default.object.isRequired
 };
 
 exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(BtnSubmit);

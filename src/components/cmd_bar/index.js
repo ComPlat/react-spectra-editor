@@ -15,6 +15,7 @@ import UndoRedo from './06_undo_redo';
 import Layout from './r01_layout';
 import Threshold from './r03_threshold';
 import Submit from './r04_submit';
+import Wavelength from './r07_wavelength_btn';
 
 const styles = () => (
   Object.assign(
@@ -46,6 +47,7 @@ const CmdBar = ({
     />
     <Threshold feature={feature} hasEdit={hasEdit} />
     <Layout feature={feature} hasEdit={hasEdit} />
+    <Wavelength />
   </div>
 );
 

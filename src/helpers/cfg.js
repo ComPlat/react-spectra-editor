@@ -5,7 +5,9 @@ const btnCmdAnaViewer = layoutSt => (
     || Format.isRamanLayout(layoutSt)
     || Format.is19FLayout(layoutSt)
     || Format.isUvVisLayout(layoutSt)
+    || Format.isHplcUvVisLayout(layoutSt)
     || Format.isTGALayout(layoutSt)
+    || Format.isXRDLayout(layoutSt)
 );
 
 const hideCmdAnaViewer = () => false;
@@ -16,7 +18,7 @@ const btnCmdRmPeak = layoutSt => Format.isMsLayout(layoutSt);
 
 const btnCmdSetRef = layoutSt => !Format.isNmrLayout(layoutSt);
 
-const btnCmdIntg = layoutSt => !Format.isNmrLayout(layoutSt);
+const btnCmdIntg = layoutSt => !(Format.isNmrLayout(layoutSt) || Format.isHplcUvVisLayout(layoutSt));
 
 const btnCmdMpy = layoutSt => !Format.isNmrLayout(layoutSt);
 
@@ -34,7 +36,7 @@ const hidePanelPeak = layoutSt => true;  // eslint-disable-line
 
 const hidePanelMpy = layoutSt => !Format.isNmrLayout(layoutSt);
 
-const hidePanelCompare = layoutSt => !Format.isIrLayout(layoutSt);
+const hidePanelCompare = layoutSt => !(Format.isIrLayout(layoutSt) || Format.isHplcUvVisLayout(layoutSt) || Format.isXRDLayout(layoutSt));
 
 const hideSolvent = layoutSt => !Format.isNmrLayout(layoutSt);
 

@@ -52,6 +52,10 @@ var _tri_btn2 = _interopRequireDefault(_tri_btn);
 
 var _common = require('./common');
 
+var _format = require('../../helpers/format');
+
+var _format2 = _interopRequireDefault(_format);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var styles = function styles() {
@@ -107,6 +111,7 @@ var iconColor = function iconColor(criteria) {
 var Integration = function Integration(_ref) {
   var classes = _ref.classes,
       refFactorSt = _ref.refFactorSt,
+      ignoreRef = _ref.ignoreRef,
       isDisableSt = _ref.isDisableSt,
       isFocusAddIntgSt = _ref.isFocusAddIntgSt,
       isFocusRmIntgSt = _ref.isFocusRmIntgSt,
@@ -216,7 +221,7 @@ var Integration = function Integration(_ref) {
         )
       )
     ),
-    setFactor(classes, isDisableSt, refFactorSt, setIntegrationFkrAct),
+    !ignoreRef ? setFactor(classes, isDisableSt, refFactorSt, setIntegrationFkrAct) : null,
     _react2.default.createElement(
       _tri_btn2.default,
       {
@@ -245,7 +250,8 @@ var mapStateToProps = function mapStateToProps(state, props) {
       isFocusAddIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
       isFocusRmIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_RM,
       isFocusSetRefSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF,
-      refFactorSt: state.integration.present.refFactor
+      refFactorSt: state.integration.present.refFactor,
+      ignoreRef: _format2.default.isHplcUvVisLayout(state.layout)
     }
   );
 };
@@ -265,6 +271,7 @@ Integration.propTypes = {
   isFocusRmIntgSt: _propTypes2.default.bool.isRequired,
   isFocusSetRefSt: _propTypes2.default.bool.isRequired,
   refFactorSt: _propTypes2.default.number.isRequired,
+  ignoreRef: _propTypes2.default.bool.isRequired,
   setUiSweepTypeAct: _propTypes2.default.func.isRequired,
   setIntegrationFkrAct: _propTypes2.default.func.isRequired,
   clearIntegrationAllAct: _propTypes2.default.func.isRequired

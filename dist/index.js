@@ -46,6 +46,18 @@ var _nmr19f_jcamp = require('./__tests__/fixtures/nmr19f_jcamp');
 
 var _nmr19f_jcamp2 = _interopRequireDefault(_nmr19f_jcamp);
 
+var _nmr31p_jcamp = require('./__tests__/fixtures/nmr31p_jcamp');
+
+var _nmr31p_jcamp2 = _interopRequireDefault(_nmr31p_jcamp);
+
+var _nmr15n_jcamp = require('./__tests__/fixtures/nmr15n_jcamp');
+
+var _nmr15n_jcamp2 = _interopRequireDefault(_nmr15n_jcamp);
+
+var _nmr29si_jcamp = require('./__tests__/fixtures/nmr29si_jcamp');
+
+var _nmr29si_jcamp2 = _interopRequireDefault(_nmr29si_jcamp);
+
 var _ir_jcamp = require('./__tests__/fixtures/ir_jcamp');
 
 var _ir_jcamp2 = _interopRequireDefault(_ir_jcamp);
@@ -78,13 +90,29 @@ var _phenylalanin = require('./__tests__/fixtures/phenylalanin');
 
 var _phenylalanin2 = _interopRequireDefault(_phenylalanin);
 
+var _compare_uv_vis_jcamp = require('./__tests__/fixtures/compare_uv_vis_jcamp');
+
+var _compare_uv_vis_jcamp2 = _interopRequireDefault(_compare_uv_vis_jcamp);
+
 var _uv_vis_jcamp = require('./__tests__/fixtures/uv_vis_jcamp');
 
 var _uv_vis_jcamp2 = _interopRequireDefault(_uv_vis_jcamp);
 
+var _hplc_uvvis_jcamp = require('./__tests__/fixtures/hplc_uvvis_jcamp');
+
+var _hplc_uvvis_jcamp2 = _interopRequireDefault(_hplc_uvvis_jcamp);
+
 var _tga_jcamp = require('./__tests__/fixtures/tga_jcamp');
 
 var _tga_jcamp2 = _interopRequireDefault(_tga_jcamp);
+
+var _xrd_jcamp_ = require('./__tests__/fixtures/xrd_jcamp_1');
+
+var _xrd_jcamp_2 = _interopRequireDefault(_xrd_jcamp_);
+
+var _xrd_jcamp_3 = require('./__tests__/fixtures/xrd_jcamp_2');
+
+var _xrd_jcamp_4 = _interopRequireDefault(_xrd_jcamp_3);
 
 var _qDescValue = require('./__tests__/fixtures/qDescValue');
 
@@ -104,13 +132,20 @@ var nmr1HEntity = _app.FN.ExtractJcamp(_nmr1h_jcamp2.default);
 var nmr13CEntity = _app.FN.ExtractJcamp(_nmr13c_jcamp2.default);
 var nmr13CDeptEntity = _app.FN.ExtractJcamp(_nmr13c_dept_jcamp2.default);
 var nmr19FEntity = _app.FN.ExtractJcamp(_nmr19f_jcamp2.default);
+var nmr31PEntity = _app.FN.ExtractJcamp(_nmr31p_jcamp2.default);
+var nmr15NEntity = _app.FN.ExtractJcamp(_nmr15n_jcamp2.default);
+var nmr29SiEntity = _app.FN.ExtractJcamp(_nmr29si_jcamp2.default);
 var irEntity = _app.FN.ExtractJcamp(_ir_jcamp2.default);
 var compIr1Entity = _app.FN.ExtractJcamp(_compare_ir_1_jcamp2.default);
 var compIr2Entity = _app.FN.ExtractJcamp(_compare_ir_2_jcamp2.default);
 var ramanEntity = _app.FN.ExtractJcamp(_raman_jcamp2.default);
 var msEntity = _app.FN.ExtractJcamp(_ms_jcamp2.default);
 var uvVisEntity = _app.FN.ExtractJcamp(_uv_vis_jcamp2.default);
+var compUvVisEntity = _app.FN.ExtractJcamp(_compare_uv_vis_jcamp2.default);
+var hplcUVVisEntity = _app.FN.ExtractJcamp(_hplc_uvvis_jcamp2.default);
 var tgaEntity = _app.FN.ExtractJcamp(_tga_jcamp2.default);
+var xrdEntity1 = _app.FN.ExtractJcamp(_xrd_jcamp_2.default);
+var xrdEntity2 = _app.FN.ExtractJcamp(_xrd_jcamp_4.default);
 
 var DemoWriteIr = function (_React$Component) {
   _inherits(DemoWriteIr, _React$Component);
@@ -172,7 +207,8 @@ var DemoWriteIr = function (_React$Component) {
           shift = _ref.shift,
           isAscend = _ref.isAscend,
           decimal = _ref.decimal,
-          isIntensity = _ref.isIntensity;
+          isIntensity = _ref.isIntensity,
+          integration = _ref.integration;
 
       var entity = this.loadEntity();
       var features = entity.features;
@@ -183,7 +219,7 @@ var DemoWriteIr = function (_React$Component) {
 
       var boundary = { maxY: maxY, minY: minY };
       var body = _app.FN.peaksBody({
-        peaks: peaks, layout: layout, decimal: decimal, shift: shift, isAscend: isAscend, isIntensity: isIntensity, boundary: boundary
+        peaks: peaks, layout: layout, decimal: decimal, shift: shift, isAscend: isAscend, isIntensity: isIntensity, boundary: boundary, integration: integration
       });
       var wrapper = _app.FN.peaksWrapper(layout, shift);
       var desc = this.rmDollarSign(wrapper.head) + body + wrapper.tail;
@@ -290,10 +326,12 @@ var DemoWriteIr = function (_React$Component) {
           shift = _ref8.shift,
           isAscend = _ref8.isAscend,
           decimal = _ref8.decimal,
-          isIntensity = _ref8.isIntensity;
+          isIntensity = _ref8.isIntensity,
+          integration = _ref8.integration,
+          waveLength = _ref8.waveLength;
 
       var desc = this.formatPks({
-        peaks: peaks, layout: layout, shift: shift, isAscend: isAscend, decimal: decimal, isIntensity: isIntensity
+        peaks: peaks, layout: layout, shift: shift, isAscend: isAscend, decimal: decimal, isIntensity: isIntensity, integration: integration
       });
       this.setState({ desc: desc });
     }
@@ -382,14 +420,24 @@ var DemoWriteIr = function (_React$Component) {
           return nmr13CDeptEntity;
         case 'nmr 19f':
           return nmr19FEntity;
+        case 'nmr 31p':
+          return nmr31PEntity;
+        case 'nmr 15n':
+          return nmr15NEntity;
+        case 'nmr 29si':
+          return nmr29SiEntity;
         case 'ir':
           return irEntity;
         case 'raman':
           return ramanEntity;
         case 'uv/vis':
           return uvVisEntity;
+        case 'hplc uv/vis':
+          return hplcUVVisEntity;
         case 'tga':
           return tgaEntity;
+        case 'xrd':
+          return xrdEntity1;
         case 'ms':
         default:
           return msEntity;
@@ -410,9 +458,14 @@ var DemoWriteIr = function (_React$Component) {
         case 'ir':
           return _qDescValue.qIR;
         case 'nmr 19f':
+        case 'nmr 31p':
+        case 'nmr 15n':
+        case 'nmr 29si':
         case 'raman':
         case 'uv/vis':
+        case 'hplc uv/vis':
         case 'tga':
+        case 'xrd':
         case 'ms':
         default:
           return false;
@@ -426,9 +479,13 @@ var DemoWriteIr = function (_React$Component) {
   }, {
     key: 'loadOthers',
     value: function loadOthers() {
-      var showOthers = this.state.showOthers;
+      var _state2 = this.state,
+          showOthers = _state2.showOthers,
+          typ = _state2.typ;
 
-      var others = showOthers ? [compIr1Entity, compIr2Entity] : [];
+      var isIr = typ === 'ir';
+      var isXRD = typ === 'xrd';
+      var others = showOthers ? isIr ? [compIr1Entity, compIr2Entity] : isXRD ? [xrdEntity2] : [compUvVisEntity] : [];
 
       return {
         others: others,
@@ -444,11 +501,11 @@ var DemoWriteIr = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _state2 = this.state,
-          desc = _state2.desc,
-          predictions = _state2.predictions,
-          molecule = _state2.molecule,
-          typ = _state2.typ;
+      var _state3 = this.state,
+          desc = _state3.desc,
+          predictions = _state3.predictions,
+          molecule = _state3.molecule,
+          typ = _state3.typ;
 
       var entity = this.loadEntity();
       var qDescVal = this.loadQuill();
@@ -456,7 +513,7 @@ var DemoWriteIr = function (_React$Component) {
       var operations = [{ name: 'write peaks', value: this.writePeak }, { name: 'save', value: this.savePeaks }].filter(function (r) {
         return r.value;
       });
-      if (['1H', '13C', '19F'].indexOf(entity.layout) >= 0) {
+      if (['1H', '13C', '19F', '31P', '15N', '29Si'].indexOf(entity.layout) >= 0) {
         operations = [{ name: 'write multiplicity', value: this.writeMpy }].concat(_toConsumableArray(operations));
       }
 
@@ -522,6 +579,33 @@ var DemoWriteIr = function (_React$Component) {
             {
               variant: 'contained',
               style: { margin: '0 10px 0 10px' },
+              onClick: this.onClick('nmr 31p')
+            },
+            'NMR 31P'
+          ),
+          _react2.default.createElement(
+            _Button2.default,
+            {
+              variant: 'contained',
+              style: { margin: '0 10px 0 10px' },
+              onClick: this.onClick('nmr 15n')
+            },
+            'NMR 15N'
+          ),
+          _react2.default.createElement(
+            _Button2.default,
+            {
+              variant: 'contained',
+              style: { margin: '0 10px 0 10px' },
+              onClick: this.onClick('nmr 29si')
+            },
+            'NMR 29Si'
+          ),
+          _react2.default.createElement(
+            _Button2.default,
+            {
+              variant: 'contained',
+              style: { margin: '0 10px 0 10px' },
               onClick: this.onClick('ir')
             },
             'IR'
@@ -549,9 +633,27 @@ var DemoWriteIr = function (_React$Component) {
             {
               variant: 'contained',
               style: { margin: '0 10px 0 10px' },
+              onClick: this.onClick('hplc uv/vis')
+            },
+            'HPLC UV/VIS'
+          ),
+          _react2.default.createElement(
+            _Button2.default,
+            {
+              variant: 'contained',
+              style: { margin: '0 10px 0 10px' },
               onClick: this.onClick('tga')
             },
             'TGA'
+          ),
+          _react2.default.createElement(
+            _Button2.default,
+            {
+              variant: 'contained',
+              style: { margin: '0 10px 0 10px' },
+              onClick: this.onClick('xrd')
+            },
+            'XRD'
           ),
           _react2.default.createElement(
             _Button2.default,

@@ -210,7 +210,7 @@ const BtnPredict = ({
   const realCount = Format.is13CLayout(layoutSt)
     ? carbonFeatures(peaksEdit, multiplicitySt).length
     : multiplicitySt.stack.length;
-
+    
   if (is13Cor1H && simuCount === 0) {
     const onClickUnknownCb = onClicUnknown(
       feature, forecast, peaksEdit, layoutSt, scan, shiftSt, thres,

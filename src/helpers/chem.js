@@ -77,7 +77,7 @@ const calcRescaleXY = (xs, ys, minY, maxY, show) => {
 
 const convertComparisons = (layout, comparisons, feature) => {
   const { minY, maxY } = feature;
-  if (!comparisons || !Format.isIrLayout(layout)) return [];
+  if (!comparisons || !(Format.isIrLayout(layout) || Format.isHplcUvVisLayout(layout) || Format.isXRDLayout(layout))) return [];
   return comparisons.map((c) => {
     const { spectra, show } = c;
     const topic = spectra[0].data[0];
@@ -95,7 +95,7 @@ const GetComparisons = createSelector(
 );
 
 const convertFrequency = (layout, feature) => {
-  if (['1H', '13C', '19F'].indexOf(layout) < 0) return false;
+  if (['1H', '13C', '19F', '31P', '15N', '29Si'].indexOf(layout) < 0) return false;
   const { observeFrequency } = feature;
   const freq = Array.isArray(observeFrequency) ? observeFrequency[0] : observeFrequency;
   return parseFloat(freq) || false;
@@ -185,10 +185,16 @@ const readLayout = (jcamp) => {
       return LIST_LAYOUT.RAMAN;
     }
     if (dataType.includes('UV/VIS SPECTRUM')) {
+      if (dataType.includes('HPLC')) {
+        return LIST_LAYOUT.HPLC_UVVIS;
+      }
       return LIST_LAYOUT.UVVIS;
     }
     if (dataType.includes('THERMOGRAVIMETRIC ANALYSIS')) {
       return LIST_LAYOUT.TGA;
+    }
+    if (dataType.includes('X-RAY DIFFRACTION')) {
+      return LIST_LAYOUT.XRD;
     }
     if (dataType.includes('MASS SPECTRUM')) {
       return LIST_LAYOUT.MS;
@@ -299,6 +305,7 @@ const buildIntegFeature = (jcamp, spectra) => {
         xL: parseFloat(ts[0]),
         xU: parseFloat(ts[1]),
         area: parseFloat(ts[2]),
+        absoluteArea: parseFloat(ts[3]),
       };
     });
     stack = [...stack, ...itStack];
@@ -324,6 +331,7 @@ const buildIntegFeature = (jcamp, spectra) => {
       refFactor: 1,
       shift: 0,
       stack: mStack,
+      originStack: stack
     }
   );
 };
@@ -435,9 +443,22 @@ const extrFeaturesNi = (jcamp, layout, peakUp, spectra) => {
       ? buildPeakFeature(jcamp, layout, peakUp, s, thresRef)
       : null;
   }).filter(r => r != null);
-
+  
   return { editPeak: features[0], autoPeak: features[1] };
+  
 };
+
+const extrFeaturesXrd = (jcamp, layout, peakUp) => {
+  const base = jcamp.spectra[0];
+
+  const features = jcamp.spectra.map((s) => {
+    const cpo = buildPeakFeature(jcamp, layout, peakUp, s, 100);
+    const bnd = getBoundary(s);
+    return Object.assign({}, base, cpo, bnd);
+  }).filter(r => r != null);
+
+  return features;
+}
 
 const getBoundary = (s) => {
   const { x, y } = s.data[0];
@@ -496,9 +517,13 @@ const ExtractJcamp = (source) => {
   const spectra = Format.isMsLayout(layout)
     ? extrSpectraMs(jcamp, layout)
     : extrSpectraNi(jcamp, layout);
+  // const features = Format.isMsLayout(layout)
+  //   ? extrFeaturesMs(jcamp, layout, peakUp)
+  //   : extrFeaturesNi(jcamp, layout, peakUp, spectra);
   const features = Format.isMsLayout(layout)
     ? extrFeaturesMs(jcamp, layout, peakUp)
-    : extrFeaturesNi(jcamp, layout, peakUp, spectra);
+    : (Format.isXRDLayout(layout)
+      ? extrFeaturesXrd(jcamp, layout, peakUp) : extrFeaturesNi(jcamp, layout, peakUp, spectra));
 
   return { spectra, features, layout };
 };
@@ -516,9 +541,16 @@ const Convert2Thres = (feature, thresSt) => {
   return value;
 };
 
+const Convert2DValue = (doubleTheta, lambda=0.15406) => {
+  const theta = doubleTheta/2;
+  const sinTheta = Math.sin(theta);
+  const dValue = lambda/(2*sinTheta);
+  return dValue;
+};
+
 export {
   ExtractJcamp, Topic2Seed, Feature2Peak,
   ToThresEndPts, ToShiftPeaks, ToFrequency,
   Convert2Peak, Convert2Scan, Convert2Thres,
-  GetComparisons,
+  GetComparisons, Convert2DValue
 };

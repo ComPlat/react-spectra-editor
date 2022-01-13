@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.GetComparisons = exports.Convert2Thres = exports.Convert2Scan = exports.Convert2Peak = exports.ToFrequency = exports.ToShiftPeaks = exports.ToThresEndPts = exports.Feature2Peak = exports.Topic2Seed = exports.ExtractJcamp = undefined;
+exports.Convert2DValue = exports.GetComparisons = exports.Convert2Thres = exports.Convert2Scan = exports.Convert2Peak = exports.ToFrequency = exports.ToShiftPeaks = exports.ToThresEndPts = exports.Feature2Peak = exports.Topic2Seed = exports.ExtractJcamp = undefined;
 
 var _jcampconverter = require('jcampconverter');
 
@@ -115,7 +115,7 @@ var convertComparisons = function convertComparisons(layout, comparisons, featur
   var minY = feature.minY,
       maxY = feature.maxY;
 
-  if (!comparisons || !_format2.default.isIrLayout(layout)) return [];
+  if (!comparisons || !(_format2.default.isIrLayout(layout) || _format2.default.isHplcUvVisLayout(layout) || _format2.default.isXRDLayout(layout))) return [];
   return comparisons.map(function (c) {
     var spectra = c.spectra,
         show = c.show;
@@ -130,7 +130,7 @@ var convertComparisons = function convertComparisons(layout, comparisons, featur
 var GetComparisons = (0, _reselect.createSelector)(getLayout, getOthers, getFeature, convertComparisons);
 
 var convertFrequency = function convertFrequency(layout, feature) {
-  if (['1H', '13C', '19F'].indexOf(layout) < 0) return false;
+  if (['1H', '13C', '19F', '31P', '15N', '29Si'].indexOf(layout) < 0) return false;
   var observeFrequency = feature.observeFrequency;
 
   var freq = Array.isArray(observeFrequency) ? observeFrequency[0] : observeFrequency;
@@ -212,10 +212,16 @@ var readLayout = function readLayout(jcamp) {
       return _list_layout.LIST_LAYOUT.RAMAN;
     }
     if (dataType.includes('UV/VIS SPECTRUM')) {
+      if (dataType.includes('HPLC')) {
+        return _list_layout.LIST_LAYOUT.HPLC_UVVIS;
+      }
       return _list_layout.LIST_LAYOUT.UVVIS;
     }
     if (dataType.includes('THERMOGRAVIMETRIC ANALYSIS')) {
       return _list_layout.LIST_LAYOUT.TGA;
+    }
+    if (dataType.includes('X-RAY DIFFRACTION')) {
+      return _list_layout.LIST_LAYOUT.XRD;
     }
     if (dataType.includes('MASS SPECTRUM')) {
       return _list_layout.LIST_LAYOUT.MS;
@@ -333,7 +339,8 @@ var buildIntegFeature = function buildIntegFeature(jcamp, spectra) {
       return {
         xL: parseFloat(ts[0]),
         xU: parseFloat(ts[1]),
-        area: parseFloat(ts[2])
+        area: parseFloat(ts[2]),
+        absoluteArea: parseFloat(ts[3])
       };
     });
     stack = [].concat(_toConsumableArray(stack), _toConsumableArray(itStack));
@@ -362,7 +369,8 @@ var buildIntegFeature = function buildIntegFeature(jcamp, spectra) {
     refArea: raw2realRatio,
     refFactor: 1,
     shift: 0,
-    stack: mStack
+    stack: mStack,
+    originStack: stack
   };
 };
 
@@ -480,6 +488,20 @@ var extrFeaturesNi = function extrFeaturesNi(jcamp, layout, peakUp, spectra) {
   return { editPeak: features[0], autoPeak: features[1] };
 };
 
+var extrFeaturesXrd = function extrFeaturesXrd(jcamp, layout, peakUp) {
+  var base = jcamp.spectra[0];
+
+  var features = jcamp.spectra.map(function (s) {
+    var cpo = buildPeakFeature(jcamp, layout, peakUp, s, 100);
+    var bnd = getBoundary(s);
+    return Object.assign({}, base, cpo, bnd);
+  }).filter(function (r) {
+    return r != null;
+  });
+
+  return features;
+};
+
 var getBoundary = function getBoundary(s) {
   var _s$data$ = s.data[0],
       x = _s$data$.x,
@@ -537,7 +559,10 @@ var ExtractJcamp = function ExtractJcamp(source) {
   var peakUp = !_format2.default.isIrLayout(layout);
 
   var spectra = _format2.default.isMsLayout(layout) ? extrSpectraMs(jcamp, layout) : extrSpectraNi(jcamp, layout);
-  var features = _format2.default.isMsLayout(layout) ? extrFeaturesMs(jcamp, layout, peakUp) : extrFeaturesNi(jcamp, layout, peakUp, spectra);
+  // const features = Format.isMsLayout(layout)
+  //   ? extrFeaturesMs(jcamp, layout, peakUp)
+  //   : extrFeaturesNi(jcamp, layout, peakUp, spectra);
+  var features = _format2.default.isMsLayout(layout) ? extrFeaturesMs(jcamp, layout, peakUp) : _format2.default.isXRDLayout(layout) ? extrFeaturesXrd(jcamp, layout, peakUp) : extrFeaturesNi(jcamp, layout, peakUp, spectra);
 
   return { spectra: spectra, features: features, layout: layout };
 };
@@ -558,6 +583,15 @@ var Convert2Thres = function Convert2Thres(feature, thresSt) {
   return value;
 };
 
+var Convert2DValue = function Convert2DValue(doubleTheta) {
+  var lambda = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.15406;
+
+  var theta = doubleTheta / 2;
+  var sinTheta = Math.sin(theta);
+  var dValue = lambda / (2 * sinTheta);
+  return dValue;
+};
+
 exports.ExtractJcamp = ExtractJcamp;
 exports.Topic2Seed = Topic2Seed;
 exports.Feature2Peak = Feature2Peak;
@@ -568,3 +602,4 @@ exports.Convert2Peak = Convert2Peak;
 exports.Convert2Scan = Convert2Scan;
 exports.Convert2Thres = Convert2Thres;
 exports.GetComparisons = GetComparisons;
+exports.Convert2DValue = Convert2DValue;

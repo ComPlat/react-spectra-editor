@@ -21,6 +21,7 @@ import {
 import Cfg from '../../helpers/cfg';
 import TriBtn from './tri_btn';
 import { MuButton, commonStyle, focusStyle } from './common';
+import Format from '../../helpers/format';
 
 const styles = () => (
   Object.assign(
@@ -71,7 +72,7 @@ const setFactor = (
 const iconColor = criteria => (criteria ? '#fff' : '#000');
 
 const Integration = ({
-  classes, refFactorSt,
+  classes, refFactorSt, ignoreRef,
   isDisableSt, isFocusAddIntgSt, isFocusRmIntgSt, isFocusSetRefSt,
   setUiSweepTypeAct, setIntegrationFkrAct, clearIntegrationAllAct,
 }) => {
@@ -144,9 +145,11 @@ const Integration = ({
         </span>
       </Tooltip>
       {
+        !ignoreRef ?
         setFactor(
           classes, isDisableSt, refFactorSt, setIntegrationFkrAct,
         )
+        : null
       }
       <TriBtn
         content={{ tp: 'Clear All Integration' }}
@@ -171,6 +174,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     isFocusRmIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_RM,
     isFocusSetRefSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF,
     refFactorSt: state.integration.present.refFactor,
+    ignoreRef: Format.isHplcUvVisLayout(state.layout),
   }
 );
 
@@ -189,6 +193,7 @@ Integration.propTypes = {
   isFocusRmIntgSt: PropTypes.bool.isRequired,
   isFocusSetRefSt: PropTypes.bool.isRequired,
   refFactorSt: PropTypes.number.isRequired,
+  ignoreRef: PropTypes.bool.isRequired,
   setUiSweepTypeAct: PropTypes.func.isRequired,
   setIntegrationFkrAct: PropTypes.func.isRequired,
   clearIntegrationAllAct: PropTypes.func.isRequired,
