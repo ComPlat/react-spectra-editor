@@ -121,6 +121,11 @@ const InfoPanel = ({
   if (!feature) return null;
   const { title, observeFrequency, solventName } = feature;
   const showSolvName = shiftNameSt === '- - -' ? solventName : shiftNameSt;
+
+  let originStack = null;
+  if (integration) {
+    originStack = integration.originStack;
+  }
   
   return (
     <ExpansionPanel

@@ -86,6 +86,7 @@ var ViewerLine = function (_React$Component) {
           isUiAddIntgSt = _props.isUiAddIntgSt,
           isUiNoBrushSt = _props.isUiNoBrushSt,
           isHidden = _props.isHidden,
+          wavelength = _props.wavelength,
           resetAllAct = _props.resetAllAct;
 
       (0, _draw.drawDestroy)(this.rootKlass);
@@ -108,7 +109,8 @@ var ViewerLine = function (_React$Component) {
         mtplySt: mtplySt,
         sweepExtentSt: sweepExtentSt,
         isUiAddIntgSt: isUiAddIntgSt,
-        isUiNoBrushSt: isUiNoBrushSt
+        isUiNoBrushSt: isUiNoBrushSt,
+        wavelength: wavelength
       });
       (0, _draw.drawLabel)(this.rootKlass, cLabel, xLabel, yLabel);
       (0, _draw.drawDisplay)(this.rootKlass, isHidden);
@@ -119,6 +121,9 @@ var ViewerLine = function (_React$Component) {
       var _props2 = this.props,
           seed = _props2.seed,
           peak = _props2.peak,
+          cLabel = _props2.cLabel,
+          xLabel = _props2.xLabel,
+          yLabel = _props2.yLabel,
           freq = _props2.freq,
           comparisons = _props2.comparisons,
           tTrEndPts = _props2.tTrEndPts,
@@ -130,7 +135,8 @@ var ViewerLine = function (_React$Component) {
           sweepExtentSt = _props2.sweepExtentSt,
           isUiAddIntgSt = _props2.isUiAddIntgSt,
           isUiNoBrushSt = _props2.isUiNoBrushSt,
-          isHidden = _props2.isHidden;
+          isHidden = _props2.isHidden,
+          wavelength = _props2.wavelength;
 
       this.normChange(prevProps);
 
@@ -150,8 +156,10 @@ var ViewerLine = function (_React$Component) {
         mtplySt: mtplySt,
         sweepExtentSt: sweepExtentSt,
         isUiAddIntgSt: isUiAddIntgSt,
-        isUiNoBrushSt: isUiNoBrushSt
+        isUiNoBrushSt: isUiNoBrushSt,
+        wavelength: wavelength
       });
+      (0, _draw.drawLabel)(this.rootKlass, cLabel, xLabel, yLabel);
       (0, _draw.drawDisplay)(this.rootKlass, isHidden);
     }
   }, {
@@ -195,7 +203,8 @@ var mapStateToProps = function mapStateToProps(state, props) {
     mtplySt: state.multiplicity.present,
     sweepExtentSt: state.ui.sweepExtent,
     isUiAddIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
-    isUiNoBrushSt: _list_ui.LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0
+    isUiNoBrushSt: _list_ui.LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
+    wavelength: state.wavelength
   };
 };
 
@@ -230,7 +239,8 @@ ViewerLine.propTypes = {
   clickUiTargetAct: _propTypes2.default.func.isRequired,
   selectUiSweepAct: _propTypes2.default.func.isRequired,
   scrollUiWheelAct: _propTypes2.default.func.isRequired,
-  isHidden: _propTypes2.default.bool.isRequired
+  isHidden: _propTypes2.default.bool.isRequired,
+  wavelength: _propTypes2.default.object.isRequired
 };
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(ViewerLine);

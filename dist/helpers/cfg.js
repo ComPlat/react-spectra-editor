@@ -62,7 +62,7 @@ var hidePanelMpy = function hidePanelMpy(layoutSt) {
 };
 
 var hidePanelCompare = function hidePanelCompare(layoutSt) {
-  return !(_format2.default.isIrLayout(layoutSt) || _format2.default.isHplcUvVisLayout(layoutSt));
+  return !(_format2.default.isIrLayout(layoutSt) || _format2.default.isHplcUvVisLayout(layoutSt) || _format2.default.isXRDLayout(layoutSt));
 };
 
 var hideSolvent = function hideSolvent(layoutSt) {
