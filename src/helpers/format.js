@@ -56,7 +56,7 @@ const spectraOps = {
   [LIST_LAYOUT.Si29]: { head: '29Si', tail: '.' },
   [LIST_LAYOUT.IR]: { head: 'IR', tail: ' cm-1' },
   [LIST_LAYOUT.RAMAN]: { head: 'RAMAN', tail: ' cm-1' },
-  [LIST_LAYOUT.UVVIS]: { head: 'UV/VIS (transmittance)', tail: ' nm' },
+  [LIST_LAYOUT.UVVIS]: { head: 'UV-VIS (absorption, solvent), λmax', tail: ' nm' },
   [LIST_LAYOUT.HPLC_UVVIS]: { head: 'HPLC UV/VIS (transmittance)', tail: '' },
   [LIST_LAYOUT.TGA]: { head: 'THERMOGRAVIMETRIC ANALYSIS', tail: ' SECONDS' },
   [LIST_LAYOUT.MS]: { head: 'MASS', tail: ' m/z' },
@@ -151,7 +151,9 @@ const formatedUvVis = (
   ordered = Object.keys(ordered).sort(sortFunc)
     .map(k => ({ x: k, y: ordered[k] }));
 
-  return ordered.map(o => `${o.x} (${o.y.toFixed(2)})`)
+  // return ordered.map(o => `${o.x} (${o.y.toFixed(2)})`)
+  //   .join(', ');
+  return ordered.map(o => `${o.x}`)
     .join(', ');
 };
 
