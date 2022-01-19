@@ -95,16 +95,16 @@ class DemoWriteIr extends React.Component {
   }
 
   formatPks({
-    peaks, layout, shift, isAscend, decimal, isIntensity, integration
+    peaks, layout, shift, isAscend, decimal, isIntensity, integration, genericComponent
   }) {
     const entity = this.loadEntity();
     const { features } = entity;
     const { maxY, minY } = Array.isArray(features) ? {} : (features.editPeak || features.autoPeak);
     const boundary = { maxY, minY };
     const body = FN.peaksBody({
-      peaks, layout, decimal, shift, isAscend, isIntensity, boundary, integration
+      peaks, layout, decimal, shift, isAscend, isIntensity, boundary, integration, genericComponent
     });
-    const wrapper = FN.peaksWrapper(layout, shift);
+    const wrapper = FN.peaksWrapper(layout, shift, genericComponent);
     const desc = this.rmDollarSign(wrapper.head) + body + wrapper.tail;
     return desc;
   }
@@ -168,17 +168,18 @@ class DemoWriteIr extends React.Component {
   }
 
   writePeak({
-    peaks, layout, shift, isAscend, decimal, isIntensity, integration, waveLength
+    peaks, layout, shift, isAscend, decimal, isIntensity, integration, waveLength, genericComponent
   }) {
+    
     const desc = this.formatPks({
-      peaks, layout, shift, isAscend, decimal, isIntensity, integration
+      peaks, layout, shift, isAscend, decimal, isIntensity, integration, genericComponent
     });
     this.setState({ desc });
   }
 
   savePeaks({
     peaks, layout, shift, isAscend, decimal, analysis, isIntensity,
-    integration, multiplicity,
+    integration, multiplicity, genericComponent
   }) {
     const entity = this.loadEntity();
     const { features } = entity;
@@ -187,7 +188,7 @@ class DemoWriteIr extends React.Component {
       : (features.editPeak || features.autoPeak);
     const boundary = { maxY, minY };
     const body = FN.peaksBody({
-      peaks, layout, decimal, shift, isAscend, isIntensity, boundary,
+      peaks, layout, decimal, shift, isAscend, isIntensity, boundary, genericComponent
     });
     /*eslint-disable */
     console.log(analysis);

@@ -15,6 +15,7 @@ import simulationReducer from './reducer_simulation';
 import metaReducer from './reducer_meta';
 import jcampReducer from './reducer_jcamp';
 import wavelengthReducer from './reducer_wavelength';
+import genericComponentReducer from './reducer_generic_component';
 
 const rootReducer = combineReducers({
   threshold: thresholdReducer,
@@ -33,6 +34,7 @@ const rootReducer = combineReducers({
   meta: metaReducer,
   jcamp: jcampReducer,
   wavelength: wavelengthReducer,
+  genericComponent: genericComponentReducer,
 });
 
 export default rootReducer;

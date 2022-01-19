@@ -24,7 +24,7 @@ const styles = () => (
 const onClickCb = (
   operation, peaksEdit, isAscend, isIntensity,
   scan, thres, layoutSt, shiftSt, analysis, decimalSt,
-  integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt
+  integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt, genericComponent
 ) => (
   () => {
     operation({
@@ -41,7 +41,8 @@ const onClickCb = (
       multiplicity: multiplicitySt,
       allIntegration: allIntegrationSt,
       aucValues: aucValues,
-      waveLength: waveLengthSt
+      waveLength: waveLengthSt,
+      genericComponent: genericComponent
     });
   }
 );
@@ -50,7 +51,7 @@ const BtnSubmit = ({
   classes, operation, feature, isAscend, isIntensity,
   editPeakSt, thresSt, layoutSt, shiftSt, scanSt, forecastSt,
   decimalSt, integrationSt, multiplicitySt, allIntegrationSt,
-  waveLengthSt
+  waveLengthSt, genericComponent
 }) => {
   const peaksEdit = extractPeaksEdit(feature, editPeakSt, thresSt, shiftSt, layoutSt);
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
@@ -72,7 +73,7 @@ const BtnSubmit = ({
         onClick={onClickCb(
           operation.value, peaksEdit, isAscend, isIntensity,
           scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt,
-          integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt
+          integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt, genericComponent
         )}
       >
         <PlayCircleOutlineIcon className={classes.icon} />
@@ -94,6 +95,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     multiplicitySt: state.multiplicity.present,
     allIntegrationSt: state.integration.past.concat(state.integration.present),
     waveLengthSt: state.wavelength,
+    genericComponent: state.genericComponent,
   }
 );
 
@@ -124,6 +126,7 @@ BtnSubmit.propTypes = {
   multiplicitySt: PropTypes.object.isRequired,
   allIntegrationSt: PropTypes.object.isRequired,
   waveLengthSt: PropTypes.object.isRequired,
+  genericComponent: PropTypes.object.isRequired,
 };
 
 export default compose(

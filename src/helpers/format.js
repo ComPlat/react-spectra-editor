@@ -1,6 +1,7 @@
 import { ToXY, IsSame } from './converter';
 import { LIST_LAYOUT } from '../constants/list_layout';
 import { calcMpyCenter } from './multiplicity_calc';
+import _ from 'lodash';
 
 const spectraDigit = (layout) => {
   switch (layout) {
@@ -57,6 +58,23 @@ const spectraOps = {
   [LIST_LAYOUT.IR]: { head: 'IR', tail: ' cm-1' },
   [LIST_LAYOUT.RAMAN]: { head: 'RAMAN', tail: ' cm-1' },
   [LIST_LAYOUT.UVVIS]: { head: 'UV-VIS (absorption, solvent), λmax', tail: ' nm' },
+  [LIST_LAYOUT.HPLC_UVVIS]: { head: 'HPLC UV/VIS (transmittance)', tail: '' },
+  [LIST_LAYOUT.TGA]: { head: 'THERMOGRAVIMETRIC ANALYSIS', tail: ' SECONDS' },
+  [LIST_LAYOUT.MS]: { head: 'MASS', tail: ' m/z' },
+  [LIST_LAYOUT.XRD]: { head: 'X-RAY DIFFRACTION', tail: '.' },
+};
+
+const spectraOpsWithGenericComponent = {
+  [LIST_LAYOUT.PLAIN]: { head: '', tail: '.' },
+  [LIST_LAYOUT.H1]: { head: '1H', tail: '.' },
+  [LIST_LAYOUT.C13]: { head: '13C', tail: '.' },
+  [LIST_LAYOUT.F19]: { head: '19F', tail: '.' },
+  [LIST_LAYOUT.P31]: { head: '31P', tail: '.' },
+  [LIST_LAYOUT.N15]: { head: '15N', tail: '.' },
+  [LIST_LAYOUT.Si29]: { head: '29Si', tail: '.' },
+  [LIST_LAYOUT.IR]: { head: 'IR', tail: ' cm-1' },
+  [LIST_LAYOUT.RAMAN]: { head: 'RAMAN', tail: ' cm-1' },
+  [LIST_LAYOUT.UVVIS]: { head: 'UV-VIS (absorption, solvent, concentration M, temperature °C), λmax (log ε in M-1cm-1)', tail: ' nm' },
   [LIST_LAYOUT.HPLC_UVVIS]: { head: 'HPLC UV/VIS (transmittance)', tail: '' },
   [LIST_LAYOUT.TGA]: { head: 'THERMOGRAVIMETRIC ANALYSIS', tail: ' SECONDS' },
   [LIST_LAYOUT.MS]: { head: 'MASS', tail: ' m/z' },
@@ -133,7 +151,7 @@ const formatedEm = (
 
 const formatedUvVis = (
   peaks, maxY, decimal = 2, isAscend = true,
-  isIntensity = false, boundary = {}, lowerIsStronger = false,
+  isIntensity = false, boundary = {}, lowerIsStronger = false, genericComponent
 ) => {
   const ascendFunc = (a, b) => parseFloat(a) - parseFloat(b);
   const descendFunc = (a, b) => parseFloat(b) - parseFloat(a);
@@ -153,6 +171,10 @@ const formatedUvVis = (
 
   // return ordered.map(o => `${o.x} (${o.y.toFixed(2)})`)
   //   .join(', ');
+  if (genericComponent !== undefined && 'concentration' in genericComponent) {
+    return ordered.map(o => `${o.x} (${genericComponent.concentration})`)
+    .join(', ');
+  }
   return ordered.map(o => `${o.x}`)
     .join(', ');
 };
@@ -213,7 +235,7 @@ const rmShiftFromPeaks = (peaks, shift) => {
 const peaksBody = ({
   peaks, layout, decimal, shift, isAscend,
   isIntensity = false, boundary = {},
-  integration
+  integration, genericComponent
 }) => {
   const result = rmShiftFromPeaks(peaks, shift);
 
@@ -233,7 +255,7 @@ const peaksBody = ({
     return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
   if (layout === LIST_LAYOUT.UVVIS) {
-    return formatedUvVis(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
+    return formatedUvVis(ordered, maxY, decimal, isAscend, isIntensity, boundary, false, genericComponent);
   }
   if (layout === LIST_LAYOUT.HPLC_UVVIS) {
     return formatedHplcUvVis(ordered, decimal, integration);
@@ -247,7 +269,7 @@ const peaksBody = ({
   return ordered.map(o => fixDigit(o.x, decimal)).join(', ');
 };
 
-const peaksWrapper = (layout, shift) => {
+const peaksWrapper = (layout, shift, genericComponent) => {
   let solvTxt = '';
   if (shift.ref.label) {
     solvTxt = ` (${shift.ref.label})`;
@@ -257,7 +279,10 @@ const peaksWrapper = (layout, shift) => {
     return { head: '', tail: '' };
   }
 
-  const ops = spectraOps[layout];
+  let ops = spectraOps[layout];
+  if (genericComponent !== undefined && !(_.isEmpty(genericComponent))) {
+    ops = spectraOpsWithGenericComponent[layout]
+  }
   return { head: `${ops.head}${solvTxt} = `, tail: ops.tail };
 };
 
