@@ -1,6 +1,6 @@
 import { GENERIC_COMPONENT } from "../constants/action_type";
 
-const initialState = {'concentration':'0'};
+const initialState = {};
 
 const genericComponentReducer = (state = initialState, action) => {
   switch(action.type) {

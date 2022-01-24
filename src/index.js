@@ -325,6 +325,9 @@ class DemoWriteIr extends React.Component {
     const entity = this.loadEntity();
     const qDescVal = this.loadQuill();
 
+    //to testing purpose
+    const genericComponent = {concentration: '0.01'}
+
     let operations = [
       { name: 'write peaks', value: this.writePeak },
       { name: 'save', value: this.savePeaks },
@@ -462,6 +465,7 @@ class DemoWriteIr extends React.Component {
           editorOnly={false}
           canChangeDescription={true}
           onDescriptionChanged={this.onDescriptionChanged}
+          genericComponent={genericComponent}
         />
         <div>
           <span>Description Changed</span>

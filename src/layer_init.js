@@ -9,6 +9,7 @@ import { updateOperation } from './actions/submit';
 import { resetInitCommon, resetInitNmr, resetInitMs, resetInitCommonWithIntergation } from './actions/manager';
 import { updateMetaPeaks } from './actions/meta';
 import { addOthers } from './actions/jcamp';
+import { updateGenericComponentValue } from './actions/generic_component';
 import LayerPrism from './layer_prism';
 import Format from './helpers/format';
 
@@ -23,17 +24,20 @@ class LayerInit extends React.Component {
     this.execReset = this.execReset.bind(this);
     this.initReducer = this.initReducer.bind(this);
     this.updateOthers = this.updateOthers.bind(this);
+    this.updateGenericComponents = this.updateGenericComponents.bind(this);
   }
 
   componentDidMount() {
     this.execReset();
     this.initReducer();
     this.updateOthers();
+    this.updateGenericComponents();
   }
 
   componentDidUpdate(prevProps) {
     this.normChange(prevProps);
     this.updateOthers();
+    this.updateGenericComponents();
   }
 
   normChange(prevProps) {
@@ -88,11 +92,16 @@ class LayerInit extends React.Component {
     addOthersAct(others);
   }
 
+  updateGenericComponents() {
+    const { genericComponent, updateGenericComponentValueAct } = this.props;
+    updateGenericComponentValueAct(genericComponent)
+  }
+
   render() {
     const {
       entity, cLabel, xLabel, yLabel, forecast, operations,
       descriptions, molSvg, editorOnly,
-      canChangeDescription, onDescriptionChanged
+      canChangeDescription, onDescriptionChanged, genericComponent
     } = this.props;
     const target = entity.spectra[0];
 
@@ -112,6 +121,7 @@ class LayerInit extends React.Component {
         editorOnly={editorOnly}
         canChangeDescription={canChangeDescription}
         onDescriptionChanged={onDescriptionChanged}
+        genericComponent={genericComponent}
       />
     );
   }
@@ -130,6 +140,7 @@ const mapDispatchToProps = dispatch => (
     updateOperationAct: updateOperation,
     updateMetaPeaksAct: updateMetaPeaks,
     addOthersAct: addOthers,
+    updateGenericComponentValueAct: updateGenericComponentValue,
   }, dispatch)
 );
 
@@ -152,7 +163,10 @@ LayerInit.propTypes = {
   updateMetaPeaksAct: PropTypes.func.isRequired,
   addOthersAct: PropTypes.func.isRequired,
   canChangeDescription: PropTypes.bool.isRequired,
-  onDescriptionChanged: PropTypes.func
+  onDescriptionChanged: PropTypes.func,
+  genericComponent: PropTypes.object.isRequired,
+  updateGenericComponentValueAct: PropTypes.func.isRequired,
+
 };
 
 export default connect(

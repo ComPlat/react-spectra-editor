@@ -32,7 +32,7 @@ const ensureQuillDelta = (descs) => {
 const SpectraEditor = ({
   entity, others, cLabel, xLabel, yLabel,
   operations, forecast, molSvg, editorOnly, descriptions,
-  canChangeDescription, onDescriptionChanged
+  canChangeDescription, onDescriptionChanged, genericComponent
 }) => (
   <Provider store={store}>
     <LayerInit
@@ -48,6 +48,7 @@ const SpectraEditor = ({
       editorOnly={editorOnly}
       canChangeDescription={canChangeDescription}
       onDescriptionChanged={onDescriptionChanged}
+      genericComponent={genericComponent}
     />
   </Provider>
 );
@@ -67,7 +68,8 @@ SpectraEditor.propTypes = {
   molSvg: PropTypes.string,
   editorOnly: PropTypes.bool,
   canChangeDescription: PropTypes.bool,
-  onDescriptionChanged: PropTypes.func
+  onDescriptionChanged: PropTypes.func,
+  genericComponent: PropTypes.object,
 };
 
 SpectraEditor.defaultProps = {
@@ -81,6 +83,7 @@ SpectraEditor.defaultProps = {
   molSvg: '',
   editorOnly: false,
   canChangeDescription: false,
+  genericComponent: {}
 };
 
 export {

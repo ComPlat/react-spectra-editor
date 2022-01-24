@@ -74,7 +74,7 @@ const spectraOpsWithGenericComponent = {
   [LIST_LAYOUT.Si29]: { head: '29Si', tail: '.' },
   [LIST_LAYOUT.IR]: { head: 'IR', tail: ' cm-1' },
   [LIST_LAYOUT.RAMAN]: { head: 'RAMAN', tail: ' cm-1' },
-  [LIST_LAYOUT.UVVIS]: { head: 'UV-VIS (absorption, solvent, concentration M, temperature °C), λmax (log ε in M-1cm-1)', tail: ' nm' },
+  [LIST_LAYOUT.UVVIS]: { head: 'UV-VIS (absorption, solvent, concentration M, temperature °C), λmax (log ε in M-1cm-1)', tail: ' M-1cm-1' },
   [LIST_LAYOUT.HPLC_UVVIS]: { head: 'HPLC UV/VIS (transmittance)', tail: '' },
   [LIST_LAYOUT.TGA]: { head: 'THERMOGRAVIMETRIC ANALYSIS', tail: ' SECONDS' },
   [LIST_LAYOUT.MS]: { head: 'MASS', tail: ' m/z' },
@@ -172,9 +172,18 @@ const formatedUvVis = (
   // return ordered.map(o => `${o.x} (${o.y.toFixed(2)})`)
   //   .join(', ');
   if (genericComponent !== undefined && 'concentration' in genericComponent) {
-    return ordered.map(o => `${o.x} (${genericComponent.concentration})`)
-    .join(', ');
+    return ordered.map(o => {
+      const A = o.x;
+      const c = genericComponent.concentration;
+      let L = 1.0;
+      if ('lightPath' in genericComponent) {
+        L = genericComponent.lightPath;
+      }
+      const epsilon = A / (c * L);
+      return `${o.x} (${epsilon.toFixed(2)})`
+    }).join(', ');
   }
+
   return ordered.map(o => `${o.x}`)
     .join(', ');
 };
