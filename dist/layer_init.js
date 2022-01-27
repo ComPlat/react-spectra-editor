@@ -170,8 +170,8 @@ var LayerInit = function (_React$Component) {
 
       var xxLabel = !xLabel && xLabel === '' ? 'X (' + target.xUnit + ')' : xLabel;
       var yyLabel = !yLabel && yLabel === '' ? 'Y (' + target.yUnit + ')' : yLabel;
-      var xxUnit = !yUnit && xUnit === '' ? target.xUnit.toLowerCase() : xUnit;
-      var yyUnit = !yUnit && yUnit === '' ? target.yUnit.toLowerCase() : yUnit;
+      var xxUnit = !yUnit && xUnit === '' ? target.xUnit : xUnit;
+      var yyUnit = !yUnit && yUnit === '' ? target.yUnit : yUnit;
 
       return _react2.default.createElement(_layer_prism2.default, {
         entity: entity,

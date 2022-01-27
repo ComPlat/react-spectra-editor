@@ -98,8 +98,8 @@ class LayerInit extends React.Component {
 
     const xxLabel = !xLabel && xLabel === '' ? `X (${target.xUnit})` : xLabel;
     const yyLabel = !yLabel && yLabel === '' ? `Y (${target.yUnit})` : yLabel;
-    const xxUnit = !yUnit && xUnit === '' ? target.xUnit.toLowerCase() : xUnit;
-    const yyUnit = !yUnit && yUnit === '' ? target.yUnit.toLowerCase() : yUnit;
+    const xxUnit = !yUnit && xUnit === '' ? target.xUnit : xUnit;
+    const yyUnit = !yUnit && yUnit === '' ? target.yUnit : yUnit;
 
     return (
       <LayerPrism
