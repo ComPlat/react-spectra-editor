@@ -49,8 +49,10 @@ var buildData = function buildData(entity) {
   var sp = entity && entity.spectrum;
   var xLabel = sp ? 'X (' + sp.xUnit + ')' : '';
   var yLabel = sp ? 'Y (' + sp.yUnit + ')' : '';
+  var xUnit = sp ? sp.xUnit.toLowerCase() : '';
+  var yUnit = sp ? sp.yUnit.toLowerCase() : '';
   return {
-    entity: entity, xLabel: xLabel, yLabel: yLabel, isExist: true
+    entity: entity, xLabel: xLabel, yLabel: yLabel, isExist: true, xUnit: xUnit, yUnit: yUnit
   };
 };
 

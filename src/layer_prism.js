@@ -16,7 +16,7 @@ const styles = () => ({
 });
 
 const LayerPrism = ({
-  entity, cLabel, xLabel, yLabel, forecast, operations,
+  entity, cLabel, xLabel, yLabel, xUnit, yUnit, forecast, operations,
   descriptions, molSvg, editorOnly,
   thresSt, scanSt, uiSt, 
   canChangeDescription, onDescriptionChanged
@@ -85,6 +85,8 @@ const LayerPrism = ({
               descriptions={descriptions}
               canChangeDescription={canChangeDescription}
               onDescriptionChanged={onDescriptionChanged}
+              xUnit={xUnit}
+              yUnit={yUnit}
             />
           </Grid>
         </Grid>
@@ -111,6 +113,8 @@ LayerPrism.propTypes = {
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
+  xUnit: PropTypes.string.isRequired,
+  yUnit: PropTypes.string.isRequired,
   molSvg: PropTypes.string.isRequired,
   editorOnly: PropTypes.bool.isRequired,
   forecast: PropTypes.object.isRequired,

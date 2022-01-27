@@ -119,7 +119,9 @@ var PanelViewer = function (_React$Component) {
           molSvg = _props.molSvg,
           descriptions = _props.descriptions,
           layoutSt = _props.layoutSt,
-          canChangeDescription = _props.canChangeDescription;
+          canChangeDescription = _props.canChangeDescription,
+          xUnit = _props.xUnit,
+          yUnit = _props.yUnit;
 
       var onExapndInfo = function onExapndInfo() {
         return _this2.onExapnd('info');
@@ -151,7 +153,9 @@ var PanelViewer = function (_React$Component) {
             onExapnd: onExapndInfo,
             descriptions: descriptions,
             canChangeDescription: canChangeDescription,
-            onDescriptionChanged: this.handleDescriptionChanged
+            onDescriptionChanged: this.handleDescriptionChanged,
+            xUnit: xUnit,
+            yUnit: yUnit
           }),
           _cfg2.default.hidePanelPeak(layoutSt) ? null : _react2.default.createElement(_peaks2.default, { expand: expand === 'peak', onExapnd: onExapndPeak }),
           _cfg2.default.hidePanelMpy(layoutSt) ? null : _react2.default.createElement(_multiplicity2.default, { expand: expand === 'mpy', onExapnd: onExapndMpy }),
@@ -185,7 +189,9 @@ PanelViewer.propTypes = {
   descriptions: _propTypes2.default.array.isRequired,
   layoutSt: _propTypes2.default.string.isRequired,
   canChangeDescription: _propTypes2.default.bool.isRequired,
-  onDescriptionChanged: _propTypes2.default.func
+  onDescriptionChanged: _propTypes2.default.func,
+  xUnit: _propTypes2.default.string.isRequired,
+  yUnit: _propTypes2.default.string.isRequired
 };
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(PanelViewer));

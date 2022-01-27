@@ -49,6 +49,8 @@ var LayerPrism = function LayerPrism(_ref) {
       cLabel = _ref.cLabel,
       xLabel = _ref.xLabel,
       yLabel = _ref.yLabel,
+      xUnit = _ref.xUnit,
+      yUnit = _ref.yUnit,
       forecast = _ref.forecast,
       operations = _ref.operations,
       descriptions = _ref.descriptions,
@@ -144,7 +146,9 @@ var LayerPrism = function LayerPrism(_ref) {
             molSvg: molSvg,
             descriptions: descriptions,
             canChangeDescription: canChangeDescription,
-            onDescriptionChanged: onDescriptionChanged
+            onDescriptionChanged: onDescriptionChanged,
+            xUnit: xUnit,
+            yUnit: yUnit
           })
         )
       )
@@ -171,6 +175,8 @@ LayerPrism.propTypes = {
   cLabel: _propTypes2.default.string.isRequired,
   xLabel: _propTypes2.default.string.isRequired,
   yLabel: _propTypes2.default.string.isRequired,
+  xUnit: _propTypes2.default.string.isRequired,
+  yUnit: _propTypes2.default.string.isRequired,
   molSvg: _propTypes2.default.string.isRequired,
   editorOnly: _propTypes2.default.bool.isRequired,
   forecast: _propTypes2.default.object.isRequired,

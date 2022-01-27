@@ -90,7 +90,7 @@ class LayerInit extends React.Component {
 
   render() {
     const {
-      entity, cLabel, xLabel, yLabel, forecast, operations,
+      entity, cLabel, xLabel, yLabel, xUnit, yUnit, forecast, operations,
       descriptions, molSvg, editorOnly,
       canChangeDescription, onDescriptionChanged
     } = this.props;
@@ -98,6 +98,8 @@ class LayerInit extends React.Component {
 
     const xxLabel = !xLabel && xLabel === '' ? `X (${target.xUnit})` : xLabel;
     const yyLabel = !yLabel && yLabel === '' ? `Y (${target.yUnit})` : yLabel;
+    const xxUnit = !yUnit && xUnit === '' ? target.xUnit.toLowerCase() : xUnit;
+    const yyUnit = !yUnit && yUnit === '' ? target.yUnit.toLowerCase() : yUnit;
 
     return (
       <LayerPrism
@@ -105,6 +107,8 @@ class LayerInit extends React.Component {
         cLabel={cLabel}
         xLabel={xxLabel}
         yLabel={yyLabel}
+        xUnit={xxUnit}
+        yUnit={yyUnit}
         forecast={forecast}
         operations={operations}
         descriptions={descriptions}
@@ -139,6 +143,8 @@ LayerInit.propTypes = {
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
+  xUnit: PropTypes.string.isRequired,
+  yUnit: PropTypes.string.isRequired,
   molSvg: PropTypes.string.isRequired,
   editorOnly: PropTypes.bool.isRequired,
   forecast: PropTypes.object.isRequired,

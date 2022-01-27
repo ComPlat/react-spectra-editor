@@ -35,8 +35,10 @@ const buildData = (entity) => {
   const sp = entity && entity.spectrum;
   const xLabel = sp ? `X (${sp.xUnit})` : '';
   const yLabel = sp ? `Y (${sp.yUnit})` : '';
+  const xUnit = sp ? sp.xUnit.toLowerCase() : '';
+  const yUnit = sp ? sp.yUnit.toLowerCase() : '';
   return {
-    entity, xLabel, yLabel, isExist: true,
+    entity, xLabel, yLabel, isExist: true, xUnit, yUnit
   };
 };
 

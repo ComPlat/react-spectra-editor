@@ -116,7 +116,8 @@ const aucValue = integration => {
 const InfoPanel = ({
   classes, expand, feature, integration, editorOnly, molSvg, descriptions,
   layoutSt, simulationSt, shiftNameSt,
-  onExapnd, canChangeDescription, onDescriptionChanged
+  onExapnd, canChangeDescription, onDescriptionChanged,
+  xUnit, yUnit
 }) => {
   if (!feature) return null;
   const { title, observeFrequency, solventName } = feature;
@@ -185,7 +186,7 @@ const InfoPanel = ({
           (Format.isHplcUvVisLayout(layoutSt)) ? (
             <div className={classNames(classes.rowRoot, classes.rowOddSim)}>
               <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>
-                Area under curve (AUC):
+                Area under curve (AUC): ({yUnit}*{xUnit})
               </span>
               <br />
               <span className={classNames(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt')}>
@@ -257,7 +258,9 @@ InfoPanel.propTypes = {
   shiftNameSt: PropTypes.string.isRequired,
   onExapnd: PropTypes.func.isRequired,
   canChangeDescription: PropTypes.bool.isRequired,
-  onDescriptionChanged: PropTypes.func
+  onDescriptionChanged: PropTypes.func,
+  xUnit: PropTypes.string.isRequired,
+  yUnit: PropTypes.string.isRequired,
 };
 
 export default connect(

@@ -156,6 +156,8 @@ var LayerInit = function (_React$Component) {
           cLabel = _props4.cLabel,
           xLabel = _props4.xLabel,
           yLabel = _props4.yLabel,
+          xUnit = _props4.xUnit,
+          yUnit = _props4.yUnit,
           forecast = _props4.forecast,
           operations = _props4.operations,
           descriptions = _props4.descriptions,
@@ -168,12 +170,16 @@ var LayerInit = function (_React$Component) {
 
       var xxLabel = !xLabel && xLabel === '' ? 'X (' + target.xUnit + ')' : xLabel;
       var yyLabel = !yLabel && yLabel === '' ? 'Y (' + target.yUnit + ')' : yLabel;
+      var xxUnit = !yUnit && xUnit === '' ? target.xUnit.toLowerCase() : xUnit;
+      var yyUnit = !yUnit && yUnit === '' ? target.yUnit.toLowerCase() : yUnit;
 
       return _react2.default.createElement(_layer_prism2.default, {
         entity: entity,
         cLabel: cLabel,
         xLabel: xxLabel,
         yLabel: yyLabel,
+        xUnit: xxUnit,
+        yUnit: yyUnit,
         forecast: forecast,
         operations: operations,
         descriptions: descriptions,
@@ -212,6 +218,8 @@ LayerInit.propTypes = {
   cLabel: _propTypes2.default.string.isRequired,
   xLabel: _propTypes2.default.string.isRequired,
   yLabel: _propTypes2.default.string.isRequired,
+  xUnit: _propTypes2.default.string.isRequired,
+  yUnit: _propTypes2.default.string.isRequired,
   molSvg: _propTypes2.default.string.isRequired,
   editorOnly: _propTypes2.default.bool.isRequired,
   forecast: _propTypes2.default.object.isRequired,

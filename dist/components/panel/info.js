@@ -171,7 +171,9 @@ var InfoPanel = function InfoPanel(_ref) {
       shiftNameSt = _ref.shiftNameSt,
       onExapnd = _ref.onExapnd,
       canChangeDescription = _ref.canChangeDescription,
-      onDescriptionChanged = _ref.onDescriptionChanged;
+      onDescriptionChanged = _ref.onDescriptionChanged,
+      xUnit = _ref.xUnit,
+      yUnit = _ref.yUnit;
 
   if (!feature) return null;
   var title = feature.title,
@@ -266,7 +268,11 @@ var InfoPanel = function InfoPanel(_ref) {
         _react2.default.createElement(
           'span',
           { className: (0, _classnames2.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt') },
-          'Area under curve (AUC):'
+          'Area under curve (AUC): (',
+          yUnit,
+          '*',
+          xUnit,
+          ')'
         ),
         _react2.default.createElement('br', null),
         _react2.default.createElement(
@@ -333,7 +339,9 @@ InfoPanel.propTypes = {
   shiftNameSt: _propTypes2.default.string.isRequired,
   onExapnd: _propTypes2.default.func.isRequired,
   canChangeDescription: _propTypes2.default.bool.isRequired,
-  onDescriptionChanged: _propTypes2.default.func
+  onDescriptionChanged: _propTypes2.default.func,
+  xUnit: _propTypes2.default.string.isRequired,
+  yUnit: _propTypes2.default.string.isRequired
 };
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(InfoPanel));

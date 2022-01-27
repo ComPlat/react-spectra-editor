@@ -60,7 +60,7 @@ class PanelViewer extends React.Component {
   render() {
     const { expand } = this.state;
     const {
-      classes, feature, integration, editorOnly, molSvg, descriptions, layoutSt, canChangeDescription,
+      classes, feature, integration, editorOnly, molSvg, descriptions, layoutSt, canChangeDescription, xUnit, yUnit
     } = this.props;
     const onExapndInfo = () => this.onExapnd('info');
     const onExapndPeak = () => this.onExapnd('peak');
@@ -82,6 +82,8 @@ class PanelViewer extends React.Component {
             descriptions={descriptions}
             canChangeDescription={canChangeDescription}
             onDescriptionChanged={this.handleDescriptionChanged}
+            xUnit={xUnit}
+            yUnit={yUnit}
           />
           { Cfg.hidePanelPeak(layoutSt) ? null : <PeakPanel expand={expand === 'peak'} onExapnd={onExapndPeak} /> }
           { Cfg.hidePanelMpy(layoutSt) ? null : <MultiplicityPanel expand={expand === 'mpy'} onExapnd={onExapndMpy} /> }
@@ -112,7 +114,9 @@ PanelViewer.propTypes = {
   descriptions: PropTypes.array.isRequired,
   layoutSt: PropTypes.string.isRequired,
   canChangeDescription: PropTypes.bool.isRequired,
-  onDescriptionChanged: PropTypes.func
+  onDescriptionChanged: PropTypes.func,
+  xUnit: PropTypes.string.isRequired,
+  yUnit: PropTypes.string.isRequired,
 };
 
 export default connect(
