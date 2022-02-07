@@ -33,13 +33,39 @@ const pksAddPos = (dataPks, editPeakSt) => {
   return result;
 };
 
-const PksEdit = (dataPks, editPeakSt) => {
-  let modDataPks = pksAddPos(dataPks, editPeakSt);
-  modDataPks = pksRmNeg(modDataPks, editPeakSt);
-  modDataPks = modDataPks.sort((a, b) => a.x - b.x);
-  return modDataPks;
+const PksEdit = (dataPks, editPeakSt, voltammetryPeak=false) => {
+  if (voltammetryPeak && voltammetryPeak.length > 0) {
+    let modDataPks = []
+    voltammetryPeak.forEach(peak => {
+      if (peak.max) {
+        modDataPks = [...modDataPks, peak.max];
+      }
+      if (peak.min) {
+        modDataPks = [...modDataPks, peak.min];
+      }
+    });
+    modDataPks = modDataPks.sort((a, b) => a.x - b.x);
+    return modDataPks;
+  }
+  else {
+    let modDataPks = pksAddPos(dataPks, editPeakSt);
+    modDataPks = pksRmNeg(modDataPks, editPeakSt);
+    modDataPks = modDataPks.sort((a, b) => a.x - b.x);
+    return modDataPks;
+  }
+};
+
+const PeckersEdit = (voltammetryPeak) => {
+  let modDataPeckers = []
+  voltammetryPeak.forEach(peak => {
+    if (peak.pecker) {
+      modDataPeckers = [...modDataPeckers, peak.pecker];
+    }
+  });
+  modDataPeckers = modDataPeckers.sort((a, b) => a.x - b.x);
+  return modDataPeckers;
 };
 
 export {
-  ToXY, PksEdit, IsSame,
+  ToXY, PksEdit, IsSame, PeckersEdit
 };

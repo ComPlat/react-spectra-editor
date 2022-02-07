@@ -60,6 +60,10 @@ var _r07_wavelength_btn = require('./r07_wavelength_btn');
 
 var _r07_wavelength_btn2 = _interopRequireDefault(_r07_wavelength_btn);
 
+var _pecker = require('./07_pecker');
+
+var _pecker2 = _interopRequireDefault(_pecker);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var styles = function styles() {
@@ -72,13 +76,16 @@ var CmdBar = function CmdBar(_ref) {
       hasEdit = _ref.hasEdit,
       forecast = _ref.forecast,
       operations = _ref.operations,
-      editorOnly = _ref.editorOnly;
+      editorOnly = _ref.editorOnly,
+      jcampIdx = _ref.jcampIdx,
+      hideThreshold = _ref.hideThreshold;
   return _react2.default.createElement(
     'div',
     { className: classes.card },
     _react2.default.createElement(_viewer2.default, { editorOnly: editorOnly }),
     _react2.default.createElement(_zoom2.default, null),
-    _react2.default.createElement(_peak2.default, null),
+    _react2.default.createElement(_peak2.default, { jcampIdx: jcampIdx }),
+    _react2.default.createElement(_pecker2.default, { jcampIdx: jcampIdx }),
     _react2.default.createElement(_integration2.default, null),
     _react2.default.createElement(_multiplicity2.default, null),
     _react2.default.createElement(_undo_redo2.default, null),
@@ -90,7 +97,7 @@ var CmdBar = function CmdBar(_ref) {
       hideSwitch: false,
       disabled: false
     }),
-    _react2.default.createElement(_r03_threshold2.default, { feature: feature, hasEdit: hasEdit }),
+    hideThreshold ? null : _react2.default.createElement(_r03_threshold2.default, { feature: feature, hasEdit: hasEdit }),
     _react2.default.createElement(_r01_layout2.default, { feature: feature, hasEdit: hasEdit }),
     _react2.default.createElement(_r07_wavelength_btn2.default, null)
   );
@@ -112,7 +119,9 @@ CmdBar.propTypes = {
   forecast: _propTypes2.default.object.isRequired,
   hasEdit: _propTypes2.default.bool.isRequired,
   operations: _propTypes2.default.array.isRequired,
-  editorOnly: _propTypes2.default.bool.isRequired
+  editorOnly: _propTypes2.default.bool.isRequired,
+  jcampIdx: _propTypes2.default.any,
+  hideThreshold: _propTypes2.default.bool
 };
 
 exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(CmdBar);

@@ -4,6 +4,7 @@ import managerSagas from './saga_manager';
 import uiSagas from './saga_ui';
 import metaSagas from './saga_meta';
 import multiplicitySagas from './saga_multiplicity';
+import multiEntitiesSagas from './saga_multi_entities';
 
 export default function* rootSaga() {
   yield all([
@@ -12,5 +13,6 @@ export default function* rootSaga() {
     ...uiSagas,
     ...metaSagas,
     ...multiplicitySagas,
+    ...multiEntitiesSagas,
   ]);
 }

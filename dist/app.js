@@ -72,12 +72,17 @@ var SpectraEditor = function SpectraEditor(_ref) {
       editorOnly = _ref.editorOnly,
       descriptions = _ref.descriptions,
       canChangeDescription = _ref.canChangeDescription,
-      onDescriptionChanged = _ref.onDescriptionChanged;
+      onDescriptionChanged = _ref.onDescriptionChanged,
+      multiEntities = _ref.multiEntities,
+      multiMolSvgs = _ref.multiMolSvgs,
+      entityFileNames = _ref.entityFileNames;
   return _react2.default.createElement(
     _reactRedux.Provider,
     { store: store },
     _react2.default.createElement(_layer_init2.default, {
       entity: entity,
+      multiEntities: multiEntities,
+      entityFileNames: entityFileNames,
       others: others,
       cLabel: cLabel,
       xLabel: xLabel,
@@ -86,6 +91,7 @@ var SpectraEditor = function SpectraEditor(_ref) {
       operations: operations,
       descriptions: ensureQuillDelta(descriptions),
       molSvg: molSvg,
+      multiMolSvgs: multiMolSvgs,
       editorOnly: editorOnly,
       canChangeDescription: canChangeDescription,
       onDescriptionChanged: onDescriptionChanged
@@ -95,6 +101,8 @@ var SpectraEditor = function SpectraEditor(_ref) {
 
 SpectraEditor.propTypes = {
   entity: _propTypes2.default.object.isRequired,
+  multiEntities: _propTypes2.default.array,
+  entityFileNames: _propTypes2.default.array,
   others: _propTypes2.default.object,
   cLabel: _propTypes2.default.string,
   xLabel: _propTypes2.default.string,
@@ -103,6 +111,7 @@ SpectraEditor.propTypes = {
   operations: _propTypes2.default.array,
   descriptions: _propTypes2.default.oneOfType([_propTypes2.default.string, _propTypes2.default.array]),
   molSvg: _propTypes2.default.string,
+  multiMolSvgs: _propTypes2.default.array,
   editorOnly: _propTypes2.default.bool,
   canChangeDescription: _propTypes2.default.bool,
   onDescriptionChanged: _propTypes2.default.func
@@ -110,6 +119,8 @@ SpectraEditor.propTypes = {
 
 SpectraEditor.defaultProps = {
   others: { others: [], addOthersCb: false },
+  multiEntities: false,
+  entityFileNames: false,
   cLabel: '',
   xLabel: '',
   yLabel: '',
@@ -117,6 +128,7 @@ SpectraEditor.defaultProps = {
   operations: [],
   descriptions: [],
   molSvg: '',
+  multiMolSvgs: [],
   editorOnly: false,
   canChangeDescription: false
 };

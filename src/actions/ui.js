@@ -7,10 +7,11 @@ const setUiViewerType = payload => (
   }
 );
 
-const setUiSweepType = payload => (
+const setUiSweepType = (payload, jcampIdx = 0) => (
   {
     type: UI.SWEEP.SET_TYPE,
     payload,
+    jcampIdx,
   }
 );
 
@@ -28,11 +29,14 @@ const scrollUiWheel = payload => (
   }
 );
 
-const clickUiTarget = (payload, onPeak) => (
+const clickUiTarget = (payload, onPeak, voltammetryPeakIdx = 0, jcampIdx = 0, onPecker = false) => (
   {
     type: UI.CLICK_TARGET,
     payload,
     onPeak,
+    voltammetryPeakIdx,
+    jcampIdx,
+    onPecker,
   }
 );
 

@@ -13,7 +13,7 @@ var _classnames = require('classnames');
 
 var _classnames2 = _interopRequireDefault(_classnames);
 
-var _reactSvgFileZoomPan = require('react-svg-file-zoom-pan');
+var _reactSvgFileZoomPan = require('@complat/react-svg-file-zoom-pan');
 
 var _reactSvgFileZoomPan2 = _interopRequireDefault(_reactSvgFileZoomPan);
 

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import SvgFileZoomPan from 'react-svg-file-zoom-pan';
+import SvgFileZoomPan from '@complat/react-svg-file-zoom-pan';
 import ReactQuill from 'react-quill';
 
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';

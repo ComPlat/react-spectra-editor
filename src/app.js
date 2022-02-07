@@ -32,11 +32,14 @@ const ensureQuillDelta = (descs) => {
 const SpectraEditor = ({
   entity, others, cLabel, xLabel, yLabel,
   operations, forecast, molSvg, editorOnly, descriptions,
-  canChangeDescription, onDescriptionChanged
+  canChangeDescription, onDescriptionChanged,
+  multiEntities, multiMolSvgs, entityFileNames
 }) => (
   <Provider store={store}>
     <LayerInit
       entity={entity}
+      multiEntities={multiEntities}
+      entityFileNames={entityFileNames}
       others={others}
       cLabel={cLabel}
       xLabel={xLabel}
@@ -45,15 +48,19 @@ const SpectraEditor = ({
       operations={operations}
       descriptions={ensureQuillDelta(descriptions)}
       molSvg={molSvg}
+      multiMolSvgs={multiMolSvgs}
       editorOnly={editorOnly}
       canChangeDescription={canChangeDescription}
       onDescriptionChanged={onDescriptionChanged}
     />
+    
   </Provider>
 );
 
 SpectraEditor.propTypes = {
   entity: PropTypes.object.isRequired,
+  multiEntities: PropTypes.array,
+  entityFileNames: PropTypes.array,
   others: PropTypes.object,
   cLabel: PropTypes.string,
   xLabel: PropTypes.string,
@@ -65,6 +72,7 @@ SpectraEditor.propTypes = {
     PropTypes.array,
   ]),
   molSvg: PropTypes.string,
+  multiMolSvgs: PropTypes.array,
   editorOnly: PropTypes.bool,
   canChangeDescription: PropTypes.bool,
   onDescriptionChanged: PropTypes.func
@@ -72,6 +80,8 @@ SpectraEditor.propTypes = {
 
 SpectraEditor.defaultProps = {
   others: { others: [], addOthersCb: false },
+  multiEntities: false,
+  entityFileNames: false,
   cLabel: '',
   xLabel: '',
   yLabel: '',
@@ -79,6 +89,7 @@ SpectraEditor.defaultProps = {
   operations: [],
   descriptions: [],
   molSvg: '',
+  multiMolSvgs: [],
   editorOnly: false,
   canChangeDescription: false,
 };
