@@ -29,6 +29,9 @@ import hplcUVVisJcamp from './__tests__/fixtures/hplc_uvvis_jcamp';
 import tgaJcamp from './__tests__/fixtures/tga_jcamp';
 import xrdJcamp1 from './__tests__/fixtures/xrd_jcamp_1';
 import xrdJcamp2 from './__tests__/fixtures/xrd_jcamp_2';
+import cyclicVoltaJcamp1 from './__tests__/fixtures/cyclic_voltammetry_1';
+import cyclicVoltaJcamp2 from './__tests__/fixtures/cyclic_voltammetry_2';
+import cyclicVoltaJcamp3 from './__tests__/fixtures/cyclic_voltammetry_3';
 import { q1H, qIR, q13C } from './__tests__/fixtures/qDescValue';
 import './__tests__/style/svg.css';
 
@@ -50,6 +53,9 @@ const hplcUVVisEntity = FN.ExtractJcamp(hplcUVVisJcamp);
 const tgaEntity = FN.ExtractJcamp(tgaJcamp);
 const xrdEntity1 = FN.ExtractJcamp(xrdJcamp1);
 const xrdEntity2 = FN.ExtractJcamp(xrdJcamp2);
+const cyclicVoltaEntity1 = FN.ExtractJcamp(cyclicVoltaJcamp1);
+const cyclicVoltaEntity2 = FN.ExtractJcamp(cyclicVoltaJcamp2);
+const cyclicVoltaEntity3 = FN.ExtractJcamp(cyclicVoltaJcamp3);
 
 class DemoWriteIr extends React.Component {
   constructor(props) {
@@ -77,6 +83,7 @@ class DemoWriteIr extends React.Component {
     this.onShowOthers = this.onShowOthers.bind(this);
     this.loadOthers = this.loadOthers.bind(this);
     this.onDescriptionChanged = this.onDescriptionChanged.bind(this);
+    this.loadMultiEntities = this.loadMultiEntities.bind(this);
   }
 
   onClick(typ) {
@@ -262,9 +269,21 @@ class DemoWriteIr extends React.Component {
         return tgaEntity;
       case 'xrd':
         return xrdEntity1;
+      case 'cyclic volta':
+        return cyclicVoltaEntity2;
       case 'ms':
       default:
         return msEntity;
+    }
+  }
+
+  loadMultiEntities() {
+    const { typ } = this.state;
+    switch (typ) {
+      case 'cyclic volta':
+        return [cyclicVoltaEntity1, cyclicVoltaEntity2, cyclicVoltaEntity3];
+      default:
+        return false;
     }
   }
 
@@ -289,6 +308,7 @@ class DemoWriteIr extends React.Component {
       case 'tga':
       case 'xrd':
       case 'ms':
+      case 'cyclic volta':
       default:
         return false;
     }
@@ -323,6 +343,8 @@ class DemoWriteIr extends React.Component {
     } = this.state;
     const entity = this.loadEntity();
     const qDescVal = this.loadQuill();
+    
+    const multiEntities = this.loadMultiEntities();
 
     let operations = [
       { name: 'write peaks', value: this.writePeak },
@@ -445,6 +467,13 @@ class DemoWriteIr extends React.Component {
           <Button
             variant="contained"
             style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('cyclic volta')}
+          >
+            CV
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
             onClick={this.onClick('ms')}
           >
             MS
@@ -452,12 +481,8 @@ class DemoWriteIr extends React.Component {
         </div>
         <SpectraEditor
           entity={entity}
+          multiEntities={multiEntities}
           others={others}
-          forecast={forecast}
-          operations={operations}
-          descriptions={qDescVal}
-          style={{ fontFamily: 'Helvetica' }}
-          molSvg={molSvg}
           editorOnly={false}
           canChangeDescription={true}
           onDescriptionChanged={this.onDescriptionChanged}

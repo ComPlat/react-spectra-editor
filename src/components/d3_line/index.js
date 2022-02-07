@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 import {
   Topic2Seed, Feature2Peak, ToThresEndPts, ToShiftPeaks, ToFrequency,
-  GetComparisons
+  GetComparisons,
 } from '../../helpers/chem';
 import { resetAll } from '../../actions/manager';
 import { selectUiSweep, scrollUiWheel, clickUiTarget } from '../../actions/ui';
@@ -14,6 +14,7 @@ import {
   drawMain, drawLabel, drawDisplay, drawDestroy,
 } from '../common/draw';
 import { LIST_UI_SWEEP_TYPE, LIST_NON_BRUSH_TYPES } from '../../constants/list_ui';
+import { addNewCylicVoltaPairPeak, addCylicVoltaMaxPeak, addCylicVoltaMinPeak } from '../../actions/cyclic_voltammetry';
 
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.85); // ROI
@@ -71,7 +72,7 @@ class ViewerLine extends React.Component {
       seed, peak, cLabel, xLabel, yLabel, freq, comparisons,
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt, integationSt, mtplySt,
       sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
-      isHidden, wavelength
+      isHidden, wavelength,
     } = this.props;
     this.normChange(prevProps);
 
@@ -92,7 +93,7 @@ class ViewerLine extends React.Component {
       sweepExtentSt,
       isUiAddIntgSt,
       isUiNoBrushSt,
-      wavelength
+      wavelength,
     });
     drawLabel(this.rootKlass, cLabel, xLabel, yLabel);
     drawDisplay(this.rootKlass, isHidden);
@@ -142,6 +143,9 @@ const mapDispatchToProps = dispatch => (
     clickUiTargetAct: clickUiTarget,
     selectUiSweepAct: selectUiSweep,
     scrollUiWheelAct: scrollUiWheel,
+    addNewCylicVoltaPairPeakAct: addNewCylicVoltaPairPeak,
+    addCylicVoltaMaxPeakAct: addCylicVoltaMaxPeak,
+    addCylicVoltaMinPeakAct: addCylicVoltaMinPeak,
   }, dispatch)
 );
 
@@ -171,7 +175,7 @@ ViewerLine.propTypes = {
   selectUiSweepAct: PropTypes.func.isRequired,
   scrollUiWheelAct: PropTypes.func.isRequired,
   isHidden: PropTypes.bool.isRequired,
-  wavelength: PropTypes.object.isRequired
+  wavelength: PropTypes.object.isRequired,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ViewerLine);

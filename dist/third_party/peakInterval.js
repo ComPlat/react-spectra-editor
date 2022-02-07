@@ -26,6 +26,8 @@ var options = {
   derivativeThreshold: -1
 }; // https://github.com/mljs/global-spectral-deconvolution/blob/master/src/gsd.js
 
+/* eslint-disable no-plusplus, operator-linebreak */
+
 var getPeakIntervals = function getPeakIntervals(entity) {
   var data = entity.spectra[0].data[0];
 

@@ -61,14 +61,46 @@ var pksAddPos = function pksAddPos(dataPks, editPeakSt) {
 };
 
 var PksEdit = function PksEdit(dataPks, editPeakSt) {
-  var modDataPks = pksAddPos(dataPks, editPeakSt);
-  modDataPks = pksRmNeg(modDataPks, editPeakSt);
-  modDataPks = modDataPks.sort(function (a, b) {
+  var voltammetryPeak = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+  if (voltammetryPeak && voltammetryPeak.length > 0) {
+    var modDataPks = [];
+    voltammetryPeak.forEach(function (peak) {
+      if (peak.max) {
+        modDataPks = [].concat(_toConsumableArray(modDataPks), [peak.max]);
+      }
+      if (peak.min) {
+        modDataPks = [].concat(_toConsumableArray(modDataPks), [peak.min]);
+      }
+    });
+    modDataPks = modDataPks.sort(function (a, b) {
+      return a.x - b.x;
+    });
+    return modDataPks;
+  } else {
+    var _modDataPks = pksAddPos(dataPks, editPeakSt);
+    _modDataPks = pksRmNeg(_modDataPks, editPeakSt);
+    _modDataPks = _modDataPks.sort(function (a, b) {
+      return a.x - b.x;
+    });
+    return _modDataPks;
+  }
+};
+
+var PeckersEdit = function PeckersEdit(voltammetryPeak) {
+  var modDataPeckers = [];
+  voltammetryPeak.forEach(function (peak) {
+    if (peak.pecker) {
+      modDataPeckers = [].concat(_toConsumableArray(modDataPeckers), [peak.pecker]);
+    }
+  });
+  modDataPeckers = modDataPeckers.sort(function (a, b) {
     return a.x - b.x;
   });
-  return modDataPks;
+  return modDataPeckers;
 };
 
 exports.ToXY = ToXY;
 exports.PksEdit = PksEdit;
 exports.IsSame = IsSame;
+exports.PeckersEdit = PeckersEdit;

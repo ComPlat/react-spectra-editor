@@ -8,7 +8,9 @@ var _action_type = require('../constants/action_type');
 
 var initialState = {
   isEdit: true,
-  value: false
+  value: false,
+  upper: false,
+  lower: false
 };
 
 var thresholdReducer = function thresholdReducer() {
@@ -18,6 +20,10 @@ var thresholdReducer = function thresholdReducer() {
   switch (action.type) {
     case _action_type.THRESHOLD.UPDATE_VALUE:
       return Object.assign({}, state, { value: action.payload });
+    case _action_type.THRESHOLD.UPDATE_UPPER_VALUE:
+      return Object.assign({}, state, { upper: action.payload });
+    case _action_type.THRESHOLD.UPDATE_LOWER_VALUE:
+      return Object.assign({}, state, { lower: action.payload });
     case _action_type.THRESHOLD.RESET_VALUE:
       return Object.assign({}, state, { value: action.payload });
     case _action_type.THRESHOLD.TOGGLE_ISEDIT:

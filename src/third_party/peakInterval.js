@@ -1,5 +1,7 @@
 // https://github.com/mljs/global-spectral-deconvolution/blob/master/src/gsd.js
 
+/* eslint-disable no-plusplus, operator-linebreak */
+
 import SG from 'ml-savitzky-golay-generalized';
 
 const options = {
@@ -95,8 +97,7 @@ const getPeakIntervals = (entity) => {
     if (ddY[i] < ddY[i - 1] && ddY[i] < ddY[i + 1]) {
       // TODO should we change this to have 3 arrays ? Huge overhead creating arrays
       minddY[minddYLen++] = i; // ( [X[i], Y[i], i] );
-      broadMask[broadMaskLen++] =
-        Math.abs(ddY[i]) <= options.broadRatio * maxDdy;
+      broadMask[broadMaskLen++] = Math.abs(ddY[i]) <= options.broadRatio * maxDdy;
     }
   }
   return { intervalL, intervalR };

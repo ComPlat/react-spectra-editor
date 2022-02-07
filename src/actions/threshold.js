@@ -21,6 +21,21 @@ const toggleThresholdIsEdit = payload => (
   }
 );
 
+const updateUpperThresholdValue = payload => (
+  {
+    type: THRESHOLD.UPDATE_UPPER_VALUE,
+    payload,
+  }
+);
+
+const updateLowerThresholdValue = payload => (
+  {
+    type: THRESHOLD.UPDATE_LOWER_VALUE,
+    payload,
+  }
+);
+
 export {
   updateThresholdValue, resetThresholdValue, toggleThresholdIsEdit,
+  updateUpperThresholdValue, updateLowerThresholdValue,
 };

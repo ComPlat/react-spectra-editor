@@ -1,9 +1,9 @@
-import { XRD } from "../constants/action_type";
+import { XRD } from '../constants/action_type';
 
 const updateWaveLength = payload => (
   {
     type: XRD.UPDATE_WAVE_LENGTH,
-    payload: payload,
+    payload,
   }
 );
 

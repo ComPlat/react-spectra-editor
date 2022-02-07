@@ -69,6 +69,14 @@ var hideSolvent = function hideSolvent(layoutSt) {
   return !_format2.default.isNmrLayout(layoutSt);
 };
 
+var showTwoThreshold = function showTwoThreshold(layoutSt) {
+  return _format2.default.isCyclicVoltaLayout(layoutSt);
+};
+
+var hidePanelCyclicVolta = function hidePanelCyclicVolta(layoutSt) {
+  return !_format2.default.isCyclicVoltaLayout(layoutSt);
+};
+
 var Config = {
   btnCmdAnaViewer: btnCmdAnaViewer,
   hideCmdAnaViewer: hideCmdAnaViewer,
@@ -83,7 +91,9 @@ var Config = {
   hidePanelPeak: hidePanelPeak,
   hidePanelMpy: hidePanelMpy,
   hidePanelCompare: hidePanelCompare,
-  hideSolvent: hideSolvent
+  hideSolvent: hideSolvent,
+  showTwoThreshold: showTwoThreshold,
+  hidePanelCyclicVolta: hidePanelCyclicVolta
 };
 
 exports.default = Config;

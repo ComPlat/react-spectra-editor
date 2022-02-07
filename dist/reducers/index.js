@@ -70,6 +70,14 @@ var _reducer_wavelength = require('./reducer_wavelength');
 
 var _reducer_wavelength2 = _interopRequireDefault(_reducer_wavelength);
 
+var _reducer_voltammetry = require('./reducer_voltammetry');
+
+var _reducer_voltammetry2 = _interopRequireDefault(_reducer_voltammetry);
+
+var _reducer_curve = require('./reducer_curve');
+
+var _reducer_curve2 = _interopRequireDefault(_reducer_curve);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var rootReducer = (0, _redux.combineReducers)({
@@ -88,7 +96,9 @@ var rootReducer = (0, _redux.combineReducers)({
   simulation: _reducer_simulation2.default,
   meta: _reducer_meta2.default,
   jcamp: _reducer_jcamp2.default,
-  wavelength: _reducer_wavelength2.default
+  wavelength: _reducer_wavelength2.default,
+  cyclicvolta: _reducer_voltammetry2.default,
+  curve: _reducer_curve2.default
 });
 
 exports.default = rootReducer;

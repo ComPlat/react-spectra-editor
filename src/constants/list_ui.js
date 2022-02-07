@@ -19,6 +19,12 @@ const LIST_UI_SWEEP_TYPE = {
   PEAK_ADD: 'peak add',
   PEAK_DELETE: 'peak delete',
   ANCHOR_SHIFT: 'anchor shift',
+  CYCLIC_VOLTA_ADD_MAX_PEAK: 'cyclic voltammetry add max peak',
+  CYCLIC_VOLTA_RM_MAX_PEAK: 'cyclic voltammetry remove max peak',
+  CYCLIC_VOLTA_ADD_MIN_PEAK: 'cyclic voltammetry add min peak',
+  CYCLIC_VOLTA_RM_MIN_PEAK: 'cyclic voltammetry remove min peak',
+  CYCLIC_VOLTA_ADD_PECKER: 'cyclic voltammetry add pecker',
+  CYCLIC_VOLTA_RM_PECKER: 'cyclic voltammetry remove pecker',
 };
 
 const LIST_NON_BRUSH_TYPES = [
@@ -31,6 +37,12 @@ const LIST_NON_BRUSH_TYPES = [
   LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_RM,
   LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_CLICK,
   LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_RM,
+  LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MAX_PEAK,
+  LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MAX_PEAK,
+  LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MIN_PEAK,
+  LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MIN_PEAK,
+  LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_PECKER,
+  LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_PECKER,
 ];
 
 export {

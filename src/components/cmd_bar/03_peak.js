@@ -25,10 +25,28 @@ const Peak = ({
   isFocusAddPeakSt, disableAddPeakSt,
   isFocusRmPeakSt, disableRmPeakSt,
   isFocusSetRefSt, disableSetRefSt,
+  isHandleMaxAndMinPeaksSt,
+  cyclicVotaSt, curveSt
 }) => {
-  const onSweepPeakAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.PEAK_ADD);
-  const onSweepPeakDELETE = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.PEAK_DELETE);
+  let onSweepPeakAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.PEAK_ADD);
+  let onSweepPeakDELETE = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.PEAK_DELETE);
   const onSweepAnchorShift = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT);
+  if (isHandleMaxAndMinPeaksSt) {
+    const { curveIdx } = curveSt;
+    const { spectraList } = cyclicVotaSt;
+    const spectra = spectraList[curveIdx];
+    if (spectra) {
+      const { isWorkMaxPeak } = spectra;
+      if (isWorkMaxPeak) {
+        onSweepPeakAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MAX_PEAK, curveIdx);
+        onSweepPeakDELETE = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MAX_PEAK, curveIdx);
+      }
+      else {
+        onSweepPeakAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MIN_PEAK, curveIdx);
+        onSweepPeakDELETE = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MIN_PEAK, curveIdx);
+      } 
+    }
+  }
 
   return (
     <span className={classes.group}>
@@ -86,12 +104,15 @@ const Peak = ({
 
 const mapStateToProps = (state, _) => ( // eslint-disable-line
   {
-    isFocusAddPeakSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.PEAK_ADD,
+    isFocusAddPeakSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.PEAK_ADD || state.ui.sweepType === LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MAX_PEAK || state.ui.sweepType === LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MIN_PEAK,
     disableAddPeakSt: Cfg.btnCmdAddPeak(state.layout),
-    isFocusRmPeakSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.PEAK_DELETE,
+    isFocusRmPeakSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.PEAK_DELETE || state.ui.sweepType === LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MAX_PEAK || state.ui.sweepType === LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MIN_PEAK,
     disableRmPeakSt: Cfg.btnCmdRmPeak(state.layout),
     isFocusSetRefSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT,
     disableSetRefSt: Cfg.btnCmdSetRef(state.layout),
+    isHandleMaxAndMinPeaksSt: !Cfg.hidePanelCyclicVolta(state.layout),
+    cyclicVotaSt: state.cyclicvolta,
+    curveSt: state.curve,
   }
 );
 
@@ -110,6 +131,9 @@ Peak.propTypes = {
   isFocusSetRefSt: PropTypes.bool.isRequired,
   disableSetRefSt: PropTypes.bool.isRequired,
   setUiSweepTypeAct: PropTypes.func.isRequired,
+  isHandleMaxAndMinPeaksSt: PropTypes.bool.isRequired,
+  cyclicVotaSt: PropTypes.object.isRequired,
+  curveSt: PropTypes.object.isRequired,
 };
 
 export default compose(

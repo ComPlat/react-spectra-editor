@@ -24,7 +24,8 @@ const styles = () => (
 const onClickCb = (
   operation, peaksEdit, isAscend, isIntensity,
   scan, thres, layoutSt, shiftSt, analysis, decimalSt,
-  integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt
+  integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt,
+  cyclicvoltaSt, curveSt
 ) => (
   () => {
     operation({
@@ -41,7 +42,9 @@ const onClickCb = (
       multiplicity: multiplicitySt,
       allIntegration: allIntegrationSt,
       aucValues: aucValues,
-      waveLength: waveLengthSt
+      waveLength: waveLengthSt,
+      cyclicvoltaSt: cyclicvoltaSt,
+      curveSt: curveSt,
     });
   }
 );
@@ -50,7 +53,7 @@ const BtnSubmit = ({
   classes, operation, feature, isAscend, isIntensity,
   editPeakSt, thresSt, layoutSt, shiftSt, scanSt, forecastSt,
   decimalSt, integrationSt, multiplicitySt, allIntegrationSt,
-  waveLengthSt
+  waveLengthSt, cyclicvoltaSt, curveSt
 }) => {
   const peaksEdit = extractPeaksEdit(feature, editPeakSt, thresSt, shiftSt, layoutSt);
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
@@ -72,7 +75,8 @@ const BtnSubmit = ({
         onClick={onClickCb(
           operation.value, peaksEdit, isAscend, isIntensity,
           scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt,
-          integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt
+          integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt,
+          cyclicvoltaSt, curveSt
         )}
       >
         <PlayCircleOutlineIcon className={classes.icon} />
@@ -94,6 +98,8 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     multiplicitySt: state.multiplicity.present,
     allIntegrationSt: state.integration.past.concat(state.integration.present),
     waveLengthSt: state.wavelength,
+    cyclicvoltaSt: state.cyclicvolta,
+    curveSt: state.curve,
   }
 );
 
@@ -124,6 +130,7 @@ BtnSubmit.propTypes = {
   multiplicitySt: PropTypes.object.isRequired,
   allIntegrationSt: PropTypes.object.isRequired,
   waveLengthSt: PropTypes.object.isRequired,
+  cyclicvoltaSt: PropTypes.object.isRequired,
 };
 
 export default compose(

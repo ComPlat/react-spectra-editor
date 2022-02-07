@@ -48,7 +48,6 @@ var styles = function styles() {
 };
 
 var wavelengthSelect = function wavelengthSelect(classes, waveLengthSt, layoutSt, updateWaveLengthAct) {
-
   if (!_format2.default.isXRDLayout(layoutSt)) {
     return _react2.default.createElement('i', null);
   }
@@ -79,6 +78,7 @@ var wavelengthSelect = function wavelengthSelect(classes, waveLengthSt, layoutSt
         })
       },
       _list_wavelength.LIST_WAVE_LENGTH.map(function (item) {
+        // eslint-disable-line
         return _react2.default.createElement(
           _core.MenuItem,
           { value: item },

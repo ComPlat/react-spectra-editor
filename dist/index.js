@@ -114,6 +114,18 @@ var _xrd_jcamp_3 = require('./__tests__/fixtures/xrd_jcamp_2');
 
 var _xrd_jcamp_4 = _interopRequireDefault(_xrd_jcamp_3);
 
+var _cyclic_voltammetry_ = require('./__tests__/fixtures/cyclic_voltammetry_1');
+
+var _cyclic_voltammetry_2 = _interopRequireDefault(_cyclic_voltammetry_);
+
+var _cyclic_voltammetry_3 = require('./__tests__/fixtures/cyclic_voltammetry_2');
+
+var _cyclic_voltammetry_4 = _interopRequireDefault(_cyclic_voltammetry_3);
+
+var _cyclic_voltammetry_5 = require('./__tests__/fixtures/cyclic_voltammetry_3');
+
+var _cyclic_voltammetry_6 = _interopRequireDefault(_cyclic_voltammetry_5);
+
 var _qDescValue = require('./__tests__/fixtures/qDescValue');
 
 require('./__tests__/style/svg.css');
@@ -146,6 +158,9 @@ var hplcUVVisEntity = _app.FN.ExtractJcamp(_hplc_uvvis_jcamp2.default);
 var tgaEntity = _app.FN.ExtractJcamp(_tga_jcamp2.default);
 var xrdEntity1 = _app.FN.ExtractJcamp(_xrd_jcamp_2.default);
 var xrdEntity2 = _app.FN.ExtractJcamp(_xrd_jcamp_4.default);
+var cyclicVoltaEntity1 = _app.FN.ExtractJcamp(_cyclic_voltammetry_2.default);
+var cyclicVoltaEntity2 = _app.FN.ExtractJcamp(_cyclic_voltammetry_4.default);
+var cyclicVoltaEntity3 = _app.FN.ExtractJcamp(_cyclic_voltammetry_6.default);
 
 var DemoWriteIr = function (_React$Component) {
   _inherits(DemoWriteIr, _React$Component);
@@ -177,6 +192,7 @@ var DemoWriteIr = function (_React$Component) {
     _this.onShowOthers = _this.onShowOthers.bind(_this);
     _this.loadOthers = _this.loadOthers.bind(_this);
     _this.onDescriptionChanged = _this.onDescriptionChanged.bind(_this);
+    _this.loadMultiEntities = _this.loadMultiEntities.bind(_this);
     return _this;
   }
 
@@ -438,9 +454,23 @@ var DemoWriteIr = function (_React$Component) {
           return tgaEntity;
         case 'xrd':
           return xrdEntity1;
+        case 'cyclic volta':
+          return cyclicVoltaEntity2;
         case 'ms':
         default:
           return msEntity;
+      }
+    }
+  }, {
+    key: 'loadMultiEntities',
+    value: function loadMultiEntities() {
+      var typ = this.state.typ;
+
+      switch (typ) {
+        case 'cyclic volta':
+          return [cyclicVoltaEntity1, cyclicVoltaEntity2, cyclicVoltaEntity3];
+        default:
+          return false;
       }
     }
   }, {
@@ -467,6 +497,7 @@ var DemoWriteIr = function (_React$Component) {
         case 'tga':
         case 'xrd':
         case 'ms':
+        case 'cyclic volta':
         default:
           return false;
       }
@@ -509,6 +540,8 @@ var DemoWriteIr = function (_React$Component) {
 
       var entity = this.loadEntity();
       var qDescVal = this.loadQuill();
+
+      var multiEntities = this.loadMultiEntities();
 
       var operations = [{ name: 'write peaks', value: this.writePeak }, { name: 'save', value: this.savePeaks }].filter(function (r) {
         return r.value;
@@ -660,6 +693,15 @@ var DemoWriteIr = function (_React$Component) {
             {
               variant: 'contained',
               style: { margin: '0 10px 0 10px' },
+              onClick: this.onClick('cyclic volta')
+            },
+            'CV'
+          ),
+          _react2.default.createElement(
+            _Button2.default,
+            {
+              variant: 'contained',
+              style: { margin: '0 10px 0 10px' },
               onClick: this.onClick('ms')
             },
             'MS'
@@ -667,12 +709,8 @@ var DemoWriteIr = function (_React$Component) {
         ),
         _react2.default.createElement(_app.SpectraEditor, {
           entity: entity,
+          multiEntities: multiEntities,
           others: others,
-          forecast: forecast,
-          operations: operations,
-          descriptions: qDescVal,
-          style: { fontFamily: 'Helvetica' },
-          molSvg: molSvg,
           editorOnly: false,
           canChangeDescription: true,
           onDescriptionChanged: this.onDescriptionChanged
