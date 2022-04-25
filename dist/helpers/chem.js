@@ -585,8 +585,12 @@ var Convert2Thres = function Convert2Thres(feature, thresSt) {
 
 var Convert2DValue = function Convert2DValue(doubleTheta) {
   var lambda = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.15406;
+  var isRadian = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
 
   var theta = doubleTheta / 2;
+  if (isRadian) {
+    theta = theta / 180 * Math.PI;
+  }
   var sinTheta = Math.sin(theta);
   var dValue = lambda / (2 * sinTheta);
   return dValue;
