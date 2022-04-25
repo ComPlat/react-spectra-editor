@@ -450,14 +450,6 @@ var LineFocus = function () {
       var ignoreRef = _format2.default.isHplcUvVisLayout(this.layout);
       var itgs = isDisable ? [] : stack;
 
-      if (itgs.length === 0 || isDisable) {
-        // remove drawn are under curve
-        var auc = this.tags.aucPath.selectAll('path').data(stack);
-        auc.exit().attr('class', 'exit').remove();
-        auc.merge(auc);
-        return;
-      }
-
       var igbp = this.tags.igbPath.selectAll('path').data(itgs);
       igbp.exit().attr('class', 'exit').remove();
       var igcp = this.tags.igcPath.selectAll('path').data(itgs);
@@ -467,10 +459,10 @@ var LineFocus = function () {
       igtp.exit().attr('class', 'exit').remove();
 
       if (itgs.length === 0 || isDisable) {
-        // remove drawn are under curve
-        var _auc = this.tags.aucPath.selectAll('path').data(stack);
-        _auc.exit().attr('class', 'exit').remove();
-        _auc.merge(_auc);
+        // remove drawn area under curve
+        var auc = this.tags.aucPath.selectAll('path').data(stack);
+        auc.exit().attr('class', 'exit').remove();
+        auc.merge(auc);
         return;
       }
 

@@ -104,10 +104,12 @@ const aucValue = integration => {
     });
     sumVal = sumVal.toFixed(2);
     stackIntegration.forEach(inte => {
-      const areaVal = inte.absoluteArea.toFixed(2);
-      const percent = (areaVal*100/sumVal).toFixed(2);
-      const valStr = areaVal + " (" + percent + "%)";
-      values.push(valStr);
+      if (inte.absoluteArea) {
+        const areaVal = inte.absoluteArea.toFixed(2);
+        const percent = (areaVal*100/sumVal).toFixed(2);
+        const valStr = areaVal + " (" + percent + "%)";
+        values.push(valStr);
+      }
     })
   }
   return values.join(", ");
