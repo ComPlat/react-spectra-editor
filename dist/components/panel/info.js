@@ -149,10 +149,12 @@ var aucValue = function aucValue(integration) {
     });
     sumVal = sumVal.toFixed(2);
     stackIntegration.forEach(function (inte) {
-      var areaVal = inte.absoluteArea.toFixed(2);
-      var percent = (areaVal * 100 / sumVal).toFixed(2);
-      var valStr = areaVal + " (" + percent + "%)";
-      values.push(valStr);
+      if (inte.absoluteArea) {
+        var areaVal = inte.absoluteArea.toFixed(2);
+        var percent = (areaVal * 100 / sumVal).toFixed(2);
+        var valStr = areaVal + " (" + percent + "%)";
+        values.push(valStr);
+      }
     });
   }
   return values.join(", ");
