@@ -541,8 +541,11 @@ const Convert2Thres = (feature, thresSt) => {
   return value;
 };
 
-const Convert2DValue = (doubleTheta, lambda=0.15406) => {
-  const theta = doubleTheta/2;
+const Convert2DValue = (doubleTheta, lambda=0.15406, isRadian=true) => {
+  let theta = doubleTheta/2;
+  if (isRadian) {
+    theta = (theta/180)*Math.PI;
+  }
   const sinTheta = Math.sin(theta);
   const dValue = lambda/(2*sinTheta);
   return dValue;

@@ -388,16 +388,6 @@ class LineFocus {
     const ignoreRef = Format.isHplcUvVisLayout(this.layout);
     const itgs = isDisable ? [] : stack;
 
-    if (itgs.length === 0 || isDisable) {
-      // remove drawn are under curve
-      const auc = this.tags.aucPath.selectAll('path').data(stack);
-      auc.exit()
-        .attr('class', 'exit')
-        .remove();
-      auc.merge(auc)
-      return;
-    }
-
     const igbp = this.tags.igbPath.selectAll('path').data(itgs);
     igbp.exit()
       .attr('class', 'exit')
@@ -413,7 +403,7 @@ class LineFocus {
       .remove();
 
     if (itgs.length === 0 || isDisable) {
-      // remove drawn are under curve
+      // remove drawn area under curve
       const auc = this.tags.aucPath.selectAll('path').data(stack);
       auc.exit()
         .attr('class', 'exit')
