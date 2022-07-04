@@ -19,8 +19,9 @@ var MountTags = function MountTags(target) {
   var mpyt2Path = target.root.append('g').attr('class', 'mpyt2Path-clip').attr('clip-path', 'url(#clip)');
   var mpypPath = target.root.append('g').attr('class', 'mpypPath-clip').attr('clip-path', 'url(#clip)');
   var aucPath = target.root.append('g').attr('class', 'aucPath-clip').attr('clip-path', 'url(#clip)');
+  var peckerPath = target.root.append('g').attr('class', 'peckerPath-clip').attr('clip-path', 'url(#clip)');
   return {
-    pPath: pPath, bpPath: bpPath, bpTxt: bpTxt, igbPath: igbPath, igcPath: igcPath, igtPath: igtPath, mpybPath: mpybPath, mpyt1Path: mpyt1Path, mpyt2Path: mpyt2Path, mpypPath: mpypPath, aucPath: aucPath
+    pPath: pPath, bpPath: bpPath, bpTxt: bpTxt, igbPath: igbPath, igcPath: igcPath, igtPath: igtPath, mpybPath: mpybPath, mpyt1Path: mpyt1Path, mpyt2Path: mpyt2Path, mpypPath: mpypPath, aucPath: aucPath, peckerPath: peckerPath
   };
 };
 
@@ -42,7 +43,9 @@ var MountPath = function MountPath(target, color) {
 };
 
 var MountComparePath = function MountComparePath(target, color, id) {
-  var path = target.root.append('g').attr('class', 'line-clip-compare').attr('id', id).attr('clip-path', 'url(#clip)').append('path').attr('class', 'line').style('fill', 'none').style('stroke', color).style('stroke-width', 1).style('stroke-dasharray', '30, 3').on('click', function () {
+  var alpha = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
+
+  var path = target.root.append('g').attr('class', 'line-clip-compare').attr('id', id).attr('clip-path', 'url(#clip)').append('path').attr('class', 'line').style('fill', 'none').style('stroke', color).style('stroke-opacity', alpha).style('stroke-width', 1).style('stroke-dasharray', '30, 3').on('click', function () {
     return (0, _compass.ClickCompass)(target);
   });
   return path;

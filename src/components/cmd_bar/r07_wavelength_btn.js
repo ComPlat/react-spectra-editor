@@ -4,9 +4,10 @@ import { connect } from 'react-redux';
 import classNames from 'classnames';
 import { bindActionCreators } from 'redux';
 
-import { FormControl, InputLabel, Select, OutlinedInput, MenuItem } from '@material-ui/core';
+import {
+  FormControl, InputLabel, Select, OutlinedInput, MenuItem,
+} from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
-
 import { updateWaveLength } from '../../actions/wavelength';
 import Format from '../../helpers/format';
 import { commonStyle } from './common';
@@ -27,12 +28,11 @@ const styles = () => (
 );
 
 const wavelengthSelect = (classes, waveLengthSt, layoutSt, updateWaveLengthAct) => {
-
   if (!Format.isXRDLayout(layoutSt)) {
     return (
-      <i></i>
+      <i />
     );
-  } 
+  }
 
   const onChange = e => updateWaveLengthAct(e.target.value);
 
@@ -57,22 +57,23 @@ const wavelengthSelect = (classes, waveLengthSt, layoutSt, updateWaveLengthAct) 
         }
       >
         {
-          LIST_WAVE_LENGTH.map(item => {
+          LIST_WAVE_LENGTH.map(item => { // eslint-disable-line
             return (
               <MenuItem value={item}>
-                <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>{item.label} ({item.value} {item.unit})</span>
+                <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>
+                  {item.label} ({item.value} {item.unit})
+                </span>
               </MenuItem>
-            )
+            );
           })
         }
-        
       </Select>
     </FormControl>
   );
 };
 
 const Wavelength = ({
-  classes, waveLengthSt, layoutSt, updateWaveLengthAct
+  classes, waveLengthSt, layoutSt, updateWaveLengthAct,
 }) => (
   <span className={classes.groupRight}>
     { wavelengthSelect(classes, waveLengthSt, layoutSt, updateWaveLengthAct) }

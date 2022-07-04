@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Convert2DValue = exports.GetComparisons = exports.Convert2Thres = exports.Convert2Scan = exports.Convert2Peak = exports.ToFrequency = exports.ToShiftPeaks = exports.ToThresEndPts = exports.Feature2Peak = exports.Topic2Seed = exports.ExtractJcamp = undefined;
+exports.Convert2MaxMinPeak = exports.convertTopic = exports.Feature2MaxMinPeak = exports.GetCyclicVoltaPeakSeparate = exports.GetCyclicVoltaRatio = exports.Convert2DValue = exports.GetComparisons = exports.Convert2Thres = exports.Convert2Scan = exports.Convert2Peak = exports.ToFrequency = exports.ToShiftPeaks = exports.ToThresEndPts = exports.Feature2Peak = exports.Topic2Seed = exports.ExtractJcamp = undefined;
 
 var _jcampconverter = require('jcampconverter');
 
@@ -144,28 +144,123 @@ var getThreshold = function getThreshold(state) {
 };
 
 var Convert2Peak = function Convert2Peak(feature, threshold, offset) {
+  var upThreshold = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+  var lowThreshold = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+
   var peak = [];
   if (!feature || !feature.data) return peak;
   var data = feature.data[0];
   var maxY = feature.maxY,
       peakUp = feature.peakUp,
-      thresRef = feature.thresRef;
+      thresRef = feature.thresRef,
+      minY = feature.minY,
+      upperThres = feature.upperThres,
+      lowerThres = feature.lowerThres;
 
-  var thresVal = threshold || thresRef;
-  var yThres = thresVal * maxY / 100.0;
-  var corrOffset = offset || 0.0;
-  for (var i = 0; i < data.y.length; i += 1) {
-    var y = data.y[i];
-    var overThres = peakUp && Math.abs(y) >= yThres || !peakUp && Math.abs(y) <= yThres;
-    if (overThres) {
-      var x = data.x[i] - corrOffset;
-      peak.push({ x: x, y: y });
+
+  if (upperThres || lowerThres) {
+    var upperThresVal = upThreshold || upperThres;
+    if (!upperThresVal) {
+      upperThresVal = 1.0;
     }
+
+    var lowerThresVal = lowThreshold || lowerThres;
+    if (!lowerThresVal) {
+      lowerThresVal = 1.0;
+    }
+
+    var yUpperThres = parseFloat(upperThresVal) / 100.0 * maxY;
+    var yLowerThres = parseFloat(lowerThresVal) / 100.0 * minY;
+
+    var corrOffset = offset || 0.0;
+    for (var i = 0; i < data.y.length; i += 1) {
+      var y = data.y[i];
+      var overUpperThres = y >= yUpperThres;
+      var belowThres = y <= yLowerThres;
+      if (overUpperThres || belowThres) {
+        var x = data.x[i] - corrOffset;
+        peak.push({ x: x, y: y });
+      }
+    }
+    return peak;
+  } else {
+    var thresVal = threshold || thresRef;
+    var yThres = thresVal * maxY / 100.0;
+    var _corrOffset = offset || 0.0;
+    for (var _i = 0; _i < data.y.length; _i += 1) {
+      var _y = data.y[_i];
+      var overThres = peakUp && Math.abs(_y) >= yThres || !peakUp && Math.abs(_y) <= yThres;
+      if (overThres) {
+        var _x3 = data.x[_i] - _corrOffset;
+        peak.push({ x: _x3, y: _y });
+      }
+    }
+    return peak;
   }
-  return peak;
 };
 
 var Feature2Peak = (0, _reselect.createSelector)(getFeature, getThreshold, getShiftOffset, Convert2Peak);
+
+var Convert2MaxMinPeak = function Convert2MaxMinPeak(layout, feature, offset) {
+  var peaks = { max: [], min: [], pecker: [] };
+  if (!_format2.default.isCyclicVoltaLayout(layout) || !feature || !feature.data) return null;
+  var data = feature.data[0];
+  var maxY = feature.maxY,
+      minY = feature.minY,
+      upperThres = feature.upperThres,
+      lowerThres = feature.lowerThres,
+      volammetryData = feature.volammetryData;
+
+
+  if (volammetryData && volammetryData.length > 0) {
+    var maxArr = volammetryData.map(function (peakData) {
+      if (peakData.max.x === '') return null;
+      return { x: Number(peakData.max.x), y: Number(peakData.max.y) };
+    });
+    var minArr = volammetryData.map(function (peakData) {
+      if (peakData.min.x === '') return null;
+      return { x: Number(peakData.min.x), y: Number(peakData.min.y) };
+    });
+    var peckerArr = volammetryData.map(function (peakData) {
+      if (peakData.pecker.x === '') return null;
+      return { x: Number(peakData.pecker.x), y: Number(peakData.pecker.y) };
+    });
+
+    peaks.max = maxArr;
+    peaks.min = minArr;
+    peaks.pecker = peckerArr;
+    return peaks;
+  }
+
+  var upperThresVal = upperThres;
+  if (!upperThresVal) {
+    upperThresVal = 1.0;
+  }
+
+  var lowerThresVal = lowerThres;
+  if (!lowerThresVal) {
+    lowerThresVal = 1.0;
+  }
+
+  var yUpperThres = parseFloat(upperThresVal) / 100.0 * maxY;
+  var yLowerThres = parseFloat(lowerThresVal) / 100.0 * minY;
+
+  var corrOffset = offset || 0.0;
+  for (var i = 0; i < data.y.length; i += 1) {
+    var y = data.y[i];
+    var overUpperThres = y >= yUpperThres;
+    var belowThres = y <= yLowerThres;
+    var x = data.x[i] - corrOffset;
+    if (overUpperThres) {
+      peaks.max.push({ x: x, y: y });
+    } else if (belowThres) {
+      peaks.min.push({ x: x, y: y });
+    }
+  }
+  return peaks;
+};
+
+var Feature2MaxMinPeak = (0, _reselect.createSelector)(getLayout, getFeature, getShiftOffset, Convert2MaxMinPeak);
 
 var convertThresEndPts = function convertThresEndPts(feature, threshold) {
   var maxY = feature.maxY,
@@ -226,6 +321,9 @@ var readLayout = function readLayout(jcamp) {
     if (dataType.includes('MASS SPECTRUM')) {
       return _list_layout.LIST_LAYOUT.MS;
     }
+    if (dataType.includes('CYCLIC VOLTAMMETRY')) {
+      return _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY;
+    }
   }
   return false;
 };
@@ -260,6 +358,20 @@ var calcThresRef = function calcThresRef(s, peakUp) {
   return peakUp ? Math.floor(ref * 100 * 100 / s.maxY) / 100 : Math.ceil(ref * 100 * 100 / s.maxY) / 100;
 };
 
+var calcUpperThres = function calcUpperThres(s) {
+  var ys = s && s.data[0].y;
+  if (!ys) return null;
+  var ref = Math.max.apply(Math, _toConsumableArray(ys));
+  return Math.floor(ref * 100 * 100 / s.maxY) / 100;
+};
+
+var calcLowerThres = function calcLowerThres(s) {
+  var ys = s && s.data[0].y;
+  if (!ys) return null;
+  var ref = Math.min.apply(Math, _toConsumableArray(ys));
+  return Math.ceil(ref * 100 * 100 / s.minY) / 100;
+};
+
 var extractShift = function extractShift(s, jcamp) {
   var shift = {
     selectX: false,
@@ -284,7 +396,28 @@ var extractShift = function extractShift(s, jcamp) {
   };
 };
 
+var extractVoltammetryData = function extractVoltammetryData(jcamp) {
+  var info = jcamp.info;
+
+  if (!info.$CSCYCLICVOLTAMMETRYDATA) return null;
+  var regx = /[^0-9.,E,e,-]/g;
+  var rawData = info.$CSCYCLICVOLTAMMETRYDATA.split('\n');
+  var peakStack = rawData.map(function (line) {
+    var splittedLine = line.replace(regx, '').split(',');
+    return {
+      max: { x: splittedLine[0], y: splittedLine[1] },
+      min: { x: splittedLine[2], y: splittedLine[3] },
+      ratio: splittedLine[4],
+      delta: splittedLine[5],
+      pecker: { x: splittedLine[6], y: splittedLine[7] }
+    };
+  });
+  return peakStack;
+};
+
 var buildPeakFeature = function buildPeakFeature(jcamp, layout, peakUp, s, thresRef) {
+  var upperThres = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
+  var lowerThres = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : false;
   var xType = jcamp.xType,
       info = jcamp.info;
 
@@ -303,7 +436,10 @@ var buildPeakFeature = function buildPeakFeature(jcamp, layout, peakUp, s, thres
       nucleus: xType || ''
     },
     observeFrequency: info['.OBSERVEFREQUENCY'],
-    solventName: info['.SOLVENTNAME']
+    solventName: info['.SOLVENTNAME'],
+    upperThres: upperThres,
+    lowerThres: lowerThres,
+    volammetryData: extractVoltammetryData(jcamp)
   }, s);
 };
 
@@ -492,7 +628,9 @@ var extrFeaturesXrd = function extrFeaturesXrd(jcamp, layout, peakUp) {
   var base = jcamp.spectra[0];
 
   var features = jcamp.spectra.map(function (s) {
-    var cpo = buildPeakFeature(jcamp, layout, peakUp, s, 100);
+    var upperThres = _format2.default.isXRDLayout(layout) ? 100 : calcUpperThres(s);
+    var lowerThres = _format2.default.isXRDLayout(layout) ? 100 : calcLowerThres(s);
+    var cpo = buildPeakFeature(jcamp, layout, peakUp, s, 100, upperThres, lowerThres);
     var bnd = getBoundary(s);
     return Object.assign({}, base, cpo, bnd);
   }).filter(function (r) {
@@ -553,7 +691,7 @@ var extrFeaturesMs = function extrFeaturesMs(jcamp, layout, peakUp) {
 var ExtractJcamp = function ExtractJcamp(source) {
   var jcamp = _jcampconverter2.default.convert(source, {
     xy: true,
-    keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS)/ // eslint-disable-line
+    keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS|\$CSUPPERTHRESHOLD|\$CSLOWERTHRESHOLD|\$CSCYCLICVOLTAMMETRYDATA)/ // eslint-disable-line
   });
   var layout = readLayout(jcamp);
   var peakUp = !_format2.default.isIrLayout(layout);
@@ -562,7 +700,7 @@ var ExtractJcamp = function ExtractJcamp(source) {
   // const features = Format.isMsLayout(layout)
   //   ? extrFeaturesMs(jcamp, layout, peakUp)
   //   : extrFeaturesNi(jcamp, layout, peakUp, spectra);
-  var features = _format2.default.isMsLayout(layout) ? extrFeaturesMs(jcamp, layout, peakUp) : _format2.default.isXRDLayout(layout) ? extrFeaturesXrd(jcamp, layout, peakUp) : extrFeaturesNi(jcamp, layout, peakUp, spectra);
+  var features = _format2.default.isMsLayout(layout) ? extrFeaturesMs(jcamp, layout, peakUp) : _format2.default.isXRDLayout(layout) || _format2.default.isCyclicVoltaLayout(layout) ? extrFeaturesXrd(jcamp, layout, peakUp) : extrFeaturesNi(jcamp, layout, peakUp, spectra);
 
   return { spectra: spectra, features: features, layout: layout };
 };
@@ -596,6 +734,18 @@ var Convert2DValue = function Convert2DValue(doubleTheta) {
   return dValue;
 };
 
+var GetCyclicVoltaRatio = function GetCyclicVoltaRatio(y_max_peak, y_min_peak, y_pecker) {
+  var firstExpr = Math.abs(y_min_peak) / Math.abs(y_max_peak);
+  var secondExpr = 0.485 * Math.abs(y_pecker) / Math.abs(y_max_peak);
+  var ratio = firstExpr + secondExpr + 0.086;
+  return ratio;
+};
+
+var GetCyclicVoltaPeakSeparate = function GetCyclicVoltaPeakSeparate(x_max_peak, x_min_peak) {
+  var delta = Math.abs(x_max_peak - x_min_peak);
+  return delta;
+};
+
 exports.ExtractJcamp = ExtractJcamp;
 exports.Topic2Seed = Topic2Seed;
 exports.Feature2Peak = Feature2Peak;
@@ -607,3 +757,8 @@ exports.Convert2Scan = Convert2Scan;
 exports.Convert2Thres = Convert2Thres;
 exports.GetComparisons = GetComparisons;
 exports.Convert2DValue = Convert2DValue;
+exports.GetCyclicVoltaRatio = GetCyclicVoltaRatio;
+exports.GetCyclicVoltaPeakSeparate = GetCyclicVoltaPeakSeparate;
+exports.Feature2MaxMinPeak = Feature2MaxMinPeak;
+exports.convertTopic = convertTopic;
+exports.Convert2MaxMinPeak = Convert2MaxMinPeak;

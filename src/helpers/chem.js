@@ -111,23 +111,52 @@ const getThreshold = state => (
   state.threshold ? state.threshold.value * 1.0 : false
 );
 
-const Convert2Peak = (feature, threshold, offset) => {
+const Convert2Peak = (feature, threshold, offset, upThreshold=false, lowThreshold=false) => {
   const peak = [];
   if (!feature || !feature.data) return peak;
   const data = feature.data[0];
-  const { maxY, peakUp, thresRef } = feature;
-  const thresVal = threshold || thresRef;
-  const yThres = thresVal * maxY / 100.0;
-  const corrOffset = offset || 0.0;
-  for (let i = 0; i < data.y.length; i += 1) {
-    const y = data.y[i];
-    const overThres = (peakUp && Math.abs(y) >= yThres) || (!peakUp && Math.abs(y) <= yThres);
-    if (overThres) {
-      const x = data.x[i] - corrOffset;
-      peak.push({ x, y });
+  const { maxY, peakUp, thresRef, minY, upperThres, lowerThres } = feature;
+
+  if (upperThres || lowerThres) {
+    let upperThresVal = upThreshold || upperThres;
+    if (!upperThresVal) {
+      upperThresVal = 1.0;
     }
+
+    let lowerThresVal = lowThreshold || lowerThres;
+    if (!lowerThresVal) {
+      lowerThresVal = 1.0
+    }
+
+    const yUpperThres = parseFloat(upperThresVal) / 100.0 * maxY;
+    const yLowerThres = parseFloat(lowerThresVal) / 100.0 * minY;
+
+    const corrOffset = offset || 0.0;
+    for (let i = 0; i < data.y.length; i += 1) {
+      const y = data.y[i];
+      const overUpperThres = y >= yUpperThres;
+      const belowThres = y <= yLowerThres;
+      if (overUpperThres || belowThres) {
+        const x = data.x[i] - corrOffset;
+        peak.push({ x, y });
+      }
+    }
+    return peak;
   }
-  return peak;
+  else {
+    const thresVal = threshold || thresRef;
+    const yThres = thresVal * maxY / 100.0;
+    const corrOffset = offset || 0.0;
+    for (let i = 0; i < data.y.length; i += 1) {
+      const y = data.y[i];
+      const overThres = (peakUp && Math.abs(y) >= yThres) || (!peakUp && Math.abs(y) <= yThres);
+      if (overThres) {
+        const x = data.x[i] - corrOffset;
+        peak.push({ x, y });
+      }
+    }
+    return peak;
+  }
 };
 
 const Feature2Peak = createSelector(
@@ -135,6 +164,68 @@ const Feature2Peak = createSelector(
   getThreshold,
   getShiftOffset,
   Convert2Peak,
+);
+
+const Convert2MaxMinPeak = (layout, feature, offset) => {
+  const peaks = {max: [], min: [], pecker: []};
+  if (!Format.isCyclicVoltaLayout(layout) || !feature || !feature.data) return null;
+  const data = feature.data[0];
+  const { maxY, minY, upperThres, lowerThres, volammetryData } = feature;
+
+  if (volammetryData && volammetryData.length > 0) {
+    const maxArr = volammetryData.map((peakData) => {
+      if (peakData.max.x === '') return null
+      return {x: Number(peakData.max.x), y: Number(peakData.max.y)};
+    });
+    const minArr = volammetryData.map((peakData) => {
+      if (peakData.min.x === '') return null
+      return {x: Number(peakData.min.x), y: Number(peakData.min.y)};
+    });
+    const peckerArr = volammetryData.map((peakData) => {
+      if (peakData.pecker.x === '') return null
+      return {x: Number(peakData.pecker.x), y: Number(peakData.pecker.y)};
+    });
+    
+    peaks.max = maxArr;
+    peaks.min = minArr;
+    peaks.pecker = peckerArr;
+    return peaks;
+  }
+
+  let upperThresVal = upperThres;
+  if (!upperThresVal) {
+    upperThresVal = 1.0;
+  }
+
+  let lowerThresVal = lowerThres;
+  if (!lowerThresVal) {
+    lowerThresVal = 1.0
+  }
+
+  const yUpperThres = parseFloat(upperThresVal) / 100.0 * maxY;
+  const yLowerThres = parseFloat(lowerThresVal) / 100.0 * minY;
+
+  const corrOffset = offset || 0.0;
+  for (let i = 0; i < data.y.length; i += 1) {
+    const y = data.y[i];
+    const overUpperThres = y >= yUpperThres;
+    const belowThres = y <= yLowerThres;
+    const x = data.x[i] - corrOffset;
+    if (overUpperThres) {
+      peaks.max.push({ x, y });
+    }
+    else if (belowThres) {
+      peaks.min.push({ x, y });
+    }
+  }
+  return peaks;
+};
+
+const Feature2MaxMinPeak = createSelector(
+  getLayout,
+  getFeature,
+  getShiftOffset,
+  Convert2MaxMinPeak,
 );
 
 const convertThresEndPts = (feature, threshold) => {
@@ -199,6 +290,9 @@ const readLayout = (jcamp) => {
     if (dataType.includes('MASS SPECTRUM')) {
       return LIST_LAYOUT.MS;
     }
+    if (dataType.includes('CYCLIC VOLTAMMETRY')) {
+      return LIST_LAYOUT.CYCLIC_VOLTAMMETRY;
+    }
   }
   return false;
 };
@@ -229,6 +323,20 @@ const calcThresRef = (s, peakUp) => {
     : Math.ceil(ref * 100 * 100 / s.maxY) / 100;
 };
 
+const calcUpperThres = (s) => {
+  const ys = s && s.data[0].y;
+  if (!ys) return null;
+  const ref =  Math.max(...ys);
+  return Math.floor(ref * 100 * 100 / s.maxY) / 100;
+};
+
+const calcLowerThres = (s) => {
+  const ys = s && s.data[0].y;
+  if (!ys) return null;
+  const ref =  Math.min(...ys);
+  return Math.ceil(ref * 100 * 100 / s.minY) / 100;
+};
+
 const extractShift = (s, jcamp) => {
   const shift = {
     selectX: false,
@@ -253,7 +361,26 @@ const extractShift = (s, jcamp) => {
   };
 };
 
-const buildPeakFeature = (jcamp, layout, peakUp, s, thresRef) => {
+const extractVoltammetryData = (jcamp) => {
+  const { info } = jcamp;
+  if (!info.$CSCYCLICVOLTAMMETRYDATA) return null;
+  const regx = /[^0-9.,E,e,-]/g;
+  const rawData = info.$CSCYCLICVOLTAMMETRYDATA.split('\n');
+  const peakStack = rawData.map((line) => {
+    const splittedLine = line.replace(regx, '').split(',');
+    return {
+      max: {x: splittedLine[0], y: splittedLine[1]},
+      min: {x: splittedLine[2], y: splittedLine[3]},
+      ratio: splittedLine[4],
+      delta: splittedLine[5],
+      pecker: {x: splittedLine[6], y: splittedLine[7]},
+    };
+  });
+  return peakStack;
+};
+
+
+const buildPeakFeature = (jcamp, layout, peakUp, s, thresRef, upperThres=false, lowerThres=false) => {
   const { xType, info } = jcamp;
   const subTyp = xType ? ` - ${xType}` : '';
 
@@ -273,6 +400,9 @@ const buildPeakFeature = (jcamp, layout, peakUp, s, thresRef) => {
         },
         observeFrequency: info['.OBSERVEFREQUENCY'],
         solventName: info['.SOLVENTNAME'],
+        upperThres,
+        lowerThres,
+        volammetryData: extractVoltammetryData(jcamp),
       },
       s,
     )
@@ -452,13 +582,16 @@ const extrFeaturesXrd = (jcamp, layout, peakUp) => {
   const base = jcamp.spectra[0];
 
   const features = jcamp.spectra.map((s) => {
-    const cpo = buildPeakFeature(jcamp, layout, peakUp, s, 100);
+    const upperThres = Format.isXRDLayout(layout) ? 100 : calcUpperThres(s);
+    const lowerThres = Format.isXRDLayout(layout) ? 100 : calcLowerThres(s);
+    const cpo = buildPeakFeature(jcamp, layout, peakUp, s, 100, upperThres, lowerThres);
     const bnd = getBoundary(s);
     return Object.assign({}, base, cpo, bnd);
   }).filter(r => r != null);
 
   return features;
 }
+
 
 const getBoundary = (s) => {
   const { x, y } = s.data[0];
@@ -508,7 +641,7 @@ const ExtractJcamp = (source) => {
     source,
     {
       xy: true,
-      keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS)/, // eslint-disable-line
+      keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS|\$CSUPPERTHRESHOLD|\$CSLOWERTHRESHOLD|\$CSCYCLICVOLTAMMETRYDATA)/, // eslint-disable-line
     },
   );
   const layout = readLayout(jcamp);
@@ -522,7 +655,7 @@ const ExtractJcamp = (source) => {
   //   : extrFeaturesNi(jcamp, layout, peakUp, spectra);
   const features = Format.isMsLayout(layout)
     ? extrFeaturesMs(jcamp, layout, peakUp)
-    : (Format.isXRDLayout(layout)
+    : ((Format.isXRDLayout(layout) || Format.isCyclicVoltaLayout(layout))
       ? extrFeaturesXrd(jcamp, layout, peakUp) : extrFeaturesNi(jcamp, layout, peakUp, spectra));
 
   return { spectra, features, layout };
@@ -551,9 +684,23 @@ const Convert2DValue = (doubleTheta, lambda=0.15406, isRadian=true) => {
   return dValue;
 };
 
+const GetCyclicVoltaRatio = (y_max_peak, y_min_peak, y_pecker) => {
+  const firstExpr = Math.abs(y_min_peak) / Math.abs(y_max_peak);
+  const secondExpr = 0.485 * Math.abs(y_pecker) / Math.abs(y_max_peak);
+  const ratio = firstExpr + secondExpr + 0.086;
+  return ratio;
+};
+
+const GetCyclicVoltaPeakSeparate = (x_max_peak, x_min_peak) => {
+  const delta = Math.abs(x_max_peak - x_min_peak);
+  return delta;
+};
+
 export {
   ExtractJcamp, Topic2Seed, Feature2Peak,
   ToThresEndPts, ToShiftPeaks, ToFrequency,
   Convert2Peak, Convert2Scan, Convert2Thres,
-  GetComparisons, Convert2DValue
+  GetComparisons, Convert2DValue,
+  GetCyclicVoltaRatio, GetCyclicVoltaPeakSeparate,
+  Feature2MaxMinPeak, convertTopic, Convert2MaxMinPeak
 };

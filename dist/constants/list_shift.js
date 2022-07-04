@@ -107,7 +107,7 @@ var cDmsoD6 = {
   name: 'DMSO-d6',
   value: 39.51,
   label: 'DMSO-d6',
-  nsdb: 'Dimethylsulphoxide-D6 (DMSO-D6, C2D6SO))'
+  nsdb: 'Dimethylsulphoxide-D6 (DMSO-D6, C2D6SO)'
 };
 
 var cEthanolD6Sep = {
@@ -320,7 +320,7 @@ var hDMSOD6Quin = {
   name: 'DMSO-d6 (quin)',
   value: 2.50,
   label: 'DMSO-d6',
-  nsdb: 'Dimethylsulphoxide-D6 (DMSO-D6, C2D6SO))'
+  nsdb: 'Dimethylsulphoxide-D6 (DMSO-D6, C2D6SO)'
 };
 
 var hEthanolD6Broad1 = {

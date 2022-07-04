@@ -15,9 +15,11 @@ var setUiViewerType = function setUiViewerType(payload) {
 };
 
 var setUiSweepType = function setUiSweepType(payload) {
+  var jcampIdx = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
   return {
     type: _action_type.UI.SWEEP.SET_TYPE,
-    payload: payload
+    payload: payload,
+    jcampIdx: jcampIdx
   };
 };
 
@@ -36,10 +38,16 @@ var scrollUiWheel = function scrollUiWheel(payload) {
 };
 
 var clickUiTarget = function clickUiTarget(payload, onPeak) {
+  var voltammetryPeakIdx = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+  var jcampIdx = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+  var onPecker = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
   return {
     type: _action_type.UI.CLICK_TARGET,
     payload: payload,
-    onPeak: onPeak
+    onPeak: onPeak,
+    voltammetryPeakIdx: voltammetryPeakIdx,
+    jcampIdx: jcampIdx,
+    onPecker: onPecker
   };
 };
 

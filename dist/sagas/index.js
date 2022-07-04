@@ -27,6 +27,10 @@ var _saga_multiplicity = require('./saga_multiplicity');
 
 var _saga_multiplicity2 = _interopRequireDefault(_saga_multiplicity);
 
+var _saga_multi_entities = require('./saga_multi_entities');
+
+var _saga_multi_entities2 = _interopRequireDefault(_saga_multi_entities);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var _marked = /*#__PURE__*/regeneratorRuntime.mark(rootSaga);
@@ -39,7 +43,7 @@ function rootSaga() {
       switch (_context.prev = _context.next) {
         case 0:
           _context.next = 2;
-          return (0, _effects.all)([].concat(_toConsumableArray(_saga_edit_peak2.default), _toConsumableArray(_saga_manager2.default), _toConsumableArray(_saga_ui2.default), _toConsumableArray(_saga_meta2.default), _toConsumableArray(_saga_multiplicity2.default)));
+          return (0, _effects.all)([].concat(_toConsumableArray(_saga_edit_peak2.default), _toConsumableArray(_saga_manager2.default), _toConsumableArray(_saga_ui2.default), _toConsumableArray(_saga_meta2.default), _toConsumableArray(_saga_multiplicity2.default), _toConsumableArray(_saga_multi_entities2.default)));
 
         case 2:
         case 'end':

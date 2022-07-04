@@ -11,6 +11,8 @@ import { updateMetaPeaks } from './actions/meta';
 import { addOthers } from './actions/jcamp';
 import LayerPrism from './layer_prism';
 import Format from './helpers/format';
+import MultiJcampsViewer from './components/multi_jcamps_viewer';
+import { setAllCurves } from './actions/curve';
 
 const styles = () => ({
 });
@@ -23,17 +25,20 @@ class LayerInit extends React.Component {
     this.execReset = this.execReset.bind(this);
     this.initReducer = this.initReducer.bind(this);
     this.updateOthers = this.updateOthers.bind(this);
+    this.updateMultiEntities = this.updateMultiEntities.bind(this);
   }
 
   componentDidMount() {
     this.execReset();
     this.initReducer();
     this.updateOthers();
+    this.updateMultiEntities();
   }
 
   componentDidUpdate(prevProps) {
     this.normChange(prevProps);
     this.updateOthers();
+    this.updateMultiEntities();
   }
 
   normChange(prevProps) {
@@ -88,16 +93,46 @@ class LayerInit extends React.Component {
     addOthersAct(others);
   }
 
+  updateMultiEntities() {
+    const { multiEntities, setAllCurvesAct,
+    } = this.props;
+    setAllCurvesAct(multiEntities);
+  }
+
   render() {
     const {
       entity, cLabel, xLabel, yLabel, forecast, operations,
       descriptions, molSvg, editorOnly,
-      canChangeDescription, onDescriptionChanged
+      canChangeDescription, onDescriptionChanged,
+      multiEntities, entityFileNames
     } = this.props;
     const target = entity.spectra[0];
 
+    const { layout } = entity;
+
     const xxLabel = !xLabel && xLabel === '' ? `X (${target.xUnit})` : xLabel;
     const yyLabel = !yLabel && yLabel === '' ? `Y (${target.yUnit})` : yLabel;
+
+    if (multiEntities) {
+      return (
+        <MultiJcampsViewer 
+          multiEntities={multiEntities}
+          entityFileNames={entityFileNames}
+          molSvg={molSvg}
+          operations={operations}
+        />
+      )
+    }
+    else if (Format.isCyclicVoltaLayout(layout)) {
+      return (
+        <MultiJcampsViewer 
+          multiEntities={[entity]}
+          entityFileNames={entityFileNames}
+          molSvg={molSvg}
+          operations={operations}
+        />
+      )
+    }
 
     return (
       <LayerPrism
@@ -130,11 +165,14 @@ const mapDispatchToProps = dispatch => (
     updateOperationAct: updateOperation,
     updateMetaPeaksAct: updateMetaPeaks,
     addOthersAct: addOthers,
+    setAllCurvesAct: setAllCurves,
   }, dispatch)
 );
 
 LayerInit.propTypes = {
   entity: PropTypes.object.isRequired,
+  multiEntities: PropTypes.array,
+  entityFileNames: PropTypes.array,
   others: PropTypes.object.isRequired,
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
@@ -152,7 +190,8 @@ LayerInit.propTypes = {
   updateMetaPeaksAct: PropTypes.func.isRequired,
   addOthersAct: PropTypes.func.isRequired,
   canChangeDescription: PropTypes.bool.isRequired,
-  onDescriptionChanged: PropTypes.func
+  onDescriptionChanged: PropTypes.func,
+  setAllCurvesAct: PropTypes.func.isRequired,
 };
 
 export default connect(

@@ -10,6 +10,7 @@ const spectraDigit = (layout) => {
     case LIST_LAYOUT.HPLC_UVVIS:
     case LIST_LAYOUT.TGA:
     case LIST_LAYOUT.XRD:
+    case LIST_LAYOUT.CYCLIC_VOLTAMMETRY:
     case LIST_LAYOUT.MS:
       return 0;
     case LIST_LAYOUT.C13:
@@ -61,6 +62,7 @@ const spectraOps = {
   [LIST_LAYOUT.TGA]: { head: 'THERMOGRAVIMETRIC ANALYSIS', tail: ' SECONDS' },
   [LIST_LAYOUT.MS]: { head: 'MASS', tail: ' m/z' },
   [LIST_LAYOUT.XRD]: { head: 'X-RAY DIFFRACTION', tail: '.' },
+  [LIST_LAYOUT.CYCLIC_VOLTAMMETRY]: { head: 'CYCLIC VOLTAMMETRY', tail: '.' },
 };
 
 const rmRef = (peaks, shift) => {
@@ -244,6 +246,9 @@ const peaksBody = ({
   if (layout === LIST_LAYOUT.XRD) {
     return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
+  if (layout === LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
+    return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
+  }
   return ordered.map(o => fixDigit(o.x, decimal)).join(', ');
 };
 
@@ -277,6 +282,7 @@ const isUvVisLayout = layoutSt => (LIST_LAYOUT.UVVIS === layoutSt);
 const isHplcUvVisLayout = layoutSt => (LIST_LAYOUT.HPLC_UVVIS === layoutSt);
 const isTGALayout = layoutSt => (LIST_LAYOUT.TGA === layoutSt);
 const isXRDLayout = layoutSt => (LIST_LAYOUT.XRD === layoutSt);
+const isCyclicVoltaLayout = layoutSt => (LIST_LAYOUT.CYCLIC_VOLTAMMETRY === layoutSt);
 const isEmWaveLayout = layoutSt => (
   [LIST_LAYOUT.IR, LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS, LIST_LAYOUT.HPLC_UVVIS].indexOf(layoutSt) >= 0
 );
@@ -331,6 +337,8 @@ const formatPeaksByPrediction = (
 
 const compareColors = idx => ['#ABB2B9', '#EDBB99', '#ABEBC6', '#D2B4DE', '#F9E79F'][idx % 5];
 
+const mutiEntitiesColors = idx => ['#fa8231', '#f7b731', '#0fb9b1', '#2d98da', '#3867d6', '#8854d0', '#4b6584'][idx % 7];
+
 const Format = {
   toPeakStr,
   buildData,
@@ -354,6 +362,7 @@ const Format = {
   isHplcUvVisLayout,
   isTGALayout,
   isXRDLayout,
+  isCyclicVoltaLayout,
   isEmWaveLayout,
   fixDigit,
   formatPeaksByPrediction,
@@ -361,6 +370,7 @@ const Format = {
   formatedEm,
   calcMpyCenter,
   compareColors,
+  mutiEntitiesColors,
 };
 
 export default Format;

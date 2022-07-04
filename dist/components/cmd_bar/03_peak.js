@@ -54,7 +54,10 @@ var Peak = function Peak(_ref) {
       isFocusRmPeakSt = _ref.isFocusRmPeakSt,
       disableRmPeakSt = _ref.disableRmPeakSt,
       isFocusSetRefSt = _ref.isFocusSetRefSt,
-      disableSetRefSt = _ref.disableSetRefSt;
+      disableSetRefSt = _ref.disableSetRefSt,
+      isHandleMaxAndMinPeaksSt = _ref.isHandleMaxAndMinPeaksSt,
+      cyclicVotaSt = _ref.cyclicVotaSt,
+      curveSt = _ref.curveSt;
 
   var onSweepPeakAdd = function onSweepPeakAdd() {
     return setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.PEAK_ADD);
@@ -65,6 +68,31 @@ var Peak = function Peak(_ref) {
   var onSweepAnchorShift = function onSweepAnchorShift() {
     return setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT);
   };
+  if (isHandleMaxAndMinPeaksSt) {
+    var curveIdx = curveSt.curveIdx;
+    var spectraList = cyclicVotaSt.spectraList;
+
+    var spectra = spectraList[curveIdx];
+    if (spectra) {
+      var isWorkMaxPeak = spectra.isWorkMaxPeak;
+
+      if (isWorkMaxPeak) {
+        onSweepPeakAdd = function onSweepPeakAdd() {
+          return setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MAX_PEAK, curveIdx);
+        };
+        onSweepPeakDELETE = function onSweepPeakDELETE() {
+          return setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MAX_PEAK, curveIdx);
+        };
+      } else {
+        onSweepPeakAdd = function onSweepPeakAdd() {
+          return setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MIN_PEAK, curveIdx);
+        };
+        onSweepPeakDELETE = function onSweepPeakDELETE() {
+          return setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MIN_PEAK, curveIdx);
+        };
+      }
+    }
+  }
 
   return _react2.default.createElement(
     'span',
@@ -146,12 +174,15 @@ var Peak = function Peak(_ref) {
 var mapStateToProps = function mapStateToProps(state, _) {
   return (// eslint-disable-line
     {
-      isFocusAddPeakSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.PEAK_ADD,
+      isFocusAddPeakSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.PEAK_ADD || state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MAX_PEAK || state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MIN_PEAK,
       disableAddPeakSt: _cfg2.default.btnCmdAddPeak(state.layout),
-      isFocusRmPeakSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.PEAK_DELETE,
+      isFocusRmPeakSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.PEAK_DELETE || state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MAX_PEAK || state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MIN_PEAK,
       disableRmPeakSt: _cfg2.default.btnCmdRmPeak(state.layout),
       isFocusSetRefSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT,
-      disableSetRefSt: _cfg2.default.btnCmdSetRef(state.layout)
+      disableSetRefSt: _cfg2.default.btnCmdSetRef(state.layout),
+      isHandleMaxAndMinPeaksSt: !_cfg2.default.hidePanelCyclicVolta(state.layout),
+      cyclicVotaSt: state.cyclicvolta,
+      curveSt: state.curve
     }
   );
 };
@@ -170,7 +201,10 @@ Peak.propTypes = {
   disableRmPeakSt: _propTypes2.default.bool.isRequired,
   isFocusSetRefSt: _propTypes2.default.bool.isRequired,
   disableSetRefSt: _propTypes2.default.bool.isRequired,
-  setUiSweepTypeAct: _propTypes2.default.func.isRequired
+  setUiSweepTypeAct: _propTypes2.default.func.isRequired,
+  isHandleMaxAndMinPeaksSt: _propTypes2.default.bool.isRequired,
+  cyclicVotaSt: _propTypes2.default.object.isRequired,
+  curveSt: _propTypes2.default.object.isRequired
 };
 
 exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(Peak);

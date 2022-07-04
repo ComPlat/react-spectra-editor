@@ -40,6 +40,10 @@ const hidePanelCompare = layoutSt => !(Format.isIrLayout(layoutSt) || Format.isH
 
 const hideSolvent = layoutSt => !Format.isNmrLayout(layoutSt);
 
+const showTwoThreshold = layoutSt => Format.isCyclicVoltaLayout(layoutSt);
+
+const hidePanelCyclicVolta = layoutSt => !Format.isCyclicVoltaLayout(layoutSt);
+
 const Config = {
   btnCmdAnaViewer,
   hideCmdAnaViewer,
@@ -55,6 +59,8 @@ const Config = {
   hidePanelMpy,
   hidePanelCompare,
   hideSolvent,
+  showTwoThreshold,
+  hidePanelCyclicVolta
 };
 
 export default Config;
