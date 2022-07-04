@@ -61,6 +61,7 @@ var LineFocus = function () {
         scrollUiWheelAct = props.scrollUiWheelAct;
 
 
+    this.jcampIdx = 0;
     this.rootKlass = '.d3Line';
     this.margin = {
       t: 5,
@@ -374,7 +375,8 @@ var LineFocus = function () {
           sameDtPk = _shouldUpdate3.sameDtPk,
           sameSfPk = _shouldUpdate3.sameSfPk;
 
-      if (sameXY && sameEpSt && sameDtPk && sameSfPk) return;
+
+      if (!_format2.default.isCyclicVoltaLayout(this.layout) && sameXY && sameEpSt && sameDtPk && sameSfPk) return;
 
       // rescale for zoom
 
@@ -753,7 +755,7 @@ var LineFocus = function () {
   }, {
     key: 'reverseXAxis',
     value: function reverseXAxis(layoutSt) {
-      return [_list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS, _list_layout.LIST_LAYOUT.TGA, _list_layout.LIST_LAYOUT.XRD].indexOf(layoutSt) < 0;
+      return [_list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS, _list_layout.LIST_LAYOUT.TGA, _list_layout.LIST_LAYOUT.XRD, _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY].indexOf(layoutSt) < 0;
     }
   }, {
     key: 'create',

@@ -20,7 +20,7 @@ var _reactRedux = require('react-redux');
 
 var _redux = require('redux');
 
-var _reactSvgFileZoomPan = require('react-svg-file-zoom-pan');
+var _reactSvgFileZoomPan = require('@complat/react-svg-file-zoom-pan');
 
 var _reactSvgFileZoomPan2 = _interopRequireDefault(_reactSvgFileZoomPan);
 

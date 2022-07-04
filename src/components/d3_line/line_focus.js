@@ -23,6 +23,7 @@ class LineFocus {
       W, H, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
     } = props;
 
+    this.jcampIdx = 0;
     this.rootKlass = '.d3Line';
     this.margin = {
       t: 5,
@@ -302,7 +303,8 @@ class LineFocus {
     const {
       sameXY, sameEpSt, sameDtPk, sameSfPk,
     } = this.shouldUpdate;
-    if (sameXY && sameEpSt && sameDtPk && sameSfPk) return;
+
+    if (!Format.isCyclicVoltaLayout(this.layout) && sameXY && sameEpSt && sameDtPk && sameSfPk) return;
 
     // rescale for zoom
     const { xt, yt } = TfRescale(this);
@@ -776,7 +778,7 @@ class LineFocus {
   }
 
   reverseXAxis(layoutSt) {
-    return [LIST_LAYOUT.UVVIS, LIST_LAYOUT.HPLC_UVVIS, LIST_LAYOUT.TGA, LIST_LAYOUT.XRD].indexOf(layoutSt) < 0;
+    return [LIST_LAYOUT.UVVIS, LIST_LAYOUT.HPLC_UVVIS, LIST_LAYOUT.TGA, LIST_LAYOUT.XRD, LIST_LAYOUT.CYCLIC_VOLTAMMETRY].indexOf(layoutSt) < 0;
   }
 
   create({
@@ -823,7 +825,7 @@ class LineFocus {
     filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, comparisons,
     editPeakSt, layoutSt, integationSt, mtplySt,
     sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
-    wavelength
+    wavelength,
   }) {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, this.reverseXAxis(layoutSt));

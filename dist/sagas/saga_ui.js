@@ -205,12 +205,12 @@ var getUiSweepType = function getUiSweepType(state) {
 };
 
 function clickUiTarget(action) {
-  var payload, onPeak, uiSweepType, xExtent, xL, xU;
+  var payload, onPeak, voltammetryPeakIdx, onPecker, jcampIdx, uiSweepType, xExtent, xL, xU;
   return regeneratorRuntime.wrap(function clickUiTarget$(_context3) {
     while (1) {
       switch (_context3.prev = _context3.next) {
         case 0:
-          payload = action.payload, onPeak = action.onPeak;
+          payload = action.payload, onPeak = action.onPeak, voltammetryPeakIdx = action.voltammetryPeakIdx, onPecker = action.onPecker, jcampIdx = action.jcampIdx;
           _context3.next = 3;
           return (0, _effects.select)(getUiSweepType);
 
@@ -229,7 +229,7 @@ function clickUiTarget(action) {
           });
 
         case 7:
-          _context3.next = 54;
+          _context3.next = 84;
           break;
 
         case 9:
@@ -245,7 +245,7 @@ function clickUiTarget(action) {
           });
 
         case 12:
-          _context3.next = 54;
+          _context3.next = 84;
           break;
 
         case 14:
@@ -261,7 +261,7 @@ function clickUiTarget(action) {
           });
 
         case 17:
-          _context3.next = 54;
+          _context3.next = 84;
           break;
 
         case 19:
@@ -277,7 +277,7 @@ function clickUiTarget(action) {
           });
 
         case 22:
-          _context3.next = 54;
+          _context3.next = 84;
           break;
 
         case 24:
@@ -293,7 +293,7 @@ function clickUiTarget(action) {
           });
 
         case 27:
-          _context3.next = 54;
+          _context3.next = 84;
           break;
 
         case 29:
@@ -309,7 +309,7 @@ function clickUiTarget(action) {
           });
 
         case 32:
-          _context3.next = 54;
+          _context3.next = 84;
           break;
 
         case 34:
@@ -348,7 +348,7 @@ function clickUiTarget(action) {
           });
 
         case 44:
-          _context3.next = 54;
+          _context3.next = 84;
           break;
 
         case 46:
@@ -364,12 +364,12 @@ function clickUiTarget(action) {
           });
 
         case 49:
-          _context3.next = 54;
+          _context3.next = 84;
           break;
 
         case 51:
           if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_RM && onPeak)) {
-            _context3.next = 54;
+            _context3.next = 56;
             break;
           }
 
@@ -380,6 +380,102 @@ function clickUiTarget(action) {
           });
 
         case 54:
+          _context3.next = 84;
+          break;
+
+        case 56:
+          if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MAX_PEAK && !onPeak)) {
+            _context3.next = 61;
+            break;
+          }
+
+          _context3.next = 59;
+          return (0, _effects.put)({
+            type: _action_type.CYCLIC_VOLTA_METRY.ADD_MAX_PEAK,
+            payload: { peak: payload, index: voltammetryPeakIdx, jcampIdx: jcampIdx }
+          });
+
+        case 59:
+          _context3.next = 84;
+          break;
+
+        case 61:
+          if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MAX_PEAK && onPeak)) {
+            _context3.next = 66;
+            break;
+          }
+
+          _context3.next = 64;
+          return (0, _effects.put)({
+            type: _action_type.CYCLIC_VOLTA_METRY.REMOVE_MAX_PEAK,
+            payload: { index: voltammetryPeakIdx, jcampIdx: jcampIdx }
+          });
+
+        case 64:
+          _context3.next = 84;
+          break;
+
+        case 66:
+          if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MIN_PEAK && !onPeak)) {
+            _context3.next = 71;
+            break;
+          }
+
+          _context3.next = 69;
+          return (0, _effects.put)({
+            type: _action_type.CYCLIC_VOLTA_METRY.ADD_MIN_PEAK,
+            payload: { peak: payload, index: voltammetryPeakIdx, jcampIdx: jcampIdx }
+          });
+
+        case 69:
+          _context3.next = 84;
+          break;
+
+        case 71:
+          if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MIN_PEAK && onPeak)) {
+            _context3.next = 76;
+            break;
+          }
+
+          _context3.next = 74;
+          return (0, _effects.put)({
+            type: _action_type.CYCLIC_VOLTA_METRY.REMOVE_MIN_PEAK,
+            payload: { index: voltammetryPeakIdx, jcampIdx: jcampIdx }
+          });
+
+        case 74:
+          _context3.next = 84;
+          break;
+
+        case 76:
+          if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_PECKER && !onPecker)) {
+            _context3.next = 81;
+            break;
+          }
+
+          _context3.next = 79;
+          return (0, _effects.put)({
+            type: _action_type.CYCLIC_VOLTA_METRY.ADD_PECKER,
+            payload: { peak: payload, index: voltammetryPeakIdx, jcampIdx: jcampIdx }
+          });
+
+        case 79:
+          _context3.next = 84;
+          break;
+
+        case 81:
+          if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_PECKER && onPecker)) {
+            _context3.next = 84;
+            break;
+          }
+
+          _context3.next = 84;
+          return (0, _effects.put)({
+            type: _action_type.CYCLIC_VOLTA_METRY.REMOVE_PECKER,
+            payload: { index: voltammetryPeakIdx, jcampIdx: jcampIdx }
+          });
+
+        case 84:
         case 'end':
           return _context3.stop();
       }

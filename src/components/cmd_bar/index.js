@@ -16,6 +16,7 @@ import Layout from './r01_layout';
 import Threshold from './r03_threshold';
 import Submit from './r04_submit';
 import Wavelength from './r07_wavelength_btn';
+import Pecker from './07_pecker';
 
 const styles = () => (
   Object.assign(
@@ -28,12 +29,13 @@ const styles = () => (
 );
 
 const CmdBar = ({
-  classes, feature, hasEdit, forecast, operations, editorOnly,
+  classes, feature, hasEdit, forecast, operations, editorOnly, jcampIdx, hideThreshold,
 }) => (
   <div className={classes.card}>
     <Viewer editorOnly={editorOnly} />
     <Zoom />
-    <Peak />
+    <Peak jcampIdx={jcampIdx}/>
+    <Pecker jcampIdx={jcampIdx} />
     <Integration />
     <Multiplicity />
     <UndoRedo />
@@ -45,7 +47,9 @@ const CmdBar = ({
       hideSwitch={false}
       disabled={false}
     />
-    <Threshold feature={feature} hasEdit={hasEdit} />
+    {
+      hideThreshold ? null : (<Threshold feature={feature} hasEdit={hasEdit} />)
+    }
     <Layout feature={feature} hasEdit={hasEdit} />
     <Wavelength />
   </div>
@@ -68,6 +72,8 @@ CmdBar.propTypes = {
   hasEdit: PropTypes.bool.isRequired,
   operations: PropTypes.array.isRequired,
   editorOnly: PropTypes.bool.isRequired,
+  jcampIdx: PropTypes.any,
+  hideThreshold: PropTypes.bool,
 };
 
 export default compose(

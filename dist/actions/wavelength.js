@@ -1,11 +1,11 @@
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.updateWaveLength = undefined;
 
-var _action_type = require("../constants/action_type");
+var _action_type = require('../constants/action_type');
 
 var updateWaveLength = function updateWaveLength(payload) {
   return {

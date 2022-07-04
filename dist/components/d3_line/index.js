@@ -32,6 +32,8 @@ var _draw = require('../common/draw');
 
 var _list_ui = require('../../constants/list_ui');
 
+var _cyclic_voltammetry = require('../../actions/cyclic_voltammetry');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -213,7 +215,10 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
     resetAllAct: _manager.resetAll,
     clickUiTargetAct: _ui.clickUiTarget,
     selectUiSweepAct: _ui.selectUiSweep,
-    scrollUiWheelAct: _ui.scrollUiWheel
+    scrollUiWheelAct: _ui.scrollUiWheel,
+    addNewCylicVoltaPairPeakAct: _cyclic_voltammetry.addNewCylicVoltaPairPeak,
+    addCylicVoltaMaxPeakAct: _cyclic_voltammetry.addCylicVoltaMaxPeak,
+    addCylicVoltaMinPeakAct: _cyclic_voltammetry.addCylicVoltaMinPeak
   }, dispatch);
 };
 

@@ -40,6 +40,14 @@ var _multiplicity = require('./multiplicity');
 
 var _multiplicity2 = _interopRequireDefault(_multiplicity);
 
+var _cyclic_voltamery_data = require('./cyclic_voltamery_data');
+
+var _cyclic_voltamery_data2 = _interopRequireDefault(_cyclic_voltamery_data);
+
+var _graph_selection = require('./graph_selection');
+
+var _graph_selection2 = _interopRequireDefault(_graph_selection);
+
 var _cfg = require('../../helpers/cfg');
 
 var _cfg2 = _interopRequireDefault(_cfg);
@@ -119,7 +127,9 @@ var PanelViewer = function (_React$Component) {
           molSvg = _props.molSvg,
           descriptions = _props.descriptions,
           layoutSt = _props.layoutSt,
-          canChangeDescription = _props.canChangeDescription;
+          canChangeDescription = _props.canChangeDescription,
+          jcampIdx = _props.jcampIdx,
+          entityFileNames = _props.entityFileNames;
 
       var onExapndInfo = function onExapndInfo() {
         return _this2.onExapnd('info');
@@ -133,6 +143,12 @@ var PanelViewer = function (_React$Component) {
       var onExapndCompare = function onExapndCompare() {
         return _this2.onExapnd('compare');
       };
+      var onExapndCyclicVolta = function onExapndCyclicVolta() {
+        return _this2.onExapnd('cyclicvolta');
+      };
+      var onExapndGraphSelection = function onExapndGraphSelection() {
+        return _this2.onExapnd('graph');
+      };
 
       return _react2.default.createElement(
         'div',
@@ -142,6 +158,7 @@ var PanelViewer = function (_React$Component) {
           {
             theme: theme
           },
+          _cfg2.default.hidePanelCyclicVolta(layoutSt) ? null : _react2.default.createElement(_graph_selection2.default, { jcampIdx: jcampIdx, entityFileNames: entityFileNames, expand: expand === 'graph', onExapnd: onExapndGraphSelection }),
           _react2.default.createElement(_info2.default, {
             feature: feature,
             integration: integration,
@@ -155,7 +172,8 @@ var PanelViewer = function (_React$Component) {
           }),
           _cfg2.default.hidePanelPeak(layoutSt) ? null : _react2.default.createElement(_peaks2.default, { expand: expand === 'peak', onExapnd: onExapndPeak }),
           _cfg2.default.hidePanelMpy(layoutSt) ? null : _react2.default.createElement(_multiplicity2.default, { expand: expand === 'mpy', onExapnd: onExapndMpy }),
-          _cfg2.default.hidePanelCompare(layoutSt) ? null : _react2.default.createElement(_compare2.default, { expand: expand === 'compare', onExapnd: onExapndCompare })
+          _cfg2.default.hidePanelCompare(layoutSt) ? null : _react2.default.createElement(_compare2.default, { expand: expand === 'compare', onExapnd: onExapndCompare }),
+          _cfg2.default.hidePanelCyclicVolta(layoutSt) ? null : _react2.default.createElement(_cyclic_voltamery_data2.default, { jcampIdx: jcampIdx, feature: feature, expand: expand === 'cyclicvolta', onExapnd: onExapndCyclicVolta })
         )
       );
     }
@@ -185,7 +203,8 @@ PanelViewer.propTypes = {
   descriptions: _propTypes2.default.array.isRequired,
   layoutSt: _propTypes2.default.string.isRequired,
   canChangeDescription: _propTypes2.default.bool.isRequired,
-  onDescriptionChanged: _propTypes2.default.func
+  onDescriptionChanged: _propTypes2.default.func,
+  entityFileNames: _propTypes2.default.array
 };
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(PanelViewer));

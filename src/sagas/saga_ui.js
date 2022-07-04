@@ -1,7 +1,7 @@
 import { put, takeEvery, select } from 'redux-saga/effects';
 
 import {
-  UI, EDITPEAK, SHIFT, INTEGRATION, MULTIPLICITY,
+  UI, EDITPEAK, SHIFT, INTEGRATION, MULTIPLICITY, CYCLIC_VOLTA_METRY,
 } from '../constants/action_type';
 import { LIST_UI_SWEEP_TYPE } from '../constants/list_ui';
 import { LIST_LAYOUT } from '../constants/list_layout';
@@ -106,7 +106,7 @@ function* scrollUiWheel(action) {
 const getUiSweepType = state => state.ui.sweepType;
 
 function* clickUiTarget(action) {
-  const { payload, onPeak } = action;
+  const { payload, onPeak, voltammetryPeakIdx, onPecker, jcampIdx } = action;
   const uiSweepType = yield select(getUiSweepType);
 
   if (uiSweepType === LIST_UI_SWEEP_TYPE.PEAK_ADD && !onPeak) {
@@ -161,6 +161,38 @@ function* clickUiTarget(action) {
     yield put({
       type: MULTIPLICITY.PEAK_RM_BY_UI,
       payload,
+    });
+  } else if (uiSweepType === LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MAX_PEAK && !onPeak) {
+    yield put({
+      type: CYCLIC_VOLTA_METRY.ADD_MAX_PEAK,
+      payload: {peak: payload, index: voltammetryPeakIdx, jcampIdx: jcampIdx},
+    });
+  } else if (uiSweepType === LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MAX_PEAK && onPeak) {
+    yield put({
+      type: CYCLIC_VOLTA_METRY.REMOVE_MAX_PEAK,
+      payload: {index: voltammetryPeakIdx, jcampIdx: jcampIdx},
+    });
+  } else if (uiSweepType === LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MIN_PEAK && !onPeak) {
+    yield put({
+      type: CYCLIC_VOLTA_METRY.ADD_MIN_PEAK,
+      payload: {peak: payload, index: voltammetryPeakIdx, jcampIdx: jcampIdx},
+    });
+  } else if (uiSweepType === LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MIN_PEAK && onPeak) {
+    yield put({
+      type: CYCLIC_VOLTA_METRY.REMOVE_MIN_PEAK,
+      payload: {index: voltammetryPeakIdx, jcampIdx: jcampIdx},
+    });
+  }
+  else if (uiSweepType === LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_PECKER && !onPecker) {
+    yield put({
+      type: CYCLIC_VOLTA_METRY.ADD_PECKER,
+      payload: {peak: payload, index: voltammetryPeakIdx, jcampIdx: jcampIdx},
+    });
+  }
+  else if (uiSweepType === LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_PECKER && onPecker) {
+    yield put({
+      type: CYCLIC_VOLTA_METRY.REMOVE_PECKER,
+      payload: {index: voltammetryPeakIdx, jcampIdx: jcampIdx},
     });
   }
 }

@@ -8,6 +8,7 @@ const initialState = {
   viewer: LIST_UI_VIEWER_TYPE.SPECTRUM,
   sweepType: LIST_UI_SWEEP_TYPE.ZOOMIN,
   sweepExtent: { xExtent: false, yExtent: false },
+  jcampIdx: 0,
 };
 
 const uiReducer = (state = initialState, action) => {
@@ -24,6 +25,7 @@ const uiReducer = (state = initialState, action) => {
       }
       return Object.assign({}, state, {
         sweepType: action.payload,
+        jcampIdx: action.jcampIdx
       });
     case UI.SWEEP.SELECT_ZOOMIN:
       return Object.assign({}, state, {

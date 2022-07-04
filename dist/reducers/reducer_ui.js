@@ -11,7 +11,8 @@ var _list_ui = require('../constants/list_ui');
 var initialState = {
   viewer: _list_ui.LIST_UI_VIEWER_TYPE.SPECTRUM,
   sweepType: _list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN,
-  sweepExtent: { xExtent: false, yExtent: false }
+  sweepExtent: { xExtent: false, yExtent: false },
+  jcampIdx: 0
 };
 
 var uiReducer = function uiReducer() {
@@ -30,7 +31,8 @@ var uiReducer = function uiReducer() {
         });
       }
       return Object.assign({}, state, {
-        sweepType: action.payload
+        sweepType: action.payload,
+        jcampIdx: action.jcampIdx
       });
     case _action_type.UI.SWEEP.SELECT_ZOOMIN:
       return Object.assign({}, state, {
