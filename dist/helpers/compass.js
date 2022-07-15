@@ -100,11 +100,11 @@ var MouseMove = function MouseMove(focus) {
       if (_format2.default.isXRDLayout(layout)) {
         var dValue = 0.0;
         if (wavelength) {
-          dValue = (0, _chem.Convert2DValue)(_pt.x, wavelength.value).toFixed(4);
+          dValue = (0, _chem.Convert2DValue)(_pt.x, wavelength.value).toExponential(2);
         } else {
-          dValue = (0, _chem.Convert2DValue)(_pt.x).toFixed(4);
+          dValue = (0, _chem.Convert2DValue)(_pt.x).toExponential(2);
         }
-        focus.root.select('.cursor-txt-hz').attr('transform', 'translate(' + _tx + ',' + (_ty - 30) + ')').text('2Theta: ' + _pt.x + ', d-value: ' + dValue);
+        focus.root.select('.cursor-txt-hz').attr('transform', 'translate(' + _tx + ',' + (_ty - 30) + ')').text('2Theta: ' + _pt.x.toExponential(2) + ', d-value: ' + dValue);
       } else {
         focus.root.select('.cursor-txt').attr('transform', 'translate(' + _tx + ',' + 10 + ')').text(_pt.x.toFixed(3));
         if (freq) {
