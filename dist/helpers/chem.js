@@ -449,7 +449,8 @@ var calcIntgRefArea = function calcIntgRefArea(spectra, stack) {
 
   var xs = data.x;
   var ys = data.y;
-  var maxY = Math.max.apply(Math, _toConsumableArray(ys));
+  var maxY = maxArray(ys);
+
   var xyk = calcXYK(xs, ys, maxY, 0);
   var _stack$ = stack[0],
       xL = _stack$.xL,
@@ -459,6 +460,16 @@ var calcIntgRefArea = function calcIntgRefArea(spectra, stack) {
   var rawArea = (0, _integration.getArea)(xL, xU, xyk);
   var raw2realRatio = rawArea / area;
   return { raw2realRatio: raw2realRatio };
+};
+
+var maxArray = function maxArray(arr) {
+  var len = arr.length;
+  var max = -Infinity;
+
+  while (len--) {
+    max = arr[len] > max ? arr[len] : max;
+  }
+  return max;
 };
 
 var buildIntegFeature = function buildIntegFeature(jcamp, spectra) {
