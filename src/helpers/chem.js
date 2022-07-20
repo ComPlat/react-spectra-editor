@@ -415,13 +415,24 @@ const calcIntgRefArea = (spectra, stack) => {
 
   const xs = data.x;
   const ys = data.y;
-  const maxY = Math.max(...ys);
+  const maxY = maxArray(ys);
+
   const xyk = calcXYK(xs, ys, maxY, 0);
   const { xL, xU, area } = stack[0];
   const rawArea = getArea(xL, xU, xyk);
   const raw2realRatio = rawArea / area;
   return { raw2realRatio };
 };
+
+const maxArray = (arr) => {
+  let len = arr.length;
+    let max = -Infinity;
+
+    while (len--) {
+        max = arr[len] > max ? arr[len] : max;
+    }
+    return max;
+}
 
 const buildIntegFeature = (jcamp, spectra) => {
   const { $OBSERVEDINTEGRALS, $OBSERVEDMULTIPLETS } = jcamp.info;
