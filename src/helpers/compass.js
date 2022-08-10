@@ -88,14 +88,14 @@ const MouseMove = (focus) => {
       if (Format.isXRDLayout(layout)) {
         let dValue = 0.0;
         if (wavelength) {
-          dValue = Convert2DValue(pt.x, wavelength.value).toFixed(4);
+          dValue = Convert2DValue(pt.x, wavelength.value).toExponential(2);
         }
         else {
-          dValue = Convert2DValue(pt.x).toFixed(4);
+          dValue = Convert2DValue(pt.x).toExponential(2);
         }
         focus.root.select('.cursor-txt-hz')
           .attr('transform', `translate(${tx},${ty-30})`)
-          .text(`2Theta: ${pt.x}, d-value: ${dValue}`);
+          .text(`2Theta: ${pt.x.toExponential(2)}, d-value: ${dValue}`);
       }
       else {
         focus.root.select('.cursor-txt')
