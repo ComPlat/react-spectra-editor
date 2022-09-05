@@ -92,7 +92,7 @@ const onClickReady = (
 
 const onClicUnknown = (
   feature, forecast, peaksEdit, layoutSt, scan, shiftSt, thres,
-  analysis, integrationSt, multiplicitySt,
+  analysis, integrationSt, multiplicitySt, curveSt
 ) => {
   const { refreshCb } = forecast;
   if (!refreshCb) {
@@ -109,6 +109,7 @@ const onClicUnknown = (
       analysis,
       integration: integrationSt,
       multiplicity: multiplicitySt,
+      curveSt: curveSt,
     })
   );
 };
@@ -195,7 +196,7 @@ const BtnPredict = ({
   classes, feature, forecast,
   layoutSt, simulationSt, editPeakSt, scanSt, shiftSt, thresSt,
   integrationSt, multiplicitySt,
-  setUiViewerTypeAct,
+  setUiViewerTypeAct, curveSt
 }) => {
   const is13Cor1H = Format.is13CLayout(layoutSt) || Format.is1HLayout(layoutSt);
   const isIr = Format.isIrLayout(layoutSt);
@@ -214,7 +215,7 @@ const BtnPredict = ({
   if (is13Cor1H && simuCount === 0) {
     const onClickUnknownCb = onClicUnknown(
       feature, forecast, peaksEdit, layoutSt, scan, shiftSt, thres,
-      forecast.predictions, integrationSt, multiplicitySt,
+      forecast.predictions, integrationSt, multiplicitySt, curveSt
     );
     return renderBtnUnknown(classes, onClickUnknownCb);
   }
@@ -226,7 +227,7 @@ const BtnPredict = ({
     ? (
       onClickReady(
         forecast, peaksEdit, layoutSt, scan, shiftSt, thres,
-        forecast.predictions, integrationSt, multiplicitySt, setUiViewerTypeAct,
+        forecast.predictions, integrationSt, multiplicitySt, setUiViewerTypeAct, curveSt
       )
     )
     : onClickFail(layoutSt, simuCount, realCount);
@@ -250,6 +251,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     thresSt: state.threshold,
     integrationSt: state.integration.present,
     multiplicitySt: state.multiplicity.present,
+    curveSt: state.curve,
   }
 );
 
