@@ -125,7 +125,7 @@ var onClickReady = function onClickReady(forecast, peaksEdit, layoutSt, scan, sh
   };
 };
 
-var onClicUnknown = function onClicUnknown(feature, forecast, peaksEdit, layoutSt, scan, shiftSt, thres, analysis, integrationSt, multiplicitySt) {
+var onClicUnknown = function onClicUnknown(feature, forecast, peaksEdit, layoutSt, scan, shiftSt, thres, analysis, integrationSt, multiplicitySt, curveSt) {
   var refreshCb = forecast.refreshCb;
 
   if (!refreshCb) {
@@ -143,7 +143,8 @@ var onClicUnknown = function onClicUnknown(feature, forecast, peaksEdit, layoutS
       thres: thres,
       analysis: analysis,
       integration: integrationSt,
-      multiplicity: multiplicitySt
+      multiplicity: multiplicitySt,
+      curveSt: curveSt
     });
   };
 };
@@ -239,7 +240,8 @@ var BtnPredict = function BtnPredict(_ref) {
       thresSt = _ref.thresSt,
       integrationSt = _ref.integrationSt,
       multiplicitySt = _ref.multiplicitySt,
-      setUiViewerTypeAct = _ref.setUiViewerTypeAct;
+      setUiViewerTypeAct = _ref.setUiViewerTypeAct,
+      curveSt = _ref.curveSt;
 
   var is13Cor1H = _format2.default.is13CLayout(layoutSt) || _format2.default.is1HLayout(layoutSt);
   var isIr = _format2.default.isIrLayout(layoutSt);
@@ -254,14 +256,14 @@ var BtnPredict = function BtnPredict(_ref) {
   var realCount = _format2.default.is13CLayout(layoutSt) ? (0, _carbonFeatures.carbonFeatures)(peaksEdit, multiplicitySt).length : multiplicitySt.stack.length;
 
   if (is13Cor1H && simuCount === 0) {
-    var onClickUnknownCb = onClicUnknown(feature, forecast, peaksEdit, layoutSt, scan, shiftSt, thres, forecast.predictions, integrationSt, multiplicitySt);
+    var onClickUnknownCb = onClicUnknown(feature, forecast, peaksEdit, layoutSt, scan, shiftSt, thres, forecast.predictions, integrationSt, multiplicitySt, curveSt);
     return renderBtnUnknown(classes, onClickUnknownCb);
   }
 
   var predictable = isIr || simuCount >= realCount && realCount > 0;
   var color = predictable ? 'green' : 'red';
 
-  var onClick = predictable ? onClickReady(forecast, peaksEdit, layoutSt, scan, shiftSt, thres, forecast.predictions, integrationSt, multiplicitySt, setUiViewerTypeAct) : onClickFail(layoutSt, simuCount, realCount);
+  var onClick = predictable ? onClickReady(forecast, peaksEdit, layoutSt, scan, shiftSt, thres, forecast.predictions, integrationSt, multiplicitySt, setUiViewerTypeAct, curveSt) : onClickFail(layoutSt, simuCount, realCount);
 
   var btnWidthCls = isIr ? classes.btnWidthIr : classes.btnWidthNmr;
 
@@ -278,7 +280,8 @@ var mapStateToProps = function mapStateToProps(state, props) {
       shiftSt: state.shift,
       thresSt: state.threshold,
       integrationSt: state.integration.present,
-      multiplicitySt: state.multiplicity.present
+      multiplicitySt: state.multiplicity.present,
+      curveSt: state.curve
     }
   );
 };
