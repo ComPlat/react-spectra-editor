@@ -632,7 +632,11 @@ var extrFeaturesNi = function extrFeaturesNi(jcamp, layout, peakUp, spectra) {
     return r != null;
   });
 
-  return { editPeak: features[0], autoPeak: features[1] };
+  var integration = buildIntegFeature(jcamp, spectra);
+  var multiplicity = buildMpyFeature(jcamp);
+  var simulation = buildSimFeature(jcamp);
+
+  return { editPeak: features[0], autoPeak: features[1], integration: integration, multiplicity: multiplicity, simulation: simulation };
 };
 
 var extrFeaturesXrd = function extrFeaturesXrd(jcamp, layout, peakUp) {
