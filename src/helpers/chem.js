@@ -584,8 +584,12 @@ const extrFeaturesNi = (jcamp, layout, peakUp, spectra) => {
       ? buildPeakFeature(jcamp, layout, peakUp, s, thresRef)
       : null;
   }).filter(r => r != null);
+
+  const integration = buildIntegFeature(jcamp, spectra);
+  const multiplicity = buildMpyFeature(jcamp);
+  const simulation = buildSimFeature(jcamp);
   
-  return { editPeak: features[0], autoPeak: features[1] };
+  return { editPeak: features[0], autoPeak: features[1], integration, multiplicity, simulation };
   
 };
 
