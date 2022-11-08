@@ -596,6 +596,36 @@ const extrFeaturesNi = (jcamp, layout, peakUp, spectra) => {
 const extrFeaturesXrd = (jcamp, layout, peakUp) => {
   const base = jcamp.spectra[0];
 
+  let features = jcamp.spectra.map((s) => {
+    const upperThres = Format.isXRDLayout(layout) ? 100 : calcUpperThres(s);
+    const lowerThres = Format.isXRDLayout(layout) ? 100 : calcLowerThres(s);
+    const cpo = buildPeakFeature(jcamp, layout, peakUp, s, 100, upperThres, lowerThres);
+    const bnd = getBoundary(s);
+    return Object.assign({}, base, cpo, bnd);
+  }).filter(r => r != null);
+  
+  const category = jcamp.info.$CSCATEGORY;
+  if (category) {
+    const idxEditPeak = category.indexOf('EDIT_PEAK');
+    if (idxEditPeak >= 0) {
+      const sEP = jcamp.spectra[idxEditPeak];
+      const thresRef = calcThresRef(sEP, peakUp);
+      features.editPeak = buildPeakFeature(jcamp, layout, peakUp, sEP, thresRef);
+    }
+    const idxAutoPeak = category.indexOf('AUTO_PEAK');
+    if (idxAutoPeak >= 0) {
+      const sAP = jcamp.spectra[idxAutoPeak];
+      const thresRef = calcThresRef(sAP, peakUp);
+      features.autoPeak = buildPeakFeature(jcamp, layout, peakUp, sAP, thresRef);
+    }
+  }
+
+  return features;
+}
+
+const extrFeaturesCylicVolta = (jcamp, layout, peakUp) => {
+  const base = jcamp.spectra[0];
+
   const features = jcamp.spectra.map((s) => {
     const upperThres = Format.isXRDLayout(layout) ? 100 : calcUpperThres(s);
     const lowerThres = Format.isXRDLayout(layout) ? 100 : calcLowerThres(s);
@@ -606,7 +636,6 @@ const extrFeaturesXrd = (jcamp, layout, peakUp) => {
 
   return features;
 }
-
 
 const getBoundary = (s) => {
   const { x, y } = s.data[0];
@@ -665,13 +694,23 @@ const ExtractJcamp = (source) => {
   const spectra = Format.isMsLayout(layout)
     ? extrSpectraMs(jcamp, layout)
     : extrSpectraNi(jcamp, layout);
+  let  features = {}
+  if (Format.isMsLayout(layout)) {
+    features = extrFeaturesMs(jcamp, layout, peakUp);
+  }
+  else if (Format.isXRDLayout(layout)) {
+    features = extrFeaturesXrd(jcamp, layout, peakUp);
+  }
+  else if (Format.isCyclicVoltaLayout(layout)) {
+    features = extrFeaturesCylicVolta(jcamp, layout, peakUp);
+  }
+  else {
+    features = extrFeaturesNi(jcamp, layout, peakUp, spectra);
+  }
   // const features = Format.isMsLayout(layout)
   //   ? extrFeaturesMs(jcamp, layout, peakUp)
-  //   : extrFeaturesNi(jcamp, layout, peakUp, spectra);
-  const features = Format.isMsLayout(layout)
-    ? extrFeaturesMs(jcamp, layout, peakUp)
-    : ((Format.isXRDLayout(layout) || Format.isCyclicVoltaLayout(layout))
-      ? extrFeaturesXrd(jcamp, layout, peakUp) : extrFeaturesNi(jcamp, layout, peakUp, spectra));
+  //   : ((Format.isXRDLayout(layout) || Format.isCyclicVoltaLayout(layout))
+  //     ? extrFeaturesXrd(jcamp, layout, peakUp) : extrFeaturesNi(jcamp, layout, peakUp, spectra));
 
   return { spectra, features, layout };
 };
