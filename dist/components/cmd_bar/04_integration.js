@@ -69,16 +69,25 @@ var styles = function styles() {
 
 var iconSize = '16px';
 
-var setFactor = function setFactor(classes, isDisable, refFactor, setIntegrationFkrAct) {
+var setFactor = function setFactor(classes, isDisable, refFactor, setIntegrationFkrAct, curveIdx) {
   var onBlur = function onBlur(e) {
-    return setIntegrationFkrAct(e.target.value);
+    return setIntegrationFkrAct({
+      factor: e.target.value,
+      curveIdx: curveIdx
+    });
   };
   var onChange = function onChange(e) {
-    return setIntegrationFkrAct(e.target.value);
+    return setIntegrationFkrAct({
+      factor: e.target.value,
+      curveIdx: curveIdx
+    });
   };
   var onEnterPress = function onEnterPress(e) {
     if (e.key === 'Enter') {
-      setIntegrationFkrAct(e.target.value);
+      setIntegrationFkrAct({
+        factor: e.target.value,
+        curveIdx: curveIdx
+      });
     }
   };
 
@@ -118,7 +127,8 @@ var Integration = function Integration(_ref) {
       isFocusSetRefSt = _ref.isFocusSetRefSt,
       setUiSweepTypeAct = _ref.setUiSweepTypeAct,
       setIntegrationFkrAct = _ref.setIntegrationFkrAct,
-      clearIntegrationAllAct = _ref.clearIntegrationAllAct;
+      clearIntegrationAllAct = _ref.clearIntegrationAllAct,
+      curveSt = _ref.curveSt;
 
   var onSweepIntegtAdd = function onSweepIntegtAdd() {
     return setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD);
@@ -128,6 +138,11 @@ var Integration = function Integration(_ref) {
   };
   var onSweepIntegtSR = function onSweepIntegtSR() {
     return setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF);
+  };
+  var curveIdx = curveSt.curveIdx;
+
+  var onClearAll = function onClearAll() {
+    return clearIntegrationAllAct({ curveIdx: curveIdx });
   };
 
   return _react2.default.createElement(
@@ -221,12 +236,12 @@ var Integration = function Integration(_ref) {
         )
       )
     ),
-    !ignoreRef ? setFactor(classes, isDisableSt, refFactorSt, setIntegrationFkrAct) : null,
+    !ignoreRef ? setFactor(classes, isDisableSt, refFactorSt, setIntegrationFkrAct, curveIdx) : null,
     _react2.default.createElement(
       _tri_btn2.default,
       {
         content: { tp: 'Clear All Integration' },
-        cb: clearIntegrationAllAct
+        cb: onClearAll
       },
       _react2.default.createElement(_react4.default, {
         path: _js.mdiMathIntegral,
@@ -251,7 +266,8 @@ var mapStateToProps = function mapStateToProps(state, props) {
       isFocusRmIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_RM,
       isFocusSetRefSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF,
       refFactorSt: state.integration.present.refFactor,
-      ignoreRef: _format2.default.isHplcUvVisLayout(state.layout)
+      ignoreRef: _format2.default.isHplcUvVisLayout(state.layout),
+      curveSt: state.curve
     }
   );
 };
@@ -274,7 +290,8 @@ Integration.propTypes = {
   ignoreRef: _propTypes2.default.bool.isRequired,
   setUiSweepTypeAct: _propTypes2.default.func.isRequired,
   setIntegrationFkrAct: _propTypes2.default.func.isRequired,
-  clearIntegrationAllAct: _propTypes2.default.func.isRequired
+  clearIntegrationAllAct: _propTypes2.default.func.isRequired,
+  curveSt: _propTypes2.default.object.isRequired
 };
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(Integration));

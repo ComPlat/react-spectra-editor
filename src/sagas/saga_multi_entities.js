@@ -1,21 +1,34 @@
 import { put, takeEvery, select } from 'redux-saga/effects';
 
 import { CURVE, CYCLIC_VOLTA_METRY } from '../constants/action_type';
+import { LIST_LAYOUT } from '../constants/list_layout';
 
 const getCurveSt = state => state.curve;
+const getLayoutSt = state => state.layout;
 
 function getMaxMinPeak(curve) {
   return curve.maxminPeak;
 }
 
 function* setCyclicVoltametry(action) {
+  const layoutSt = yield select(getLayoutSt);
+  if (layoutSt !== LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
+    return
+  }
+
   const curveSt = yield select(getCurveSt);
   const { listCurves } = curveSt;
+
   if (listCurves) {
     yield put(({
       type: CYCLIC_VOLTA_METRY.RESETALL,
       payload: null,
     }));
+
+    const numberOfCurves = listCurves.length;
+    if (numberOfCurves <= 0) {
+      return;
+    }
 
     for (let index = 0; index < listCurves.length; index++) {
       const curve = listCurves[index];

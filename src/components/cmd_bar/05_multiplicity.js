@@ -26,12 +26,14 @@ const styles = () => (
 const Multiplicity = ({
   classes, isFocusAddMpySt, disableAddMpySt, isFocusRmMpySt, disableRmMpySt,
   isFocusAddPeakSt, isFocusRmPeakSt, disableMpyPeakSt,
-  setUiSweepTypeAct, clearMpyAllAct,
+  setUiSweepTypeAct, clearMpyAllAct, curveSt
 }) => {
   const onSweepMutAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD);
   const onOneMutAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_RM);
   const onPeakMutAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_ADD);
   const onPeakMutRm = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_RM);
+  const { curveIdx } = curveSt;
+  const onClearAll = () => clearMpyAllAct({curveIdx});
 
   return (
     <span className={classes.group}>
@@ -104,7 +106,7 @@ const Multiplicity = ({
         (
           <TriBtn
             content={{ tp: 'Clear All Multiplicity' }}
-            cb={clearMpyAllAct}
+            cb={onClearAll}
           >
             <span className={classNames(classes.txt, 'txt-sv-bar-rmallmpy')}>Jx</span>
           </TriBtn>
@@ -124,6 +126,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     isFocusAddPeakSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_ADD,
     isFocusRmPeakSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_RM,
     disableMpyPeakSt: Cfg.btnCmdMpyPeak(state.layout, state.multiplicity.present),
+    curveSt: state.curve,
   }
 );
 
@@ -145,6 +148,7 @@ Multiplicity.propTypes = {
   disableMpyPeakSt: PropTypes.bool.isRequired,
   setUiSweepTypeAct: PropTypes.func.isRequired,
   clearMpyAllAct: PropTypes.func.isRequired,
+  curveSt: PropTypes.object.isRequired,
 };
 
 export default connect(

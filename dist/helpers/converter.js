@@ -26,7 +26,12 @@ var IsSame = function IsSame(one, two) {
 };
 
 var pksRmNeg = function pksRmNeg(dataPks, editPeakSt) {
-  var neg = editPeakSt.neg;
+  var selectedIdx = editPeakSt.selectedIdx,
+      peaks = editPeakSt.peaks;
+
+  var selectedEditPeaks = peaks[selectedIdx];
+
+  var neg = selectedEditPeaks.neg;
 
   var negXs = neg.map(function (n) {
     return n.x;
@@ -43,7 +48,12 @@ var pksRmNeg = function pksRmNeg(dataPks, editPeakSt) {
 };
 
 var pksAddPos = function pksAddPos(dataPks, editPeakSt) {
-  var pos = editPeakSt.pos;
+  var selectedIdx = editPeakSt.selectedIdx,
+      peaks = editPeakSt.peaks;
+
+  var selectedEditPeaks = peaks[selectedIdx];
+
+  var pos = selectedEditPeaks.pos;
 
   var posXs = pos.map(function (p) {
     return p.x;

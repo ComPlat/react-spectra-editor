@@ -30,6 +30,18 @@ var _format2 = _interopRequireDefault(_format);
 
 var _chem = require('../../helpers/chem');
 
+var _cfg = require('../../helpers/cfg');
+
+var _cfg2 = _interopRequireDefault(_cfg);
+
+var _focus = require('../../helpers/focus');
+
+var _integration = require('../../helpers/integration');
+
+var _multiplicity_calc = require('../../helpers/multiplicity_calc');
+
+var _calc = require('../../helpers/calc');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
@@ -71,6 +83,7 @@ var MultiFocus = function () {
     this.path = null;
     this.grid = null;
     this.tags = null;
+    this.ref = null;
     this.data = [];
     this.otherLineData = [];
     this.pathColor = 'steelblue';
@@ -100,6 +113,10 @@ var MultiFocus = function () {
     this.drawOtherLines = this.drawOtherLines.bind(this);
     this.drawGrid = this.drawGrid.bind(this);
     this.drawPeaks = this.drawPeaks.bind(this);
+    this.drawRef = this.drawRef.bind(this);
+    this.drawInteg = this.drawInteg.bind(this);
+    this.drawMtply = this.drawMtply.bind(this);
+    this.drawAUC = this.drawAUC.bind(this);
     this.onClickTarget = this.onClickTarget.bind(this);
     this.mergedPeaks = this.mergedPeaks.bind(this);
     this.setDataPecker = this.setDataPecker.bind(this);
@@ -298,11 +315,15 @@ var MultiFocus = function () {
       d3.event.stopPropagation();
       d3.event.preventDefault();
       var onPeak = true;
-      var spectraList = this.cyclicvoltaSt.spectraList;
+      if (this.layout === _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
+        var spectraList = this.cyclicvoltaSt.spectraList;
 
-      var spectra = spectraList[this.jcampIdx];
-      var voltammetryPeakIdx = spectra.selectedIdx;
-      this.clickUiTargetAct(data, onPeak, voltammetryPeakIdx, this.jcampIdx);
+        var spectra = spectraList[this.jcampIdx];
+        var voltammetryPeakIdx = spectra.selectedIdx;
+        this.clickUiTargetAct(data, onPeak, voltammetryPeakIdx, this.jcampIdx);
+      } else {
+        this.clickUiTargetAct(data, onPeak, false, this.jcampIdx);
+      }
     }
   }, {
     key: 'onClickPecker',
@@ -344,9 +365,66 @@ var MultiFocus = function () {
       return this.dataPeckers;
     }
   }, {
+    key: 'drawAUC',
+    value: function drawAUC(stack) {
+      var _this3 = this;
+
+      var _TfRescale5 = (0, _compass.TfRescale)(this),
+          xt = _TfRescale5.xt,
+          yt = _TfRescale5.yt;
+
+      var auc = this.tags.aucPath.selectAll('path').data(stack);
+      auc.exit().attr('class', 'exit').remove();
+
+      var integCurve = function integCurve(border) {
+        var xL = border.xL,
+            xU = border.xU;
+
+        var ps = _this3.data.filter(function (d) {
+          return d.x > xL && d.x < xU;
+        });
+        if (!ps[0]) return null;
+
+        var point1 = ps[0];
+        var point2 = ps[ps.length - 1];
+        var slope = (0, _calc.calcSlope)(point1.x, point1.y, point2.x, point2.y);
+        var lastDY = point1.y;
+
+        return d3.area().x(function (d) {
+          return xt(d.x);
+        }).y0(function (d, index) {
+          if (index > 0) {
+            var lastD = ps[index - 1];
+            var y = slope * (d.x - lastD.x) + lastDY;
+            lastDY = y;
+            return yt(y);
+          }
+          return yt(0);
+        }).y1(function (d) {
+          return yt(d.y);
+        })(ps);
+      };
+
+      auc.enter().append('path').attr('class', 'auc').attr('fill', 'red').attr('stroke', 'none').attr('fill-opacity', 0.2).attr('stroke-width', 2).merge(auc).attr('d', function (d) {
+        return integCurve(d);
+      }).attr('id', function (d) {
+        return 'auc' + (0, _focus.itgIdTag)(d);
+      }).on('mouseover', function (d) {
+        d3.select('#auc' + (0, _focus.itgIdTag)(d)).attr('stroke', 'blue');
+        d3.select('#auc' + (0, _focus.itgIdTag)(d)).attr('stroke', 'blue');
+        d3.select('#auc' + (0, _focus.itgIdTag)(d)).style('fill', 'blue');
+      }).on('mouseout', function (d) {
+        d3.select('#auc' + (0, _focus.itgIdTag)(d)).attr('stroke', 'none');
+        d3.select('#auc' + (0, _focus.itgIdTag)(d)).style('fill', 'red');
+        d3.select('#auc' + (0, _focus.itgIdTag)(d)).style('fill-opacity', 0.2);
+      }).on('click', function (d) {
+        return _this3.onClickTarget(d);
+      });
+    }
+  }, {
     key: 'drawPeaks',
     value: function drawPeaks(editPeakSt) {
-      var _this3 = this;
+      var _this4 = this;
 
       var _shouldUpdate2 = this.shouldUpdate,
           sameXY = _shouldUpdate2.sameXY,
@@ -359,9 +437,9 @@ var MultiFocus = function () {
 
       // rescale for zoom
 
-      var _TfRescale5 = (0, _compass.TfRescale)(this),
-          xt = _TfRescale5.xt,
-          yt = _TfRescale5.yt;
+      var _TfRescale6 = (0, _compass.TfRescale)(this),
+          xt = _TfRescale6.xt,
+          yt = _TfRescale6.yt;
 
       var dPks = this.mergedPeaks(editPeakSt);
 
@@ -382,15 +460,15 @@ var MultiFocus = function () {
       }).on('mouseover', function (d, i, n) {
         d3.select('#mpp' + Math.round(1000 * d.x)).attr('stroke-opacity', '1.0');
         d3.select('#bpt' + Math.round(1000 * d.x)).style('fill', 'blue');
-        var tipParams = { d: d, layout: _this3.layout };
-        _this3.tip.show(tipParams, n[i]);
+        var tipParams = { d: d, layout: _this4.layout };
+        _this4.tip.show(tipParams, n[i]);
       }).on('mouseout', function (d, i, n) {
         d3.select('#mpp' + Math.round(1000 * d.x)).attr('stroke-opacity', '0.0');
         d3.select('#bpt' + Math.round(1000 * d.x)).style('fill', 'red');
-        var tipParams = { d: d, layout: _this3.layout };
-        _this3.tip.hide(tipParams, n[i]);
+        var tipParams = { d: d, layout: _this4.layout };
+        _this4.tip.hide(tipParams, n[i]);
       }).on('click', function (d) {
-        return _this3.onClickTarget(d);
+        return _this4.onClickTarget(d);
       });
 
       var ignoreRef = _format2.default.isHplcUvVisLayout(this.layout);
@@ -405,14 +483,14 @@ var MultiFocus = function () {
         }).attr('transform', function (d) {
           return 'translate(' + xt(d.x) + ', ' + (yt(d.y) - 25) + ')';
         }).on('click', function (d) {
-          return _this3.onClickTarget(d);
+          return _this4.onClickTarget(d);
         });
       }
     }
   }, {
     key: 'drawPeckers',
     value: function drawPeckers() {
-      var _this4 = this;
+      var _this5 = this;
 
       var _shouldUpdate3 = this.shouldUpdate,
           sameXY = _shouldUpdate3.sameXY,
@@ -425,9 +503,9 @@ var MultiFocus = function () {
 
       // rescale for zoom
 
-      var _TfRescale6 = (0, _compass.TfRescale)(this),
-          xt = _TfRescale6.xt,
-          yt = _TfRescale6.yt;
+      var _TfRescale7 = (0, _compass.TfRescale)(this),
+          xt = _TfRescale7.xt,
+          yt = _TfRescale7.yt;
 
       var dPks = this.setDataPecker();
 
@@ -448,30 +526,389 @@ var MultiFocus = function () {
       }).on('mouseover', function (d, i, n) {
         d3.select('#mpp' + Math.round(1000 * d.x)).attr('stroke-opacity', '1.0');
         d3.select('#bpt' + Math.round(1000 * d.x)).style('fill', 'blue');
-        var tipParams = { d: d, layout: _this4.layout };
-        _this4.tip.show(tipParams, n[i]);
+        var tipParams = { d: d, layout: _this5.layout };
+        _this5.tip.show(tipParams, n[i]);
       }).on('mouseout', function (d, i, n) {
         d3.select('#mpp' + Math.round(1000 * d.x)).attr('stroke-opacity', '0.0');
         d3.select('#bpt' + Math.round(1000 * d.x)).style('fill', '#228B22');
-        var tipParams = { d: d, layout: _this4.layout };
-        _this4.tip.hide(tipParams, n[i]);
+        var tipParams = { d: d, layout: _this5.layout };
+        _this5.tip.hide(tipParams, n[i]);
       }).on('click', function (d) {
-        return _this4.onClickPecker(d);
+        return _this5.onClickPecker(d);
       });
     }
   }, {
+    key: 'drawInteg',
+    value: function drawInteg(integationSt) {
+      var _this6 = this;
+
+      var _shouldUpdate4 = this.shouldUpdate,
+          sameXY = _shouldUpdate4.sameXY,
+          sameLySt = _shouldUpdate4.sameLySt,
+          sameItSt = _shouldUpdate4.sameItSt,
+          sameData = _shouldUpdate4.sameData;
+
+      if (sameXY && sameLySt && sameItSt && sameData) return;
+
+      var integrations = integationSt.integrations;
+
+      var selectedIntegration = integrations[this.jcampIdx];
+      if (selectedIntegration === false || selectedIntegration === undefined) {
+        var _itgs = [];
+        var _igbp = this.tags.igbPath.selectAll('path').data(_itgs);
+        _igbp.exit().attr('class', 'exit').remove();
+        var _igcp = this.tags.igcPath.selectAll('path').data(_itgs);
+        _igcp.exit().attr('class', 'exit').remove();
+
+        var _igtp = this.tags.igtPath.selectAll('text').data(_itgs);
+        _igtp.exit().attr('class', 'exit').remove();
+        return;
+      }
+
+      var stack = selectedIntegration.stack,
+          refArea = selectedIntegration.refArea,
+          refFactor = selectedIntegration.refFactor,
+          shift = selectedIntegration.shift;
+
+
+      var isDisable = _cfg2.default.btnCmdIntg(this.layout);
+      var ignoreRef = _format2.default.isHplcUvVisLayout(this.layout);
+      var itgs = isDisable ? [] : stack;
+
+      var igbp = this.tags.igbPath.selectAll('path').data(itgs);
+      igbp.exit().attr('class', 'exit').remove();
+      var igcp = this.tags.igcPath.selectAll('path').data(itgs);
+      igcp.exit().attr('class', 'exit').remove();
+
+      var igtp = this.tags.igtPath.selectAll('text').data(itgs);
+      igtp.exit().attr('class', 'exit').remove();
+
+      if (itgs.length === 0 || isDisable) {
+        // remove drawn area under curve
+        var auc = this.tags.aucPath.selectAll('path').data(stack);
+        auc.exit().attr('class', 'exit').remove();
+        auc.merge(auc);
+        return;
+      }
+
+      if (ignoreRef) {
+        this.drawAUC(stack);
+      } else {
+
+        // rescale for zoom
+        var _TfRescale8 = (0, _compass.TfRescale)(this),
+            xt = _TfRescale8.xt;
+
+        var dh = 50;
+        var integBar = function integBar(data) {
+          return d3.line()([[xt(data.xL - shift), dh], [xt(data.xL - shift), dh - 10], [xt(data.xL - shift), dh - 5], [xt(data.xU - shift), dh - 5], [xt(data.xU - shift), dh - 10], [xt(data.xU - shift), dh]]);
+        };
+
+        igbp.enter().append('path').attr('class', 'igbp').attr('fill', 'none').attr('stroke', '#228B22').attr('stroke-width', 2).merge(igbp).attr('id', function (d) {
+          return 'igbp' + (0, _focus.itgIdTag)(d);
+        }).attr('d', function (d) {
+          return integBar(d);
+        }).on('mouseover', function (d) {
+          d3.select('#igbp' + (0, _focus.itgIdTag)(d)).attr('stroke', 'blue');
+          d3.select('#igbc' + (0, _focus.itgIdTag)(d)).attr('stroke', 'blue');
+          d3.select('#igtp' + (0, _focus.itgIdTag)(d)).style('fill', 'blue');
+        }).on('mouseout', function (d) {
+          d3.select('#igbp' + (0, _focus.itgIdTag)(d)).attr('stroke', '#228B22');
+          d3.select('#igbc' + (0, _focus.itgIdTag)(d)).attr('stroke', '#228B22');
+          d3.select('#igtp' + (0, _focus.itgIdTag)(d)).style('fill', '#228B22');
+        }).on('click', function (d) {
+          return _this6.onClickTarget(d);
+        });
+
+        var integCurve = function integCurve(border) {
+          var xL = border.xL,
+              xU = border.xU;
+          var nXL = xL - shift,
+              nXU = xU - shift;
+
+          var ps = _this6.data.filter(function (d) {
+            return d.x > nXL && d.x < nXU;
+          });
+          var kMax = _this6.data[_this6.data.length - 1].k;
+          if (!ps[0]) return null;
+          var kRef = ps[0].k;
+          if (!_this6.reverseXAxis(_this6.layout)) {
+            return d3.line().x(function (d) {
+              return xt(d.x);
+            }).y(function (d) {
+              return 100 - (kRef - d.k) * 400 / kMax;
+            })(ps);
+          }
+          return d3.line().x(function (d) {
+            return xt(d.x);
+          }).y(function (d) {
+            return 300 - (d.k - kRef) * 400 / kMax;
+          })(ps);
+        };
+
+        igcp.enter().append('path').attr('class', 'igcp').attr('fill', 'none').attr('stroke', '#228B22').attr('stroke-width', 2).merge(igcp).attr('id', function (d) {
+          return 'igbc' + (0, _focus.itgIdTag)(d);
+        }).attr('d', function (d) {
+          return integCurve(d);
+        }).on('mouseover', function (d) {
+          d3.select('#igbp' + (0, _focus.itgIdTag)(d)).attr('stroke', 'blue');
+          d3.select('#igbc' + (0, _focus.itgIdTag)(d)).attr('stroke', 'blue');
+          d3.select('#igtp' + (0, _focus.itgIdTag)(d)).style('fill', 'blue');
+        }).on('mouseout', function (d) {
+          d3.select('#igbp' + (0, _focus.itgIdTag)(d)).attr('stroke', '#228B22');
+          d3.select('#igbc' + (0, _focus.itgIdTag)(d)).attr('stroke', '#228B22');
+          d3.select('#igtp' + (0, _focus.itgIdTag)(d)).style('fill', '#228B22');
+        }).on('click', function (d) {
+          return _this6.onClickTarget(d);
+        });
+
+        igtp.enter().append('text').attr('class', 'igtp').attr('font-family', 'Helvetica').style('font-size', '12px').attr('fill', '#228B22').style('text-anchor', 'middle').merge(igtp).attr('id', function (d) {
+          return 'igtp' + (0, _focus.itgIdTag)(d);
+        }).text(function (d) {
+          return (0, _integration.calcArea)(d, refArea, refFactor, ignoreRef);
+        }).attr('transform', function (d) {
+          return 'translate(' + xt((d.xL + d.xU) / 2 - shift) + ', ' + (dh - 12) + ')';
+        }).on('mouseover', function (d) {
+          d3.select('#igbp' + (0, _focus.itgIdTag)(d)).attr('stroke', 'blue');
+          d3.select('#igbc' + (0, _focus.itgIdTag)(d)).attr('stroke', 'blue');
+          d3.select('#igtp' + (0, _focus.itgIdTag)(d)).style('fill', 'blue');
+        }).on('mouseout', function (d) {
+          d3.select('#igbp' + (0, _focus.itgIdTag)(d)).attr('stroke', '#228B22');
+          d3.select('#igbc' + (0, _focus.itgIdTag)(d)).attr('stroke', '#228B22');
+          d3.select('#igtp' + (0, _focus.itgIdTag)(d)).style('fill', '#228B22');
+        }).on('click', function (d) {
+          return _this6.onClickTarget(d);
+        });
+      }
+    }
+  }, {
+    key: 'drawMtply',
+    value: function drawMtply(mtplySt) {
+      var _ref3,
+          _this7 = this;
+
+      var _shouldUpdate5 = this.shouldUpdate,
+          sameXY = _shouldUpdate5.sameXY,
+          sameLySt = _shouldUpdate5.sameLySt,
+          sameMySt = _shouldUpdate5.sameMySt;
+
+      if (sameXY && sameLySt && sameMySt) return;
+
+      var multiplicities = mtplySt.multiplicities;
+
+      var selectedMulti = multiplicities[this.jcampIdx];
+
+      if (selectedMulti === false || selectedMulti === undefined) {
+        var _ref2;
+
+        var _mpys = [];
+        var _mpyb = this.tags.mpybPath.selectAll('path').data(_mpys);
+        _mpyb.exit().attr('class', 'exit').remove();
+        var _mpyt = this.tags.mpyt1Path.selectAll('text').data(_mpys);
+        _mpyt.exit().attr('class', 'exit').remove();
+        var _mpyt2 = this.tags.mpyt2Path.selectAll('text').data(_mpys);
+        _mpyt2.exit().attr('class', 'exit').remove();
+        var _mPeaks = _mpys.map(function (m) {
+          var peaks = m.peaks,
+              xExtent = m.xExtent;
+
+          return peaks.map(function (p) {
+            return Object.assign({}, p, { xExtent: xExtent });
+          });
+        });
+        _mPeaks = (_ref2 = []).concat.apply(_ref2, _toConsumableArray(_mPeaks));
+        var _mpyp = this.tags.mpypPath.selectAll('path').data(_mPeaks);
+        _mpyp.exit().attr('class', 'exit').remove();
+        return;
+      }
+
+      var stack = selectedMulti.stack,
+          smExtext = selectedMulti.smExtext,
+          shift = selectedMulti.shift;
+
+      var mpys = stack;
+      var isDisable = _cfg2.default.btnCmdMpy(this.layout);
+      if (mpys === 0 || isDisable) return;
+      // rescale for zoom
+
+      var _TfRescale9 = (0, _compass.TfRescale)(this),
+          xt = _TfRescale9.xt;
+
+      var mpyb = this.tags.mpybPath.selectAll('path').data(mpys);
+      mpyb.exit().attr('class', 'exit').remove();
+      var mpyt1 = this.tags.mpyt1Path.selectAll('text').data(mpys);
+      mpyt1.exit().attr('class', 'exit').remove();
+      var mpyt2 = this.tags.mpyt2Path.selectAll('text').data(mpys);
+      mpyt2.exit().attr('class', 'exit').remove();
+      var mPeaks = mpys.map(function (m) {
+        var peaks = m.peaks,
+            xExtent = m.xExtent;
+
+        return peaks.map(function (p) {
+          return Object.assign({}, p, { xExtent: xExtent });
+        });
+      });
+      mPeaks = (_ref3 = []).concat.apply(_ref3, _toConsumableArray(mPeaks));
+      var mpyp = this.tags.mpypPath.selectAll('path').data(mPeaks);
+      mpyp.exit().attr('class', 'exit').remove();
+
+      var height = this.h;
+      var dh = Math.abs(0.06 * height);
+      var mpyBar = function mpyBar(data) {
+        return d3.line()([[xt(data.xExtent.xL - shift), height - dh], [xt(data.xExtent.xL - shift), height - dh - 10], [xt(data.xExtent.xL - shift), height - dh - 5], [xt(data.xExtent.xU - shift), height - dh - 5], [xt(data.xExtent.xU - shift), height - dh - 10], [xt(data.xExtent.xU - shift), height - dh]]);
+      };
+
+      var mpyColor = function mpyColor(d) {
+        var _d$xExtent = d.xExtent,
+            xL = _d$xExtent.xL,
+            xU = _d$xExtent.xU;
+
+        return smExtext.xL === xL && smExtext.xU === xU ? 'purple' : '#DA70D6';
+      };
+
+      mpyb.enter().append('path').attr('class', 'mpyb').attr('fill', 'none').attr('stroke-width', 2).merge(mpyb).attr('stroke', function (d) {
+        return mpyColor(d);
+      }).attr('id', function (d) {
+        return 'mpyb' + (0, _focus.mpyIdTag)(d);
+      }).attr('d', function (d) {
+        return mpyBar(d);
+      }).on('mouseover', function (d) {
+        d3.selectAll('#mpyb' + (0, _focus.mpyIdTag)(d)).attr('stroke', 'blue');
+        d3.selectAll('#mpyt1' + (0, _focus.mpyIdTag)(d)).style('fill', 'blue');
+        d3.selectAll('#mpyt2' + (0, _focus.mpyIdTag)(d)).style('fill', 'blue');
+        d3.selectAll('#mpyp' + (0, _focus.mpyIdTag)(d)).attr('stroke', 'blue');
+      }).on('mouseout', function (d) {
+        var dColor = mpyColor(d);
+        d3.selectAll('#mpyb' + (0, _focus.mpyIdTag)(d)).attr('stroke', dColor);
+        d3.selectAll('#mpyt1' + (0, _focus.mpyIdTag)(d)).style('fill', dColor);
+        d3.selectAll('#mpyt2' + (0, _focus.mpyIdTag)(d)).style('fill', dColor);
+        d3.selectAll('#mpyp' + (0, _focus.mpyIdTag)(d)).attr('stroke', dColor);
+      }).on('click', function (d) {
+        return _this7.onClickTarget(d);
+      });
+
+      mpyt1.enter().append('text').attr('class', 'mpyt1').attr('font-family', 'Helvetica').style('font-size', '12px').style('text-anchor', 'middle').merge(mpyt1).attr('fill', function (d) {
+        return mpyColor(d);
+      }).attr('id', function (d) {
+        return 'mpyt1' + (0, _focus.mpyIdTag)(d);
+      }).text(function (d) {
+        return '' + (0, _multiplicity_calc.calcMpyCenter)(d.peaks, shift, d.mpyType).toFixed(3);
+      }).attr('transform', function (d) {
+        return 'translate(' + xt((d.xExtent.xL + d.xExtent.xU) / 2 - shift) + ', ' + (height - dh + 12) + ')';
+      }).on('mouseover', function (d) {
+        d3.selectAll('#mpyb' + (0, _focus.mpyIdTag)(d)).attr('stroke', 'blue');
+        d3.selectAll('#mpyt1' + (0, _focus.mpyIdTag)(d)).style('fill', 'blue');
+        d3.selectAll('#mpyt2' + (0, _focus.mpyIdTag)(d)).style('fill', 'blue');
+        d3.selectAll('#mpyp' + (0, _focus.mpyIdTag)(d)).attr('stroke', 'blue');
+      }).on('mouseout', function (d) {
+        var dColor = mpyColor(d);
+        d3.selectAll('#mpyb' + (0, _focus.mpyIdTag)(d)).attr('stroke', dColor);
+        d3.selectAll('#mpyt1' + (0, _focus.mpyIdTag)(d)).style('fill', dColor);
+        d3.selectAll('#mpyt2' + (0, _focus.mpyIdTag)(d)).style('fill', dColor);
+        d3.selectAll('#mpyp' + (0, _focus.mpyIdTag)(d)).attr('stroke', dColor);
+      }).on('click', function (d) {
+        return _this7.onClickTarget(d);
+      });
+
+      mpyt2.enter().append('text').attr('class', 'mpyt2').attr('font-family', 'Helvetica').style('font-size', '12px').style('text-anchor', 'middle').merge(mpyt2).attr('fill', function (d) {
+        return mpyColor(d);
+      }).attr('id', function (d) {
+        return 'mpyt2' + (0, _focus.mpyIdTag)(d);
+      }).text(function (d) {
+        return '(' + d.mpyType + ')';
+      }).attr('transform', function (d) {
+        return 'translate(' + xt((d.xExtent.xL + d.xExtent.xU) / 2 - shift) + ', ' + (height - dh + 24) + ')';
+      }).on('mouseover', function (d) {
+        d3.selectAll('#mpyb' + (0, _focus.mpyIdTag)(d)).attr('stroke', 'blue');
+        d3.selectAll('#mpyt1' + (0, _focus.mpyIdTag)(d)).style('fill', 'blue');
+        d3.selectAll('#mpyt2' + (0, _focus.mpyIdTag)(d)).style('fill', 'blue');
+        d3.selectAll('#mpyp' + (0, _focus.mpyIdTag)(d)).attr('stroke', 'blue');
+      }).on('mouseout', function (d) {
+        var dColor = mpyColor(d);
+        d3.selectAll('#mpyb' + (0, _focus.mpyIdTag)(d)).attr('stroke', dColor);
+        d3.selectAll('#mpyt1' + (0, _focus.mpyIdTag)(d)).style('fill', dColor);
+        d3.selectAll('#mpyt2' + (0, _focus.mpyIdTag)(d)).style('fill', dColor);
+        d3.selectAll('#mpyp' + (0, _focus.mpyIdTag)(d)).attr('stroke', dColor);
+      }).on('click', function (d) {
+        return _this7.onClickTarget(d);
+      });
+
+      var mpypH = height - dh;
+      var mpypPath = function mpypPath(pk) {
+        return [{ x: xt(pk.x - shift) - 0.5, y: mpypH - 5 }, { x: xt(pk.x - shift) - 0.5, y: mpypH - 20 }, { x: xt(pk.x - shift) + 0.5, y: mpypH - 20 }, { x: xt(pk.x - shift) + 0.5, y: mpypH - 5 }];
+      };
+      // const faktor = layoutSt === LIST_LAYOUT.IR ? -1 : 1;
+      var lineSymbol = d3.line().x(function (d) {
+        return d.x;
+      }).y(function (d) {
+        return d.y;
+      });
+
+      mpyp.enter().append('path').attr('class', 'mpyp').attr('fill', 'none').merge(mpyp).attr('stroke', function (d) {
+        return mpyColor(d);
+      }).attr('d', function (d) {
+        return lineSymbol(mpypPath(d));
+      }).attr('id', function (d) {
+        return 'mpyp' + (0, _focus.mpyIdTag)(d);
+      }).on('mouseover', function (d) {
+        d3.selectAll('#mpyb' + (0, _focus.mpyIdTag)(d)).attr('stroke', 'blue');
+        d3.selectAll('#mpyt1' + (0, _focus.mpyIdTag)(d)).style('fill', 'blue');
+        d3.selectAll('#mpyt2' + (0, _focus.mpyIdTag)(d)).style('fill', 'blue');
+        d3.selectAll('#mpyp' + (0, _focus.mpyIdTag)(d)).attr('stroke', 'blue');
+      }).on('mouseout', function (d) {
+        var dColor = mpyColor(d);
+        d3.selectAll('#mpyb' + (0, _focus.mpyIdTag)(d)).attr('stroke', dColor);
+        d3.selectAll('#mpyt1' + (0, _focus.mpyIdTag)(d)).style('fill', dColor);
+        d3.selectAll('#mpyt2' + (0, _focus.mpyIdTag)(d)).style('fill', dColor);
+        d3.selectAll('#mpyp' + (0, _focus.mpyIdTag)(d)).attr('stroke', dColor);
+      }).on('click', function (d) {
+        return _this7.onClickTarget(d);
+      });
+    }
+  }, {
+    key: 'drawRef',
+    value: function drawRef() {
+      // rescale for zoom
+      var _TfRescale10 = (0, _compass.TfRescale)(this),
+          xt = _TfRescale10.xt,
+          yt = _TfRescale10.yt;
+
+      var ccp = this.ref.selectAll('path').data(this.tSfPeaks);
+
+      ccp.exit().attr('class', 'exit').remove();
+
+      var linePath = [{ x: -0.5, y: 10 }, { x: -4, y: -20 }, { x: 4, y: -20 }, { x: 0.5, y: 10 }];
+      var faktor = _format2.default.isIrLayout(this.layout) ? -1 : 1;
+      var lineSymbol = d3.line().x(function (d) {
+        return d.x;
+      }).y(function (d) {
+        return faktor * d.y;
+      })(linePath);
+
+      ccp.enter().append('path').attr('d', lineSymbol).attr('class', 'enter-ref').attr('fill', 'green').attr('fill-opacity', 0.8).merge(ccp).attr('transform', function (d) {
+        return 'translate(' + xt(d.x) + ', ' + yt(d.y) + ')';
+      });
+    }
+  }, {
+    key: 'reverseXAxis',
+    value: function reverseXAxis(layoutSt) {
+      return [_list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS, _list_layout.LIST_LAYOUT.TGA, _list_layout.LIST_LAYOUT.XRD, _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY].indexOf(layoutSt) < 0;
+    }
+  }, {
     key: 'create',
-    value: function create(_ref2) {
-      var curveSt = _ref2.curveSt,
-          filterSeed = _ref2.filterSeed,
-          filterPeak = _ref2.filterPeak,
-          tTrEndPts = _ref2.tTrEndPts,
-          tSfPeaks = _ref2.tSfPeaks,
-          editPeakSt = _ref2.editPeakSt,
-          layoutSt = _ref2.layoutSt,
-          sweepExtentSt = _ref2.sweepExtentSt,
-          isUiNoBrushSt = _ref2.isUiNoBrushSt,
-          cyclicvoltaSt = _ref2.cyclicvoltaSt;
+    value: function create(_ref4) {
+      var curveSt = _ref4.curveSt,
+          filterSeed = _ref4.filterSeed,
+          filterPeak = _ref4.filterPeak,
+          tTrEndPts = _ref4.tTrEndPts,
+          tSfPeaks = _ref4.tSfPeaks,
+          editPeakSt = _ref4.editPeakSt,
+          layoutSt = _ref4.layoutSt,
+          sweepExtentSt = _ref4.sweepExtentSt,
+          isUiNoBrushSt = _ref4.isUiNoBrushSt,
+          cyclicvoltaSt = _ref4.cyclicvoltaSt,
+          integationSt = _ref4.integationSt,
+          mtplySt = _ref4.mtplySt;
 
       this.svg = d3.select(this.rootKlass).select('.d3Svg');
       (0, _mount.MountMainFrame)(this, 'focus');
@@ -482,7 +919,7 @@ var MultiFocus = function () {
       var jcampIdx = curveIdx;
 
       this.root = d3.select(this.rootKlass).selectAll('.focus-main');
-      this.scales = (0, _init.InitScale)(this, false);
+      this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt));
       this.setTip();
       this.setDataParams(filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
       (0, _compass.MountCompass)(this);
@@ -491,6 +928,7 @@ var MultiFocus = function () {
       this.path = (0, _mount.MountPath)(this, this.pathColor);
       this.grid = (0, _mount.MountGrid)(this);
       this.tags = (0, _mount.MountTags)(this);
+      this.ref = (0, _mount.MountRef)(this);
       (0, _mount.MountAxisLabelX)(this);
       (0, _mount.MountAxisLabelY)(this);
 
@@ -500,28 +938,33 @@ var MultiFocus = function () {
         this.drawGrid();
         this.drawOtherLines(layoutSt);
         this.drawPeaks(editPeakSt);
+        this.drawRef();
         this.drawPeckers();
+        this.drawInteg(integationSt);
+        this.drawMtply(mtplySt);
       }
       (0, _brush2.default)(this, false, isUiNoBrushSt);
       this.resetShouldUpdate(editPeakSt);
     }
   }, {
     key: 'update',
-    value: function update(_ref3) {
-      var entities = _ref3.entities,
-          curveSt = _ref3.curveSt,
-          filterSeed = _ref3.filterSeed,
-          filterPeak = _ref3.filterPeak,
-          tTrEndPts = _ref3.tTrEndPts,
-          tSfPeaks = _ref3.tSfPeaks,
-          editPeakSt = _ref3.editPeakSt,
-          layoutSt = _ref3.layoutSt,
-          sweepExtentSt = _ref3.sweepExtentSt,
-          isUiNoBrushSt = _ref3.isUiNoBrushSt,
-          cyclicvoltaSt = _ref3.cyclicvoltaSt;
+    value: function update(_ref5) {
+      var entities = _ref5.entities,
+          curveSt = _ref5.curveSt,
+          filterSeed = _ref5.filterSeed,
+          filterPeak = _ref5.filterPeak,
+          tTrEndPts = _ref5.tTrEndPts,
+          tSfPeaks = _ref5.tSfPeaks,
+          editPeakSt = _ref5.editPeakSt,
+          layoutSt = _ref5.layoutSt,
+          sweepExtentSt = _ref5.sweepExtentSt,
+          isUiNoBrushSt = _ref5.isUiNoBrushSt,
+          cyclicvoltaSt = _ref5.cyclicvoltaSt,
+          integationSt = _ref5.integationSt,
+          mtplySt = _ref5.mtplySt;
 
       this.root = d3.select(this.rootKlass).selectAll('.focus-main');
-      this.scales = (0, _init.InitScale)(this, false);
+      this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt));
 
       var curveIdx = curveSt.curveIdx;
 
@@ -537,7 +980,10 @@ var MultiFocus = function () {
         this.drawGrid();
         this.drawOtherLines(layoutSt);
         this.drawPeaks(editPeakSt);
+        this.drawRef();
         this.drawPeckers();
+        this.drawInteg(integationSt);
+        this.drawMtply(mtplySt);
       }
       (0, _brush2.default)(this, false, isUiNoBrushSt);
       this.resetShouldUpdate(editPeakSt);

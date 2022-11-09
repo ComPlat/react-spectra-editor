@@ -34,6 +34,10 @@ var _nmr1h_jcamp = require('./__tests__/fixtures/nmr1h_jcamp');
 
 var _nmr1h_jcamp2 = _interopRequireDefault(_nmr1h_jcamp);
 
+var _nmr1h_2_jcamp = require('./__tests__/fixtures/nmr1h_2_jcamp');
+
+var _nmr1h_2_jcamp2 = _interopRequireDefault(_nmr1h_2_jcamp);
+
 var _nmr13c_dept_jcamp = require('./__tests__/fixtures/nmr13c_dept_jcamp');
 
 var _nmr13c_dept_jcamp2 = _interopRequireDefault(_nmr13c_dept_jcamp);
@@ -102,6 +106,10 @@ var _hplc_uvvis_jcamp = require('./__tests__/fixtures/hplc_uvvis_jcamp');
 
 var _hplc_uvvis_jcamp2 = _interopRequireDefault(_hplc_uvvis_jcamp);
 
+var _hplc_uvvis_jcamp_ = require('./__tests__/fixtures/hplc_uvvis_jcamp_2');
+
+var _hplc_uvvis_jcamp_2 = _interopRequireDefault(_hplc_uvvis_jcamp_);
+
 var _tga_jcamp = require('./__tests__/fixtures/tga_jcamp');
 
 var _tga_jcamp2 = _interopRequireDefault(_tga_jcamp);
@@ -141,6 +149,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var nmr1HEntity = _app.FN.ExtractJcamp(_nmr1h_jcamp2.default);
+var nmr1HEntity2 = _app.FN.ExtractJcamp(_nmr1h_2_jcamp2.default);
 var nmr13CEntity = _app.FN.ExtractJcamp(_nmr13c_jcamp2.default);
 var nmr13CDeptEntity = _app.FN.ExtractJcamp(_nmr13c_dept_jcamp2.default);
 var nmr19FEntity = _app.FN.ExtractJcamp(_nmr19f_jcamp2.default);
@@ -155,6 +164,7 @@ var msEntity = _app.FN.ExtractJcamp(_ms_jcamp2.default);
 var uvVisEntity = _app.FN.ExtractJcamp(_uv_vis_jcamp2.default);
 var compUvVisEntity = _app.FN.ExtractJcamp(_compare_uv_vis_jcamp2.default);
 var hplcUVVisEntity = _app.FN.ExtractJcamp(_hplc_uvvis_jcamp2.default);
+var hplcUVVisEntity2 = _app.FN.ExtractJcamp(_hplc_uvvis_jcamp_2.default);
 var tgaEntity = _app.FN.ExtractJcamp(_tga_jcamp2.default);
 var xrdEntity1 = _app.FN.ExtractJcamp(_xrd_jcamp_2.default);
 var xrdEntity2 = _app.FN.ExtractJcamp(_xrd_jcamp_4.default);
@@ -469,6 +479,14 @@ var DemoWriteIr = function (_React$Component) {
       switch (typ) {
         case 'cyclic volta':
           return [cyclicVoltaEntity1, cyclicVoltaEntity2, cyclicVoltaEntity3];
+        case 'multi':
+          return [nmr1HEntity, nmr1HEntity2];
+        case 'multi hplc':
+          return [hplcUVVisEntity, hplcUVVisEntity2];
+        case 'multi ir':
+          return [compIr1Entity, compIr2Entity];
+        case 'multi xrd':
+          return [xrdEntity1, xrdEntity2];
         default:
           return false;
       }
@@ -705,6 +723,42 @@ var DemoWriteIr = function (_React$Component) {
               onClick: this.onClick('ms')
             },
             'MS'
+          ),
+          _react2.default.createElement(
+            _Button2.default,
+            {
+              variant: 'contained',
+              style: { margin: '0 10px 0 10px' },
+              onClick: this.onClick('multi')
+            },
+            'Multi NMR'
+          ),
+          _react2.default.createElement(
+            _Button2.default,
+            {
+              variant: 'contained',
+              style: { margin: '0 10px 0 10px' },
+              onClick: this.onClick('multi ir')
+            },
+            'Multi IR'
+          ),
+          _react2.default.createElement(
+            _Button2.default,
+            {
+              variant: 'contained',
+              style: { margin: '0 10px 0 10px' },
+              onClick: this.onClick('multi hplc')
+            },
+            'Multi HPLC'
+          ),
+          _react2.default.createElement(
+            _Button2.default,
+            {
+              variant: 'contained',
+              style: { margin: '0 10px 0 10px' },
+              onClick: this.onClick('multi xrd')
+            },
+            'Multi XRD'
           )
         ),
         _react2.default.createElement(_app.SpectraEditor, {

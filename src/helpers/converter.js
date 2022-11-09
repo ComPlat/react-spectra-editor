@@ -13,7 +13,10 @@ const ToXY = (data) => {
 const IsSame = (one, two) => Math.abs((one - two) * 10000000) < 1.0;
 
 const pksRmNeg = (dataPks, editPeakSt) => {
-  const { neg } = editPeakSt;
+  const { selectedIdx, peaks } = editPeakSt;
+  const selectedEditPeaks = peaks[selectedIdx];
+
+  const { neg } = selectedEditPeaks;
   const negXs = neg.map(n => n.x);
   const result = dataPks.map((p) => {
     const idx = negXs.findIndex(nx => IsSame(nx, p.x));
@@ -23,7 +26,10 @@ const pksRmNeg = (dataPks, editPeakSt) => {
 };
 
 const pksAddPos = (dataPks, editPeakSt) => {
-  const { pos } = editPeakSt;
+  const { selectedIdx, peaks } = editPeakSt;
+  const selectedEditPeaks = peaks[selectedIdx];
+
+  const { pos } = selectedEditPeaks;
   const posXs = pos.map(p => p.x);
   const posPks = dataPks.map((p) => {
     const idx = posXs.findIndex(px => px === p.x);

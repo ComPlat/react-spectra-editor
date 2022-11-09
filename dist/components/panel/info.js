@@ -170,7 +170,8 @@ var InfoPanel = function InfoPanel(_ref) {
       descriptions = _ref.descriptions,
       layoutSt = _ref.layoutSt,
       simulationSt = _ref.simulationSt,
-      shiftNameSt = _ref.shiftNameSt,
+      shiftSt = _ref.shiftSt,
+      curveSt = _ref.curveSt,
       onExapnd = _ref.onExapnd,
       canChangeDescription = _ref.canChangeDescription,
       onDescriptionChanged = _ref.onDescriptionChanged;
@@ -179,8 +180,15 @@ var InfoPanel = function InfoPanel(_ref) {
   var title = feature.title,
       observeFrequency = feature.observeFrequency,
       solventName = feature.solventName;
+  var curveIdx = curveSt.curveIdx;
+  var shifts = shiftSt.shifts;
 
-  var showSolvName = shiftNameSt === '- - -' ? solventName : shiftNameSt;
+  var selectedShift = shifts[curveIdx];
+  var showSolvName = solventName;
+  if (selectedShift !== undefined) {
+    var shiftName = selectedShift.ref.name;
+    showSolvName = shiftName === '- - -' ? solventName : shiftName;
+  }
 
   var originStack = null;
   if (integration) {
@@ -313,7 +321,8 @@ var mapStateToProps = function mapStateToProps(state, props) {
     {
       layoutSt: state.layout,
       simulationSt: state.simulation,
-      shiftNameSt: state.shift.ref.name
+      shiftSt: state.shift,
+      curveSt: state.curve
     }
   );
 };
@@ -332,7 +341,8 @@ InfoPanel.propTypes = {
   descriptions: _propTypes2.default.array.isRequired,
   layoutSt: _propTypes2.default.string.isRequired,
   simulationSt: _propTypes2.default.array.isRequired,
-  shiftNameSt: _propTypes2.default.string.isRequired,
+  shiftSt: _propTypes2.default.object.isRequired,
+  curveSt: _propTypes2.default.object.isRequired,
   onExapnd: _propTypes2.default.func.isRequired,
   canChangeDescription: _propTypes2.default.bool.isRequired,
   onDescriptionChanged: _propTypes2.default.func

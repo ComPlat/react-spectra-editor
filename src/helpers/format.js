@@ -200,8 +200,10 @@ const formatedHplcUvVis = (
 
 const rmShiftFromPeaks = (peaks, shift) => {
   const peaksXY = ToXY(peaks);
+  const { selectedIdx, shifts } = shift;
+  const selectedShift = shifts[selectedIdx];
   // const digit = spectraDigit(layout);
-  const rmShiftX = shift.ref.value || shift.peak.x;
+  const rmShiftX = selectedShift.ref.value || selectedShift.peak.x;
   const result = peaksXY.map((p) => {
     const srcX = parseFloat(p[0]);
     const x = IsSame(srcX, rmShiftX) ? null : srcX;

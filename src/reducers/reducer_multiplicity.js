@@ -6,6 +6,18 @@ import {
 import { undoRedoConfig, undoRedoActions } from './undo_redo_config';
 
 const initialState = {
+  selectedIdx: 0,
+  multiplicities: [
+    {
+      stack: [],
+      shift: 0,
+      smExtext: false,
+      edited: false,
+    }
+  ],
+};
+
+const defaultEmptyMultiplicity = {
   stack: [],
   shift: 0,
   smExtext: false,
@@ -14,12 +26,24 @@ const initialState = {
 
 const setShift = (state, action) => {
   const shift = action.payload.prevOffset;
-  return Object.assign({}, state, { shift });
+
+  const { selectedIdx, multiplicities } = state;
+  const selectedMulti = multiplicities[selectedIdx];
+
+  const newSelectedMulti = Object.assign({}, selectedMulti, { shift });
+  multiplicities[selectedIdx] = newSelectedMulti;
+  return Object.assign({}, state, { multiplicities });
 };
 
 const rmFromStack = (state, action) => {
-  const { stack } = state;
-  const { xL, xU, xExtent } = action.payload;
+
+  const { dataToRemove, curveIdx } = action.payload;
+
+  const { multiplicities } = state;
+  const selectedMulti = multiplicities[curveIdx];
+
+  const { stack } = selectedMulti;
+  const { xL, xU, xExtent } = dataToRemove;
   let [txL, txU] = [0, 0];
   if (xL && xU) { // rm click integration
     [txL, txU] = [xL, xU];
@@ -33,14 +57,21 @@ const rmFromStack = (state, action) => {
     return kxL !== txL && kxU !== txU;
   });
   const newSmExtext = newStack[0] ? newStack[0].xExtent : false;
-  return Object.assign({}, state, { stack: newStack, smExtext: newSmExtext });
+
+  const newSelectedMulti = Object.assign({}, selectedMulti, { stack: newStack, smExtext: newSmExtext });
+  multiplicities[curveIdx] = newSelectedMulti;
+  return Object.assign({}, state, { multiplicities, selectedIdx: curveIdx });
 };
 
 const updateMpyJ = (state, action) => {
   const { payload } = action;
   const { xExtent, value } = payload;
   if (!value && value !== '') return state;
-  const { stack } = state;
+
+  const { selectedIdx, multiplicities } = state;
+  const selectedMulti = multiplicities[selectedIdx];
+
+  const { stack } = selectedMulti;
   const regx = /[^0-9.,-]/g;
   const js = value.replace(regx, '').split(',').map(j => parseFloat(j)).filter(j => j);
 
@@ -51,17 +82,33 @@ const updateMpyJ = (state, action) => {
     }
     return k;
   });
-  return Object.assign({}, state, { stack: newStack });
+
+  const newSelectedMulti = Object.assign({}, selectedMulti,  { stack: newStack });
+  multiplicities[selectedIdx] = newSelectedMulti;
+  return Object.assign({}, state, { multiplicities });
 };
 
 const clickMpyOne = (state, action) => {
   const { payload } = action;
-  return Object.assign({}, state, { smExtext: payload });
+  const { curveIdx, payloadData } = payload
+
+  const { multiplicities } = state;
+  const selectedMulti = multiplicities[curveIdx];
+
+  const newSelectedMulti = Object.assign({}, selectedMulti,  { smExtext: payloadData });
+  multiplicities[curveIdx] = newSelectedMulti;
+  return Object.assign({}, state, { multiplicities, selectedIdx: curveIdx });
 };
 
-const clearAll = () => (
-  Object.assign({}, initialState, { edited: true })
-);
+const clearAll = (state, action) => {
+  const { payload } = action;
+  const { curveIdx } = payload;
+  const { multiplicities } = state;
+
+  const newSelectedMulti = Object.assign({}, defaultEmptyMultiplicity,  { edited: true });
+  multiplicities[curveIdx] = newSelectedMulti;
+  return Object.assign({}, state, { multiplicities });
+};
 
 const multiplicityReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -85,7 +132,7 @@ const multiplicityReducer = (state = initialState, action) => {
     case MULTIPLICITY.RESET_ALL_RDC:
       return action.payload;
     case MULTIPLICITY.CLEAR_ALL:
-      return clearAll();
+      return clearAll(state, action);
     case MANAGER.RESETALL:
       return state;
     default:

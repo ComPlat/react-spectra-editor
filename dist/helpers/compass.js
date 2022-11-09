@@ -132,16 +132,18 @@ var ClickCompass = function ClickCompass(focus) {
 
   if (_format2.default.isCyclicVoltaLayout(layout)) {
     pt = fetchFreePt(focus, xt, yt);
-  }
-  var onPeak = false;
-  if (cyclicvoltaSt) {
-    var spectraList = cyclicvoltaSt.spectraList;
+    var onPeak = false;
+    if (cyclicvoltaSt) {
+      var spectraList = cyclicvoltaSt.spectraList;
 
-    var spectra = spectraList[jcampIdx];
-    var voltammetryPeakIdx = spectra.selectedIdx;
-    focus.clickUiTargetAct(pt, onPeak, voltammetryPeakIdx, jcampIdx);
+      var spectra = spectraList[jcampIdx];
+      var voltammetryPeakIdx = spectra.selectedIdx;
+      focus.clickUiTargetAct(pt, onPeak, voltammetryPeakIdx, jcampIdx);
+    } else {
+      focus.clickUiTargetAct(pt, onPeak);
+    }
   } else {
-    focus.clickUiTargetAct(pt, onPeak);
+    focus.clickUiTargetAct(pt, false);
   }
 };
 

@@ -58,7 +58,8 @@ var Multiplicity = function Multiplicity(_ref) {
       isFocusRmPeakSt = _ref.isFocusRmPeakSt,
       disableMpyPeakSt = _ref.disableMpyPeakSt,
       setUiSweepTypeAct = _ref.setUiSweepTypeAct,
-      clearMpyAllAct = _ref.clearMpyAllAct;
+      clearMpyAllAct = _ref.clearMpyAllAct,
+      curveSt = _ref.curveSt;
 
   var onSweepMutAdd = function onSweepMutAdd() {
     return setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD);
@@ -71,6 +72,11 @@ var Multiplicity = function Multiplicity(_ref) {
   };
   var onPeakMutRm = function onPeakMutRm() {
     return setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_RM);
+  };
+  var curveIdx = curveSt.curveIdx;
+
+  var onClearAll = function onClearAll() {
+    return clearMpyAllAct({ curveIdx: curveIdx });
   };
 
   return _react2.default.createElement(
@@ -180,7 +186,7 @@ var Multiplicity = function Multiplicity(_ref) {
       _tri_btn2.default,
       {
         content: { tp: 'Clear All Multiplicity' },
-        cb: clearMpyAllAct
+        cb: onClearAll
       },
       _react2.default.createElement(
         'span',
@@ -200,7 +206,8 @@ var mapStateToProps = function mapStateToProps(state, props) {
       disableRmMpySt: _cfg2.default.btnCmdMpy(state.layout),
       isFocusAddPeakSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_ADD,
       isFocusRmPeakSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_RM,
-      disableMpyPeakSt: _cfg2.default.btnCmdMpyPeak(state.layout, state.multiplicity.present)
+      disableMpyPeakSt: _cfg2.default.btnCmdMpyPeak(state.layout, state.multiplicity.present),
+      curveSt: state.curve
     }
   );
 };
@@ -222,7 +229,8 @@ Multiplicity.propTypes = {
   isFocusRmPeakSt: _propTypes2.default.bool.isRequired,
   disableMpyPeakSt: _propTypes2.default.bool.isRequired,
   setUiSweepTypeAct: _propTypes2.default.func.isRequired,
-  clearMpyAllAct: _propTypes2.default.func.isRequired
+  clearMpyAllAct: _propTypes2.default.func.isRequired,
+  curveSt: _propTypes2.default.object.isRequired
 };
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(Multiplicity));

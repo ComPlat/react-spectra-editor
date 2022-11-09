@@ -231,8 +231,12 @@ var formatedHplcUvVis = function formatedHplcUvVis(peaks) {
 
 var rmShiftFromPeaks = function rmShiftFromPeaks(peaks, shift) {
   var peaksXY = (0, _converter.ToXY)(peaks);
+  var selectedIdx = shift.selectedIdx,
+      shifts = shift.shifts;
+
+  var selectedShift = shifts[selectedIdx];
   // const digit = spectraDigit(layout);
-  var rmShiftX = shift.ref.value || shift.peak.x;
+  var rmShiftX = selectedShift.ref.value || selectedShift.peak.x;
   var result = peaksXY.map(function (p) {
     var srcX = parseFloat(p[0]);
     var x = (0, _converter.IsSame)(srcX, rmShiftX) ? null : srcX;

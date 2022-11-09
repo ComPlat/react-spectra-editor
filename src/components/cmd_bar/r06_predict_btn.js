@@ -208,9 +208,16 @@ const BtnPredict = ({
   const thres = Convert2Thres(feature, thresSt);
   const simuCount = simulationSt.nmrSimPeaks.length;
   const uniqCount = [...new Set(simulationSt.nmrSimPeaks)].length;
-  const realCount = Format.is13CLayout(layoutSt)
-    ? carbonFeatures(peaksEdit, multiplicitySt).length
-    : multiplicitySt.stack.length;
+  let realCount = 0;
+  if (Format.is13CLayout(layoutSt)) {
+    realCount =  carbonFeatures(peaksEdit, multiplicitySt).length
+  }
+  else {
+    const { selectedIdx, multiplicities } = multiplicitySt;
+    const selectedMultiplicity = multiplicities[selectedIdx];
+    const { stack } = selectedMultiplicity;
+    realCount = stack.length;
+  }
     
   if (is13Cor1H && simuCount === 0) {
     const onClickUnknownCb = onClicUnknown(

@@ -121,18 +121,22 @@ const ClickCompass = (focus) => {
   let pt = fetchPt(focus, xt);
   const { layout, cyclicvoltaSt, jcampIdx } = focus;
   if (Format.isCyclicVoltaLayout(layout)) {
-    pt = fetchFreePt(focus, xt, yt)
-  }
-  const onPeak = false;
-  if (cyclicvoltaSt) {
-    const { spectraList } = cyclicvoltaSt;
-    const spectra = spectraList[jcampIdx];
-    const voltammetryPeakIdx = spectra.selectedIdx;
-    focus.clickUiTargetAct(pt, onPeak, voltammetryPeakIdx, jcampIdx);
+    pt = fetchFreePt(focus, xt, yt);
+    const onPeak = false;
+    if (cyclicvoltaSt) {
+      const { spectraList } = cyclicvoltaSt;
+      const spectra = spectraList[jcampIdx];
+      const voltammetryPeakIdx = spectra.selectedIdx;
+      focus.clickUiTargetAct(pt, onPeak, voltammetryPeakIdx, jcampIdx);
+    }
+    else {
+      focus.clickUiTargetAct(pt, onPeak);
+    }
   }
   else {
-    focus.clickUiTargetAct(pt, onPeak);
+    focus.clickUiTargetAct(pt, false);
   }
+  
 };
 
 const MountCompass = (focus) => {
