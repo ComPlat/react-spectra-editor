@@ -80,7 +80,8 @@ var MultiJcampsViewer = function (_React$Component) {
           curvSt = _props.curvSt,
           operations = _props.operations,
           entityFileNames = _props.entityFileNames,
-          entities = _props.entities;
+          entities = _props.entities,
+          userManualLink = _props.userManualLink;
 
       if (!entities || entities.length === 0) return _react2.default.createElement('div', null);
 
@@ -122,6 +123,7 @@ var MultiJcampsViewer = function (_React$Component) {
               _react2.default.createElement(_index2.default, {
                 jcampIdx: curvSt.curveIdx,
                 entityFileNames: entityFileNames,
+                userManualLink: userManualLink,
                 feature: feature,
                 molSvg: molSvg,
                 descriptions: '',
@@ -169,7 +171,8 @@ MultiJcampsViewer.propTypes = {
   addNewCylicVoltaPairPeakAct: _propTypes2.default.func.isRequired,
   addCylicVoltaMaxPeakAct: _propTypes2.default.func.isRequired,
   addCylicVoltaMinPeakAct: _propTypes2.default.func.isRequired,
-  operations: _propTypes2.default.func.isRequired
+  operations: _propTypes2.default.func.isRequired,
+  userManualLink: _propTypes2.default.object
 };
 
 MultiJcampsViewer.defaultProps = {

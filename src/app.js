@@ -33,13 +33,14 @@ const SpectraEditor = ({
   entity, others, cLabel, xLabel, yLabel,
   operations, forecast, molSvg, editorOnly, descriptions,
   canChangeDescription, onDescriptionChanged,
-  multiEntities, multiMolSvgs, entityFileNames
+  multiEntities, multiMolSvgs, entityFileNames, userManualLink
 }) => (
   <Provider store={store}>
     <LayerInit
       entity={entity}
       multiEntities={multiEntities}
       entityFileNames={entityFileNames}
+      userManualLink={userManualLink}
       others={others}
       cLabel={cLabel}
       xLabel={xLabel}
@@ -75,7 +76,8 @@ SpectraEditor.propTypes = {
   multiMolSvgs: PropTypes.array,
   editorOnly: PropTypes.bool,
   canChangeDescription: PropTypes.bool,
-  onDescriptionChanged: PropTypes.func
+  onDescriptionChanged: PropTypes.func,
+  userManualLink: PropTypes.object,
 };
 
 SpectraEditor.defaultProps = {
@@ -92,6 +94,7 @@ SpectraEditor.defaultProps = {
   multiMolSvgs: [],
   editorOnly: false,
   canChangeDescription: false,
+  userManualLink: {},
 };
 
 export {

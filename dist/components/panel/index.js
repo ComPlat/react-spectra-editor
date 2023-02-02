@@ -129,7 +129,8 @@ var PanelViewer = function (_React$Component) {
           layoutSt = _props.layoutSt,
           canChangeDescription = _props.canChangeDescription,
           jcampIdx = _props.jcampIdx,
-          entityFileNames = _props.entityFileNames;
+          entityFileNames = _props.entityFileNames,
+          userManualLink = _props.userManualLink;
 
       var onExapndInfo = function onExapndInfo() {
         return _this2.onExapnd('info');
@@ -173,7 +174,7 @@ var PanelViewer = function (_React$Component) {
           _cfg2.default.hidePanelPeak(layoutSt) ? null : _react2.default.createElement(_peaks2.default, { expand: expand === 'peak', onExapnd: onExapndPeak }),
           _cfg2.default.hidePanelMpy(layoutSt) ? null : _react2.default.createElement(_multiplicity2.default, { expand: expand === 'mpy', onExapnd: onExapndMpy }),
           _cfg2.default.hidePanelCompare(layoutSt) ? null : _react2.default.createElement(_compare2.default, { expand: expand === 'compare', onExapnd: onExapndCompare }),
-          _cfg2.default.hidePanelCyclicVolta(layoutSt) ? null : _react2.default.createElement(_cyclic_voltamery_data2.default, { jcampIdx: jcampIdx, feature: feature, expand: expand === 'cyclicvolta', onExapnd: onExapndCyclicVolta })
+          _cfg2.default.hidePanelCyclicVolta(layoutSt) ? null : _react2.default.createElement(_cyclic_voltamery_data2.default, { jcampIdx: jcampIdx, feature: feature, expand: expand === 'cyclicvolta', onExapnd: onExapndCyclicVolta, userManualLink: userManualLink ? userManualLink.cv : undefined })
         )
       );
     }
@@ -204,7 +205,8 @@ PanelViewer.propTypes = {
   layoutSt: _propTypes2.default.string.isRequired,
   canChangeDescription: _propTypes2.default.bool.isRequired,
   onDescriptionChanged: _propTypes2.default.func,
-  entityFileNames: _propTypes2.default.array
+  entityFileNames: _propTypes2.default.array,
+  userManualLink: _propTypes2.default.object
 };
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(PanelViewer));
