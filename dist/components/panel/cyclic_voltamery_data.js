@@ -36,6 +36,10 @@ var _Info = require('@material-ui/icons/Info');
 
 var _Info2 = _interopRequireDefault(_Info);
 
+var _Help = require('@material-ui/icons/Help');
+
+var _Help2 = _interopRequireDefault(_Help);
+
 var _Tooltip = require('@material-ui/core/Tooltip');
 
 var _Tooltip2 = _interopRequireDefault(_Tooltip);
@@ -98,12 +102,30 @@ var styles = function styles() {
       padding: 10
     },
     infoIcon: {
-      width: '0.6em',
-      height: '0.6em'
+      width: '15px',
+      height: '16px'
     },
     txtToolTip: {
       lineHeight: 'normal !important',
       fontSize: '14px !important'
+    },
+    rowRoot: {
+      border: '1px solid #eee',
+      height: 36,
+      lineHeight: '36px',
+      overflow: 'hidden',
+      paddingLeft: 24,
+      textAlign: 'left'
+    },
+    rowOdd: {
+      backgroundColor: '#fff',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap'
+    },
+    rowEven: {
+      backgroundColor: '#fafafa',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap'
     }
   };
 };
@@ -118,7 +140,8 @@ var CyclicVoltammetryPanel = function CyclicVoltammetryPanel(_ref) {
       removePairPeakAct = _ref.removePairPeakAct,
       sweepTypeSt = _ref.sweepTypeSt,
       setUiSweepTypeAct = _ref.setUiSweepTypeAct,
-      jcampIdx = _ref.jcampIdx;
+      jcampIdx = _ref.jcampIdx,
+      userManualLink = _ref.userManualLink;
   var spectraList = cyclicVotaSt.spectraList;
 
   var spectra = spectraList[jcampIdx];
@@ -236,7 +259,7 @@ var CyclicVoltammetryPanel = function CyclicVoltammetryPanel(_ref) {
                   { className: (0, _classnames2.default)(classes.txtToolTip) },
                   'Baseline correction value for I ratio ',
                   _react2.default.createElement('br', null),
-                  '(aka y value of pecker)'
+                  '(a.k.a y value of pecker)'
                 )
               },
               _react2.default.createElement(_Info2.default, { className: (0, _classnames2.default)(classes.infoIcon) })
@@ -361,6 +384,30 @@ var CyclicVoltammetryPanel = function CyclicVoltammetryPanel(_ref) {
           );
         })
       )
+    ),
+    _react2.default.createElement(
+      'div',
+      { className: (0, _classnames2.default)(classes.rowRoot, classes.rowEven) },
+      _react2.default.createElement(
+        _Tooltip2.default,
+        {
+          title: _react2.default.createElement(
+            'span',
+            { className: (0, _classnames2.default)(classes.txtToolTip) },
+            'Click here to open the User manual document'
+          )
+        },
+        _react2.default.createElement(
+          'span',
+          null,
+          _react2.default.createElement(
+            'a',
+            { target: '_blank', rel: 'noopener noreferrer', href: userManualLink },
+            'How-To'
+          ),
+          _react2.default.createElement(_Help2.default, { className: (0, _classnames2.default)(classes.infoIcon) })
+        )
+      )
     )
   );
 };
@@ -398,7 +445,8 @@ CyclicVoltammetryPanel.propTypes = {
   selectPairPeakAct: _propTypes2.default.func.isRequired,
   removePairPeakAct: _propTypes2.default.func.isRequired,
   setUiSweepTypeAct: _propTypes2.default.func.isRequired,
-  sweepTypeSt: _propTypes2.default.string.isRequired
+  sweepTypeSt: _propTypes2.default.string.isRequired,
+  userManualLink: _propTypes2.default.string
 };
 
 CyclicVoltammetryPanel.defaultProps = {

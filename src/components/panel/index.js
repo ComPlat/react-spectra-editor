@@ -62,7 +62,7 @@ class PanelViewer extends React.Component {
   render() {
     const { expand } = this.state;
     const {
-      classes, feature, integration, editorOnly, molSvg, descriptions, layoutSt, canChangeDescription, jcampIdx, entityFileNames
+      classes, feature, integration, editorOnly, molSvg, descriptions, layoutSt, canChangeDescription, jcampIdx, entityFileNames, userManualLink
     } = this.props;
     const onExapndInfo = () => this.onExapnd('info');
     const onExapndPeak = () => this.onExapnd('peak');
@@ -91,7 +91,7 @@ class PanelViewer extends React.Component {
           { Cfg.hidePanelPeak(layoutSt) ? null : <PeakPanel expand={expand === 'peak'} onExapnd={onExapndPeak} /> }
           { Cfg.hidePanelMpy(layoutSt) ? null : <MultiplicityPanel expand={expand === 'mpy'} onExapnd={onExapndMpy} /> }
           { Cfg.hidePanelCompare(layoutSt) ? null : <ComparePanel expand={expand === 'compare'} onExapnd={onExapndCompare} /> }
-          { Cfg.hidePanelCyclicVolta(layoutSt) ? null: <CyclicVoltammetryPanel jcampIdx={jcampIdx} feature={feature} expand={expand === 'cyclicvolta'} onExapnd={onExapndCyclicVolta} />}
+          { Cfg.hidePanelCyclicVolta(layoutSt) ? null: <CyclicVoltammetryPanel jcampIdx={jcampIdx} feature={feature} expand={expand === 'cyclicvolta'} onExapnd={onExapndCyclicVolta} userManualLink={userManualLink ? userManualLink.cv : undefined} />}
         </MuiThemeProvider>
       </div>
     );
@@ -120,6 +120,7 @@ PanelViewer.propTypes = {
   canChangeDescription: PropTypes.bool.isRequired,
   onDescriptionChanged: PropTypes.func,
   entityFileNames: PropTypes.array,
+  userManualLink: PropTypes.object,
 };
 
 export default connect(

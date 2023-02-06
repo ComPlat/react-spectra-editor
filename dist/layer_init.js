@@ -182,7 +182,8 @@ var LayerInit = function (_React$Component) {
           canChangeDescription = _props5.canChangeDescription,
           onDescriptionChanged = _props5.onDescriptionChanged,
           multiEntities = _props5.multiEntities,
-          entityFileNames = _props5.entityFileNames;
+          entityFileNames = _props5.entityFileNames,
+          userManualLink = _props5.userManualLink;
 
       var target = entity.spectra[0];
 
@@ -196,6 +197,7 @@ var LayerInit = function (_React$Component) {
         return _react2.default.createElement(_multi_jcamps_viewer2.default, {
           multiEntities: multiEntities,
           entityFileNames: entityFileNames,
+          userManualLink: userManualLink,
           molSvg: molSvg,
           operations: operations
         });
@@ -203,6 +205,7 @@ var LayerInit = function (_React$Component) {
         return _react2.default.createElement(_multi_jcamps_viewer2.default, {
           multiEntities: [entity],
           entityFileNames: entityFileNames,
+          userManualLink: userManualLink,
           molSvg: molSvg,
           operations: operations
         });
@@ -268,7 +271,8 @@ LayerInit.propTypes = {
   addOthersAct: _propTypes2.default.func.isRequired,
   canChangeDescription: _propTypes2.default.bool.isRequired,
   onDescriptionChanged: _propTypes2.default.func,
-  setAllCurvesAct: _propTypes2.default.func.isRequired
+  setAllCurvesAct: _propTypes2.default.func.isRequired,
+  userManualLink: _propTypes2.default.object
 };
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(LayerInit));

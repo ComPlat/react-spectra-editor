@@ -32,7 +32,7 @@ class MultiJcampsViewer extends React.Component {
   }
 
   render() {
-    const { classes, curvSt, operations, entityFileNames, entities } = this.props;
+    const { classes, curvSt, operations, entityFileNames, entities, userManualLink } = this.props;
     if (!entities || entities.length === 0) return (<div></div>);
 
     const entity = entities[curvSt.curveIdx];
@@ -61,6 +61,7 @@ class MultiJcampsViewer extends React.Component {
               <PanelViewer
                 jcampIdx={curvSt.curveIdx}
                 entityFileNames={entityFileNames}
+                userManualLink={userManualLink}
                 feature={feature}
                 molSvg={molSvg}
                 descriptions={''}
@@ -105,6 +106,7 @@ MultiJcampsViewer.propTypes = {
   addCylicVoltaMaxPeakAct: PropTypes.func.isRequired,
   addCylicVoltaMinPeakAct: PropTypes.func.isRequired,
   operations: PropTypes.func.isRequired,
+  userManualLink: PropTypes.object,
 };
 
 MultiJcampsViewer.defaultProps = {
