@@ -8,6 +8,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 import InfoIcon from '@material-ui/icons/Info';
+import HelpIcon from '@material-ui/icons/Help';
 import Tooltip from '@material-ui/core/Tooltip';
 import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
@@ -53,20 +54,38 @@ const styles = () => ({
     padding: 10,
   },
   infoIcon: {
-    width: '0.6em',
-    height: '0.6em'
+    width: '15px',
+    height: '16px'
   },
   txtToolTip: {
     lineHeight: 'normal !important',
     fontSize: '14px !important'
-  }
+  },
+  rowRoot: {
+    border: '1px solid #eee',
+    height: 36,
+    lineHeight: '36px',
+    overflow: 'hidden',
+    paddingLeft: 24,
+    textAlign: 'left',
+  },
+  rowOdd: {
+    backgroundColor: '#fff',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
+  rowEven: {
+    backgroundColor: '#fafafa',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
 });
 
 
 const CyclicVoltammetryPanel = ({
   classes, cyclicVotaSt, feature,
   addNewPairPeakAct, setWorkWithMaxPeakAct, selectPairPeakAct, removePairPeakAct,
-  sweepTypeSt, setUiSweepTypeAct, jcampIdx
+  sweepTypeSt, setUiSweepTypeAct, jcampIdx, userManualLink
 }) => {
   const { spectraList } = cyclicVotaSt;
   const spectra = spectraList[jcampIdx];
@@ -158,7 +177,7 @@ const CyclicVoltammetryPanel = ({
                 title={
                   <p className={classNames(classes.txtToolTip)}>
                     Baseline correction value for I ratio <br/>
-                    (aka y value of pecker)
+                    (a.k.a y value of pecker)
                   </p>
                 }
               >
@@ -258,6 +277,21 @@ https://doi.org/10.1021/ac60242a030</i>
         }
         </TableBody>
       </Table>
+
+      <div className={classNames(classes.rowRoot, classes.rowEven)}>
+        <Tooltip 
+          title={
+            <span className={classNames(classes.txtToolTip)}>
+              Click here to open the User manual document
+            </span>
+          }
+        >
+          <span>
+            <a target="_blank" rel="noopener noreferrer" href={ userManualLink }>How-To</a>
+            <HelpIcon className={classNames(classes.infoIcon)}/>
+          </span>
+        </Tooltip>
+      </div>
     </ExpansionPanel>
   );
 };
@@ -294,6 +328,7 @@ CyclicVoltammetryPanel.propTypes = {
   removePairPeakAct: PropTypes.func.isRequired,
   setUiSweepTypeAct: PropTypes.func.isRequired,
   sweepTypeSt: PropTypes.string.isRequired,
+  userManualLink: PropTypes.string,
 };
 
 CyclicVoltammetryPanel.defaultProps = {

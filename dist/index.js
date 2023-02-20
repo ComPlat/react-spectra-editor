@@ -713,7 +713,8 @@ var DemoWriteIr = function (_React$Component) {
           others: others,
           editorOnly: false,
           canChangeDescription: true,
-          onDescriptionChanged: this.onDescriptionChanged
+          onDescriptionChanged: this.onDescriptionChanged,
+          userManualLink: { cv: "https://www.chemotion.net/chemotionsaurus/docs/eln/chemspectra/cvanalysis" }
         }),
         _react2.default.createElement(
           'div',

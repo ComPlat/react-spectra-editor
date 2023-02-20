@@ -104,7 +104,7 @@ class LayerInit extends React.Component {
       entity, cLabel, xLabel, yLabel, forecast, operations,
       descriptions, molSvg, editorOnly,
       canChangeDescription, onDescriptionChanged,
-      multiEntities, entityFileNames
+      multiEntities, entityFileNames, userManualLink
     } = this.props;
     const target = entity.spectra[0];
 
@@ -118,6 +118,7 @@ class LayerInit extends React.Component {
         <MultiJcampsViewer 
           multiEntities={multiEntities}
           entityFileNames={entityFileNames}
+          userManualLink={userManualLink}
           molSvg={molSvg}
           operations={operations}
         />
@@ -128,6 +129,7 @@ class LayerInit extends React.Component {
         <MultiJcampsViewer 
           multiEntities={[entity]}
           entityFileNames={entityFileNames}
+          userManualLink={userManualLink}
           molSvg={molSvg}
           operations={operations}
         />
@@ -192,6 +194,7 @@ LayerInit.propTypes = {
   canChangeDescription: PropTypes.bool.isRequired,
   onDescriptionChanged: PropTypes.func,
   setAllCurvesAct: PropTypes.func.isRequired,
+  userManualLink: PropTypes.object,
 };
 
 export default connect(
