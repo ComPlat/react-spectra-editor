@@ -486,6 +486,7 @@ class DemoWriteIr extends React.Component {
           editorOnly={false}
           canChangeDescription={true}
           onDescriptionChanged={this.onDescriptionChanged}
+          molSvg={molSvg}
           userManualLink={{cv: "https://www.chemotion.net/chemotionsaurus/docs/eln/chemspectra/cvanalysis"}}
         />
         <div>
