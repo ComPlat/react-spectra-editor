@@ -279,7 +279,16 @@ var convertThresEndPts = function convertThresEndPts(feature, threshold) {
 var ToThresEndPts = (0, _reselect.createSelector)(getFeature, getThreshold, convertThresEndPts);
 
 var getShiftPeak = function getShiftPeak(state) {
-  return state.shift.peak;
+  var curve = state.curve,
+      shift = state.shift;
+  var curveIdx = curve.curveIdx;
+  var shifts = shift.shifts;
+
+  var selectedShift = shifts[curveIdx];
+  if (!selectedShift) {
+    return false;
+  }
+  return selectedShift.peak;
 };
 
 var convertSfPeaks = function convertSfPeaks(peak, offset) {

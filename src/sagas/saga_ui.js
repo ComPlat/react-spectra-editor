@@ -7,6 +7,7 @@ import { LIST_UI_SWEEP_TYPE } from '../constants/list_ui';
 import { LIST_LAYOUT } from '../constants/list_layout';
 
 const getUiSt = state => state.ui;
+const getCurveSt = state => state.curve
 
 const calcPeaks = (payload) => {
   const { xExtent, yExtent, dataPks } = payload;
@@ -20,6 +21,9 @@ const calcPeaks = (payload) => {
 function* selectUiSweep(action) {
   const uiSt = yield select(getUiSt);
   const { payload } = action;
+
+  const curveSt = yield select(getCurveSt);
+  const { curveIdx } = curveSt;
 
   switch (uiSt.sweepType) {
     case LIST_UI_SWEEP_TYPE.ZOOMIN:
@@ -37,7 +41,7 @@ function* selectUiSweep(action) {
     case LIST_UI_SWEEP_TYPE.INTEGRATION_ADD:
       yield put({
         type: UI.SWEEP.SELECT_INTEGRATION,
-        payload,
+        payload: { newData: payload, curveIdx: curveIdx },
       });
       break;
     case LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD:
@@ -47,11 +51,11 @@ function* selectUiSweep(action) {
 
       yield put({
         type: UI.SWEEP.SELECT_INTEGRATION,
-        payload: newPayload,
+        payload: { newData: newPayload, curveIdx: curveIdx },
       });
       yield put({
         type: UI.SWEEP.SELECT_MULTIPLICITY,
-        payload: newPayload,
+        payload: { newData: newPayload, curveIdx: curveIdx },
       });
       break;
     default:
@@ -112,44 +116,44 @@ function* clickUiTarget(action) {
   if (uiSweepType === LIST_UI_SWEEP_TYPE.PEAK_ADD && !onPeak) {
     yield put({
       type: EDITPEAK.ADD_POSITIVE,
-      payload,
+      payload: { dataToAdd: payload, curveIdx: jcampIdx },
     });
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.PEAK_DELETE && onPeak) {
     yield put({
       type: EDITPEAK.ADD_NEGATIVE,
-      payload,
+      payload: { dataToAdd: payload, curveIdx: jcampIdx },
     });
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT && onPeak) {
     yield put({
       type: SHIFT.SET_PEAK,
-      payload,
+      payload: { dataToSet: payload, curveIdx: jcampIdx },
     });
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_RM && onPeak) {
     yield put({
       type: INTEGRATION.RM_ONE,
-      payload,
+      payload: { dataToRemove: payload, curveIdx: jcampIdx },
     });
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_RM && onPeak) {
     yield put({
       type: INTEGRATION.RM_ONE,
-      payload,
+      payload: { dataToRemove: payload, curveIdx: jcampIdx },
     });
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF && onPeak) {
     yield put({
       type: INTEGRATION.SET_REF,
-      payload,
+      payload: { refData: payload, curveIdx: jcampIdx },
     });
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_CLICK && onPeak) {
     const { xExtent, xL, xU } = payload;
     if (xExtent) {
       yield put({
         type: MULTIPLICITY.ONE_CLICK_BY_UI,
-        payload: xExtent,
+        payload: { payloadData: xExtent, curveIdx: jcampIdx },
       });
     } else if (xL && xU) {
       yield put({
         type: MULTIPLICITY.ONE_CLICK_BY_UI,
-        payload: { xL, xU },
+        payload:{ payloadData: { xL, xU }, curveIdx: jcampIdx },
       });
     }
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_ADD) {

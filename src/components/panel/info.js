@@ -117,12 +117,20 @@ const aucValue = integration => {
 
 const InfoPanel = ({
   classes, expand, feature, integration, editorOnly, molSvg, descriptions,
-  layoutSt, simulationSt, shiftNameSt,
+  layoutSt, simulationSt, shiftSt, curveSt,
   onExapnd, canChangeDescription, onDescriptionChanged
 }) => {
   if (!feature) return null;
   const { title, observeFrequency, solventName } = feature;
-  const showSolvName = shiftNameSt === '- - -' ? solventName : shiftNameSt;
+  const { curveIdx } = curveSt;
+  const { shifts } = shiftSt;
+  const selectedShift = shifts[curveIdx];
+  let showSolvName = solventName;
+  if (selectedShift !== undefined) {
+    const shiftName = selectedShift.ref.name;
+    showSolvName = shiftName === '- - -' ? solventName : shiftName;
+  }
+  
 
   let originStack = null;
   if (integration) {
@@ -237,7 +245,8 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     layoutSt: state.layout,
     simulationSt: state.simulation,
-    shiftNameSt: state.shift.ref.name,
+    shiftSt: state.shift,
+    curveSt: state.curve,
   }
 );
 
@@ -256,7 +265,8 @@ InfoPanel.propTypes = {
   descriptions: PropTypes.array.isRequired,
   layoutSt: PropTypes.string.isRequired,
   simulationSt: PropTypes.array.isRequired,
-  shiftNameSt: PropTypes.string.isRequired,
+  shiftSt: PropTypes.object.isRequired,
+  curveSt: PropTypes.object.isRequired,
   onExapnd: PropTypes.func.isRequired,
   canChangeDescription: PropTypes.bool.isRequired,
   onDescriptionChanged: PropTypes.func

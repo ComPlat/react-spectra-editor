@@ -256,10 +256,24 @@ var refreshBtn = function refreshBtn(classes, onRefresh) {
   );
 };
 
-var mpyList = function mpyList(classes, digits, multiplicitySt, clickMpyOneAct, rmMpyPeakByPanelAct, resetMpyOneAct) {
-  var stack = multiplicitySt.stack,
-      shift = multiplicitySt.shift,
-      smExtext = multiplicitySt.smExtext;
+var mpyList = function mpyList(classes, digits, multiplicitySt, curveSt, clickMpyOneAct, rmMpyPeakByPanelAct, resetMpyOneAct) {
+  var curveIdx = curveSt.curveIdx;
+  var multiplicities = multiplicitySt.multiplicities;
+
+  var selectedMulti = multiplicities[curveIdx];
+  if (selectedMulti === undefined) {
+    selectedMulti = {
+      stack: [],
+      shift: 0,
+      smExtext: false,
+      edited: false
+    };
+  }
+
+  var _selectedMulti = selectedMulti,
+      stack = _selectedMulti.stack,
+      shift = _selectedMulti.shift,
+      smExtext = _selectedMulti.smExtext;
 
   var rows = stack.map(function (k, idx) {
     var peaks = k.peaks,
@@ -336,6 +350,7 @@ var MultiplicityPanel = function MultiplicityPanel(_ref) {
       expand = _ref.expand,
       onExapnd = _ref.onExapnd,
       multiplicitySt = _ref.multiplicitySt,
+      curveSt = _ref.curveSt,
       clickMpyOneAct = _ref.clickMpyOneAct,
       rmMpyPeakByPanelAct = _ref.rmMpyPeakByPanelAct,
       resetMpyOneAct = _ref.resetMpyOneAct;
@@ -370,7 +385,7 @@ var MultiplicityPanel = function MultiplicityPanel(_ref) {
     _react2.default.createElement(
       'div',
       { className: (0, _classnames2.default)(classes.panelDetail) },
-      mpyList(classes, digits, multiplicitySt, clickMpyOneAct, rmMpyPeakByPanelAct, resetMpyOneAct)
+      mpyList(classes, digits, multiplicitySt, curveSt, clickMpyOneAct, rmMpyPeakByPanelAct, resetMpyOneAct)
     )
   );
 };
@@ -379,7 +394,8 @@ var mapStateToProps = function mapStateToProps(state, props) {
   return (// eslint-disable-line
     {
       integrationSt: state.integration.present,
-      multiplicitySt: state.multiplicity.present
+      multiplicitySt: state.multiplicity.present,
+      curveSt: state.curve
     }
   );
 };
@@ -399,7 +415,8 @@ MultiplicityPanel.propTypes = {
   multiplicitySt: _propTypes2.default.object.isRequired,
   clickMpyOneAct: _propTypes2.default.func.isRequired,
   rmMpyPeakByPanelAct: _propTypes2.default.func.isRequired,
-  resetMpyOneAct: _propTypes2.default.func.isRequired
+  resetMpyOneAct: _propTypes2.default.func.isRequired,
+  curveSt: _propTypes2.default.object.isRequired
 };
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(MultiplicityPanel));

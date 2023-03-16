@@ -39,13 +39,22 @@ const styles = () => (
 const iconSize = '16px';
 
 const setFactor = (
-  classes, isDisable, refFactor, setIntegrationFkrAct,
+  classes, isDisable, refFactor, setIntegrationFkrAct, curveIdx
 ) => {
-  const onBlur = e => setIntegrationFkrAct(e.target.value);
-  const onChange = e => setIntegrationFkrAct(e.target.value);
+  const onBlur = e => setIntegrationFkrAct({
+    factor: e.target.value,
+    curveIdx,
+  });
+  const onChange = e => setIntegrationFkrAct({
+    factor: e.target.value,
+    curveIdx,
+  });
   const onEnterPress = (e) => {
     if (e.key === 'Enter') {
-      setIntegrationFkrAct(e.target.value);
+      setIntegrationFkrAct({
+        factor: e.target.value,
+        curveIdx,
+      });
     }
   };
 
@@ -75,10 +84,13 @@ const Integration = ({
   classes, refFactorSt, ignoreRef,
   isDisableSt, isFocusAddIntgSt, isFocusRmIntgSt, isFocusSetRefSt,
   setUiSweepTypeAct, setIntegrationFkrAct, clearIntegrationAllAct,
+  curveSt,
 }) => {
   const onSweepIntegtAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.INTEGRATION_ADD);
   const onSweepIntegtRm = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.INTEGRATION_RM);
   const onSweepIntegtSR = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF);
+  const { curveIdx } = curveSt;
+  const onClearAll = () => clearIntegrationAllAct({curveIdx});
 
   return (
     <span className={classes.group}>
@@ -147,13 +159,13 @@ const Integration = ({
       {
         !ignoreRef ?
         setFactor(
-          classes, isDisableSt, refFactorSt, setIntegrationFkrAct,
+          classes, isDisableSt, refFactorSt, setIntegrationFkrAct, curveIdx
         )
         : null
       }
       <TriBtn
         content={{ tp: 'Clear All Integration' }}
-        cb={clearIntegrationAllAct}
+        cb={onClearAll}
       >
         <Icon
           path={mdiMathIntegral}
@@ -175,6 +187,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     isFocusSetRefSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF,
     refFactorSt: state.integration.present.refFactor,
     ignoreRef: Format.isHplcUvVisLayout(state.layout),
+    curveSt: state.curve,
   }
 );
 
@@ -197,6 +210,7 @@ Integration.propTypes = {
   setUiSweepTypeAct: PropTypes.func.isRequired,
   setIntegrationFkrAct: PropTypes.func.isRequired,
   clearIntegrationAllAct: PropTypes.func.isRequired,
+  curveSt: PropTypes.object.isRequired,
 };
 
 export default connect(

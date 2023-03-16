@@ -43,7 +43,8 @@ class ViewerMulti extends React.Component {
       seed, peak, cLabel, xLabel, yLabel, feature,
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt,
       sweepExtentSt, isUiNoBrushSt,
-      isHidden,resetAllAct, cyclicvoltaSt
+      isHidden,resetAllAct, cyclicvoltaSt,
+      integationSt, mtplySt
     } = this.props;
 
     drawDestroy(this.rootKlass);
@@ -64,6 +65,8 @@ class ViewerMulti extends React.Component {
       sweepExtentSt,
       isUiNoBrushSt,
       cyclicvoltaSt,
+      integationSt,
+      mtplySt,
     });
     drawLabel(this.rootKlass, cLabel, xLabel, yLabel);
     drawDisplay(this.rootKlass, isHidden);
@@ -76,6 +79,7 @@ class ViewerMulti extends React.Component {
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt,
       sweepExtentSt, isUiNoBrushSt,
       isHidden, cyclicvoltaSt,
+      integationSt, mtplySt,
     } = this.props;
     this.normChange(prevProps);
 
@@ -94,6 +98,8 @@ class ViewerMulti extends React.Component {
       sweepExtentSt,
       isUiNoBrushSt,
       cyclicvoltaSt,
+      integationSt,
+      mtplySt
     });
     drawLabel(this.rootKlass, cLabel, xLabel, yLabel);
     drawDisplay(this.rootKlass, isHidden);
@@ -131,6 +137,8 @@ const mapStateToProps = (state, props) => (
     isUiNoBrushSt: LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
     cyclicvoltaSt: state.cyclicvolta,
     maxminPeakSt: Feature2MaxMinPeak(state, props),
+    integationSt: state.integration.present,
+    mtplySt: state.multiplicity.present,
   }
 );
 
@@ -159,6 +167,8 @@ ViewerMulti.propTypes = {
   tSfPeaks: PropTypes.array.isRequired,
   editPeakSt: PropTypes.object.isRequired,
   layoutSt: PropTypes.string.isRequired,
+  integationSt: PropTypes.object.isRequired,
+  mtplySt: PropTypes.object.isRequired,
   sweepExtentSt: PropTypes.object.isRequired,
   isUiNoBrushSt: PropTypes.bool.isRequired,
   resetAllAct: PropTypes.func.isRequired,

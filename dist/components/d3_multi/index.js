@@ -89,7 +89,9 @@ var ViewerMulti = function (_React$Component) {
           isUiNoBrushSt = _props.isUiNoBrushSt,
           isHidden = _props.isHidden,
           resetAllAct = _props.resetAllAct,
-          cyclicvoltaSt = _props.cyclicvoltaSt;
+          cyclicvoltaSt = _props.cyclicvoltaSt,
+          integationSt = _props.integationSt,
+          mtplySt = _props.mtplySt;
 
 
       (0, _draw.drawDestroy)(this.rootKlass);
@@ -109,7 +111,9 @@ var ViewerMulti = function (_React$Component) {
         layoutSt: layoutSt,
         sweepExtentSt: sweepExtentSt,
         isUiNoBrushSt: isUiNoBrushSt,
-        cyclicvoltaSt: cyclicvoltaSt
+        cyclicvoltaSt: cyclicvoltaSt,
+        integationSt: integationSt,
+        mtplySt: mtplySt
       });
       (0, _draw.drawLabel)(this.rootKlass, cLabel, xLabel, yLabel);
       (0, _draw.drawDisplay)(this.rootKlass, isHidden);
@@ -132,7 +136,9 @@ var ViewerMulti = function (_React$Component) {
           sweepExtentSt = _props2.sweepExtentSt,
           isUiNoBrushSt = _props2.isUiNoBrushSt,
           isHidden = _props2.isHidden,
-          cyclicvoltaSt = _props2.cyclicvoltaSt;
+          cyclicvoltaSt = _props2.cyclicvoltaSt,
+          integationSt = _props2.integationSt,
+          mtplySt = _props2.mtplySt;
 
       this.normChange(prevProps);
 
@@ -150,7 +156,9 @@ var ViewerMulti = function (_React$Component) {
         layoutSt: layoutSt,
         sweepExtentSt: sweepExtentSt,
         isUiNoBrushSt: isUiNoBrushSt,
-        cyclicvoltaSt: cyclicvoltaSt
+        cyclicvoltaSt: cyclicvoltaSt,
+        integationSt: integationSt,
+        mtplySt: mtplySt
       });
       (0, _draw.drawLabel)(this.rootKlass, cLabel, xLabel, yLabel);
       (0, _draw.drawDisplay)(this.rootKlass, isHidden);
@@ -195,7 +203,9 @@ var mapStateToProps = function mapStateToProps(state, props) {
     sweepExtentSt: state.ui.sweepExtent,
     isUiNoBrushSt: _list_ui.LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
     cyclicvoltaSt: state.cyclicvolta,
-    maxminPeakSt: (0, _chem.Feature2MaxMinPeak)(state, props)
+    maxminPeakSt: (0, _chem.Feature2MaxMinPeak)(state, props),
+    integationSt: state.integration.present,
+    mtplySt: state.multiplicity.present
   };
 };
 
@@ -223,6 +233,8 @@ ViewerMulti.propTypes = {
   tSfPeaks: _propTypes2.default.array.isRequired,
   editPeakSt: _propTypes2.default.object.isRequired,
   layoutSt: _propTypes2.default.string.isRequired,
+  integationSt: _propTypes2.default.object.isRequired,
+  mtplySt: _propTypes2.default.object.isRequired,
   sweepExtentSt: _propTypes2.default.object.isRequired,
   isUiNoBrushSt: _propTypes2.default.bool.isRequired,
   resetAllAct: _propTypes2.default.func.isRequired,

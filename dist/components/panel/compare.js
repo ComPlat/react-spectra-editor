@@ -212,12 +212,19 @@ var content = function content(classes, desc) {
   );
 };
 
-var inputOthers = function inputOthers(classes, addOthersCbSt) {
+var inputOthers = function inputOthers(classes, jcampSt) {
+  var selectedIdx = jcampSt.selectedIdx,
+      jcamps = jcampSt.jcamps;
+
+  var selectedJcamp = jcamps[selectedIdx];
+  var addOthersCb = selectedJcamp.addOthersCb;
+
+
   var fileName = '';
   var desc = fileName || msgDefault;
-  var onDrop = function onDrop(jcamps) {
-    if (!addOthersCbSt) return;
-    addOthersCbSt({ jcamps: jcamps });
+  var onDrop = function onDrop(jcampFiles) {
+    if (!addOthersCb) return;
+    addOthersCb({ jcamps: jcampFiles });
   };
 
   return _react2.default.createElement(
@@ -241,8 +248,15 @@ var inputOthers = function inputOthers(classes, addOthersCbSt) {
   );
 };
 
-var compareList = function compareList(classes, othersSt, rmOthersOneAct, toggleShowAct) {
-  var rows = othersSt.map(function (o, idx) {
+var compareList = function compareList(classes, jcampSt, rmOthersOneAct, toggleShowAct) {
+  var selectedIdx = jcampSt.selectedIdx,
+      jcamps = jcampSt.jcamps;
+
+  var selectedJcamp = jcamps[selectedIdx];
+  var others = selectedJcamp.others;
+
+
+  var rows = others.map(function (o, idx) {
     return {
       idx: idx,
       title: o.spectra[0].title,
@@ -303,8 +317,7 @@ var ComparePanel = function ComparePanel(_ref2) {
   var classes = _ref2.classes,
       expand = _ref2.expand,
       onExapnd = _ref2.onExapnd,
-      othersSt = _ref2.othersSt,
-      addOthersCbSt = _ref2.addOthersCbSt,
+      jcampSt = _ref2.jcampSt,
       rmOthersOneAct = _ref2.rmOthersOneAct,
       toggleShowAct = _ref2.toggleShowAct;
   return _react2.default.createElement(
@@ -332,11 +345,11 @@ var ComparePanel = function ComparePanel(_ref2) {
       )
     ),
     _react2.default.createElement(_Divider2.default, null),
-    inputOthers(classes, addOthersCbSt),
+    inputOthers(classes, jcampSt),
     _react2.default.createElement(
       'div',
       { className: (0, _classnames2.default)(classes.panelDetail) },
-      compareList(classes, othersSt, rmOthersOneAct, toggleShowAct)
+      compareList(classes, jcampSt, rmOthersOneAct, toggleShowAct)
     )
   );
 };
@@ -344,8 +357,7 @@ var ComparePanel = function ComparePanel(_ref2) {
 var mapStateToProps = function mapStateToProps(state, props) {
   return (// eslint-disable-line
     {
-      othersSt: state.jcamp.others,
-      addOthersCbSt: state.jcamp.addOthersCb
+      jcampSt: state.jcamp
     }
   );
 };
@@ -361,8 +373,7 @@ ComparePanel.propTypes = {
   classes: _propTypes2.default.object.isRequired,
   expand: _propTypes2.default.bool.isRequired,
   onExapnd: _propTypes2.default.func.isRequired,
-  othersSt: _propTypes2.default.array.isRequired,
-  addOthersCbSt: _propTypes2.default.func.isRequired,
+  jcampSt: _propTypes2.default.object.isRequired,
   rmOthersOneAct: _propTypes2.default.func.isRequired,
   toggleShowAct: _propTypes2.default.func.isRequired
 };

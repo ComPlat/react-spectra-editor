@@ -138,13 +138,18 @@ const content = (classes, desc) => (
 );
 
 const inputOthers = (
-  classes, addOthersCbSt,
+  classes, jcampSt,
 ) => {
+
+  const { selectedIdx, jcamps } = jcampSt;
+  const selectedJcamp = jcamps[selectedIdx];
+  const { addOthersCb } = selectedJcamp;
+
   const fileName = '';
   const desc = fileName || msgDefault;
-  const onDrop = (jcamps) => {
-    if (!addOthersCbSt) return;
-    addOthersCbSt({ jcamps });
+  const onDrop = (jcampFiles) => {
+    if (!addOthersCb) return;
+    addOthersCb({ jcamps: jcampFiles });
   };
 
   return (
@@ -168,9 +173,14 @@ const inputOthers = (
 };
 
 const compareList = (
-  classes, othersSt, rmOthersOneAct, toggleShowAct,
+  classes, jcampSt, rmOthersOneAct, toggleShowAct,
 ) => {
-  const rows = othersSt.map((o, idx) => (
+
+  const { selectedIdx, jcamps } = jcampSt;
+  const selectedJcamp = jcamps[selectedIdx];
+  const { others } = selectedJcamp;
+
+  const rows = others.map((o, idx) => (
     {
       idx,
       title: o.spectra[0].title,
@@ -224,7 +234,7 @@ const compareList = (
 };
 
 const ComparePanel = ({
-  classes, expand, onExapnd, othersSt, addOthersCbSt,
+  classes, expand, onExapnd, jcampSt,
   rmOthersOneAct, toggleShowAct,
 }) => (
   <ExpansionPanel
@@ -244,10 +254,10 @@ const ComparePanel = ({
       </Typography>
     </ExpansionPanelSummary>
     <Divider />
-    { inputOthers(classes, addOthersCbSt) }
+    { inputOthers(classes, jcampSt) }
     <div className={classNames(classes.panelDetail)}>
       {
-        compareList(classes, othersSt, rmOthersOneAct, toggleShowAct)
+        compareList(classes, jcampSt, rmOthersOneAct, toggleShowAct)
       }
     </div>
   </ExpansionPanel>
@@ -255,8 +265,7 @@ const ComparePanel = ({
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
-    othersSt: state.jcamp.others,
-    addOthersCbSt: state.jcamp.addOthersCb,
+    jcampSt: state.jcamp,
   }
 );
 
@@ -271,8 +280,7 @@ ComparePanel.propTypes = {
   classes: PropTypes.object.isRequired,
   expand: PropTypes.bool.isRequired,
   onExapnd: PropTypes.func.isRequired,
-  othersSt: PropTypes.array.isRequired,
-  addOthersCbSt: PropTypes.func.isRequired,
+  jcampSt: PropTypes.object.isRequired,
   rmOthersOneAct: PropTypes.func.isRequired,
   toggleShowAct: PropTypes.func.isRequired,
 };

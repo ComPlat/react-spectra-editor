@@ -383,9 +383,14 @@ class LineFocus {
       sameXY, sameLySt, sameItSt, sameData,
     } = this.shouldUpdate;
     if (sameXY && sameLySt && sameItSt && sameData) return;
+
+    const { selectedIdx, integrations } = integationSt;
+    const selectedIntegration = integrations[selectedIdx];
+
     const {
       stack, refArea, refFactor, shift,
-    } = integationSt;
+    } = selectedIntegration;
+    
     const isDisable = Cfg.btnCmdIntg(this.layout);
     const ignoreRef = Format.isHplcUvVisLayout(this.layout);
     const itgs = isDisable ? [] : stack;
@@ -541,7 +546,10 @@ class LineFocus {
     const { sameXY, sameLySt, sameMySt } = this.shouldUpdate;
     if (sameXY && sameLySt && sameMySt) return;
 
-    const { stack, smExtext, shift } = mtplySt;
+    const { selectedIdx, multiplicities } = mtplySt;
+    const selectedMulti = multiplicities[selectedIdx];
+
+    const { stack, smExtext, shift } = selectedMulti;
     const mpys = stack;
     const isDisable = Cfg.btnCmdMpy(this.layout);
     if (mpys === 0 || isDisable) return;

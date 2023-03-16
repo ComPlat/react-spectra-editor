@@ -19,6 +19,9 @@ var _marked = /*#__PURE__*/regeneratorRuntime.mark(selectUiSweep),
 var getUiSt = function getUiSt(state) {
   return state.ui;
 };
+var getCurveSt = function getCurveSt(state) {
+  return state.curve;
+};
 
 var calcPeaks = function calcPeaks(payload) {
   var xExtent = payload.xExtent,
@@ -38,7 +41,7 @@ var calcPeaks = function calcPeaks(payload) {
 };
 
 function selectUiSweep(action) {
-  var uiSt, payload, peaks, newPayload;
+  var uiSt, payload, curveSt, curveIdx, peaks, newPayload;
   return regeneratorRuntime.wrap(function selectUiSweep$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
@@ -49,76 +52,82 @@ function selectUiSweep(action) {
         case 2:
           uiSt = _context.sent;
           payload = action.payload;
+          _context.next = 6;
+          return (0, _effects.select)(getCurveSt);
+
+        case 6:
+          curveSt = _context.sent;
+          curveIdx = curveSt.curveIdx;
           _context.t0 = uiSt.sweepType;
-          _context.next = _context.t0 === _list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN ? 7 : _context.t0 === _list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET ? 10 : _context.t0 === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD ? 13 : _context.t0 === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD ? 16 : 25;
+          _context.next = _context.t0 === _list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN ? 11 : _context.t0 === _list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET ? 14 : _context.t0 === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD ? 17 : _context.t0 === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD ? 20 : 29;
           break;
 
-        case 7:
-          _context.next = 9;
+        case 11:
+          _context.next = 13;
           return (0, _effects.put)({
             type: _action_type.UI.SWEEP.SELECT_ZOOMIN,
             payload: payload
           });
 
-        case 9:
-          return _context.abrupt('break', 26);
+        case 13:
+          return _context.abrupt('break', 30);
 
-        case 10:
-          _context.next = 12;
+        case 14:
+          _context.next = 16;
           return (0, _effects.put)({
             type: _action_type.UI.SWEEP.SELECT_ZOOMRESET,
             payload: payload
           });
 
-        case 12:
-          return _context.abrupt('break', 26);
+        case 16:
+          return _context.abrupt('break', 30);
 
-        case 13:
-          _context.next = 15;
+        case 17:
+          _context.next = 19;
           return (0, _effects.put)({
             type: _action_type.UI.SWEEP.SELECT_INTEGRATION,
-            payload: payload
+            payload: { newData: payload, curveIdx: curveIdx }
           });
 
-        case 15:
-          return _context.abrupt('break', 26);
+        case 19:
+          return _context.abrupt('break', 30);
 
-        case 16:
+        case 20:
           peaks = calcPeaks(payload); // eslint-disable-line
 
           if (!(peaks.length === 0)) {
-            _context.next = 19;
+            _context.next = 23;
             break;
           }
 
-          return _context.abrupt('break', 26);
+          return _context.abrupt('break', 30);
 
-        case 19:
+        case 23:
           newPayload = Object.assign({}, payload, { peaks: peaks }); // eslint-disable-line
 
-          _context.next = 22;
+          _context.next = 26;
           return (0, _effects.put)({
             type: _action_type.UI.SWEEP.SELECT_INTEGRATION,
-            payload: newPayload
+            payload: { newData: newPayload, curveIdx: curveIdx }
           });
-
-        case 22:
-          _context.next = 24;
-          return (0, _effects.put)({
-            type: _action_type.UI.SWEEP.SELECT_MULTIPLICITY,
-            payload: newPayload
-          });
-
-        case 24:
-          return _context.abrupt('break', 26);
-
-        case 25:
-          return _context.abrupt('break', 26);
 
         case 26:
+          _context.next = 28;
+          return (0, _effects.put)({
+            type: _action_type.UI.SWEEP.SELECT_MULTIPLICITY,
+            payload: { newData: newPayload, curveIdx: curveIdx }
+          });
+
+        case 28:
+          return _context.abrupt('break', 30);
+
+        case 29:
+          return _context.abrupt('break', 30);
+
+        case 30:
           return _context.abrupt('return', null);
 
-        case 27:
+        case 31:
         case 'end':
           return _context.stop();
       }
@@ -225,7 +234,7 @@ function clickUiTarget(action) {
           _context3.next = 7;
           return (0, _effects.put)({
             type: _action_type.EDITPEAK.ADD_POSITIVE,
-            payload: payload
+            payload: { dataToAdd: payload, curveIdx: jcampIdx }
           });
 
         case 7:
@@ -241,7 +250,7 @@ function clickUiTarget(action) {
           _context3.next = 12;
           return (0, _effects.put)({
             type: _action_type.EDITPEAK.ADD_NEGATIVE,
-            payload: payload
+            payload: { dataToAdd: payload, curveIdx: jcampIdx }
           });
 
         case 12:
@@ -257,7 +266,7 @@ function clickUiTarget(action) {
           _context3.next = 17;
           return (0, _effects.put)({
             type: _action_type.SHIFT.SET_PEAK,
-            payload: payload
+            payload: { dataToSet: payload, curveIdx: jcampIdx }
           });
 
         case 17:
@@ -273,7 +282,7 @@ function clickUiTarget(action) {
           _context3.next = 22;
           return (0, _effects.put)({
             type: _action_type.INTEGRATION.RM_ONE,
-            payload: payload
+            payload: { dataToRemove: payload, curveIdx: jcampIdx }
           });
 
         case 22:
@@ -289,7 +298,7 @@ function clickUiTarget(action) {
           _context3.next = 27;
           return (0, _effects.put)({
             type: _action_type.INTEGRATION.RM_ONE,
-            payload: payload
+            payload: { dataToRemove: payload, curveIdx: jcampIdx }
           });
 
         case 27:
@@ -305,7 +314,7 @@ function clickUiTarget(action) {
           _context3.next = 32;
           return (0, _effects.put)({
             type: _action_type.INTEGRATION.SET_REF,
-            payload: payload
+            payload: { refData: payload, curveIdx: jcampIdx }
           });
 
         case 32:
@@ -328,7 +337,7 @@ function clickUiTarget(action) {
           _context3.next = 39;
           return (0, _effects.put)({
             type: _action_type.MULTIPLICITY.ONE_CLICK_BY_UI,
-            payload: xExtent
+            payload: { payloadData: xExtent, curveIdx: jcampIdx }
           });
 
         case 39:
@@ -344,7 +353,7 @@ function clickUiTarget(action) {
           _context3.next = 44;
           return (0, _effects.put)({
             type: _action_type.MULTIPLICITY.ONE_CLICK_BY_UI,
-            payload: { xL: xL, xU: xU }
+            payload: { payloadData: { xL: xL, xU: xU }, curveIdx: jcampIdx }
           });
 
         case 44:

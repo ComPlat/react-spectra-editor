@@ -130,6 +130,7 @@ var PanelViewer = function (_React$Component) {
           canChangeDescription = _props.canChangeDescription,
           jcampIdx = _props.jcampIdx,
           entityFileNames = _props.entityFileNames,
+          curveSt = _props.curveSt,
           userManualLink = _props.userManualLink;
 
       var onExapndInfo = function onExapndInfo() {
@@ -151,6 +152,10 @@ var PanelViewer = function (_React$Component) {
         return _this2.onExapnd('graph');
       };
 
+      var listCurves = curveSt.listCurves;
+
+      var hideGraphSelection = listCurves === false || listCurves === undefined;
+
       return _react2.default.createElement(
         'div',
         { className: (0, _classnames2.default)(classes.panels) },
@@ -159,7 +164,7 @@ var PanelViewer = function (_React$Component) {
           {
             theme: theme
           },
-          _cfg2.default.hidePanelCyclicVolta(layoutSt) ? null : _react2.default.createElement(_graph_selection2.default, { jcampIdx: jcampIdx, entityFileNames: entityFileNames, expand: expand === 'graph', onExapnd: onExapndGraphSelection }),
+          hideGraphSelection ? null : _react2.default.createElement(_graph_selection2.default, { jcampIdx: jcampIdx, entityFileNames: entityFileNames, expand: expand === 'graph', onExapnd: onExapndGraphSelection }),
           _react2.default.createElement(_info2.default, {
             feature: feature,
             integration: integration,
@@ -173,7 +178,7 @@ var PanelViewer = function (_React$Component) {
           }),
           _cfg2.default.hidePanelPeak(layoutSt) ? null : _react2.default.createElement(_peaks2.default, { expand: expand === 'peak', onExapnd: onExapndPeak }),
           _cfg2.default.hidePanelMpy(layoutSt) ? null : _react2.default.createElement(_multiplicity2.default, { expand: expand === 'mpy', onExapnd: onExapndMpy }),
-          _cfg2.default.hidePanelCompare(layoutSt) ? null : _react2.default.createElement(_compare2.default, { expand: expand === 'compare', onExapnd: onExapndCompare }),
+          _cfg2.default.hidePanelCompare(layoutSt) || listCurves.length > 1 ? null : _react2.default.createElement(_compare2.default, { expand: expand === 'compare', onExapnd: onExapndCompare }),
           _cfg2.default.hidePanelCyclicVolta(layoutSt) ? null : _react2.default.createElement(_cyclic_voltamery_data2.default, { jcampIdx: jcampIdx, feature: feature, expand: expand === 'cyclicvolta', onExapnd: onExapndCyclicVolta, userManualLink: userManualLink ? userManualLink.cv : undefined })
         )
       );
@@ -186,7 +191,8 @@ var PanelViewer = function (_React$Component) {
 var mapStateToProps = function mapStateToProps(state, _) {
   return (// eslint-disable-line
     {
-      layoutSt: state.layout
+      layoutSt: state.layout,
+      curveSt: state.curve
     }
   );
 };
@@ -206,7 +212,8 @@ PanelViewer.propTypes = {
   canChangeDescription: _propTypes2.default.bool.isRequired,
   onDescriptionChanged: _propTypes2.default.func,
   entityFileNames: _propTypes2.default.array,
-  userManualLink: _propTypes2.default.object
+  userManualLink: _propTypes2.default.object,
+  curveSt: _propTypes2.default.object.isRequired
 };
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(PanelViewer));

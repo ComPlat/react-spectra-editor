@@ -246,9 +246,16 @@ const ToThresEndPts = createSelector(
   convertThresEndPts,
 );
 
-const getShiftPeak = state => (
-  state.shift.peak
-);
+const getShiftPeak = state => {
+  const { curve, shift } = state;
+  const { curveIdx } = curve;
+  const { shifts } = shift;
+  const selectedShift = shifts[curveIdx];
+  if (!selectedShift) {
+    return false;
+  }
+  return selectedShift.peak;
+}
 
 const convertSfPeaks = (peak, offset) => {
   if (!peak || !peak.x) return [];

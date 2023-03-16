@@ -1,47 +1,56 @@
 import { JCAMP, MANAGER } from '../constants/action_type';
 
 const initialState = {
-  others: [],
-  addOthersCb: false,
+  selectedIdx: 0,
+  jcamps: [
+    {
+      others: [],
+      addOthersCb: false,
+    }
+  ],
 };
 
 const addOthers = (state, { others, addOthersCb }) => {
-  if (state.others.length > 5) return state;
+  const { selectedIdx, jcamps } = state;
+  const selectedJcamp = jcamps[selectedIdx];
+
+  if (selectedJcamp.others.length > 5) return state;
   const decoOthers = others.map(o => Object.assign({}, o, { show: true }));
 
-  return (
-    {
-      others: [...state.others, ...decoOthers].slice(0, 5),
-      addOthersCb,
-    }
-  );
+  const newJcamp = Object.assign({}, selectedJcamp, { others: [...selectedJcamp.others, ...decoOthers].slice(0, 5), addOthersCb});
+  jcamps[selectedIdx] = newJcamp;
+
+  return Object.assign({}, state, { jcamps });
 };
 
 const rmOthersOne = (state, payload) => {
+  const { selectedIdx, jcamps } = state;
+  const selectedJcamp = jcamps[selectedIdx];
+
   const idx = payload;
-  const { others } = state;
+  const { others } = selectedJcamp;
   const nextOther = others.filter((_, i) => i !== idx);
-  return Object.assign(
-    {},
-    state,
-    { others: nextOther },
-  );
+
+  const newJcamp = Object.assign({}, selectedJcamp, { others: nextOther });
+  jcamps[selectedIdx] = newJcamp;
+  return Object.assign({}, state, { jcamps });
 };
 
 const toggleShow = (state, payload) => {
+  const { selectedIdx, jcamps } = state;
+  const selectedJcamp = jcamps[selectedIdx];
+
   const idx = payload;
-  const { others } = state;
+  const { others } = selectedJcamp;
   const nextOthers = others.map((o, i) => {
     if (i !== idx) return o;
     const currentShow = o.show;
     return Object.assign({}, o, { show: !currentShow });
   });
 
-  return Object.assign(
-    {},
-    state,
-    { others: nextOthers },
-  );
+  const newJcamp = Object.assign({}, selectedJcamp, { others: nextOthers });
+  jcamps[selectedIdx] = newJcamp;
+  return Object.assign({}, state, { jcamps });
 };
 
 const layoutReducer = (state = initialState, action) => {
