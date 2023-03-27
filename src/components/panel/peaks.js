@@ -4,8 +4,7 @@ import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import { Accordion, AccordionSummary } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
@@ -16,6 +15,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import { withStyles } from '@material-ui/core/styles';
+import { Convert2Peak } from '../../helpers/chem';
 
 import { rmFromPosList, rmFromNegList } from '../../actions/edit_peak';
 import Format from '../../helpers/format';
@@ -121,19 +121,38 @@ const peakList = (peaks, digits, cbAct, classes, isPos) => {
 
 const PeakPanel = ({
   editPeakSt, layoutSt, classes, expand, onExapnd,
-  rmFromPosListAct, rmFromNegListAct,
+  rmFromPosListAct, rmFromNegListAct, curveSt
 }) => {
-  const { neg, pos } = editPeakSt;
+  const { curveIdx, listCurves } = curveSt;
+  const { peaks } = editPeakSt;
+  if (curveIdx >= peaks.length) {
+    return null;
+  }
+  const selectedEditPeaks = peaks[curveIdx];
+  if (!selectedEditPeaks) {
+    return null;
+  }
+  const { pos } = selectedEditPeaks;
+
+  const selectedCurve = listCurves[curveIdx];
+  if (!selectedCurve) {
+    return null;
+  }
+  const { feature } = selectedCurve;
+  const currentPeakOfCurve = Convert2Peak(feature);
+
+  const peaksData = [].concat(currentPeakOfCurve).concat(pos);
+
   const digits = Format.isEmWaveLayout(layoutSt) ? 0 : 4;
 
   return (
-    <ExpansionPanel
+    <Accordion data-testid='PeaksPanelInfo'
       expanded={expand}
       onChange={onExapnd}
       className={classNames(classes.panel)}
       TransitionProps={{ unmountOnExit: true }} // increase ExpansionPanel performance
     >
-      <ExpansionPanelSummary
+      <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
         className={classNames(classes.panelSummary)}
       >
@@ -142,13 +161,13 @@ const PeakPanel = ({
             Peaks
           </span>
         </Typography>
-      </ExpansionPanelSummary>
+      </AccordionSummary>
       <Divider />
       <div className={classNames(classes.panelDetail)}>
-        { peakList(pos, digits, rmFromPosListAct, classes, true) }
-        { peakList(neg, digits, rmFromNegListAct, classes, false) }
+        { peakList(peaksData, digits, rmFromPosListAct, classes, true) }
+        {/* { peakList(neg, digits, rmFromNegListAct, classes, false) } */}
       </div>
-    </ExpansionPanel>
+    </Accordion>
   );
 };
 
@@ -156,6 +175,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     editPeakSt: state.editPeak.present,
     layoutSt: state.layout,
+    curveSt: state.curve,
   }
 );
 
@@ -174,6 +194,7 @@ PeakPanel.propTypes = {
   onExapnd: PropTypes.func.isRequired,
   rmFromPosListAct: PropTypes.func.isRequired,
   rmFromNegListAct: PropTypes.func.isRequired,
+  curveSt: PropTypes.object.isRequired,
 };
 
 export default connect(

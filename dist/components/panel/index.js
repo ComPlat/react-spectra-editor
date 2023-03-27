@@ -131,7 +131,8 @@ var PanelViewer = function (_React$Component) {
           jcampIdx = _props.jcampIdx,
           entityFileNames = _props.entityFileNames,
           curveSt = _props.curveSt,
-          userManualLink = _props.userManualLink;
+          userManualLink = _props.userManualLink,
+          subLayoutsInfo = _props.subLayoutsInfo;
 
       var onExapndInfo = function onExapndInfo() {
         return _this2.onExapnd('info');
@@ -164,7 +165,7 @@ var PanelViewer = function (_React$Component) {
           {
             theme: theme
           },
-          hideGraphSelection ? null : _react2.default.createElement(_graph_selection2.default, { jcampIdx: jcampIdx, entityFileNames: entityFileNames, expand: expand === 'graph', onExapnd: onExapndGraphSelection }),
+          hideGraphSelection ? null : _react2.default.createElement(_graph_selection2.default, { jcampIdx: jcampIdx, entityFileNames: entityFileNames, expand: expand === 'graph', onExapnd: onExapndGraphSelection, subLayoutsInfo: subLayoutsInfo }),
           _react2.default.createElement(_info2.default, {
             feature: feature,
             integration: integration,
@@ -213,7 +214,8 @@ PanelViewer.propTypes = {
   onDescriptionChanged: _propTypes2.default.func,
   entityFileNames: _propTypes2.default.array,
   userManualLink: _propTypes2.default.object,
-  curveSt: _propTypes2.default.object.isRequired
+  curveSt: _propTypes2.default.object.isRequired,
+  subLayoutsInfo: _propTypes2.default.object
 };
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(PanelViewer));

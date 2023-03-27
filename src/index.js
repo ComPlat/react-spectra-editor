@@ -34,6 +34,11 @@ import xrdJcamp2 from './__tests__/fixtures/xrd_jcamp_2';
 import cyclicVoltaJcamp1 from './__tests__/fixtures/cyclic_voltammetry_1';
 import cyclicVoltaJcamp2 from './__tests__/fixtures/cyclic_voltammetry_2';
 import cyclicVoltaJcamp3 from './__tests__/fixtures/cyclic_voltammetry_3';
+import cdsJcamp from './__tests__/fixtures/cds_jcamp';
+import secJcamp1 from './__tests__/fixtures/sec_1_jcamp';
+import secJcamp2 from './__tests__/fixtures/sec_2_jcamp';
+import secJcamp3 from './__tests__/fixtures/sec_3_jcamp';
+import secJcamp4 from './__tests__/fixtures/sec_4_jcamp';
 import { q1H, qIR, q13C } from './__tests__/fixtures/qDescValue';
 import './__tests__/style/svg.css';
 
@@ -60,6 +65,11 @@ const xrdEntity2 = FN.ExtractJcamp(xrdJcamp2);
 const cyclicVoltaEntity1 = FN.ExtractJcamp(cyclicVoltaJcamp1);
 const cyclicVoltaEntity2 = FN.ExtractJcamp(cyclicVoltaJcamp2);
 const cyclicVoltaEntity3 = FN.ExtractJcamp(cyclicVoltaJcamp3);
+const cdsEntity = FN.ExtractJcamp(cdsJcamp);
+const secEntity1 = FN.ExtractJcamp(secJcamp1);
+const secEntity2 = FN.ExtractJcamp(secJcamp2);
+const secEntity3 = FN.ExtractJcamp(secJcamp3);
+const secEntity4 = FN.ExtractJcamp(secJcamp4);
 
 class DemoWriteIr extends React.Component {
   constructor(props) {
@@ -275,6 +285,10 @@ class DemoWriteIr extends React.Component {
         return xrdEntity1;
       case 'cyclic volta':
         return cyclicVoltaEntity2;
+      case 'cds':
+        return cdsEntity;
+      case 'sec':
+        return secEntity1;
       case 'ms':
       default:
         return msEntity;
@@ -294,6 +308,8 @@ class DemoWriteIr extends React.Component {
         return [compIr1Entity, compIr2Entity];
       case 'multi xrd':
         return [xrdEntity1, xrdEntity2];
+      case 'sec':
+        return [secEntity1, secEntity2, secEntity3, secEntity4];
       default:
         return false;
     }
@@ -321,6 +337,8 @@ class DemoWriteIr extends React.Component {
       case 'xrd':
       case 'ms':
       case 'cyclic volta':
+      case 'cds':
+      case 'sec':
       default:
         return false;
     }
@@ -482,6 +500,20 @@ class DemoWriteIr extends React.Component {
             onClick={this.onClick('cyclic volta')}
           >
             CV
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('cds')}
+          >
+            CDS
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('sec')}
+          >
+            SEC
           </Button>
           <Button
             variant="contained"

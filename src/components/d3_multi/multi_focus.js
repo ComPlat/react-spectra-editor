@@ -141,17 +141,25 @@ class MultiFocus {
     this.jcampIdx = jcampIdx;
     this.data = [];
     this.otherLineData = [];
+    let filterSubLayoutValue = null;
     this.entities.forEach((entry, idx) => {
       const { topic, feature, color } = entry;
       const currData = convertTopic(topic, layout, feature, 0);
+      
       if (idx === this.jcampIdx) {
         this.data = [...currData];
         this.pathColor = color;
+        filterSubLayoutValue = feature.xUnit;
       }
       else {
-        this.otherLineData.push({ data: currData, color });
+        this.otherLineData.push({ data: currData, color, filterSublayout: feature.xUnit });
       }
     });
+    if (Format.isSECLayout(layout)) {
+      this.otherLineData = this.otherLineData.filter((data) => {
+        return data.filterSublayout === filterSubLayoutValue;
+      });
+    }
     
     this.dataPks = [...peaks];
     this.tTrEndPts = tTrEndPts;
@@ -273,7 +281,8 @@ class MultiFocus {
       this.dataPks = PksEdit(this.dataPks, editPeakSt, spectra.list);
     }
     else {
-      this.dataPks = PksEdit(this.dataPks, editPeakSt, []);
+      const newEditPeaks = Object.assign({}, editPeakSt, { selectedIdx: this.jcampIdx })
+      this.dataPks = PksEdit(this.dataPks, newEditPeaks, []);
     }
     
     return this.dataPks;
@@ -924,7 +933,7 @@ class MultiFocus {
   }
 
   reverseXAxis(layoutSt) {
-    return [LIST_LAYOUT.UVVIS, LIST_LAYOUT.HPLC_UVVIS, LIST_LAYOUT.TGA, LIST_LAYOUT.XRD, LIST_LAYOUT.CYCLIC_VOLTAMMETRY].indexOf(layoutSt) < 0;
+    return [LIST_LAYOUT.UVVIS, LIST_LAYOUT.HPLC_UVVIS, LIST_LAYOUT.TGA, LIST_LAYOUT.XRD, LIST_LAYOUT.CYCLIC_VOLTAMMETRY, LIST_LAYOUT.CDS, LIST_LAYOUT.SEC].indexOf(layoutSt) < 0;
   }
 
   create({

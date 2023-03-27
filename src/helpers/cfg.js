@@ -8,6 +8,12 @@ const btnCmdAnaViewer = layoutSt => (
     || Format.isHplcUvVisLayout(layoutSt)
     || Format.isTGALayout(layoutSt)
     || Format.isXRDLayout(layoutSt)
+    || Format.is31PLayout(layoutSt)
+    || Format.is15NLayout(layoutSt)
+    || Format.is29SiLayout(layoutSt)
+    || Format.isCyclicVoltaLayout(layoutSt)
+    || Format.isCDSLayout(layoutSt)
+    || Format.isSECLayout(layoutSt)
 );
 
 const hideCmdAnaViewer = () => false;
@@ -16,7 +22,7 @@ const btnCmdAddPeak = layoutSt => Format.isMsLayout(layoutSt);
 
 const btnCmdRmPeak = layoutSt => Format.isMsLayout(layoutSt);
 
-const btnCmdSetRef = layoutSt => !Format.isNmrLayout(layoutSt);
+const btnCmdSetRef = layoutSt => !(Format.isNmrLayout(layoutSt));
 
 const btnCmdIntg = layoutSt => !(Format.isNmrLayout(layoutSt) || Format.isHplcUvVisLayout(layoutSt));
 
@@ -32,7 +38,7 @@ const hideCmdThres = layoutSt => Format.isMsLayout(layoutSt);
 const btnCmdThres = thresVal => !thresVal;
 
 // const hidePanelPeak = layoutSt => Format.isMsLayout(layoutSt);
-const hidePanelPeak = layoutSt => true;  // eslint-disable-line
+const hidePanelPeak = layoutSt => !(Format.isSECLayout(layoutSt));  // eslint-disable-line
 
 const hidePanelMpy = layoutSt => !Format.isNmrLayout(layoutSt);
 

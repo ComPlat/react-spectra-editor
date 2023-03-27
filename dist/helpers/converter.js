@@ -30,8 +30,15 @@ var pksRmNeg = function pksRmNeg(dataPks, editPeakSt) {
       peaks = editPeakSt.peaks;
 
   var selectedEditPeaks = peaks[selectedIdx];
+  if (!selectedEditPeaks) {
+    return dataPks;
+  }
 
   var neg = selectedEditPeaks.neg;
+
+  if (!neg) {
+    return dataPks;
+  }
 
   var negXs = neg.map(function (n) {
     return n.x;
@@ -52,8 +59,15 @@ var pksAddPos = function pksAddPos(dataPks, editPeakSt) {
       peaks = editPeakSt.peaks;
 
   var selectedEditPeaks = peaks[selectedIdx];
+  if (!selectedEditPeaks) {
+    return dataPks;
+  }
 
   var pos = selectedEditPeaks.pos;
+
+  if (!pos) {
+    return dataPks;
+  }
 
   var posXs = pos.map(function (p) {
     return p.x;

@@ -91,6 +91,9 @@ var Peak = function Peak(_ref) {
           return setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MIN_PEAK, curveIdx);
         };
       }
+      onSweepAnchorShift = function onSweepAnchorShift() {
+        return setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_SET_REF, curveIdx);
+      };
     }
   }
 

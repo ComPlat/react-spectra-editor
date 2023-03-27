@@ -161,6 +161,12 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
         <MenuItem value={LIST_LAYOUT.CYCLIC_VOLTAMMETRY}>
           <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>CV (CYCLIC VOLTAMMETRY)</span>
         </MenuItem>
+        <MenuItem value={LIST_LAYOUT.CDS}>
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>CDS (CIRCULAR DICHROISM SPECTROSCOPY)</span>
+        </MenuItem>
+        <MenuItem value={LIST_LAYOUT.SEC}>
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>SEC</span>
+        </MenuItem>
       </Select>
     </FormControl>
   );

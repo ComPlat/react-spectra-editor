@@ -20,13 +20,7 @@ var _reactRedux = require('react-redux');
 
 var _redux = require('redux');
 
-var _ExpansionPanel = require('@material-ui/core/ExpansionPanel');
-
-var _ExpansionPanel2 = _interopRequireDefault(_ExpansionPanel);
-
-var _ExpansionPanelSummary = require('@material-ui/core/ExpansionPanelSummary');
-
-var _ExpansionPanelSummary2 = _interopRequireDefault(_ExpansionPanelSummary);
+var _core = require('@material-ui/core');
 
 var _ExpandMore = require('@material-ui/icons/ExpandMore');
 
@@ -65,6 +59,8 @@ var _HighlightOff = require('@material-ui/icons/HighlightOff');
 var _HighlightOff2 = _interopRequireDefault(_HighlightOff);
 
 var _styles = require('@material-ui/core/styles');
+
+var _chem = require('../../helpers/chem');
 
 var _edit_peak = require('../../actions/edit_peak');
 
@@ -227,22 +223,44 @@ var PeakPanel = function PeakPanel(_ref) {
       expand = _ref.expand,
       onExapnd = _ref.onExapnd,
       rmFromPosListAct = _ref.rmFromPosListAct,
-      rmFromNegListAct = _ref.rmFromNegListAct;
-  var neg = editPeakSt.neg,
-      pos = editPeakSt.pos;
+      rmFromNegListAct = _ref.rmFromNegListAct,
+      curveSt = _ref.curveSt;
+  var curveIdx = curveSt.curveIdx,
+      listCurves = curveSt.listCurves;
+  var peaks = editPeakSt.peaks;
+
+  if (curveIdx >= peaks.length) {
+    return null;
+  }
+  var selectedEditPeaks = peaks[curveIdx];
+  if (!selectedEditPeaks) {
+    return null;
+  }
+  var pos = selectedEditPeaks.pos;
+
+
+  var selectedCurve = listCurves[curveIdx];
+  if (!selectedCurve) {
+    return null;
+  }
+  var feature = selectedCurve.feature;
+
+  var currentPeakOfCurve = (0, _chem.Convert2Peak)(feature);
+
+  var peaksData = [].concat(currentPeakOfCurve).concat(pos);
 
   var digits = _format2.default.isEmWaveLayout(layoutSt) ? 0 : 4;
 
   return _react2.default.createElement(
-    _ExpansionPanel2.default,
-    {
+    _core.Accordion,
+    { 'data-testid': 'PeaksPanelInfo',
       expanded: expand,
       onChange: onExapnd,
       className: (0, _classnames2.default)(classes.panel),
       TransitionProps: { unmountOnExit: true } // increase ExpansionPanel performance
     },
     _react2.default.createElement(
-      _ExpansionPanelSummary2.default,
+      _core.AccordionSummary,
       {
         expandIcon: _react2.default.createElement(_ExpandMore2.default, null),
         className: (0, _classnames2.default)(classes.panelSummary)
@@ -261,8 +279,7 @@ var PeakPanel = function PeakPanel(_ref) {
     _react2.default.createElement(
       'div',
       { className: (0, _classnames2.default)(classes.panelDetail) },
-      peakList(pos, digits, rmFromPosListAct, classes, true),
-      peakList(neg, digits, rmFromNegListAct, classes, false)
+      peakList(peaksData, digits, rmFromPosListAct, classes, true)
     )
   );
 };
@@ -271,7 +288,8 @@ var mapStateToProps = function mapStateToProps(state, props) {
   return (// eslint-disable-line
     {
       editPeakSt: state.editPeak.present,
-      layoutSt: state.layout
+      layoutSt: state.layout,
+      curveSt: state.curve
     }
   );
 };
@@ -290,7 +308,8 @@ PeakPanel.propTypes = {
   layoutSt: _propTypes2.default.string.isRequired,
   onExapnd: _propTypes2.default.func.isRequired,
   rmFromPosListAct: _propTypes2.default.func.isRequired,
-  rmFromNegListAct: _propTypes2.default.func.isRequired
+  rmFromNegListAct: _propTypes2.default.func.isRequired,
+  curveSt: _propTypes2.default.object.isRequired
 };
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(PeakPanel));

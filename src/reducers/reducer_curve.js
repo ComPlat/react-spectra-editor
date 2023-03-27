@@ -17,9 +17,9 @@ const setAllCurves = (state, action) => {
       const layout = entity.layout;
       const maxminPeak = Convert2MaxMinPeak(layout, feature, 0);
       const color = Format.mutiEntitiesColors(idx)
-      return { layout, topic, feature, hasEdit, integration, maxminPeak, color };
+      return { layout, topic, feature, hasEdit, integration, maxminPeak, color, curveIdx: idx };
     });
-  
+
     return Object.assign({}, state, { curveIdx: 0, listCurves: entities });
   }
   return Object.assign({}, state, { curveIdx: 0, listCurves: payload });
