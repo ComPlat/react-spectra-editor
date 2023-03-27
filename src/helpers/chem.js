@@ -300,6 +300,9 @@ const readLayout = (jcamp) => {
     if (dataType.includes('CYCLIC VOLTAMMETRY')) {
       return LIST_LAYOUT.CYCLIC_VOLTAMMETRY;
     }
+    if (dataType.includes('SIZE EXCLUSION CHROMATOGRAPHY')) {
+      return LIST_LAYOUT.SEC;
+    }
   }
   return false;
 };

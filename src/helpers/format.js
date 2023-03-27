@@ -11,6 +11,7 @@ const spectraDigit = (layout) => {
     case LIST_LAYOUT.TGA:
     case LIST_LAYOUT.XRD:
     case LIST_LAYOUT.CYCLIC_VOLTAMMETRY:
+    case LIST_LAYOUT.SEC:
     case LIST_LAYOUT.MS:
       return 0;
     case LIST_LAYOUT.C13:
@@ -63,6 +64,7 @@ const spectraOps = {
   [LIST_LAYOUT.MS]: { head: 'MASS', tail: ' m/z' },
   [LIST_LAYOUT.XRD]: { head: 'X-RAY DIFFRACTION', tail: '.' },
   [LIST_LAYOUT.CYCLIC_VOLTAMMETRY]: { head: 'CYCLIC VOLTAMMETRY', tail: '.' },
+  [LIST_LAYOUT.SEC]: { head: 'SIZE EXCLUSION CHROMATOGRAPHY', tail: '.' },
 };
 
 const rmRef = (peaks, shift) => {
@@ -251,6 +253,9 @@ const peaksBody = ({
   if (layout === LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
     return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
+  if (layout === LIST_LAYOUT.SEC) {
+    return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
+  }
   return ordered.map(o => fixDigit(o.x, decimal)).join(', ');
 };
 
@@ -285,6 +290,7 @@ const isHplcUvVisLayout = layoutSt => (LIST_LAYOUT.HPLC_UVVIS === layoutSt);
 const isTGALayout = layoutSt => (LIST_LAYOUT.TGA === layoutSt);
 const isXRDLayout = layoutSt => (LIST_LAYOUT.XRD === layoutSt);
 const isCyclicVoltaLayout = layoutSt => (LIST_LAYOUT.CYCLIC_VOLTAMMETRY === layoutSt);
+const isSECLayout = layoutSt => (LIST_LAYOUT.SEC === layoutSt);
 const isEmWaveLayout = layoutSt => (
   [LIST_LAYOUT.IR, LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS, LIST_LAYOUT.HPLC_UVVIS].indexOf(layoutSt) >= 0
 );
@@ -365,6 +371,7 @@ const Format = {
   isTGALayout,
   isXRDLayout,
   isCyclicVoltaLayout,
+  isSECLayout,
   isEmWaveLayout,
   fixDigit,
   formatPeaksByPrediction,
