@@ -25,6 +25,7 @@ var spectraDigit = function spectraDigit(layout) {
     case _list_layout.LIST_LAYOUT.TGA:
     case _list_layout.LIST_LAYOUT.XRD:
     case _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY:
+    case _list_layout.LIST_LAYOUT.CDS:
     case _list_layout.LIST_LAYOUT.MS:
       return 0;
     case _list_layout.LIST_LAYOUT.C13:
@@ -63,7 +64,7 @@ var toPeakStr = function toPeakStr(peaks) {
   return str;
 };
 
-var spectraOps = (_spectraOps = {}, _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.PLAIN, { head: '', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.H1, { head: '1H', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.C13, { head: '13C', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.F19, { head: '19F', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.P31, { head: '31P', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.N15, { head: '15N', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.Si29, { head: '29Si', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.IR, { head: 'IR', tail: ' cm-1' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.RAMAN, { head: 'RAMAN', tail: ' cm-1' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.UVVIS, { head: 'UV-VIS (absorption, solvent), λmax', tail: ' nm' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.HPLC_UVVIS, { head: 'HPLC UV/VIS (transmittance)', tail: '' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.TGA, { head: 'THERMOGRAVIMETRIC ANALYSIS', tail: ' SECONDS' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.MS, { head: 'MASS', tail: ' m/z' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.XRD, { head: 'X-RAY DIFFRACTION', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY, { head: 'CYCLIC VOLTAMMETRY', tail: '.' }), _spectraOps);
+var spectraOps = (_spectraOps = {}, _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.PLAIN, { head: '', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.H1, { head: '1H', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.C13, { head: '13C', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.F19, { head: '19F', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.P31, { head: '31P', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.N15, { head: '15N', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.Si29, { head: '29Si', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.IR, { head: 'IR', tail: ' cm-1' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.RAMAN, { head: 'RAMAN', tail: ' cm-1' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.UVVIS, { head: 'UV-VIS (absorption, solvent), λmax', tail: ' nm' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.HPLC_UVVIS, { head: 'HPLC UV/VIS (transmittance)', tail: '' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.TGA, { head: 'THERMOGRAVIMETRIC ANALYSIS', tail: ' SECONDS' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.MS, { head: 'MASS', tail: ' m/z' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.XRD, { head: 'X-RAY DIFFRACTION', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY, { head: 'CYCLIC VOLTAMMETRY', tail: '.' }), _defineProperty(_spectraOps, _list_layout.LIST_LAYOUT.CDS, { head: 'CIRCULAR DICHROISM SPECTROSCOPY', tail: '.' }), _spectraOps);
 
 var rmRef = function rmRef(peaks, shift) {
   var refValue = shift.ref.value || shift.peak.x;
@@ -295,6 +296,9 @@ var peaksBody = function peaksBody(_ref) {
   if (layout === _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
     return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
+  if (layout === _list_layout.LIST_LAYOUT.CDS) {
+    return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
+  }
   return ordered.map(function (o) {
     return fixDigit(o.x, decimal);
   }).join(', ');
@@ -358,6 +362,9 @@ var isXRDLayout = function isXRDLayout(layoutSt) {
 };
 var isCyclicVoltaLayout = function isCyclicVoltaLayout(layoutSt) {
   return _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY === layoutSt;
+};
+var isCDSLayout = function isCDSLayout(layoutSt) {
+  return _list_layout.LIST_LAYOUT.CDS === layoutSt;
 };
 var isEmWaveLayout = function isEmWaveLayout(layoutSt) {
   return [_list_layout.LIST_LAYOUT.IR, _list_layout.LIST_LAYOUT.RAMAN, _list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS].indexOf(layoutSt) >= 0;
@@ -449,6 +456,7 @@ var Format = {
   isTGALayout: isTGALayout,
   isXRDLayout: isXRDLayout,
   isCyclicVoltaLayout: isCyclicVoltaLayout,
+  isCDSLayout: isCDSLayout,
   isEmWaveLayout: isEmWaveLayout,
   fixDigit: fixDigit,
   formatPeaksByPrediction: formatPeaksByPrediction,

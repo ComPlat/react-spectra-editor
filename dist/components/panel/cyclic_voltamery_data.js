@@ -169,21 +169,21 @@ var CyclicVoltammetryPanel = function CyclicVoltammetryPanel(_ref) {
   };
 
   var getDelta = function getDelta(data) {
-    return data.max && data.min ? (0, _chem.GetCyclicVoltaPeakSeparate)(data.max.x, data.min.x).toExponential(2) : "undefined";
+    return data.max && data.min ? (0, _chem.GetCyclicVoltaPeakSeparate)(data.max.x, data.min.x) : "undefined";
   };
 
   var getRatio = function getRatio(feature, data) {
     var featureData = feature.data[0];
     var idx = featureData.x.indexOf(feature.maxX);
     var y_pecker = data.pecker ? data.pecker.y : featureData.y[idx];
-    return data.max && data.min ? (0, _chem.GetCyclicVoltaRatio)(data.max.y, data.min.y, y_pecker).toExponential(2) : "undefined";
+    return data.max && data.min ? (0, _chem.GetCyclicVoltaRatio)(data.max.y, data.min.y, y_pecker).toFixed(8) : "undefined";
   };
 
   var rows = list.map(function (o, idx) {
     return {
       idx: idx,
-      max: o.max ? 'x:' + parseFloat(o.max.x).toExponential(2) + ', y:' + parseFloat(o.max.y).toExponential(2) : "undefined",
-      min: o.min ? 'x:' + parseFloat(o.min.x).toExponential(2) + ', y:' + parseFloat(o.min.y).toExponential(2) : "undefined",
+      max: o.max ? 'x:' + parseFloat(o.max.x) + ', y:' + parseFloat(o.max.y).toExponential(2) : "undefined",
+      min: o.min ? 'x:' + parseFloat(o.min.x) + ', y:' + parseFloat(o.min.y).toExponential(2) : "undefined",
       pecker: o.pecker ? '' + parseFloat(o.pecker.y).toExponential(2) : "undefined",
       delta: getDelta(o),
       ratio: getRatio(feature, o),

@@ -32,6 +32,7 @@ import xrdJcamp2 from './__tests__/fixtures/xrd_jcamp_2';
 import cyclicVoltaJcamp1 from './__tests__/fixtures/cyclic_voltammetry_1';
 import cyclicVoltaJcamp2 from './__tests__/fixtures/cyclic_voltammetry_2';
 import cyclicVoltaJcamp3 from './__tests__/fixtures/cyclic_voltammetry_3';
+import cdsJcamp from './__tests__/fixtures/cds_jcamp';
 import { q1H, qIR, q13C } from './__tests__/fixtures/qDescValue';
 import './__tests__/style/svg.css';
 
@@ -56,6 +57,7 @@ const xrdEntity2 = FN.ExtractJcamp(xrdJcamp2);
 const cyclicVoltaEntity1 = FN.ExtractJcamp(cyclicVoltaJcamp1);
 const cyclicVoltaEntity2 = FN.ExtractJcamp(cyclicVoltaJcamp2);
 const cyclicVoltaEntity3 = FN.ExtractJcamp(cyclicVoltaJcamp3);
+const cdsEntity = FN.ExtractJcamp(cdsJcamp);
 
 class DemoWriteIr extends React.Component {
   constructor(props) {
@@ -271,6 +273,8 @@ class DemoWriteIr extends React.Component {
         return xrdEntity1;
       case 'cyclic volta':
         return cyclicVoltaEntity2;
+      case 'cds':
+        return cdsEntity;
       case 'ms':
       default:
         return msEntity;
@@ -309,6 +313,7 @@ class DemoWriteIr extends React.Component {
       case 'xrd':
       case 'ms':
       case 'cyclic volta':
+      case 'cds':
       default:
         return false;
     }
@@ -470,6 +475,13 @@ class DemoWriteIr extends React.Component {
             onClick={this.onClick('cyclic volta')}
           >
             CV
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('cds')}
+          >
+            CDS
           </Button>
           <Button
             variant="contained"

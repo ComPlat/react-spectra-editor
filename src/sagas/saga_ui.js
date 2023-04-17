@@ -195,6 +195,12 @@ function* clickUiTarget(action) {
       payload: {index: voltammetryPeakIdx, jcampIdx: jcampIdx},
     });
   }
+  else if (uiSweepType === LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_SET_REF && onPeak) {
+    yield put({
+      type: CYCLIC_VOLTA_METRY.SET_REF,
+      payload: {index: voltammetryPeakIdx, jcampIdx: jcampIdx},
+    });
+  }
 }
 
 const managerSagas = [
