@@ -25,6 +25,7 @@ const LIST_UI_SWEEP_TYPE = {
   CYCLIC_VOLTA_RM_MIN_PEAK: 'cyclic voltammetry remove min peak',
   CYCLIC_VOLTA_ADD_PECKER: 'cyclic voltammetry add pecker',
   CYCLIC_VOLTA_RM_PECKER: 'cyclic voltammetry remove pecker',
+  CYCLIC_VOLTA_SET_REF: 'cyclic voltammetry set ref',
 };
 
 const LIST_NON_BRUSH_TYPES = [
@@ -43,6 +44,7 @@ const LIST_NON_BRUSH_TYPES = [
   LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MIN_PEAK,
   LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_PECKER,
   LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_PECKER,
+  LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_SET_REF,
 ];
 
 export {

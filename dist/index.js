@@ -126,6 +126,10 @@ var _cyclic_voltammetry_5 = require('./__tests__/fixtures/cyclic_voltammetry_3')
 
 var _cyclic_voltammetry_6 = _interopRequireDefault(_cyclic_voltammetry_5);
 
+var _cds_jcamp = require('./__tests__/fixtures/cds_jcamp');
+
+var _cds_jcamp2 = _interopRequireDefault(_cds_jcamp);
+
 var _qDescValue = require('./__tests__/fixtures/qDescValue');
 
 require('./__tests__/style/svg.css');
@@ -161,6 +165,7 @@ var xrdEntity2 = _app.FN.ExtractJcamp(_xrd_jcamp_4.default);
 var cyclicVoltaEntity1 = _app.FN.ExtractJcamp(_cyclic_voltammetry_2.default);
 var cyclicVoltaEntity2 = _app.FN.ExtractJcamp(_cyclic_voltammetry_4.default);
 var cyclicVoltaEntity3 = _app.FN.ExtractJcamp(_cyclic_voltammetry_6.default);
+var cdsEntity = _app.FN.ExtractJcamp(_cds_jcamp2.default);
 
 var DemoWriteIr = function (_React$Component) {
   _inherits(DemoWriteIr, _React$Component);
@@ -456,6 +461,8 @@ var DemoWriteIr = function (_React$Component) {
           return xrdEntity1;
         case 'cyclic volta':
           return cyclicVoltaEntity2;
+        case 'cds':
+          return cdsEntity;
         case 'ms':
         default:
           return msEntity;
@@ -498,6 +505,7 @@ var DemoWriteIr = function (_React$Component) {
         case 'xrd':
         case 'ms':
         case 'cyclic volta':
+        case 'cds':
         default:
           return false;
       }
@@ -696,6 +704,15 @@ var DemoWriteIr = function (_React$Component) {
               onClick: this.onClick('cyclic volta')
             },
             'CV'
+          ),
+          _react2.default.createElement(
+            _Button2.default,
+            {
+              variant: 'contained',
+              style: { margin: '0 10px 0 10px' },
+              onClick: this.onClick('cds')
+            },
+            'CDS'
           ),
           _react2.default.createElement(
             _Button2.default,

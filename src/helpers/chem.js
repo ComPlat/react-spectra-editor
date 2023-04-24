@@ -293,6 +293,9 @@ const readLayout = (jcamp) => {
     if (dataType.includes('CYCLIC VOLTAMMETRY')) {
       return LIST_LAYOUT.CYCLIC_VOLTAMMETRY;
     }
+    if (dataType.includes('CIRCULAR DICHROISM SPECTROSCOPY')) {
+      return LIST_LAYOUT.CDS;
+    }
   }
   return false;
 };
@@ -698,7 +701,7 @@ const ExtractJcamp = (source) => {
   if (Format.isMsLayout(layout)) {
     features = extrFeaturesMs(jcamp, layout, peakUp);
   }
-  else if (Format.isXRDLayout(layout)) {
+  else if (Format.isXRDLayout(layout) || Format.isCDSLayout(layout)) {
     features = extrFeaturesXrd(jcamp, layout, peakUp);
   }
   else if (Format.isCyclicVoltaLayout(layout)) {

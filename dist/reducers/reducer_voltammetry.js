@@ -213,6 +213,32 @@ var removePecker = function removePecker(state, action) {
   }
 };
 
+var setRef = function setRef(state, action) {
+  var payload = action.payload;
+  var spectraList = state.spectraList;
+
+  if (payload) {
+    var index = payload.index,
+        jcampIdx = payload.jcampIdx;
+
+    var spectra = spectraList[jcampIdx];
+    var list = spectra.list;
+
+    var newList = list;
+    var pairPeak = newList[index];
+    // pairPeak.pecker = null;
+    // newList[index] = pairPeak;
+
+    // spectraList[jcampIdx] = Object.assign({}, spectra, { list: newList, selectedIdx: index, jcampIdx: jcampIdx });
+    // return Object.assign({}, state, { spectraList: spectraList });
+
+    //TODO: implement ref
+    console.log(pairPeak);
+  } else {
+    return state;
+  }
+};
+
 var cyclicVoltaReducer = function cyclicVoltaReducer() {
   var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
   var action = arguments[1];
@@ -238,6 +264,8 @@ var cyclicVoltaReducer = function cyclicVoltaReducer() {
       return addPecker(state, action);
     case _action_type.CYCLIC_VOLTA_METRY.REMOVE_PECKER:
       return removePecker(state, action);
+    case _action_type.CYCLIC_VOLTA_METRY.SET_REF:
+      return setRef(state, action);
     case _action_type.CYCLIC_VOLTA_METRY.RESETALL:
       return Object.assign({}, state, { spectraList: [] });
     default:

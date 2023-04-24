@@ -229,7 +229,7 @@ function clickUiTarget(action) {
           });
 
         case 7:
-          _context3.next = 84;
+          _context3.next = 89;
           break;
 
         case 9:
@@ -245,7 +245,7 @@ function clickUiTarget(action) {
           });
 
         case 12:
-          _context3.next = 84;
+          _context3.next = 89;
           break;
 
         case 14:
@@ -261,7 +261,7 @@ function clickUiTarget(action) {
           });
 
         case 17:
-          _context3.next = 84;
+          _context3.next = 89;
           break;
 
         case 19:
@@ -277,7 +277,7 @@ function clickUiTarget(action) {
           });
 
         case 22:
-          _context3.next = 84;
+          _context3.next = 89;
           break;
 
         case 24:
@@ -293,7 +293,7 @@ function clickUiTarget(action) {
           });
 
         case 27:
-          _context3.next = 84;
+          _context3.next = 89;
           break;
 
         case 29:
@@ -309,7 +309,7 @@ function clickUiTarget(action) {
           });
 
         case 32:
-          _context3.next = 84;
+          _context3.next = 89;
           break;
 
         case 34:
@@ -348,7 +348,7 @@ function clickUiTarget(action) {
           });
 
         case 44:
-          _context3.next = 84;
+          _context3.next = 89;
           break;
 
         case 46:
@@ -364,7 +364,7 @@ function clickUiTarget(action) {
           });
 
         case 49:
-          _context3.next = 84;
+          _context3.next = 89;
           break;
 
         case 51:
@@ -380,7 +380,7 @@ function clickUiTarget(action) {
           });
 
         case 54:
-          _context3.next = 84;
+          _context3.next = 89;
           break;
 
         case 56:
@@ -396,7 +396,7 @@ function clickUiTarget(action) {
           });
 
         case 59:
-          _context3.next = 84;
+          _context3.next = 89;
           break;
 
         case 61:
@@ -412,7 +412,7 @@ function clickUiTarget(action) {
           });
 
         case 64:
-          _context3.next = 84;
+          _context3.next = 89;
           break;
 
         case 66:
@@ -428,7 +428,7 @@ function clickUiTarget(action) {
           });
 
         case 69:
-          _context3.next = 84;
+          _context3.next = 89;
           break;
 
         case 71:
@@ -444,7 +444,7 @@ function clickUiTarget(action) {
           });
 
         case 74:
-          _context3.next = 84;
+          _context3.next = 89;
           break;
 
         case 76:
@@ -460,12 +460,12 @@ function clickUiTarget(action) {
           });
 
         case 79:
-          _context3.next = 84;
+          _context3.next = 89;
           break;
 
         case 81:
           if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_PECKER && onPecker)) {
-            _context3.next = 84;
+            _context3.next = 86;
             break;
           }
 
@@ -476,6 +476,22 @@ function clickUiTarget(action) {
           });
 
         case 84:
+          _context3.next = 89;
+          break;
+
+        case 86:
+          if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_SET_REF && onPeak)) {
+            _context3.next = 89;
+            break;
+          }
+
+          _context3.next = 89;
+          return (0, _effects.put)({
+            type: _action_type.CYCLIC_VOLTA_METRY.SET_REF,
+            payload: { index: voltammetryPeakIdx, jcampIdx: jcampIdx }
+          });
+
+        case 89:
         case 'end':
           return _context3.stop();
       }

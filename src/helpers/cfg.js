@@ -16,7 +16,7 @@ const btnCmdAddPeak = layoutSt => Format.isMsLayout(layoutSt);
 
 const btnCmdRmPeak = layoutSt => Format.isMsLayout(layoutSt);
 
-const btnCmdSetRef = layoutSt => !Format.isNmrLayout(layoutSt);
+const btnCmdSetRef = layoutSt => !(Format.isNmrLayout(layoutSt));
 
 const btnCmdIntg = layoutSt => !(Format.isNmrLayout(layoutSt) || Format.isHplcUvVisLayout(layoutSt));
 
