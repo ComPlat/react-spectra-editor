@@ -182,6 +182,29 @@ const removePecker = (state, action) => {
   }
 };
 
+const setRef = (state, action) => {
+  const { payload } = action;
+  const { spectraList } = state;
+  if (payload) {
+    const { index, jcampIdx } = payload;
+    const spectra = spectraList[jcampIdx];
+    const { list } = spectra;
+    const newList = list;
+    let pairPeak = newList[index];
+    // pairPeak.pecker = null;
+    // newList[index] = pairPeak;
+
+    // spectraList[jcampIdx] = Object.assign({}, spectra, { list: newList, selectedIdx: index, jcampIdx: jcampIdx });
+    // return Object.assign({}, state, { spectraList: spectraList });
+
+    //TODO: implement ref
+    console.log(pairPeak);
+  }
+  else {
+    return state;
+  }
+};
+
 const cyclicVoltaReducer = (state = initialState, action) => {
   switch(action.type) {
     case CYCLIC_VOLTA_METRY.ADD_PAIR_PEAKS:
@@ -204,6 +227,8 @@ const cyclicVoltaReducer = (state = initialState, action) => {
       return addPecker(state, action);
     case CYCLIC_VOLTA_METRY.REMOVE_PECKER:
       return removePecker(state, action);
+    case CYCLIC_VOLTA_METRY.SET_REF:
+      return setRef(state, action);
     case CYCLIC_VOLTA_METRY.RESETALL:
         return Object.assign({}, state, { spectraList: [] });
     default:

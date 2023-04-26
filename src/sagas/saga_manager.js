@@ -6,10 +6,24 @@ import {
 
 
 const getLayout = state => state.layout;
+const getCurveSt = state => state.curve;
+const getIntegrationSt = state => state.integration.present;
+const getShiftSt = state => state.shift;
 
 function* resetShift(action) {
+  const curveSt = yield select(getCurveSt);
   const layout = yield select(getLayout);
+  const shiftSt = yield select(getShiftSt);
+
   const { payload } = action;
+  // const { shift } = payload;
+  // console.log(payload);
+  // console.log(shiftSt);
+  // const { curveIdx } = curveSt;
+  // const { shifts } = shiftSt;
+  // shifts[curveIdx] = shift;
+
+  // const newPayload = Object.assign({}, shiftSt, { shifts, selectedIdx: curveIdx })
 
   yield put({
     type: MANAGER.RESETSHIFT,
@@ -24,12 +38,20 @@ function* resetShift(action) {
 }
 
 function* resetInitNmr(action) {
+  const curveSt = yield select(getCurveSt);
+  const integationSt = yield select(getIntegrationSt);
+  const { curveIdx } = curveSt;
+
   const { integration, simulation } = action.payload;
+  const { integrations } = integationSt;
+  integrations[curveIdx] = integration;
+
+  const payload = Object.assign({}, integationSt, { integrations, selectedIdx: curveIdx })
 
   if (integration) {
     yield put({
       type: INTEGRATION.RESET_ALL_RDC,
-      payload: integration,
+      payload: payload,
     });
   }
   if (simulation) {
@@ -41,12 +63,21 @@ function* resetInitNmr(action) {
 }
 
 function* resetInitCommonWithIntergation(action) {
+  const curveSt = yield select(getCurveSt);
+  const integationSt = yield select(getIntegrationSt);
+  const { curveIdx } = curveSt;
+
   const { integration } = action.payload;
+
+  const { integrations } = integationSt;
+  integrations[curveIdx] = integration;
+
+  const payload = Object.assign({}, integationSt, { integrations, selectedIdx: curveIdx })
 
   if (integration) {
     yield put({
       type: INTEGRATION.RESET_ALL_RDC,
-      payload: integration,
+      payload: payload,
     });
   }
 }

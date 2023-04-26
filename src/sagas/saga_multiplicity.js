@@ -5,6 +5,7 @@ import { calcMpyCoup } from '../helpers/multiplicity_calc';
 import { calcMpyManual } from '../helpers/multiplicity_manual';
 
 const getMetaSt = state => state.meta;
+const getCurveSt = state => state.curve;
 
 const getMultiplicitySt = state => state.multiplicity.present;
 
@@ -59,9 +60,12 @@ function* selectMpy(action) {
 function* addUiPeakToStack(action) {
   const metaSt = yield select(getMetaSt);
   const mpySt = yield select(getMultiplicitySt);
+  const curveSt = yield select(getCurveSt);
 
-  const { selectedIdx, multiplicities } = mpySt;
-  const selectedMulti = multiplicities[selectedIdx];
+  const { curveIdx } = curveSt;
+
+  const { multiplicities } = mpySt;
+  const selectedMulti = multiplicities[curveIdx];
 
   const { shift, stack, smExtext } = selectedMulti;
   let { x, y } = action.payload; // eslint-disable-line
@@ -97,7 +101,7 @@ function* addUiPeakToStack(action) {
   if (isDuplicate) return;
 
   const newSelectedMulti = Object.assign({}, selectedMulti,{ stack: newStack });
-  multiplicities[selectedIdx] = newSelectedMulti;
+  multiplicities[curveIdx] = newSelectedMulti;
 
   const payload = Object.assign({}, mpySt, { multiplicities });
 
@@ -107,11 +111,11 @@ function* addUiPeakToStack(action) {
   });
 }
 
-const rmPeakFromStack = (action, metaSt, mpySt) => {
+const rmPeakFromStack = (action, metaSt, mpySt, curveIdx=0) => {
   const { peak, xExtent } = action.payload;
-
-  const { selectedIdx, multiplicities } = mpySt;
-  const selectedMulti = multiplicities[selectedIdx];
+  
+  const { multiplicities } = mpySt;
+  const selectedMulti = multiplicities[curveIdx];
 
   const { stack } = selectedMulti;
   let newStack = stack.map((k) => {
@@ -134,7 +138,7 @@ const rmPeakFromStack = (action, metaSt, mpySt) => {
 
   if (newStack.length === 0) {
     const newSelectedMulti = Object.assign({}, selectedMulti, { stack: newStack, smExtext: false });
-    multiplicities[selectedIdx] = newSelectedMulti;
+    multiplicities[curveIdx] = newSelectedMulti;
     return Object.assign({}, mpySt, { multiplicities });
   }
   const noSmExtext = newStack.map(k => (
@@ -143,15 +147,18 @@ const rmPeakFromStack = (action, metaSt, mpySt) => {
   const newSmExtext = noSmExtext ? newStack[0].xExtent : xExtent;
 
   const newSelectedMulti = Object.assign({}, selectedMulti, { stack: newStack, smExtext: newSmExtext });
-  multiplicities[selectedIdx] = newSelectedMulti;
+  multiplicities[curveIdx] = newSelectedMulti;
   return Object.assign({}, mpySt, { multiplicities });
 };
 
 function* rmPanelPeakFromStack(action) {
   const metaSt = yield select(getMetaSt);
   const mpySt = yield select(getMultiplicitySt);
+  const curveSt = yield select(getCurveSt);
 
-  const payload = rmPeakFromStack(action, metaSt, mpySt);
+  const { curveIdx } = curveSt;
+
+  const payload = rmPeakFromStack(action, metaSt, mpySt, curveIdx);
 
   yield put({
     type: MULTIPLICITY.PEAK_RM_BY_PANEL_RDC,
@@ -162,15 +169,18 @@ function* rmPanelPeakFromStack(action) {
 function* rmUiPeakFromStack(action) {
   const metaSt = yield select(getMetaSt);
   const mpySt = yield select(getMultiplicitySt);
+  const curveSt = yield select(getCurveSt);
 
-  const { selectedIdx, multiplicities } = mpySt;
-  const selectedMulti = multiplicities[selectedIdx];
+  const { curveIdx } = curveSt;
+
+  const { multiplicities } = mpySt;
+  const selectedMulti = multiplicities[curveIdx];
 
   const peak = action.payload;
   const xExtent = selectedMulti.smExtext;
   const newAction = Object.assign({}, action, { payload: { peak, xExtent } });
 
-  const payload = rmPeakFromStack(newAction, metaSt, mpySt);
+  const payload = rmPeakFromStack(newAction, metaSt, mpySt, curveIdx);
 
   yield put({
     type: MULTIPLICITY.PEAK_RM_BY_UI_RDC,
@@ -180,12 +190,18 @@ function* rmUiPeakFromStack(action) {
 
 function* resetInitNmr(action) {
   const { multiplicity } = action.payload;
+  const curveSt = yield select(getCurveSt);
   const mpySt = yield select(getMultiplicitySt);
+
+  const { curveIdx } = curveSt;
+  const { multiplicities } = mpySt;
+  multiplicities[curveIdx] = multiplicity;
+  const payload = Object.assign({}, mpySt, { multiplicities, selectedIdx: curveIdx })
 
   if (multiplicity) {
     yield put({
       type: MULTIPLICITY.RESET_ALL_RDC,
-      payload: Object.assign({}, mpySt, multiplicity),
+      payload: payload,
     });
   }
   // const metaSt = yield select(getMetaSt);
@@ -224,9 +240,11 @@ function* resetOne(action) {
 
   const metaSt = yield select(getMetaSt);
   const mpySt = yield select(getMultiplicitySt);
+  const curveSt = yield select(getCurveSt);
 
-  const { selectedIdx, multiplicities } = mpySt;
-  const selectedMulti = multiplicities[selectedIdx];
+  const { curveIdx } = curveSt;
+  const { multiplicities } = mpySt;
+  const selectedMulti = multiplicities[curveIdx];
 
   const { stack } = selectedMulti;
   const newStack = stack.map((k) => {
@@ -247,7 +265,7 @@ function* resetOne(action) {
   });
 
   const newSelectedMulti = Object.assign({}, selectedMulti, { stack: newStack });
-  multiplicities[selectedIdx] = newSelectedMulti;
+  multiplicities[curveIdx] = newSelectedMulti;
 
   const payload = Object.assign({}, mpySt, { multiplicities });
   yield put({
@@ -259,9 +277,11 @@ function* resetOne(action) {
 function* selectMpyType(action) {
   const mpySt = yield select(getMultiplicitySt);
   const metaSt = yield select(getMetaSt);
+  const curveSt = yield select(getCurveSt);
 
-  const { selectedIdx, multiplicities } = mpySt;
-  const selectedMulti = multiplicities[selectedIdx];
+  const { curveIdx } = curveSt;
+  const { multiplicities } = mpySt;
+  const selectedMulti = multiplicities[curveIdx];
 
   const { mpyType, xExtent } = action.payload;
   const { stack } = selectedMulti;
@@ -272,7 +292,7 @@ function* selectMpyType(action) {
   });
 
   const newSelectedMulti = Object.assign({}, selectedMulti, { stack: newStack });
-  multiplicities[selectedIdx] = newSelectedMulti;
+  multiplicities[curveIdx] = newSelectedMulti;
 
   const payload = Object.assign({}, mpySt, { multiplicities });
 

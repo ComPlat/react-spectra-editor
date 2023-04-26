@@ -110,50 +110,53 @@ function* scrollUiWheel(action) {
 const getUiSweepType = state => state.ui.sweepType;
 
 function* clickUiTarget(action) {
-  const { payload, onPeak, voltammetryPeakIdx, onPecker, jcampIdx } = action;
+  const { payload, onPeak, voltammetryPeakIdx, onPecker } = action;
   const uiSweepType = yield select(getUiSweepType);
+
+  const curveSt = yield select(getCurveSt);
+  const { curveIdx } = curveSt;
 
   if (uiSweepType === LIST_UI_SWEEP_TYPE.PEAK_ADD && !onPeak) {
     yield put({
       type: EDITPEAK.ADD_POSITIVE,
-      payload: { dataToAdd: payload, curveIdx: jcampIdx },
+      payload: { dataToAdd: payload, curveIdx: curveIdx },
     });
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.PEAK_DELETE && onPeak) {
     yield put({
       type: EDITPEAK.ADD_NEGATIVE,
-      payload: { dataToAdd: payload, curveIdx: jcampIdx },
+      payload: { dataToAdd: payload, curveIdx: curveIdx },
     });
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT && onPeak) {
     yield put({
       type: SHIFT.SET_PEAK,
-      payload: { dataToSet: payload, curveIdx: jcampIdx },
+      payload: { dataToSet: payload, curveIdx: curveIdx },
     });
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_RM && onPeak) {
     yield put({
       type: INTEGRATION.RM_ONE,
-      payload: { dataToRemove: payload, curveIdx: jcampIdx },
+      payload: { dataToRemove: payload, curveIdx: curveIdx },
     });
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_RM && onPeak) {
     yield put({
       type: INTEGRATION.RM_ONE,
-      payload: { dataToRemove: payload, curveIdx: jcampIdx },
+      payload: { dataToRemove: payload, curveIdx: curveIdx },
     });
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF && onPeak) {
     yield put({
       type: INTEGRATION.SET_REF,
-      payload: { refData: payload, curveIdx: jcampIdx },
+      payload: { refData: payload, curveIdx: curveIdx },
     });
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_CLICK && onPeak) {
     const { xExtent, xL, xU } = payload;
     if (xExtent) {
       yield put({
         type: MULTIPLICITY.ONE_CLICK_BY_UI,
-        payload: { payloadData: xExtent, curveIdx: jcampIdx },
+        payload: { payloadData: xExtent, curveIdx: curveIdx },
       });
     } else if (xL && xU) {
       yield put({
         type: MULTIPLICITY.ONE_CLICK_BY_UI,
-        payload:{ payloadData: { xL, xU }, curveIdx: jcampIdx },
+        payload:{ payloadData: { xL, xU }, curveIdx: curveIdx },
       });
     }
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_ADD) {
@@ -169,34 +172,40 @@ function* clickUiTarget(action) {
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MAX_PEAK && !onPeak) {
     yield put({
       type: CYCLIC_VOLTA_METRY.ADD_MAX_PEAK,
-      payload: {peak: payload, index: voltammetryPeakIdx, jcampIdx: jcampIdx},
+      payload: {peak: payload, index: voltammetryPeakIdx, jcampIdx: curveIdx},
     });
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MAX_PEAK && onPeak) {
     yield put({
       type: CYCLIC_VOLTA_METRY.REMOVE_MAX_PEAK,
-      payload: {index: voltammetryPeakIdx, jcampIdx: jcampIdx},
+      payload: {index: voltammetryPeakIdx, jcampIdx: curveIdx},
     });
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MIN_PEAK && !onPeak) {
     yield put({
       type: CYCLIC_VOLTA_METRY.ADD_MIN_PEAK,
-      payload: {peak: payload, index: voltammetryPeakIdx, jcampIdx: jcampIdx},
+      payload: {peak: payload, index: voltammetryPeakIdx, jcampIdx: curveIdx},
     });
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MIN_PEAK && onPeak) {
     yield put({
       type: CYCLIC_VOLTA_METRY.REMOVE_MIN_PEAK,
-      payload: {index: voltammetryPeakIdx, jcampIdx: jcampIdx},
+      payload: {index: voltammetryPeakIdx, jcampIdx: curveIdx},
     });
   }
   else if (uiSweepType === LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_PECKER && !onPecker) {
     yield put({
       type: CYCLIC_VOLTA_METRY.ADD_PECKER,
-      payload: {peak: payload, index: voltammetryPeakIdx, jcampIdx: jcampIdx},
+      payload: {peak: payload, index: voltammetryPeakIdx, jcampIdx: curveIdx},
     });
   }
   else if (uiSweepType === LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_PECKER && onPecker) {
     yield put({
       type: CYCLIC_VOLTA_METRY.REMOVE_PECKER,
-      payload: {index: voltammetryPeakIdx, jcampIdx: jcampIdx},
+      payload: {index: voltammetryPeakIdx, jcampIdx: curveIdx},
+    });
+  }
+  else if (uiSweepType === LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_SET_REF && onPeak) {
+    yield put({
+      type: CYCLIC_VOLTA_METRY.SET_REF,
+      payload: {index: voltammetryPeakIdx, jcampIdx: curveIdx},
     });
   }
 }

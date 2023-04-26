@@ -26,6 +26,21 @@ const styles = () => ({
   },
 });
 
+const seperatingSubLayout = (entities, featureCondition) => {
+  let storedDict = {};
+  entities.forEach(entity => {
+    const { feature } = entity;
+    const keyValue = feature[featureCondition];
+    if (keyValue in storedDict) {
+      storedDict[keyValue].push(entity)
+    }
+    else {
+      storedDict[keyValue] = [entity]
+    }
+  });
+  return Object.assign({}, storedDict);
+};
+
 class MultiJcampsViewer extends React.Component {
   constructor(props) {
     super(props);
@@ -35,6 +50,7 @@ class MultiJcampsViewer extends React.Component {
     const { classes, curvSt, operations, entityFileNames, entities, userManualLink } = this.props;
     if (!entities || entities.length === 0) return (<div></div>);
 
+    const seperatedSubLayouts = seperatingSubLayout(entities, 'xUnit');
     const entity = entities[curvSt.curveIdx];
     const { feature, topic, molSvg } = entity;
 
@@ -64,6 +80,7 @@ class MultiJcampsViewer extends React.Component {
                 userManualLink={userManualLink}
                 feature={feature}
                 molSvg={molSvg}
+                subLayoutsInfo={seperatedSubLayouts}
                 descriptions={''}
                 canChangeDescription={() => {}}
                 onDescriptionChanged={() => {}}

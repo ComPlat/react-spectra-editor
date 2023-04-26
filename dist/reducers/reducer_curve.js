@@ -35,7 +35,7 @@ var setAllCurves = function setAllCurves(state, action) {
       var layout = entity.layout;
       var maxminPeak = (0, _chem.Convert2MaxMinPeak)(layout, feature, 0);
       var color = _format2.default.mutiEntitiesColors(idx);
-      return { layout: layout, topic: topic, feature: feature, hasEdit: hasEdit, integration: integration, maxminPeak: maxminPeak, color: color };
+      return { layout: layout, topic: topic, feature: feature, hasEdit: hasEdit, integration: integration, maxminPeak: maxminPeak, color: color, curveIdx: idx };
     });
 
     return Object.assign({}, state, { curveIdx: 0, listCurves: entities });

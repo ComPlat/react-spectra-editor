@@ -4,23 +4,28 @@ import { FromManualToOffset } from './shift';
 import Format from './format';
 import { calcArea } from './integration';
 
-const niOffset = (shiftSt) => {
-  const { ref, peak } = shiftSt;
+const niOffset = (shiftSt, atIndex=0) => {
+  const { shifts } = shiftSt;
+  const selectedShift = shifts[atIndex];
+  if (!selectedShift) {
+    return 0;
+  }
+  const { ref, peak } = selectedShift;
   const offset = FromManualToOffset(ref, peak);
   return offset;
 };
 
 const msOffset = () => 0;
 
-const extractPeaksEdit = (feature, editPeakSt, thresSt, shiftSt, layoutSt) => {
-  const offset = Format.isMsLayout(layoutSt) ? msOffset() : niOffset(shiftSt);
+const extractPeaksEdit = (feature, editPeakSt, thresSt, shiftSt, layoutSt, atIndex=0) => {
+  const offset = Format.isMsLayout(layoutSt) ? msOffset() : niOffset(shiftSt, atIndex);
   const peaks = Convert2Peak(feature, thresSt.value, offset);
   const peaksEdit = PksEdit(peaks, editPeakSt);
   return peaksEdit;
 };
 
 const getAUCValue = (integrationSt, layoutSt) => {
-  const { refArea, refFactor, stack} = integrationSt
+  const { refArea, refFactor, stack } = integrationSt
   if (Array.isArray(stack) && stack.length > 0) {
     const data = stack.at(-1);
     const ignoreRef = Format.isHplcUvVisLayout(layoutSt);

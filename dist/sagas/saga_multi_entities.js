@@ -138,6 +138,14 @@ function setCyclicVoltametry(action) {
   }, _marked);
 }
 
+// function* setInitData(action) {
+//   const layoutSt = yield select(getLayoutSt);
+//   console.log(layoutSt);
+//   const curveSt = yield select(getCurveSt);
+//   const { listCurves } = curveSt;
+//   console.log(listCurves);
+// }
+
 var multiEntitiesSagas = [(0, _effects.takeEvery)(_action_type.CURVE.SET_ALL_CURVES, setCyclicVoltametry)];
 
 exports.default = multiEntitiesSagas;

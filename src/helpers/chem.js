@@ -14,8 +14,16 @@ const getFeature = (_, props) => props.feature;
 const getLayout = (state, _) => state.layout; // eslint-disable-line
 
 const getShiftOffset = (state, _) => { // eslint-disable-line
-  const { shift } = state;
-  const { ref, peak } = shift;
+  const { curve, shift } = state;
+  const { curveIdx } = curve;
+  const { shifts } = shift;
+  const selectedShift = shifts[curveIdx];
+  if (!selectedShift) {
+    return 0.0;
+  }
+
+  // const { shift } = state;
+  const { ref, peak } = selectedShift;
   return FromManualToOffset(ref, peak);
 };
 
@@ -115,9 +123,10 @@ const Convert2Peak = (feature, threshold, offset, upThreshold=false, lowThreshol
   const peak = [];
   if (!feature || !feature.data) return peak;
   const data = feature.data[0];
-  const { maxY, peakUp, thresRef, minY, upperThres, lowerThres } = feature;
+  const { maxY, peakUp, thresRef, minY, upperThres, lowerThres, operation } = feature;
+  const { layout } = operation;
 
-  if (upperThres || lowerThres) {
+  if (!Format.isSECLayout(layout) && (upperThres || lowerThres)) {
     let upperThresVal = upThreshold || upperThres;
     if (!upperThresVal) {
       upperThresVal = 1.0;
@@ -145,7 +154,7 @@ const Convert2Peak = (feature, threshold, offset, upThreshold=false, lowThreshol
   }
   else {
     const thresVal = threshold || thresRef;
-    const yThres = thresVal * maxY / 100.0;
+    const yThres = Number.parseFloat((thresVal * maxY / 100.0).toFixed(10));
     const corrOffset = offset || 0.0;
     for (let i = 0; i < data.y.length; i += 1) {
       const y = data.y[i];
@@ -299,6 +308,12 @@ const readLayout = (jcamp) => {
     }
     if (dataType.includes('CYCLIC VOLTAMMETRY')) {
       return LIST_LAYOUT.CYCLIC_VOLTAMMETRY;
+    }
+    if (dataType.includes('CIRCULAR DICHROISM SPECTROSCOPY')) {
+      return LIST_LAYOUT.CDS;
+    }
+    if (dataType.includes('SIZE EXCLUSION CHROMATOGRAPHY')) {
+      return LIST_LAYOUT.SEC;
     }
   }
   return false;
@@ -705,10 +720,10 @@ const ExtractJcamp = (source) => {
   if (Format.isMsLayout(layout)) {
     features = extrFeaturesMs(jcamp, layout, peakUp);
   }
-  else if (Format.isXRDLayout(layout)) {
+  else if (Format.isXRDLayout(layout)|| Format.isCDSLayout(layout)) {
     features = extrFeaturesXrd(jcamp, layout, peakUp);
   }
-  else if (Format.isCyclicVoltaLayout(layout)) {
+  else if (Format.isCyclicVoltaLayout(layout) || Format.isSECLayout(layout)) {
     features = extrFeaturesCylicVolta(jcamp, layout, peakUp);
   }
   else {

@@ -62,7 +62,8 @@ class PanelViewer extends React.Component {
   render() {
     const { expand } = this.state;
     const {
-      classes, feature, integration, editorOnly, molSvg, descriptions, layoutSt, canChangeDescription, jcampIdx, entityFileNames, curveSt, userManualLink
+      classes, feature, integration, editorOnly, molSvg, descriptions, layoutSt, canChangeDescription, jcampIdx, entityFileNames, curveSt, userManualLink,
+      subLayoutsInfo
     } = this.props;
     const onExapndInfo = () => this.onExapnd('info');
     const onExapndPeak = () => this.onExapnd('peak');
@@ -79,7 +80,7 @@ class PanelViewer extends React.Component {
         <MuiThemeProvider
           theme={theme}
         >
-          { hideGraphSelection ? null: <GraphSelectionPanel jcampIdx={jcampIdx} entityFileNames={entityFileNames} expand={expand === 'graph'} onExapnd={onExapndGraphSelection} />}
+          { hideGraphSelection ? null: <GraphSelectionPanel jcampIdx={jcampIdx} entityFileNames={entityFileNames} expand={expand === 'graph'} onExapnd={onExapndGraphSelection} subLayoutsInfo={subLayoutsInfo} />}
           <InfoPanel
             feature={feature}
             integration={integration}
@@ -126,6 +127,7 @@ PanelViewer.propTypes = {
   entityFileNames: PropTypes.array,
   userManualLink: PropTypes.object,
   curveSt: PropTypes.object.isRequired,
+  subLayoutsInfo: PropTypes.object,
 };
 
 export default connect(

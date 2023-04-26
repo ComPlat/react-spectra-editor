@@ -11,7 +11,7 @@ var _format2 = _interopRequireDefault(_format);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var btnCmdAnaViewer = function btnCmdAnaViewer(layoutSt) {
-  return _format2.default.isMsLayout(layoutSt) || _format2.default.isRamanLayout(layoutSt) || _format2.default.is19FLayout(layoutSt) || _format2.default.isUvVisLayout(layoutSt) || _format2.default.isHplcUvVisLayout(layoutSt) || _format2.default.isTGALayout(layoutSt) || _format2.default.isXRDLayout(layoutSt);
+  return _format2.default.isMsLayout(layoutSt) || _format2.default.isRamanLayout(layoutSt) || _format2.default.is19FLayout(layoutSt) || _format2.default.isUvVisLayout(layoutSt) || _format2.default.isHplcUvVisLayout(layoutSt) || _format2.default.isTGALayout(layoutSt) || _format2.default.isXRDLayout(layoutSt) || _format2.default.is31PLayout(layoutSt) || _format2.default.is15NLayout(layoutSt) || _format2.default.is29SiLayout(layoutSt) || _format2.default.isCyclicVoltaLayout(layoutSt) || _format2.default.isCDSLayout(layoutSt) || _format2.default.isSECLayout(layoutSt);
 };
 
 var hideCmdAnaViewer = function hideCmdAnaViewer() {
@@ -54,7 +54,7 @@ var btnCmdThres = function btnCmdThres(thresVal) {
 
 // const hidePanelPeak = layoutSt => Format.isMsLayout(layoutSt);
 var hidePanelPeak = function hidePanelPeak(layoutSt) {
-  return true;
+  return !_format2.default.isSECLayout(layoutSt);
 }; // eslint-disable-line
 
 var hidePanelMpy = function hidePanelMpy(layoutSt) {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
@@ -8,7 +8,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
-import { ExpansionPanel, ExpansionPanelSummary, ListItem, List } from "@material-ui/core";
+import { Accordion, AccordionSummary, ListItem, List, RadioGroup, Radio, FormControlLabel, Tabs, Tab } from "@material-ui/core";
 import { selectCurve } from '../../actions/curve';
 
 const styles = () => ({
@@ -39,17 +39,45 @@ const styles = () => ({
 });
 
 const GraphSelectionPanel = ({
-  classes, curveSt, selectCurveAct, entityFileNames
+  classes, curveSt, selectCurveAct, entityFileNames, subLayoutsInfo
 }) => {
-
+  
   if (!curveSt) {
-    return (<span/>)    
+    return (<span/>);
   }
   const {curveIdx, listCurves} = curveSt;
+  if (!listCurves) {
+    return (<span/>);
+  }
 
   const onChange = (idx) => {
     selectCurveAct(idx);
   }
+
+  
+  let subLayoutValues = [];
+  if (subLayoutsInfo !== undefined && subLayoutsInfo !== null) {
+    subLayoutValues = Object.keys(subLayoutsInfo);
+  }
+
+  
+  const onChangeTabSubLayout = (event, newValue) => {
+    setSelectedSublayout(newValue);
+  };
+
+  const [selectedSubLayout, setSelectedSublayout] = useState(subLayoutValues[0]);
+  let itemsSubLayout = [];
+  if (selectedSubLayout && subLayoutValues.length > 1) {
+    const subLayout = subLayoutsInfo[selectedSubLayout];
+    itemsSubLayout = subLayout.map((spectra, idx) => {
+      const { color, curveIdx } = spectra;
+      let filename = '';
+      if (entityFileNames && curveIdx < entityFileNames.length) {
+          filename = entityFileNames[curveIdx];
+      }
+      return { name: `${idx + 1}.`, idx: curveIdx, color, filename };
+    });
+  };
 
   const items = listCurves.map((spectra, idx) => {
     const { color } = spectra;
@@ -61,9 +89,9 @@ const GraphSelectionPanel = ({
   });
 
   return (
-    <ExpansionPanel>
-      <ExpansionPanelSummary
-        xpandIcon={<ExpandMoreIcon />}
+    <Accordion data-testid='GraphSelectionPanel'>
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon />}
         className={classNames(classes.panelSummary)}
       >
         <Typography className="txt-panel-header">
@@ -71,32 +99,82 @@ const GraphSelectionPanel = ({
             Graph selection
           </span>
         </Typography>
-      </ExpansionPanelSummary>
+      </AccordionSummary>
       <Divider />
-      <List>
-        {
-          items.map((item) => (
-            <ListItem 
-              key={item.idx} 
-              onClick={() => onChange(item.idx)}
-              className={
-                classNames((item.idx === curveIdx ? classes.curveSelected : classes.curveDefault ))
+      {
+        (subLayoutValues && subLayoutValues.length > 1) ? (
+          <div>
+            <Tabs value={selectedSubLayout} onChange={onChangeTabSubLayout}>
+              {
+                subLayoutValues.map((subLayout, i) => {
+                  let subLayoutName = '';
+                  switch (subLayout) {
+                    case 'G/MOL':
+                      subLayoutName = 'MWD';
+                      break;
+                    case 'MILLILITERS':
+                      subLayoutName = 'ELU';
+                      break;
+                    default:
+                      break;
+                  }
+                  return <Tab key={i} value={subLayout} label={subLayoutName} />
+                })
               }
-            >
-              <span className={classNames(classes.curve)}>
-                <i>{ item.name }</i>
-                <span style={{float: "right", width: "95%"}}>
-                    <hr className={classNames(classes.line)} style={{backgroundColor: item.color}}/>
-                    {
-                        item.filename !== '' ? <span>File: { item.filename }</span> : null
-                    }
-                </span>
-              </span>
-            </ListItem>
-          ))
-        }
-      </List>
-    </ExpansionPanel>
+            </Tabs>
+            <List>
+            {
+              itemsSubLayout.map((item) => (
+                <ListItem 
+                  key={item.idx} 
+                  onClick={() => onChange(item.idx)}
+                  className={
+                    classNames((item.idx === curveIdx ? classes.curveSelected : classes.curveDefault ))
+                  }
+                >
+                  <span className={classNames(classes.curve)}>
+                    <i>{ item.name }</i>
+                    <span style={{float: "right", width: "95%"}}>
+                        <hr className={classNames(classes.line)} style={{backgroundColor: item.color}}/>
+                        {
+                            item.filename !== '' ? <span>File: { item.filename }</span> : null
+                        }
+                    </span>
+                  </span>
+                </ListItem>
+              ))
+            }
+          </List>
+          </div>
+        ) :
+        (
+          <List>
+            {
+              items.map((item) => (
+                <ListItem 
+                  key={item.idx} 
+                  onClick={() => onChange(item.idx)}
+                  className={
+                    classNames((item.idx === curveIdx ? classes.curveSelected : classes.curveDefault ))
+                  }
+                >
+                  <span className={classNames(classes.curve)}>
+                    <i>{ item.name }</i>
+                    <span style={{float: "right", width: "95%"}}>
+                        <hr className={classNames(classes.line)} style={{backgroundColor: item.color}}/>
+                        {
+                            item.filename !== '' ? <span>File: { item.filename }</span> : null
+                        }
+                    </span>
+                  </span>
+                </ListItem>
+              ))
+            }
+          </List>
+        )
+      }
+      
+    </Accordion>
   );
 };
 
@@ -121,6 +199,7 @@ GraphSelectionPanel.propTypes = {
   curveSt: PropTypes.object.isRequired,
   selectCurveAct: PropTypes.func.isRequired,
   entityFileNames: PropTypes.array.isRequired,
+  subLayoutsInfo: PropTypes.array,
 };
 
 export default connect(

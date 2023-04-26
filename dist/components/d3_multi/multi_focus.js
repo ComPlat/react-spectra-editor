@@ -190,19 +190,27 @@ var MultiFocus = function () {
       this.jcampIdx = jcampIdx;
       this.data = [];
       this.otherLineData = [];
+      var filterSubLayoutValue = null;
       this.entities.forEach(function (entry, idx) {
         var topic = entry.topic,
             feature = entry.feature,
             color = entry.color;
 
         var currData = (0, _chem.convertTopic)(topic, layout, feature, 0);
+
         if (idx === _this.jcampIdx) {
           _this.data = [].concat(_toConsumableArray(currData));
           _this.pathColor = color;
+          filterSubLayoutValue = feature.xUnit;
         } else {
-          _this.otherLineData.push({ data: currData, color: color });
+          _this.otherLineData.push({ data: currData, color: color, filterSublayout: feature.xUnit });
         }
       });
+      if (_format2.default.isSECLayout(layout)) {
+        this.otherLineData = this.otherLineData.filter(function (data) {
+          return data.filterSublayout === filterSubLayoutValue;
+        });
+      }
 
       this.dataPks = [].concat(_toConsumableArray(peaks));
       this.tTrEndPts = tTrEndPts;
@@ -348,7 +356,8 @@ var MultiFocus = function () {
         this.dataPks = [];
         this.dataPks = (0, _converter.PksEdit)(this.dataPks, editPeakSt, spectra.list);
       } else {
-        this.dataPks = (0, _converter.PksEdit)(this.dataPks, editPeakSt, []);
+        var newEditPeaks = Object.assign({}, editPeakSt, { selectedIdx: this.jcampIdx });
+        this.dataPks = (0, _converter.PksEdit)(this.dataPks, newEditPeaks, []);
       }
 
       return this.dataPks;
@@ -892,7 +901,7 @@ var MultiFocus = function () {
   }, {
     key: 'reverseXAxis',
     value: function reverseXAxis(layoutSt) {
-      return [_list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS, _list_layout.LIST_LAYOUT.TGA, _list_layout.LIST_LAYOUT.XRD, _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY].indexOf(layoutSt) < 0;
+      return [_list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS, _list_layout.LIST_LAYOUT.TGA, _list_layout.LIST_LAYOUT.XRD, _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY, _list_layout.LIST_LAYOUT.CDS, _list_layout.LIST_LAYOUT.SEC].indexOf(layoutSt) < 0;
     }
   }, {
     key: 'create',
