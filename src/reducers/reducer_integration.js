@@ -1,3 +1,4 @@
+/* eslint-disable prefer-object-spread, default-param-last */
 import undoable from 'redux-undo';
 import {
   UI, INTEGRATION, EDITPEAK, MANAGER,
@@ -36,24 +37,30 @@ const addToStack = (state, action) => {
   }
 
   const { stack, refArea, shift } = selectedIntegration;
-  
   const { xExtent, data } = newData;
   const { xL, xU } = xExtent;
   if (!xL || !xU || (xU - xL) === 0) { return state; }
 
   const area = getArea(xL, xU, data);
   const defaultRefArea = stack.length === 0 ? area : refArea;
-  const absoluteArea = getAbsoluteArea(xL, xU, data); //area depends on y baseline
-  const newStack = [...stack, { xL: xL + shift, xU: xU + shift, area, absoluteArea }];
+  const absoluteArea = getAbsoluteArea(xL, xU, data); // area depends on y baseline
+  const newStack = [...stack,
+    {
+      xL: xL + shift, xU: xU + shift, area, absoluteArea,
+    },
+  ];
 
-  const newIntegration = Object.assign({}, selectedIntegration, { stack: newStack, refArea: defaultRefArea });
+  const newIntegration = Object.assign(
+    {},
+    selectedIntegration,
+    { stack: newStack, refArea: defaultRefArea },
+  );
   integrations[curveIdx] = newIntegration;
 
   return Object.assign({}, state, { integrations, selectedIdx: curveIdx });
 };
 
 const rmFromStack = (state, action) => {
-  
   const { dataToRemove, curveIdx } = action.payload;
   const { xL, xU, xExtent } = dataToRemove;
 
@@ -70,7 +77,7 @@ const rmFromStack = (state, action) => {
   } else {
     return state;
   }
-  const newStack = stack.filter(k => k.xL !== txL && k.xU !== txU);
+  const newStack = stack.filter((k) => k.xL !== txL && k.xU !== txU);
 
   const newIntegration = Object.assign({}, selectedIntegration, { stack: newStack });
   integrations[curveIdx] = newIntegration;
@@ -87,7 +94,7 @@ const setRef = (state, action) => {
   const { stack } = selectedIntegration;
 
   const { xL, xU } = refData;
-  const ref = stack.filter(k => k.xL === xL && k.xU === xU)[0];
+  const ref = stack.filter((k) => k.xL === xL && k.xU === xU)[0];
   if (!ref) {
     return state;
   }
@@ -122,7 +129,6 @@ const setShift = (state, action) => {
 
   const newIntegration = Object.assign({}, selectedIntegration, { shift });
   integrations[selectedIdx] = newIntegration;
-  
   return Object.assign({}, state, { integrations });
 };
 

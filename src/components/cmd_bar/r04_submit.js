@@ -1,3 +1,5 @@
+/* eslint-disable prefer-object-spread, function-paren-newline,
+react/function-component-definition */
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -125,7 +127,7 @@ const decimalSelect = (
 ) => {
   if (hideSwitch) return null;
   const decimals = [0, 1, 2, 3, 4];
-  const options = decimals.map(d => (
+  const options = decimals.map((d) => (
     <MenuItem value={d} key={d}>
       <span className={classNames(classes.txtOpt, 'option-sv-bar-decimal')}>
         {d}
@@ -162,7 +164,7 @@ const decimalSelect = (
 const operationSelect = (
   classes, operations, operation, onChangeSelect,
 ) => {
-  const options = operations.map(o => (
+  const options = operations.map((o) => (
     <MenuItem value={o.name} key={o.name}>
       <span className={classNames(classes.txtOpt, 'option-sv-bar-operation')}>{o.name}</span>
     </MenuItem>
@@ -207,12 +209,12 @@ const selectOperation = (name, operations, updateOperationAct) => {
 };
 
 const Submit = ({
-  operations, classes, feature, forecast, editorOnly ,hideSwitch, disabled,
+  operations, classes, feature, forecast, editorOnly, hideSwitch, disabled,
   isAscendSt, isIntensitySt, operationSt, decimalSt, isEmWaveSt,
   toggleIsAscendAct, toggleIsIntensityAct,
   updateOperationAct, updateDecimalAct,
 }) => {
-  const onChangeSelect = e => (
+  const onChangeSelect = (e) => (
     selectOperation(e.target.value, operations, updateOperationAct)
   );
 
@@ -271,7 +273,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     toggleIsAscendAct: toggleIsAscend,
     toggleIsIntensityAct: toggleIsIntensity,

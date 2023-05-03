@@ -1,3 +1,5 @@
+/* eslint-disable no-mixed-operators, react/function-component-definition,
+react/require-default-props */
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -85,40 +87,40 @@ const simTitle = () => (
   'Simulated signals from NMRshiftDB'
 );
 
-const simContent = nmrSimPeaks => (
+const simContent = (nmrSimPeaks) => (
   nmrSimPeaks && nmrSimPeaks.sort((a, b) => a - b).join(', ')
 );
 
-const aucValue = integration => {
+const aucValue = (integration) => {
   if (!integration) {
-    return "";
+    return '';
   }
-  let values = [];
-  let stackIntegration = integration.stack;
+  const values = [];
+  const stackIntegration = integration.stack;
   if (Array.isArray(stackIntegration)) {
     let sumVal = 0.0;
-    stackIntegration.forEach(inte => {
+    stackIntegration.forEach((inte) => {
       if (inte.absoluteArea) {
         sumVal += inte.absoluteArea;
       }
     });
     sumVal = sumVal.toFixed(2);
-    stackIntegration.forEach(inte => {
+    stackIntegration.forEach((inte) => {
       if (inte.absoluteArea) {
         const areaVal = inte.absoluteArea.toFixed(2);
-        const percent = (areaVal*100/sumVal).toFixed(2);
-        const valStr = areaVal + " (" + percent + "%)";
+        const percent = (areaVal * 100 / sumVal).toFixed(2);
+        const valStr = areaVal + " (" + percent + "%)"; // eslint-disable-line
         values.push(valStr);
       }
-    })
+    });
   }
-  return values.join(", ");
-}
+  return values.join(', ');
+};
 
 const InfoPanel = ({
   classes, expand, feature, integration, editorOnly, molSvg, descriptions,
   layoutSt, simulationSt, shiftSt, curveSt,
-  onExapnd, canChangeDescription, onDescriptionChanged
+  onExapnd, canChangeDescription, onDescriptionChanged,
 }) => {
   if (!feature) return null;
   const { title, observeFrequency, solventName } = feature;
@@ -130,13 +132,12 @@ const InfoPanel = ({
     const shiftName = selectedShift.ref.name;
     showSolvName = shiftName === '- - -' ? solventName : shiftName;
   }
-  
 
   let originStack = null;
   if (integration) {
-    originStack = integration.originStack;
+    originStack = integration.originStack;  // eslint-disable-line
   }
-  
+
   return (
     <ExpansionPanel
       expanded={expand}
@@ -199,11 +200,10 @@ const InfoPanel = ({
               </span>
               <br />
               <span className={classNames(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt')}>
-              {aucValue(integration)}
+                {aucValue(integration)}
               </span>
             </div>
-          )
-          : null
+          ) : null
         }
       </div>
       {/* <ReactQuill
@@ -250,7 +250,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
   }, dispatch)
 );
@@ -269,9 +269,9 @@ InfoPanel.propTypes = {
   curveSt: PropTypes.object.isRequired,
   onExapnd: PropTypes.func.isRequired,
   canChangeDescription: PropTypes.bool.isRequired,
-  onDescriptionChanged: PropTypes.func
+  onDescriptionChanged: PropTypes.func,
 };
 
-export default connect(
-  mapStateToProps, mapDispatchToProps
-)(withStyles(styles)(InfoPanel));
+export default connect( // eslint-disable-line
+  mapStateToProps, mapDispatchToProps,
+)(withStyles(styles)(InfoPanel)); // eslint-disable-line

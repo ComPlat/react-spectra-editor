@@ -1,3 +1,6 @@
+/* eslint-disable prefer-object-spread, function-paren-newline,
+react/function-component-definition, react/require-default-props, max-len,
+react/no-unused-prop-types */
 import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -26,14 +29,14 @@ const styles = () => (
 const Multiplicity = ({
   classes, isFocusAddMpySt, disableAddMpySt, isFocusRmMpySt, disableRmMpySt,
   isFocusAddPeakSt, isFocusRmPeakSt, disableMpyPeakSt,
-  setUiSweepTypeAct, clearMpyAllAct, curveSt
+  setUiSweepTypeAct, clearMpyAllAct, curveSt,
 }) => {
   const onSweepMutAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD);
   const onOneMutAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_RM);
   const onPeakMutAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_ADD);
   const onPeakMutRm = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_RM);
   const { curveIdx } = curveSt;
-  const onClearAll = () => clearMpyAllAct({curveIdx});
+  const onClearAll = () => clearMpyAllAct({ curveIdx });
 
   return (
     <span className={classes.group}>
@@ -102,17 +105,17 @@ const Multiplicity = ({
         </span>
       </Tooltip>
       {
-        disableAddMpySt ? null : 
-        (
-          <TriBtn
-            content={{ tp: 'Clear All Multiplicity' }}
-            cb={onClearAll}
-          >
-            <span className={classNames(classes.txt, 'txt-sv-bar-rmallmpy')}>Jx</span>
-          </TriBtn>
-        )
+        disableAddMpySt ? null
+          :  // eslint-disable-line
+          (
+            <TriBtn
+              content={{ tp: 'Clear All Multiplicity' }}
+              cb={onClearAll}
+            >
+              <span className={classNames(classes.txt, 'txt-sv-bar-rmallmpy')}>Jx</span>
+            </TriBtn>
+          )
       }
-      
     </span>
   );
 };
@@ -130,7 +133,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     setUiSweepTypeAct: setUiSweepType,
     clearMpyAllAct: clearMpyAll,

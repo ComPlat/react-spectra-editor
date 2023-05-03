@@ -1,3 +1,4 @@
+/* eslint-disable prefer-object-spread, default-param-last */
 import { LIST_SHIFT_13C } from '../constants/list_shift';
 
 const shiftNone = LIST_SHIFT_13C[0];
@@ -19,7 +20,7 @@ const CalcResidualX = (origRef, origApex, nextApex) => {
 
 const VirtalPts = (pts, resX) => (
   pts.map(
-    pt => Object.assign(
+    (pt) => Object.assign(
       {
         x: pt.x + resX,
         y: pt.y,
@@ -30,7 +31,7 @@ const VirtalPts = (pts, resX) => (
 
 const RealPts = (pts, resX) => (
   pts.map(
-    pt => Object.assign(
+    (pt) => Object.assign(
       {
         x: pt.x - resX,
         y: pt.y,

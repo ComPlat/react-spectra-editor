@@ -23,8 +23,8 @@ const InitAxisCall = (count) => {
 
 const InitPathCall = (target) => {
   const line = d3.line()
-    .x(d => target.scales.x(d.x))
-    .y(d => target.scales.y(d.y));
+    .x((d) => target.scales.x(d.x))
+    .y((d) => target.scales.y(d.y));
   return line;
 };
 

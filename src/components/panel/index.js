@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types, react/require-default-props */
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -46,24 +47,25 @@ class PanelViewer extends React.Component {
     this.handleDescriptionChanged = this.handleDescriptionChanged.bind(this);
   }
 
+  handleDescriptionChanged(content, delta, source, editor) {
+    if (source === 'user') {
+      const contentChanged = editor.getContents();
+      this.props.onDescriptionChanged(contentChanged);  // eslint-disable-line
+    }
+  }
+
   onExapnd(input) {
     const { expand } = this.state;
     const nextExpand = input === expand ? '' : input;
     this.setState({ expand: nextExpand });
   }
 
-  handleDescriptionChanged(content, delta, source, editor) {
-    if (source === 'user') {
-      const contentChanged = editor.getContents()
-      this.props.onDescriptionChanged(contentChanged)
-    }
-  }
-
   render() {
     const { expand } = this.state;
     const {
-      classes, feature, integration, editorOnly, molSvg, descriptions, layoutSt, canChangeDescription, jcampIdx, entityFileNames, curveSt, userManualLink,
-      subLayoutsInfo
+      classes, feature, integration, editorOnly, molSvg, descriptions, layoutSt,
+      canChangeDescription, jcampIdx, entityFileNames, curveSt, userManualLink,
+      subLayoutsInfo,
     } = this.props;
     const onExapndInfo = () => this.onExapnd('info');
     const onExapndPeak = () => this.onExapnd('peak');
@@ -71,7 +73,7 @@ class PanelViewer extends React.Component {
     const onExapndCompare = () => this.onExapnd('compare');
     const onExapndCyclicVolta = () => this.onExapnd('cyclicvolta');
     const onExapndGraphSelection = () => this.onExapnd('graph');
-    
+
     const { listCurves } = curveSt;
     const hideGraphSelection = listCurves === false || listCurves === undefined;
 
@@ -80,7 +82,7 @@ class PanelViewer extends React.Component {
         <MuiThemeProvider
           theme={theme}
         >
-          { hideGraphSelection ? null: <GraphSelectionPanel jcampIdx={jcampIdx} entityFileNames={entityFileNames} expand={expand === 'graph'} onExapnd={onExapndGraphSelection} subLayoutsInfo={subLayoutsInfo} />}
+          { hideGraphSelection ? null : <GraphSelectionPanel jcampIdx={jcampIdx} entityFileNames={entityFileNames} expand={expand === 'graph'} onExapnd={onExapndGraphSelection} subLayoutsInfo={subLayoutsInfo} />}
           <InfoPanel
             feature={feature}
             integration={integration}
@@ -95,7 +97,7 @@ class PanelViewer extends React.Component {
           { Cfg.hidePanelPeak(layoutSt) ? null : <PeakPanel expand={expand === 'peak'} onExapnd={onExapndPeak} /> }
           { Cfg.hidePanelMpy(layoutSt) ? null : <MultiplicityPanel expand={expand === 'mpy'} onExapnd={onExapndMpy} /> }
           { (Cfg.hidePanelCompare(layoutSt) || listCurves.length > 1) ? null : <ComparePanel expand={expand === 'compare'} onExapnd={onExapndCompare} /> }
-          { Cfg.hidePanelCyclicVolta(layoutSt) ? null: <CyclicVoltammetryPanel jcampIdx={jcampIdx} feature={feature} expand={expand === 'cyclicvolta'} onExapnd={onExapndCyclicVolta} userManualLink={userManualLink ? userManualLink.cv : undefined} />}
+          { Cfg.hidePanelCyclicVolta(layoutSt) ? null : <CyclicVoltammetryPanel jcampIdx={jcampIdx} feature={feature} expand={expand === 'cyclicvolta'} onExapnd={onExapndCyclicVolta} userManualLink={userManualLink ? userManualLink.cv : undefined} />}
         </MuiThemeProvider>
       </div>
     );
@@ -109,7 +111,7 @@ const mapStateToProps = (state, _) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
   }, dispatch)
 );
@@ -130,6 +132,6 @@ PanelViewer.propTypes = {
   subLayoutsInfo: PropTypes.object,
 };
 
-export default connect(
+export default connect( // eslint-disable-line
   mapStateToProps, mapDispatchToProps,
-)(withStyles(styles)(PanelViewer));
+)(withStyles(styles)(PanelViewer)); // eslint-disable-line

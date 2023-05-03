@@ -1,3 +1,4 @@
+/* eslint-disable prefer-object-spread, default-param-last */
 import {
   STATUS, EDITPEAK, THRESHOLD, MANAGER, LAYOUT,
 } from '../constants/action_type';

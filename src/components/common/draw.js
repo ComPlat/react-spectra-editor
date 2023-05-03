@@ -23,7 +23,7 @@ const drawDisplay = (klass, isHidden) => {
   }
 };
 
-const drawDestroy = klass => d3.select(`${klass} > *`).remove();
+const drawDestroy = (klass) => d3.select(`${klass} > *`).remove();
 
 export {
   drawMain, drawLabel, drawDisplay, drawDestroy,

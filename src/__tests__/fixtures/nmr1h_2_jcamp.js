@@ -1,3 +1,4 @@
+/* eslint-disable */
 const nmr1H_2_Jcamp = `
 ##TITLE=1H.edit (3)
 ##JCAMP-DX=5.0

@@ -1,3 +1,4 @@
+/* eslint-disable prefer-object-spread, default-param-last */
 import { UI, MANAGER } from '../constants/action_type';
 import {
   LIST_UI_VIEWER_TYPE,
@@ -25,7 +26,7 @@ const uiReducer = (state = initialState, action) => {
       }
       return Object.assign({}, state, {
         sweepType: action.payload,
-        jcampIdx: action.jcampIdx
+        jcampIdx: action.jcampIdx,
       });
     case UI.SWEEP.SELECT_ZOOMIN:
       return Object.assign({}, state, {

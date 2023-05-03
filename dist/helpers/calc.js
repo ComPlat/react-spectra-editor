@@ -3,16 +3,13 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-var almostEqual = function almostEqual(a, b) {
-  return Math.abs(a - b) < 0.00000001 * Math.abs(a + b);
-};
-
-var calcSlope = function calcSlope(x1, y1, x2, y2) {
+exports.calcSlope = exports.almostEqual = void 0;
+const almostEqual = (a, b) => Math.abs(a - b) < 0.00000001 * Math.abs(a + b);
+exports.almostEqual = almostEqual;
+const calcSlope = (x1, y1, x2, y2) => {
   if (x2 === x1) {
     return 0;
   }
   return (y2 - y1) / (x2 - x1);
 };
-
-exports.almostEqual = almostEqual;
 exports.calcSlope = calcSlope;

@@ -16,7 +16,6 @@ import {
 } from './comps';
 import { IrTableHeader, IrTableBodyRow } from './ir_comps';
 
-
 const Styles = () => ({
   root: {
     overflowX: 'hidden',
@@ -82,7 +81,7 @@ const sectionTable = (classes, pds) => {
   );
 };
 
-const IrViewer = ({
+const IrViewer = ({ // eslint-disable-line
   classes, molecule, inputCb, forecastSt,
 }) => (
   <div className={classNames(classes.root, 'card-forecast-viewer')}>
@@ -106,7 +105,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
   }, dispatch)
 );

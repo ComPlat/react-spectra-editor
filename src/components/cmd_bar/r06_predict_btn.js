@@ -1,3 +1,6 @@
+/* eslint-disable prefer-object-spread, function-paren-newline,
+max-len, react/function-component-definition,
+function-call-argument-newline, react/require-default-props */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -17,7 +20,6 @@ import { extractPeaksEdit } from '../../helpers/extractPeaksEdit';
 import { setUiViewerType } from '../../actions/ui';
 import { LIST_UI_VIEWER_TYPE } from '../../constants/list_ui';
 import { Convert2Scan, Convert2Thres } from '../../helpers/chem';
-
 
 const styles = () => (
   Object.assign(
@@ -92,7 +94,7 @@ const onClickReady = (
 
 const onClicUnknown = (
   feature, forecast, peaksEdit, layoutSt, scan, shiftSt, thres,
-  analysis, integrationSt, multiplicitySt, curveSt
+  analysis, integrationSt, multiplicitySt, curveSt,
 ) => {
   const { refreshCb } = forecast;
   if (!refreshCb) {
@@ -109,7 +111,7 @@ const onClicUnknown = (
       analysis,
       integration: integrationSt,
       multiplicity: multiplicitySt,
-      curveSt: curveSt,
+      curveSt,
     })
   );
 };
@@ -191,12 +193,11 @@ const renderBtnUnknown = (
   </Tooltip>
 );
 
-
 const BtnPredict = ({
   classes, feature, forecast,
   layoutSt, simulationSt, editPeakSt, scanSt, shiftSt, thresSt,
   integrationSt, multiplicitySt,
-  setUiViewerTypeAct, curveSt
+  setUiViewerTypeAct, curveSt,
 }) => {
   const is13Cor1H = Format.is13CLayout(layoutSt) || Format.is1HLayout(layoutSt);
   const isIr = Format.isIrLayout(layoutSt);
@@ -210,19 +211,18 @@ const BtnPredict = ({
   const uniqCount = [...new Set(simulationSt.nmrSimPeaks)].length;
   let realCount = 0;
   if (Format.is13CLayout(layoutSt)) {
-    realCount =  carbonFeatures(peaksEdit, multiplicitySt).length
-  }
-  else {
+    realCount = carbonFeatures(peaksEdit, multiplicitySt).length;
+  } else {
     const { selectedIdx, multiplicities } = multiplicitySt;
     const selectedMultiplicity = multiplicities[selectedIdx];
     const { stack } = selectedMultiplicity;
     realCount = stack.length;
   }
-    
+
   if (is13Cor1H && simuCount === 0) {
     const onClickUnknownCb = onClicUnknown(
       feature, forecast, peaksEdit, layoutSt, scan, shiftSt, thres,
-      forecast.predictions, integrationSt, multiplicitySt, curveSt
+      forecast.predictions, integrationSt, multiplicitySt, curveSt,
     );
     return renderBtnUnknown(classes, onClickUnknownCb);
   }
@@ -234,7 +234,7 @@ const BtnPredict = ({
     ? (
       onClickReady(
         forecast, peaksEdit, layoutSt, scan, shiftSt, thres,
-        forecast.predictions, integrationSt, multiplicitySt, setUiViewerTypeAct, curveSt
+        forecast.predictions, integrationSt, multiplicitySt, setUiViewerTypeAct, curveSt,
       )
     )
     : onClickFail(layoutSt, simuCount, realCount);
@@ -262,7 +262,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     setUiViewerTypeAct: setUiViewerType,
   }, dispatch)
@@ -281,6 +281,7 @@ BtnPredict.propTypes = {
   integrationSt: PropTypes.object.isRequired,
   multiplicitySt: PropTypes.object.isRequired,
   setUiViewerTypeAct: PropTypes.func.isRequired,
+  curveSt: PropTypes.object,
 };
 
 export default compose(

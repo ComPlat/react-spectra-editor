@@ -1,24 +1,22 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
+var _action_type = require("../constants/action_type");
+/* eslint-disable prefer-object-spread, default-param-last */
 
-var _action_type = require('../constants/action_type');
-
-var initialState = {
+const initialState = {
   nmrSimPeaks: []
 };
-
-var resetAll = function resetAll(state, action) {
-  var newState = action.payload;
+const resetAll = (state, action) => {
+  const newState = action.payload;
   return Object.assign({}, state, newState);
 };
-
-var simulatioinReducer = function simulatioinReducer() {
-  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-  var action = arguments[1];
-
+const simulatioinReducer = function () {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+  let action = arguments.length > 1 ? arguments[1] : undefined;
   switch (action.type) {
     case _action_type.SIMULATION.RESET_ALL_RDC:
       return resetAll(state, action);
@@ -26,5 +24,5 @@ var simulatioinReducer = function simulatioinReducer() {
       return state;
   }
 };
-
-exports.default = simulatioinReducer;
+var _default = simulatioinReducer;
+exports.default = _default;

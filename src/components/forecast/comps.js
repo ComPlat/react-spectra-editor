@@ -1,3 +1,5 @@
+/* eslint-disable react/function-component-definition, react/destructuring-assignment,
+max-len */
 import React from 'react';
 import classNames from 'classnames';
 import SvgFileZoomPan from '@complat/react-svg-file-zoom-pan';

@@ -1,3 +1,4 @@
+/* eslint-disable prefer-object-spread, default-param-last, react/function-component-definition */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -18,7 +19,7 @@ const extractLayout = (forecast, layoutSt) => {
   const isXRD = Format.isXRDLayout(layoutSt);
   const showForecast = !isEmpty && (isNmr || isIr || isUvvis || isXRD);
   return {
-    showForecast, isNmr, isIr, isMs, isUvvis, isXRD
+    showForecast, isNmr, isIr, isMs, isUvvis, isXRD,
   };
 };
 
@@ -26,7 +27,7 @@ const Content = ({
   topic, feature, cLabel, xLabel, yLabel, forecast, operations, layoutSt,
 }) => {
   const {
-    showForecast, isNmr, isIr, isMs, isUvvis, isXRD
+    showForecast, isNmr, isIr, isMs, isUvvis, isXRD,
   } = extractLayout(forecast, layoutSt);
 
   if (showForecast) {
@@ -78,7 +79,7 @@ const mapStateToProps = (state, _) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
   }, dispatch)
 );

@@ -4,13 +4,12 @@ import { UI, MULTIPLICITY, MANAGER } from '../constants/action_type';
 import { calcMpyCoup } from '../helpers/multiplicity_calc';
 import { calcMpyManual } from '../helpers/multiplicity_manual';
 
-const getMetaSt = state => state.meta;
-const getCurveSt = state => state.curve;
+const getMetaSt = (state) => state.meta;
+const getCurveSt = (state) => state.curve;
 
-const getMultiplicitySt = state => state.multiplicity.present;
+const getMultiplicitySt = (state) => state.multiplicity.present;
 
 function* selectMpy(action) {
- 
   const metaSt = yield select(getMetaSt);
   const mpySt = yield select(getMultiplicitySt);
 
@@ -24,15 +23,15 @@ function* selectMpy(action) {
       shift: 0,
       smExtext: false,
       edited: false,
-    }
+    };
   }
 
   const { xExtent, yExtent, dataPks } = newData;
   const { shift, stack } = selectedMulti;
   const { xL, xU } = xExtent;
   const { yL, yU } = yExtent;
-  let peaks = dataPks.filter(p => xL <= p.x && p.x <= xU && yL <= p.y && p.y <= yU);
-  peaks = peaks.map(pk => ({ x: pk.x + shift, y: pk.y }));
+  let peaks = dataPks.filter((p) => xL <= p.x && p.x <= xU && yL <= p.y && p.y <= yU);
+  peaks = peaks.map((pk) => ({ x: pk.x + shift, y: pk.y }));
   const newXExtemt = { xL: xL + shift, xU: xU + shift };
   const coupling = calcMpyCoup(peaks, metaSt);
   const m = {
@@ -44,11 +43,17 @@ function* selectMpy(action) {
   };
   const newStack = [...stack, m];
 
-  const newSelectedMulti = Object.assign({}, selectedMulti, { stack: newStack, smExtext: newXExtemt });
+  const newSelectedMulti = Object.assign( // eslint-disable-line
+    {},
+    selectedMulti,
+    { stack: newStack, smExtext: newXExtemt },
+  );
   multiplicities[curveIdx] = newSelectedMulti;
 
-  const payload = Object.assign(
-    {}, mpySt, { multiplicities, selectedIdx: curveIdx },
+  const payload = Object.assign(  // eslint-disable-line
+    {},
+    mpySt,
+    { multiplicities, selectedIdx: curveIdx },
   );
 
   yield put({
@@ -79,14 +84,14 @@ function* addUiPeakToStack(action) {
   let isDuplicate = false;
   const newStack = stack.map((k) => {
     if (k.xExtent.xL === xL && k.xExtent.xU === xU) {
-      const existXs = k.peaks.map(pk => pk.x);
+      const existXs = k.peaks.map((pk) => pk.x);
       if (existXs.indexOf(newPeak.x) >= 0) {
         isDuplicate = true;
         return k;
       }
       const newPks = [...k.peaks, newPeak];
       const coupling = calcMpyCoup(newPks, metaSt);
-      return Object.assign(
+      return Object.assign( // eslint-disable-line
         {},
         k,
         {
@@ -100,10 +105,10 @@ function* addUiPeakToStack(action) {
   });
   if (isDuplicate) return;
 
-  const newSelectedMulti = Object.assign({}, selectedMulti,{ stack: newStack });
+  const newSelectedMulti = Object.assign({}, selectedMulti,{ stack: newStack });  // eslint-disable-line
   multiplicities[curveIdx] = newSelectedMulti;
 
-  const payload = Object.assign({}, mpySt, { multiplicities });
+  const payload = Object.assign({}, mpySt, { multiplicities }); // eslint-disable-line
 
   yield put({
     type: MULTIPLICITY.PEAK_ADD_BY_UI_RDC,
@@ -111,18 +116,17 @@ function* addUiPeakToStack(action) {
   });
 }
 
-const rmPeakFromStack = (action, metaSt, mpySt, curveIdx=0) => {
+const rmPeakFromStack = (action, metaSt, mpySt, curveIdx = 0) => {
   const { peak, xExtent } = action.payload;
-  
   const { multiplicities } = mpySt;
   const selectedMulti = multiplicities[curveIdx];
 
   const { stack } = selectedMulti;
   let newStack = stack.map((k) => {
     if (k.xExtent.xL === xExtent.xL && k.xExtent.xU === xExtent.xU) {
-      const newPks = k.peaks.filter(pk => pk.x !== peak.x);
+      const newPks = k.peaks.filter((pk) => pk.x !== peak.x);
       const coupling = calcMpyCoup(newPks, metaSt);
-      return Object.assign(
+      return Object.assign( // eslint-disable-line
         {},
         k,
         {
@@ -134,21 +138,21 @@ const rmPeakFromStack = (action, metaSt, mpySt, curveIdx=0) => {
     }
     return k;
   });
-  newStack = newStack.filter(k => k.peaks.length !== 0);
+  newStack = newStack.filter((k) => k.peaks.length !== 0);
 
   if (newStack.length === 0) {
-    const newSelectedMulti = Object.assign({}, selectedMulti, { stack: newStack, smExtext: false });
+    const newSelectedMulti = Object.assign({}, selectedMulti, { stack: newStack, smExtext: false });  // eslint-disable-line
     multiplicities[curveIdx] = newSelectedMulti;
-    return Object.assign({}, mpySt, { multiplicities });
+    return Object.assign({}, mpySt, { multiplicities });  // eslint-disable-line
   }
-  const noSmExtext = newStack.map(k => (
+  const noSmExtext = newStack.map((k) => (
     (k.xExtent.xL === xExtent.xL && k.xExtent.xU === xExtent.xU) ? 1 : 0
   )).reduce((a, s) => a + s) === 0;
   const newSmExtext = noSmExtext ? newStack[0].xExtent : xExtent;
 
-  const newSelectedMulti = Object.assign({}, selectedMulti, { stack: newStack, smExtext: newSmExtext });
+  const newSelectedMulti = Object.assign({}, selectedMulti, { stack: newStack, smExtext: newSmExtext });  // eslint-disable-line
   multiplicities[curveIdx] = newSelectedMulti;
-  return Object.assign({}, mpySt, { multiplicities });
+  return Object.assign({}, mpySt, { multiplicities });  // eslint-disable-line
 };
 
 function* rmPanelPeakFromStack(action) {
@@ -178,7 +182,7 @@ function* rmUiPeakFromStack(action) {
 
   const peak = action.payload;
   const xExtent = selectedMulti.smExtext;
-  const newAction = Object.assign({}, action, { payload: { peak, xExtent } });
+  const newAction = Object.assign({}, action, { payload: { peak, xExtent } });  // eslint-disable-line
 
   const payload = rmPeakFromStack(newAction, metaSt, mpySt, curveIdx);
 
@@ -196,12 +200,12 @@ function* resetInitNmr(action) {
   const { curveIdx } = curveSt;
   const { multiplicities } = mpySt;
   multiplicities[curveIdx] = multiplicity;
-  const payload = Object.assign({}, mpySt, { multiplicities, selectedIdx: curveIdx })
+  const payload = Object.assign({}, mpySt, { multiplicities, selectedIdx: curveIdx });  // eslint-disable-line
 
   if (multiplicity) {
     yield put({
       type: MULTIPLICITY.RESET_ALL_RDC,
-      payload: payload,
+      payload,
     });
   }
   // const metaSt = yield select(getMetaSt);
@@ -251,7 +255,7 @@ function* resetOne(action) {
     if (k.xExtent.xL === xExtent.xL && k.xExtent.xU === xExtent.xU) {
       const { peaks } = k;
       const coupling = calcMpyCoup(peaks, metaSt);
-      return Object.assign(
+      return Object.assign( // eslint-disable-line
         {},
         k,
         {
@@ -264,10 +268,10 @@ function* resetOne(action) {
     return k;
   });
 
-  const newSelectedMulti = Object.assign({}, selectedMulti, { stack: newStack });
+  const newSelectedMulti = Object.assign({}, selectedMulti, { stack: newStack }); // eslint-disable-line
   multiplicities[curveIdx] = newSelectedMulti;
 
-  const payload = Object.assign({}, mpySt, { multiplicities });
+  const payload = Object.assign({}, mpySt, { multiplicities }); // eslint-disable-line
   yield put({
     type: MULTIPLICITY.RESET_ONE_RDC,
     payload,
@@ -291,10 +295,10 @@ function* selectMpyType(action) {
     return k;
   });
 
-  const newSelectedMulti = Object.assign({}, selectedMulti, { stack: newStack });
+  const newSelectedMulti = Object.assign({}, selectedMulti, { stack: newStack }); // eslint-disable-line
   multiplicities[curveIdx] = newSelectedMulti;
 
-  const payload = Object.assign({}, mpySt, { multiplicities });
+  const payload = Object.assign({}, mpySt, { multiplicities }); // eslint-disable-line
 
   yield put({
     type: MULTIPLICITY.TYPE_SELECT_RDC,

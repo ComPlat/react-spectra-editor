@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+/* eslint-disable react/function-component-definition, function-paren-newline,
+react/require-default-props, react/no-unused-prop-types */
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
@@ -8,7 +10,9 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
-import { Accordion, AccordionSummary, ListItem, List, RadioGroup, Radio, FormControlLabel, Tabs, Tab } from "@material-ui/core";
+import {
+  Accordion, AccordionSummary, ListItem, List, Tabs, Tab,
+} from '@material-ui/core';
 import { selectCurve } from '../../actions/curve';
 
 const styles = () => ({
@@ -22,74 +26,76 @@ const styles = () => ({
   line: {
     height: '2px',
     borderWidth: '0',
-    margin: '0'
+    margin: '0',
   },
   curveDefault: {
     backgroundColor: '#fff',
     fontSize: '0.8em',
     margin: '0',
-    padding: '10px 2px 2px 10px'
+    padding: '10px 2px 2px 10px',
   },
   curveSelected: {
     backgroundColor: '#2196f3',
     fontSize: '0.8em',
     color: '#fff',
-    padding: '10px 2px 2px 10px'
+    padding: '10px 2px 2px 10px',
   },
 });
 
 const GraphSelectionPanel = ({
-  classes, curveSt, selectCurveAct, entityFileNames, subLayoutsInfo
+  classes, curveSt, selectCurveAct, entityFileNames, subLayoutsInfo,
 }) => {
-  
-  if (!curveSt) {
-    return (<span/>);
-  }
-  const {curveIdx, listCurves} = curveSt;
-  if (!listCurves) {
-    return (<span/>);
-  }
-
-  const onChange = (idx) => {
-    selectCurveAct(idx);
-  }
-
-  
   let subLayoutValues = [];
   if (subLayoutsInfo !== undefined && subLayoutsInfo !== null) {
     subLayoutValues = Object.keys(subLayoutsInfo);
   }
 
-  
+  const [selectedSubLayout, setSelectedSublayout] = useState(subLayoutValues[0]);
+
+  if (!curveSt) {
+    return (<span />);
+  }
+  const { curveIdx, listCurves } = curveSt;
+  if (!listCurves) {
+    return (<span />);
+  }
+
+  const onChange = (idx) => {
+    selectCurveAct(idx);
+  };
+
   const onChangeTabSubLayout = (event, newValue) => {
     setSelectedSublayout(newValue);
   };
 
-  const [selectedSubLayout, setSelectedSublayout] = useState(subLayoutValues[0]);
   let itemsSubLayout = [];
   if (selectedSubLayout && subLayoutValues.length > 1) {
     const subLayout = subLayoutsInfo[selectedSubLayout];
     itemsSubLayout = subLayout.map((spectra, idx) => {
-      const { color, curveIdx } = spectra;
+      const { color } = spectra;
       let filename = '';
       if (entityFileNames && curveIdx < entityFileNames.length) {
-          filename = entityFileNames[curveIdx];
+        filename = entityFileNames[curveIdx];
       }
-      return { name: `${idx + 1}.`, idx: curveIdx, color, filename };
+      return {
+        name: `${idx + 1}.`, idx: curveIdx, color, filename,
+      };
     });
-  };
+  }
 
   const items = listCurves.map((spectra, idx) => {
     const { color } = spectra;
     let filename = '';
     if (entityFileNames && idx < entityFileNames.length) {
-        filename = entityFileNames[idx];
+      filename = entityFileNames[idx];
     }
-    return { name: `${idx + 1}.`, idx, color, filename };
+    return {
+      name: `${idx + 1}.`, idx, color, filename,
+    };
   });
 
   return (
-    <Accordion data-testid='GraphSelectionPanel'>
+    <Accordion data-testid="GraphSelectionPanel">
       <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
         className={classNames(classes.panelSummary)}
@@ -118,62 +124,67 @@ const GraphSelectionPanel = ({
                     default:
                       break;
                   }
-                  return <Tab key={i} value={subLayout} label={subLayoutName} />
+                  return (<Tab key={i} value={subLayout} label={subLayoutName} />);
                 })
               }
             </Tabs>
             <List>
-            {
-              itemsSubLayout.map((item) => (
-                <ListItem 
-                  key={item.idx} 
-                  onClick={() => onChange(item.idx)}
-                  className={
-                    classNames((item.idx === curveIdx ? classes.curveSelected : classes.curveDefault ))
-                  }
-                >
-                  <span className={classNames(classes.curve)}>
-                    <i>{ item.name }</i>
-                    <span style={{float: "right", width: "95%"}}>
-                        <hr className={classNames(classes.line)} style={{backgroundColor: item.color}}/>
+              {
+                itemsSubLayout.map((item) => (
+                  <ListItem
+                    key={item.idx}
+                    onClick={() => onChange(item.idx)}
+                    className={
+                      classNames((item.idx === curveIdx ? classes.curveSelected : classes.curveDefault))  // eslint-disable-line
+                    }
+                  >
+                    <span className={classNames(classes.curve)}>
+                      <i>{ item.name }</i>
+                      <span style={{ float: 'right', width: '95%' }}>
+                        <hr
+                          className={classNames(classes.line)}
+                          style={{ backgroundColor: item.color }}
+                        />
                         {
-                            item.filename !== '' ? <span>File: { item.filename }</span> : null
+                          item.filename !== '' ? <span>File: { item.filename }</span> : null  // eslint-disable-line
                         }
+                      </span>
                     </span>
-                  </span>
-                </ListItem>
-              ))
-            }
-          </List>
+                  </ListItem>
+                ))
+              }
+            </List>
           </div>
-        ) :
-        (
-          <List>
-            {
-              items.map((item) => (
-                <ListItem 
-                  key={item.idx} 
-                  onClick={() => onChange(item.idx)}
-                  className={
-                    classNames((item.idx === curveIdx ? classes.curveSelected : classes.curveDefault ))
-                  }
-                >
-                  <span className={classNames(classes.curve)}>
-                    <i>{ item.name }</i>
-                    <span style={{float: "right", width: "95%"}}>
-                        <hr className={classNames(classes.line)} style={{backgroundColor: item.color}}/>
-                        {
-                            item.filename !== '' ? <span>File: { item.filename }</span> : null
-                        }
-                    </span>
-                  </span>
-                </ListItem>
-              ))
-            }
-          </List>
         )
+          : (
+            <List>
+              {
+                items.map((item) => (
+                  <ListItem
+                    key={item.idx}
+                    onClick={() => onChange(item.idx)}
+                    className={
+                      classNames((item.idx === curveIdx ? classes.curveSelected : classes.curveDefault))  // eslint-disable-line
+                    }
+                  >
+                    <span className={classNames(classes.curve)}>
+                      <i>{ item.name }</i>
+                      <span style={{ float: 'right', width: '95%' }}>
+                        <hr
+                          className={classNames(classes.line)}
+                          style={{ backgroundColor: item.color }}
+                        />
+                        {
+                          item.filename !== '' ? <span>File: { item.filename }</span> : null  // eslint-disable-line
+                        }
+                      </span>
+                    </span>
+                  </ListItem>
+                ))
+              }
+            </List>
+          )
       }
-      
     </Accordion>
   );
 };
@@ -185,7 +196,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     selectCurveAct: selectCurve,
   }, dispatch)
@@ -203,5 +214,5 @@ GraphSelectionPanel.propTypes = {
 };
 
 export default connect(
-  mapStateToProps, mapDispatchToProps
+  mapStateToProps, mapDispatchToProps,
 )(withStyles(styles)(GraphSelectionPanel));

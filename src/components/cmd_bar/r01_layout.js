@@ -1,3 +1,5 @@
+/* eslint-disable prefer-object-spread, function-paren-newline,
+react/function-component-definition */
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -37,11 +39,11 @@ const shiftSelect = (
   classes, layoutSt, shiftRefSt, setShiftRefAct,
 ) => {
   if (Cfg.hideSolvent(layoutSt)) return null;
-  const onChange = e => setShiftRefAct(e.target.value);
+  const onChange = (e) => setShiftRefAct(e.target.value);
 
   const listShift = getListShift(layoutSt);
 
-  const content = listShift.map(ref => (
+  const content = listShift.map((ref) => (
     <MenuItem value={ref} key={ref.name}>
       <span className={classNames(classes.txtOpt, 'option-sv-bar-shift')}>
         { `${ref.name}: ${ref.value} ppm` }
@@ -76,7 +78,7 @@ const shiftSelect = (
 };
 
 const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
-  const onChange = e => updateLayoutAct(e.target.value);
+  const onChange = (e) => updateLayoutAct(e.target.value);
 
   return (
     <FormControl
@@ -190,7 +192,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     setShiftRefAct: setShiftRef,
     updateLayoutAct: updateLayout,

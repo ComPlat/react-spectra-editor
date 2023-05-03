@@ -1,3 +1,4 @@
+/* eslint-disable prefer-object-spread, default-param-last */
 import { JCAMP, MANAGER } from '../constants/action_type';
 
 const initialState = {
@@ -6,7 +7,7 @@ const initialState = {
     {
       others: [],
       addOthersCb: false,
-    }
+    },
   ],
 };
 
@@ -15,9 +16,13 @@ const addOthers = (state, { others, addOthersCb }) => {
   const selectedJcamp = jcamps[selectedIdx];
 
   if (selectedJcamp.others.length > 5) return state;
-  const decoOthers = others.map(o => Object.assign({}, o, { show: true }));
+  const decoOthers = others.map((o) => Object.assign({}, o, { show: true }));
 
-  const newJcamp = Object.assign({}, selectedJcamp, { others: [...selectedJcamp.others, ...decoOthers].slice(0, 5), addOthersCb});
+  const newJcamp = Object.assign(
+    {},
+    selectedJcamp,
+    { others: [...selectedJcamp.others, ...decoOthers].slice(0, 5), addOthersCb },
+  );
   jcamps[selectedIdx] = newJcamp;
 
   return Object.assign({}, state, { jcamps });

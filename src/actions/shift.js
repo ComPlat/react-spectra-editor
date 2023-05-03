@@ -1,6 +1,6 @@
 import { SHIFT } from '../constants/action_type';
 
-const setShiftRef = payload => (
+const setShiftRef = (payload) => (
   {
     type: SHIFT.SET_REF,
     payload,

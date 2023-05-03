@@ -1,3 +1,5 @@
+/* eslint-disable prefer-object-spread, react/jsx-one-expression-per-line,
+react/function-component-definition */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -34,7 +36,7 @@ const wavelengthSelect = (classes, waveLengthSt, layoutSt, updateWaveLengthAct) 
     );
   }
 
-  const onChange = e => updateWaveLengthAct(e.target.value);
+  const onChange = (e) => updateWaveLengthAct(e.target.value);
 
   return (
     <FormControl
@@ -87,7 +89,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     updateWaveLengthAct: updateWaveLength,
   }, dispatch)

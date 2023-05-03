@@ -1,3 +1,5 @@
+/* eslint-disable function-paren-newline,
+function-call-argument-newline, react/function-component-definition */
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -27,7 +29,7 @@ import MpySelect from './multiplicity_select';
 import MpyCoupling from './multiplicity_coupling';
 import { calcMpyCenter, calcMpyJStr } from '../../helpers/multiplicity_calc';
 
-const styles = theme => ({
+const styles = (theme) => ({
   panel: {
     backgroundColor: '#eee',
     display: 'table-row',
@@ -187,7 +189,7 @@ const mpyList = (
       shift: 0,
       smExtext: false,
       edited: false,
-    }
+    };
   }
 
   const { stack, shift, smExtext } = selectedMulti;
@@ -209,7 +211,7 @@ const mpyList = (
 
   return (
     <div>
-      {rows.map(row => (
+      {rows.map((row) => (
         <div className={classes.moCard} key={row.idx}>
           <div className={classes.moCardHead}>
             <div>
@@ -283,7 +285,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     clickMpyOneAct: clickMpyOne,
     rmMpyPeakByPanelAct: rmMpyPeakByPanel,

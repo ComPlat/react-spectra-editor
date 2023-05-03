@@ -1,141 +1,76 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
+var _effects = require("redux-saga/effects");
+var _action_type = require("../constants/action_type");
+var _list_layout = require("../constants/list_layout");
+/* eslint-disable no-plusplus */
 
-var _effects = require('redux-saga/effects');
-
-var _action_type = require('../constants/action_type');
-
-var _list_layout = require('../constants/list_layout');
-
-var _marked = /*#__PURE__*/regeneratorRuntime.mark(setCyclicVoltametry);
-
-var getCurveSt = function getCurveSt(state) {
-  return state.curve;
-};
-var getLayoutSt = function getLayoutSt(state) {
-  return state.layout;
-};
-
+const getCurveSt = state => state.curve;
+const getLayoutSt = state => state.layout;
 function getMaxMinPeak(curve) {
   return curve.maxminPeak;
 }
-
-function setCyclicVoltametry(action) {
-  var layoutSt, curveSt, listCurves, numberOfCurves, index, curve, maxminPeak, pidx, maxPeak, minPeak, pecker;
-  return regeneratorRuntime.wrap(function setCyclicVoltametry$(_context) {
-    while (1) {
-      switch (_context.prev = _context.next) {
-        case 0:
-          _context.next = 2;
-          return (0, _effects.select)(getLayoutSt);
-
-        case 2:
-          layoutSt = _context.sent;
-
-          if (!(layoutSt !== _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY)) {
-            _context.next = 5;
-            break;
+function* setCyclicVoltametry(action) {
+  // eslint-disable-line
+  const layoutSt = yield (0, _effects.select)(getLayoutSt);
+  if (layoutSt !== _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
+    return;
+  }
+  const curveSt = yield (0, _effects.select)(getCurveSt);
+  const {
+    listCurves
+  } = curveSt;
+  if (listCurves) {
+    yield (0, _effects.put)({
+      type: _action_type.CYCLIC_VOLTA_METRY.RESETALL,
+      payload: null
+    });
+    const numberOfCurves = listCurves.length;
+    if (numberOfCurves <= 0) {
+      return;
+    }
+    for (let index = 0; index < listCurves.length; index++) {
+      const curve = listCurves[index];
+      const maxminPeak = getMaxMinPeak(curve);
+      yield (0, _effects.put)({
+        type: _action_type.CYCLIC_VOLTA_METRY.ADD_PAIR_PEAKS,
+        payload: index
+      });
+      for (let pidx = 0; pidx < maxminPeak.max.length; pidx++) {
+        const maxPeak = maxminPeak.max[pidx];
+        yield (0, _effects.put)({
+          type: _action_type.CYCLIC_VOLTA_METRY.ADD_MAX_PEAK,
+          payload: {
+            peak: maxPeak,
+            index: pidx,
+            jcampIdx: index
           }
-
-          return _context.abrupt('return');
-
-        case 5:
-          _context.next = 7;
-          return (0, _effects.select)(getCurveSt);
-
-        case 7:
-          curveSt = _context.sent;
-          listCurves = curveSt.listCurves;
-
-          if (!listCurves) {
-            _context.next = 38;
-            break;
+        });
+        const minPeak = maxminPeak.min[pidx];
+        yield (0, _effects.put)({
+          type: _action_type.CYCLIC_VOLTA_METRY.ADD_MIN_PEAK,
+          payload: {
+            peak: minPeak,
+            index: pidx,
+            jcampIdx: index
           }
-
-          _context.next = 12;
-          return (0, _effects.put)({
-            type: _action_type.CYCLIC_VOLTA_METRY.RESETALL,
-            payload: null
-          });
-
-        case 12:
-          numberOfCurves = listCurves.length;
-
-          if (!(numberOfCurves <= 0)) {
-            _context.next = 15;
-            break;
+        });
+        const pecker = maxminPeak.pecker[pidx];
+        yield (0, _effects.put)({
+          type: _action_type.CYCLIC_VOLTA_METRY.ADD_PECKER,
+          payload: {
+            peak: pecker,
+            index: pidx,
+            jcampIdx: index
           }
-
-          return _context.abrupt('return');
-
-        case 15:
-          index = 0;
-
-        case 16:
-          if (!(index < listCurves.length)) {
-            _context.next = 38;
-            break;
-          }
-
-          curve = listCurves[index];
-          maxminPeak = getMaxMinPeak(curve);
-          _context.next = 21;
-          return (0, _effects.put)({
-            type: _action_type.CYCLIC_VOLTA_METRY.ADD_PAIR_PEAKS,
-            payload: index
-          });
-
-        case 21:
-          pidx = 0;
-
-        case 22:
-          if (!(pidx < maxminPeak.max.length)) {
-            _context.next = 35;
-            break;
-          }
-
-          maxPeak = maxminPeak.max[pidx];
-          _context.next = 26;
-          return (0, _effects.put)({
-            type: _action_type.CYCLIC_VOLTA_METRY.ADD_MAX_PEAK,
-            payload: { peak: maxPeak, index: pidx, jcampIdx: index }
-          });
-
-        case 26:
-          minPeak = maxminPeak.min[pidx];
-          _context.next = 29;
-          return (0, _effects.put)({
-            type: _action_type.CYCLIC_VOLTA_METRY.ADD_MIN_PEAK,
-            payload: { peak: minPeak, index: pidx, jcampIdx: index }
-          });
-
-        case 29:
-          pecker = maxminPeak.pecker[pidx];
-          _context.next = 32;
-          return (0, _effects.put)({
-            type: _action_type.CYCLIC_VOLTA_METRY.ADD_PECKER,
-            payload: { peak: pecker, index: pidx, jcampIdx: index }
-          });
-
-        case 32:
-          pidx++;
-          _context.next = 22;
-          break;
-
-        case 35:
-          index++;
-          _context.next = 16;
-          break;
-
-        case 38:
-        case 'end':
-          return _context.stop();
+        });
       }
     }
-  }, _marked);
+  }
 }
 
 // function* setInitData(action) {
@@ -146,6 +81,8 @@ function setCyclicVoltametry(action) {
 //   console.log(listCurves);
 // }
 
-var multiEntitiesSagas = [(0, _effects.takeEvery)(_action_type.CURVE.SET_ALL_CURVES, setCyclicVoltametry)];
-
-exports.default = multiEntitiesSagas;
+const multiEntitiesSagas = [(0, _effects.takeEvery)(_action_type.CURVE.SET_ALL_CURVES, setCyclicVoltametry)
+// takeEvery(CURVE.SET_ALL_CURVES, setInitData),
+];
+var _default = multiEntitiesSagas;
+exports.default = _default;

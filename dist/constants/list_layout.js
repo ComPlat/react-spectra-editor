@@ -1,9 +1,10 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-var LIST_LAYOUT = {
+exports.LIST_LAYOUT = void 0;
+const LIST_LAYOUT = {
   PLAIN: 'PLAIN',
   IR: 'IR',
   RAMAN: 'RAMAN',
@@ -22,5 +23,4 @@ var LIST_LAYOUT = {
   CDS: 'CIRCULAR DICHROISM SPECTROSCOPY',
   SEC: 'SIZE EXCLUSION CHROMATOGRAPHY'
 };
-
 exports.LIST_LAYOUT = LIST_LAYOUT;

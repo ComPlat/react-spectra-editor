@@ -1,119 +1,67 @@
-'use strict';
+"use strict";
 
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
+var _react = _interopRequireDefault(require("react"));
+var _reactRedux = require("react-redux");
+var _redux = require("redux");
+var _classnames = _interopRequireDefault(require("classnames"));
+var _propTypes = _interopRequireDefault(require("prop-types"));
+var _styles = require("@material-ui/core/styles");
+var _ZoomInOutlined = _interopRequireDefault(require("@material-ui/icons/ZoomInOutlined"));
+var _FindReplaceOutlined = _interopRequireDefault(require("@material-ui/icons/FindReplaceOutlined"));
+var _Tooltip = _interopRequireDefault(require("@material-ui/core/Tooltip"));
+var _ui = require("../../actions/ui");
+var _common = require("./common");
+var _list_ui = require("../../constants/list_ui");
+/* eslint-disable prefer-object-spread, react/function-component-definition */
 
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _reactRedux = require('react-redux');
-
-var _redux = require('redux');
-
-var _classnames = require('classnames');
-
-var _classnames2 = _interopRequireDefault(_classnames);
-
-var _propTypes = require('prop-types');
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
-var _styles = require('@material-ui/core/styles');
-
-var _ZoomInOutlined = require('@material-ui/icons/ZoomInOutlined');
-
-var _ZoomInOutlined2 = _interopRequireDefault(_ZoomInOutlined);
-
-var _FindReplaceOutlined = require('@material-ui/icons/FindReplaceOutlined');
-
-var _FindReplaceOutlined2 = _interopRequireDefault(_FindReplaceOutlined);
-
-var _Tooltip = require('@material-ui/core/Tooltip');
-
-var _Tooltip2 = _interopRequireDefault(_Tooltip);
-
-var _ui = require('../../actions/ui');
-
-var _common = require('./common');
-
-var _list_ui = require('../../constants/list_ui');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var styles = function styles() {
-  return Object.assign({}, _common.commonStyle);
+const styles = () => Object.assign({}, _common.commonStyle);
+const Zoom = _ref => {
+  let {
+    classes,
+    isfocusZoomSt,
+    setUiSweepTypeAct
+  } = _ref;
+  const onSweepZoomIn = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN);
+  const onSweepZoomReset = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET);
+  return /*#__PURE__*/_react.default.createElement("span", {
+    className: classes.group
+  }, /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+    title: /*#__PURE__*/_react.default.createElement("span", {
+      className: "txt-sv-tp"
+    }, "Zoom In")
+  }, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
+    className: (0, _classnames.default)((0, _common.focusStyle)(isfocusZoomSt, classes), 'btn-sv-bar-zoomin'),
+    onClick: onSweepZoomIn
+  }, /*#__PURE__*/_react.default.createElement(_ZoomInOutlined.default, {
+    className: (0, _classnames.default)(classes.icon, classes.iconWp)
+  }))), /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+    title: /*#__PURE__*/_react.default.createElement("span", {
+      className: "txt-sv-tp"
+    }, "Reset Zoom")
+  }, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
+    className: (0, _classnames.default)('btn-sv-bar-zoomreset'),
+    onClick: onSweepZoomReset
+  }, /*#__PURE__*/_react.default.createElement(_FindReplaceOutlined.default, {
+    className: classes.icon
+  }))));
 };
-
-var Zoom = function Zoom(_ref) {
-  var classes = _ref.classes,
-      isfocusZoomSt = _ref.isfocusZoomSt,
-      setUiSweepTypeAct = _ref.setUiSweepTypeAct;
-
-  var onSweepZoomIn = function onSweepZoomIn() {
-    return setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN);
-  };
-  var onSweepZoomReset = function onSweepZoomReset() {
-    return setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET);
-  };
-
-  return _react2.default.createElement(
-    'span',
-    { className: classes.group },
-    _react2.default.createElement(
-      _Tooltip2.default,
-      { title: _react2.default.createElement(
-          'span',
-          { className: 'txt-sv-tp' },
-          'Zoom In'
-        ) },
-      _react2.default.createElement(
-        _common.MuButton,
-        {
-          className: (0, _classnames2.default)((0, _common.focusStyle)(isfocusZoomSt, classes), 'btn-sv-bar-zoomin'),
-          onClick: onSweepZoomIn
-        },
-        _react2.default.createElement(_ZoomInOutlined2.default, { className: (0, _classnames2.default)(classes.icon, classes.iconWp) })
-      )
-    ),
-    _react2.default.createElement(
-      _Tooltip2.default,
-      { title: _react2.default.createElement(
-          'span',
-          { className: 'txt-sv-tp' },
-          'Reset Zoom'
-        ) },
-      _react2.default.createElement(
-        _common.MuButton,
-        {
-          className: (0, _classnames2.default)('btn-sv-bar-zoomreset'),
-          onClick: onSweepZoomReset
-        },
-        _react2.default.createElement(_FindReplaceOutlined2.default, { className: classes.icon })
-      )
-    )
-  );
-};
-
-var mapStateToProps = function mapStateToProps(state, _) {
-  return (// eslint-disable-line
-    {
-      isfocusZoomSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN
-    }
-  );
-};
-
-var mapDispatchToProps = function mapDispatchToProps(dispatch) {
-  return (0, _redux.bindActionCreators)({
-    setUiSweepTypeAct: _ui.setUiSweepType
-  }, dispatch);
-};
-
+const mapStateToProps = (state, _) => (
+// eslint-disable-line
+{
+  isfocusZoomSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN
+});
+const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
+  setUiSweepTypeAct: _ui.setUiSweepType
+}, dispatch);
 Zoom.propTypes = {
-  classes: _propTypes2.default.object.isRequired,
-  isfocusZoomSt: _propTypes2.default.bool.isRequired,
-  setUiSweepTypeAct: _propTypes2.default.func.isRequired
+  classes: _propTypes.default.object.isRequired,
+  isfocusZoomSt: _propTypes.default.bool.isRequired,
+  setUiSweepTypeAct: _propTypes.default.func.isRequired
 };
-
-exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(Zoom);
+var _default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(Zoom);
+exports.default = _default;

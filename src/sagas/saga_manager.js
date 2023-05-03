@@ -4,16 +4,15 @@ import {
   MANAGER, INTEGRATION, SIMULATION,
 } from '../constants/action_type';
 
-
-const getLayout = state => state.layout;
-const getCurveSt = state => state.curve;
-const getIntegrationSt = state => state.integration.present;
-const getShiftSt = state => state.shift;
+const getLayout = (state) => state.layout;
+const getCurveSt = (state) => state.curve;
+const getIntegrationSt = (state) => state.integration.present;
+// const getShiftSt = (state) => state.shift;
 
 function* resetShift(action) {
-  const curveSt = yield select(getCurveSt);
+  // const curveSt = yield select(getCurveSt);
   const layout = yield select(getLayout);
-  const shiftSt = yield select(getShiftSt);
+  // const shiftSt = yield select(getShiftSt);
 
   const { payload } = action;
   // const { shift } = payload;
@@ -27,7 +26,7 @@ function* resetShift(action) {
 
   yield put({
     type: MANAGER.RESETSHIFT,
-    payload: Object.assign(
+    payload: Object.assign( // eslint-disable-line
       {},
       payload,
       {
@@ -46,12 +45,12 @@ function* resetInitNmr(action) {
   const { integrations } = integationSt;
   integrations[curveIdx] = integration;
 
-  const payload = Object.assign({}, integationSt, { integrations, selectedIdx: curveIdx })
+  const payload = Object.assign({}, integationSt, { integrations, selectedIdx: curveIdx }); // eslint-disable-line
 
   if (integration) {
     yield put({
       type: INTEGRATION.RESET_ALL_RDC,
-      payload: payload,
+      payload,
     });
   }
   if (simulation) {
@@ -72,12 +71,12 @@ function* resetInitCommonWithIntergation(action) {
   const { integrations } = integationSt;
   integrations[curveIdx] = integration;
 
-  const payload = Object.assign({}, integationSt, { integrations, selectedIdx: curveIdx })
+  const payload = Object.assign({}, integationSt, { integrations, selectedIdx: curveIdx }); // eslint-disable-line
 
   if (integration) {
     yield put({
       type: INTEGRATION.RESET_ALL_RDC,
-      payload: payload,
+      payload,
     });
   }
 }

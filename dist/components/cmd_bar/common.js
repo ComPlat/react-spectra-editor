@@ -1,19 +1,13 @@
-'use strict';
+"use strict";
 
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.focusStyle = exports.commonStyle = exports.MuButton = undefined;
-
-var _styles = require('@material-ui/core/styles');
-
-var _Button = require('@material-ui/core/Button');
-
-var _Button2 = _interopRequireDefault(_Button);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var MuButton = (0, _styles.withStyles)({
+exports.focusStyle = exports.commonStyle = exports.MuButton = void 0;
+var _styles = require("@material-ui/core/styles");
+var _Button = _interopRequireDefault(require("@material-ui/core/Button"));
+const MuButton = (0, _styles.withStyles)({
   root: {
     border: '1px solid #ccc',
     borderRadius: 4,
@@ -25,9 +19,9 @@ var MuButton = (0, _styles.withStyles)({
     padding: 0,
     width: 30
   }
-})(_Button2.default);
-
-var commonStyle = {
+})(_Button.default);
+exports.MuButton = MuButton;
+const commonStyle = {
   card: {
     margin: '0 0 5px 52px',
     border: '1px solid white',
@@ -94,11 +88,8 @@ var commonStyle = {
     height: 30
   }
 };
-
-var focusStyle = function focusStyle(criteria, cls) {
-  return criteria ? [cls.btnHt] : [];
-};
-
-exports.MuButton = MuButton;
 exports.commonStyle = commonStyle;
-exports.focusStyle = focusStyle; // eslint-disable-line
+const focusStyle = (criteria, cls) => criteria ? [cls.btnHt] : [];
+
+// eslint-disable-line
+exports.focusStyle = focusStyle;

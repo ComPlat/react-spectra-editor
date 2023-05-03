@@ -1,3 +1,4 @@
+/* eslint-disable prefer-object-spread, default-param-last */
 import { SUBMIT, LAYOUT, MANAGER } from '../constants/action_type';
 import Format from '../helpers/format';
 
@@ -8,7 +9,7 @@ const initialState = {
   operation: { name: 'empty' },
 };
 
-const updateOperation = action => (
+const updateOperation = (action) => (
   { operation: action.payload || initialState.operation }
 );
 

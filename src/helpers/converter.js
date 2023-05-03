@@ -24,11 +24,11 @@ const pksRmNeg = (dataPks, editPeakSt) => {
     return dataPks;
   }
 
-  const negXs = neg.map(n => n.x);
+  const negXs = neg.map((n) => n.x);
   const result = dataPks.map((p) => {
-    const idx = negXs.findIndex(nx => IsSame(nx, p.x));
+    const idx = negXs.findIndex((nx) => IsSame(nx, p.x));
     return idx >= 0 ? null : p;
-  }).filter(r => r != null);
+  }).filter((r) => r != null);
   return result;
 };
 
@@ -43,20 +43,20 @@ const pksAddPos = (dataPks, editPeakSt) => {
   if (!pos) {
     return dataPks;
   }
-  
-  const posXs = pos.map(p => p.x);
+
+  const posXs = pos.map((p) => p.x);
   const posPks = dataPks.map((p) => {
-    const idx = posXs.findIndex(px => px === p.x);
+    const idx = posXs.findIndex((px) => px === p.x);
     return idx >= 0 ? null : p;
-  }).filter(r => r != null);
+  }).filter((r) => r != null);
   const result = [...posPks, ...pos];
   return result;
 };
 
-const PksEdit = (dataPks, editPeakSt, voltammetryPeak=false) => {
+const PksEdit = (dataPks, editPeakSt, voltammetryPeak = false) => {
   if (voltammetryPeak && voltammetryPeak.length > 0) {
-    let modDataPks = []
-    voltammetryPeak.forEach(peak => {
+    let modDataPks = [];
+    voltammetryPeak.forEach((peak) => {
       if (peak.max) {
         modDataPks = [...modDataPks, peak.max];
       }
@@ -67,17 +67,15 @@ const PksEdit = (dataPks, editPeakSt, voltammetryPeak=false) => {
     modDataPks = modDataPks.sort((a, b) => a.x - b.x);
     return modDataPks;
   }
-  else {
-    let modDataPks = pksAddPos(dataPks, editPeakSt);
-    modDataPks = pksRmNeg(modDataPks, editPeakSt);
-    modDataPks = modDataPks.sort((a, b) => a.x - b.x);
-    return modDataPks;
-  }
+  let modDataPks = pksAddPos(dataPks, editPeakSt);
+  modDataPks = pksRmNeg(modDataPks, editPeakSt);
+  modDataPks = modDataPks.sort((a, b) => a.x - b.x);
+  return modDataPks;
 };
 
 const PeckersEdit = (voltammetryPeak) => {
-  let modDataPeckers = []
-  voltammetryPeak.forEach(peak => {
+  let modDataPeckers = [];
+  voltammetryPeak.forEach((peak) => {
     if (peak.pecker) {
       modDataPeckers = [...modDataPeckers, peak.pecker];
     }
@@ -87,5 +85,5 @@ const PeckersEdit = (voltammetryPeak) => {
 };
 
 export {
-  ToXY, PksEdit, IsSame, PeckersEdit
+  ToXY, PksEdit, IsSame, PeckersEdit,
 };

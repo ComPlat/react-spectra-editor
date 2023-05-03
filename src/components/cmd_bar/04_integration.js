@@ -1,3 +1,6 @@
+/* eslint-disable prefer-object-spread, function-paren-newline,
+react/function-component-definition, react/require-default-props, max-len,
+react/no-unused-prop-types */
 import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -39,13 +42,13 @@ const styles = () => (
 const iconSize = '16px';
 
 const setFactor = (
-  classes, isDisable, refFactor, setIntegrationFkrAct, curveIdx
+  classes, isDisable, refFactor, setIntegrationFkrAct, curveIdx,
 ) => {
-  const onBlur = e => setIntegrationFkrAct({
+  const onBlur = (e) => setIntegrationFkrAct({
     factor: e.target.value,
     curveIdx,
   });
-  const onChange = e => setIntegrationFkrAct({
+  const onChange = (e) => setIntegrationFkrAct({
     factor: e.target.value,
     curveIdx,
   });
@@ -78,7 +81,7 @@ const setFactor = (
   );
 };
 
-const iconColor = criteria => (criteria ? '#fff' : '#000');
+const iconColor = (criteria) => (criteria ? '#fff' : '#000');
 
 const Integration = ({
   classes, refFactorSt, ignoreRef,
@@ -90,7 +93,7 @@ const Integration = ({
   const onSweepIntegtRm = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.INTEGRATION_RM);
   const onSweepIntegtSR = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF);
   const { curveIdx } = curveSt;
-  const onClearAll = () => clearIntegrationAllAct({curveIdx});
+  const onClearAll = () => clearIntegrationAllAct({ curveIdx });
 
   return (
     <span className={classes.group}>
@@ -157,11 +160,11 @@ const Integration = ({
         </span>
       </Tooltip>
       {
-        !ignoreRef ?
-        setFactor(
-          classes, isDisableSt, refFactorSt, setIntegrationFkrAct, curveIdx
-        )
-        : null
+        !ignoreRef
+          ? setFactor(
+            classes, isDisableSt, refFactorSt, setIntegrationFkrAct, curveIdx,
+          )
+          : null
       }
       <TriBtn
         content={{ tp: 'Clear All Integration' }}
@@ -191,7 +194,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     setUiSweepTypeAct: setUiSweepType,
     setIntegrationFkrAct: setIntegrationFkr,

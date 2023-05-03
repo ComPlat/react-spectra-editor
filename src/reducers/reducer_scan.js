@@ -1,3 +1,4 @@
+/* eslint-disable prefer-object-spread, default-param-last */
 import { SCAN, MANAGER } from '../constants/action_type';
 
 const initialState = {
@@ -28,7 +29,7 @@ const resetAll = (state, payload) => {
   );
 };
 
-const toggleIsAuto = state => (
+const toggleIsAuto = (state) => (
   Object.assign(
     {},
     state,

@@ -1,32 +1,25 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _d = require('d3');
-
-var d3 = _interopRequireWildcard(_d);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-var resetZoom = function resetZoom(main) {
+exports.default = void 0;
+var d3 = _interopRequireWildcard(require("d3"));
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+const resetZoom = main => {
   main.svg.call(main.zoom.transform, d3.zoomIdentity);
   main.svg.selectAll('.brush').call(main.brush.move, null);
 };
-
-var MountZoom = function MountZoom(main, zoomed) {
-  var zoomedCb = function zoomedCb() {
-    return zoomed(main);
-  };
-  var resetZoomCb = function resetZoomCb() {
+const MountZoom = (main, zoomed) => {
+  const zoomedCb = () => zoomed(main);
+  const resetZoomCb = () => {
     d3.event.stopPropagation();
     d3.event.preventDefault();
     resetZoom(main);
   };
-
   main.zoom.on('zoom', zoomedCb);
   main.svg.call(main.zoom).on('contextmenu.zoom', resetZoomCb);
 };
-
-exports.default = MountZoom;
+var _default = MountZoom;
+exports.default = _default;

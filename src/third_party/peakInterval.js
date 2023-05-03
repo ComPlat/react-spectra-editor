@@ -51,10 +51,10 @@ const getPeakIntervals = (entity) => {
   }
   let lastMax = null;
   let lastMin = null;
-  let minddY = new Array(Y.length - 2);
-  let intervalL = new Array(Y.length);
-  let intervalR = new Array(Y.length);
-  let broadMask = new Array(Y.length - 2);
+  const minddY = new Array(Y.length - 2);
+  const intervalL = new Array(Y.length);
+  const intervalR = new Array(Y.length);
+  const broadMask = new Array(Y.length - 2);
   let minddYLen = 0;
   let intervalLLen = 0;
   let intervalRLen = 0;

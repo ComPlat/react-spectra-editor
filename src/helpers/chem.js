@@ -1,3 +1,6 @@
+/* eslint-disable
+no-mixed-operators, react/function-component-definition,
+prefer-object-spread, camelcase,  no-plusplus */
 import Jcampconverter from 'jcampconverter';
 import { createSelector } from 'reselect';
 
@@ -85,7 +88,8 @@ const calcRescaleXY = (xs, ys, minY, maxY, show) => {
 
 const convertComparisons = (layout, comparisons, feature) => {
   const { minY, maxY } = feature;
-  if (!comparisons || !(Format.isIrLayout(layout) || Format.isHplcUvVisLayout(layout) || Format.isXRDLayout(layout))) return [];
+  if (!comparisons || !(Format.isIrLayout(layout)
+  || Format.isHplcUvVisLayout(layout) || Format.isXRDLayout(layout))) return [];
   return comparisons.map((c) => {
     const { spectra, show } = c;
     const topic = spectra[0].data[0];
@@ -115,15 +119,17 @@ const ToFrequency = createSelector(
   convertFrequency,
 );
 
-const getThreshold = state => (
+const getThreshold = (state) => (
   state.threshold ? state.threshold.value * 1.0 : false
 );
 
-const Convert2Peak = (feature, threshold, offset, upThreshold=false, lowThreshold=false) => {
+const Convert2Peak = (feature, threshold, offset, upThreshold = false, lowThreshold = false) => {
   const peak = [];
   if (!feature || !feature.data) return peak;
   const data = feature.data[0];
-  const { maxY, peakUp, thresRef, minY, upperThres, lowerThres, operation } = feature;
+  const {
+    maxY, peakUp, thresRef, minY, upperThres, lowerThres, operation,
+  } = feature;
   const { layout } = operation;
 
   if (!Format.isSECLayout(layout) && (upperThres || lowerThres)) {
@@ -134,7 +140,7 @@ const Convert2Peak = (feature, threshold, offset, upThreshold=false, lowThreshol
 
     let lowerThresVal = lowThreshold || lowerThres;
     if (!lowerThresVal) {
-      lowerThresVal = 1.0
+      lowerThresVal = 1.0;
     }
 
     const yUpperThres = parseFloat(upperThresVal) / 100.0 * maxY;
@@ -152,20 +158,18 @@ const Convert2Peak = (feature, threshold, offset, upThreshold=false, lowThreshol
     }
     return peak;
   }
-  else {
-    const thresVal = threshold || thresRef;
-    const yThres = Number.parseFloat((thresVal * maxY / 100.0).toFixed(10));
-    const corrOffset = offset || 0.0;
-    for (let i = 0; i < data.y.length; i += 1) {
-      const y = data.y[i];
-      const overThres = (peakUp && Math.abs(y) >= yThres) || (!peakUp && Math.abs(y) <= yThres);
-      if (overThres) {
-        const x = data.x[i] - corrOffset;
-        peak.push({ x, y });
-      }
+  const thresVal = threshold || thresRef;
+  const yThres = Number.parseFloat((thresVal * maxY / 100.0).toFixed(10));
+  const corrOffset = offset || 0.0;
+  for (let i = 0; i < data.y.length; i += 1) {
+    const y = data.y[i];
+    const overThres = (peakUp && Math.abs(y) >= yThres) || (!peakUp && Math.abs(y) <= yThres);
+    if (overThres) {
+      const x = data.x[i] - corrOffset;
+      peak.push({ x, y });
     }
-    return peak;
   }
+  return peak;
 };
 
 const Feature2Peak = createSelector(
@@ -176,25 +180,27 @@ const Feature2Peak = createSelector(
 );
 
 const Convert2MaxMinPeak = (layout, feature, offset) => {
-  const peaks = {max: [], min: [], pecker: []};
-  if (!Format.isCyclicVoltaLayout(layout) || !feature || !feature.data) return null;
-  const data = feature.data[0];
-  const { maxY, minY, upperThres, lowerThres, volammetryData } = feature;
+  const peaks = { max: [], min: [], pecker: [] };
+  if (!Format.isCyclicVoltaLayout(layout) || !feature || !feature.data) return null;  // eslint-disable-line
+  const data = feature.data[0]; // eslint-disable-line
+  const {
+    maxY, minY, upperThres, lowerThres, volammetryData,
+  } = feature;
 
   if (volammetryData && volammetryData.length > 0) {
     const maxArr = volammetryData.map((peakData) => {
-      if (peakData.max.x === '') return null
-      return {x: Number(peakData.max.x), y: Number(peakData.max.y)};
+      if (peakData.max.x === '') return null;
+      return { x: Number(peakData.max.x), y: Number(peakData.max.y) };
     });
     const minArr = volammetryData.map((peakData) => {
-      if (peakData.min.x === '') return null
-      return {x: Number(peakData.min.x), y: Number(peakData.min.y)};
+      if (peakData.min.x === '') return null;
+      return { x: Number(peakData.min.x), y: Number(peakData.min.y) };
     });
     const peckerArr = volammetryData.map((peakData) => {
-      if (peakData.pecker.x === '') return null
-      return {x: Number(peakData.pecker.x), y: Number(peakData.pecker.y)};
+      if (peakData.pecker.x === '') return null;
+      return { x: Number(peakData.pecker.x), y: Number(peakData.pecker.y) };
     });
-    
+
     peaks.max = maxArr;
     peaks.min = minArr;
     peaks.pecker = peckerArr;
@@ -208,7 +214,7 @@ const Convert2MaxMinPeak = (layout, feature, offset) => {
 
   let lowerThresVal = lowerThres;
   if (!lowerThresVal) {
-    lowerThresVal = 1.0
+    lowerThresVal = 1.0;
   }
 
   const yUpperThres = parseFloat(upperThresVal) / 100.0 * maxY;
@@ -222,8 +228,7 @@ const Convert2MaxMinPeak = (layout, feature, offset) => {
     const x = data.x[i] - corrOffset;
     if (overUpperThres) {
       peaks.max.push({ x, y });
-    }
-    else if (belowThres) {
+    } else if (belowThres) {
       peaks.min.push({ x, y });
     }
   }
@@ -255,7 +260,7 @@ const ToThresEndPts = createSelector(
   convertThresEndPts,
 );
 
-const getShiftPeak = state => {
+const getShiftPeak = (state) => {
   const { curve, shift } = state;
   const { curveIdx } = curve;
   const { shifts } = shift;
@@ -264,7 +269,7 @@ const getShiftPeak = state => {
     return false;
   }
   return selectedShift.peak;
-}
+};
 
 const convertSfPeaks = (peak, offset) => {
   if (!peak || !peak.x) return [];
@@ -320,7 +325,7 @@ const readLayout = (jcamp) => {
 };
 
 const extrSpectraShare = (spectra, layout) => (
-  spectra.map(s => Object.assign({ layout }, s)).filter(r => r != null)
+  spectra.map((s) => Object.assign({ layout }, s)).filter((r) => r != null)
 );
 
 const extrSpectraMs = (jcamp, layout) => {
@@ -339,7 +344,7 @@ const extrSpectraNi = (jcamp, layout) => {
 const calcThresRef = (s, peakUp) => {
   const ys = s && s.data[0].y;
   if (!ys) return null;
-  const ref = peakUp ? Math.min(...ys.map(a => Math.abs(a))) : Math.max(...ys);
+  const ref = peakUp ? Math.min(...ys.map((a) => Math.abs(a))) : Math.max(...ys);
   return peakUp
     ? Math.floor(ref * 100 * 100 / s.maxY) / 100
     : Math.ceil(ref * 100 * 100 / s.maxY) / 100;
@@ -348,14 +353,14 @@ const calcThresRef = (s, peakUp) => {
 const calcUpperThres = (s) => {
   const ys = s && s.data[0].y;
   if (!ys) return null;
-  const ref =  Math.max(...ys);
+  const ref = Math.max(...ys);
   return Math.floor(ref * 100 * 100 / s.maxY) / 100;
 };
 
 const calcLowerThres = (s) => {
   const ys = s && s.data[0].y;
   if (!ys) return null;
-  const ref =  Math.min(...ys);
+  const ref = Math.min(...ys);
   return Math.ceil(ref * 100 * 100 / s.minY) / 100;
 };
 
@@ -391,18 +396,17 @@ const extractVoltammetryData = (jcamp) => {
   const peakStack = rawData.map((line) => {
     const splittedLine = line.replace(regx, '').split(',');
     return {
-      max: {x: splittedLine[0], y: splittedLine[1]},
-      min: {x: splittedLine[2], y: splittedLine[3]},
+      max: { x: splittedLine[0], y: splittedLine[1] },
+      min: { x: splittedLine[2], y: splittedLine[3] },
       ratio: splittedLine[4],
       delta: splittedLine[5],
-      pecker: {x: splittedLine[6], y: splittedLine[7]},
+      pecker: { x: splittedLine[6], y: splittedLine[7] },
     };
   });
   return peakStack;
 };
 
-
-const buildPeakFeature = (jcamp, layout, peakUp, s, thresRef, upperThres=false, lowerThres=false) => {
+const buildPeakFeature = (jcamp, layout, peakUp, s, thresRef, upperThres = false, lowerThres = false) => {  // eslint-disable-line
   const { xType, info } = jcamp;
   const subTyp = xType ? ` - ${xType}` : '';
 
@@ -431,6 +435,16 @@ const buildPeakFeature = (jcamp, layout, peakUp, s, thresRef, upperThres=false, 
   );
 };
 
+const maxArray = (arr) => {
+  let len = arr.length;
+  let max = -Infinity;
+
+  while (len--) {
+    max = arr[len] > max ? arr[len] : max;
+  }
+  return max;
+};
+
 const calcIntgRefArea = (spectra, stack) => {
   if (stack.length === 0) return 1;
   const data = spectra[0].data[0];
@@ -445,16 +459,6 @@ const calcIntgRefArea = (spectra, stack) => {
   const raw2realRatio = rawArea / area;
   return { raw2realRatio };
 };
-
-const maxArray = (arr) => {
-  let len = arr.length;
-    let max = -Infinity;
-
-    while (len--) {
-        max = arr[len] > max ? arr[len] : max;
-    }
-    return max;
-}
 
 const buildIntegFeature = (jcamp, spectra) => {
   const { $OBSERVEDINTEGRALS, $OBSERVEDMULTIPLETS } = jcamp.info;
@@ -486,7 +490,7 @@ const buildIntegFeature = (jcamp, spectra) => {
     stack = [...stack, ...mpStack];
   }
   const { raw2realRatio } = calcIntgRefArea(spectra, stack);
-  const mStack = stack.map(st => Object.assign({}, st, { area: st.area * raw2realRatio }));
+  const mStack = stack.map((st) => Object.assign({}, st, { area: st.area * raw2realRatio }));
 
   return (
     {
@@ -494,7 +498,7 @@ const buildIntegFeature = (jcamp, spectra) => {
       refFactor: 1,
       shift: 0,
       stack: mStack,
-      originStack: stack
+      originStack: stack,
     }
   );
 };
@@ -511,7 +515,7 @@ const range = (head, tail, length) => {
 const buildSimFeature = (jcamp) => {
   const { $CSSIMULATIONPEAKS } = jcamp.info;
   let nmrSimPeaks = $CSSIMULATIONPEAKS ? $CSSIMULATIONPEAKS.split('\n') : [];
-  nmrSimPeaks = nmrSimPeaks.map(x => parseFloat(x).toFixed(2));
+  nmrSimPeaks = nmrSimPeaks.map((x) => parseFloat(x).toFixed(2));
   return {
     nmrSimPeaks,
   };
@@ -524,7 +528,7 @@ const buildMpyFeature = (jcamp) => {
   let stack = [];
   if (!$OBSERVEDMULTIPLETSPEAKS) return { stack: [] };
   const allPeaks = $OBSERVEDMULTIPLETSPEAKS.split('\n').map(
-    p => p.replace(regx, '').split(','),
+    (p) => p.replace(regx, '').split(','),
   );
 
   if ($OBSERVEDMULTIPLETS) {
@@ -539,10 +543,10 @@ const buildMpyFeature = (jcamp) => {
           return { x: parseFloat(p[1]), y: parseFloat(p[2]) };
         }
         return null;
-      }).filter(r => r != null);
+      }).filter((r) => r != null);
       let js = m.split(',');
       js = js[js.length - 1].split(' ')
-        .map(j => parseFloat(j.replace(regxNum, '')))
+        .map((j) => parseFloat(j.replace(regxNum, '')))
         .filter(Boolean);
 
       return {
@@ -571,7 +575,7 @@ const buildMpyFeature = (jcamp) => {
   );
 };
 
-const isPeakTable = s => (
+const isPeakTable = (s) => (
   s.dataType && (
     s.dataType.includes('PEAKTABLE')
       || s.dataType.includes('PEAK ASSIGNMENTS')
@@ -605,27 +609,39 @@ const extrFeaturesNi = (jcamp, layout, peakUp, spectra) => {
     return isPeakTable(s)
       ? buildPeakFeature(jcamp, layout, peakUp, s, thresRef)
       : null;
-  }).filter(r => r != null);
+  }).filter((r) => r != null);
 
   const integration = buildIntegFeature(jcamp, spectra);
   const multiplicity = buildMpyFeature(jcamp);
   const simulation = buildSimFeature(jcamp);
-  
-  return { editPeak: features[0], autoPeak: features[1], integration, multiplicity, simulation };
-  
+
+  return {
+    editPeak: features[0], autoPeak: features[1], integration, multiplicity, simulation,
+  };
+};
+
+const getBoundary = (s) => {
+  const { x, y } = s.data[0];
+  const maxX = Math.max(...x);
+  const minX = Math.min(...x);
+  const maxY = Math.max(...y);
+  const minY = Math.min(...y);
+  return {
+    maxX, minX, maxY, minY,
+  };
 };
 
 const extrFeaturesXrd = (jcamp, layout, peakUp) => {
   const base = jcamp.spectra[0];
 
-  let features = jcamp.spectra.map((s) => {
+  const features = jcamp.spectra.map((s) => {
     const upperThres = Format.isXRDLayout(layout) ? 100 : calcUpperThres(s);
     const lowerThres = Format.isXRDLayout(layout) ? 100 : calcLowerThres(s);
     const cpo = buildPeakFeature(jcamp, layout, peakUp, s, 100, upperThres, lowerThres);
     const bnd = getBoundary(s);
     return Object.assign({}, base, cpo, bnd);
-  }).filter(r => r != null);
-  
+  }).filter((r) => r != null);
+
   const category = jcamp.info.$CSCATEGORY;
   if (category) {
     const idxEditPeak = category.indexOf('EDIT_PEAK');
@@ -643,7 +659,7 @@ const extrFeaturesXrd = (jcamp, layout, peakUp) => {
   }
 
   return features;
-}
+};
 
 const extrFeaturesCylicVolta = (jcamp, layout, peakUp) => {
   const base = jcamp.spectra[0];
@@ -654,20 +670,9 @@ const extrFeaturesCylicVolta = (jcamp, layout, peakUp) => {
     const cpo = buildPeakFeature(jcamp, layout, peakUp, s, 100, upperThres, lowerThres);
     const bnd = getBoundary(s);
     return Object.assign({}, base, cpo, bnd);
-  }).filter(r => r != null);
+  }).filter((r) => r != null);
 
   return features;
-}
-
-const getBoundary = (s) => {
-  const { x, y } = s.data[0];
-  const maxX = Math.max(...x);
-  const minX = Math.min(...x);
-  const maxY = Math.max(...y);
-  const minY = Math.min(...y);
-  return {
-    maxX, minX, maxY, minY,
-  };
 };
 
 const extrFeaturesMs = (jcamp, layout, peakUp) => {
@@ -697,7 +702,7 @@ const extrFeaturesMs = (jcamp, layout, peakUp) => {
     const cpo = buildPeakFeature(jcamp, layout, peakUp, s, +thresRef.toFixed(4));
     const bnd = getBoundary(s);
     return Object.assign({}, base, cpo, bnd);
-  }).filter(r => r != null);
+  }).filter((r) => r != null);
 
   return features;
 };
@@ -716,17 +721,14 @@ const ExtractJcamp = (source) => {
   const spectra = Format.isMsLayout(layout)
     ? extrSpectraMs(jcamp, layout)
     : extrSpectraNi(jcamp, layout);
-  let  features = {}
+  let features = {};
   if (Format.isMsLayout(layout)) {
     features = extrFeaturesMs(jcamp, layout, peakUp);
-  }
-  else if (Format.isXRDLayout(layout)|| Format.isCDSLayout(layout)) {
+  } else if (Format.isXRDLayout(layout) || Format.isCDSLayout(layout)) {
     features = extrFeaturesXrd(jcamp, layout, peakUp);
-  }
-  else if (Format.isCyclicVoltaLayout(layout) || Format.isSECLayout(layout)) {
+  } else if (Format.isCyclicVoltaLayout(layout) || Format.isSECLayout(layout)) {
     features = extrFeaturesCylicVolta(jcamp, layout, peakUp);
-  }
-  else {
+  } else {
     features = extrFeaturesNi(jcamp, layout, peakUp, spectra);
   }
   // const features = Format.isMsLayout(layout)
@@ -750,13 +752,13 @@ const Convert2Thres = (feature, thresSt) => {
   return value;
 };
 
-const Convert2DValue = (doubleTheta, lambda=0.15406, isRadian=true) => {
-  let theta = doubleTheta/2;
+const Convert2DValue = (doubleTheta, lambda = 0.15406, isRadian = true) => {
+  let theta = doubleTheta / 2;
   if (isRadian) {
-    theta = (theta/180)*Math.PI;
+    theta = (theta / 180) * Math.PI;
   }
   const sinTheta = Math.sin(theta);
-  const dValue = lambda/(2*sinTheta);
+  const dValue = lambda / (2 * sinTheta);
   return dValue;
 };
 
@@ -778,5 +780,5 @@ export {
   Convert2Peak, Convert2Scan, Convert2Thres,
   GetComparisons, Convert2DValue,
   GetCyclicVoltaRatio, GetCyclicVoltaPeakSeparate,
-  Feature2MaxMinPeak, convertTopic, Convert2MaxMinPeak
+  Feature2MaxMinPeak, convertTopic, Convert2MaxMinPeak,
 };

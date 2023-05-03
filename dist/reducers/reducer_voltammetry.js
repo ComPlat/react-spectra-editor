@@ -3,246 +3,312 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
+exports.default = void 0;
 var _action_type = require("../constants/action_type");
+/* eslint-disable prefer-object-spread, default-param-last */
 
-var initialState = {
+const initialState = {
   spectraList: []
 };
-
-var initSpectra = {
+const initSpectra = {
   list: [],
   selectedIdx: -1,
   isWorkMaxPeak: true,
   jcampIdx: -1
 };
-
-var addPairPeak = function addPairPeak(state, action) {
-  var payload = action.payload;
-  var spectraList = state.spectraList;
-
+const addPairPeak = (state, action) => {
+  const {
+    payload
+  } = action;
+  const {
+    spectraList
+  } = state;
   if (payload !== undefined) {
-    var spectra = spectraList[payload];
+    let spectra = spectraList[payload];
     if (!spectra) {
       spectra = initSpectra;
       spectraList.push(spectra);
     }
-    var _spectra = spectra,
-        list = _spectra.list,
-        selectedIdx = _spectra.selectedIdx;
-
-    var index = selectedIdx;
+    const {
+      list,
+      selectedIdx
+    } = spectra;
+    let index = selectedIdx;
     index += 1;
-    var newList = list.map(function (item) {
-      return _extends({}, item);
+    const newList = list.map(item => {
+      // eslint-disable-line
+      return {
+        ...item
+      };
     });
-    newList.push({ min: null, max: null });
-
-    spectraList[payload] = Object.assign({}, spectra, { list: newList, selectedIdx: index });
-    return Object.assign({}, state, { spectraList: spectraList });
-  } else {
-    return state;
+    newList.push({
+      min: null,
+      max: null
+    });
+    spectraList[payload] = Object.assign({}, spectra, {
+      list: newList,
+      selectedIdx: index
+    });
+    return Object.assign({}, state, {
+      spectraList
+    });
   }
+  return state;
 };
-
-var removePairPeak = function removePairPeak(state, action) {
-  var payload = action.payload;
-  var spectraList = state.spectraList;
-
+const removePairPeak = (state, action) => {
+  const {
+    payload
+  } = action;
+  const {
+    spectraList
+  } = state;
   if (payload !== undefined) {
-    var index = payload.index,
-        jcampIdx = payload.jcampIdx;
-
-    var spectra = spectraList[jcampIdx];
+    const {
+      index,
+      jcampIdx
+    } = payload;
+    const spectra = spectraList[jcampIdx];
     if (spectra) {
-      var list = spectra.list;
-
+      const {
+        list
+      } = spectra;
       list.splice(index, 1);
-      spectraList[jcampIdx] = Object.assign({}, spectra, { list: list, selectedIdx: index });
-      return Object.assign({}, state, { spectraList: spectraList });
+      spectraList[jcampIdx] = Object.assign({}, spectra, {
+        list,
+        selectedIdx: index
+      });
+      return Object.assign({}, state, {
+        spectraList
+      });
     }
     return state;
-  } else {
-    return state;
   }
+  return state;
 };
-
-var addPeak = function addPeak(state, action) {
-  var isMax = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
-  var payload = action.payload;
-  var spectraList = state.spectraList;
-
+const addPeak = function (state, action) {
+  let isMax = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+  const {
+    payload
+  } = action;
+  const {
+    spectraList
+  } = state;
   if (payload) {
-    var peak = payload.peak,
-        index = payload.index,
-        jcampIdx = payload.jcampIdx;
-
-    var spectra = spectraList[jcampIdx];
-    var list = spectra.list;
-
-    var newList = list.map(function (item) {
-      return _extends({}, item);
+    const {
+      peak,
+      index,
+      jcampIdx
+    } = payload;
+    const spectra = spectraList[jcampIdx];
+    const {
+      list
+    } = spectra;
+    const newList = list.map(item => {
+      // eslint-disable-line
+      return {
+        ...item
+      };
     });
-    var pairPeak = newList[index];
+    let pairPeak = newList[index];
     if (isMax) {
-      pairPeak = Object.assign({}, pairPeak, { max: peak });
+      pairPeak = Object.assign({}, pairPeak, {
+        max: peak
+      });
     } else {
-      pairPeak = Object.assign({}, pairPeak, { min: peak });
+      pairPeak = Object.assign({}, pairPeak, {
+        min: peak
+      });
     }
     newList[index] = pairPeak;
-
-    spectraList[jcampIdx] = Object.assign({}, spectra, { list: newList, selectedIdx: index, jcampIdx: jcampIdx });
-    return Object.assign({}, state, { spectraList: spectraList });
-  } else {
-    return state;
+    spectraList[jcampIdx] = Object.assign({}, spectra, {
+      list: newList,
+      selectedIdx: index,
+      jcampIdx
+    });
+    return Object.assign({}, state, {
+      spectraList
+    });
   }
+  return state;
 };
-
-var removePeak = function removePeak(state, action) {
-  var isMax = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
-  var payload = action.payload;
-  var spectraList = state.spectraList;
-
+const removePeak = function (state, action) {
+  let isMax = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+  const {
+    payload
+  } = action;
+  const {
+    spectraList
+  } = state;
   if (payload) {
-    var index = payload.index,
-        jcampIdx = payload.jcampIdx;
-
-    var spectra = spectraList[jcampIdx];
-    var list = spectra.list;
-
-    var newList = list;
-    var pairPeak = newList[index];
+    const {
+      index,
+      jcampIdx
+    } = payload;
+    const spectra = spectraList[jcampIdx];
+    const {
+      list
+    } = spectra;
+    const newList = list;
+    const pairPeak = newList[index];
     if (isMax) {
       pairPeak.max = null;
     } else {
       pairPeak.min = null;
     }
     newList[index] = pairPeak;
-
-    spectraList[jcampIdx] = Object.assign({}, spectra, { list: newList, selectedIdx: index, jcampIdx: jcampIdx });
-    return Object.assign({}, state, { spectraList: spectraList });
-  } else {
-    return state;
+    spectraList[jcampIdx] = Object.assign({}, spectra, {
+      list: newList,
+      selectedIdx: index,
+      jcampIdx
+    });
+    return Object.assign({}, state, {
+      spectraList
+    });
   }
+  return state;
 };
-
-var selectPairPeak = function selectPairPeak(state, action) {
-  var payload = action.payload;
-
+const selectPairPeak = (state, action) => {
+  const {
+    payload
+  } = action;
   if (payload !== undefined) {
-    var spectraList = state.spectraList;
-    var index = payload.index,
-        jcampIdx = payload.jcampIdx;
-
-    var spectra = spectraList[jcampIdx];
+    const {
+      spectraList
+    } = state;
+    const {
+      index,
+      jcampIdx
+    } = payload;
+    const spectra = spectraList[jcampIdx];
     if (spectra) {
-      spectraList[jcampIdx] = Object.assign({}, spectra, { selectedIdx: index });
-      return Object.assign({}, state, { spectraList: spectraList });
+      spectraList[jcampIdx] = Object.assign({}, spectra, {
+        selectedIdx: index
+      });
+      return Object.assign({}, state, {
+        spectraList
+      });
     }
     return state;
-  } else {
-    return state;
   }
+  return state;
 };
-
-var setWorkWithMaxPeak = function setWorkWithMaxPeak(state, action) {
-  var payload = action.payload;
-
+const setWorkWithMaxPeak = (state, action) => {
+  const {
+    payload
+  } = action;
   if (payload !== undefined) {
-    var spectraList = state.spectraList;
-    var isMax = payload.isMax,
-        jcampIdx = payload.jcampIdx;
-
-    var spectra = spectraList[jcampIdx];
+    const {
+      spectraList
+    } = state;
+    const {
+      isMax,
+      jcampIdx
+    } = payload;
+    const spectra = spectraList[jcampIdx];
     if (spectra) {
-      spectraList[jcampIdx] = Object.assign({}, spectra, { isWorkMaxPeak: isMax });
-      return Object.assign({}, state, { spectraList: spectraList });
+      spectraList[jcampIdx] = Object.assign({}, spectra, {
+        isWorkMaxPeak: isMax
+      });
+      return Object.assign({}, state, {
+        spectraList
+      });
     }
     return state;
-  } else {
-    return state;
   }
+  return state;
 };
-
-var addPecker = function addPecker(state, action) {
-  var payload = action.payload;
-  var spectraList = state.spectraList;
-
+const addPecker = (state, action) => {
+  const {
+    payload
+  } = action;
+  const {
+    spectraList
+  } = state;
   if (payload) {
-    var peak = payload.peak,
-        index = payload.index,
-        jcampIdx = payload.jcampIdx;
-
-    var spectra = spectraList[jcampIdx];
-    var list = spectra.list;
-
-    var newList = list;
-    var pairPeak = newList[index];
+    const {
+      peak,
+      index,
+      jcampIdx
+    } = payload;
+    const spectra = spectraList[jcampIdx];
+    const {
+      list
+    } = spectra;
+    const newList = list;
+    const pairPeak = newList[index];
     pairPeak.pecker = peak;
     newList[index] = pairPeak;
-
-    spectraList[jcampIdx] = Object.assign({}, spectra, { list: newList, selectedIdx: index, jcampIdx: jcampIdx });
-    return Object.assign({}, state, { spectraList: spectraList });
-  } else {
-    return state;
+    spectraList[jcampIdx] = Object.assign({}, spectra, {
+      list: newList,
+      selectedIdx: index,
+      jcampIdx
+    });
+    return Object.assign({}, state, {
+      spectraList
+    });
   }
+  return state;
 };
-
-var removePecker = function removePecker(state, action) {
-  var payload = action.payload;
-  var spectraList = state.spectraList;
-
+const removePecker = (state, action) => {
+  const {
+    payload
+  } = action;
+  const {
+    spectraList
+  } = state;
   if (payload) {
-    var index = payload.index,
-        jcampIdx = payload.jcampIdx;
-
-    var spectra = spectraList[jcampIdx];
-    var list = spectra.list;
-
-    var newList = list;
-    var pairPeak = newList[index];
+    const {
+      index,
+      jcampIdx
+    } = payload;
+    const spectra = spectraList[jcampIdx];
+    const {
+      list
+    } = spectra;
+    const newList = list;
+    const pairPeak = newList[index];
     pairPeak.pecker = null;
     newList[index] = pairPeak;
-
-    spectraList[jcampIdx] = Object.assign({}, spectra, { list: newList, selectedIdx: index, jcampIdx: jcampIdx });
-    return Object.assign({}, state, { spectraList: spectraList });
-  } else {
-    return state;
+    spectraList[jcampIdx] = Object.assign({}, spectra, {
+      list: newList,
+      selectedIdx: index,
+      jcampIdx
+    });
+    return Object.assign({}, state, {
+      spectraList
+    });
   }
+  return state;
 };
-
-var setRef = function setRef(state, action) {
-  var payload = action.payload;
-  var spectraList = state.spectraList;
-
+const setRef = (state, action) => {
+  const {
+    payload
+  } = action;
+  // const { spectraList } = state;
   if (payload) {
-    var index = payload.index,
-        jcampIdx = payload.jcampIdx;
-
-    var spectra = spectraList[jcampIdx];
-    var list = spectra.list;
-
-    var newList = list;
-    var pairPeak = newList[index];
+    // const { index, jcampIdx } = payload;
+    // const spectra = spectraList[jcampIdx];
+    // const { list } = spectra;
+    // const newList = list;
+    // const pairPeak = newList[index];
     // pairPeak.pecker = null;
     // newList[index] = pairPeak;
 
-    // spectraList[jcampIdx] = Object.assign({}, spectra, { list: newList, selectedIdx: index, jcampIdx: jcampIdx });
+    // spectraList[jcampIdx] = Object.assign(
+    //   {},
+    //   spectra,
+    //   { list: newList, selectedIdx: index, jcampIdx },
+    // );
     // return Object.assign({}, state, { spectraList: spectraList });
 
-    //TODO: implement ref
-    console.log(pairPeak);
-  } else {
-    return state;
+    // TODO: implement ref
+    // console.log(pairPeak);
   }
+  return state;
 };
-
-var cyclicVoltaReducer = function cyclicVoltaReducer() {
-  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-  var action = arguments[1];
-
+const cyclicVoltaReducer = function () {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+  let action = arguments.length > 1 ? arguments[1] : undefined;
   switch (action.type) {
     case _action_type.CYCLIC_VOLTA_METRY.ADD_PAIR_PEAKS:
       return addPairPeak(state, action);
@@ -267,10 +333,12 @@ var cyclicVoltaReducer = function cyclicVoltaReducer() {
     case _action_type.CYCLIC_VOLTA_METRY.SET_REF:
       return setRef(state, action);
     case _action_type.CYCLIC_VOLTA_METRY.RESETALL:
-      return Object.assign({}, state, { spectraList: [] });
+      return Object.assign({}, state, {
+        spectraList: []
+      });
     default:
       return state;
   }
 };
-
-exports.default = cyclicVoltaReducer;
+var _default = cyclicVoltaReducer;
+exports.default = _default;

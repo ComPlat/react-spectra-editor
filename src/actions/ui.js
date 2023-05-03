@@ -1,6 +1,6 @@
 import { UI } from '../constants/action_type';
 
-const setUiViewerType = payload => (
+const setUiViewerType = (payload) => (
   {
     type: UI.VIEWER.SET_TYPE,
     payload,
@@ -15,14 +15,14 @@ const setUiSweepType = (payload, jcampIdx = 0) => (
   }
 );
 
-const selectUiSweep = payload => (
+const selectUiSweep = (payload) => (
   {
     type: UI.SWEEP.SELECT,
     payload,
   }
 );
 
-const scrollUiWheel = payload => (
+const scrollUiWheel = (payload) => (
   {
     type: UI.WHEEL.SCROLL,
     payload,
