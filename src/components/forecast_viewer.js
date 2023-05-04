@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unused-prop-types */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -58,7 +59,7 @@ class ForecastViewer extends React.Component {
   render() {
     const {
       classes, topic, feature, cLabel, xLabel, yLabel, forecast,
-      isNmr, isIr, uiSt, comparisonsSt, isXRD, wavelength
+      isNmr, isIr, uiSt, comparisonsSt, isXRD, wavelength,
     } = this.props;
     const { viewer } = uiSt;
     const {
@@ -105,7 +106,7 @@ const mapStateToProps = (state, _) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     initForecastStatusAct: initForecastStatus,
     setUiViewerTypeAct: setUiViewerType,
@@ -128,7 +129,7 @@ ForecastViewer.propTypes = {
   comparisonsSt: PropTypes.array.isRequired,
   initForecastStatusAct: PropTypes.func.isRequired,
   setUiViewerTypeAct: PropTypes.func.isRequired,
-  wavelength: PropTypes.object.isRequired
+  wavelength: PropTypes.object.isRequired,
 };
 
 export default compose(

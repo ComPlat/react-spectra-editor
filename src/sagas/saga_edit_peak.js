@@ -4,8 +4,8 @@ import { EDITPEAK, SHIFT } from '../constants/action_type';
 import { FromManualToOffset, VirtalPts } from '../helpers/shift';
 import { LIST_SHIFT_1H } from '../constants/list_shift';
 
-const getShift = state => state.shift;
-const getEditPeak = state => state.editPeak.present;
+const getShift = (state) => state.shift;
+const getEditPeak = (state) => state.editPeak.present;
 
 function* addVirtualFactor(action) {
   const originShift = yield select(getShift);
@@ -44,7 +44,7 @@ function* addVirtualFactor(action) {
 
   yield put({
     type: EDITPEAK.SHIFT,
-    payload: Object.assign({}, payload, {
+    payload: Object.assign({}, payload, { // eslint-disable-line
       prevOffset: absOffset,
       pos: nextPos,
       neg: nextNeg,

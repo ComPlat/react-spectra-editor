@@ -1,127 +1,112 @@
-'use strict';
+"use strict";
 
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.FN = exports.SpectraEditor = undefined;
+Object.defineProperty(exports, "FN", {
+  enumerable: true,
+  get: function () {
+    return _fn.default;
+  }
+});
+exports.SpectraEditor = void 0;
+var _react = _interopRequireDefault(require("react"));
+var _reactRedux = require("react-redux");
+var _redux = require("redux");
+var _propTypes = _interopRequireDefault(require("prop-types"));
+require("regenerator-runtime/runtime");
+var _reduxSaga = _interopRequireDefault(require("redux-saga"));
+var _index = _interopRequireDefault(require("./reducers/index"));
+var _index2 = _interopRequireDefault(require("./sagas/index"));
+var _layer_init = _interopRequireDefault(require("./layer_init"));
+var _fn = _interopRequireDefault(require("./fn"));
+/* eslint-disable react/function-component-definition, react/require-default-props */
 
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _reactRedux = require('react-redux');
-
-var _redux = require('redux');
-
-var _propTypes = require('prop-types');
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
-require('regenerator-runtime/runtime');
-
-var _reduxSaga = require('redux-saga');
-
-var _reduxSaga2 = _interopRequireDefault(_reduxSaga);
-
-var _index = require('./reducers/index');
-
-var _index2 = _interopRequireDefault(_index);
-
-var _index3 = require('./sagas/index');
-
-var _index4 = _interopRequireDefault(_index3);
-
-var _layer_init = require('./layer_init');
-
-var _layer_init2 = _interopRequireDefault(_layer_init);
-
-var _fn = require('./fn');
-
-var _fn2 = _interopRequireDefault(_fn);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// - - - store & middleware - - -
+// eslint-disable-line
 
 // import { logger } from 'redux-logger';
 
-var sagaMiddleware = (0, _reduxSaga2.default)(); // eslint-disable-line
+// - - - store & middleware - - -
+const sagaMiddleware = (0, _reduxSaga.default)();
+const middlewares = [sagaMiddleware]; // logger
 
-var middlewares = [sagaMiddleware]; // logger
-
-var store = (0, _redux.compose)(_redux.applyMiddleware.apply(undefined, middlewares))(_redux.createStore)(_index2.default);
-
-sagaMiddleware.run(_index4.default);
+const store = (0, _redux.compose)((0, _redux.applyMiddleware)(...middlewares))(_redux.createStore)(_index.default);
+sagaMiddleware.run(_index2.default);
 
 // - - - helper - - -
-var ensureQuillDelta = function ensureQuillDelta(descs) {
-  var isArr = Array.isArray(descs);
-  return isArr ? descs : [{ insert: descs }];
+const ensureQuillDelta = descs => {
+  const isArr = Array.isArray(descs);
+  return isArr ? descs : [{
+    insert: descs
+  }];
 };
 
 // - - - React - - -
-var SpectraEditor = function SpectraEditor(_ref) {
-  var entity = _ref.entity,
-      others = _ref.others,
-      cLabel = _ref.cLabel,
-      xLabel = _ref.xLabel,
-      yLabel = _ref.yLabel,
-      operations = _ref.operations,
-      forecast = _ref.forecast,
-      molSvg = _ref.molSvg,
-      editorOnly = _ref.editorOnly,
-      descriptions = _ref.descriptions,
-      canChangeDescription = _ref.canChangeDescription,
-      onDescriptionChanged = _ref.onDescriptionChanged,
-      multiEntities = _ref.multiEntities,
-      multiMolSvgs = _ref.multiMolSvgs,
-      entityFileNames = _ref.entityFileNames,
-      userManualLink = _ref.userManualLink;
-  return _react2.default.createElement(
-    _reactRedux.Provider,
-    { store: store },
-    _react2.default.createElement(_layer_init2.default, {
-      entity: entity,
-      multiEntities: multiEntities,
-      entityFileNames: entityFileNames,
-      userManualLink: userManualLink,
-      others: others,
-      cLabel: cLabel,
-      xLabel: xLabel,
-      yLabel: yLabel,
-      forecast: forecast,
-      operations: operations,
-      descriptions: ensureQuillDelta(descriptions),
-      molSvg: molSvg,
-      multiMolSvgs: multiMolSvgs,
-      editorOnly: editorOnly,
-      canChangeDescription: canChangeDescription,
-      onDescriptionChanged: onDescriptionChanged
-    })
-  );
+const SpectraEditor = _ref => {
+  let {
+    entity,
+    others,
+    cLabel,
+    xLabel,
+    yLabel,
+    operations,
+    forecast,
+    molSvg,
+    editorOnly,
+    descriptions,
+    canChangeDescription,
+    onDescriptionChanged,
+    multiEntities,
+    multiMolSvgs,
+    entityFileNames,
+    userManualLink
+  } = _ref;
+  return /*#__PURE__*/_react.default.createElement(_reactRedux.Provider, {
+    store: store
+  }, /*#__PURE__*/_react.default.createElement(_layer_init.default, {
+    entity: entity,
+    multiEntities: multiEntities,
+    entityFileNames: entityFileNames,
+    userManualLink: userManualLink,
+    others: others,
+    cLabel: cLabel,
+    xLabel: xLabel,
+    yLabel: yLabel,
+    forecast: forecast,
+    operations: operations,
+    descriptions: ensureQuillDelta(descriptions),
+    molSvg: molSvg,
+    multiMolSvgs: multiMolSvgs,
+    editorOnly: editorOnly,
+    canChangeDescription: canChangeDescription,
+    onDescriptionChanged: onDescriptionChanged
+  }));
 };
-
+exports.SpectraEditor = SpectraEditor;
 SpectraEditor.propTypes = {
-  entity: _propTypes2.default.object.isRequired,
-  multiEntities: _propTypes2.default.array,
-  entityFileNames: _propTypes2.default.array,
-  others: _propTypes2.default.object,
-  cLabel: _propTypes2.default.string,
-  xLabel: _propTypes2.default.string,
-  yLabel: _propTypes2.default.string,
-  forecast: _propTypes2.default.object,
-  operations: _propTypes2.default.array,
-  descriptions: _propTypes2.default.oneOfType([_propTypes2.default.string, _propTypes2.default.array]),
-  molSvg: _propTypes2.default.string,
-  multiMolSvgs: _propTypes2.default.array,
-  editorOnly: _propTypes2.default.bool,
-  canChangeDescription: _propTypes2.default.bool,
-  onDescriptionChanged: _propTypes2.default.func,
-  userManualLink: _propTypes2.default.object
+  entity: _propTypes.default.object.isRequired,
+  multiEntities: _propTypes.default.array,
+  entityFileNames: _propTypes.default.array,
+  others: _propTypes.default.object,
+  cLabel: _propTypes.default.string,
+  xLabel: _propTypes.default.string,
+  yLabel: _propTypes.default.string,
+  forecast: _propTypes.default.object,
+  operations: _propTypes.default.array,
+  descriptions: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.array]),
+  molSvg: _propTypes.default.string,
+  multiMolSvgs: _propTypes.default.array,
+  editorOnly: _propTypes.default.bool,
+  canChangeDescription: _propTypes.default.bool,
+  onDescriptionChanged: _propTypes.default.func,
+  userManualLink: _propTypes.default.object
 };
-
 SpectraEditor.defaultProps = {
-  others: { others: [], addOthersCb: false },
+  others: {
+    others: [],
+    addOthersCb: false
+  },
   multiEntities: false,
   entityFileNames: false,
   cLabel: '',
@@ -136,6 +121,3 @@ SpectraEditor.defaultProps = {
   canChangeDescription: false,
   userManualLink: {}
 };
-
-exports.SpectraEditor = SpectraEditor;
-exports.FN = _fn2.default;

@@ -1,3 +1,6 @@
+/* eslint-disable prefer-object-spread, function-paren-newline,
+react/function-component-definition, react/require-default-props, max-len,
+react/no-unused-prop-types */
 import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
@@ -23,11 +26,11 @@ const styles = () => (
 const Pecker = ({
   classes, layoutSt,
   isFocusAddPeckerSt, isFocusRmPeckerSt,
-  setUiSweepTypeAct, jcampIdx
+  setUiSweepTypeAct, jcampIdx,
 }) => {
   const onSweepPeckerAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_PECKER, jcampIdx);
   const onSweepPeckerDELETE = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_PECKER, jcampIdx);
-  
+
   return (
     (!Cfg.hidePanelCyclicVolta(layoutSt)) ? (
       <span>
@@ -62,9 +65,8 @@ const Pecker = ({
           </span>
         </Tooltip>
       </span>
-    ) : 
-    (<span></span>)
-    
+    )
+      : (<span />)
   );
 };
 
@@ -77,7 +79,7 @@ const mapStateToProps = (state, _) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     setUiSweepTypeAct: setUiSweepType,
   }, dispatch)
@@ -90,7 +92,7 @@ Pecker.propTypes = {
   isFocusRmPeckerSt: PropTypes.bool.isRequired,
   setUiSweepTypeAct: PropTypes.func.isRequired,
   cyclicVotaSt: PropTypes.object.isRequired,
-  jcampIdx: PropTypes.any
+  jcampIdx: PropTypes.any,
 };
 
 export default compose(

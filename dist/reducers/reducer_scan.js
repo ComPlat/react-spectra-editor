@@ -1,44 +1,38 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
+var _action_type = require("../constants/action_type");
+/* eslint-disable prefer-object-spread, default-param-last */
 
-var _action_type = require('../constants/action_type');
-
-var initialState = {
+const initialState = {
   target: false,
   count: 1,
   isAuto: true
 };
-
-var setTarget = function setTarget(state, payload) {
-  return Object.assign({}, state, { target: payload });
-};
-
-var resetAll = function resetAll(state, payload) {
-  var scanCount = payload.scanCount,
-      scanEditTarget = payload.scanEditTarget;
-
-
+const setTarget = (state, payload) => Object.assign({}, state, {
+  target: payload
+});
+const resetAll = (state, payload) => {
+  const {
+    scanCount,
+    scanEditTarget
+  } = payload;
   return Object.assign({}, state, {
     target: false,
     count: parseInt(scanCount, 10),
     isAuto: !scanEditTarget
   });
 };
-
-var toggleIsAuto = function toggleIsAuto(state) {
-  return Object.assign({}, state, {
-    isAuto: !state.isAuto,
-    target: false
-  });
-};
-
-var scanReducer = function scanReducer() {
-  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-  var action = arguments[1];
-
+const toggleIsAuto = state => Object.assign({}, state, {
+  isAuto: !state.isAuto,
+  target: false
+});
+const scanReducer = function () {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+  let action = arguments.length > 1 ? arguments[1] : undefined;
   switch (action.type) {
     case _action_type.SCAN.SET_TARGET:
     case _action_type.SCAN.RESET_TARGET:
@@ -51,5 +45,5 @@ var scanReducer = function scanReducer() {
       return state;
   }
 };
-
-exports.default = scanReducer;
+var _default = scanReducer;
+exports.default = _default;

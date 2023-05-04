@@ -1,87 +1,99 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
+var _action_type = require("../constants/action_type");
+/* eslint-disable prefer-object-spread, default-param-last */
 
-var _action_type = require('../constants/action_type');
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-var initialState = {
+const initialState = {
   predictions: {
     outline: {},
-    output: { result: [] }
+    output: {
+      result: []
+    }
   }
 };
-
-var updateIrResl = function updateIrResl(stResl, plPred) {
-  var sma = plPred.sma,
-      identity = plPred.identity,
-      value = plPred.value;
-  var svgs = stResl.svgs;
-
-  var prevFgs = stResl.fgs;
-  var nextVal = _defineProperty({}, 'status' + identity, value);
-  var nextFgs = prevFgs.map(function (fg) {
+const updateIrResl = (stResl, plPred) => {
+  const {
+    sma,
+    identity,
+    value
+  } = plPred;
+  const {
+    svgs
+  } = stResl;
+  const prevFgs = stResl.fgs;
+  const nextVal = {
+    [`status${identity}`]: value
+  };
+  const nextFgs = prevFgs.map(fg => {
     if (fg.sma === sma) {
       return Object.assign({}, fg, nextVal);
     }
     return fg;
   });
-  var nextResult = { type: 'ir', fgs: nextFgs, svgs: svgs };
+  const nextResult = {
+    type: 'ir',
+    fgs: nextFgs,
+    svgs
+  };
   return nextResult;
 };
-
-var updateIrStatus = function updateIrStatus(state, action) {
-  var predictions = action.payload.predictions;
-  var _state$predictions = state.predictions,
-      outline = _state$predictions.outline,
-      output = _state$predictions.output;
-
-  var stResl = output.result[0];
-  var nextResl = updateIrResl(stResl, predictions);
-
+const updateIrStatus = (state, action) => {
+  const {
+    predictions
+  } = action.payload;
+  const {
+    outline,
+    output
+  } = state.predictions;
+  const stResl = output.result[0];
+  const nextResl = updateIrResl(stResl, predictions);
   return Object.assign({}, state, {
     predictions: {
-      outline: outline,
+      outline,
       output: {
         result: [nextResl]
       }
     }
   });
 };
-
-var updateNmrResl = function updateNmrResl(stResl, plPred) {
-  var idx = plPred.idx,
-      atom = plPred.atom,
-      identity = plPred.identity,
-      value = plPred.value;
-
-  var preResult = stResl;
-
-  var nextShifts = preResult.shifts.map(function (s, index) {
+const updateNmrResl = (stResl, plPred) => {
+  const {
+    idx,
+    atom,
+    identity,
+    value
+  } = plPred;
+  const preResult = stResl;
+  const nextShifts = preResult.shifts.map((s, index) => {
     if (s.atom === atom && index === idx) {
-      return Object.assign({}, s, _defineProperty({}, 'status' + identity, value));
+      return Object.assign({}, s, {
+        [`status${identity}`]: value
+      });
     }
     return s;
   });
-  var nextResult = Object.assign({}, preResult, { shifts: nextShifts });
+  const nextResult = Object.assign({}, preResult, {
+    shifts: nextShifts
+  });
   return nextResult;
 };
-
-var updateNmrStatus = function updateNmrStatus(state, action) {
-  var predictions = action.payload.predictions;
-  var _state$predictions2 = state.predictions,
-      outline = _state$predictions2.outline,
-      output = _state$predictions2.output;
-
-  var stResl = output.result[0];
-  var nextResl = updateNmrResl(stResl, predictions);
-
-  var newSt = Object.assign({}, state, {
+const updateNmrStatus = (state, action) => {
+  const {
+    predictions
+  } = action.payload;
+  const {
+    outline,
+    output
+  } = state.predictions;
+  const stResl = output.result[0];
+  const nextResl = updateNmrResl(stResl, predictions);
+  const newSt = Object.assign({}, state, {
     predictions: {
-      outline: outline,
+      outline,
       output: {
         result: [nextResl]
       }
@@ -89,11 +101,9 @@ var updateNmrStatus = function updateNmrStatus(state, action) {
   });
   return newSt;
 };
-
-var forecastReducer = function forecastReducer() {
-  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-  var action = arguments[1];
-
+const forecastReducer = function () {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+  let action = arguments.length > 1 ? arguments[1] : undefined;
   switch (action.type) {
     case _action_type.FORECAST.INIT_STATUS:
       if (!action.payload) return state;
@@ -109,5 +119,5 @@ var forecastReducer = function forecastReducer() {
       return state;
   }
 };
-
-exports.default = forecastReducer;
+var _default = forecastReducer;
+exports.default = _default;

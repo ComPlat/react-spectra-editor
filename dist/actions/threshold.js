@@ -1,49 +1,32 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.updateLowerThresholdValue = exports.updateUpperThresholdValue = exports.toggleThresholdIsEdit = exports.resetThresholdValue = exports.updateThresholdValue = undefined;
-
-var _action_type = require('../constants/action_type');
-
-var updateThresholdValue = function updateThresholdValue(payload) {
-  return {
-    type: _action_type.THRESHOLD.UPDATE_VALUE,
-    payload: payload
-  };
-};
-
-var resetThresholdValue = function resetThresholdValue() {
-  return {
-    type: _action_type.THRESHOLD.RESET_VALUE,
-    payload: false
-  };
-};
-
-var toggleThresholdIsEdit = function toggleThresholdIsEdit(payload) {
-  return {
-    type: _action_type.THRESHOLD.TOGGLE_ISEDIT,
-    payload: payload
-  };
-};
-
-var updateUpperThresholdValue = function updateUpperThresholdValue(payload) {
-  return {
-    type: _action_type.THRESHOLD.UPDATE_UPPER_VALUE,
-    payload: payload
-  };
-};
-
-var updateLowerThresholdValue = function updateLowerThresholdValue(payload) {
-  return {
-    type: _action_type.THRESHOLD.UPDATE_LOWER_VALUE,
-    payload: payload
-  };
-};
-
+exports.updateUpperThresholdValue = exports.updateThresholdValue = exports.updateLowerThresholdValue = exports.toggleThresholdIsEdit = exports.resetThresholdValue = void 0;
+var _action_type = require("../constants/action_type");
+const updateThresholdValue = payload => ({
+  type: _action_type.THRESHOLD.UPDATE_VALUE,
+  payload
+});
 exports.updateThresholdValue = updateThresholdValue;
+const resetThresholdValue = () => ({
+  type: _action_type.THRESHOLD.RESET_VALUE,
+  payload: false
+});
 exports.resetThresholdValue = resetThresholdValue;
+const toggleThresholdIsEdit = payload => ({
+  type: _action_type.THRESHOLD.TOGGLE_ISEDIT,
+  payload
+});
 exports.toggleThresholdIsEdit = toggleThresholdIsEdit;
+const updateUpperThresholdValue = payload => ({
+  type: _action_type.THRESHOLD.UPDATE_UPPER_VALUE,
+  payload
+});
 exports.updateUpperThresholdValue = updateUpperThresholdValue;
+const updateLowerThresholdValue = payload => ({
+  type: _action_type.THRESHOLD.UPDATE_LOWER_VALUE,
+  payload
+});
 exports.updateLowerThresholdValue = updateLowerThresholdValue;

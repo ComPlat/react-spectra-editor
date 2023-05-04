@@ -1,6 +1,6 @@
 import Format from './format';
 
-const btnCmdAnaViewer = layoutSt => (
+const btnCmdAnaViewer = (layoutSt) => (
   Format.isMsLayout(layoutSt)
     || Format.isRamanLayout(layoutSt)
     || Format.is19FLayout(layoutSt)
@@ -18,37 +18,37 @@ const btnCmdAnaViewer = layoutSt => (
 
 const hideCmdAnaViewer = () => false;
 
-const btnCmdAddPeak = layoutSt => Format.isMsLayout(layoutSt);
+const btnCmdAddPeak = (layoutSt) => Format.isMsLayout(layoutSt);
 
-const btnCmdRmPeak = layoutSt => Format.isMsLayout(layoutSt);
+const btnCmdRmPeak = (layoutSt) => Format.isMsLayout(layoutSt);
 
-const btnCmdSetRef = layoutSt => !(Format.isNmrLayout(layoutSt));
+const btnCmdSetRef = (layoutSt) => !(Format.isNmrLayout(layoutSt));
 
-const btnCmdIntg = layoutSt => !(Format.isNmrLayout(layoutSt) || Format.isHplcUvVisLayout(layoutSt));
+const btnCmdIntg = (layoutSt) => !(Format.isNmrLayout(layoutSt)|| Format.isHplcUvVisLayout(layoutSt));  // eslint-disable-line
 
-const btnCmdMpy = layoutSt => !Format.isNmrLayout(layoutSt);
+const btnCmdMpy = (layoutSt) => !Format.isNmrLayout(layoutSt);
 
 const btnCmdMpyPeak = (layoutSt, mpySt) => {
   const { smExtext } = mpySt;
   return btnCmdMpy(layoutSt) || !smExtext;
 };
 
-const hideCmdThres = layoutSt => Format.isMsLayout(layoutSt);
+const hideCmdThres = (layoutSt) => Format.isMsLayout(layoutSt);
 
-const btnCmdThres = thresVal => !thresVal;
+const btnCmdThres = (thresVal) => !thresVal;
 
 // const hidePanelPeak = layoutSt => Format.isMsLayout(layoutSt);
 const hidePanelPeak = layoutSt => !(Format.isSECLayout(layoutSt));  // eslint-disable-line
 
-const hidePanelMpy = layoutSt => !Format.isNmrLayout(layoutSt);
+const hidePanelMpy = (layoutSt) => !Format.isNmrLayout(layoutSt);
 
-const hidePanelCompare = layoutSt => !(Format.isIrLayout(layoutSt) || Format.isHplcUvVisLayout(layoutSt) || Format.isXRDLayout(layoutSt));
+const hidePanelCompare = (layoutSt) => !(Format.isIrLayout(layoutSt) || Format.isHplcUvVisLayout(layoutSt) || Format.isXRDLayout(layoutSt));  // eslint-disable-line
 
-const hideSolvent = layoutSt => !Format.isNmrLayout(layoutSt);
+const hideSolvent = (layoutSt) => !Format.isNmrLayout(layoutSt);
 
-const showTwoThreshold = layoutSt => Format.isCyclicVoltaLayout(layoutSt);
+const showTwoThreshold = (layoutSt) => Format.isCyclicVoltaLayout(layoutSt);
 
-const hidePanelCyclicVolta = layoutSt => !Format.isCyclicVoltaLayout(layoutSt);
+const hidePanelCyclicVolta = (layoutSt) => !Format.isCyclicVoltaLayout(layoutSt);
 
 const Config = {
   btnCmdAnaViewer,
@@ -66,7 +66,7 @@ const Config = {
   hidePanelCompare,
   hideSolvent,
   showTwoThreshold,
-  hidePanelCyclicVolta
+  hidePanelCyclicVolta,
 };
 
 export default Config;

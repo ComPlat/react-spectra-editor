@@ -1,3 +1,5 @@
+/* eslint-disable prefer-object-spread, function-paren-newline,
+react/function-component-definition */
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -42,8 +44,8 @@ const txtPercent = () => (
 const setThreshold = (
   classes, thresVal, updateThresholdValueAct,
 ) => {
-  const onBlur = e => updateThresholdValueAct(e.target.value);
-  const onChange = e => updateThresholdValueAct(e.target.value);
+  const onBlur = (e) => updateThresholdValueAct(e.target.value);
+  const onChange = (e) => updateThresholdValueAct(e.target.value);
   const onEnterPress = (e) => {
     if (e.key === 'Enter') {
       updateThresholdValueAct(e.target.value);
@@ -136,7 +138,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     updateThresholdValueAct: updateThresholdValue,
     resetThresholdValueAct: resetThresholdValue,

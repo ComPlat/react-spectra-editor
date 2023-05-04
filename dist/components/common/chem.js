@@ -1,11 +1,12 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 /* eslint-disable */
 
-var SmaToSvg = function SmaToSvg(sma) {
+const SmaToSvg = sma => {
   switch (sma) {
     case 'C-,:O':
       return '<svg version="1.1" baseProfile="full" viewBox="0 0 300 300"><polygon fill="rgb(255,255,255)" stroke="none" stroke-width="0" points="0.00,0.00 300.00,0.00 300.00,300.00 0.00,300.00 0.00,0.00"></polygon> <g>  <text font-family="helvetica"   font-size="55.00" fill="rgb(255,0,0)" x="192.35" y="183.00">O</text> </g><line x1="86.25" y1="150.00" x2="132.70" y2="150.00" stroke="rgb(0,0,0)" stroke-width="3"></line> <line x1="132.70" y1="150.00" x2="179.16" y2="150.00" stroke="rgb(255,0,0)" stroke-width="3"></line> </svg>';
@@ -111,5 +112,5 @@ var SmaToSvg = function SmaToSvg(sma) {
 };
 
 /* eslint-enable */
-
-exports.default = SmaToSvg;
+var _default = SmaToSvg;
+exports.default = _default;

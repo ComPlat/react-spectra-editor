@@ -1,3 +1,5 @@
+/* eslint-disable no-mixed-operators, prefer-object-spread,
+function-paren-newline, no-unused-vars, default-param-last */
 import { ToXY, IsSame } from './converter';
 import { LIST_LAYOUT } from '../constants/list_layout';
 import { calcMpyCenter } from './multiplicity_calc';
@@ -44,7 +46,7 @@ const buildData = (entity) => {
 };
 
 const toPeakStr = (peaks) => {
-  const arr = peaks.map(p => `${p.x},${p.y}`);
+  const arr = peaks.map((p) => `${p.x},${p.y}`);
   const str = arr.join('#');
   return str;
 };
@@ -69,14 +71,14 @@ const spectraOps = {
   [LIST_LAYOUT.SEC]: { head: 'SIZE EXCLUSION CHROMATOGRAPHY', tail: '.' },
 };
 
-const rmRef = (peaks, shift, atIndex=0) => {
+const rmRef = (peaks, shift, atIndex = 0) => {
   if (!shift) return peaks;
   const { shifts } = shift;
   const selectedShift = shifts[atIndex];
   const refValue = selectedShift.ref.value || selectedShift.peak.x;
   return peaks.map(
-    p => (IsSame(p.x, refValue) ? null : p),
-  ).filter(r => r != null);
+    (p) => (IsSame(p.x, refValue) ? null : p),
+  ).filter((r) => r != null);
 };
 
 const formatedMS = (peaks, maxY, decimal = 2, isAscend = true) => {
@@ -94,9 +96,9 @@ const formatedMS = (peaks, maxY, decimal = 2, isAscend = true) => {
   });
 
   ordered = Object.keys(ordered).sort(sortFunc)
-    .map(k => ({ x: k, y: ordered[k] }));
+    .map((k) => ({ x: k, y: ordered[k] }));
 
-  return ordered.map(o => `${o.x} (${parseInt((100 * o.y / maxY), 10)})`)
+  return ordered.map((o) => `${o.x} (${parseInt((100 * o.y / maxY), 10)})`)
     .join(', ');
 };
 
@@ -130,13 +132,13 @@ const formatedEm = (
   });
 
   ordered = Object.keys(ordered).sort(sortFunc)
-    .map(k => ({ x: k, y: ordered[k] }));
+    .map((k) => ({ x: k, y: ordered[k] }));
 
   if (isIntensity) {
-    return ordered.map(o => `${o.x} (${emLevel(boundary, o.y, lowerIsStronger)})`)
+    return ordered.map((o) => `${o.x} (${emLevel(boundary, o.y, lowerIsStronger)})`)
       .join(', ');
   }
-  return ordered.map(o => `${o.x}`)
+  return ordered.map((o) => `${o.x}`)
     .join(', ');
 };
 
@@ -158,23 +160,22 @@ const formatedUvVis = (
   });
 
   ordered = Object.keys(ordered).sort(sortFunc)
-    .map(k => ({ x: k, y: ordered[k] }));
+    .map((k) => ({ x: k, y: ordered[k] }));
 
   // return ordered.map(o => `${o.x} (${o.y.toFixed(2)})`)
   //   .join(', ');
-  return ordered.map(o => `${o.x}`)
+  return ordered.map((o) => `${o.x}`)
     .join(', ');
 };
 
 const formatedHplcUvVis = (
-  peaks, decimal = 2, integration
+  peaks, decimal = 2, integration,
 ) => {
-
   let stack = [];
   if (integration) {
     stack = integration.stack;
   }
-  
+
   let ordered = {};
 
   peaks.forEach((p) => {
@@ -186,26 +187,25 @@ const formatedHplcUvVis = (
   });
 
   ordered = Object.keys(ordered)
-    .map(k => ({ x: k, y: ordered[k] }));
+    .map((k) => ({ x: k, y: ordered[k] }));
 
-  
-  let arrResult = [];
-  ordered.forEach(o => {
-    let pStr = `${o.x} (${o.y.toFixed(2)})`
+  const arrResult = [];
+  ordered.forEach((o) => {
+    let pStr = `${o.x} (${o.y.toFixed(2)})`;
     if (stack) {
-      stack.forEach(s => {
+      stack.forEach((s) => {
         if (s.xL <= o.x && s.xU >= o.x) {
           pStr = `${o.x} (${o.y.toFixed(2)}, AUC=${s.absoluteArea})`;
         }
       });
     }
     arrResult.push(pStr);
-  })
+  });
 
-  return arrResult.join(', ')
+  return arrResult.join(', ');
 };
 
-const rmShiftFromPeaks = (peaks, shift, atIndex=0) => {
+const rmShiftFromPeaks = (peaks, shift, atIndex = 0) => {
   const peaksXY = ToXY(peaks);
   const { shifts } = shift;
   const selectedShift = shifts[atIndex];
@@ -220,14 +220,14 @@ const rmShiftFromPeaks = (peaks, shift, atIndex=0) => {
     if (!x) return null;
     const y = parseFloat(p[1]);
     return { x, y };
-  }).filter(r => r != null);
+  }).filter((r) => r != null);
   return result;
 };
 
 const peaksBody = ({
   peaks, layout, decimal, shift, isAscend,
   isIntensity = false, boundary = {},
-  integration, atIndex = 0
+  integration, atIndex = 0,
 }) => {
   const result = rmShiftFromPeaks(peaks, shift, atIndex);
 
@@ -235,7 +235,7 @@ const peaksBody = ({
   const descendFunc = (a, b) => parseFloat(b.x) - parseFloat(a.x);
   const sortFunc = isAscend ? ascendFunc : descendFunc;
   const ordered = result.sort(sortFunc);
-  const maxY = Math.max(...ordered.map(o => o.y));
+  const maxY = Math.max(...ordered.map((o) => o.y));
 
   if (layout === LIST_LAYOUT.MS) {
     return formatedMS(ordered, maxY, decimal, isAscend);
@@ -249,21 +249,18 @@ const peaksBody = ({
   if (layout === LIST_LAYOUT.HPLC_UVVIS) {
     return formatedHplcUvVis(ordered, decimal, integration);
   }
-  if (layout === LIST_LAYOUT.RAMAN 
-    || layout === LIST_LAYOUT.TGA 
-    || layout === LIST_LAYOUT.XRD 
-    || layout === LIST_LAYOUT.CYCLIC_VOLTAMMETRY 
-    || layout === LIST_LAYOUT.CDS 
+  if (layout === LIST_LAYOUT.RAMAN
+    || layout === LIST_LAYOUT.TGA
+    || layout === LIST_LAYOUT.XRD
+    || layout === LIST_LAYOUT.CYCLIC_VOLTAMMETRY
+    || layout === LIST_LAYOUT.CDS
     || layout === LIST_LAYOUT.SEC) {
     return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
-  if (layout === LIST_LAYOUT.CDS) {
-    return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
-  }
-  return ordered.map(o => fixDigit(o.x, decimal)).join(', ');
+  return ordered.map((o) => fixDigit(o.x, decimal)).join(', ');
 };
 
-const peaksWrapper = (layout, shift, atIndex=0) => {
+const peaksWrapper = (layout, shift, atIndex = 0) => {
   let solvTxt = '';
   const { shifts } = shift;
   const selectedShift = shifts[atIndex];
@@ -279,27 +276,29 @@ const peaksWrapper = (layout, shift, atIndex=0) => {
   return { head: `${ops.head}${solvTxt} = `, tail: ops.tail };
 };
 
-const isNmrLayout = layoutSt => (
-  [LIST_LAYOUT.H1, LIST_LAYOUT.C13, LIST_LAYOUT.F19, LIST_LAYOUT.P31, LIST_LAYOUT.N15, LIST_LAYOUT.Si29].indexOf(layoutSt) >= 0
+const isNmrLayout = (layoutSt) => (
+  [LIST_LAYOUT.H1, LIST_LAYOUT.C13, LIST_LAYOUT.F19, LIST_LAYOUT.P31,
+    LIST_LAYOUT.N15, LIST_LAYOUT.Si29].indexOf(layoutSt) >= 0
 );
-const is29SiLayout = layoutSt => (LIST_LAYOUT.Si29 === layoutSt);
-const is15NLayout = layoutSt => (LIST_LAYOUT.N15 === layoutSt);
-const is31PLayout = layoutSt => (LIST_LAYOUT.P31 === layoutSt);
-const is19FLayout = layoutSt => (LIST_LAYOUT.F19 === layoutSt);
-const is13CLayout = layoutSt => (LIST_LAYOUT.C13 === layoutSt);
-const is1HLayout = layoutSt => (LIST_LAYOUT.H1 === layoutSt);
-const isMsLayout = layoutSt => (LIST_LAYOUT.MS === layoutSt);
-const isIrLayout = layoutSt => ([LIST_LAYOUT.IR, 'INFRARED'].indexOf(layoutSt) >= 0);
-const isRamanLayout = layoutSt => (LIST_LAYOUT.RAMAN === layoutSt);
-const isUvVisLayout = layoutSt => (LIST_LAYOUT.UVVIS === layoutSt);
-const isHplcUvVisLayout = layoutSt => (LIST_LAYOUT.HPLC_UVVIS === layoutSt);
-const isTGALayout = layoutSt => (LIST_LAYOUT.TGA === layoutSt);
-const isXRDLayout = layoutSt => (LIST_LAYOUT.XRD === layoutSt);
-const isCyclicVoltaLayout = layoutSt => (LIST_LAYOUT.CYCLIC_VOLTAMMETRY === layoutSt);
-const isCDSLayout = layoutSt => (LIST_LAYOUT.CDS === layoutSt);
-const isSECLayout = layoutSt => (LIST_LAYOUT.SEC === layoutSt);
-const isEmWaveLayout = layoutSt => (
-  [LIST_LAYOUT.IR, LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS, LIST_LAYOUT.HPLC_UVVIS].indexOf(layoutSt) >= 0
+const is29SiLayout = (layoutSt) => (LIST_LAYOUT.Si29 === layoutSt);
+const is15NLayout = (layoutSt) => (LIST_LAYOUT.N15 === layoutSt);
+const is31PLayout = (layoutSt) => (LIST_LAYOUT.P31 === layoutSt);
+const is19FLayout = (layoutSt) => (LIST_LAYOUT.F19 === layoutSt);
+const is13CLayout = (layoutSt) => (LIST_LAYOUT.C13 === layoutSt);
+const is1HLayout = (layoutSt) => (LIST_LAYOUT.H1 === layoutSt);
+const isMsLayout = (layoutSt) => (LIST_LAYOUT.MS === layoutSt);
+const isIrLayout = (layoutSt) => ([LIST_LAYOUT.IR, 'INFRARED'].indexOf(layoutSt) >= 0);
+const isRamanLayout = (layoutSt) => (LIST_LAYOUT.RAMAN === layoutSt);
+const isUvVisLayout = (layoutSt) => (LIST_LAYOUT.UVVIS === layoutSt);
+const isHplcUvVisLayout = (layoutSt) => (LIST_LAYOUT.HPLC_UVVIS === layoutSt);
+const isTGALayout = (layoutSt) => (LIST_LAYOUT.TGA === layoutSt);
+const isXRDLayout = (layoutSt) => (LIST_LAYOUT.XRD === layoutSt);
+const isCyclicVoltaLayout = (layoutSt) => (LIST_LAYOUT.CYCLIC_VOLTAMMETRY === layoutSt);
+const isCDSLayout = (layoutSt) => (LIST_LAYOUT.CDS === layoutSt);
+const isSECLayout = (layoutSt) => (LIST_LAYOUT.SEC === layoutSt);
+const isEmWaveLayout = (layoutSt) => (
+  [LIST_LAYOUT.IR, LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS,
+    LIST_LAYOUT.HPLC_UVVIS].indexOf(layoutSt) >= 0
 );
 
 const getNmrTyp = (layout) => {
@@ -346,13 +345,13 @@ const formatPeaksByPrediction = (
     return { k, v: `${k} (${pDict[k]}${typ})` };
   }).sort(sortFunc);
 
-  const body = pArr.map(p => p.v).join(', ');
+  const body = pArr.map((p) => p.v).join(', ');
   return body;
 };
 
-const compareColors = idx => ['#ABB2B9', '#EDBB99', '#ABEBC6', '#D2B4DE', '#F9E79F'][idx % 5];
+const compareColors = (idx) => ['#ABB2B9', '#EDBB99', '#ABEBC6', '#D2B4DE', '#F9E79F'][idx % 5];
 
-const mutiEntitiesColors = idx => ['#fa8231', '#f7b731', '#0fb9b1', '#2d98da', '#3867d6', '#8854d0', '#4b6584'][idx % 7];
+const mutiEntitiesColors = (idx) => ['#fa8231', '#f7b731', '#0fb9b1', '#2d98da', '#3867d6', '#8854d0', '#4b6584'][idx % 7];
 
 const Format = {
   toPeakStr,

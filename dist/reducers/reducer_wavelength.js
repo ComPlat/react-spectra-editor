@@ -3,17 +3,15 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
+exports.default = void 0;
 var _list_wavelength = require("../constants/list_wavelength");
-
 var _action_type = require("../constants/action_type");
+/* eslint-disable default-param-last */
 
-var initialState = _list_wavelength.LIST_WAVE_LENGTH[0];
-
-var wavelengthReducer = function wavelengthReducer() {
-  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-  var action = arguments[1];
-
+const initialState = _list_wavelength.LIST_WAVE_LENGTH[0];
+const wavelengthReducer = function () {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+  let action = arguments.length > 1 ? arguments[1] : undefined;
   switch (action.type) {
     case _action_type.XRD.UPDATE_WAVE_LENGTH:
       return action.payload;
@@ -21,5 +19,5 @@ var wavelengthReducer = function wavelengthReducer() {
       return state;
   }
 };
-
-exports.default = wavelengthReducer;
+var _default = wavelengthReducer;
+exports.default = _default;

@@ -1,9 +1,10 @@
+/* eslint-disable prefer-object-spread, default-param-last, no-mixed-operators */
 import { mpyBasicPatterns, getInterval } from './multiplicity';
 
-const isTypeM = mpyType => mpyType === 'm';
-const isTypeBasic = mpyType => mpyBasicPatterns.slice(1).indexOf(mpyType) >= 0;
+const isTypeM = (mpyType) => mpyType === 'm';
+const isTypeBasic = (mpyType) => mpyBasicPatterns.slice(1).indexOf(mpyType) >= 0;
 
-const outputTypeM = k => Object.assign({}, k, { mpyType: 'm', js: [] });
+const outputTypeM = (k) => Object.assign({}, k, { mpyType: 'm', js: [] });
 
 const outputTypeBasic = (k, mpyType, ivs, freq) => {
   const numIvs = ivs.length || 1;

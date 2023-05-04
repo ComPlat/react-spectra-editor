@@ -1,25 +1,19 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.rmShiftPeak = exports.setShiftRef = undefined;
-
-var _action_type = require('../constants/action_type');
-
-var setShiftRef = function setShiftRef(payload) {
-  return {
-    type: _action_type.SHIFT.SET_REF,
-    payload: payload
-  };
-};
-
-var rmShiftPeak = function rmShiftPeak() {
-  return {
-    type: _action_type.SHIFT.RM_PEAK,
-    payload: null
-  };
-};
-
+exports.setShiftRef = exports.rmShiftPeak = void 0;
+var _action_type = require("../constants/action_type");
+const setShiftRef = payload => ({
+  type: _action_type.SHIFT.SET_REF,
+  payload
+});
 exports.setShiftRef = setShiftRef;
-exports.rmShiftPeak = rmShiftPeak; // eslint-disable-line
+const rmShiftPeak = () => ({
+  type: _action_type.SHIFT.RM_PEAK,
+  payload: null
+});
+
+// eslint-disable-line
+exports.rmShiftPeak = rmShiftPeak;

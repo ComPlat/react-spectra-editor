@@ -1,3 +1,4 @@
+/* eslint-disable prefer-object-spread, default-param-last */
 import JAnalyzer from '../third_party/jAnalyzer';
 import { getInterval } from './multiplicity';
 import {
@@ -7,7 +8,7 @@ import {
 } from './multiplicity_verify_basic';
 
 const centerX = (ps, shift) => {
-  const pxs = ps.map(p => p.x).sort((a, b) => a - b);
+  const pxs = ps.map((p) => p.x).sort((a, b) => a - b);
   const centIdx = (ps.length - 1) / 2;
   if (centIdx < 0) return 0;
   return pxs[centIdx] - shift;
@@ -23,7 +24,7 @@ const calcMpyCenter = (ps, shift, typ) => {
 
 const calcMpyJStr = (js) => {
   if (!Array.isArray(js) || js.length === 0) return ' - ';
-  const cJ = js.map(j => j.toFixed(3)).join(', ');
+  const cJ = js.map((j) => j.toFixed(3)).join(', ');
   return `${cJ}`;
 };
 
@@ -53,7 +54,7 @@ const calcMpyCoup = (pks, metaSt) => {
   if (pks.length === 0) return { type: '', js: '' };
   const orderPks = pks.sort((a, b) => b.x - a.x);
   const { observeFrequency } = metaSt.peaks;
-  const peaks = orderPks.map(p => (
+  const peaks = orderPks.map((p) => (
     {
       x: p.x,
       intensity: p.y,
@@ -69,7 +70,7 @@ const calcMpyCoup = (pks, metaSt) => {
   };
   JAnalyzer.compilePattern(signal);
   const type = signal.multiplicity;
-  const js = signal.nmrJs ? signal.nmrJs.map(j => j.coupling).sort() : [];
+  const js = signal.nmrJs ? signal.nmrJs.map((j) => j.coupling).sort() : [];
 
   const isTPCMatch = verifyTypePeakCount(type, peaks);
   if (!isTPCMatch) return { type: 'm', js: [] };

@@ -1,3 +1,4 @@
+/* eslint-disable no-mixed-operators */
 import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -111,7 +112,7 @@ const mapStateToProps = (state, props) => (
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     resetAllAct: resetAll,
     clickUiTargetAct: clickUiTarget,

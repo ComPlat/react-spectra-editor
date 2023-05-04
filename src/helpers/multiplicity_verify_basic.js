@@ -1,3 +1,4 @@
+/* eslint-disable prefer-object-spread, default-param-last, no-mixed-operators */
 // ---------------------------------------------------------------
 // verifyTypePeakCount
 // ---------------------------------------------------------------
@@ -51,8 +52,8 @@ const getRuleParams = (oivs, metaSt) => {
   const rDeltaX = Math.abs(2 * deltaX / ref);
   const tTolerance = rDeltaX > allowedTolerance ? rDeltaX : allowedTolerance;
   const tolerance = Math.abs(tTolerance * faktor);
-  const roivs = oivs.map(oiv => oiv / ref);
-  const rsivs = sivs.map(siv => siv / ref);
+  const roivs = oivs.map((oiv) => oiv / ref);
+  const rsivs = sivs.map((siv) => siv / ref);
   return {
     roivs, rsivs, tolerance, observeFrequency,
   };

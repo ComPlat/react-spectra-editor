@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { LIST_LAYOUT } from './list_layout';
 
 const noReference = {

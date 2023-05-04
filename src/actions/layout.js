@@ -1,6 +1,6 @@
 import { LAYOUT } from '../constants/action_type';
 
-const updateLayout = payload => (
+const updateLayout = (payload) => (
   {
     type: LAYOUT.UPDATE,
     payload,

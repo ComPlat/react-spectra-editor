@@ -1,99 +1,54 @@
-'use strict';
+"use strict";
 
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
+var _format = _interopRequireDefault(require("./format"));
+const btnCmdAnaViewer = layoutSt => _format.default.isMsLayout(layoutSt) || _format.default.isRamanLayout(layoutSt) || _format.default.is19FLayout(layoutSt) || _format.default.isUvVisLayout(layoutSt) || _format.default.isHplcUvVisLayout(layoutSt) || _format.default.isTGALayout(layoutSt) || _format.default.isXRDLayout(layoutSt) || _format.default.is31PLayout(layoutSt) || _format.default.is15NLayout(layoutSt) || _format.default.is29SiLayout(layoutSt) || _format.default.isCyclicVoltaLayout(layoutSt) || _format.default.isCDSLayout(layoutSt) || _format.default.isSECLayout(layoutSt);
+const hideCmdAnaViewer = () => false;
+const btnCmdAddPeak = layoutSt => _format.default.isMsLayout(layoutSt);
+const btnCmdRmPeak = layoutSt => _format.default.isMsLayout(layoutSt);
+const btnCmdSetRef = layoutSt => !_format.default.isNmrLayout(layoutSt);
+const btnCmdIntg = layoutSt => !(_format.default.isNmrLayout(layoutSt) || _format.default.isHplcUvVisLayout(layoutSt)); // eslint-disable-line
 
-var _format = require('./format');
-
-var _format2 = _interopRequireDefault(_format);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var btnCmdAnaViewer = function btnCmdAnaViewer(layoutSt) {
-  return _format2.default.isMsLayout(layoutSt) || _format2.default.isRamanLayout(layoutSt) || _format2.default.is19FLayout(layoutSt) || _format2.default.isUvVisLayout(layoutSt) || _format2.default.isHplcUvVisLayout(layoutSt) || _format2.default.isTGALayout(layoutSt) || _format2.default.isXRDLayout(layoutSt) || _format2.default.is31PLayout(layoutSt) || _format2.default.is15NLayout(layoutSt) || _format2.default.is29SiLayout(layoutSt) || _format2.default.isCyclicVoltaLayout(layoutSt) || _format2.default.isCDSLayout(layoutSt) || _format2.default.isSECLayout(layoutSt);
-};
-
-var hideCmdAnaViewer = function hideCmdAnaViewer() {
-  return false;
-};
-
-var btnCmdAddPeak = function btnCmdAddPeak(layoutSt) {
-  return _format2.default.isMsLayout(layoutSt);
-};
-
-var btnCmdRmPeak = function btnCmdRmPeak(layoutSt) {
-  return _format2.default.isMsLayout(layoutSt);
-};
-
-var btnCmdSetRef = function btnCmdSetRef(layoutSt) {
-  return !_format2.default.isNmrLayout(layoutSt);
-};
-
-var btnCmdIntg = function btnCmdIntg(layoutSt) {
-  return !(_format2.default.isNmrLayout(layoutSt) || _format2.default.isHplcUvVisLayout(layoutSt));
-};
-
-var btnCmdMpy = function btnCmdMpy(layoutSt) {
-  return !_format2.default.isNmrLayout(layoutSt);
-};
-
-var btnCmdMpyPeak = function btnCmdMpyPeak(layoutSt, mpySt) {
-  var smExtext = mpySt.smExtext;
-
+const btnCmdMpy = layoutSt => !_format.default.isNmrLayout(layoutSt);
+const btnCmdMpyPeak = (layoutSt, mpySt) => {
+  const {
+    smExtext
+  } = mpySt;
   return btnCmdMpy(layoutSt) || !smExtext;
 };
-
-var hideCmdThres = function hideCmdThres(layoutSt) {
-  return _format2.default.isMsLayout(layoutSt);
-};
-
-var btnCmdThres = function btnCmdThres(thresVal) {
-  return !thresVal;
-};
+const hideCmdThres = layoutSt => _format.default.isMsLayout(layoutSt);
+const btnCmdThres = thresVal => !thresVal;
 
 // const hidePanelPeak = layoutSt => Format.isMsLayout(layoutSt);
-var hidePanelPeak = function hidePanelPeak(layoutSt) {
-  return !_format2.default.isSECLayout(layoutSt);
-}; // eslint-disable-line
+const hidePanelPeak = layoutSt => !_format.default.isSECLayout(layoutSt); // eslint-disable-line
 
-var hidePanelMpy = function hidePanelMpy(layoutSt) {
-  return !_format2.default.isNmrLayout(layoutSt);
+const hidePanelMpy = layoutSt => !_format.default.isNmrLayout(layoutSt);
+const hidePanelCompare = layoutSt => !(_format.default.isIrLayout(layoutSt) || _format.default.isHplcUvVisLayout(layoutSt) || _format.default.isXRDLayout(layoutSt)); // eslint-disable-line
+
+const hideSolvent = layoutSt => !_format.default.isNmrLayout(layoutSt);
+const showTwoThreshold = layoutSt => _format.default.isCyclicVoltaLayout(layoutSt);
+const hidePanelCyclicVolta = layoutSt => !_format.default.isCyclicVoltaLayout(layoutSt);
+const Config = {
+  btnCmdAnaViewer,
+  hideCmdAnaViewer,
+  btnCmdAddPeak,
+  btnCmdRmPeak,
+  btnCmdSetRef,
+  btnCmdIntg,
+  btnCmdMpy,
+  btnCmdMpyPeak,
+  hideCmdThres,
+  btnCmdThres,
+  hidePanelPeak,
+  hidePanelMpy,
+  hidePanelCompare,
+  hideSolvent,
+  showTwoThreshold,
+  hidePanelCyclicVolta
 };
-
-var hidePanelCompare = function hidePanelCompare(layoutSt) {
-  return !(_format2.default.isIrLayout(layoutSt) || _format2.default.isHplcUvVisLayout(layoutSt) || _format2.default.isXRDLayout(layoutSt));
-};
-
-var hideSolvent = function hideSolvent(layoutSt) {
-  return !_format2.default.isNmrLayout(layoutSt);
-};
-
-var showTwoThreshold = function showTwoThreshold(layoutSt) {
-  return _format2.default.isCyclicVoltaLayout(layoutSt);
-};
-
-var hidePanelCyclicVolta = function hidePanelCyclicVolta(layoutSt) {
-  return !_format2.default.isCyclicVoltaLayout(layoutSt);
-};
-
-var Config = {
-  btnCmdAnaViewer: btnCmdAnaViewer,
-  hideCmdAnaViewer: hideCmdAnaViewer,
-  btnCmdAddPeak: btnCmdAddPeak,
-  btnCmdRmPeak: btnCmdRmPeak,
-  btnCmdSetRef: btnCmdSetRef,
-  btnCmdIntg: btnCmdIntg,
-  btnCmdMpy: btnCmdMpy,
-  btnCmdMpyPeak: btnCmdMpyPeak,
-  hideCmdThres: hideCmdThres,
-  btnCmdThres: btnCmdThres,
-  hidePanelPeak: hidePanelPeak,
-  hidePanelMpy: hidePanelMpy,
-  hidePanelCompare: hidePanelCompare,
-  hideSolvent: hideSolvent,
-  showTwoThreshold: showTwoThreshold,
-  hidePanelCyclicVolta: hidePanelCyclicVolta
-};
-
-exports.default = Config;
+var _default = Config;
+exports.default = _default;

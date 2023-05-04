@@ -1,3 +1,5 @@
+/* eslint-disable prefer-object-spread, function-paren-newline,
+react/function-component-definition */
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -83,7 +85,7 @@ const scanSelect = (
   const { target, count } = scanSt;
   if (!count) return null;
   const range = [...Array(count + 1).keys()].slice(1);
-  const content = range.map(num => (
+  const content = range.map((num) => (
     <MenuItem value={num} key={num}>
       <span className={classNames(classes.txtOpt, 'option-sv-bar-scan')}>
         { `scan ${num}` }
@@ -129,7 +131,7 @@ const Scan = ({
   const isMs = ['MS'].indexOf(layoutSt) >= 0;
   if (!isMs) return null;
 
-  const onChange = e => setScanTargetAct(e.target.value);
+  const onChange = (e) => setScanTargetAct(e.target.value);
 
   return (
     <span>
@@ -159,7 +161,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     setScanTargetAct: setScanTarget,
     resetScanTargetAct: resetScanTarget,

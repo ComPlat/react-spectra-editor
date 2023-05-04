@@ -1,3 +1,4 @@
+/* eslint-disable prefer-object-spread, default-param-last */
 // import { MANAGER } from '../constants/action_type';
 
 const initialState = {};

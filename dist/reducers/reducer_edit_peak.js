@@ -1,24 +1,17 @@
-'use strict';
+"use strict";
 
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
+var _reduxUndo = _interopRequireDefault(require("redux-undo"));
+var _action_type = require("../constants/action_type");
+var _undo_redo_config = require("./undo_redo_config");
+var _calc = require("../helpers/calc");
+/* eslint-disable prefer-object-spread, default-param-last */
 
-var _reduxUndo = require('redux-undo');
-
-var _reduxUndo2 = _interopRequireDefault(_reduxUndo);
-
-var _action_type = require('../constants/action_type');
-
-var _undo_redo_config = require('./undo_redo_config');
-
-var _calc = require('../helpers/calc');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-var initialState = {
+const initialState = {
   selectedIdx: 0,
   peaks: [{
     prevOffset: 0,
@@ -26,143 +19,163 @@ var initialState = {
     neg: []
   }]
 };
-
-var defaultEmptyPeaks = {
+const defaultEmptyPeaks = {
   prevOffset: 0,
   pos: [],
   neg: []
 };
-
-var addToPos = function addToPos(state, action) {
-  var peaks = state.peaks;
-  var payload = action.payload;
-  var dataToAdd = payload.dataToAdd,
-      curveIdx = payload.curveIdx;
-
-  var selectedEditPeaks = peaks[curveIdx];
+const addToPos = (state, action) => {
+  const {
+    peaks
+  } = state;
+  const {
+    payload
+  } = action;
+  const {
+    dataToAdd,
+    curveIdx
+  } = payload;
+  let selectedEditPeaks = peaks[curveIdx];
   if (!selectedEditPeaks) {
     selectedEditPeaks = defaultEmptyPeaks;
   }
-
-  var oriPosState = selectedEditPeaks.pos;
-  var oriNegState = selectedEditPeaks.neg;
-  var idxN = oriNegState.findIndex(function (n) {
-    return (0, _calc.almostEqual)(n.x, dataToAdd.x);
-  });
+  const oriPosState = selectedEditPeaks.pos;
+  const oriNegState = selectedEditPeaks.neg;
+  const idxN = oriNegState.findIndex(n => (0, _calc.almostEqual)(n.x, dataToAdd.x));
   if (idxN >= 0) {
     // rm the peak from oriNegState if it is already deleted.
-    var neg = [].concat(_toConsumableArray(oriNegState.slice(0, idxN)), _toConsumableArray(oriNegState.slice(idxN + 1)));
-
-    var newSelectedEditPeaks = Object.assign({}, selectedEditPeaks, { neg: neg });
+    const neg = [...oriNegState.slice(0, idxN), ...oriNegState.slice(idxN + 1)];
+    const newSelectedEditPeaks = Object.assign({}, selectedEditPeaks, {
+      neg
+    });
     peaks[curveIdx] = newSelectedEditPeaks;
-
-    return Object.assign({}, state, { peaks: peaks });
+    return Object.assign({}, state, {
+      peaks
+    });
   }
-  var idxP = oriPosState.findIndex(function (p) {
-    return (0, _calc.almostEqual)(p.x, dataToAdd.x);
-  });
+  const idxP = oriPosState.findIndex(p => (0, _calc.almostEqual)(p.x, dataToAdd.x));
   if (idxP < 0) {
     // add the peak
-    var pos = [].concat(_toConsumableArray(oriPosState), [dataToAdd]);
-
-    var _newSelectedEditPeaks = Object.assign({}, selectedEditPeaks, { pos: pos });
-    peaks[curveIdx] = _newSelectedEditPeaks;
-    return Object.assign({}, state, { peaks: peaks, selectedIdx: curveIdx });
-  }
-  return state;
-};
-
-var rmFromPos = function rmFromPos(state, action) {
-  var selectedIdx = state.selectedIdx,
-      peaks = state.peaks;
-
-  var selectedEditPeaks = peaks[selectedIdx];
-
-  var oriPosState = selectedEditPeaks.pos;
-  var idx = oriPosState.findIndex(function (p) {
-    return p.x === action.payload.x;
-  });
-  var pos = [].concat(_toConsumableArray(oriPosState.slice(0, idx)), _toConsumableArray(oriPosState.slice(idx + 1)));
-
-  var newSelectedEditPeaks = Object.assign({}, selectedEditPeaks, { pos: pos });
-  peaks[selectedIdx] = newSelectedEditPeaks;
-  return Object.assign({}, state, { peaks: peaks });
-};
-
-var addToNeg = function addToNeg(state, action) {
-  var peaks = state.peaks;
-  var payload = action.payload;
-  var dataToAdd = payload.dataToAdd,
-      curveIdx = payload.curveIdx;
-
-  var selectedEditPeaks = peaks[curveIdx];
-  if (!selectedEditPeaks) {
-    selectedEditPeaks = defaultEmptyPeaks;
-  }
-
-  var oriPosState = selectedEditPeaks.pos;
-  var oriNegState = selectedEditPeaks.neg;
-  var idxP = oriPosState.findIndex(function (n) {
-    return n.x === dataToAdd.x;
-  });
-  if (idxP >= 0) {
-    var pos = [].concat(_toConsumableArray(oriPosState.slice(0, idxP)), _toConsumableArray(oriPosState.slice(idxP + 1)));
-    var newSelectedEditPeaks = Object.assign({}, selectedEditPeaks, { pos: pos });
+    const pos = [...oriPosState, dataToAdd];
+    const newSelectedEditPeaks = Object.assign({}, selectedEditPeaks, {
+      pos
+    });
     peaks[curveIdx] = newSelectedEditPeaks;
-    return Object.assign({}, state, { peaks: peaks });
-  }
-  var idxN = oriNegState.findIndex(function (n) {
-    return n.x === dataToAdd.x;
-  });
-  if (idxN < 0) {
-    var neg = [].concat(_toConsumableArray(oriNegState), [dataToAdd]);
-    var _newSelectedEditPeaks2 = Object.assign({}, selectedEditPeaks, { neg: neg });
-    peaks[curveIdx] = _newSelectedEditPeaks2;
-    return Object.assign({}, state, { peaks: peaks, selectedIdx: curveIdx });
+    return Object.assign({}, state, {
+      peaks,
+      selectedIdx: curveIdx
+    });
   }
   return state;
 };
-
-var rmFromNeg = function rmFromNeg(state, action) {
-  var selectedIdx = state.selectedIdx,
-      peaks = state.peaks;
-
-  var selectedEditPeaks = peaks[selectedIdx];
-
-  var oriNegState = selectedEditPeaks.neg;
-  var idx = oriNegState.findIndex(function (n) {
-    return n.x === action.payload.x;
+const rmFromPos = (state, action) => {
+  const {
+    selectedIdx,
+    peaks
+  } = state;
+  const selectedEditPeaks = peaks[selectedIdx];
+  const oriPosState = selectedEditPeaks.pos;
+  const idx = oriPosState.findIndex(p => p.x === action.payload.x);
+  const pos = [...oriPosState.slice(0, idx), ...oriPosState.slice(idx + 1)];
+  const newSelectedEditPeaks = Object.assign({}, selectedEditPeaks, {
+    pos
   });
-  var neg = [].concat(_toConsumableArray(oriNegState.slice(0, idx)), _toConsumableArray(oriNegState.slice(idx + 1)));
-  var newSelectedEditPeaks = Object.assign({}, selectedEditPeaks, { neg: neg });
   peaks[selectedIdx] = newSelectedEditPeaks;
-  return Object.assign({}, state, { peaks: peaks });
+  return Object.assign({}, state, {
+    peaks
+  });
 };
-
-var processShift = function processShift(state, action) {
-  var payload = action.payload;
-  var curveIdx = action.payload.curveIdx;
-  var peaks = state.peaks;
-
-  var selectedEditPeaks = peaks[curveIdx];
+const addToNeg = (state, action) => {
+  const {
+    peaks
+  } = state;
+  const {
+    payload
+  } = action;
+  const {
+    dataToAdd,
+    curveIdx
+  } = payload;
+  let selectedEditPeaks = peaks[curveIdx];
   if (!selectedEditPeaks) {
     selectedEditPeaks = defaultEmptyPeaks;
   }
-
-  var pos = payload.pos,
-      neg = payload.neg,
-      prevOffset = payload.prevOffset;
-
-
-  var newSelectedEditPeaks = Object.assign({}, selectedEditPeaks, { pos: pos, neg: neg, prevOffset: prevOffset });
-  peaks[curveIdx] = newSelectedEditPeaks;
-  return Object.assign({}, state, { peaks: peaks });
+  const oriPosState = selectedEditPeaks.pos;
+  const oriNegState = selectedEditPeaks.neg;
+  const idxP = oriPosState.findIndex(n => n.x === dataToAdd.x);
+  if (idxP >= 0) {
+    const pos = [...oriPosState.slice(0, idxP), ...oriPosState.slice(idxP + 1)];
+    const newSelectedEditPeaks = Object.assign({}, selectedEditPeaks, {
+      pos
+    });
+    peaks[curveIdx] = newSelectedEditPeaks;
+    return Object.assign({}, state, {
+      peaks
+    });
+  }
+  const idxN = oriNegState.findIndex(n => n.x === dataToAdd.x);
+  if (idxN < 0) {
+    const neg = [...oriNegState, dataToAdd];
+    const newSelectedEditPeaks = Object.assign({}, selectedEditPeaks, {
+      neg
+    });
+    peaks[curveIdx] = newSelectedEditPeaks;
+    return Object.assign({}, state, {
+      peaks,
+      selectedIdx: curveIdx
+    });
+  }
+  return state;
 };
-
-var editPeakReducer = function editPeakReducer() {
-  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-  var action = arguments[1];
-
+const rmFromNeg = (state, action) => {
+  const {
+    selectedIdx,
+    peaks
+  } = state;
+  const selectedEditPeaks = peaks[selectedIdx];
+  const oriNegState = selectedEditPeaks.neg;
+  const idx = oriNegState.findIndex(n => n.x === action.payload.x);
+  const neg = [...oriNegState.slice(0, idx), ...oriNegState.slice(idx + 1)];
+  const newSelectedEditPeaks = Object.assign({}, selectedEditPeaks, {
+    neg
+  });
+  peaks[selectedIdx] = newSelectedEditPeaks;
+  return Object.assign({}, state, {
+    peaks
+  });
+};
+const processShift = (state, action) => {
+  const {
+    payload
+  } = action;
+  const {
+    curveIdx
+  } = action.payload;
+  const {
+    peaks
+  } = state;
+  let selectedEditPeaks = peaks[curveIdx];
+  if (!selectedEditPeaks) {
+    selectedEditPeaks = defaultEmptyPeaks;
+  }
+  const {
+    pos,
+    neg,
+    prevOffset
+  } = payload;
+  const newSelectedEditPeaks = Object.assign({}, selectedEditPeaks, {
+    pos,
+    neg,
+    prevOffset
+  });
+  peaks[curveIdx] = newSelectedEditPeaks;
+  return Object.assign({}, state, {
+    peaks
+  });
+};
+const editPeakReducer = function () {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+  let action = arguments.length > 1 ? arguments[1] : undefined;
   switch (action.type) {
     case _action_type.EDITPEAK.ADD_POSITIVE:
       return addToPos(state, action);
@@ -180,7 +193,6 @@ var editPeakReducer = function editPeakReducer() {
       return _undo_redo_config.undoRedoActions.indexOf(action.type) >= 0 ? Object.assign({}, state) : state;
   }
 };
-
-var undoableEditPeakReducer = (0, _reduxUndo2.default)(editPeakReducer, _undo_redo_config.undoRedoConfig);
-
-exports.default = undoableEditPeakReducer;
+const undoableEditPeakReducer = (0, _reduxUndo.default)(editPeakReducer, _undo_redo_config.undoRedoConfig);
+var _default = undoableEditPeakReducer;
+exports.default = _default;

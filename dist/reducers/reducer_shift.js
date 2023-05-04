@@ -1,16 +1,15 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
+var _action_type = require("../constants/action_type");
+var _list_shift = require("../constants/list_shift");
+var _shift = require("../helpers/shift");
+/* eslint-disable prefer-object-spread, default-param-last */
 
-var _action_type = require('../constants/action_type');
-
-var _list_shift = require('../constants/list_shift');
-
-var _shift = require('../helpers/shift');
-
-var shiftNone = _list_shift.LIST_SHIFT_1H[0];
+const shiftNone = _list_shift.LIST_SHIFT_1H[0];
 
 // const initialState = {
 //   ref: shiftNone,
@@ -18,7 +17,7 @@ var shiftNone = _list_shift.LIST_SHIFT_1H[0];
 //   enable: true,
 // };
 
-var initialState = {
+const initialState = {
   selectedIdx: 0,
   shifts: [{
     ref: shiftNone,
@@ -26,33 +25,31 @@ var initialState = {
     enable: true
   }]
 };
-
-var defaultEmptyShift = {
+const defaultEmptyShift = {
   ref: shiftNone,
   peak: false,
   enable: true
 };
-
-var resetRef = function resetRef(payload) {
-  var shift = payload.shift,
-      layout = payload.layout;
-
+const resetRef = payload => {
+  const {
+    shift,
+    layout
+  } = payload;
   if (!shift || !shift.solventName || !shift.solventValue) return shiftNone;
-
-  var name = shift.solventName;
-  var target = false;
-  var listShift = (0, _list_shift.getListShift)(layout);
-  listShift.forEach(function (l) {
+  const name = shift.solventName;
+  let target = false;
+  const listShift = (0, _list_shift.getListShift)(layout);
+  listShift.forEach(l => {
     if (l.name === name) {
       target = l;
     }
   });
   return target || shiftNone[0];
 };
-
-var resetEnable = function resetEnable(payload) {
-  var typ = payload.operation.typ;
-
+const resetEnable = payload => {
+  const {
+    typ
+  } = payload.operation;
   switch (typ) {
     case 'NMR':
       return true;
@@ -60,143 +57,151 @@ var resetEnable = function resetEnable(payload) {
       return false;
   }
 };
-
-var resetShift = function resetShift(state, action) {
-  var selectedIdx = state.selectedIdx,
-      shifts = state.shifts;
-
-  var selectedShift = shifts[selectedIdx];
+const resetShift = (state, action) => {
+  const {
+    selectedIdx,
+    shifts
+  } = state;
+  let selectedShift = shifts[selectedIdx];
   if (selectedShift === false || selectedShift === undefined) {
     selectedShift = defaultEmptyShift;
   }
-
-  var newShift = Object.assign({}, selectedShift, {
+  const newShift = Object.assign({}, selectedShift, {
     ref: resetRef(action.payload),
     enable: resetEnable(action.payload)
   });
-
   shifts[selectedIdx] = newShift;
-
-  return Object.assign({}, state, { shifts: shifts, selectedIdx: selectedIdx });
+  return Object.assign({}, state, {
+    shifts,
+    selectedIdx
+  });
 };
-
-var updateShift = function updateShift(state, action) {
-  var selectedIdx = state.selectedIdx,
-      shifts = state.shifts;
-
-  var selectedShift = shifts[selectedIdx];
+const updateShift = (state, action) => {
+  // eslint-disable-line
+  const {
+    selectedIdx,
+    shifts
+  } = state;
+  let selectedShift = shifts[selectedIdx];
   if (selectedShift === false || selectedShift === undefined) {
     selectedShift = defaultEmptyShift;
   }
-
-  var newShift = Object.assign({}, selectedShift, {
+  const newShift = Object.assign({}, selectedShift, {
     ref: false,
     enable: selectedShift.enable
   });
-
   shifts[selectedIdx] = newShift;
-
-  return Object.assign({}, state, { shifts: shifts, selectedIdx: selectedIdx });
+  return Object.assign({}, state, {
+    shifts,
+    selectedIdx
+  });
 };
-
-var setRef = function setRef(state, action) {
-  var payload = action.payload;
-  var dataToSet = payload.dataToSet,
-      curveIdx = payload.curveIdx;
-  var shifts = state.shifts;
-
-  var selectedShift = shifts[curveIdx];
+const setRef = (state, action) => {
+  const {
+    payload
+  } = action;
+  const {
+    dataToSet,
+    curveIdx
+  } = payload;
+  const {
+    shifts
+  } = state;
+  let selectedShift = shifts[curveIdx];
   if (selectedShift === false || selectedShift === undefined) {
     selectedShift = defaultEmptyShift;
   }
-
-  var newShift = Object.assign({}, selectedShift, {
+  const newShift = Object.assign({}, selectedShift, {
     ref: dataToSet,
     enable: true
   });
-
   shifts[curveIdx] = newShift;
-
-  return Object.assign({}, state, { shifts: shifts, selectedIdx: curveIdx });
+  return Object.assign({}, state, {
+    shifts,
+    selectedIdx: curveIdx
+  });
 };
-
-var setPeak = function setPeak(state, action) {
-  var payload = action.payload;
-  var dataToSet = payload.dataToSet,
-      curveIdx = payload.curveIdx;
-  var shifts = state.shifts;
-
-  var selectedShift = shifts[curveIdx];
+const setPeak = (state, action) => {
+  const {
+    payload
+  } = action;
+  const {
+    dataToSet,
+    curveIdx
+  } = payload;
+  const {
+    shifts
+  } = state;
+  let selectedShift = shifts[curveIdx];
   if (selectedShift === false || selectedShift === undefined) {
     selectedShift = defaultEmptyShift;
   }
-
-  var resX = (0, _shift.CalcResidualX)(selectedShift.ref, selectedShift.peak, dataToSet);
-  var trueApex = (0, _shift.RealPts)([dataToSet], resX)[0];
-  var isSamePt = selectedShift.peak.x === trueApex.x;
-  var truePeak = trueApex && trueApex.x && !isSamePt ? trueApex : false;
-
-  var newShift = Object.assign({}, selectedShift, {
+  const resX = (0, _shift.CalcResidualX)(selectedShift.ref, selectedShift.peak, dataToSet);
+  const trueApex = (0, _shift.RealPts)([dataToSet], resX)[0];
+  const isSamePt = selectedShift.peak.x === trueApex.x;
+  const truePeak = trueApex && trueApex.x && !isSamePt ? trueApex : false;
+  const newShift = Object.assign({}, selectedShift, {
     peak: truePeak,
     enable: true
   });
-
   shifts[curveIdx] = newShift;
-
-  return Object.assign({}, state, { shifts: shifts, selectedIdx: curveIdx });
+  return Object.assign({}, state, {
+    shifts,
+    selectedIdx: curveIdx
+  });
 };
-
-var removePeak = function removePeak(state, action) {
-  var selectedIdx = state.selectedIdx,
-      shifts = state.shifts;
-
-  var selectedShift = shifts[selectedIdx];
+const removePeak = (state, action) => {
+  // eslint-disable-line
+  const {
+    selectedIdx,
+    shifts
+  } = state;
+  let selectedShift = shifts[selectedIdx];
   if (selectedShift === false || selectedShift === undefined) {
     selectedShift = defaultEmptyShift;
   }
-
-  var newShift = Object.assign({}, selectedShift, {
+  const newShift = Object.assign({}, selectedShift, {
     peak: false,
     enable: true
   });
-
   shifts[selectedIdx] = newShift;
-
-  return Object.assign({}, state, { shifts: shifts, selectedIdx: selectedIdx });
+  return Object.assign({}, state, {
+    shifts,
+    selectedIdx
+  });
 };
-
-var addNegative = function addNegative(state, action) {
-  var payload = action.payload;
-  var dataToAdd = payload.dataToAdd,
-      curveIdx = payload.curveIdx;
-  var shifts = state.shifts;
-
-
-  var selectedShift = shifts[curveIdx];
+const addNegative = (state, action) => {
+  const {
+    payload
+  } = action;
+  const {
+    dataToAdd,
+    curveIdx
+  } = payload;
+  const {
+    shifts
+  } = state;
+  let selectedShift = shifts[curveIdx];
   if (selectedShift === false || selectedShift === undefined) {
     selectedShift = defaultEmptyShift;
   }
-
-  var rmApex = selectedShift.peak.x === dataToAdd.x;
-
+  const rmApex = selectedShift.peak.x === dataToAdd.x;
   if (!rmApex) {
     return state;
-  } else {
-    var newShift = Object.assign({}, selectedShift, {
-      peak: false,
-      enable: true
-    });
-
-    shifts[curveIdx] = newShift;
-
-    return Object.assign({}, state, { shifts: shifts, selectedIdx: curveIdx });
   }
+  const newShift = Object.assign({}, selectedShift, {
+    peak: false,
+    enable: true
+  });
+  shifts[curveIdx] = newShift;
+  return Object.assign({}, state, {
+    shifts,
+    selectedIdx: curveIdx
+  });
 };
-
-var shiftReducer = function shiftReducer() {
-  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-  var action = arguments[1];
-
+const shiftReducer = function () {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+  let action = arguments.length > 1 ? arguments[1] : undefined;
   switch (action.type) {
     case _action_type.SHIFT.SET_REF:
       return setRef(state, action);
@@ -219,5 +224,5 @@ var shiftReducer = function shiftReducer() {
       return state;
   }
 };
-
-exports.default = shiftReducer;
+var _default = shiftReducer;
+exports.default = _default;

@@ -77,8 +77,8 @@ class RectFocus {
 
   updatePathCall(xt, yt) {
     this.pathCall = d3.line()
-      .x(d => xt(d.x))
-      .y(d => yt(d.y));
+      .x((d) => xt(d.x))
+      .y((d) => yt(d.y));
   }
 
   setConfig(sweepExtentSt) {
@@ -86,10 +86,10 @@ class RectFocus {
     let { xExtent, yExtent } = sweepExtentSt || { xExtent: false, yExtent: false };
 
     if (!xExtent || !yExtent) {
-      const xes = d3.extent(this.data, d => d.x).sort((a, b) => a - b);
+      const xes = d3.extent(this.data, (d) => d.x).sort((a, b) => a - b);
       xExtent = { xL: xes[0] - 10, xU: xes[1] + 10 };
       const btm = 0; // MS baseline is always 0.
-      const top = d3.max(this.data, d => d.y);
+      const top = d3.max(this.data, (d) => d.y);
       const height = top - btm;
       yExtent = {
         yL: (btm - this.factor * height),
@@ -138,10 +138,10 @@ class RectFocus {
       .attr('class', 'enter-bar')
       .attr('width', 1.5)
       .merge(bars)
-      .attr('fill', d => this.barColor(d.y, yRef))
-      .attr('height', d => this.posHeight(gnd, yt(d.y)))
-      .attr('id', d => `mpp${Math.round(1000 * d.x)}`)
-      .attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y)})`)
+      .attr('fill', (d) => this.barColor(d.y, yRef))
+      .attr('height', (d) => this.posHeight(gnd, yt(d.y)))
+      .attr('id', (d) => `mpp${Math.round(1000 * d.x)}`)
+      .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(d.y)})`)
       .on('mouseover', (d, i, n) => {
         d3.select(`#mpp${Math.round(1000 * d.x)}`)
           .attr('stroke-opacity', '1.0');

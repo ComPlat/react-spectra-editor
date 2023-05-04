@@ -1,3 +1,4 @@
+/* eslint-disable prefer-object-spread, default-param-last */
 import undoable from 'redux-undo';
 import {
   UI, EDITPEAK, INTEGRATION, MULTIPLICITY, MANAGER,
@@ -13,7 +14,7 @@ const initialState = {
       shift: 0,
       smExtext: false,
       edited: false,
-    }
+    },
   ],
 };
 
@@ -36,7 +37,6 @@ const setShift = (state, action) => {
 };
 
 const rmFromStack = (state, action) => {
-
   const { dataToRemove, curveIdx } = action.payload;
 
   const { multiplicities } = state;
@@ -58,7 +58,11 @@ const rmFromStack = (state, action) => {
   });
   const newSmExtext = newStack[0] ? newStack[0].xExtent : false;
 
-  const newSelectedMulti = Object.assign({}, selectedMulti, { stack: newStack, smExtext: newSmExtext });
+  const newSelectedMulti = Object.assign(
+    {},
+    selectedMulti,
+    { stack: newStack, smExtext: newSmExtext },
+  );
   multiplicities[curveIdx] = newSelectedMulti;
   return Object.assign({}, state, { multiplicities, selectedIdx: curveIdx });
 };
@@ -73,7 +77,7 @@ const updateMpyJ = (state, action) => {
 
   const { stack } = selectedMulti;
   const regx = /[^0-9.,-]/g;
-  const js = value.replace(regx, '').split(',').map(j => parseFloat(j)).filter(j => j);
+  const js = value.replace(regx, '').split(',').map((j) => parseFloat(j)).filter((j) => j);
 
   const newStack = stack.map((k) => {
     if (k.xExtent.xL === xExtent.xL && k.xExtent.xU === xExtent.xU) {
@@ -83,19 +87,23 @@ const updateMpyJ = (state, action) => {
     return k;
   });
 
-  const newSelectedMulti = Object.assign({}, selectedMulti,  { stack: newStack });
+  const newSelectedMulti = Object.assign(
+    {},
+    selectedMulti,
+    { stack: newStack },
+  );
   multiplicities[selectedIdx] = newSelectedMulti;
   return Object.assign({}, state, { multiplicities });
 };
 
 const clickMpyOne = (state, action) => {
   const { payload } = action;
-  const { curveIdx, payloadData } = payload
+  const { curveIdx, payloadData } = payload;
 
   const { multiplicities } = state;
   const selectedMulti = multiplicities[curveIdx];
 
-  const newSelectedMulti = Object.assign({}, selectedMulti,  { smExtext: payloadData });
+  const newSelectedMulti = Object.assign({}, selectedMulti, { smExtext: payloadData });
   multiplicities[curveIdx] = newSelectedMulti;
   return Object.assign({}, state, { multiplicities, selectedIdx: curveIdx });
 };
@@ -105,7 +113,7 @@ const clearAll = (state, action) => {
   const { curveIdx } = payload;
   const { multiplicities } = state;
 
-  const newSelectedMulti = Object.assign({}, defaultEmptyMultiplicity,  { edited: true });
+  const newSelectedMulti = Object.assign({}, defaultEmptyMultiplicity, { edited: true });
   multiplicities[curveIdx] = newSelectedMulti;
   return Object.assign({}, state, { multiplicities });
 };

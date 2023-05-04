@@ -1,3 +1,6 @@
+/* eslint-disable prefer-object-spread, function-paren-newline,
+react/function-component-definition, react/require-default-props, max-len,
+react/no-unused-prop-types */
 import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
@@ -26,7 +29,7 @@ const Peak = ({
   isFocusRmPeakSt, disableRmPeakSt,
   isFocusSetRefSt, disableSetRefSt,
   isHandleMaxAndMinPeaksSt,
-  cyclicVotaSt, curveSt
+  cyclicVotaSt, curveSt,
 }) => {
   let onSweepPeakAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.PEAK_ADD);
   let onSweepPeakDELETE = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.PEAK_DELETE);
@@ -40,11 +43,10 @@ const Peak = ({
       if (isWorkMaxPeak) {
         onSweepPeakAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MAX_PEAK, curveIdx);
         onSweepPeakDELETE = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MAX_PEAK, curveIdx);
-      }
-      else {
+      } else {
         onSweepPeakAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MIN_PEAK, curveIdx);
         onSweepPeakDELETE = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MIN_PEAK, curveIdx);
-      } 
+      }
       onSweepAnchorShift = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_SET_REF, curveIdx);
     }
   }
@@ -117,7 +119,7 @@ const mapStateToProps = (state, _) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     setUiSweepTypeAct: setUiSweepType,
   }, dispatch)

@@ -1,97 +1,67 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _effects = require('redux-saga/effects');
-
-var _action_type = require('../constants/action_type');
-
-var _shift = require('../helpers/shift');
-
-var _list_shift = require('../constants/list_shift');
-
-var _marked = /*#__PURE__*/regeneratorRuntime.mark(addVirtualFactor);
-
-var getShift = function getShift(state) {
-  return state.shift;
-};
-var getEditPeak = function getEditPeak(state) {
-  return state.editPeak.present;
-};
-
-function addVirtualFactor(action) {
-  var originShift, origEPeak, payload, curveIdx, peaks, currentOriginPeaks, currentOriginShift, shiftNone, origRef, origApex, _currentOriginPeaks, prevOffset, pos, neg, absOffset, relOffset, nextPos, nextNeg;
-
-  return regeneratorRuntime.wrap(function addVirtualFactor$(_context) {
-    while (1) {
-      switch (_context.prev = _context.next) {
-        case 0:
-          _context.next = 2;
-          return (0, _effects.select)(getShift);
-
-        case 2:
-          originShift = _context.sent;
-          _context.next = 5;
-          return (0, _effects.select)(getEditPeak);
-
-        case 5:
-          origEPeak = _context.sent;
-          payload = action.payload;
-          curveIdx = payload.curveIdx;
-          peaks = origEPeak.peaks;
-          currentOriginPeaks = peaks[curveIdx];
-
-          if (currentOriginPeaks === false || currentOriginPeaks === undefined) {
-            currentOriginPeaks = {
-              prevOffset: 0,
-              pos: [],
-              neg: []
-            };
-          }
-
-          currentOriginShift = originShift[curveIdx];
-
-          if (currentOriginShift === false || currentOriginShift === undefined) {
-            shiftNone = _list_shift.LIST_SHIFT_1H[0];
-
-            currentOriginShift = {
-              ref: shiftNone,
-              peak: false,
-              enable: true
-            };
-          }
-
-          origRef = currentOriginShift.ref;
-          origApex = currentOriginShift.peak;
-          _currentOriginPeaks = currentOriginPeaks, prevOffset = _currentOriginPeaks.prevOffset, pos = _currentOriginPeaks.pos, neg = _currentOriginPeaks.neg;
-          absOffset = (0, _shift.FromManualToOffset)(origRef, origApex);
-          relOffset = prevOffset - absOffset;
-          nextPos = (0, _shift.VirtalPts)(pos, relOffset);
-          nextNeg = (0, _shift.VirtalPts)(neg, relOffset);
-          _context.next = 22;
-          return (0, _effects.put)({
-            type: _action_type.EDITPEAK.SHIFT,
-            payload: Object.assign({}, payload, {
-              prevOffset: absOffset,
-              pos: nextPos,
-              neg: nextNeg
-            })
-          });
-
-        case 22:
-        case 'end':
-          return _context.stop();
-      }
-    }
-  }, _marked);
+exports.default = void 0;
+var _effects = require("redux-saga/effects");
+var _action_type = require("../constants/action_type");
+var _shift = require("../helpers/shift");
+var _list_shift = require("../constants/list_shift");
+const getShift = state => state.shift;
+const getEditPeak = state => state.editPeak.present;
+function* addVirtualFactor(action) {
+  const originShift = yield (0, _effects.select)(getShift);
+  const origEPeak = yield (0, _effects.select)(getEditPeak);
+  const {
+    payload
+  } = action;
+  const {
+    curveIdx
+  } = payload;
+  const {
+    peaks
+  } = origEPeak;
+  let currentOriginPeaks = peaks[curveIdx];
+  if (currentOriginPeaks === false || currentOriginPeaks === undefined) {
+    currentOriginPeaks = {
+      prevOffset: 0,
+      pos: [],
+      neg: []
+    };
+  }
+  let currentOriginShift = originShift[curveIdx];
+  if (currentOriginShift === false || currentOriginShift === undefined) {
+    const shiftNone = _list_shift.LIST_SHIFT_1H[0];
+    currentOriginShift = {
+      ref: shiftNone,
+      peak: false,
+      enable: true
+    };
+  }
+  const origRef = currentOriginShift.ref;
+  const origApex = currentOriginShift.peak;
+  const {
+    prevOffset,
+    pos,
+    neg
+  } = currentOriginPeaks;
+  const absOffset = (0, _shift.FromManualToOffset)(origRef, origApex);
+  const relOffset = prevOffset - absOffset;
+  const nextPos = (0, _shift.VirtalPts)(pos, relOffset);
+  const nextNeg = (0, _shift.VirtalPts)(neg, relOffset);
+  yield (0, _effects.put)({
+    type: _action_type.EDITPEAK.SHIFT,
+    payload: Object.assign({}, payload, {
+      // eslint-disable-line
+      prevOffset: absOffset,
+      pos: nextPos,
+      neg: nextNeg
+    })
+  });
 }
-
-var editPeakSagas = [(0, _effects.takeEvery)(_action_type.SHIFT.SET_REF, addVirtualFactor), (0, _effects.takeEvery)(_action_type.SHIFT.SET_PEAK, addVirtualFactor)];
-
-exports.default = editPeakSagas;
-
+const editPeakSagas = [(0, _effects.takeEvery)(_action_type.SHIFT.SET_REF, addVirtualFactor), (0, _effects.takeEvery)(_action_type.SHIFT.SET_PEAK, addVirtualFactor)];
+var _default = editPeakSagas;
 /* LOGIC
                                       -no        po - tg
   | picked | another | absoffset | prevOffset | relative | newOffset
@@ -103,3 +73,4 @@ exports.default = editPeakSagas;
 -------------------------------------------------------------------
 
 */
+exports.default = _default;

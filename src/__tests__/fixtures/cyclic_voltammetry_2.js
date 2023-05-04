@@ -750,4 +750,4 @@ const cyclicVoltaJcamp2 = `
 
 `;
 
-export default cyclicVoltaJcamp2
+export default cyclicVoltaJcamp2;

@@ -1,3 +1,4 @@
+/* eslint-disable react/function-component-definition, no-unused-vars */
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -20,7 +21,7 @@ import { Convert2Peak } from '../../helpers/chem';
 import { rmFromPosList, rmFromNegList } from '../../actions/edit_peak';
 import Format from '../../helpers/format';
 
-const styles = theme => ({
+const styles = (theme) => ({
   chip: {
     margin: '1px 0 1px 0',
   },
@@ -106,7 +107,7 @@ const peakList = (peaks, digits, cbAct, classes, isPos) => {
         </TableRow>
       </TableHead>
       <TableBody>
-        {rows.map(row => (
+        {rows.map((row) => (
           <TableRow key={row.idx} className={classes.tRow} hover>
             <TableCell align="right" className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{row.idx}</TableCell>
             <TableCell align="right" className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{row.x}</TableCell>
@@ -121,7 +122,7 @@ const peakList = (peaks, digits, cbAct, classes, isPos) => {
 
 const PeakPanel = ({
   editPeakSt, layoutSt, classes, expand, onExapnd,
-  rmFromPosListAct, rmFromNegListAct, curveSt
+  rmFromPosListAct, rmFromNegListAct, curveSt,
 }) => {
   const { curveIdx, listCurves } = curveSt;
   const { peaks } = editPeakSt;
@@ -146,7 +147,8 @@ const PeakPanel = ({
   const digits = Format.isEmWaveLayout(layoutSt) ? 0 : 4;
 
   return (
-    <Accordion data-testid='PeaksPanelInfo'
+    <Accordion
+      data-testid="PeaksPanelInfo"
       expanded={expand}
       onChange={onExapnd}
       className={classNames(classes.panel)}
@@ -179,7 +181,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     rmFromPosListAct: rmFromPosList,
     rmFromNegListAct: rmFromNegList,
@@ -197,6 +199,6 @@ PeakPanel.propTypes = {
   curveSt: PropTypes.object.isRequired,
 };
 
-export default connect(
+export default connect( // eslint-disable-line
   mapStateToProps, mapDispatchToProps,
-)(withStyles(styles)(PeakPanel));
+)(withStyles(styles)(PeakPanel)); // eslint-disable-line

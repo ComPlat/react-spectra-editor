@@ -1,277 +1,199 @@
-'use strict';
+"use strict";
 
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
+var _react = _interopRequireWildcard(require("react"));
+var _propTypes = _interopRequireDefault(require("prop-types"));
+var _classnames = _interopRequireDefault(require("classnames"));
+var _reactRedux = require("react-redux");
+var _redux = require("redux");
+var _ExpandMore = _interopRequireDefault(require("@material-ui/icons/ExpandMore"));
+var _Divider = _interopRequireDefault(require("@material-ui/core/Divider"));
+var _Typography = _interopRequireDefault(require("@material-ui/core/Typography"));
+var _styles = require("@material-ui/core/styles");
+var _core = require("@material-ui/core");
+var _curve = require("../../actions/curve");
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+/* eslint-disable react/function-component-definition, function-paren-newline,
+react/require-default-props, react/no-unused-prop-types */
 
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _propTypes = require('prop-types');
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
-var _classnames = require('classnames');
-
-var _classnames2 = _interopRequireDefault(_classnames);
-
-var _reactRedux = require('react-redux');
-
-var _redux = require('redux');
-
-var _ExpandMore = require('@material-ui/icons/ExpandMore');
-
-var _ExpandMore2 = _interopRequireDefault(_ExpandMore);
-
-var _Divider = require('@material-ui/core/Divider');
-
-var _Divider2 = _interopRequireDefault(_Divider);
-
-var _Typography = require('@material-ui/core/Typography');
-
-var _Typography2 = _interopRequireDefault(_Typography);
-
-var _styles = require('@material-ui/core/styles');
-
-var _core = require('@material-ui/core');
-
-var _curve = require('../../actions/curve');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var styles = function styles() {
-  return {
-    panelSummary: {
-      backgroundColor: '#eee',
-      height: 22
-    },
-    curve: {
-      width: '100%'
-    },
-    line: {
-      height: '2px',
-      borderWidth: '0',
-      margin: '0'
-    },
-    curveDefault: {
-      backgroundColor: '#fff',
-      fontSize: '0.8em',
-      margin: '0',
-      padding: '10px 2px 2px 10px'
-    },
-    curveSelected: {
-      backgroundColor: '#2196f3',
-      fontSize: '0.8em',
-      color: '#fff',
-      padding: '10px 2px 2px 10px'
-    }
-  };
-};
-
-var GraphSelectionPanel = function GraphSelectionPanel(_ref) {
-  var classes = _ref.classes,
-      curveSt = _ref.curveSt,
-      selectCurveAct = _ref.selectCurveAct,
-      entityFileNames = _ref.entityFileNames,
-      subLayoutsInfo = _ref.subLayoutsInfo;
-
-
-  if (!curveSt) {
-    return _react2.default.createElement('span', null);
+const styles = () => ({
+  panelSummary: {
+    backgroundColor: '#eee',
+    height: 22
+  },
+  curve: {
+    width: '100%'
+  },
+  line: {
+    height: '2px',
+    borderWidth: '0',
+    margin: '0'
+  },
+  curveDefault: {
+    backgroundColor: '#fff',
+    fontSize: '0.8em',
+    margin: '0',
+    padding: '10px 2px 2px 10px'
+  },
+  curveSelected: {
+    backgroundColor: '#2196f3',
+    fontSize: '0.8em',
+    color: '#fff',
+    padding: '10px 2px 2px 10px'
   }
-  var curveIdx = curveSt.curveIdx,
-      listCurves = curveSt.listCurves;
-
-  if (!listCurves) {
-    return _react2.default.createElement('span', null);
-  }
-
-  var onChange = function onChange(idx) {
-    selectCurveAct(idx);
-  };
-
-  var subLayoutValues = [];
+});
+const GraphSelectionPanel = _ref => {
+  let {
+    classes,
+    curveSt,
+    selectCurveAct,
+    entityFileNames,
+    subLayoutsInfo
+  } = _ref;
+  let subLayoutValues = [];
   if (subLayoutsInfo !== undefined && subLayoutsInfo !== null) {
     subLayoutValues = Object.keys(subLayoutsInfo);
   }
-
-  var onChangeTabSubLayout = function onChangeTabSubLayout(event, newValue) {
+  const [selectedSubLayout, setSelectedSublayout] = (0, _react.useState)(subLayoutValues[0]);
+  if (!curveSt) {
+    return /*#__PURE__*/_react.default.createElement("span", null);
+  }
+  const {
+    curveIdx,
+    listCurves
+  } = curveSt;
+  if (!listCurves) {
+    return /*#__PURE__*/_react.default.createElement("span", null);
+  }
+  const onChange = idx => {
+    selectCurveAct(idx);
+  };
+  const onChangeTabSubLayout = (event, newValue) => {
     setSelectedSublayout(newValue);
   };
-
-  var _useState = (0, _react.useState)(subLayoutValues[0]),
-      _useState2 = _slicedToArray(_useState, 2),
-      selectedSubLayout = _useState2[0],
-      setSelectedSublayout = _useState2[1];
-
-  var itemsSubLayout = [];
+  let itemsSubLayout = [];
   if (selectedSubLayout && subLayoutValues.length > 1) {
-    var subLayout = subLayoutsInfo[selectedSubLayout];
-    itemsSubLayout = subLayout.map(function (spectra, idx) {
-      var color = spectra.color,
-          curveIdx = spectra.curveIdx;
-
-      var filename = '';
+    const subLayout = subLayoutsInfo[selectedSubLayout];
+    itemsSubLayout = subLayout.map((spectra, idx) => {
+      const {
+        color
+      } = spectra;
+      let filename = '';
       if (entityFileNames && curveIdx < entityFileNames.length) {
         filename = entityFileNames[curveIdx];
       }
-      return { name: idx + 1 + '.', idx: curveIdx, color: color, filename: filename };
+      return {
+        name: `${idx + 1}.`,
+        idx: curveIdx,
+        color,
+        filename
+      };
     });
-  };
-
-  var items = listCurves.map(function (spectra, idx) {
-    var color = spectra.color;
-
-    var filename = '';
+  }
+  const items = listCurves.map((spectra, idx) => {
+    const {
+      color
+    } = spectra;
+    let filename = '';
     if (entityFileNames && idx < entityFileNames.length) {
       filename = entityFileNames[idx];
     }
-    return { name: idx + 1 + '.', idx: idx, color: color, filename: filename };
+    return {
+      name: `${idx + 1}.`,
+      idx,
+      color,
+      filename
+    };
   });
-
-  return _react2.default.createElement(
-    _core.Accordion,
-    { 'data-testid': 'GraphSelectionPanel' },
-    _react2.default.createElement(
-      _core.AccordionSummary,
-      {
-        expandIcon: _react2.default.createElement(_ExpandMore2.default, null),
-        className: (0, _classnames2.default)(classes.panelSummary)
-      },
-      _react2.default.createElement(
-        _Typography2.default,
-        { className: 'txt-panel-header' },
-        _react2.default.createElement(
-          'span',
-          { className: (0, _classnames2.default)(classes.txtBadge, 'txt-sv-panel-title') },
-          'Graph selection'
-        )
-      )
-    ),
-    _react2.default.createElement(_Divider2.default, null),
-    subLayoutValues && subLayoutValues.length > 1 ? _react2.default.createElement(
-      'div',
-      null,
-      _react2.default.createElement(
-        _core.Tabs,
-        { value: selectedSubLayout, onChange: onChangeTabSubLayout },
-        subLayoutValues.map(function (subLayout, i) {
-          var subLayoutName = '';
-          switch (subLayout) {
-            case 'G/MOL':
-              subLayoutName = 'MWD';
-              break;
-            case 'MILLILITERS':
-              subLayoutName = 'ELU';
-              break;
-            default:
-              break;
-          }
-          return _react2.default.createElement(_core.Tab, { key: i, value: subLayout, label: subLayoutName });
-        })
-      ),
-      _react2.default.createElement(
-        _core.List,
-        null,
-        itemsSubLayout.map(function (item) {
-          return _react2.default.createElement(
-            _core.ListItem,
-            {
-              key: item.idx,
-              onClick: function onClick() {
-                return onChange(item.idx);
-              },
-              className: (0, _classnames2.default)(item.idx === curveIdx ? classes.curveSelected : classes.curveDefault)
-            },
-            _react2.default.createElement(
-              'span',
-              { className: (0, _classnames2.default)(classes.curve) },
-              _react2.default.createElement(
-                'i',
-                null,
-                item.name
-              ),
-              _react2.default.createElement(
-                'span',
-                { style: { float: "right", width: "95%" } },
-                _react2.default.createElement('hr', { className: (0, _classnames2.default)(classes.line), style: { backgroundColor: item.color } }),
-                item.filename !== '' ? _react2.default.createElement(
-                  'span',
-                  null,
-                  'File: ',
-                  item.filename
-                ) : null
-              )
-            )
-          );
-        })
-      )
-    ) : _react2.default.createElement(
-      _core.List,
-      null,
-      items.map(function (item) {
-        return _react2.default.createElement(
-          _core.ListItem,
-          {
-            key: item.idx,
-            onClick: function onClick() {
-              return onChange(item.idx);
-            },
-            className: (0, _classnames2.default)(item.idx === curveIdx ? classes.curveSelected : classes.curveDefault)
-          },
-          _react2.default.createElement(
-            'span',
-            { className: (0, _classnames2.default)(classes.curve) },
-            _react2.default.createElement(
-              'i',
-              null,
-              item.name
-            ),
-            _react2.default.createElement(
-              'span',
-              { style: { float: "right", width: "95%" } },
-              _react2.default.createElement('hr', { className: (0, _classnames2.default)(classes.line), style: { backgroundColor: item.color } }),
-              item.filename !== '' ? _react2.default.createElement(
-                'span',
-                null,
-                'File: ',
-                item.filename
-              ) : null
-            )
-          )
-        );
-      })
-    )
-  );
-};
-
-var mapStateToProps = function mapStateToProps(state, props) {
-  return (// eslint-disable-line
-    {
-      layoutSt: state.layout,
-      curveSt: state.curve
+  return /*#__PURE__*/_react.default.createElement(_core.Accordion, {
+    "data-testid": "GraphSelectionPanel"
+  }, /*#__PURE__*/_react.default.createElement(_core.AccordionSummary, {
+    expandIcon: /*#__PURE__*/_react.default.createElement(_ExpandMore.default, null),
+    className: (0, _classnames.default)(classes.panelSummary)
+  }, /*#__PURE__*/_react.default.createElement(_Typography.default, {
+    className: "txt-panel-header"
+  }, /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title')
+  }, "Graph selection"))), /*#__PURE__*/_react.default.createElement(_Divider.default, null), subLayoutValues && subLayoutValues.length > 1 ? /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement(_core.Tabs, {
+    value: selectedSubLayout,
+    onChange: onChangeTabSubLayout
+  }, subLayoutValues.map((subLayout, i) => {
+    let subLayoutName = '';
+    switch (subLayout) {
+      case 'G/MOL':
+        subLayoutName = 'MWD';
+        break;
+      case 'MILLILITERS':
+        subLayoutName = 'ELU';
+        break;
+      default:
+        break;
     }
-  );
+    return /*#__PURE__*/_react.default.createElement(_core.Tab, {
+      key: i,
+      value: subLayout,
+      label: subLayoutName
+    });
+  })), /*#__PURE__*/_react.default.createElement(_core.List, null, itemsSubLayout.map(item => /*#__PURE__*/_react.default.createElement(_core.ListItem, {
+    key: item.idx,
+    onClick: () => onChange(item.idx),
+    className: (0, _classnames.default)(item.idx === curveIdx ? classes.curveSelected : classes.curveDefault) // eslint-disable-line
+  }, /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.curve)
+  }, /*#__PURE__*/_react.default.createElement("i", null, item.name), /*#__PURE__*/_react.default.createElement("span", {
+    style: {
+      float: 'right',
+      width: '95%'
+    }
+  }, /*#__PURE__*/_react.default.createElement("hr", {
+    className: (0, _classnames.default)(classes.line),
+    style: {
+      backgroundColor: item.color
+    }
+  }), item.filename !== '' ? /*#__PURE__*/_react.default.createElement("span", null, "File: ", item.filename) : null // eslint-disable-line
+  )))))) : /*#__PURE__*/_react.default.createElement(_core.List, null, items.map(item => /*#__PURE__*/_react.default.createElement(_core.ListItem, {
+    key: item.idx,
+    onClick: () => onChange(item.idx),
+    className: (0, _classnames.default)(item.idx === curveIdx ? classes.curveSelected : classes.curveDefault) // eslint-disable-line
+  }, /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.curve)
+  }, /*#__PURE__*/_react.default.createElement("i", null, item.name), /*#__PURE__*/_react.default.createElement("span", {
+    style: {
+      float: 'right',
+      width: '95%'
+    }
+  }, /*#__PURE__*/_react.default.createElement("hr", {
+    className: (0, _classnames.default)(classes.line),
+    style: {
+      backgroundColor: item.color
+    }
+  }), item.filename !== '' ? /*#__PURE__*/_react.default.createElement("span", null, "File: ", item.filename) : null // eslint-disable-line
+  ))))));
 };
 
-var mapDispatchToProps = function mapDispatchToProps(dispatch) {
-  return (0, _redux.bindActionCreators)({
-    selectCurveAct: _curve.selectCurve
-  }, dispatch);
-};
-
+const mapStateToProps = (state, props) => (
+// eslint-disable-line
+{
+  layoutSt: state.layout,
+  curveSt: state.curve
+});
+const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
+  selectCurveAct: _curve.selectCurve
+}, dispatch);
 GraphSelectionPanel.propTypes = {
-  classes: _propTypes2.default.object.isRequired,
-  expand: _propTypes2.default.bool.isRequired,
-  layoutSt: _propTypes2.default.string.isRequired,
-  onExapnd: _propTypes2.default.func.isRequired,
-  curveSt: _propTypes2.default.object.isRequired,
-  selectCurveAct: _propTypes2.default.func.isRequired,
-  entityFileNames: _propTypes2.default.array.isRequired,
-  subLayoutsInfo: _propTypes2.default.array
+  classes: _propTypes.default.object.isRequired,
+  expand: _propTypes.default.bool.isRequired,
+  layoutSt: _propTypes.default.string.isRequired,
+  onExapnd: _propTypes.default.func.isRequired,
+  curveSt: _propTypes.default.object.isRequired,
+  selectCurveAct: _propTypes.default.func.isRequired,
+  entityFileNames: _propTypes.default.array.isRequired,
+  subLayoutsInfo: _propTypes.default.array
 };
-
-exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(GraphSelectionPanel));
+var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(GraphSelectionPanel));
+exports.default = _default;

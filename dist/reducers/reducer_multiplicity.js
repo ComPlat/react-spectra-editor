@@ -1,20 +1,16 @@
-'use strict';
+"use strict";
 
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
+var _reduxUndo = _interopRequireDefault(require("redux-undo"));
+var _action_type = require("../constants/action_type");
+var _undo_redo_config = require("./undo_redo_config");
+/* eslint-disable prefer-object-spread, default-param-last */
 
-var _reduxUndo = require('redux-undo');
-
-var _reduxUndo2 = _interopRequireDefault(_reduxUndo);
-
-var _action_type = require('../constants/action_type');
-
-var _undo_redo_config = require('./undo_redo_config');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var initialState = {
+const initialState = {
   selectedIdx: 0,
   multiplicities: [{
     stack: [],
@@ -23,130 +19,149 @@ var initialState = {
     edited: false
   }]
 };
-
-var defaultEmptyMultiplicity = {
+const defaultEmptyMultiplicity = {
   stack: [],
   shift: 0,
   smExtext: false,
   edited: false
 };
-
-var setShift = function setShift(state, action) {
-  var shift = action.payload.prevOffset;
-
-  var selectedIdx = state.selectedIdx,
-      multiplicities = state.multiplicities;
-
-  var selectedMulti = multiplicities[selectedIdx];
-
-  var newSelectedMulti = Object.assign({}, selectedMulti, { shift: shift });
+const setShift = (state, action) => {
+  const shift = action.payload.prevOffset;
+  const {
+    selectedIdx,
+    multiplicities
+  } = state;
+  const selectedMulti = multiplicities[selectedIdx];
+  const newSelectedMulti = Object.assign({}, selectedMulti, {
+    shift
+  });
   multiplicities[selectedIdx] = newSelectedMulti;
-  return Object.assign({}, state, { multiplicities: multiplicities });
+  return Object.assign({}, state, {
+    multiplicities
+  });
 };
-
-var rmFromStack = function rmFromStack(state, action) {
-  var _action$payload = action.payload,
-      dataToRemove = _action$payload.dataToRemove,
-      curveIdx = _action$payload.curveIdx;
-  var multiplicities = state.multiplicities;
-
-  var selectedMulti = multiplicities[curveIdx];
-
-  var stack = selectedMulti.stack;
-  var xL = dataToRemove.xL,
-      xU = dataToRemove.xU,
-      xExtent = dataToRemove.xExtent;
-  var txL = 0,
-      txU = 0;
-
+const rmFromStack = (state, action) => {
+  const {
+    dataToRemove,
+    curveIdx
+  } = action.payload;
+  const {
+    multiplicities
+  } = state;
+  const selectedMulti = multiplicities[curveIdx];
+  const {
+    stack
+  } = selectedMulti;
+  const {
+    xL,
+    xU,
+    xExtent
+  } = dataToRemove;
+  let [txL, txU] = [0, 0];
   if (xL && xU) {
-    txL = xL; // rm click integration
-
-    txU = xU;
+    // rm click integration
+    [txL, txU] = [xL, xU];
   } else if (xExtent) {
-    var _ref = [xExtent.xL, xExtent.xU]; // rm click multiplicity
-
-    txL = _ref[0];
-    txU = _ref[1];
+    // rm click multiplicity
+    [txL, txU] = [xExtent.xL, xExtent.xU];
   } else {
     return state;
   }
-  var newStack = stack.filter(function (k) {
-    var _ref2 = [k.xExtent.xL, k.xExtent.xU],
-        kxL = _ref2[0],
-        kxU = _ref2[1];
-
+  const newStack = stack.filter(k => {
+    const [kxL, kxU] = [k.xExtent.xL, k.xExtent.xU];
     return kxL !== txL && kxU !== txU;
   });
-  var newSmExtext = newStack[0] ? newStack[0].xExtent : false;
-
-  var newSelectedMulti = Object.assign({}, selectedMulti, { stack: newStack, smExtext: newSmExtext });
-  multiplicities[curveIdx] = newSelectedMulti;
-  return Object.assign({}, state, { multiplicities: multiplicities, selectedIdx: curveIdx });
-};
-
-var updateMpyJ = function updateMpyJ(state, action) {
-  var payload = action.payload;
-  var xExtent = payload.xExtent,
-      value = payload.value;
-
-  if (!value && value !== '') return state;
-
-  var selectedIdx = state.selectedIdx,
-      multiplicities = state.multiplicities;
-
-  var selectedMulti = multiplicities[selectedIdx];
-
-  var stack = selectedMulti.stack;
-
-  var regx = /[^0-9.,-]/g;
-  var js = value.replace(regx, '').split(',').map(function (j) {
-    return parseFloat(j);
-  }).filter(function (j) {
-    return j;
+  const newSmExtext = newStack[0] ? newStack[0].xExtent : false;
+  const newSelectedMulti = Object.assign({}, selectedMulti, {
+    stack: newStack,
+    smExtext: newSmExtext
   });
-
-  var newStack = stack.map(function (k) {
+  multiplicities[curveIdx] = newSelectedMulti;
+  return Object.assign({}, state, {
+    multiplicities,
+    selectedIdx: curveIdx
+  });
+};
+const updateMpyJ = (state, action) => {
+  const {
+    payload
+  } = action;
+  const {
+    xExtent,
+    value
+  } = payload;
+  if (!value && value !== '') return state;
+  const {
+    selectedIdx,
+    multiplicities
+  } = state;
+  const selectedMulti = multiplicities[selectedIdx];
+  const {
+    stack
+  } = selectedMulti;
+  const regx = /[^0-9.,-]/g;
+  const js = value.replace(regx, '').split(',').map(j => parseFloat(j)).filter(j => j);
+  const newStack = stack.map(k => {
     if (k.xExtent.xL === xExtent.xL && k.xExtent.xU === xExtent.xU) {
-      if (k.mpyType === 'm') return Object.assign({}, k, { js: [] });
-      return Object.assign({}, k, { js: js });
+      if (k.mpyType === 'm') return Object.assign({}, k, {
+        js: []
+      });
+      return Object.assign({}, k, {
+        js
+      });
     }
     return k;
   });
-
-  var newSelectedMulti = Object.assign({}, selectedMulti, { stack: newStack });
+  const newSelectedMulti = Object.assign({}, selectedMulti, {
+    stack: newStack
+  });
   multiplicities[selectedIdx] = newSelectedMulti;
-  return Object.assign({}, state, { multiplicities: multiplicities });
+  return Object.assign({}, state, {
+    multiplicities
+  });
 };
-
-var clickMpyOne = function clickMpyOne(state, action) {
-  var payload = action.payload;
-  var curveIdx = payload.curveIdx,
-      payloadData = payload.payloadData;
-  var multiplicities = state.multiplicities;
-
-  var selectedMulti = multiplicities[curveIdx];
-
-  var newSelectedMulti = Object.assign({}, selectedMulti, { smExtext: payloadData });
+const clickMpyOne = (state, action) => {
+  const {
+    payload
+  } = action;
+  const {
+    curveIdx,
+    payloadData
+  } = payload;
+  const {
+    multiplicities
+  } = state;
+  const selectedMulti = multiplicities[curveIdx];
+  const newSelectedMulti = Object.assign({}, selectedMulti, {
+    smExtext: payloadData
+  });
   multiplicities[curveIdx] = newSelectedMulti;
-  return Object.assign({}, state, { multiplicities: multiplicities, selectedIdx: curveIdx });
+  return Object.assign({}, state, {
+    multiplicities,
+    selectedIdx: curveIdx
+  });
 };
-
-var clearAll = function clearAll(state, action) {
-  var payload = action.payload;
-  var curveIdx = payload.curveIdx;
-  var multiplicities = state.multiplicities;
-
-
-  var newSelectedMulti = Object.assign({}, defaultEmptyMultiplicity, { edited: true });
+const clearAll = (state, action) => {
+  const {
+    payload
+  } = action;
+  const {
+    curveIdx
+  } = payload;
+  const {
+    multiplicities
+  } = state;
+  const newSelectedMulti = Object.assign({}, defaultEmptyMultiplicity, {
+    edited: true
+  });
   multiplicities[curveIdx] = newSelectedMulti;
-  return Object.assign({}, state, { multiplicities: multiplicities });
+  return Object.assign({}, state, {
+    multiplicities
+  });
 };
-
-var multiplicityReducer = function multiplicityReducer() {
-  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-  var action = arguments[1];
-
+const multiplicityReducer = function () {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+  let action = arguments.length > 1 ? arguments[1] : undefined;
   switch (action.type) {
     case _action_type.EDITPEAK.SHIFT:
       return setShift(state, action);
@@ -175,7 +190,6 @@ var multiplicityReducer = function multiplicityReducer() {
       return _undo_redo_config.undoRedoActions.indexOf(action.type) >= 0 ? Object.assign({}, state) : state;
   }
 };
-
-var undoableMultiplicityReducer = (0, _reduxUndo2.default)(multiplicityReducer, _undo_redo_config.undoRedoConfig);
-
-exports.default = undoableMultiplicityReducer;
+const undoableMultiplicityReducer = (0, _reduxUndo.default)(multiplicityReducer, _undo_redo_config.undoRedoConfig);
+var _default = undoableMultiplicityReducer;
+exports.default = _default;
