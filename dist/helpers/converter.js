@@ -26,7 +26,19 @@ var IsSame = function IsSame(one, two) {
 };
 
 var pksRmNeg = function pksRmNeg(dataPks, editPeakSt) {
-  var neg = editPeakSt.neg;
+  var selectedIdx = editPeakSt.selectedIdx,
+      peaks = editPeakSt.peaks;
+
+  var selectedEditPeaks = peaks[selectedIdx];
+  if (!selectedEditPeaks) {
+    return dataPks;
+  }
+
+  var neg = selectedEditPeaks.neg;
+
+  if (!neg) {
+    return dataPks;
+  }
 
   var negXs = neg.map(function (n) {
     return n.x;
@@ -43,7 +55,19 @@ var pksRmNeg = function pksRmNeg(dataPks, editPeakSt) {
 };
 
 var pksAddPos = function pksAddPos(dataPks, editPeakSt) {
-  var pos = editPeakSt.pos;
+  var selectedIdx = editPeakSt.selectedIdx,
+      peaks = editPeakSt.peaks;
+
+  var selectedEditPeaks = peaks[selectedIdx];
+  if (!selectedEditPeaks) {
+    return dataPks;
+  }
+
+  var pos = selectedEditPeaks.pos;
+
+  if (!pos) {
+    return dataPks;
+  }
 
   var posXs = pos.map(function (p) {
     return p.x;

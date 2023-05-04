@@ -175,10 +175,22 @@ const refreshBtn = (classes, onRefresh) => (
 );
 
 const mpyList = (
-  classes, digits, multiplicitySt,
+  classes, digits, multiplicitySt, curveSt,
   clickMpyOneAct, rmMpyPeakByPanelAct, resetMpyOneAct,
 ) => {
-  const { stack, shift, smExtext } = multiplicitySt;
+  const { curveIdx } = curveSt;
+  const { multiplicities } = multiplicitySt;
+  let selectedMulti = multiplicities[curveIdx];
+  if (selectedMulti === undefined) {
+    selectedMulti = {
+      stack: [],
+      shift: 0,
+      smExtext: false,
+      edited: false,
+    }
+  }
+
+  const { stack, shift, smExtext } = selectedMulti;
   const rows = stack.map((k, idx) => {
     const {
       peaks, xExtent, mpyType, js,
@@ -228,7 +240,7 @@ const mpyList = (
 
 const MultiplicityPanel = ({
   classes, expand, onExapnd,
-  multiplicitySt,
+  multiplicitySt, curveSt,
   clickMpyOneAct, rmMpyPeakByPanelAct, resetMpyOneAct,
 }) => {
   const digits = 4;
@@ -254,7 +266,7 @@ const MultiplicityPanel = ({
       <div className={classNames(classes.panelDetail)}>
         {
           mpyList(
-            classes, digits, multiplicitySt,
+            classes, digits, multiplicitySt, curveSt,
             clickMpyOneAct, rmMpyPeakByPanelAct, resetMpyOneAct,
           )
         }
@@ -267,6 +279,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     integrationSt: state.integration.present,
     multiplicitySt: state.multiplicity.present,
+    curveSt: state.curve,
   }
 );
 
@@ -286,6 +299,7 @@ MultiplicityPanel.propTypes = {
   clickMpyOneAct: PropTypes.func.isRequired,
   rmMpyPeakByPanelAct: PropTypes.func.isRequired,
   resetMpyOneAct: PropTypes.func.isRequired,
+  curveSt: PropTypes.object.isRequired,
 };
 
 export default connect(

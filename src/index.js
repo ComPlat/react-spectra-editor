@@ -9,6 +9,7 @@ import ReactQuill from 'react-quill';
 
 import { SpectraEditor, FN } from './app';
 import nmr1HJcamp from './__tests__/fixtures/nmr1h_jcamp';
+import nmr1H_2_Jcamp from './__tests__/fixtures/nmr1h_2_jcamp';
 import nmr13CDeptJcamp from './__tests__/fixtures/nmr13c_dept_jcamp';
 import nmr13CJcamp from './__tests__/fixtures/nmr13c_jcamp';
 import nmr19FJcamp from './__tests__/fixtures/nmr19f_jcamp';
@@ -26,6 +27,7 @@ import Phenylalanin from './__tests__/fixtures/phenylalanin';
 import compareUvVisJcamp from './__tests__/fixtures/compare_uv_vis_jcamp';
 import uvVisJcamp from './__tests__/fixtures/uv_vis_jcamp';
 import hplcUVVisJcamp from './__tests__/fixtures/hplc_uvvis_jcamp';
+import hplcUVVisJcamp2 from './__tests__/fixtures/hplc_uvvis_jcamp_2';
 import tgaJcamp from './__tests__/fixtures/tga_jcamp';
 import xrdJcamp1 from './__tests__/fixtures/xrd_jcamp_1';
 import xrdJcamp2 from './__tests__/fixtures/xrd_jcamp_2';
@@ -33,10 +35,15 @@ import cyclicVoltaJcamp1 from './__tests__/fixtures/cyclic_voltammetry_1';
 import cyclicVoltaJcamp2 from './__tests__/fixtures/cyclic_voltammetry_2';
 import cyclicVoltaJcamp3 from './__tests__/fixtures/cyclic_voltammetry_3';
 import cdsJcamp from './__tests__/fixtures/cds_jcamp';
+import secJcamp1 from './__tests__/fixtures/sec_1_jcamp';
+import secJcamp2 from './__tests__/fixtures/sec_2_jcamp';
+import secJcamp3 from './__tests__/fixtures/sec_3_jcamp';
+import secJcamp4 from './__tests__/fixtures/sec_4_jcamp';
 import { q1H, qIR, q13C } from './__tests__/fixtures/qDescValue';
 import './__tests__/style/svg.css';
 
 const nmr1HEntity = FN.ExtractJcamp(nmr1HJcamp);
+const nmr1HEntity2 = FN.ExtractJcamp(nmr1H_2_Jcamp);
 const nmr13CEntity = FN.ExtractJcamp(nmr13CJcamp);
 const nmr13CDeptEntity = FN.ExtractJcamp(nmr13CDeptJcamp);
 const nmr19FEntity = FN.ExtractJcamp(nmr19FJcamp);
@@ -51,6 +58,7 @@ const msEntity = FN.ExtractJcamp(msJcamp);
 const uvVisEntity = FN.ExtractJcamp(uvVisJcamp);
 const compUvVisEntity = FN.ExtractJcamp(compareUvVisJcamp);
 const hplcUVVisEntity = FN.ExtractJcamp(hplcUVVisJcamp);
+const hplcUVVisEntity2 = FN.ExtractJcamp(hplcUVVisJcamp2);
 const tgaEntity = FN.ExtractJcamp(tgaJcamp);
 const xrdEntity1 = FN.ExtractJcamp(xrdJcamp1);
 const xrdEntity2 = FN.ExtractJcamp(xrdJcamp2);
@@ -58,6 +66,10 @@ const cyclicVoltaEntity1 = FN.ExtractJcamp(cyclicVoltaJcamp1);
 const cyclicVoltaEntity2 = FN.ExtractJcamp(cyclicVoltaJcamp2);
 const cyclicVoltaEntity3 = FN.ExtractJcamp(cyclicVoltaJcamp3);
 const cdsEntity = FN.ExtractJcamp(cdsJcamp);
+const secEntity1 = FN.ExtractJcamp(secJcamp1);
+const secEntity2 = FN.ExtractJcamp(secJcamp2);
+const secEntity3 = FN.ExtractJcamp(secJcamp3);
+const secEntity4 = FN.ExtractJcamp(secJcamp4);
 
 class DemoWriteIr extends React.Component {
   constructor(props) {
@@ -275,6 +287,8 @@ class DemoWriteIr extends React.Component {
         return cyclicVoltaEntity2;
       case 'cds':
         return cdsEntity;
+      case 'sec':
+        return secEntity1;
       case 'ms':
       default:
         return msEntity;
@@ -286,6 +300,16 @@ class DemoWriteIr extends React.Component {
     switch (typ) {
       case 'cyclic volta':
         return [cyclicVoltaEntity1, cyclicVoltaEntity2, cyclicVoltaEntity3];
+      case 'multi':
+        return [nmr1HEntity, nmr1HEntity2];
+      case 'multi hplc':
+        return [hplcUVVisEntity, hplcUVVisEntity2];
+      case 'multi ir':
+        return [compIr1Entity, compIr2Entity];
+      case 'multi xrd':
+        return [xrdEntity1, xrdEntity2];
+      case 'sec':
+        return [secEntity1, secEntity2, secEntity3, secEntity4];
       default:
         return false;
     }
@@ -314,6 +338,7 @@ class DemoWriteIr extends React.Component {
       case 'ms':
       case 'cyclic volta':
       case 'cds':
+      case 'sec':
       default:
         return false;
     }
@@ -486,9 +511,44 @@ class DemoWriteIr extends React.Component {
           <Button
             variant="contained"
             style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('sec')}
+          >
+            SEC
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
             onClick={this.onClick('ms')}
           >
             MS
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('multi')}
+          >
+            Multi NMR
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('multi ir')}
+          >
+            Multi IR
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('multi hplc')}
+          >
+            Multi HPLC
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('multi xrd')}
+          >
+            Multi XRD
           </Button>
         </div>
         <SpectraEditor

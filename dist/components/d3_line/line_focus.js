@@ -443,10 +443,17 @@ var LineFocus = function () {
           sameData = _shouldUpdate4.sameData;
 
       if (sameXY && sameLySt && sameItSt && sameData) return;
-      var stack = integationSt.stack,
-          refArea = integationSt.refArea,
-          refFactor = integationSt.refFactor,
-          shift = integationSt.shift;
+
+      var selectedIdx = integationSt.selectedIdx,
+          integrations = integationSt.integrations;
+
+      var selectedIntegration = integrations[selectedIdx];
+
+      var stack = selectedIntegration.stack,
+          refArea = selectedIntegration.refArea,
+          refFactor = selectedIntegration.refFactor,
+          shift = selectedIntegration.shift;
+
 
       var isDisable = _cfg2.default.btnCmdIntg(this.layout);
       var ignoreRef = _format2.default.isHplcUvVisLayout(this.layout);
@@ -571,9 +578,14 @@ var LineFocus = function () {
 
       if (sameXY && sameLySt && sameMySt) return;
 
-      var stack = mtplySt.stack,
-          smExtext = mtplySt.smExtext,
-          shift = mtplySt.shift;
+      var selectedIdx = mtplySt.selectedIdx,
+          multiplicities = mtplySt.multiplicities;
+
+      var selectedMulti = multiplicities[selectedIdx];
+
+      var stack = selectedMulti.stack,
+          smExtext = selectedMulti.smExtext,
+          shift = selectedMulti.shift;
 
       var mpys = stack;
       var isDisable = _cfg2.default.btnCmdMpy(this.layout);
@@ -755,7 +767,7 @@ var LineFocus = function () {
   }, {
     key: 'reverseXAxis',
     value: function reverseXAxis(layoutSt) {
-      return [_list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS, _list_layout.LIST_LAYOUT.TGA, _list_layout.LIST_LAYOUT.XRD, _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY, _list_layout.LIST_LAYOUT.CDS].indexOf(layoutSt) < 0;
+      return [_list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS, _list_layout.LIST_LAYOUT.TGA, _list_layout.LIST_LAYOUT.XRD, _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY, _list_layout.LIST_LAYOUT.CDS, _list_layout.LIST_LAYOUT.SEC].indexOf(layoutSt) < 0;
     }
   }, {
     key: 'create',

@@ -94,8 +94,7 @@ class LayerInit extends React.Component {
   }
 
   updateMultiEntities() {
-    const { multiEntities, setAllCurvesAct,
-    } = this.props;
+    const { multiEntities, setAllCurvesAct } = this.props;
     setAllCurvesAct(multiEntities);
   }
 
@@ -149,6 +148,7 @@ class LayerInit extends React.Component {
         editorOnly={editorOnly}
         canChangeDescription={canChangeDescription}
         onDescriptionChanged={onDescriptionChanged}
+        
       />
     );
   }

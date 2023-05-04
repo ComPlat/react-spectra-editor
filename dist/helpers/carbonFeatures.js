@@ -10,8 +10,12 @@ var _multiplicity_calc = require('./multiplicity_calc');
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 var carbonFeatures = function carbonFeatures(peaksEdit, multiplicitySt) {
-  var stack = multiplicitySt.stack,
-      shift = multiplicitySt.shift;
+  var selectedIdx = multiplicitySt.selectedIdx,
+      multiplicities = multiplicitySt.multiplicities;
+
+  var selectedMultiplicity = multiplicities[selectedIdx];
+  var stack = selectedMultiplicity.stack,
+      shift = selectedMultiplicity.shift;
 
   var nmrMpyCenters = stack.map(function (stk) {
     return {

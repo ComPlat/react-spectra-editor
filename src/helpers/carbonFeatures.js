@@ -1,7 +1,9 @@
 import { calcMpyCenter } from './multiplicity_calc';
 
 const carbonFeatures = (peaksEdit, multiplicitySt) => {
-    const { stack, shift } = multiplicitySt;
+    const { selectedIdx, multiplicities } = multiplicitySt;
+    const selectedMultiplicity = multiplicities[selectedIdx];
+    const { stack, shift } = selectedMultiplicity;
     const nmrMpyCenters = stack.map((stk) => {
       return {
         x: calcMpyCenter(stk.peaks, shift, stk.mpyType),

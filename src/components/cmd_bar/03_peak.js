@@ -44,7 +44,7 @@ const Peak = ({
       else {
         onSweepPeakAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MIN_PEAK, curveIdx);
         onSweepPeakDELETE = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MIN_PEAK, curveIdx);
-      }
+      } 
       onSweepAnchorShift = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_SET_REF, curveIdx);
     }
   }

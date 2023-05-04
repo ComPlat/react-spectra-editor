@@ -253,7 +253,18 @@ var BtnPredict = function BtnPredict(_ref) {
   var thres = (0, _chem.Convert2Thres)(feature, thresSt);
   var simuCount = simulationSt.nmrSimPeaks.length;
   var uniqCount = [].concat(_toConsumableArray(new Set(simulationSt.nmrSimPeaks))).length;
-  var realCount = _format2.default.is13CLayout(layoutSt) ? (0, _carbonFeatures.carbonFeatures)(peaksEdit, multiplicitySt).length : multiplicitySt.stack.length;
+  var realCount = 0;
+  if (_format2.default.is13CLayout(layoutSt)) {
+    realCount = (0, _carbonFeatures.carbonFeatures)(peaksEdit, multiplicitySt).length;
+  } else {
+    var selectedIdx = multiplicitySt.selectedIdx,
+        multiplicities = multiplicitySt.multiplicities;
+
+    var selectedMultiplicity = multiplicities[selectedIdx];
+    var stack = selectedMultiplicity.stack;
+
+    realCount = stack.length;
+  }
 
   if (is13Cor1H && simuCount === 0) {
     var onClickUnknownCb = onClicUnknown(feature, forecast, peaksEdit, layoutSt, scan, shiftSt, thres, forecast.predictions, integrationSt, multiplicitySt, curveSt);

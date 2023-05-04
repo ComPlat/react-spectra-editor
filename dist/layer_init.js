@@ -223,6 +223,7 @@ var LayerInit = function (_React$Component) {
         editorOnly: editorOnly,
         canChangeDescription: canChangeDescription,
         onDescriptionChanged: onDescriptionChanged
+
       });
     }
   }]);

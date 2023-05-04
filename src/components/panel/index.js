@@ -62,7 +62,8 @@ class PanelViewer extends React.Component {
   render() {
     const { expand } = this.state;
     const {
-      classes, feature, integration, editorOnly, molSvg, descriptions, layoutSt, canChangeDescription, jcampIdx, entityFileNames, userManualLink
+      classes, feature, integration, editorOnly, molSvg, descriptions, layoutSt, canChangeDescription, jcampIdx, entityFileNames, curveSt, userManualLink,
+      subLayoutsInfo
     } = this.props;
     const onExapndInfo = () => this.onExapnd('info');
     const onExapndPeak = () => this.onExapnd('peak');
@@ -70,13 +71,16 @@ class PanelViewer extends React.Component {
     const onExapndCompare = () => this.onExapnd('compare');
     const onExapndCyclicVolta = () => this.onExapnd('cyclicvolta');
     const onExapndGraphSelection = () => this.onExapnd('graph');
+    
+    const { listCurves } = curveSt;
+    const hideGraphSelection = listCurves === false || listCurves === undefined;
 
     return (
       <div className={classNames(classes.panels)}>
         <MuiThemeProvider
           theme={theme}
         >
-          { Cfg.hidePanelCyclicVolta(layoutSt) ? null: <GraphSelectionPanel jcampIdx={jcampIdx} entityFileNames={entityFileNames} expand={expand === 'graph'} onExapnd={onExapndGraphSelection} />}
+          { hideGraphSelection ? null: <GraphSelectionPanel jcampIdx={jcampIdx} entityFileNames={entityFileNames} expand={expand === 'graph'} onExapnd={onExapndGraphSelection} subLayoutsInfo={subLayoutsInfo} />}
           <InfoPanel
             feature={feature}
             integration={integration}
@@ -90,7 +94,7 @@ class PanelViewer extends React.Component {
           />
           { Cfg.hidePanelPeak(layoutSt) ? null : <PeakPanel expand={expand === 'peak'} onExapnd={onExapndPeak} /> }
           { Cfg.hidePanelMpy(layoutSt) ? null : <MultiplicityPanel expand={expand === 'mpy'} onExapnd={onExapndMpy} /> }
-          { Cfg.hidePanelCompare(layoutSt) ? null : <ComparePanel expand={expand === 'compare'} onExapnd={onExapndCompare} /> }
+          { (Cfg.hidePanelCompare(layoutSt) || listCurves.length > 1) ? null : <ComparePanel expand={expand === 'compare'} onExapnd={onExapndCompare} /> }
           { Cfg.hidePanelCyclicVolta(layoutSt) ? null: <CyclicVoltammetryPanel jcampIdx={jcampIdx} feature={feature} expand={expand === 'cyclicvolta'} onExapnd={onExapndCyclicVolta} userManualLink={userManualLink ? userManualLink.cv : undefined} />}
         </MuiThemeProvider>
       </div>
@@ -101,6 +105,7 @@ class PanelViewer extends React.Component {
 const mapStateToProps = (state, _) => ( // eslint-disable-line
   {
     layoutSt: state.layout,
+    curveSt: state.curve,
   }
 );
 
@@ -121,6 +126,8 @@ PanelViewer.propTypes = {
   onDescriptionChanged: PropTypes.func,
   entityFileNames: PropTypes.array,
   userManualLink: PropTypes.object,
+  curveSt: PropTypes.object.isRequired,
+  subLayoutsInfo: PropTypes.object,
 };
 
 export default connect(

@@ -25,13 +25,16 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 var getMetaSt = function getMetaSt(state) {
   return state.meta;
 };
+var getCurveSt = function getCurveSt(state) {
+  return state.curve;
+};
 
 var getMultiplicitySt = function getMultiplicitySt(state) {
   return state.multiplicity.present;
 };
 
 function selectMpy(action) {
-  var metaSt, mpySt, _action$payload, xExtent, yExtent, dataPks, shift, stack, xL, xU, yL, yU, peaks, newXExtemt, coupling, m, newStack, payload;
+  var metaSt, mpySt, _action$payload, newData, curveIdx, multiplicities, selectedMulti, xExtent, yExtent, dataPks, _selectedMulti, shift, stack, xL, xU, yL, yU, peaks, newXExtemt, coupling, m, newStack, newSelectedMulti, payload;
 
   return regeneratorRuntime.wrap(function selectMpy$(_context) {
     while (1) {
@@ -47,8 +50,21 @@ function selectMpy(action) {
 
         case 5:
           mpySt = _context.sent;
-          _action$payload = action.payload, xExtent = _action$payload.xExtent, yExtent = _action$payload.yExtent, dataPks = _action$payload.dataPks;
-          shift = mpySt.shift, stack = mpySt.stack;
+          _action$payload = action.payload, newData = _action$payload.newData, curveIdx = _action$payload.curveIdx;
+          multiplicities = mpySt.multiplicities;
+          selectedMulti = multiplicities[curveIdx];
+
+          if (selectedMulti === false || selectedMulti === undefined) {
+            selectedMulti = {
+              stack: [],
+              shift: 0,
+              smExtext: false,
+              edited: false
+            };
+          }
+
+          xExtent = newData.xExtent, yExtent = newData.yExtent, dataPks = newData.dataPks;
+          _selectedMulti = selectedMulti, shift = _selectedMulti.shift, stack = _selectedMulti.stack;
           xL = xExtent.xL, xU = xExtent.xU;
           yL = yExtent.yL, yU = yExtent.yU;
           peaks = dataPks.filter(function (p) {
@@ -68,14 +84,18 @@ function selectMpy(action) {
             js: coupling.js
           };
           newStack = [].concat(_toConsumableArray(stack), [m]);
-          payload = Object.assign({}, mpySt, { stack: newStack, smExtext: newXExtemt });
-          _context.next = 19;
+          newSelectedMulti = Object.assign({}, selectedMulti, { stack: newStack, smExtext: newXExtemt });
+
+          multiplicities[curveIdx] = newSelectedMulti;
+
+          payload = Object.assign({}, mpySt, { multiplicities: multiplicities, selectedIdx: curveIdx });
+          _context.next = 25;
           return (0, _effects.put)({
             type: _action_type.UI.SWEEP.SELECT_MULTIPLICITY_RDC,
             payload: payload
           });
 
-        case 19:
+        case 25:
         case 'end':
           return _context.stop();
       }
@@ -84,7 +104,7 @@ function selectMpy(action) {
 }
 
 function addUiPeakToStack(action) {
-  var metaSt, mpySt, shift, stack, smExtext, _action$payload2, x, y, newPeak, xL, xU, isDuplicate, newStack, payload;
+  var metaSt, mpySt, curveSt, curveIdx, multiplicities, selectedMulti, shift, stack, smExtext, _action$payload2, x, y, newPeak, xL, xU, isDuplicate, newStack, newSelectedMulti, payload;
 
   return regeneratorRuntime.wrap(function addUiPeakToStack$(_context2) {
     while (1) {
@@ -100,30 +120,38 @@ function addUiPeakToStack(action) {
 
         case 5:
           mpySt = _context2.sent;
-          shift = mpySt.shift, stack = mpySt.stack, smExtext = mpySt.smExtext;
+          _context2.next = 8;
+          return (0, _effects.select)(getCurveSt);
+
+        case 8:
+          curveSt = _context2.sent;
+          curveIdx = curveSt.curveIdx;
+          multiplicities = mpySt.multiplicities;
+          selectedMulti = multiplicities[curveIdx];
+          shift = selectedMulti.shift, stack = selectedMulti.stack, smExtext = selectedMulti.smExtext;
           _action$payload2 = action.payload, x = _action$payload2.x, y = _action$payload2.y; // eslint-disable-line
 
           if (!(!x || !y)) {
-            _context2.next = 10;
+            _context2.next = 16;
             break;
           }
 
           return _context2.abrupt('return');
 
-        case 10:
+        case 16:
 
           x += shift;
           newPeak = { x: x, y: y };
           xL = smExtext.xL, xU = smExtext.xU;
 
           if (!(x < xL || xU < x)) {
-            _context2.next = 15;
+            _context2.next = 21;
             break;
           }
 
           return _context2.abrupt('return');
 
-        case 15:
+        case 21:
           isDuplicate = false;
           newStack = stack.map(function (k) {
             if (k.xExtent.xL === xL && k.xExtent.xU === xU) {
@@ -146,21 +174,25 @@ function addUiPeakToStack(action) {
           });
 
           if (!isDuplicate) {
-            _context2.next = 19;
+            _context2.next = 25;
             break;
           }
 
           return _context2.abrupt('return');
 
-        case 19:
-          payload = Object.assign({}, mpySt, { stack: newStack });
-          _context2.next = 22;
+        case 25:
+          newSelectedMulti = Object.assign({}, selectedMulti, { stack: newStack });
+
+          multiplicities[curveIdx] = newSelectedMulti;
+
+          payload = Object.assign({}, mpySt, { multiplicities: multiplicities });
+          _context2.next = 30;
           return (0, _effects.put)({
             type: _action_type.MULTIPLICITY.PEAK_ADD_BY_UI_RDC,
             payload: payload
           });
 
-        case 22:
+        case 30:
         case 'end':
           return _context2.stop();
       }
@@ -169,10 +201,15 @@ function addUiPeakToStack(action) {
 }
 
 var rmPeakFromStack = function rmPeakFromStack(action, metaSt, mpySt) {
+  var curveIdx = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
   var _action$payload3 = action.payload,
       peak = _action$payload3.peak,
       xExtent = _action$payload3.xExtent;
-  var stack = mpySt.stack;
+  var multiplicities = mpySt.multiplicities;
+
+  var selectedMulti = multiplicities[curveIdx];
+
+  var stack = selectedMulti.stack;
 
   var newStack = stack.map(function (k) {
     if (k.xExtent.xL === xExtent.xL && k.xExtent.xU === xExtent.xU) {
@@ -191,18 +228,26 @@ var rmPeakFromStack = function rmPeakFromStack(action, metaSt, mpySt) {
   newStack = newStack.filter(function (k) {
     return k.peaks.length !== 0;
   });
-  if (newStack.length === 0) return Object.assign({}, mpySt, { stack: newStack, smExtext: false });
+
+  if (newStack.length === 0) {
+    var _newSelectedMulti = Object.assign({}, selectedMulti, { stack: newStack, smExtext: false });
+    multiplicities[curveIdx] = _newSelectedMulti;
+    return Object.assign({}, mpySt, { multiplicities: multiplicities });
+  }
   var noSmExtext = newStack.map(function (k) {
     return k.xExtent.xL === xExtent.xL && k.xExtent.xU === xExtent.xU ? 1 : 0;
   }).reduce(function (a, s) {
     return a + s;
   }) === 0;
   var newSmExtext = noSmExtext ? newStack[0].xExtent : xExtent;
-  return Object.assign({}, mpySt, { stack: newStack, smExtext: newSmExtext });
+
+  var newSelectedMulti = Object.assign({}, selectedMulti, { stack: newStack, smExtext: newSmExtext });
+  multiplicities[curveIdx] = newSelectedMulti;
+  return Object.assign({}, mpySt, { multiplicities: multiplicities });
 };
 
 function rmPanelPeakFromStack(action) {
-  var metaSt, mpySt, payload;
+  var metaSt, mpySt, curveSt, curveIdx, payload;
   return regeneratorRuntime.wrap(function rmPanelPeakFromStack$(_context3) {
     while (1) {
       switch (_context3.prev = _context3.next) {
@@ -217,14 +262,20 @@ function rmPanelPeakFromStack(action) {
 
         case 5:
           mpySt = _context3.sent;
-          payload = rmPeakFromStack(action, metaSt, mpySt);
-          _context3.next = 9;
+          _context3.next = 8;
+          return (0, _effects.select)(getCurveSt);
+
+        case 8:
+          curveSt = _context3.sent;
+          curveIdx = curveSt.curveIdx;
+          payload = rmPeakFromStack(action, metaSt, mpySt, curveIdx);
+          _context3.next = 13;
           return (0, _effects.put)({
             type: _action_type.MULTIPLICITY.PEAK_RM_BY_PANEL_RDC,
             payload: payload
           });
 
-        case 9:
+        case 13:
         case 'end':
           return _context3.stop();
       }
@@ -233,7 +284,7 @@ function rmPanelPeakFromStack(action) {
 }
 
 function rmUiPeakFromStack(action) {
-  var metaSt, mpySt, peak, xExtent, newAction, payload;
+  var metaSt, mpySt, curveSt, curveIdx, multiplicities, selectedMulti, peak, xExtent, newAction, payload;
   return regeneratorRuntime.wrap(function rmUiPeakFromStack$(_context4) {
     while (1) {
       switch (_context4.prev = _context4.next) {
@@ -248,17 +299,25 @@ function rmUiPeakFromStack(action) {
 
         case 5:
           mpySt = _context4.sent;
+          _context4.next = 8;
+          return (0, _effects.select)(getCurveSt);
+
+        case 8:
+          curveSt = _context4.sent;
+          curveIdx = curveSt.curveIdx;
+          multiplicities = mpySt.multiplicities;
+          selectedMulti = multiplicities[curveIdx];
           peak = action.payload;
-          xExtent = mpySt.smExtext;
+          xExtent = selectedMulti.smExtext;
           newAction = Object.assign({}, action, { payload: { peak: peak, xExtent: xExtent } });
-          payload = rmPeakFromStack(newAction, metaSt, mpySt);
-          _context4.next = 12;
+          payload = rmPeakFromStack(newAction, metaSt, mpySt, curveIdx);
+          _context4.next = 18;
           return (0, _effects.put)({
             type: _action_type.MULTIPLICITY.PEAK_RM_BY_UI_RDC,
             payload: payload
           });
 
-        case 12:
+        case 18:
         case 'end':
           return _context4.stop();
       }
@@ -267,30 +326,40 @@ function rmUiPeakFromStack(action) {
 }
 
 function resetInitNmr(action) {
-  var multiplicity, mpySt;
+  var multiplicity, curveSt, mpySt, curveIdx, multiplicities, payload;
   return regeneratorRuntime.wrap(function resetInitNmr$(_context5) {
     while (1) {
       switch (_context5.prev = _context5.next) {
         case 0:
           multiplicity = action.payload.multiplicity;
           _context5.next = 3;
-          return (0, _effects.select)(getMultiplicitySt);
+          return (0, _effects.select)(getCurveSt);
 
         case 3:
+          curveSt = _context5.sent;
+          _context5.next = 6;
+          return (0, _effects.select)(getMultiplicitySt);
+
+        case 6:
           mpySt = _context5.sent;
+          curveIdx = curveSt.curveIdx;
+          multiplicities = mpySt.multiplicities;
+
+          multiplicities[curveIdx] = multiplicity;
+          payload = Object.assign({}, mpySt, { multiplicities: multiplicities, selectedIdx: curveIdx });
 
           if (!multiplicity) {
-            _context5.next = 7;
+            _context5.next = 14;
             break;
           }
 
-          _context5.next = 7;
+          _context5.next = 14;
           return (0, _effects.put)({
             type: _action_type.MULTIPLICITY.RESET_ALL_RDC,
-            payload: Object.assign({}, mpySt, multiplicity)
+            payload: payload
           });
 
-        case 7:
+        case 14:
         case 'end':
           return _context5.stop();
       }
@@ -299,7 +368,7 @@ function resetInitNmr(action) {
 }
 
 function resetOne(action) {
-  var xExtent, metaSt, mpySt, stack, newStack, payload;
+  var xExtent, metaSt, mpySt, curveSt, curveIdx, multiplicities, selectedMulti, stack, newStack, newSelectedMulti, payload;
   return regeneratorRuntime.wrap(function resetOne$(_context6) {
     while (1) {
       switch (_context6.prev = _context6.next) {
@@ -315,7 +384,15 @@ function resetOne(action) {
 
         case 6:
           mpySt = _context6.sent;
-          stack = mpySt.stack;
+          _context6.next = 9;
+          return (0, _effects.select)(getCurveSt);
+
+        case 9:
+          curveSt = _context6.sent;
+          curveIdx = curveSt.curveIdx;
+          multiplicities = mpySt.multiplicities;
+          selectedMulti = multiplicities[curveIdx];
+          stack = selectedMulti.stack;
           newStack = stack.map(function (k) {
             if (k.xExtent.xL === xExtent.xL && k.xExtent.xU === xExtent.xU) {
               var peaks = k.peaks;
@@ -329,14 +406,18 @@ function resetOne(action) {
             }
             return k;
           });
-          payload = Object.assign({}, mpySt, { stack: newStack });
-          _context6.next = 12;
+          newSelectedMulti = Object.assign({}, selectedMulti, { stack: newStack });
+
+          multiplicities[curveIdx] = newSelectedMulti;
+
+          payload = Object.assign({}, mpySt, { multiplicities: multiplicities });
+          _context6.next = 20;
           return (0, _effects.put)({
             type: _action_type.MULTIPLICITY.RESET_ONE_RDC,
             payload: payload
           });
 
-        case 12:
+        case 20:
         case 'end':
           return _context6.stop();
       }
@@ -345,7 +426,7 @@ function resetOne(action) {
 }
 
 function selectMpyType(action) {
-  var mpySt, metaSt, _action$payload4, mpyType, xExtent, stack, newStack;
+  var mpySt, metaSt, curveSt, curveIdx, multiplicities, selectedMulti, _action$payload4, mpyType, xExtent, stack, newStack, newSelectedMulti, payload;
 
   return regeneratorRuntime.wrap(function selectMpyType$(_context7) {
     while (1) {
@@ -361,20 +442,33 @@ function selectMpyType(action) {
 
         case 5:
           metaSt = _context7.sent;
+          _context7.next = 8;
+          return (0, _effects.select)(getCurveSt);
+
+        case 8:
+          curveSt = _context7.sent;
+          curveIdx = curveSt.curveIdx;
+          multiplicities = mpySt.multiplicities;
+          selectedMulti = multiplicities[curveIdx];
           _action$payload4 = action.payload, mpyType = _action$payload4.mpyType, xExtent = _action$payload4.xExtent;
-          stack = mpySt.stack;
+          stack = selectedMulti.stack;
           newStack = stack.map(function (k) {
             var isTargetStack = k.xExtent.xL === xExtent.xL && k.xExtent.xU === xExtent.xU;
             if (isTargetStack) return (0, _multiplicity_manual.calcMpyManual)(k, mpyType, metaSt);
             return k;
           });
-          _context7.next = 11;
+          newSelectedMulti = Object.assign({}, selectedMulti, { stack: newStack });
+
+          multiplicities[curveIdx] = newSelectedMulti;
+
+          payload = Object.assign({}, mpySt, { multiplicities: multiplicities });
+          _context7.next = 20;
           return (0, _effects.put)({
             type: _action_type.MULTIPLICITY.TYPE_SELECT_RDC,
-            payload: Object.assign({}, mpySt, { stack: newStack })
+            payload: payload
           });
 
-        case 11:
+        case 20:
         case 'end':
           return _context7.stop();
       }

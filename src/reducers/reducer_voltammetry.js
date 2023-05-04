@@ -196,7 +196,6 @@ const setRef = (state, action) => {
 
     // spectraList[jcampIdx] = Object.assign({}, spectra, { list: newList, selectedIdx: index, jcampIdx: jcampIdx });
     // return Object.assign({}, state, { spectraList: spectraList });
-    
     //TODO: implement ref
     console.log(pairPeak);
   }

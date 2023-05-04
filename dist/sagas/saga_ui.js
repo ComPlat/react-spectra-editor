@@ -19,6 +19,9 @@ var _marked = /*#__PURE__*/regeneratorRuntime.mark(selectUiSweep),
 var getUiSt = function getUiSt(state) {
   return state.ui;
 };
+var getCurveSt = function getCurveSt(state) {
+  return state.curve;
+};
 
 var calcPeaks = function calcPeaks(payload) {
   var xExtent = payload.xExtent,
@@ -38,7 +41,7 @@ var calcPeaks = function calcPeaks(payload) {
 };
 
 function selectUiSweep(action) {
-  var uiSt, payload, peaks, newPayload;
+  var uiSt, payload, curveSt, curveIdx, peaks, newPayload;
   return regeneratorRuntime.wrap(function selectUiSweep$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
@@ -49,76 +52,82 @@ function selectUiSweep(action) {
         case 2:
           uiSt = _context.sent;
           payload = action.payload;
+          _context.next = 6;
+          return (0, _effects.select)(getCurveSt);
+
+        case 6:
+          curveSt = _context.sent;
+          curveIdx = curveSt.curveIdx;
           _context.t0 = uiSt.sweepType;
-          _context.next = _context.t0 === _list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN ? 7 : _context.t0 === _list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET ? 10 : _context.t0 === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD ? 13 : _context.t0 === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD ? 16 : 25;
+          _context.next = _context.t0 === _list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN ? 11 : _context.t0 === _list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET ? 14 : _context.t0 === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD ? 17 : _context.t0 === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD ? 20 : 29;
           break;
 
-        case 7:
-          _context.next = 9;
+        case 11:
+          _context.next = 13;
           return (0, _effects.put)({
             type: _action_type.UI.SWEEP.SELECT_ZOOMIN,
             payload: payload
           });
 
-        case 9:
-          return _context.abrupt('break', 26);
+        case 13:
+          return _context.abrupt('break', 30);
 
-        case 10:
-          _context.next = 12;
+        case 14:
+          _context.next = 16;
           return (0, _effects.put)({
             type: _action_type.UI.SWEEP.SELECT_ZOOMRESET,
             payload: payload
           });
 
-        case 12:
-          return _context.abrupt('break', 26);
+        case 16:
+          return _context.abrupt('break', 30);
 
-        case 13:
-          _context.next = 15;
+        case 17:
+          _context.next = 19;
           return (0, _effects.put)({
             type: _action_type.UI.SWEEP.SELECT_INTEGRATION,
-            payload: payload
+            payload: { newData: payload, curveIdx: curveIdx }
           });
 
-        case 15:
-          return _context.abrupt('break', 26);
+        case 19:
+          return _context.abrupt('break', 30);
 
-        case 16:
+        case 20:
           peaks = calcPeaks(payload); // eslint-disable-line
 
           if (!(peaks.length === 0)) {
-            _context.next = 19;
+            _context.next = 23;
             break;
           }
 
-          return _context.abrupt('break', 26);
+          return _context.abrupt('break', 30);
 
-        case 19:
+        case 23:
           newPayload = Object.assign({}, payload, { peaks: peaks }); // eslint-disable-line
 
-          _context.next = 22;
+          _context.next = 26;
           return (0, _effects.put)({
             type: _action_type.UI.SWEEP.SELECT_INTEGRATION,
-            payload: newPayload
+            payload: { newData: newPayload, curveIdx: curveIdx }
           });
-
-        case 22:
-          _context.next = 24;
-          return (0, _effects.put)({
-            type: _action_type.UI.SWEEP.SELECT_MULTIPLICITY,
-            payload: newPayload
-          });
-
-        case 24:
-          return _context.abrupt('break', 26);
-
-        case 25:
-          return _context.abrupt('break', 26);
 
         case 26:
+          _context.next = 28;
+          return (0, _effects.put)({
+            type: _action_type.UI.SWEEP.SELECT_MULTIPLICITY,
+            payload: { newData: newPayload, curveIdx: curveIdx }
+          });
+
+        case 28:
+          return _context.abrupt('break', 30);
+
+        case 29:
+          return _context.abrupt('break', 30);
+
+        case 30:
           return _context.abrupt('return', null);
 
-        case 27:
+        case 31:
         case 'end':
           return _context.stop();
       }
@@ -205,293 +214,299 @@ var getUiSweepType = function getUiSweepType(state) {
 };
 
 function clickUiTarget(action) {
-  var payload, onPeak, voltammetryPeakIdx, onPecker, jcampIdx, uiSweepType, xExtent, xL, xU;
+  var payload, onPeak, voltammetryPeakIdx, onPecker, uiSweepType, curveSt, curveIdx, xExtent, xL, xU;
   return regeneratorRuntime.wrap(function clickUiTarget$(_context3) {
     while (1) {
       switch (_context3.prev = _context3.next) {
         case 0:
-          payload = action.payload, onPeak = action.onPeak, voltammetryPeakIdx = action.voltammetryPeakIdx, onPecker = action.onPecker, jcampIdx = action.jcampIdx;
+          payload = action.payload, onPeak = action.onPeak, voltammetryPeakIdx = action.voltammetryPeakIdx, onPecker = action.onPecker;
           _context3.next = 3;
           return (0, _effects.select)(getUiSweepType);
 
         case 3:
           uiSweepType = _context3.sent;
+          _context3.next = 6;
+          return (0, _effects.select)(getCurveSt);
+
+        case 6:
+          curveSt = _context3.sent;
+          curveIdx = curveSt.curveIdx;
 
           if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.PEAK_ADD && !onPeak)) {
-            _context3.next = 9;
+            _context3.next = 13;
             break;
           }
 
-          _context3.next = 7;
+          _context3.next = 11;
           return (0, _effects.put)({
             type: _action_type.EDITPEAK.ADD_POSITIVE,
-            payload: payload
+            payload: { dataToAdd: payload, curveIdx: curveIdx }
           });
 
-        case 7:
-          _context3.next = 89;
+        case 11:
+          _context3.next = 93;
           break;
 
-        case 9:
+        case 13:
           if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.PEAK_DELETE && onPeak)) {
-            _context3.next = 14;
+            _context3.next = 18;
             break;
           }
 
-          _context3.next = 12;
+          _context3.next = 16;
           return (0, _effects.put)({
             type: _action_type.EDITPEAK.ADD_NEGATIVE,
-            payload: payload
+            payload: { dataToAdd: payload, curveIdx: curveIdx }
           });
 
-        case 12:
-          _context3.next = 89;
+        case 16:
+          _context3.next = 93;
           break;
 
-        case 14:
+        case 18:
           if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT && onPeak)) {
-            _context3.next = 19;
+            _context3.next = 23;
             break;
           }
 
-          _context3.next = 17;
+          _context3.next = 21;
           return (0, _effects.put)({
             type: _action_type.SHIFT.SET_PEAK,
-            payload: payload
+            payload: { dataToSet: payload, curveIdx: curveIdx }
           });
 
-        case 17:
-          _context3.next = 89;
+        case 21:
+          _context3.next = 93;
           break;
 
-        case 19:
+        case 23:
           if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_RM && onPeak)) {
-            _context3.next = 24;
+            _context3.next = 28;
             break;
           }
 
-          _context3.next = 22;
+          _context3.next = 26;
           return (0, _effects.put)({
             type: _action_type.INTEGRATION.RM_ONE,
-            payload: payload
+            payload: { dataToRemove: payload, curveIdx: curveIdx }
           });
 
-        case 22:
-          _context3.next = 89;
+        case 26:
+          _context3.next = 93;
           break;
 
-        case 24:
+        case 28:
           if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_RM && onPeak)) {
-            _context3.next = 29;
+            _context3.next = 33;
             break;
           }
 
-          _context3.next = 27;
+          _context3.next = 31;
           return (0, _effects.put)({
             type: _action_type.INTEGRATION.RM_ONE,
-            payload: payload
+            payload: { dataToRemove: payload, curveIdx: curveIdx }
           });
 
-        case 27:
-          _context3.next = 89;
+        case 31:
+          _context3.next = 93;
           break;
 
-        case 29:
+        case 33:
           if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF && onPeak)) {
-            _context3.next = 34;
+            _context3.next = 38;
             break;
           }
 
-          _context3.next = 32;
+          _context3.next = 36;
           return (0, _effects.put)({
             type: _action_type.INTEGRATION.SET_REF,
-            payload: payload
+            payload: { refData: payload, curveIdx: curveIdx }
           });
 
-        case 32:
-          _context3.next = 89;
+        case 36:
+          _context3.next = 93;
           break;
 
-        case 34:
+        case 38:
           if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_CLICK && onPeak)) {
-            _context3.next = 46;
+            _context3.next = 50;
             break;
           }
 
           xExtent = payload.xExtent, xL = payload.xL, xU = payload.xU;
 
           if (!xExtent) {
-            _context3.next = 41;
+            _context3.next = 45;
             break;
           }
 
-          _context3.next = 39;
+          _context3.next = 43;
           return (0, _effects.put)({
             type: _action_type.MULTIPLICITY.ONE_CLICK_BY_UI,
-            payload: xExtent
+            payload: { payloadData: xExtent, curveIdx: curveIdx }
           });
 
-        case 39:
-          _context3.next = 44;
+        case 43:
+          _context3.next = 48;
           break;
 
-        case 41:
+        case 45:
           if (!(xL && xU)) {
-            _context3.next = 44;
+            _context3.next = 48;
             break;
           }
 
-          _context3.next = 44;
+          _context3.next = 48;
           return (0, _effects.put)({
             type: _action_type.MULTIPLICITY.ONE_CLICK_BY_UI,
-            payload: { xL: xL, xU: xU }
+            payload: { payloadData: { xL: xL, xU: xU }, curveIdx: curveIdx }
           });
 
-        case 44:
-          _context3.next = 89;
+        case 48:
+          _context3.next = 93;
           break;
 
-        case 46:
+        case 50:
           if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_ADD)) {
-            _context3.next = 51;
+            _context3.next = 55;
             break;
           }
 
-          _context3.next = 49;
+          _context3.next = 53;
           return (0, _effects.put)({
             type: _action_type.MULTIPLICITY.PEAK_ADD_BY_UI_SAG,
             payload: payload
           });
 
-        case 49:
-          _context3.next = 89;
+        case 53:
+          _context3.next = 93;
           break;
 
-        case 51:
+        case 55:
           if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_RM && onPeak)) {
-            _context3.next = 56;
+            _context3.next = 60;
             break;
           }
 
-          _context3.next = 54;
+          _context3.next = 58;
           return (0, _effects.put)({
             type: _action_type.MULTIPLICITY.PEAK_RM_BY_UI,
             payload: payload
           });
 
-        case 54:
-          _context3.next = 89;
+        case 58:
+          _context3.next = 93;
           break;
 
-        case 56:
+        case 60:
           if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MAX_PEAK && !onPeak)) {
-            _context3.next = 61;
+            _context3.next = 65;
             break;
           }
 
-          _context3.next = 59;
+          _context3.next = 63;
           return (0, _effects.put)({
             type: _action_type.CYCLIC_VOLTA_METRY.ADD_MAX_PEAK,
-            payload: { peak: payload, index: voltammetryPeakIdx, jcampIdx: jcampIdx }
+            payload: { peak: payload, index: voltammetryPeakIdx, jcampIdx: curveIdx }
           });
 
-        case 59:
-          _context3.next = 89;
+        case 63:
+          _context3.next = 93;
           break;
 
-        case 61:
+        case 65:
           if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MAX_PEAK && onPeak)) {
-            _context3.next = 66;
+            _context3.next = 70;
             break;
           }
 
-          _context3.next = 64;
+          _context3.next = 68;
           return (0, _effects.put)({
             type: _action_type.CYCLIC_VOLTA_METRY.REMOVE_MAX_PEAK,
-            payload: { index: voltammetryPeakIdx, jcampIdx: jcampIdx }
+            payload: { index: voltammetryPeakIdx, jcampIdx: curveIdx }
           });
 
-        case 64:
-          _context3.next = 89;
+        case 68:
+          _context3.next = 93;
           break;
 
-        case 66:
+        case 70:
           if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MIN_PEAK && !onPeak)) {
-            _context3.next = 71;
+            _context3.next = 75;
             break;
           }
 
-          _context3.next = 69;
+          _context3.next = 73;
           return (0, _effects.put)({
             type: _action_type.CYCLIC_VOLTA_METRY.ADD_MIN_PEAK,
-            payload: { peak: payload, index: voltammetryPeakIdx, jcampIdx: jcampIdx }
+            payload: { peak: payload, index: voltammetryPeakIdx, jcampIdx: curveIdx }
           });
 
-        case 69:
-          _context3.next = 89;
+        case 73:
+          _context3.next = 93;
           break;
 
-        case 71:
+        case 75:
           if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MIN_PEAK && onPeak)) {
-            _context3.next = 76;
+            _context3.next = 80;
             break;
           }
 
-          _context3.next = 74;
+          _context3.next = 78;
           return (0, _effects.put)({
             type: _action_type.CYCLIC_VOLTA_METRY.REMOVE_MIN_PEAK,
-            payload: { index: voltammetryPeakIdx, jcampIdx: jcampIdx }
+            payload: { index: voltammetryPeakIdx, jcampIdx: curveIdx }
           });
 
-        case 74:
-          _context3.next = 89;
+        case 78:
+          _context3.next = 93;
           break;
 
-        case 76:
+        case 80:
           if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_PECKER && !onPecker)) {
-            _context3.next = 81;
+            _context3.next = 85;
             break;
           }
 
-          _context3.next = 79;
+          _context3.next = 83;
           return (0, _effects.put)({
             type: _action_type.CYCLIC_VOLTA_METRY.ADD_PECKER,
-            payload: { peak: payload, index: voltammetryPeakIdx, jcampIdx: jcampIdx }
+            payload: { peak: payload, index: voltammetryPeakIdx, jcampIdx: curveIdx }
           });
 
-        case 79:
-          _context3.next = 89;
+        case 83:
+          _context3.next = 93;
           break;
 
-        case 81:
+        case 85:
           if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_PECKER && onPecker)) {
-            _context3.next = 86;
+            _context3.next = 90;
             break;
           }
 
-          _context3.next = 84;
+          _context3.next = 88;
           return (0, _effects.put)({
             type: _action_type.CYCLIC_VOLTA_METRY.REMOVE_PECKER,
-            payload: { index: voltammetryPeakIdx, jcampIdx: jcampIdx }
+            payload: { index: voltammetryPeakIdx, jcampIdx: curveIdx }
           });
 
-        case 84:
-          _context3.next = 89;
+        case 88:
+          _context3.next = 93;
           break;
 
-        case 86:
+        case 90:
           if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_SET_REF && onPeak)) {
-            _context3.next = 89;
+            _context3.next = 93;
             break;
           }
 
-          _context3.next = 89;
+          _context3.next = 93;
           return (0, _effects.put)({
             type: _action_type.CYCLIC_VOLTA_METRY.SET_REF,
-            payload: { index: voltammetryPeakIdx, jcampIdx: jcampIdx }
+            payload: { index: voltammetryPeakIdx, jcampIdx: curveIdx }
           });
 
-        case 89:
+        case 93:
         case 'end':
           return _context3.stop();
       }

@@ -43,9 +43,19 @@ var getLayout = function getLayout(state, _) {
 
 var getShiftOffset = function getShiftOffset(state, _) {
   // eslint-disable-line
-  var shift = state.shift;
-  var ref = shift.ref,
-      peak = shift.peak;
+  var curve = state.curve,
+      shift = state.shift;
+  var curveIdx = curve.curveIdx;
+  var shifts = shift.shifts;
+
+  var selectedShift = shifts[curveIdx];
+  if (!selectedShift) {
+    return 0.0;
+  }
+
+  // const { shift } = state;
+  var ref = selectedShift.ref,
+      peak = selectedShift.peak;
 
   return (0, _shift.FromManualToOffset)(ref, peak);
 };
@@ -155,10 +165,12 @@ var Convert2Peak = function Convert2Peak(feature, threshold, offset) {
       thresRef = feature.thresRef,
       minY = feature.minY,
       upperThres = feature.upperThres,
-      lowerThres = feature.lowerThres;
+      lowerThres = feature.lowerThres,
+      operation = feature.operation;
+  var layout = operation.layout;
 
 
-  if (upperThres || lowerThres) {
+  if (!_format2.default.isSECLayout(layout) && (upperThres || lowerThres)) {
     var upperThresVal = upThreshold || upperThres;
     if (!upperThresVal) {
       upperThresVal = 1.0;
@@ -185,7 +197,7 @@ var Convert2Peak = function Convert2Peak(feature, threshold, offset) {
     return peak;
   } else {
     var thresVal = threshold || thresRef;
-    var yThres = thresVal * maxY / 100.0;
+    var yThres = Number.parseFloat((thresVal * maxY / 100.0).toFixed(10));
     var _corrOffset = offset || 0.0;
     for (var _i = 0; _i < data.y.length; _i += 1) {
       var _y = data.y[_i];
@@ -279,7 +291,16 @@ var convertThresEndPts = function convertThresEndPts(feature, threshold) {
 var ToThresEndPts = (0, _reselect.createSelector)(getFeature, getThreshold, convertThresEndPts);
 
 var getShiftPeak = function getShiftPeak(state) {
-  return state.shift.peak;
+  var curve = state.curve,
+      shift = state.shift;
+  var curveIdx = curve.curveIdx;
+  var shifts = shift.shifts;
+
+  var selectedShift = shifts[curveIdx];
+  if (!selectedShift) {
+    return false;
+  }
+  return selectedShift.peak;
 };
 
 var convertSfPeaks = function convertSfPeaks(peak, offset) {
@@ -326,6 +347,9 @@ var readLayout = function readLayout(jcamp) {
     }
     if (dataType.includes('CIRCULAR DICHROISM SPECTROSCOPY')) {
       return _list_layout.LIST_LAYOUT.CDS;
+    }
+    if (dataType.includes('SIZE EXCLUSION CHROMATOGRAPHY')) {
+      return _list_layout.LIST_LAYOUT.SEC;
     }
   }
   return false;
@@ -752,7 +776,7 @@ var ExtractJcamp = function ExtractJcamp(source) {
     features = extrFeaturesMs(jcamp, layout, peakUp);
   } else if (_format2.default.isXRDLayout(layout) || _format2.default.isCDSLayout(layout)) {
     features = extrFeaturesXrd(jcamp, layout, peakUp);
-  } else if (_format2.default.isCyclicVoltaLayout(layout)) {
+  } else if (_format2.default.isCyclicVoltaLayout(layout) || _format2.default.isSECLayout(layout)) {
     features = extrFeaturesCylicVolta(jcamp, layout, peakUp);
   } else {
     features = extrFeaturesNi(jcamp, layout, peakUp, spectra);

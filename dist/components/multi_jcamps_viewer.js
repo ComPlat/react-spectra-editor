@@ -63,6 +63,21 @@ var styles = function styles() {
   };
 };
 
+var seperatingSubLayout = function seperatingSubLayout(entities, featureCondition) {
+  var storedDict = {};
+  entities.forEach(function (entity) {
+    var feature = entity.feature;
+
+    var keyValue = feature[featureCondition];
+    if (keyValue in storedDict) {
+      storedDict[keyValue].push(entity);
+    } else {
+      storedDict[keyValue] = [entity];
+    }
+  });
+  return Object.assign({}, storedDict);
+};
+
 var MultiJcampsViewer = function (_React$Component) {
   _inherits(MultiJcampsViewer, _React$Component);
 
@@ -85,6 +100,7 @@ var MultiJcampsViewer = function (_React$Component) {
 
       if (!entities || entities.length === 0) return _react2.default.createElement('div', null);
 
+      var seperatedSubLayouts = seperatingSubLayout(entities, 'xUnit');
       var entity = entities[curvSt.curveIdx];
       var feature = entity.feature,
           topic = entity.topic,
@@ -126,6 +142,7 @@ var MultiJcampsViewer = function (_React$Component) {
                 userManualLink: userManualLink,
                 feature: feature,
                 molSvg: molSvg,
+                subLayoutsInfo: seperatedSubLayouts,
                 descriptions: '',
                 canChangeDescription: function canChangeDescription() {},
                 onDescriptionChanged: function onDescriptionChanged() {}

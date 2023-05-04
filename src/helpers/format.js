@@ -12,6 +12,7 @@ const spectraDigit = (layout) => {
     case LIST_LAYOUT.XRD:
     case LIST_LAYOUT.CYCLIC_VOLTAMMETRY:
     case LIST_LAYOUT.CDS:
+    case LIST_LAYOUT.SEC:
     case LIST_LAYOUT.MS:
       return 0;
     case LIST_LAYOUT.C13:
@@ -65,10 +66,14 @@ const spectraOps = {
   [LIST_LAYOUT.XRD]: { head: 'X-RAY DIFFRACTION', tail: '.' },
   [LIST_LAYOUT.CYCLIC_VOLTAMMETRY]: { head: 'CYCLIC VOLTAMMETRY', tail: '.' },
   [LIST_LAYOUT.CDS]: { head: 'CIRCULAR DICHROISM SPECTROSCOPY', tail: '.' },
+  [LIST_LAYOUT.SEC]: { head: 'SIZE EXCLUSION CHROMATOGRAPHY', tail: '.' },
 };
 
-const rmRef = (peaks, shift) => {
-  const refValue = shift.ref.value || shift.peak.x;
+const rmRef = (peaks, shift, atIndex=0) => {
+  if (!shift) return peaks;
+  const { shifts } = shift;
+  const selectedShift = shifts[atIndex];
+  const refValue = selectedShift.ref.value || selectedShift.peak.x;
   return peaks.map(
     p => (IsSame(p.x, refValue) ? null : p),
   ).filter(r => r != null);
@@ -200,10 +205,15 @@ const formatedHplcUvVis = (
   return arrResult.join(', ')
 };
 
-const rmShiftFromPeaks = (peaks, shift) => {
+const rmShiftFromPeaks = (peaks, shift, atIndex=0) => {
   const peaksXY = ToXY(peaks);
+  const { shifts } = shift;
+  const selectedShift = shifts[atIndex];
+  if (!selectedShift) {
+    return peaks;
+  }
   // const digit = spectraDigit(layout);
-  const rmShiftX = shift.ref.value || shift.peak.x;
+  const rmShiftX = selectedShift.ref.value || selectedShift.peak.x;
   const result = peaksXY.map((p) => {
     const srcX = parseFloat(p[0]);
     const x = IsSame(srcX, rmShiftX) ? null : srcX;
@@ -217,9 +227,9 @@ const rmShiftFromPeaks = (peaks, shift) => {
 const peaksBody = ({
   peaks, layout, decimal, shift, isAscend,
   isIntensity = false, boundary = {},
-  integration
+  integration, atIndex = 0
 }) => {
-  const result = rmShiftFromPeaks(peaks, shift);
+  const result = rmShiftFromPeaks(peaks, shift, atIndex);
 
   const ascendFunc = (a, b) => parseFloat(a.x) - parseFloat(b.x);
   const descendFunc = (a, b) => parseFloat(b.x) - parseFloat(a.x);
@@ -233,22 +243,18 @@ const peaksBody = ({
   if (layout === LIST_LAYOUT.IR) {
     return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, true);
   }
-  if (layout === LIST_LAYOUT.RAMAN) {
-    return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
-  }
   if (layout === LIST_LAYOUT.UVVIS) {
     return formatedUvVis(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
   if (layout === LIST_LAYOUT.HPLC_UVVIS) {
     return formatedHplcUvVis(ordered, decimal, integration);
   }
-  if (layout === LIST_LAYOUT.TGA) {
-    return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
-  }
-  if (layout === LIST_LAYOUT.XRD) {
-    return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
-  }
-  if (layout === LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
+  if (layout === LIST_LAYOUT.RAMAN 
+    || layout === LIST_LAYOUT.TGA 
+    || layout === LIST_LAYOUT.XRD 
+    || layout === LIST_LAYOUT.CYCLIC_VOLTAMMETRY 
+    || layout === LIST_LAYOUT.CDS 
+    || layout === LIST_LAYOUT.SEC) {
     return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
   if (layout === LIST_LAYOUT.CDS) {
@@ -257,10 +263,12 @@ const peaksBody = ({
   return ordered.map(o => fixDigit(o.x, decimal)).join(', ');
 };
 
-const peaksWrapper = (layout, shift) => {
+const peaksWrapper = (layout, shift, atIndex=0) => {
   let solvTxt = '';
-  if (shift.ref.label) {
-    solvTxt = ` (${shift.ref.label})`;
+  const { shifts } = shift;
+  const selectedShift = shifts[atIndex];
+  if (selectedShift.ref.label) {
+    solvTxt = ` (${selectedShift.ref.label})`;
   }
 
   if (layout === LIST_LAYOUT.PLAIN) {
@@ -289,6 +297,7 @@ const isTGALayout = layoutSt => (LIST_LAYOUT.TGA === layoutSt);
 const isXRDLayout = layoutSt => (LIST_LAYOUT.XRD === layoutSt);
 const isCyclicVoltaLayout = layoutSt => (LIST_LAYOUT.CYCLIC_VOLTAMMETRY === layoutSt);
 const isCDSLayout = layoutSt => (LIST_LAYOUT.CDS === layoutSt);
+const isSECLayout = layoutSt => (LIST_LAYOUT.SEC === layoutSt);
 const isEmWaveLayout = layoutSt => (
   [LIST_LAYOUT.IR, LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS, LIST_LAYOUT.HPLC_UVVIS].indexOf(layoutSt) >= 0
 );
@@ -370,6 +379,7 @@ const Format = {
   isXRDLayout,
   isCyclicVoltaLayout,
   isCDSLayout,
+  isSECLayout,
   isEmWaveLayout,
   fixDigit,
   formatPeaksByPrediction,

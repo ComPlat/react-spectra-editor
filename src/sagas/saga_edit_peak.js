@@ -2,18 +2,41 @@ import { put, takeEvery, select } from 'redux-saga/effects';
 
 import { EDITPEAK, SHIFT } from '../constants/action_type';
 import { FromManualToOffset, VirtalPts } from '../helpers/shift';
+import { LIST_SHIFT_1H } from '../constants/list_shift';
 
-const getShiftRef = state => state.shift.ref;
-const getShiftPeak = state => state.shift.peak;
+const getShift = state => state.shift;
 const getEditPeak = state => state.editPeak.present;
 
 function* addVirtualFactor(action) {
-  const origRef = yield select(getShiftRef);
-  const origApex = yield select(getShiftPeak);
+  const originShift = yield select(getShift);
   const origEPeak = yield select(getEditPeak);
   const { payload } = action;
 
-  const { prevOffset, pos, neg } = origEPeak;
+  const { curveIdx } = payload;
+  const { peaks } = origEPeak;
+  let currentOriginPeaks = peaks[curveIdx];
+  if (currentOriginPeaks === false || currentOriginPeaks === undefined) {
+    currentOriginPeaks = {
+      prevOffset: 0,
+      pos: [],
+      neg: [],
+    };
+  }
+
+  let currentOriginShift = originShift[curveIdx];
+  if (currentOriginShift === false || currentOriginShift === undefined) {
+    const shiftNone = LIST_SHIFT_1H[0];
+    currentOriginShift = {
+      ref: shiftNone,
+      peak: false,
+      enable: true,
+    };
+  }
+
+  const origRef = currentOriginShift.ref;
+  const origApex = currentOriginShift.peak;
+
+  const { prevOffset, pos, neg } = currentOriginPeaks;
   const absOffset = FromManualToOffset(origRef, origApex);
   const relOffset = prevOffset - absOffset;
   const nextPos = VirtalPts(pos, relOffset);

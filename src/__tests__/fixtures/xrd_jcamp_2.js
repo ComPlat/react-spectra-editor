@@ -1,4 +1,4 @@
-const xrdJcamp1 = `
+const xrdJcamp2 = `
 ##TITLE=Spectrum
 ##JCAMP-DX=5.00 $$ chemotion-converter-app (0.1.0)
 ##DATA TYPE=X-RAY DIFFRACTION
@@ -947,4 +947,4 @@ const xrdJcamp1 = `
 ##END=$$ End of the data block
 `;
 
-export default xrdJcamp1;
+export default xrdJcamp2;
