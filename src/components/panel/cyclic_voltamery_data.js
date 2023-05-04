@@ -36,16 +36,16 @@ const styles = () => ({
   table: {
     width: '100%',
     wordWrap: 'break-all',
-    fontSize: '14px !important'
+    fontSize: '14px !important',
   },
   td: {
     wordWrap: 'break-all',
-    fontSize: '14px !important'
+    fontSize: '14px !important',
   },
   cellSelected: {
     backgroundColor: '#2196f3',
     color: '#fff',
-    fontSize: '14px !important'
+    fontSize: '14px !important',
   },
   btnRemove: {
     color: 'red'

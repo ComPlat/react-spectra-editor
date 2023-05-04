@@ -257,6 +257,9 @@ const peaksBody = ({
     || layout === LIST_LAYOUT.SEC) {
     return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
+  if (layout === LIST_LAYOUT.CDS) {
+    return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
+  }
   return ordered.map(o => fixDigit(o.x, decimal)).join(', ');
 };
 
