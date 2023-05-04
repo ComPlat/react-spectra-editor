@@ -1,49 +1,34 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.resetInitCommonWithIntergation = exports.resetInitMs = exports.resetInitNmr = exports.resetInitCommon = exports.resetAll = undefined;
-
-var _action_type = require('../constants/action_type');
-
-var resetAll = function resetAll(payload) {
-  return {
-    type: _action_type.MANAGER.RESETALL,
-    payload: payload
-  };
-};
-
-var resetInitCommon = function resetInitCommon(payload) {
-  return {
-    type: _action_type.MANAGER.RESET_INIT_COMMON,
-    payload: payload
-  };
-};
-
-var resetInitNmr = function resetInitNmr(payload) {
-  return {
-    type: _action_type.MANAGER.RESET_INIT_NMR,
-    payload: payload
-  };
-};
-
-var resetInitMs = function resetInitMs(payload) {
-  return {
-    type: _action_type.MANAGER.RESET_INIT_MS,
-    payload: payload
-  };
-};
-
-var resetInitCommonWithIntergation = function resetInitCommonWithIntergation(payload) {
-  return {
-    type: _action_type.MANAGER.RESET_INIT_COMMON_WITH_INTERGATION,
-    payload: payload
-  };
-};
-
+exports.resetInitNmr = exports.resetInitMs = exports.resetInitCommonWithIntergation = exports.resetInitCommon = exports.resetAll = void 0;
+var _action_type = require("../constants/action_type");
+const resetAll = payload => ({
+  type: _action_type.MANAGER.RESETALL,
+  payload
+});
 exports.resetAll = resetAll;
+const resetInitCommon = payload => ({
+  type: _action_type.MANAGER.RESET_INIT_COMMON,
+  payload
+});
 exports.resetInitCommon = resetInitCommon;
+const resetInitNmr = payload => ({
+  type: _action_type.MANAGER.RESET_INIT_NMR,
+  payload
+});
 exports.resetInitNmr = resetInitNmr;
+const resetInitMs = payload => ({
+  type: _action_type.MANAGER.RESET_INIT_MS,
+  payload
+});
 exports.resetInitMs = resetInitMs;
-exports.resetInitCommonWithIntergation = resetInitCommonWithIntergation; // eslint-disable-line
+const resetInitCommonWithIntergation = payload => ({
+  type: _action_type.MANAGER.RESET_INIT_COMMON_WITH_INTERGATION,
+  payload
+});
+
+// eslint-disable-line
+exports.resetInitCommonWithIntergation = resetInitCommonWithIntergation;

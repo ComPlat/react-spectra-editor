@@ -1,19 +1,20 @@
+/* eslint-disable no-plusplus */
 import { put, takeEvery, select } from 'redux-saga/effects';
 
 import { CURVE, CYCLIC_VOLTA_METRY } from '../constants/action_type';
 import { LIST_LAYOUT } from '../constants/list_layout';
 
-const getCurveSt = state => state.curve;
-const getLayoutSt = state => state.layout;
+const getCurveSt = (state) => state.curve;
+const getLayoutSt = (state) => state.layout;
 
 function getMaxMinPeak(curve) {
   return curve.maxminPeak;
 }
 
-function* setCyclicVoltametry(action) {
+function* setCyclicVoltametry(action) { // eslint-disable-line
   const layoutSt = yield select(getLayoutSt);
   if (layoutSt !== LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
-    return
+    return;
   }
 
   const curveSt = yield select(getCurveSt);
@@ -42,19 +43,19 @@ function* setCyclicVoltametry(action) {
         const maxPeak = maxminPeak.max[pidx];
         yield put(({
           type: CYCLIC_VOLTA_METRY.ADD_MAX_PEAK,
-          payload: {peak: maxPeak, index: pidx, jcampIdx: index},
+          payload: { peak: maxPeak, index: pidx, jcampIdx: index },
         }));
 
         const minPeak = maxminPeak.min[pidx];
         yield put(({
           type: CYCLIC_VOLTA_METRY.ADD_MIN_PEAK,
-          payload: {peak: minPeak, index: pidx, jcampIdx: index},
+          payload: { peak: minPeak, index: pidx, jcampIdx: index },
         }));
 
         const pecker = maxminPeak.pecker[pidx];
         yield put(({
           type: CYCLIC_VOLTA_METRY.ADD_PECKER,
-          payload: {peak: pecker, index: pidx, jcampIdx: index},
+          payload: { peak: pecker, index: pidx, jcampIdx: index },
         }));
       }
     }

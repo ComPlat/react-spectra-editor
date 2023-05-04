@@ -14,14 +14,14 @@ const toggleIsIntensity = () => (
   }
 );
 
-const updateOperation = payload => (
+const updateOperation = (payload) => (
   {
     type: SUBMIT.UPDATE_OPERATION,
     payload,
   }
 );
 
-const updateDecimal = payload => (
+const updateDecimal = (payload) => (
   {
     type: SUBMIT.UPDATE_DECIMAL,
     payload,

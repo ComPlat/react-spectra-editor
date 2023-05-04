@@ -1,3 +1,6 @@
+/* eslint-disable prefer-object-spread, function-paren-newline,
+react/function-component-definition, react/require-default-props, max-len,
+react/no-unused-prop-types */
 import React from 'react';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
@@ -55,13 +58,13 @@ const UndoRedo = ({
   </span>
 );
 
-const canUndoFunc = state => (
+const canUndoFunc = (state) => (
   state.editPeak.past.length > 0
     || state.integration.past.length > 0
     || state.multiplicity.past.length > 0
 );
 
-const canRedoFunc = state => (
+const canRedoFunc = (state) => (
   state.editPeak.future.length > 0
     || state.integration.future.length > 0
     || state.multiplicity.future.length > 0
@@ -74,7 +77,7 @@ const mapStateToProps = (state, _) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   {
     onUndoAct: () => dispatch(UndoActionCreators.undo()),
     onRedoAct: () => dispatch(UndoActionCreators.redo()),

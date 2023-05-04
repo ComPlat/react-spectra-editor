@@ -1,3 +1,5 @@
+/* eslint-disable no-mixed-operators, react/require-default-props,
+react/no-unused-prop-types */
 import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -5,7 +7,7 @@ import PropTypes from 'prop-types';
 
 import {
   Topic2Seed, Feature2Peak, ToThresEndPts, ToShiftPeaks,
-  Feature2MaxMinPeak
+  Feature2MaxMinPeak,
 } from '../../helpers/chem';
 import { resetAll } from '../../actions/manager';
 import { selectUiSweep, scrollUiWheel, clickUiTarget } from '../../actions/ui';
@@ -21,14 +23,14 @@ import {
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.85); // ROI
 
-
-
 class ViewerMulti extends React.Component {
   constructor(props) {
     super(props);
 
-    const { entities, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct } = this.props;
-    this.rootKlass = ".d3Line";
+    const {
+      entities, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
+    } = this.props;
+    this.rootKlass = '.d3Line';
 
     this.focus = new MultiFocus({
       W, H, entities, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
@@ -43,8 +45,8 @@ class ViewerMulti extends React.Component {
       seed, peak, cLabel, xLabel, yLabel, feature,
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt,
       sweepExtentSt, isUiNoBrushSt,
-      isHidden,resetAllAct, cyclicvoltaSt,
-      integationSt, mtplySt
+      isHidden, resetAllAct, cyclicvoltaSt,
+      integationSt, mtplySt,
     } = this.props;
 
     drawDestroy(this.rootKlass);
@@ -99,7 +101,7 @@ class ViewerMulti extends React.Component {
       isUiNoBrushSt,
       cyclicvoltaSt,
       integationSt,
-      mtplySt
+      mtplySt,
     });
     drawLabel(this.rootKlass, cLabel, xLabel, yLabel);
     drawDisplay(this.rootKlass, isHidden);
@@ -120,7 +122,7 @@ class ViewerMulti extends React.Component {
   render() {
     return (
       <div className="d3Line" />
-    )
+    );
   }
 }
 
@@ -142,7 +144,7 @@ const mapStateToProps = (state, props) => (
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     resetAllAct: resetAll,
     clickUiTargetAct: clickUiTarget,
@@ -153,7 +155,6 @@ const mapDispatchToProps = dispatch => (
     addCylicVoltaMinPeakAct: addCylicVoltaMinPeak,
   }, dispatch)
 );
-
 
 ViewerMulti.propTypes = {
   curveSt: PropTypes.object.isRequired,
@@ -181,6 +182,7 @@ ViewerMulti.propTypes = {
   addNewCylicVoltaPairPeakAct: PropTypes.func.isRequired,
   addCylicVoltaMaxPeakAct: PropTypes.func.isRequired,
   addCylicVoltaMinPeakAct: PropTypes.func.isRequired,
-}
+  cLabel: PropTypes.string,
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(ViewerMulti);

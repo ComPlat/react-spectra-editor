@@ -1,3 +1,4 @@
+/* eslint-disable prefer-object-spread, default-param-last */
 import { LAYOUT, MANAGER } from '../constants/action_type';
 import { LIST_LAYOUT } from '../constants/list_layout';
 

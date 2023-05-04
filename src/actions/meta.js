@@ -1,6 +1,6 @@
 import { META } from '../constants/action_type';
 
-const updateMetaPeaks = payload => (
+const updateMetaPeaks = (payload) => (
   {
     type: META.UPDATE_PEAKS,
     payload,

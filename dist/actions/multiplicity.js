@@ -1,57 +1,39 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.updateMpyJ = exports.resetMpyOne = exports.clearMpyAll = exports.selectMpyType = exports.rmMpyPeakByPanel = exports.clickMpyOne = undefined;
-
-var _action_type = require('../constants/action_type');
-
-var clickMpyOne = function clickMpyOne(payload) {
-  return {
-    type: _action_type.MULTIPLICITY.ONE_CLICK,
-    payload: payload
-  };
-};
-
-var rmMpyPeakByPanel = function rmMpyPeakByPanel(payload) {
-  return {
-    type: _action_type.MULTIPLICITY.PEAK_RM_BY_PANEL,
-    payload: payload
-  };
-};
-
-var selectMpyType = function selectMpyType(payload) {
-  return {
-    type: _action_type.MULTIPLICITY.TYPE_SELECT,
-    payload: payload
-  };
-};
-
-var clearMpyAll = function clearMpyAll(payload) {
-  return {
-    type: _action_type.MULTIPLICITY.CLEAR_ALL,
-    payload: payload
-  };
-};
-
-var resetMpyOne = function resetMpyOne(payload) {
-  return {
-    type: _action_type.MULTIPLICITY.RESET_ONE,
-    payload: payload
-  };
-};
-
-var updateMpyJ = function updateMpyJ(payload) {
-  return {
-    type: _action_type.MULTIPLICITY.UPDATE_J,
-    payload: payload
-  };
-};
-
+exports.updateMpyJ = exports.selectMpyType = exports.rmMpyPeakByPanel = exports.resetMpyOne = exports.clickMpyOne = exports.clearMpyAll = void 0;
+var _action_type = require("../constants/action_type");
+const clickMpyOne = payload => ({
+  type: _action_type.MULTIPLICITY.ONE_CLICK,
+  payload
+});
 exports.clickMpyOne = clickMpyOne;
+const rmMpyPeakByPanel = payload => ({
+  type: _action_type.MULTIPLICITY.PEAK_RM_BY_PANEL,
+  payload
+});
 exports.rmMpyPeakByPanel = rmMpyPeakByPanel;
+const selectMpyType = payload => ({
+  type: _action_type.MULTIPLICITY.TYPE_SELECT,
+  payload
+});
 exports.selectMpyType = selectMpyType;
+const clearMpyAll = payload => ({
+  type: _action_type.MULTIPLICITY.CLEAR_ALL,
+  payload
+});
 exports.clearMpyAll = clearMpyAll;
+const resetMpyOne = payload => ({
+  type: _action_type.MULTIPLICITY.RESET_ONE,
+  payload
+});
 exports.resetMpyOne = resetMpyOne;
-exports.updateMpyJ = updateMpyJ; // eslint-disable-line
+const updateMpyJ = payload => ({
+  type: _action_type.MULTIPLICITY.UPDATE_J,
+  payload
+});
+
+// eslint-disable-line
+exports.updateMpyJ = updateMpyJ;

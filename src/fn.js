@@ -1,3 +1,4 @@
+/* eslint-disable prefer-object-spread */
 import Format from './helpers/format';
 import { ExtractJcamp } from './helpers/chem';
 import { ToXY } from './helpers/converter';

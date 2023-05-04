@@ -1,3 +1,4 @@
+/* eslint-disable prefer-object-spread, default-param-last */
 import {
   SHIFT, EDITPEAK, MANAGER, LAYOUT,
 } from '../constants/action_type';
@@ -62,7 +63,7 @@ const resetShift = (state, action) => {
   }
 
   const newShift = Object.assign(
-    {}, 
+    {},
     selectedShift,
     {
       ref: resetRef(action.payload),
@@ -72,10 +73,10 @@ const resetShift = (state, action) => {
 
   shifts[selectedIdx] = newShift;
 
-  return Object.assign({}, state, { shifts, selectedIdx: selectedIdx });
+  return Object.assign({}, state, { shifts, selectedIdx });
 };
 
-const updateShift = (state, action) => {
+const updateShift = (state, action) => {  // eslint-disable-line
   const { selectedIdx, shifts } = state;
   let selectedShift = shifts[selectedIdx];
   if (selectedShift === false || selectedShift === undefined) {
@@ -83,7 +84,7 @@ const updateShift = (state, action) => {
   }
 
   const newShift = Object.assign(
-    {}, 
+    {},
     selectedShift,
     {
       ref: false,
@@ -93,7 +94,7 @@ const updateShift = (state, action) => {
 
   shifts[selectedIdx] = newShift;
 
-  return Object.assign({}, state, { shifts, selectedIdx: selectedIdx });
+  return Object.assign({}, state, { shifts, selectedIdx });
 };
 
 const setRef = (state, action) => {
@@ -106,7 +107,7 @@ const setRef = (state, action) => {
   }
 
   const newShift = Object.assign(
-    {}, 
+    {},
     selectedShift,
     {
       ref: dataToSet,
@@ -117,7 +118,7 @@ const setRef = (state, action) => {
   shifts[curveIdx] = newShift;
 
   return Object.assign({}, state, { shifts, selectedIdx: curveIdx });
-}
+};
 
 const setPeak = (state, action) => {
   const { payload } = action;
@@ -138,7 +139,7 @@ const setPeak = (state, action) => {
   const truePeak = trueApex && trueApex.x && !isSamePt ? trueApex : false;
 
   const newShift = Object.assign(
-    {}, 
+    {},
     selectedShift,
     {
       peak: truePeak,
@@ -149,9 +150,9 @@ const setPeak = (state, action) => {
   shifts[curveIdx] = newShift;
 
   return Object.assign({}, state, { shifts, selectedIdx: curveIdx });
-}
+};
 
-const removePeak = (state, action) => {
+const removePeak = (state, action) => { // eslint-disable-line
   const { selectedIdx, shifts } = state;
   let selectedShift = shifts[selectedIdx];
   if (selectedShift === false || selectedShift === undefined) {
@@ -159,7 +160,7 @@ const removePeak = (state, action) => {
   }
 
   const newShift = Object.assign(
-    {}, 
+    {},
     selectedShift,
     {
       peak: false,
@@ -169,7 +170,7 @@ const removePeak = (state, action) => {
 
   shifts[selectedIdx] = newShift;
 
-  return Object.assign({}, state, { shifts, selectedIdx: selectedIdx });
+  return Object.assign({}, state, { shifts, selectedIdx });
 };
 
 const addNegative = (state, action) => {
@@ -187,21 +188,19 @@ const addNegative = (state, action) => {
   if (!rmApex) {
     return state;
   }
-  else {
-    const newShift = Object.assign(
-      {}, 
-      selectedShift,
-      {
-        peak: false,
-        enable: true,
-      },
-    );
-  
-    shifts[curveIdx] = newShift;
-  
-    return Object.assign({}, state, { shifts, selectedIdx: curveIdx });
-  }
-}
+  const newShift = Object.assign(
+    {},
+    selectedShift,
+    {
+      peak: false,
+      enable: true,
+    },
+  );
+
+  shifts[curveIdx] = newShift;
+
+  return Object.assign({}, state, { shifts, selectedIdx: curveIdx });
+};
 
 const shiftReducer = (state = initialState, action) => {
   switch (action.type) {

@@ -1,82 +1,89 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
+var _action_type = require("../constants/action_type");
+/* eslint-disable prefer-object-spread, default-param-last */
 
-var _action_type = require('../constants/action_type');
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-var initialState = {
+const initialState = {
   selectedIdx: 0,
   jcamps: [{
     others: [],
     addOthersCb: false
   }]
 };
-
-var addOthers = function addOthers(state, _ref) {
-  var others = _ref.others,
-      addOthersCb = _ref.addOthersCb;
-  var selectedIdx = state.selectedIdx,
-      jcamps = state.jcamps;
-
-  var selectedJcamp = jcamps[selectedIdx];
-
+const addOthers = (state, _ref) => {
+  let {
+    others,
+    addOthersCb
+  } = _ref;
+  const {
+    selectedIdx,
+    jcamps
+  } = state;
+  const selectedJcamp = jcamps[selectedIdx];
   if (selectedJcamp.others.length > 5) return state;
-  var decoOthers = others.map(function (o) {
-    return Object.assign({}, o, { show: true });
+  const decoOthers = others.map(o => Object.assign({}, o, {
+    show: true
+  }));
+  const newJcamp = Object.assign({}, selectedJcamp, {
+    others: [...selectedJcamp.others, ...decoOthers].slice(0, 5),
+    addOthersCb
   });
-
-  var newJcamp = Object.assign({}, selectedJcamp, { others: [].concat(_toConsumableArray(selectedJcamp.others), _toConsumableArray(decoOthers)).slice(0, 5), addOthersCb: addOthersCb });
   jcamps[selectedIdx] = newJcamp;
-
-  return Object.assign({}, state, { jcamps: jcamps });
-};
-
-var rmOthersOne = function rmOthersOne(state, payload) {
-  var selectedIdx = state.selectedIdx,
-      jcamps = state.jcamps;
-
-  var selectedJcamp = jcamps[selectedIdx];
-
-  var idx = payload;
-  var others = selectedJcamp.others;
-
-  var nextOther = others.filter(function (_, i) {
-    return i !== idx;
+  return Object.assign({}, state, {
+    jcamps
   });
-
-  var newJcamp = Object.assign({}, selectedJcamp, { others: nextOther });
-  jcamps[selectedIdx] = newJcamp;
-  return Object.assign({}, state, { jcamps: jcamps });
 };
-
-var toggleShow = function toggleShow(state, payload) {
-  var selectedIdx = state.selectedIdx,
-      jcamps = state.jcamps;
-
-  var selectedJcamp = jcamps[selectedIdx];
-
-  var idx = payload;
-  var others = selectedJcamp.others;
-
-  var nextOthers = others.map(function (o, i) {
+const rmOthersOne = (state, payload) => {
+  const {
+    selectedIdx,
+    jcamps
+  } = state;
+  const selectedJcamp = jcamps[selectedIdx];
+  const idx = payload;
+  const {
+    others
+  } = selectedJcamp;
+  const nextOther = others.filter((_, i) => i !== idx);
+  const newJcamp = Object.assign({}, selectedJcamp, {
+    others: nextOther
+  });
+  jcamps[selectedIdx] = newJcamp;
+  return Object.assign({}, state, {
+    jcamps
+  });
+};
+const toggleShow = (state, payload) => {
+  const {
+    selectedIdx,
+    jcamps
+  } = state;
+  const selectedJcamp = jcamps[selectedIdx];
+  const idx = payload;
+  const {
+    others
+  } = selectedJcamp;
+  const nextOthers = others.map((o, i) => {
     if (i !== idx) return o;
-    var currentShow = o.show;
-    return Object.assign({}, o, { show: !currentShow });
+    const currentShow = o.show;
+    return Object.assign({}, o, {
+      show: !currentShow
+    });
   });
-
-  var newJcamp = Object.assign({}, selectedJcamp, { others: nextOthers });
+  const newJcamp = Object.assign({}, selectedJcamp, {
+    others: nextOthers
+  });
   jcamps[selectedIdx] = newJcamp;
-  return Object.assign({}, state, { jcamps: jcamps });
+  return Object.assign({}, state, {
+    jcamps
+  });
 };
-
-var layoutReducer = function layoutReducer() {
-  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-  var action = arguments[1];
-
+const layoutReducer = function () {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+  let action = arguments.length > 1 ? arguments[1] : undefined;
   switch (action.type) {
     case _action_type.JCAMP.ADD_OTHERS:
       return addOthers(state, action.payload);
@@ -92,5 +99,5 @@ var layoutReducer = function layoutReducer() {
       return state;
   }
 };
-
-exports.default = layoutReducer;
+var _default = layoutReducer;
+exports.default = _default;

@@ -1,3 +1,5 @@
+/* eslint-disable function-paren-newline, react/jsx-props-no-spreading,
+react/function-component-definition */
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -23,7 +25,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Format from '../../helpers/format';
 import { rmOthersOne, toggleShow } from '../../actions/jcamp';
 
-const styles = theme => ({
+const styles = (theme) => ({
   panel: {
     backgroundColor: '#eee',
     display: 'table-row',
@@ -115,7 +117,7 @@ const styles = theme => ({
 
 const msgDefault = 'Add spectra to compare.';
 
-const tpHint = classes => (
+const tpHint = (classes) => (
   <span className={classNames(classes.tpCard)}>
     <p className={classNames(classes.tpLabel, 'txt-sv-tp')}>
       - Accept *.dx, *.jdx, *.JCAMP,
@@ -140,7 +142,6 @@ const content = (classes, desc) => (
 const inputOthers = (
   classes, jcampSt,
 ) => {
-
   const { selectedIdx, jcamps } = jcampSt;
   const selectedJcamp = jcamps[selectedIdx];
   const { addOthersCb } = selectedJcamp;
@@ -175,7 +176,6 @@ const inputOthers = (
 const compareList = (
   classes, jcampSt, rmOthersOneAct, toggleShowAct,
 ) => {
-
   const { selectedIdx, jcamps } = jcampSt;
   const selectedJcamp = jcamps[selectedIdx];
   const { others } = selectedJcamp;
@@ -195,7 +195,7 @@ const compareList = (
     <Table className={classes.table}>
       <TableBody>
         {
-          rows.map(row => (
+          rows.map((row) => (
             <TableRow key={row.idx} className={classes.tRow} hover>
               <TableCell
                 align="right"
@@ -269,7 +269,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     rmOthersOneAct: rmOthersOne,
     toggleShowAct: toggleShow,

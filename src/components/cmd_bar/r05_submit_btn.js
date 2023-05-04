@@ -1,3 +1,6 @@
+/* eslint-disable prefer-object-spread, function-paren-newline,
+react/function-component-definition, function-call-argument-newline,
+react/require-default-props */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -25,7 +28,7 @@ const onClickCb = (
   operation, peaksEdit, isAscend, isIntensity,
   scan, thres, layoutSt, shiftSt, analysis, decimalSt,
   integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt,
-  cyclicvoltaSt, curveSt
+  cyclicvoltaSt, curveSt,
 ) => (
   () => {
     operation({
@@ -41,10 +44,10 @@ const onClickCb = (
       integration: integrationSt,
       multiplicity: multiplicitySt,
       allIntegration: allIntegrationSt,
-      aucValues: aucValues,
+      aucValues,
       waveLength: waveLengthSt,
-      cyclicvoltaSt: cyclicvoltaSt,
-      curveSt: curveSt,
+      cyclicvoltaSt,
+      curveSt,
     });
   }
 );
@@ -53,7 +56,7 @@ const BtnSubmit = ({
   classes, operation, feature, isAscend, isIntensity,
   editPeakSt, thresSt, layoutSt, shiftSt, scanSt, forecastSt,
   decimalSt, integrationSt, multiplicitySt, allIntegrationSt,
-  waveLengthSt, cyclicvoltaSt, curveSt
+  waveLengthSt, cyclicvoltaSt, curveSt,
 }) => {
   const peaksEdit = extractPeaksEdit(feature, editPeakSt, thresSt, shiftSt, layoutSt);
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
@@ -76,7 +79,7 @@ const BtnSubmit = ({
           operation.value, peaksEdit, isAscend, isIntensity,
           scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt,
           integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt,
-          cyclicvoltaSt, curveSt
+          cyclicvoltaSt, curveSt,
         )}
       >
         <PlayCircleOutlineIcon className={classes.icon} />
@@ -103,7 +106,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
   }, dispatch)
 );
@@ -131,6 +134,7 @@ BtnSubmit.propTypes = {
   allIntegrationSt: PropTypes.object.isRequired,
   waveLengthSt: PropTypes.object.isRequired,
   cyclicvoltaSt: PropTypes.object.isRequired,
+  curveSt: PropTypes.object,
 };
 
 export default compose(

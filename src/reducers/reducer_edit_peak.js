@@ -1,3 +1,4 @@
+/* eslint-disable prefer-object-spread, default-param-last */
 import undoable from 'redux-undo';
 import { EDITPEAK, MANAGER } from '../constants/action_type';
 
@@ -32,7 +33,7 @@ const addToPos = (state, action) => {
 
   const oriPosState = selectedEditPeaks.pos;
   const oriNegState = selectedEditPeaks.neg;
-  const idxN = oriNegState.findIndex(n => almostEqual(n.x, dataToAdd.x));
+  const idxN = oriNegState.findIndex((n) => almostEqual(n.x, dataToAdd.x));
   if (idxN >= 0) { // rm the peak from oriNegState if it is already deleted.
     const neg = [
       ...oriNegState.slice(0, idxN),
@@ -44,7 +45,7 @@ const addToPos = (state, action) => {
 
     return Object.assign({}, state, { peaks });
   }
-  const idxP = oriPosState.findIndex(p => almostEqual(p.x, dataToAdd.x));
+  const idxP = oriPosState.findIndex((p) => almostEqual(p.x, dataToAdd.x));
   if (idxP < 0) { // add the peak
     const pos = [...oriPosState, dataToAdd];
 
@@ -60,7 +61,7 @@ const rmFromPos = (state, action) => {
   const selectedEditPeaks = peaks[selectedIdx];
 
   const oriPosState = selectedEditPeaks.pos;
-  const idx = oriPosState.findIndex(p => p.x === action.payload.x);
+  const idx = oriPosState.findIndex((p) => p.x === action.payload.x);
   const pos = [
     ...oriPosState.slice(0, idx),
     ...oriPosState.slice(idx + 1),
@@ -82,7 +83,7 @@ const addToNeg = (state, action) => {
 
   const oriPosState = selectedEditPeaks.pos;
   const oriNegState = selectedEditPeaks.neg;
-  const idxP = oriPosState.findIndex(n => n.x === dataToAdd.x);
+  const idxP = oriPosState.findIndex((n) => n.x === dataToAdd.x);
   if (idxP >= 0) {
     const pos = [
       ...oriPosState.slice(0, idxP),
@@ -92,7 +93,7 @@ const addToNeg = (state, action) => {
     peaks[curveIdx] = newSelectedEditPeaks;
     return Object.assign({}, state, { peaks });
   }
-  const idxN = oriNegState.findIndex(n => n.x === dataToAdd.x);
+  const idxN = oriNegState.findIndex((n) => n.x === dataToAdd.x);
   if (idxN < 0) {
     const neg = [...oriNegState, dataToAdd];
     const newSelectedEditPeaks = Object.assign({}, selectedEditPeaks, { neg });
@@ -107,7 +108,7 @@ const rmFromNeg = (state, action) => {
   const selectedEditPeaks = peaks[selectedIdx];
 
   const oriNegState = selectedEditPeaks.neg;
-  const idx = oriNegState.findIndex(n => n.x === action.payload.x);
+  const idx = oriNegState.findIndex((n) => n.x === action.payload.x);
   const neg = [
     ...oriNegState.slice(0, idx),
     ...oriNegState.slice(idx + 1),

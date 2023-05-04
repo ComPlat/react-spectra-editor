@@ -1,3 +1,5 @@
+/* eslint-disable prefer-object-spread, function-paren-newline,
+react/function-component-definition, react/require-default-props */
 import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
@@ -34,7 +36,7 @@ const CmdBar = ({
   <div className={classes.card}>
     <Viewer editorOnly={editorOnly} />
     <Zoom />
-    <Peak jcampIdx={jcampIdx}/>
+    <Peak jcampIdx={jcampIdx} />
     <Pecker jcampIdx={jcampIdx} />
     <Integration />
     <Multiplicity />
@@ -60,7 +62,7 @@ const mapStateToProps = (state, _) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
   }, dispatch)
 );

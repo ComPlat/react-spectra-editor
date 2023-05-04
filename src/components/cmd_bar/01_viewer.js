@@ -1,3 +1,4 @@
+/* eslint-disable prefer-object-spread, react/function-component-definition */
 import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
@@ -77,7 +78,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     setUiViewerTypeAct: setUiViewerType,
   }, dispatch)

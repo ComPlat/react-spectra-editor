@@ -13,7 +13,7 @@ const fetchPt = (focus, xt) => {
     ? d3.event.offsetX
     : d3.mouse(focus.root.node())[0];
   const mouseX = xt.invert(rawMouseX);
-  const bisectDate = d3.bisector(d => +d.x).left;
+  const bisectDate = d3.bisector((d) => +d.x).left;
   const dt = focus.data;
   const ls = dt.length;
   const sortData = ls > 0 && dt[0].x > dt[ls - 1].x ? dt.reverse() : dt;
@@ -34,18 +34,18 @@ const fetchFreePt = (focus, xt, yt) => {
   const distance2 = (x1, x2, y1, y2) => {
     const dx = x1 - x2;
     const dy = y1 - y2;
-    return dx*dx + dy*dy;
+    return dx * dx + dy * dy;
   };
 
   let minDistance = Number.MAX_VALUE;
 
   const dt = focus.data;
-  let selectPoint = null
-  dt.forEach(pt => {
+  let selectPoint = null;
+  dt.forEach((pt) => {
     const distance = distance2(pt.x, mouseX, pt.y, mouseY);
     if (minDistance > distance) {
       minDistance = distance;
-      selectPoint = pt
+      selectPoint = pt;
     }
   });
   return selectPoint;
@@ -55,7 +55,7 @@ const MouseMove = (focus) => {
   const { xt, yt } = TfRescale(focus);
   const { freq, layout, wavelength } = focus;
   if (Format.isCyclicVoltaLayout(layout)) {
-    const pt = fetchFreePt(focus, xt, yt)
+    const pt = fetchFreePt(focus, xt, yt);
     if (pt) {
       const tx = xt(pt.x);
       const ty = yt(pt.y);
@@ -63,20 +63,19 @@ const MouseMove = (focus) => {
       focus.root.select('.x-hover-line')
         .attr('y1', 0 - ty)
         .attr('y2', focus.h - ty);
-        focus.root.select('.cursor-txt')
+      focus.root.select('.cursor-txt')
         .attr('transform', `translate(${tx},${10})`)
         .text(pt.x.toFixed(3));
-        if (freq) {
-          focus.root.select('.cursor-txt-hz')
-            .attr('transform', `translate(${tx},${20})`)
-            .text(`${(pt.x * freq).toFixed(3)} Hz`);
-        } else {
-          focus.root.select('.cursor-txt-hz')
-            .text('');
-        }
+      if (freq) {
+        focus.root.select('.cursor-txt-hz')
+          .attr('transform', `translate(${tx},${20})`)
+          .text(`${(pt.x * freq).toFixed(3)} Hz`);
+      } else {
+        focus.root.select('.cursor-txt-hz')
+          .text('');
+      }
     }
-  }
-  else {
+  } else {
     const pt = fetchPt(focus, xt);
     if (pt) {
       const tx = xt(pt.x);
@@ -89,18 +88,16 @@ const MouseMove = (focus) => {
         let dValue = 0.0;
         if (wavelength) {
           dValue = Convert2DValue(pt.x, wavelength.value).toExponential(2);
-        }
-        else {
+        } else {
           dValue = Convert2DValue(pt.x).toExponential(2);
         }
         focus.root.select('.cursor-txt-hz')
-          .attr('transform', `translate(${tx},${ty-30})`)
+          .attr('transform', `translate(${tx},${ty - 30})`)
           .text(`2Theta: ${pt.x.toExponential(2)}, d-value: ${dValue}`);
-      }
-      else {
+      } else {
         focus.root.select('.cursor-txt')
-        .attr('transform', `translate(${tx},${10})`)
-        .text(pt.x.toFixed(3));
+          .attr('transform', `translate(${tx},${10})`)
+          .text(pt.x.toFixed(3));
         if (freq) {
           focus.root.select('.cursor-txt-hz')
             .attr('transform', `translate(${tx},${20})`)
@@ -128,15 +125,12 @@ const ClickCompass = (focus) => {
       const spectra = spectraList[jcampIdx];
       const voltammetryPeakIdx = spectra.selectedIdx;
       focus.clickUiTargetAct(pt, onPeak, voltammetryPeakIdx, jcampIdx);
-    }
-    else {
+    } else {
       focus.clickUiTargetAct(pt, onPeak);
     }
-  }
-  else {
+  } else {
     focus.clickUiTargetAct(pt, false);
   }
-  
 };
 
 const MountCompass = (focus) => {

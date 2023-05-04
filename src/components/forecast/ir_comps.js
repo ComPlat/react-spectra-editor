@@ -1,3 +1,5 @@
+/* eslint-disable react/function-component-definition, function-paren-newline,
+prefer-object-spread */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -18,7 +20,6 @@ import {
 } from './comps';
 import { setIrStatus } from '../../actions/forecast';
 // import SmaToSvg from '../common/chem';
-
 
 const baseSelectIrStatus = ({
   sma, status, identity,
@@ -57,7 +58,7 @@ const bssMapStateToProps = (state, props) => ( // eslint-disable-line
   {}
 );
 
-const bssMapDispatchToProps = dispatch => (
+const bssMapDispatchToProps = (dispatch) => (
   bindActionCreators({
     setIrStatusAct: setIrStatus,
   }, dispatch)
@@ -78,8 +79,7 @@ const SelectIrStatus = connect(
   bssMapStateToProps, bssMapDispatchToProps,
 )(baseSelectIrStatus);
 
-
-const IrTableHeader = classes => (
+const IrTableHeader = (classes) => (
   <TableHead>
     <TableRow>
       <TableCell />

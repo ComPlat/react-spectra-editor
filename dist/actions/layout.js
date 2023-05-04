@@ -1,17 +1,14 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.updateLayout = undefined;
+exports.updateLayout = void 0;
+var _action_type = require("../constants/action_type");
+const updateLayout = payload => ({
+  type: _action_type.LAYOUT.UPDATE,
+  payload
+});
 
-var _action_type = require('../constants/action_type');
-
-var updateLayout = function updateLayout(payload) {
-  return {
-    type: _action_type.LAYOUT.UPDATE,
-    payload: payload
-  };
-};
-
-exports.updateLayout = updateLayout; // eslint-disable-line
+// eslint-disable-line
+exports.updateLayout = updateLayout;

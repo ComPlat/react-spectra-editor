@@ -1,3 +1,4 @@
+/* eslint-disable prefer-object-spread, default-param-last */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -6,7 +7,9 @@ import { bindActionCreators } from 'redux';
 import { withStyles } from '@material-ui/core/styles';
 
 import { updateOperation } from './actions/submit';
-import { resetInitCommon, resetInitNmr, resetInitMs, resetInitCommonWithIntergation } from './actions/manager';
+import {
+  resetInitCommon, resetInitNmr, resetInitMs, resetInitCommonWithIntergation,
+} from './actions/manager';
 import { updateMetaPeaks } from './actions/meta';
 import { addOthers } from './actions/jcamp';
 import LayerPrism from './layer_prism';
@@ -56,7 +59,7 @@ class LayerInit extends React.Component {
   execReset() {
     const {
       entity, updateMetaPeaksAct,
-      resetInitCommonAct, resetInitMsAct, resetInitNmrAct, resetInitCommonWithIntergationAct
+      resetInitCommonAct, resetInitMsAct, resetInitNmrAct, resetInitCommonWithIntergationAct,
     } = this.props;
     resetInitCommonAct();
     const { layout, features } = entity;
@@ -73,12 +76,11 @@ class LayerInit extends React.Component {
       resetInitNmrAct({
         integration, multiplicity, simulation,
       });
-    }
-    else if (Format.isHplcUvVisLayout(layout)) {
+    } else if (Format.isHplcUvVisLayout(layout)) {
       const { integration } = features;
       updateMetaPeaksAct(entity);
       resetInitCommonWithIntergationAct({
-        integration
+        integration,
       });
     }
   }
@@ -103,7 +105,7 @@ class LayerInit extends React.Component {
       entity, cLabel, xLabel, yLabel, forecast, operations,
       descriptions, molSvg, editorOnly,
       canChangeDescription, onDescriptionChanged,
-      multiEntities, entityFileNames, userManualLink
+      multiEntities, entityFileNames, userManualLink,
     } = this.props;
     const target = entity.spectra[0];
 
@@ -114,25 +116,24 @@ class LayerInit extends React.Component {
 
     if (multiEntities) {
       return (
-        <MultiJcampsViewer 
+        <MultiJcampsViewer
           multiEntities={multiEntities}
           entityFileNames={entityFileNames}
           userManualLink={userManualLink}
           molSvg={molSvg}
           operations={operations}
         />
-      )
-    }
-    else if (Format.isCyclicVoltaLayout(layout)) {
+      );
+    } else if (Format.isCyclicVoltaLayout(layout)) {  // eslint-disable-line
       return (
-        <MultiJcampsViewer 
+        <MultiJcampsViewer
           multiEntities={[entity]}
           entityFileNames={entityFileNames}
           userManualLink={userManualLink}
           molSvg={molSvg}
           operations={operations}
         />
-      )
+      );
     }
 
     return (
@@ -148,7 +149,6 @@ class LayerInit extends React.Component {
         editorOnly={editorOnly}
         canChangeDescription={canChangeDescription}
         onDescriptionChanged={onDescriptionChanged}
-        
       />
     );
   }
@@ -158,7 +158,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   {}
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     resetInitCommonAct: resetInitCommon,
     resetInitNmrAct: resetInitNmr,
@@ -173,8 +173,8 @@ const mapDispatchToProps = dispatch => (
 
 LayerInit.propTypes = {
   entity: PropTypes.object.isRequired,
-  multiEntities: PropTypes.array,
-  entityFileNames: PropTypes.array,
+  multiEntities: PropTypes.array, // eslint-disable-line
+  entityFileNames: PropTypes.array, // eslint-disable-line
   others: PropTypes.object.isRequired,
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
@@ -192,11 +192,11 @@ LayerInit.propTypes = {
   updateMetaPeaksAct: PropTypes.func.isRequired,
   addOthersAct: PropTypes.func.isRequired,
   canChangeDescription: PropTypes.bool.isRequired,
-  onDescriptionChanged: PropTypes.func,
+  onDescriptionChanged: PropTypes.func, // eslint-disable-line
   setAllCurvesAct: PropTypes.func.isRequired,
-  userManualLink: PropTypes.object,
+  userManualLink: PropTypes.object, // eslint-disable-line
 };
 
-export default connect(
+export default connect( // eslint-disable-line
   mapStateToProps, mapDispatchToProps,
-)(withStyles(styles)(LayerInit));
+)(withStyles(styles)(LayerInit)); // eslint-disable-line

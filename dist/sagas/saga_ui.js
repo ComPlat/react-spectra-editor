@@ -1,519 +1,321 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _effects = require('redux-saga/effects');
-
-var _action_type = require('../constants/action_type');
-
-var _list_ui = require('../constants/list_ui');
-
-var _list_layout = require('../constants/list_layout');
-
-var _marked = /*#__PURE__*/regeneratorRuntime.mark(selectUiSweep),
-    _marked2 = /*#__PURE__*/regeneratorRuntime.mark(scrollUiWheel),
-    _marked3 = /*#__PURE__*/regeneratorRuntime.mark(clickUiTarget);
-
-var getUiSt = function getUiSt(state) {
-  return state.ui;
-};
-var getCurveSt = function getCurveSt(state) {
-  return state.curve;
-};
-
-var calcPeaks = function calcPeaks(payload) {
-  var xExtent = payload.xExtent,
-      yExtent = payload.yExtent,
-      dataPks = payload.dataPks;
-
+exports.default = void 0;
+var _effects = require("redux-saga/effects");
+var _action_type = require("../constants/action_type");
+var _list_ui = require("../constants/list_ui");
+var _list_layout = require("../constants/list_layout");
+const getUiSt = state => state.ui;
+const getCurveSt = state => state.curve;
+const calcPeaks = payload => {
+  const {
+    xExtent,
+    yExtent,
+    dataPks
+  } = payload;
   if (!dataPks) return [];
-  var xL = xExtent.xL,
-      xU = xExtent.xU;
-  var yL = yExtent.yL,
-      yU = yExtent.yU;
-
-  var peaks = dataPks.filter(function (p) {
-    return xL <= p.x && p.x <= xU && yL <= p.y && p.y <= yU;
-  });
+  const {
+    xL,
+    xU
+  } = xExtent;
+  const {
+    yL,
+    yU
+  } = yExtent;
+  const peaks = dataPks.filter(p => xL <= p.x && p.x <= xU && yL <= p.y && p.y <= yU);
   return peaks;
 };
-
-function selectUiSweep(action) {
-  var uiSt, payload, curveSt, curveIdx, peaks, newPayload;
-  return regeneratorRuntime.wrap(function selectUiSweep$(_context) {
-    while (1) {
-      switch (_context.prev = _context.next) {
-        case 0:
-          _context.next = 2;
-          return (0, _effects.select)(getUiSt);
-
-        case 2:
-          uiSt = _context.sent;
-          payload = action.payload;
-          _context.next = 6;
-          return (0, _effects.select)(getCurveSt);
-
-        case 6:
-          curveSt = _context.sent;
-          curveIdx = curveSt.curveIdx;
-          _context.t0 = uiSt.sweepType;
-          _context.next = _context.t0 === _list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN ? 11 : _context.t0 === _list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET ? 14 : _context.t0 === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD ? 17 : _context.t0 === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD ? 20 : 29;
-          break;
-
-        case 11:
-          _context.next = 13;
-          return (0, _effects.put)({
-            type: _action_type.UI.SWEEP.SELECT_ZOOMIN,
-            payload: payload
-          });
-
-        case 13:
-          return _context.abrupt('break', 30);
-
-        case 14:
-          _context.next = 16;
-          return (0, _effects.put)({
-            type: _action_type.UI.SWEEP.SELECT_ZOOMRESET,
-            payload: payload
-          });
-
-        case 16:
-          return _context.abrupt('break', 30);
-
-        case 17:
-          _context.next = 19;
-          return (0, _effects.put)({
-            type: _action_type.UI.SWEEP.SELECT_INTEGRATION,
-            payload: { newData: payload, curveIdx: curveIdx }
-          });
-
-        case 19:
-          return _context.abrupt('break', 30);
-
-        case 20:
-          peaks = calcPeaks(payload); // eslint-disable-line
-
-          if (!(peaks.length === 0)) {
-            _context.next = 23;
-            break;
-          }
-
-          return _context.abrupt('break', 30);
-
-        case 23:
-          newPayload = Object.assign({}, payload, { peaks: peaks }); // eslint-disable-line
-
-          _context.next = 26;
-          return (0, _effects.put)({
-            type: _action_type.UI.SWEEP.SELECT_INTEGRATION,
-            payload: { newData: newPayload, curveIdx: curveIdx }
-          });
-
-        case 26:
-          _context.next = 28;
-          return (0, _effects.put)({
-            type: _action_type.UI.SWEEP.SELECT_MULTIPLICITY,
-            payload: { newData: newPayload, curveIdx: curveIdx }
-          });
-
-        case 28:
-          return _context.abrupt('break', 30);
-
-        case 29:
-          return _context.abrupt('break', 30);
-
-        case 30:
-          return _context.abrupt('return', null);
-
-        case 31:
-        case 'end':
-          return _context.stop();
+function* selectUiSweep(action) {
+  const uiSt = yield (0, _effects.select)(getUiSt);
+  const {
+    payload
+  } = action;
+  const curveSt = yield (0, _effects.select)(getCurveSt);
+  const {
+    curveIdx
+  } = curveSt;
+  switch (uiSt.sweepType) {
+    case _list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN:
+      yield (0, _effects.put)({
+        type: _action_type.UI.SWEEP.SELECT_ZOOMIN,
+        payload
+      });
+      break;
+    case _list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET:
+      yield (0, _effects.put)({
+        type: _action_type.UI.SWEEP.SELECT_ZOOMRESET,
+        payload
+      });
+      break;
+    case _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD:
+      yield (0, _effects.put)({
+        type: _action_type.UI.SWEEP.SELECT_INTEGRATION,
+        payload: {
+          newData: payload,
+          curveIdx
+        }
+      });
+      break;
+    case _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD:
+      const peaks = calcPeaks(payload); // eslint-disable-line
+      if (peaks.length === 0) {
+        break;
       }
-    }
-  }, _marked);
+      const newPayload = Object.assign({}, payload, {
+        peaks
+      }); // eslint-disable-line
+
+      yield (0, _effects.put)({
+        type: _action_type.UI.SWEEP.SELECT_INTEGRATION,
+        payload: {
+          newData: newPayload,
+          curveIdx
+        }
+      });
+      yield (0, _effects.put)({
+        type: _action_type.UI.SWEEP.SELECT_MULTIPLICITY,
+        payload: {
+          newData: newPayload,
+          curveIdx
+        }
+      });
+      break;
+    default:
+      break;
+  }
+  return null;
 }
-
-var getLayoutSt = function getLayoutSt(state) {
-  return state.layout;
-};
-
-function scrollUiWheel(action) {
-  var layoutSt, payload, xExtent, yExtent, direction, yL, yU, yeL, yeU, scale, nextExtent, nyeL, nyeU, h, nytL, nytU;
-  return regeneratorRuntime.wrap(function scrollUiWheel$(_context2) {
-    while (1) {
-      switch (_context2.prev = _context2.next) {
-        case 0:
-          _context2.next = 2;
-          return (0, _effects.select)(getLayoutSt);
-
-        case 2:
-          layoutSt = _context2.sent;
-          payload = action.payload;
-          xExtent = payload.xExtent, yExtent = payload.yExtent, direction = payload.direction;
-          yL = yExtent.yL, yU = yExtent.yU;
-          yeL = yL + (yU - yL) * 0.1, yeU = yU - (yU - yL) * 0.1;
-          scale = direction ? 0.8 : 1.25;
-          nextExtent = { xExtent: false, yExtent: false };
-          nyeL = 0, nyeU = 1, h = 1, nytL = 0, nytU = 1;
-          _context2.t0 = layoutSt;
-          _context2.next = _context2.t0 === _list_layout.LIST_LAYOUT.IR ? 13 : _context2.t0 === _list_layout.LIST_LAYOUT.RAMAN ? 13 : _context2.t0 === _list_layout.LIST_LAYOUT.MS ? 20 : _context2.t0 === _list_layout.LIST_LAYOUT.UVVIS ? 27 : _context2.t0 === _list_layout.LIST_LAYOUT.HPLC_UVVIS ? 27 : _context2.t0 === _list_layout.LIST_LAYOUT.TGA ? 27 : _context2.t0 === _list_layout.LIST_LAYOUT.XRD ? 27 : 27;
-          break;
-
-        case 13:
-          nyeL = yeL + (yeU - yeL) * (1 - scale);
-          nyeU = yeU;
-
-          h = nyeU - nyeL;
-          nytL = nyeL - 0.125 * h;
-          nytU = nyeU + 0.125 * h;
-
-          nextExtent = { xExtent: xExtent, yExtent: { yL: nytL, yU: nytU } };
-          return _context2.abrupt('break', 34);
-
-        case 20:
-          nyeL = 0;
-          nyeU = yeL + (yeU - yeL) * scale;
-
-          h = nyeU - nyeL;
-          nytL = nyeL - 0.125 * h;
-          nytU = nyeU + 0.125 * h;
-
-          nextExtent = { xExtent: xExtent, yExtent: { yL: nytL, yU: nytU } };
-          return _context2.abrupt('break', 34);
-
-        case 27:
-          nyeL = yeL;
-          nyeU = yeL + (yeU - yeL) * scale;
-
-          h = nyeU - nyeL;
-          nytL = nyeL - 0.125 * h;
-          nytU = nyeU + 0.125 * h;
-
-          nextExtent = { xExtent: xExtent, yExtent: { yL: nytL, yU: nytU } };
-          return _context2.abrupt('break', 34);
-
-        case 34:
-          _context2.next = 36;
-          return (0, _effects.put)({
-            type: _action_type.UI.SWEEP.SELECT_ZOOMIN,
-            payload: nextExtent
-          });
-
-        case 36:
-        case 'end':
-          return _context2.stop();
+const getLayoutSt = state => state.layout;
+function* scrollUiWheel(action) {
+  const layoutSt = yield (0, _effects.select)(getLayoutSt);
+  const {
+    payload
+  } = action;
+  const {
+    xExtent,
+    yExtent,
+    direction
+  } = payload;
+  const {
+    yL,
+    yU
+  } = yExtent;
+  const [yeL, yeU] = [yL + (yU - yL) * 0.1, yU - (yU - yL) * 0.1];
+  const scale = direction ? 0.8 : 1.25;
+  let nextExtent = {
+    xExtent: false,
+    yExtent: false
+  };
+  let [nyeL, nyeU, h, nytL, nytU] = [0, 1, 1, 0, 1];
+  switch (layoutSt) {
+    case _list_layout.LIST_LAYOUT.IR:
+    case _list_layout.LIST_LAYOUT.RAMAN:
+      [nyeL, nyeU] = [yeL + (yeU - yeL) * (1 - scale), yeU];
+      h = nyeU - nyeL;
+      [nytL, nytU] = [nyeL - 0.125 * h, nyeU + 0.125 * h];
+      nextExtent = {
+        xExtent,
+        yExtent: {
+          yL: nytL,
+          yU: nytU
+        }
+      };
+      break;
+    case _list_layout.LIST_LAYOUT.MS:
+      [nyeL, nyeU] = [0, yeL + (yeU - yeL) * scale];
+      h = nyeU - nyeL;
+      [nytL, nytU] = [nyeL - 0.125 * h, nyeU + 0.125 * h];
+      nextExtent = {
+        xExtent,
+        yExtent: {
+          yL: nytL,
+          yU: nytU
+        }
+      };
+      break;
+    case _list_layout.LIST_LAYOUT.UVVIS:
+    case _list_layout.LIST_LAYOUT.HPLC_UVVIS:
+    case _list_layout.LIST_LAYOUT.TGA:
+    case _list_layout.LIST_LAYOUT.XRD:
+    default:
+      [nyeL, nyeU] = [yeL, yeL + (yeU - yeL) * scale];
+      h = nyeU - nyeL;
+      [nytL, nytU] = [nyeL - 0.125 * h, nyeU + 0.125 * h];
+      nextExtent = {
+        xExtent,
+        yExtent: {
+          yL: nytL,
+          yU: nytU
+        }
+      };
+      break;
+  }
+  yield (0, _effects.put)({
+    type: _action_type.UI.SWEEP.SELECT_ZOOMIN,
+    payload: nextExtent
+  });
+}
+const getUiSweepType = state => state.ui.sweepType;
+function* clickUiTarget(action) {
+  const {
+    payload,
+    onPeak,
+    voltammetryPeakIdx,
+    onPecker
+  } = action;
+  const uiSweepType = yield (0, _effects.select)(getUiSweepType);
+  const curveSt = yield (0, _effects.select)(getCurveSt);
+  const {
+    curveIdx
+  } = curveSt;
+  if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.PEAK_ADD && !onPeak) {
+    yield (0, _effects.put)({
+      type: _action_type.EDITPEAK.ADD_POSITIVE,
+      payload: {
+        dataToAdd: payload,
+        curveIdx
       }
-    }
-  }, _marked2);
-}
-
-var getUiSweepType = function getUiSweepType(state) {
-  return state.ui.sweepType;
-};
-
-function clickUiTarget(action) {
-  var payload, onPeak, voltammetryPeakIdx, onPecker, uiSweepType, curveSt, curveIdx, xExtent, xL, xU;
-  return regeneratorRuntime.wrap(function clickUiTarget$(_context3) {
-    while (1) {
-      switch (_context3.prev = _context3.next) {
-        case 0:
-          payload = action.payload, onPeak = action.onPeak, voltammetryPeakIdx = action.voltammetryPeakIdx, onPecker = action.onPecker;
-          _context3.next = 3;
-          return (0, _effects.select)(getUiSweepType);
-
-        case 3:
-          uiSweepType = _context3.sent;
-          _context3.next = 6;
-          return (0, _effects.select)(getCurveSt);
-
-        case 6:
-          curveSt = _context3.sent;
-          curveIdx = curveSt.curveIdx;
-
-          if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.PEAK_ADD && !onPeak)) {
-            _context3.next = 13;
-            break;
-          }
-
-          _context3.next = 11;
-          return (0, _effects.put)({
-            type: _action_type.EDITPEAK.ADD_POSITIVE,
-            payload: { dataToAdd: payload, curveIdx: curveIdx }
-          });
-
-        case 11:
-          _context3.next = 93;
-          break;
-
-        case 13:
-          if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.PEAK_DELETE && onPeak)) {
-            _context3.next = 18;
-            break;
-          }
-
-          _context3.next = 16;
-          return (0, _effects.put)({
-            type: _action_type.EDITPEAK.ADD_NEGATIVE,
-            payload: { dataToAdd: payload, curveIdx: curveIdx }
-          });
-
-        case 16:
-          _context3.next = 93;
-          break;
-
-        case 18:
-          if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT && onPeak)) {
-            _context3.next = 23;
-            break;
-          }
-
-          _context3.next = 21;
-          return (0, _effects.put)({
-            type: _action_type.SHIFT.SET_PEAK,
-            payload: { dataToSet: payload, curveIdx: curveIdx }
-          });
-
-        case 21:
-          _context3.next = 93;
-          break;
-
-        case 23:
-          if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_RM && onPeak)) {
-            _context3.next = 28;
-            break;
-          }
-
-          _context3.next = 26;
-          return (0, _effects.put)({
-            type: _action_type.INTEGRATION.RM_ONE,
-            payload: { dataToRemove: payload, curveIdx: curveIdx }
-          });
-
-        case 26:
-          _context3.next = 93;
-          break;
-
-        case 28:
-          if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_RM && onPeak)) {
-            _context3.next = 33;
-            break;
-          }
-
-          _context3.next = 31;
-          return (0, _effects.put)({
-            type: _action_type.INTEGRATION.RM_ONE,
-            payload: { dataToRemove: payload, curveIdx: curveIdx }
-          });
-
-        case 31:
-          _context3.next = 93;
-          break;
-
-        case 33:
-          if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF && onPeak)) {
-            _context3.next = 38;
-            break;
-          }
-
-          _context3.next = 36;
-          return (0, _effects.put)({
-            type: _action_type.INTEGRATION.SET_REF,
-            payload: { refData: payload, curveIdx: curveIdx }
-          });
-
-        case 36:
-          _context3.next = 93;
-          break;
-
-        case 38:
-          if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_CLICK && onPeak)) {
-            _context3.next = 50;
-            break;
-          }
-
-          xExtent = payload.xExtent, xL = payload.xL, xU = payload.xU;
-
-          if (!xExtent) {
-            _context3.next = 45;
-            break;
-          }
-
-          _context3.next = 43;
-          return (0, _effects.put)({
-            type: _action_type.MULTIPLICITY.ONE_CLICK_BY_UI,
-            payload: { payloadData: xExtent, curveIdx: curveIdx }
-          });
-
-        case 43:
-          _context3.next = 48;
-          break;
-
-        case 45:
-          if (!(xL && xU)) {
-            _context3.next = 48;
-            break;
-          }
-
-          _context3.next = 48;
-          return (0, _effects.put)({
-            type: _action_type.MULTIPLICITY.ONE_CLICK_BY_UI,
-            payload: { payloadData: { xL: xL, xU: xU }, curveIdx: curveIdx }
-          });
-
-        case 48:
-          _context3.next = 93;
-          break;
-
-        case 50:
-          if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_ADD)) {
-            _context3.next = 55;
-            break;
-          }
-
-          _context3.next = 53;
-          return (0, _effects.put)({
-            type: _action_type.MULTIPLICITY.PEAK_ADD_BY_UI_SAG,
-            payload: payload
-          });
-
-        case 53:
-          _context3.next = 93;
-          break;
-
-        case 55:
-          if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_RM && onPeak)) {
-            _context3.next = 60;
-            break;
-          }
-
-          _context3.next = 58;
-          return (0, _effects.put)({
-            type: _action_type.MULTIPLICITY.PEAK_RM_BY_UI,
-            payload: payload
-          });
-
-        case 58:
-          _context3.next = 93;
-          break;
-
-        case 60:
-          if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MAX_PEAK && !onPeak)) {
-            _context3.next = 65;
-            break;
-          }
-
-          _context3.next = 63;
-          return (0, _effects.put)({
-            type: _action_type.CYCLIC_VOLTA_METRY.ADD_MAX_PEAK,
-            payload: { peak: payload, index: voltammetryPeakIdx, jcampIdx: curveIdx }
-          });
-
-        case 63:
-          _context3.next = 93;
-          break;
-
-        case 65:
-          if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MAX_PEAK && onPeak)) {
-            _context3.next = 70;
-            break;
-          }
-
-          _context3.next = 68;
-          return (0, _effects.put)({
-            type: _action_type.CYCLIC_VOLTA_METRY.REMOVE_MAX_PEAK,
-            payload: { index: voltammetryPeakIdx, jcampIdx: curveIdx }
-          });
-
-        case 68:
-          _context3.next = 93;
-          break;
-
-        case 70:
-          if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MIN_PEAK && !onPeak)) {
-            _context3.next = 75;
-            break;
-          }
-
-          _context3.next = 73;
-          return (0, _effects.put)({
-            type: _action_type.CYCLIC_VOLTA_METRY.ADD_MIN_PEAK,
-            payload: { peak: payload, index: voltammetryPeakIdx, jcampIdx: curveIdx }
-          });
-
-        case 73:
-          _context3.next = 93;
-          break;
-
-        case 75:
-          if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MIN_PEAK && onPeak)) {
-            _context3.next = 80;
-            break;
-          }
-
-          _context3.next = 78;
-          return (0, _effects.put)({
-            type: _action_type.CYCLIC_VOLTA_METRY.REMOVE_MIN_PEAK,
-            payload: { index: voltammetryPeakIdx, jcampIdx: curveIdx }
-          });
-
-        case 78:
-          _context3.next = 93;
-          break;
-
-        case 80:
-          if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_PECKER && !onPecker)) {
-            _context3.next = 85;
-            break;
-          }
-
-          _context3.next = 83;
-          return (0, _effects.put)({
-            type: _action_type.CYCLIC_VOLTA_METRY.ADD_PECKER,
-            payload: { peak: payload, index: voltammetryPeakIdx, jcampIdx: curveIdx }
-          });
-
-        case 83:
-          _context3.next = 93;
-          break;
-
-        case 85:
-          if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_PECKER && onPecker)) {
-            _context3.next = 90;
-            break;
-          }
-
-          _context3.next = 88;
-          return (0, _effects.put)({
-            type: _action_type.CYCLIC_VOLTA_METRY.REMOVE_PECKER,
-            payload: { index: voltammetryPeakIdx, jcampIdx: curveIdx }
-          });
-
-        case 88:
-          _context3.next = 93;
-          break;
-
-        case 90:
-          if (!(uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_SET_REF && onPeak)) {
-            _context3.next = 93;
-            break;
-          }
-
-          _context3.next = 93;
-          return (0, _effects.put)({
-            type: _action_type.CYCLIC_VOLTA_METRY.SET_REF,
-            payload: { index: voltammetryPeakIdx, jcampIdx: curveIdx }
-          });
-
-        case 93:
-        case 'end':
-          return _context3.stop();
+    });
+  } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.PEAK_DELETE && onPeak) {
+    yield (0, _effects.put)({
+      type: _action_type.EDITPEAK.ADD_NEGATIVE,
+      payload: {
+        dataToAdd: payload,
+        curveIdx
       }
+    });
+  } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT && onPeak) {
+    yield (0, _effects.put)({
+      type: _action_type.SHIFT.SET_PEAK,
+      payload: {
+        dataToSet: payload,
+        curveIdx
+      }
+    });
+  } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_RM && onPeak) {
+    yield (0, _effects.put)({
+      type: _action_type.INTEGRATION.RM_ONE,
+      payload: {
+        dataToRemove: payload,
+        curveIdx
+      }
+    });
+  } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_RM && onPeak) {
+    yield (0, _effects.put)({
+      type: _action_type.INTEGRATION.RM_ONE,
+      payload: {
+        dataToRemove: payload,
+        curveIdx
+      }
+    });
+  } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF && onPeak) {
+    yield (0, _effects.put)({
+      type: _action_type.INTEGRATION.SET_REF,
+      payload: {
+        refData: payload,
+        curveIdx
+      }
+    });
+  } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_CLICK && onPeak) {
+    const {
+      xExtent,
+      xL,
+      xU
+    } = payload;
+    if (xExtent) {
+      yield (0, _effects.put)({
+        type: _action_type.MULTIPLICITY.ONE_CLICK_BY_UI,
+        payload: {
+          payloadData: xExtent,
+          curveIdx
+        }
+      });
+    } else if (xL && xU) {
+      yield (0, _effects.put)({
+        type: _action_type.MULTIPLICITY.ONE_CLICK_BY_UI,
+        payload: {
+          payloadData: {
+            xL,
+            xU
+          },
+          curveIdx
+        }
+      });
     }
-  }, _marked3);
+  } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_ADD) {
+    yield (0, _effects.put)({
+      type: _action_type.MULTIPLICITY.PEAK_ADD_BY_UI_SAG,
+      payload
+    });
+  } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_RM && onPeak) {
+    yield (0, _effects.put)({
+      type: _action_type.MULTIPLICITY.PEAK_RM_BY_UI,
+      payload
+    });
+  } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MAX_PEAK && !onPeak) {
+    yield (0, _effects.put)({
+      type: _action_type.CYCLIC_VOLTA_METRY.ADD_MAX_PEAK,
+      payload: {
+        peak: payload,
+        index: voltammetryPeakIdx,
+        jcampIdx: curveIdx
+      }
+    });
+  } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MAX_PEAK && onPeak) {
+    yield (0, _effects.put)({
+      type: _action_type.CYCLIC_VOLTA_METRY.REMOVE_MAX_PEAK,
+      payload: {
+        index: voltammetryPeakIdx,
+        jcampIdx: curveIdx
+      }
+    });
+  } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MIN_PEAK && !onPeak) {
+    yield (0, _effects.put)({
+      type: _action_type.CYCLIC_VOLTA_METRY.ADD_MIN_PEAK,
+      payload: {
+        peak: payload,
+        index: voltammetryPeakIdx,
+        jcampIdx: curveIdx
+      }
+    });
+  } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MIN_PEAK && onPeak) {
+    yield (0, _effects.put)({
+      type: _action_type.CYCLIC_VOLTA_METRY.REMOVE_MIN_PEAK,
+      payload: {
+        index: voltammetryPeakIdx,
+        jcampIdx: curveIdx
+      }
+    });
+  } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_PECKER && !onPecker) {
+    yield (0, _effects.put)({
+      type: _action_type.CYCLIC_VOLTA_METRY.ADD_PECKER,
+      payload: {
+        peak: payload,
+        index: voltammetryPeakIdx,
+        jcampIdx: curveIdx
+      }
+    });
+  } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_PECKER && onPecker) {
+    yield (0, _effects.put)({
+      type: _action_type.CYCLIC_VOLTA_METRY.REMOVE_PECKER,
+      payload: {
+        index: voltammetryPeakIdx,
+        jcampIdx: curveIdx
+      }
+    });
+  } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_SET_REF && onPeak) {
+    yield (0, _effects.put)({
+      type: _action_type.CYCLIC_VOLTA_METRY.SET_REF,
+      payload: {
+        index: voltammetryPeakIdx,
+        jcampIdx: curveIdx
+      }
+    });
+  }
 }
-
-var managerSagas = [(0, _effects.takeEvery)(_action_type.UI.CLICK_TARGET, clickUiTarget), (0, _effects.takeEvery)(_action_type.UI.SWEEP.SELECT, selectUiSweep), (0, _effects.takeEvery)(_action_type.UI.WHEEL.SCROLL, scrollUiWheel)];
-
-exports.default = managerSagas;
+const managerSagas = [(0, _effects.takeEvery)(_action_type.UI.CLICK_TARGET, clickUiTarget), (0, _effects.takeEvery)(_action_type.UI.SWEEP.SELECT, selectUiSweep), (0, _effects.takeEvery)(_action_type.UI.WHEEL.SCROLL, scrollUiWheel)];
+var _default = managerSagas;
+exports.default = _default;

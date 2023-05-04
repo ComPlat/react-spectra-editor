@@ -751,4 +751,4 @@ const cyclicVoltaJcamp3 = `
 
 `;
 
-export default cyclicVoltaJcamp3
+export default cyclicVoltaJcamp3;

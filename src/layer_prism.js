@@ -1,3 +1,6 @@
+/* eslint-disable prefer-object-spread, default-param-last,
+react/function-component-definition, react/require-default-props
+*/
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -18,10 +21,12 @@ const styles = () => ({
 const LayerPrism = ({
   entity, cLabel, xLabel, yLabel, forecast, operations,
   descriptions, molSvg, editorOnly,
-  thresSt, scanSt, uiSt, 
-  canChangeDescription, onDescriptionChanged
+  thresSt, scanSt, uiSt,
+  canChangeDescription, onDescriptionChanged,
 }) => {
-  const { topic, feature, hasEdit, integration } = extractParams(entity, thresSt, scanSt);
+  const {
+    topic, feature, hasEdit, integration,
+  } = extractParams(entity, thresSt, scanSt);
   if (!topic) return null;
 
   const { viewer } = uiSt;
@@ -101,7 +106,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
   }, dispatch)
 );
@@ -120,9 +125,9 @@ LayerPrism.propTypes = {
   scanSt: PropTypes.object.isRequired,
   uiSt: PropTypes.object.isRequired,
   canChangeDescription: PropTypes.bool.isRequired,
-  onDescriptionChanged: PropTypes.func
+  onDescriptionChanged: PropTypes.func,
 };
 
-export default connect(
+export default connect( // eslint-disable-line
   mapStateToProps, mapDispatchToProps,
-)(withStyles(styles)(LayerPrism));
+)(withStyles(styles)(LayerPrism));  // eslint-disable-line

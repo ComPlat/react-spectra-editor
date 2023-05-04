@@ -1,3 +1,4 @@
+/* eslint-disable react/function-component-definition, react/require-default-props */
 import React from 'react';
 import { Provider } from 'react-redux';
 import { createStore, compose, applyMiddleware } from 'redux';
@@ -33,7 +34,7 @@ const SpectraEditor = ({
   entity, others, cLabel, xLabel, yLabel,
   operations, forecast, molSvg, editorOnly, descriptions,
   canChangeDescription, onDescriptionChanged,
-  multiEntities, multiMolSvgs, entityFileNames, userManualLink
+  multiEntities, multiMolSvgs, entityFileNames, userManualLink,
 }) => (
   <Provider store={store}>
     <LayerInit
@@ -54,7 +55,6 @@ const SpectraEditor = ({
       canChangeDescription={canChangeDescription}
       onDescriptionChanged={onDescriptionChanged}
     />
-    
   </Provider>
 );
 

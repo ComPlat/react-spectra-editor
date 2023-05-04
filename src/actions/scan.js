@@ -1,6 +1,6 @@
 import { SCAN } from '../constants/action_type';
 
-const setScanTarget = payload => (
+const setScanTarget = (payload) => (
   {
     type: SCAN.SET_TARGET,
     payload,
@@ -14,7 +14,7 @@ const resetScanTarget = () => (
   }
 );
 
-const toggleScanIsAuto = payload => (
+const toggleScanIsAuto = (payload) => (
   {
     type: SCAN.TOGGLE_ISAUTO,
     payload,

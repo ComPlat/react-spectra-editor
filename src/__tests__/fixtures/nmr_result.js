@@ -1,3 +1,4 @@
+/* eslint-disable */
 import nmrSvg from './nmr_svg';
 
 const nmrResult = {

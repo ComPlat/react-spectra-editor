@@ -1,20 +1,20 @@
 import { INTEGRATION } from '../constants/action_type';
 
-const sweepIntegration = payload => (
+const sweepIntegration = (payload) => (
   {
     type: INTEGRATION.SWEEP,
     payload,
   }
 );
 
-const setIntegrationFkr = payload => (
+const setIntegrationFkr = (payload) => (
   {
     type: INTEGRATION.SET_FKR,
     payload,
   }
 );
 
-const clearIntegrationAll = payload => (
+const clearIntegrationAll = (payload) => (
   {
     type: INTEGRATION.CLEAR_ALL,
     payload,

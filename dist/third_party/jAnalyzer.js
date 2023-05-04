@@ -1,27 +1,28 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
+/* eslint-disable */
 // https://github.com/cheminfo-js/spectra/blob/master/packages/spectra-data/src/peakPicking/jAnalyzer.js
 
 /*
  * This library implements the J analyser described by Cobas et al in the paper:
  * A two-stage approach to automatic determination of 1H NMR coupling constants
  */
-var patterns = ['s', 'd', 't', 'q', 'quint', 'h', 'sept', 'o', 'n'];
-var symRatio = 1.5;
-var maxErrorIter1 = 2.5; // Hz
-var maxErrorIter2 = 1; // Hz
-
-exports.default = {
+const patterns = ['s', 'd', 't', 'q', 'quint', 'h', 'sept', 'o', 'n'];
+let symRatio = 1.5;
+let maxErrorIter1 = 2.5; // Hz
+let maxErrorIter2 = 1; // Hz
+var _default = {
   /**
    * The compilation process implements at the first stage a normalization procedure described by Golotvin et al.
    * embedding in peak-component-counting method described by Hoyes et al.
    * @param {object} signal
    * @private
    */
-  compilePattern: function compilePattern(signal) {
+  compilePattern: function (signal) {
     signal.multiplicity = 'm';
     // 1.1 symmetrize
     // It will add a set of peaks(signal.peaksComp) to the signal that will be used during
@@ -32,15 +33,15 @@ exports.default = {
     if (signal.symRank >= 0.95 && signal.peaksComp.length < 32) {
       signal.asymmetric = false;
       var i, j, n, P1, n2, maxFlagged;
-      var k = 1;
-      var Jc = [];
+      let k = 1;
+      let Jc = [];
 
       // Loop over the possible number of coupling contributing to the multiplet
       for (n = 0; n < 9; n++) {
         // 1.2 Normalize. It makes a deep copy of the peaks before to modify them.
-        var peaks = normalize(signal, n);
+        let peaks = normalize(signal, n);
         // signal.peaksCompX = peaks;
-        var validPattern = false; // It will change to true, when we find the good patter
+        let validPattern = false; // It will change to true, when we find the good patter
         // Lets check if the signal could be a singulet.
         if (peaks.length === 1 && n === 0) {
           validPattern = true;
@@ -50,16 +51,16 @@ exports.default = {
           }
         }
         // 1.3 Establish a range for the Heights Hi [peaks.intensity*0.85,peaks.intensity*1.15];
-        var ranges = getRanges(peaks);
+        let ranges = getRanges(peaks);
         n2 = Math.pow(2, n);
 
         // 1.4 Find a combination of integer heights Hi, one from each Si, that sums to 2^n.
-        var heights = null;
-        var counter = 1;
+        let heights = null;
+        let counter = 1;
         while (!validPattern && (heights = getNextCombination(ranges, n2)) !== null && counter < 400) {
           // 2.1 Number the components of the multiplet consecutively from 1 to 2n,
           // starting at peak 1
-          var numbering = new Array(heights.length);
+          let numbering = new Array(heights.length);
           k = 1;
           for (i = 0; i < heights.length; i++) {
             numbering[i] = new Array(heights[i]);
@@ -67,7 +68,6 @@ exports.default = {
               numbering[i][j] = k++;
             }
           }
-
           Jc = []; // The array to store the detected j-coupling
           // 2.2 Set j = 1; J1 = P2 - P1. Flag components 1 and 2 as accounted for.
           j = 1;
@@ -76,7 +76,7 @@ exports.default = {
           numbering[0].splice(0, 1); // Flagged
           numbering[1].splice(0, 1); // Flagged
           k = 1;
-          var nFlagged = 2;
+          let nFlagged = 2;
           maxFlagged = Math.pow(2, n) - 1;
           while (Jc.length < n && nFlagged < maxFlagged && k < peaks.length) {
             counter += 1;
@@ -92,9 +92,9 @@ exports.default = {
               numbering[k].splice(0, 1); // Flageed
               nFlagged++;
               // Flag the other components of the multiplet
-              for (var u = 2; u <= j; u++) {
+              for (let u = 2; u <= j; u++) {
                 // TODO improve those loops
-                var jSum = 0;
+                let jSum = 0;
                 for (i = 0; i < u; i++) {
                   jSum += Jc[i];
                 }
@@ -110,7 +110,7 @@ exports.default = {
             }
           }
           // Calculate the ideal patter by using the extracted j-couplings
-          var pattern = idealPattern(Jc);
+          let pattern = idealPattern(Jc);
           // Compare the ideal pattern with the proposed intensities.
           // All the intensities have to match to accept the multiplet
           validPattern = true;
@@ -132,18 +132,17 @@ exports.default = {
     }
   }
 };
-
 /**
  * @private
  * update the signal
  * @param {*} signal
  * @param {*} Jc
  */
-
+exports.default = _default;
 function updateSignal(signal, Jc) {
   // Update the limits of the signal
-  var peaks = signal.peaksComp; // Always in Hz
-  var nbPeaks = peaks.length;
+  let peaks = signal.peaksComp; // Always in Hz
+  let nbPeaks = peaks.length;
   signal.startX = peaks[0].x / signal.observe - peaks[0].width;
   signal.stopX = peaks[nbPeaks - 1].x / signal.observe + peaks[nbPeaks - 1].width;
 
@@ -169,17 +168,15 @@ function updateSignal(signal, Jc) {
  * @private
  */
 function abstractPattern(signal, Jc) {
-  var tol = 0.05;
-  var i = void 0;
-  var pattern = '';
-  var cont = 1;
-  var newNmrJs = [];
-
+  let tol = 0.05;
+  let i;
+  let pattern = '';
+  let cont = 1;
+  let newNmrJs = [];
   if (Jc && Jc.length > 0) {
     Jc.sort(function (a, b) {
       return b - a;
     });
-
     for (i = 0; i < Jc.length - 1; i++) {
       if (Math.abs(Jc[i] - Jc[i + 1]) < tol) {
         cont++;
@@ -192,7 +189,10 @@ function abstractPattern(signal, Jc) {
         cont = 1;
       }
     }
-    newNmrJs.push({ coupling: Math.abs(Jc[i]), multiplicity: patterns[cont] });
+    newNmrJs.push({
+      coupling: Math.abs(Jc[i]),
+      multiplicity: patterns[cont]
+    });
     pattern += patterns[cont];
     signal.nmrJs = newNmrJs;
   } else {
@@ -201,6 +201,7 @@ function abstractPattern(signal, Jc) {
     //   pattern = 'br s';
     // }
   }
+
   return pattern;
 }
 
@@ -212,10 +213,12 @@ function abstractPattern(signal, Jc) {
  * @private
  */
 function idealPattern(Jc) {
-  var hsum = Math.pow(2, Jc.length);
-  var i = void 0,
-      j = void 0;
-  var pattern = [{ x: 0, intensity: hsum }];
+  let hsum = Math.pow(2, Jc.length);
+  let i, j;
+  let pattern = [{
+    x: 0,
+    intensity: hsum
+  }];
   // To split the initial height
   for (i = 0; i < Jc.length; i++) {
     for (j = pattern.length - 1; j >= 0; j--) {
@@ -248,11 +251,10 @@ function idealPattern(Jc) {
  * @private
  */
 function getNextCombination(ranges, value) {
-  var half = Math.ceil(ranges.values.length * 0.5);
-  var lng = ranges.values.length;
-  var sum = 0;
-  var i = void 0,
-      ok = void 0;
+  let half = Math.ceil(ranges.values.length * 0.5);
+  let lng = ranges.values.length;
+  let sum = 0;
+  let i, ok;
   while (sum !== value) {
     // Update the indexes to point at the next possible combination
     ok = false;
@@ -284,7 +286,7 @@ function getNextCombination(ranges, value) {
   }
   // If the sum is equal to the expected value, fill the array to return
   if (sum === value) {
-    var heights = new Array(lng);
+    let heights = new Array(lng);
     for (i = 0; i < half; i++) {
       heights[i] = ranges.values[i][ranges.currentIndex[i]];
       heights[lng - i - 1] = ranges.values[i][ranges.currentIndex[i]];
@@ -302,24 +304,27 @@ function getNextCombination(ranges, value) {
  * @private
  */
 function getRanges(peaks) {
-  var ranges = new Array(peaks.length);
-  var currentIndex = new Array(peaks.length);
-  var min = void 0,
-      max = void 0;
+  let ranges = new Array(peaks.length);
+  let currentIndex = new Array(peaks.length);
+  let min, max;
   ranges[0] = [1];
   ranges[peaks.length - 1] = [1];
   currentIndex[0] = -1;
   currentIndex[peaks.length - 1] = 0;
-  for (var i = 1; i < peaks.length - 1; i++) {
+  for (let i = 1; i < peaks.length - 1; i++) {
     min = Math.round(peaks[i].intensity * 0.85);
     max = Math.round(peaks[i].intensity * 1.15);
     ranges[i] = [];
-    for (var j = min; j <= max; j++) {
+    for (let j = min; j <= max; j++) {
       ranges[i].push(j);
     }
     currentIndex[i] = 0;
   }
-  return { values: ranges, currentIndex: currentIndex, active: 0 };
+  return {
+    values: ranges,
+    currentIndex: currentIndex,
+    active: 0
+  };
 }
 /**
  * Performs a symmetrization of the signal by using different aproximations to the center.
@@ -331,12 +336,12 @@ function getRanges(peaks) {
  * @private
  */
 function symmetrizeChoiseBest(signal, maxError, iteration) {
-  var symRank1 = symmetrize(signal, maxError, iteration);
-  var tmpPeaks = signal.peaksComp;
-  var tmpMask = signal.mask;
-  var cs = signal.delta1;
+  let symRank1 = symmetrize(signal, maxError, iteration);
+  let tmpPeaks = signal.peaksComp;
+  let tmpMask = signal.mask;
+  let cs = signal.delta1;
   signal.delta1 = (signal.peaks[0].x + signal.peaks[signal.peaks.length - 1].x) / 2;
-  var symRank2 = symmetrize(signal, maxError, iteration);
+  let symRank2 = symmetrize(signal, maxError, iteration);
   if (signal.peaksComp.length > tmpPeaks.length) {
     return symRank2;
   } else {
@@ -358,13 +363,8 @@ function symmetrizeChoiseBest(signal, maxError, iteration) {
  */
 function symmetrize(signal, maxError, iteration) {
   // Before to symmetrize we need to keep only the peaks that possibly conforms the multiplete
-  var max = void 0,
-      min = void 0,
-      avg = void 0,
-      ratio = void 0,
-      avgWidth = void 0,
-      i = void 0;
-  var peaks = new Array(signal.peaks.length);
+  let max, min, avg, ratio, avgWidth, i;
+  let peaks = new Array(signal.peaks.length);
   // Make a deep copy of the peaks and convert PPM ot HZ
   for (i = 0; i < peaks.length; i++) {
     peaks[i] = {
@@ -385,22 +385,21 @@ function symmetrize(signal, maxError, iteration) {
     }
   }
   signal.peaksComp = peaks;
-  var nbPeaks = peaks.length;
-  var mask = new Array(nbPeaks);
+  let nbPeaks = peaks.length;
+  let mask = new Array(nbPeaks);
   signal.mask = mask;
-  var left = 0;
-  var right = peaks.length - 1;
-  var cs = signal.delta1 * signal.observe;
-  var middle = [(peaks[0].x + peaks[nbPeaks - 1].x) / 2, 1];
+  let left = 0;
+  let right = peaks.length - 1;
+  let cs = signal.delta1 * signal.observe;
+  let middle = [(peaks[0].x + peaks[nbPeaks - 1].x) / 2, 1];
   maxError = error(Math.abs(cs - middle[0]));
-  var heightSum = 0;
+  let heightSum = 0;
   // We try to symmetrize the extreme peaks. We consider as candidates for symmetricing those which have
   // ratio smaller than 3
   for (i = 0; i < nbPeaks; i++) {
     mask[i] = true;
     heightSum += signal.peaks[i].intensity;
   }
-
   while (left <= right) {
     mask[left] = true;
     mask[right] = true;
@@ -421,9 +420,8 @@ function symmetrize(signal, maxError, iteration) {
           left--;
         }
       } else {
-        var diffL = Math.abs(peaks[left].x - cs);
-        var diffR = Math.abs(peaks[right].x - cs);
-
+        let diffL = Math.abs(peaks[left].x - cs);
+        let diffR = Math.abs(peaks[right].x - cs);
         if (Math.abs(diffL - diffR) < maxError) {
           avg = Math.min(peaks[left].intensity, peaks[right].intensity);
           avgWidth = Math.min(peaks[left].width, peaks[right].width);
@@ -465,8 +463,8 @@ function symmetrize(signal, maxError, iteration) {
   }
   signal.delta1 = cs / signal.observe;
   // Now, the peak should be symmetric in heights, but we need to know if it is symmetric in x
-  var symFactor = 0;
-  var weight = 0;
+  let symFactor = 0;
+  let weight = 0;
   if (peaks.length > 1) {
     for (i = Math.ceil(peaks.length / 2) - 1; i >= 0; i--) {
       symFactor += (3 + Math.min(Math.abs(peaks[i].x - cs), Math.abs(peaks[peaks.length - 1 - i].x - cs))) / (3 + Math.max(Math.abs(peaks[i].x - cs), Math.abs(peaks[peaks.length - 1 - i].x - cs))) * peaks[i].intensity;
@@ -478,7 +476,7 @@ function symmetrize(signal, maxError, iteration) {
       symFactor = 1;
     }
   }
-  var newSumHeights = 0;
+  let newSumHeights = 0;
   for (i = 0; i < peaks.length; i++) {
     newSumHeights += peaks[i].intensity;
   }
@@ -489,7 +487,7 @@ function symmetrize(signal, maxError, iteration) {
   } else {
     // Center the given pattern at cs and symmetrize x
     if (peaks.length > 1) {
-      var dxi = void 0;
+      let dxi;
       for (i = Math.ceil(peaks.length / 2) - 1; i >= 0; i--) {
         dxi = (peaks[i].x - peaks[peaks.length - 1 - i].x) / 2.0;
         peaks[i].x = cs + dxi;
@@ -506,7 +504,7 @@ function symmetrize(signal, maxError, iteration) {
  * @private
  */
 function error(value) {
-  var maxError = value * 2.5;
+  let maxError = value * 2.5;
   if (maxError < 0.75) {
     maxError = 0.75;
   }
@@ -525,16 +523,15 @@ function error(value) {
  */
 function normalize(signal, n) {
   // Perhaps this is slow
-  var peaks = JSON.parse(JSON.stringify(signal.peaksComp));
-  var norm = 0;
-  var norm2 = 0;
+  let peaks = JSON.parse(JSON.stringify(signal.peaksComp));
+  let norm = 0;
+  let norm2 = 0;
   for (var i = 0; i < peaks.length; i++) {
     norm += peaks[i].intensity;
   }
   norm = Math.pow(2, n) / norm;
   signal.mask2 = JSON.parse(JSON.stringify(signal.mask));
-
-  var index = signal.mask2.length - 1;
+  let index = signal.mask2.length - 1;
   for (i = peaks.length - 1; i >= 0; i--) {
     peaks[i].intensity *= norm;
     while (index >= 0 && signal.mask2[index] === false) {
@@ -563,10 +560,9 @@ function normalize(signal, n) {
  * @return {number}
  */
 function chemicalShift(peaks, mask) {
-  var sum = 0;
-  var cs = 0;
-  var i = void 0,
-      area = void 0;
+  let sum = 0;
+  let cs = 0;
+  let i, area;
   if (mask) {
     for (i = 0; i < peaks.length; i++) {
       if (mask[i] === true) {

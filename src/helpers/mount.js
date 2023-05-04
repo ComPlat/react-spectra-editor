@@ -38,7 +38,7 @@ const MountTags = (target) => {
     .attr('class', 'peckerPath-clip')
     .attr('clip-path', 'url(#clip)');
   return {
-    pPath, bpPath, bpTxt, igbPath, igcPath, igtPath, mpybPath, mpyt1Path, mpyt2Path, mpypPath, aucPath, peckerPath
+    pPath, bpPath, bpTxt, igbPath, igcPath, igtPath, mpybPath, mpyt1Path, mpyt2Path, mpypPath, aucPath, peckerPath, // eslint-disable-line
   };
 };
 
@@ -69,7 +69,7 @@ const MountPath = (target, color) => {
   return path;
 };
 
-const MountComparePath = (target, color, id, alpha=1) => {
+const MountComparePath = (target, color, id, alpha = 1) => {
   const path = target.root.append('g')
     .attr('class', 'line-clip-compare')
     .attr('id', id)

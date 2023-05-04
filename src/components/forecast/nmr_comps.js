@@ -1,3 +1,4 @@
+/* eslint-disable react/function-component-definition, react/destructuring-assignment */
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -18,7 +19,7 @@ import {
 } from './comps';
 import { setNmrStatus } from '../../actions/forecast';
 
-const baseSelectNmrStatus = ({
+const baseSelectNmrStatus = ({  // eslint-disable-line
   idx, atom, status, identity,
   setNmrStatusAct,
 }) => {
@@ -55,7 +56,7 @@ const bssMapStateToProps = (state, props) => ( // eslint-disable-line
   {}
 );
 
-const bssMapDispatchToProps = dispatch => (
+const bssMapDispatchToProps = (dispatch) => (
   bindActionCreators({
     setNmrStatusAct: setNmrStatus,
   }, dispatch)
@@ -73,11 +74,11 @@ baseSelectNmrStatus.defaultProps = {
   status: '',
 };
 
-const SelectNmrStatus = connect(
+const SelectNmrStatus = connect(  // eslint-disable-line
   bssMapStateToProps, bssMapDispatchToProps,
-)(baseSelectNmrStatus);
+)(baseSelectNmrStatus); // eslint-disable-line
 
-const numFormat = input => parseFloat(input).toFixed(2);
+const numFormat = (input) => parseFloat(input).toFixed(2);
 
 const realFormat = (val, status) => {
   if (status === 'missing') {
@@ -86,7 +87,7 @@ const realFormat = (val, status) => {
   return numFormat(val);
 };
 
-const NmrTableHeader = classes => (
+const NmrTableHeader = (classes) => (
   <TableHead>
     <TableRow>
       <TableCell>
@@ -151,7 +152,7 @@ const NmrTableBodyRow = (classes, row, idx) => (
   </TableRow>
 );
 
-const SectionReference = classes => (
+const SectionReference = (classes) => (
   <div className={classNames(classes.reference)}>
     <p>
       <span>NMR prediction source: </span>

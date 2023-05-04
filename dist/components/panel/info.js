@@ -1,351 +1,246 @@
-'use strict';
+"use strict";
 
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
+var _react = _interopRequireDefault(require("react"));
+var _propTypes = _interopRequireDefault(require("prop-types"));
+var _classnames = _interopRequireDefault(require("classnames"));
+var _reactRedux = require("react-redux");
+var _redux = require("redux");
+var _reactSvgFileZoomPan = _interopRequireDefault(require("@complat/react-svg-file-zoom-pan"));
+var _reactQuill = _interopRequireDefault(require("react-quill"));
+var _ExpansionPanel = _interopRequireDefault(require("@material-ui/core/ExpansionPanel"));
+var _ExpansionPanelSummary = _interopRequireDefault(require("@material-ui/core/ExpansionPanelSummary"));
+var _ExpandMore = _interopRequireDefault(require("@material-ui/icons/ExpandMore"));
+var _Divider = _interopRequireDefault(require("@material-ui/core/Divider"));
+var _Typography = _interopRequireDefault(require("@material-ui/core/Typography"));
+var _styles = require("@material-ui/core/styles");
+var _format = _interopRequireDefault(require("../../helpers/format"));
+/* eslint-disable no-mixed-operators, react/function-component-definition,
+react/require-default-props */
 
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _propTypes = require('prop-types');
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
-var _classnames = require('classnames');
-
-var _classnames2 = _interopRequireDefault(_classnames);
-
-var _reactRedux = require('react-redux');
-
-var _redux = require('redux');
-
-var _reactSvgFileZoomPan = require('@complat/react-svg-file-zoom-pan');
-
-var _reactSvgFileZoomPan2 = _interopRequireDefault(_reactSvgFileZoomPan);
-
-var _reactQuill = require('react-quill');
-
-var _reactQuill2 = _interopRequireDefault(_reactQuill);
-
-var _ExpansionPanel = require('@material-ui/core/ExpansionPanel');
-
-var _ExpansionPanel2 = _interopRequireDefault(_ExpansionPanel);
-
-var _ExpansionPanelSummary = require('@material-ui/core/ExpansionPanelSummary');
-
-var _ExpansionPanelSummary2 = _interopRequireDefault(_ExpansionPanelSummary);
-
-var _ExpandMore = require('@material-ui/icons/ExpandMore');
-
-var _ExpandMore2 = _interopRequireDefault(_ExpandMore);
-
-var _Divider = require('@material-ui/core/Divider');
-
-var _Divider2 = _interopRequireDefault(_Divider);
-
-var _Typography = require('@material-ui/core/Typography');
-
-var _Typography2 = _interopRequireDefault(_Typography);
-
-var _styles = require('@material-ui/core/styles');
-
-var _format = require('../../helpers/format');
-
-var _format2 = _interopRequireDefault(_format);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var styles = function styles() {
-  return {
-    chip: {
-      margin: '1px 0 1px 0'
-    },
-    panel: {
-      backgroundColor: '#eee',
-      display: 'table-row'
-    },
-    panelSummary: {
-      backgroundColor: '#eee',
-      height: 32
-    },
-    panelDetail: {
-      backgroundColor: '#fff',
-      maxHeight: 'calc(90vh - 220px)', // ROI
-      overflow: 'auto'
-    },
-    table: {
-      width: 'auto'
-    },
-    rowRoot: {
-      border: '1px solid #eee',
-      height: 36,
-      lineHeight: '36px',
-      overflow: 'hidden',
-      paddingLeft: 24,
-      textAlign: 'left'
-    },
-    rowOdd: {
-      backgroundColor: '#fff',
-      textOverflow: 'ellipsis',
-      whiteSpace: 'nowrap'
-    },
-    rowEven: {
-      backgroundColor: '#fafafa',
-      textOverflow: 'ellipsis',
-      whiteSpace: 'nowrap'
-    },
-    rowOddSim: {
-      backgroundColor: '#fff',
-      height: 108,
-      lineHeight: '24px',
-      overflowY: 'scroll',
-      overflowWrap: 'word-break'
-    },
-    tHead: {
-      fontWeight: 'bold',
-      float: 'left',
-      fontSize: '0.8rem',
-      fontFamily: 'Helvetica'
-    },
-    tTxt: {
-      fontSize: '0.8rem',
-      fontFamily: 'Helvetica',
-      marginRight: 3
-    },
-    quill: {
-      backgroundColor: '#fafafa',
-      border: '1px solid #eee',
-      fontSize: '0.8rem',
-      fontFamily: 'Helvetica',
-      padding: '0 10px 0 10px',
-      textAlign: 'left'
-    }
-  };
-};
-
-var simTitle = function simTitle() {
-  return 'Simulated signals from NMRshiftDB';
-};
-
-var simContent = function simContent(nmrSimPeaks) {
-  return nmrSimPeaks && nmrSimPeaks.sort(function (a, b) {
-    return a - b;
-  }).join(', ');
-};
-
-var aucValue = function aucValue(integration) {
-  if (!integration) {
-    return "";
+const styles = () => ({
+  chip: {
+    margin: '1px 0 1px 0'
+  },
+  panel: {
+    backgroundColor: '#eee',
+    display: 'table-row'
+  },
+  panelSummary: {
+    backgroundColor: '#eee',
+    height: 32
+  },
+  panelDetail: {
+    backgroundColor: '#fff',
+    maxHeight: 'calc(90vh - 220px)',
+    // ROI
+    overflow: 'auto'
+  },
+  table: {
+    width: 'auto'
+  },
+  rowRoot: {
+    border: '1px solid #eee',
+    height: 36,
+    lineHeight: '36px',
+    overflow: 'hidden',
+    paddingLeft: 24,
+    textAlign: 'left'
+  },
+  rowOdd: {
+    backgroundColor: '#fff',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap'
+  },
+  rowEven: {
+    backgroundColor: '#fafafa',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap'
+  },
+  rowOddSim: {
+    backgroundColor: '#fff',
+    height: 108,
+    lineHeight: '24px',
+    overflowY: 'scroll',
+    overflowWrap: 'word-break'
+  },
+  tHead: {
+    fontWeight: 'bold',
+    float: 'left',
+    fontSize: '0.8rem',
+    fontFamily: 'Helvetica'
+  },
+  tTxt: {
+    fontSize: '0.8rem',
+    fontFamily: 'Helvetica',
+    marginRight: 3
+  },
+  quill: {
+    backgroundColor: '#fafafa',
+    border: '1px solid #eee',
+    fontSize: '0.8rem',
+    fontFamily: 'Helvetica',
+    padding: '0 10px 0 10px',
+    textAlign: 'left'
   }
-  var values = [];
-  var stackIntegration = integration.stack;
+});
+const simTitle = () => 'Simulated signals from NMRshiftDB';
+const simContent = nmrSimPeaks => nmrSimPeaks && nmrSimPeaks.sort((a, b) => a - b).join(', ');
+const aucValue = integration => {
+  if (!integration) {
+    return '';
+  }
+  const values = [];
+  const stackIntegration = integration.stack;
   if (Array.isArray(stackIntegration)) {
-    var sumVal = 0.0;
-    stackIntegration.forEach(function (inte) {
+    let sumVal = 0.0;
+    stackIntegration.forEach(inte => {
       if (inte.absoluteArea) {
         sumVal += inte.absoluteArea;
       }
     });
     sumVal = sumVal.toFixed(2);
-    stackIntegration.forEach(function (inte) {
+    stackIntegration.forEach(inte => {
       if (inte.absoluteArea) {
-        var areaVal = inte.absoluteArea.toFixed(2);
-        var percent = (areaVal * 100 / sumVal).toFixed(2);
-        var valStr = areaVal + " (" + percent + "%)";
+        const areaVal = inte.absoluteArea.toFixed(2);
+        const percent = (areaVal * 100 / sumVal).toFixed(2);
+        const valStr = areaVal + " (" + percent + "%)"; // eslint-disable-line
         values.push(valStr);
       }
     });
   }
-  return values.join(", ");
+  return values.join(', ');
 };
-
-var InfoPanel = function InfoPanel(_ref) {
-  var classes = _ref.classes,
-      expand = _ref.expand,
-      feature = _ref.feature,
-      integration = _ref.integration,
-      editorOnly = _ref.editorOnly,
-      molSvg = _ref.molSvg,
-      descriptions = _ref.descriptions,
-      layoutSt = _ref.layoutSt,
-      simulationSt = _ref.simulationSt,
-      shiftSt = _ref.shiftSt,
-      curveSt = _ref.curveSt,
-      onExapnd = _ref.onExapnd,
-      canChangeDescription = _ref.canChangeDescription,
-      onDescriptionChanged = _ref.onDescriptionChanged;
-
+const InfoPanel = _ref => {
+  let {
+    classes,
+    expand,
+    feature,
+    integration,
+    editorOnly,
+    molSvg,
+    descriptions,
+    layoutSt,
+    simulationSt,
+    shiftSt,
+    curveSt,
+    onExapnd,
+    canChangeDescription,
+    onDescriptionChanged
+  } = _ref;
   if (!feature) return null;
-  var title = feature.title,
-      observeFrequency = feature.observeFrequency,
-      solventName = feature.solventName;
-  var curveIdx = curveSt.curveIdx;
-  var shifts = shiftSt.shifts;
-
-  var selectedShift = shifts[curveIdx];
-  var showSolvName = solventName;
+  const {
+    title,
+    observeFrequency,
+    solventName
+  } = feature;
+  const {
+    curveIdx
+  } = curveSt;
+  const {
+    shifts
+  } = shiftSt;
+  const selectedShift = shifts[curveIdx];
+  let showSolvName = solventName;
   if (selectedShift !== undefined) {
-    var shiftName = selectedShift.ref.name;
+    const shiftName = selectedShift.ref.name;
     showSolvName = shiftName === '- - -' ? solventName : shiftName;
   }
-
-  var originStack = null;
+  let originStack = null;
   if (integration) {
-    originStack = integration.originStack;
+    originStack = integration.originStack; // eslint-disable-line
   }
 
-  return _react2.default.createElement(
-    _ExpansionPanel2.default,
-    {
-      expanded: expand,
-      onChange: onExapnd,
-      className: (0, _classnames2.default)(classes.panel),
-      TransitionProps: { unmountOnExit: true } // increase ExpansionPanel performance
+  return /*#__PURE__*/_react.default.createElement(_ExpansionPanel.default, {
+    expanded: expand,
+    onChange: onExapnd,
+    className: (0, _classnames.default)(classes.panel),
+    TransitionProps: {
+      unmountOnExit: true
+    } // increase ExpansionPanel performance
+  }, /*#__PURE__*/_react.default.createElement(_ExpansionPanelSummary.default, {
+    expandIcon: /*#__PURE__*/_react.default.createElement(_ExpandMore.default, null),
+    className: (0, _classnames.default)(classes.panelSummary)
+  }, /*#__PURE__*/_react.default.createElement(_Typography.default, {
+    className: "txt-panel-header"
+  }, /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title')
+  }, "Info"))), /*#__PURE__*/_react.default.createElement(_Divider.default, null), /*#__PURE__*/_react.default.createElement("div", {
+    className: (0, _classnames.default)(classes.panelDetail)
+  }, /*#__PURE__*/_react.default.createElement("div", {
+    className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd)
+  }, /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
+  }, "Title : "), /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
+  }, title)), _format.default.isNmrLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement("div", {
+    className: (0, _classnames.default)(classes.rowRoot, classes.rowEven)
+  }, /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
+  }, "Freq : "), /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
+  }, parseInt(observeFrequency, 10) || ' - ')) : null, _format.default.isNmrLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement("div", {
+    className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd)
+  }, /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
+  }, "Solv : "), /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
+  }, showSolvName)) : null, !molSvg ? null : /*#__PURE__*/_react.default.createElement(_reactSvgFileZoomPan.default, {
+    svg: molSvg,
+    duration: 300,
+    resize: true
+  }), _format.default.isHplcUvVisLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement("div", {
+    className: (0, _classnames.default)(classes.rowRoot, classes.rowOddSim)
+  }, /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
+  }, "Area under curve (AUC):"), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt')
+  }, aucValue(integration))) : null), /*#__PURE__*/_react.default.createElement(_reactQuill.default, {
+    className: (0, _classnames.default)(classes.quill, 'card-sv-quill'),
+    value: descriptions,
+    modules: {
+      toolbar: false
     },
-    _react2.default.createElement(
-      _ExpansionPanelSummary2.default,
-      {
-        expandIcon: _react2.default.createElement(_ExpandMore2.default, null),
-        className: (0, _classnames2.default)(classes.panelSummary)
-      },
-      _react2.default.createElement(
-        _Typography2.default,
-        { className: 'txt-panel-header' },
-        _react2.default.createElement(
-          'span',
-          { className: (0, _classnames2.default)(classes.txtBadge, 'txt-sv-panel-title') },
-          'Info'
-        )
-      )
-    ),
-    _react2.default.createElement(_Divider2.default, null),
-    _react2.default.createElement(
-      'div',
-      { className: (0, _classnames2.default)(classes.panelDetail) },
-      _react2.default.createElement(
-        'div',
-        { className: (0, _classnames2.default)(classes.rowRoot, classes.rowOdd) },
-        _react2.default.createElement(
-          'span',
-          { className: (0, _classnames2.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt') },
-          'Title : '
-        ),
-        _react2.default.createElement(
-          'span',
-          { className: (0, _classnames2.default)(classes.tTxt, 'txt-sv-panel-txt') },
-          title
-        )
-      ),
-      _format2.default.isNmrLayout(layoutSt) ? _react2.default.createElement(
-        'div',
-        { className: (0, _classnames2.default)(classes.rowRoot, classes.rowEven) },
-        _react2.default.createElement(
-          'span',
-          { className: (0, _classnames2.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt') },
-          'Freq : '
-        ),
-        _react2.default.createElement(
-          'span',
-          { className: (0, _classnames2.default)(classes.tTxt, 'txt-sv-panel-txt') },
-          parseInt(observeFrequency, 10) || ' - '
-        )
-      ) : null,
-      _format2.default.isNmrLayout(layoutSt) ? _react2.default.createElement(
-        'div',
-        { className: (0, _classnames2.default)(classes.rowRoot, classes.rowOdd) },
-        _react2.default.createElement(
-          'span',
-          { className: (0, _classnames2.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt') },
-          'Solv : '
-        ),
-        _react2.default.createElement(
-          'span',
-          { className: (0, _classnames2.default)(classes.tTxt, 'txt-sv-panel-txt') },
-          showSolvName
-        )
-      ) : null,
-      !molSvg ? null : _react2.default.createElement(_reactSvgFileZoomPan2.default, {
-        svg: molSvg,
-        duration: 300,
-        resize: true
-      }),
-      _format2.default.isHplcUvVisLayout(layoutSt) ? _react2.default.createElement(
-        'div',
-        { className: (0, _classnames2.default)(classes.rowRoot, classes.rowOddSim) },
-        _react2.default.createElement(
-          'span',
-          { className: (0, _classnames2.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt') },
-          'Area under curve (AUC):'
-        ),
-        _react2.default.createElement('br', null),
-        _react2.default.createElement(
-          'span',
-          { className: (0, _classnames2.default)(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt') },
-          aucValue(integration)
-        )
-      ) : null
-    ),
-    _react2.default.createElement(_reactQuill2.default, {
-      className: (0, _classnames2.default)(classes.quill, 'card-sv-quill'),
-      value: descriptions,
-      modules: { toolbar: false },
-      onChange: onDescriptionChanged,
-      readOnly: canChangeDescription !== undefined ? !canChangeDescription : true
-    }),
-    _react2.default.createElement(
-      'div',
-      null,
-      !editorOnly && _format2.default.isNmrLayout(layoutSt) ? _react2.default.createElement(
-        'div',
-        { className: (0, _classnames2.default)(classes.rowRoot, classes.rowOddSim) },
-        _react2.default.createElement(
-          'span',
-          { className: (0, _classnames2.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt') },
-          simTitle(),
-          ':'
-        ),
-        _react2.default.createElement('br', null),
-        _react2.default.createElement(
-          'span',
-          { className: (0, _classnames2.default)(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt') },
-          simContent(simulationSt.nmrSimPeaks)
-        )
-      ) : null
-    )
-  );
+    onChange: onDescriptionChanged,
+    readOnly: canChangeDescription !== undefined ? !canChangeDescription : true
+  }), /*#__PURE__*/_react.default.createElement("div", null, !editorOnly && _format.default.isNmrLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement("div", {
+    className: (0, _classnames.default)(classes.rowRoot, classes.rowOddSim)
+  }, /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
+  }, simTitle(), ":"), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt')
+  }, simContent(simulationSt.nmrSimPeaks))) : null));
 };
-
-var mapStateToProps = function mapStateToProps(state, props) {
-  return (// eslint-disable-line
-    {
-      layoutSt: state.layout,
-      simulationSt: state.simulation,
-      shiftSt: state.shift,
-      curveSt: state.curve
-    }
-  );
-};
-
-var mapDispatchToProps = function mapDispatchToProps(dispatch) {
-  return (0, _redux.bindActionCreators)({}, dispatch);
-};
-
+const mapStateToProps = (state, props) => (
+// eslint-disable-line
+{
+  layoutSt: state.layout,
+  simulationSt: state.simulation,
+  shiftSt: state.shift,
+  curveSt: state.curve
+});
+const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({}, dispatch);
 InfoPanel.propTypes = {
-  classes: _propTypes2.default.object.isRequired,
-  expand: _propTypes2.default.bool.isRequired,
-  feature: _propTypes2.default.object.isRequired,
-  integration: _propTypes2.default.object.isRequired,
-  editorOnly: _propTypes2.default.bool.isRequired,
-  molSvg: _propTypes2.default.string.isRequired,
-  descriptions: _propTypes2.default.array.isRequired,
-  layoutSt: _propTypes2.default.string.isRequired,
-  simulationSt: _propTypes2.default.array.isRequired,
-  shiftSt: _propTypes2.default.object.isRequired,
-  curveSt: _propTypes2.default.object.isRequired,
-  onExapnd: _propTypes2.default.func.isRequired,
-  canChangeDescription: _propTypes2.default.bool.isRequired,
-  onDescriptionChanged: _propTypes2.default.func
+  classes: _propTypes.default.object.isRequired,
+  expand: _propTypes.default.bool.isRequired,
+  feature: _propTypes.default.object.isRequired,
+  integration: _propTypes.default.object.isRequired,
+  editorOnly: _propTypes.default.bool.isRequired,
+  molSvg: _propTypes.default.string.isRequired,
+  descriptions: _propTypes.default.array.isRequired,
+  layoutSt: _propTypes.default.string.isRequired,
+  simulationSt: _propTypes.default.array.isRequired,
+  shiftSt: _propTypes.default.object.isRequired,
+  curveSt: _propTypes.default.object.isRequired,
+  onExapnd: _propTypes.default.func.isRequired,
+  canChangeDescription: _propTypes.default.bool.isRequired,
+  onDescriptionChanged: _propTypes.default.func
 };
-
-exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(InfoPanel));
+var _default = (0, _reactRedux.connect)(
+// eslint-disable-line
+mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(InfoPanel)); // eslint-disable-line
+exports.default = _default;

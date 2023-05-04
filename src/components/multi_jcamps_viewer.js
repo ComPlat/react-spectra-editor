@@ -1,3 +1,6 @@
+/* eslint-disable react/default-props-match-prop-types,
+react/require-default-props, react/no-unused-prop-types, react/jsx-boolean-value,
+prefer-object-spread */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -8,10 +11,12 @@ import { withStyles } from '@material-ui/core/styles';
 
 import PanelViewer from './panel/index';
 import CmdBar from './cmd_bar/index';
-import ViewerMulti  from './d3_multi/index';
+import ViewerMulti from './d3_multi/index';
 
 import { setAllCurves } from '../actions/curve';
-import { addNewCylicVoltaPairPeak, addCylicVoltaMaxPeak, addCylicVoltaMinPeak, addCylicVoltaPecker } from '../actions/cyclic_voltammetry';
+import {
+  addNewCylicVoltaPairPeak, addCylicVoltaMaxPeak, addCylicVoltaMinPeak, addCylicVoltaPecker,
+} from '../actions/cyclic_voltammetry';
 
 const styles = () => ({
   root: {
@@ -27,28 +32,25 @@ const styles = () => ({
 });
 
 const seperatingSubLayout = (entities, featureCondition) => {
-  let storedDict = {};
-  entities.forEach(entity => {
+  const storedDict = {};
+  entities.forEach((entity) => {
     const { feature } = entity;
     const keyValue = feature[featureCondition];
     if (keyValue in storedDict) {
-      storedDict[keyValue].push(entity)
-    }
-    else {
-      storedDict[keyValue] = [entity]
+      storedDict[keyValue].push(entity);
+    } else {
+      storedDict[keyValue] = [entity];
     }
   });
   return Object.assign({}, storedDict);
 };
 
-class MultiJcampsViewer extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
+class MultiJcampsViewer extends React.Component { // eslint-disable-line
   render() {
-    const { classes, curvSt, operations, entityFileNames, entities, userManualLink } = this.props;
-    if (!entities || entities.length === 0) return (<div></div>);
+    const {
+      classes, curvSt, operations, entityFileNames, entities, userManualLink,
+    } = this.props;
+    if (!entities || entities.length === 0) return (<div />);
 
     const seperatedSubLayouts = seperatingSubLayout(entities, 'xUnit');
     const entity = entities[curvSt.curveIdx];
@@ -81,7 +83,7 @@ class MultiJcampsViewer extends React.Component {
                 feature={feature}
                 molSvg={molSvg}
                 subLayoutsInfo={seperatedSubLayouts}
-                descriptions={''}
+                descriptions=""
                 canChangeDescription={() => {}}
                 onDescriptionChanged={() => {}}
               />
@@ -101,13 +103,13 @@ const mapStateToProps = (state, _) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     setAllCurvesAct: setAllCurves,
     addNewCylicVoltaPairPeakAct: addNewCylicVoltaPairPeak,
     addCylicVoltaMaxPeakAct: addCylicVoltaMaxPeak,
     addCylicVoltaMinPeakAct: addCylicVoltaMinPeak,
-    addCylicVoltaPeckerAct: addCylicVoltaPecker
+    addCylicVoltaPeckerAct: addCylicVoltaPecker,
   }, dispatch)
 );
 
@@ -124,6 +126,7 @@ MultiJcampsViewer.propTypes = {
   addCylicVoltaMinPeakAct: PropTypes.func.isRequired,
   operations: PropTypes.func.isRequired,
   userManualLink: PropTypes.object,
+  entities: PropTypes.array,
 };
 
 MultiJcampsViewer.defaultProps = {
@@ -133,7 +136,7 @@ MultiJcampsViewer.defaultProps = {
   cLabel: '',
   xLabel: '',
   yLabel: '',
-  entities: []
+  entities: [],
 };
 
 export default compose(

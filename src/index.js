@@ -1,3 +1,4 @@
+/* eslint-disable prefer-object-spread, default-param-last, no-nested-ternary */
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -9,7 +10,7 @@ import ReactQuill from 'react-quill';
 
 import { SpectraEditor, FN } from './app';
 import nmr1HJcamp from './__tests__/fixtures/nmr1h_jcamp';
-import nmr1H_2_Jcamp from './__tests__/fixtures/nmr1h_2_jcamp';
+import nmr1H2Jcamp from './__tests__/fixtures/nmr1h_2_jcamp';
 import nmr13CDeptJcamp from './__tests__/fixtures/nmr13c_dept_jcamp';
 import nmr13CJcamp from './__tests__/fixtures/nmr13c_jcamp';
 import nmr19FJcamp from './__tests__/fixtures/nmr19f_jcamp';
@@ -43,7 +44,7 @@ import { q1H, qIR, q13C } from './__tests__/fixtures/qDescValue';
 import './__tests__/style/svg.css';
 
 const nmr1HEntity = FN.ExtractJcamp(nmr1HJcamp);
-const nmr1HEntity2 = FN.ExtractJcamp(nmr1H_2_Jcamp);
+const nmr1HEntity2 = FN.ExtractJcamp(nmr1H2Jcamp);
 const nmr13CEntity = FN.ExtractJcamp(nmr13CJcamp);
 const nmr13CDeptEntity = FN.ExtractJcamp(nmr13CDeptJcamp);
 const nmr19FEntity = FN.ExtractJcamp(nmr19FJcamp);
@@ -81,7 +82,7 @@ class DemoWriteIr extends React.Component {
       predictions: false,
       molecule: '',
       showOthers: false,
-      descChanged: ''
+      descChanged: '',
     };
 
     this.onClick = this.onClick.bind(this);
@@ -111,147 +112,13 @@ class DemoWriteIr extends React.Component {
     };
   }
 
-  rmDollarSign(target) {
-    return target.replace(/\$/g, '');
+  onShowOthers(jcamp) { // eslint-disable-line
+    this.setState({ showOthers: true });
   }
 
-  formatPks({
-    peaks, layout, shift, isAscend, decimal, isIntensity, integration
-  }) {
-    const entity = this.loadEntity();
-    const { features } = entity;
-    const { maxY, minY } = Array.isArray(features) ? {} : (features.editPeak || features.autoPeak);
-    const boundary = { maxY, minY };
-    const body = FN.peaksBody({
-      peaks, layout, decimal, shift, isAscend, isIntensity, boundary, integration
-    });
-    const wrapper = FN.peaksWrapper(layout, shift);
-    const desc = this.rmDollarSign(wrapper.head) + body + wrapper.tail;
-    return desc;
-  }
-
-  formatMpy({
-    multiplicity, integration, shift, isAscend, decimal, layout,
-  }) {
-    // obsv freq
-    const entity = this.loadEntity();
-    const { features } = entity;
-    const { observeFrequency } = Array.isArray(features)
-      ? features[0]
-      : (features.editPeak || features.autoPeak);
-    const freq = observeFrequency[0];
-    const freqStr = freq ? `${parseInt(freq, 10)} MHz, ` : '';
-    // multiplicity
-    const { refArea, refFactor } = integration;
-    const shiftVal = multiplicity.shift;
-    const ms = multiplicity.stack;
-    const is = integration.stack;
-
-    const macs = ms.map((m) => {
-      const { peaks, mpyType, xExtent } = m;
-      const { xL, xU } = xExtent;
-      const it = is.filter(i => i.xL === xL && i.xU === xU)[0] || { area: 0 };
-      const area = it.area * refFactor / refArea;
-      const center = FN.calcMpyCenter(peaks, shiftVal, mpyType);
-      const xs = m.peaks.map(p => p.x).sort((a, b) => a - b);
-      const [aIdx, bIdx] = isAscend ? [0, xs.length - 1] : [xs.length - 1, 0];
-      const mxA = mpyType === 'm' ? (xs[aIdx] - shiftVal).toFixed(decimal) : 0;
-      const mxB = mpyType === 'm' ? (xs[bIdx] - shiftVal).toFixed(decimal) : 0;
-      return Object.assign({}, m, {
-        area, center, mxA, mxB,
-      });
-    }).sort((a, b) => (isAscend ? a.center - b.center : b.center - a.center));
-    const str = macs.map((m) => {
-      const c = m.center;
-      const type = m.mpyType;
-      const it = Math.round(m.area);
-      const js = m.js.map(j => `J = ${j.toFixed(1)} Hz`).join(', ');
-      const atomCount = layout === '1H' ? `, ${it}H` : '';
-      const location = type === 'm' ? `${m.mxA}–${m.mxB}` : `${c.toFixed(decimal)}`;
-      return m.js.length === 0
-        ? `${location} (${type}${atomCount})`
-        : `${location} (${type}, ${js}${atomCount})`;
-    }).join(', ');
-    const { label, value, name } = shift.ref;
-    const solvent = label ? `${name.split('(')[0].trim()} [${value.toFixed(decimal)} ppm], ` : '';
-    return `${layout} NMR (${freqStr}${solvent}ppm) δ = ${str}.`;
-  }
-
-  writeMpy({
-    layout, shift, isAscend, decimal,
-    multiplicity, integration,
-  }) {
-    if (['1H', '13C', '19F'].indexOf(layout) < 0) return;
-    const desc = this.formatMpy({
-      multiplicity, integration, shift, isAscend, decimal, layout,
-    });
-    this.setState({ desc });
-  }
-
-  writePeak({
-    peaks, layout, shift, isAscend, decimal, isIntensity, integration, waveLength
-  }) {
-    const desc = this.formatPks({
-      peaks, layout, shift, isAscend, decimal, isIntensity, integration
-    });
-    this.setState({ desc });
-  }
-
-  savePeaks({
-    peaks, layout, shift, isAscend, decimal, analysis, isIntensity,
-    integration, multiplicity,
-  }) {
-    const entity = this.loadEntity();
-    const { features } = entity;
-    const { maxY, minY } = Array.isArray(features)
-      ? features[0]
-      : (features.editPeak || features.autoPeak);
-    const boundary = { maxY, minY };
-    const body = FN.peaksBody({
-      peaks, layout, decimal, shift, isAscend, isIntensity, boundary,
-    });
-    /*eslint-disable */
-    console.log(analysis);
-    console.log(integration);
-    console.log(multiplicity);
-    if (shift.ref.label) {
-      const label = this.rmDollarSign(shift.ref.label);
-      alert(
-        `Peaks: ${body}` + '\n' +
-        '- - - - - - - - - - -' + '\n' +
-        `Shift solvent = ${label}, ${shift.ref.value}ppm` + '\n'
-      );
-    } else {
-      alert(
-        `Peaks: ${body}` + '\n'
-      );
-    }
-    /*eslint-disable */
-  }
-
-  predictOp({
-    multiplicity,
-   }) {
-    const { stack, shift } = multiplicity;
-    const targets = stack.map((stk) => {
-      const { mpyType, peaks } = stk;
-      return FN.CalcMpyCenter(peaks, shift, mpyType);
-    })
-    // console.log(targets)
-    const { molecule, typ } = this.state;
-    const predictions = { running: true };
-
-    this.setState({ predictions });
-    // simulate fetching...
-    const result = typ === 'ir' ? irResult : nmrResult;
-    setTimeout(() => {
-      this.setState({ predictions: result });
-    }, 2000);
-  }
-
-  updatInput(e) {
-    const molecule = e.target.value;
-    this.setState({ molecule });
+  onDescriptionChanged(content) {
+    // console.log(content)
+    this.setState({ descChanged: content });
   }
 
   loadEntity() {
@@ -261,8 +128,8 @@ class DemoWriteIr extends React.Component {
         return nmr1HEntity;
       case 'nmr 13c':
         return nmr13CEntity;
-        case 'nmr 13c dept':
-          return nmr13CDeptEntity;
+      case 'nmr 13c dept':
+        return nmr13CDeptEntity;
       case 'nmr 19f':
         return nmr19FEntity;
       case 'nmr 31p':
@@ -344,10 +211,6 @@ class DemoWriteIr extends React.Component {
     }
   }
 
-  onShowOthers(jcamp) {
-    this.setState({ showOthers: true });
-  }
-
   loadOthers() {
     const { showOthers, typ } = this.state;
     const isIr = typ === 'ir';
@@ -362,9 +225,147 @@ class DemoWriteIr extends React.Component {
     };
   }
 
-  onDescriptionChanged(content) {
-    // console.log(content)
-    this.setState({descChanged: content})
+  rmDollarSign(target) {
+    return target.replace(/\$/g, '');
+  }
+
+  formatPks({
+    peaks, layout, shift, isAscend, decimal, isIntensity, integration,
+  }) {
+    const entity = this.loadEntity();
+    const { features } = entity;
+    const { maxY, minY } = Array.isArray(features) ? {} : (features.editPeak || features.autoPeak);
+    const boundary = { maxY, minY };
+    const body = FN.peaksBody({
+      peaks, layout, decimal, shift, isAscend, isIntensity, boundary, integration,
+    });
+    const wrapper = FN.peaksWrapper(layout, shift);
+    const desc = this.rmDollarSign(wrapper.head) + body + wrapper.tail;
+    return desc;
+  }
+
+  formatMpy({
+    multiplicity, integration, shift, isAscend, decimal, layout,
+  }) {
+    // obsv freq
+    const entity = this.loadEntity();
+    const { features } = entity;
+    const { observeFrequency } = Array.isArray(features)
+      ? features[0]
+      : (features.editPeak || features.autoPeak);
+    const freq = observeFrequency[0];
+    const freqStr = freq ? `${parseInt(freq, 10)} MHz, ` : '';
+    // multiplicity
+    const { refArea, refFactor } = integration;
+    const shiftVal = multiplicity.shift;
+    const ms = multiplicity.stack;
+    const is = integration.stack;
+
+    const macs = ms.map((m) => {
+      const { peaks, mpyType, xExtent } = m;
+      const { xL, xU } = xExtent;
+      const it = is.filter((i) => i.xL === xL && i.xU === xU)[0] || { area: 0 };
+      const area = it.area * refFactor / refArea; // eslint-disable-line
+      const center = FN.calcMpyCenter(peaks, shiftVal, mpyType);
+      const xs = m.peaks.map((p) => p.x).sort((a, b) => a - b);
+      const [aIdx, bIdx] = isAscend ? [0, xs.length - 1] : [xs.length - 1, 0];
+      const mxA = mpyType === 'm' ? (xs[aIdx] - shiftVal).toFixed(decimal) : 0;
+      const mxB = mpyType === 'm' ? (xs[bIdx] - shiftVal).toFixed(decimal) : 0;
+      return Object.assign({}, m, {
+        area, center, mxA, mxB,
+      });
+    }).sort((a, b) => (isAscend ? a.center - b.center : b.center - a.center));
+    const str = macs.map((m) => {
+      const c = m.center;
+      const type = m.mpyType;
+      const it = Math.round(m.area);
+      const js = m.js.map((j) => `J = ${j.toFixed(1)} Hz`).join(', ');
+      const atomCount = layout === '1H' ? `, ${it}H` : '';
+      const location = type === 'm' ? `${m.mxA}–${m.mxB}` : `${c.toFixed(decimal)}`;
+      return m.js.length === 0
+        ? `${location} (${type}${atomCount})`
+        : `${location} (${type}, ${js}${atomCount})`;
+    }).join(', ');
+    const { label, value, name } = shift.ref;
+    const solvent = label ? `${name.split('(')[0].trim()} [${value.toFixed(decimal)} ppm], ` : '';
+    return `${layout} NMR (${freqStr}${solvent}ppm) δ = ${str}.`;
+  }
+
+  writeMpy({
+    layout, shift, isAscend, decimal,
+    multiplicity, integration,
+  }) {
+    if (['1H', '13C', '19F'].indexOf(layout) < 0) return;
+    const desc = this.formatMpy({
+      multiplicity, integration, shift, isAscend, decimal, layout,
+    });
+    this.setState({ desc });
+  }
+
+  writePeak({
+    peaks, layout, shift, isAscend, decimal, isIntensity, integration,
+  }) {
+    const desc = this.formatPks({
+      peaks, layout, shift, isAscend, decimal, isIntensity, integration,
+    });
+    this.setState({ desc });
+  }
+
+  savePeaks({
+    peaks, layout, shift, isAscend, decimal, analysis, isIntensity,
+    integration, multiplicity,
+  }) {
+    const entity = this.loadEntity();
+    const { features } = entity;
+    const { maxY, minY } = Array.isArray(features)
+      ? features[0]
+      : (features.editPeak || features.autoPeak);
+    const boundary = { maxY, minY };
+    const body = FN.peaksBody({
+      peaks, layout, decimal, shift, isAscend, isIntensity, boundary,
+    });
+    /*eslint-disable */
+    console.log(analysis);
+    console.log(integration);
+    console.log(multiplicity);
+    if (shift.ref.label) {
+      const label = this.rmDollarSign(shift.ref.label);
+      alert(
+        `Peaks: ${body}` + '\n' +
+        '- - - - - - - - - - -' + '\n' +
+        `Shift solvent = ${label}, ${shift.ref.value}ppm` + '\n'
+      );
+    } else {
+      alert(
+        `Peaks: ${body}` + '\n'
+      );
+    }
+    /*eslint-disable */
+  }
+
+  predictOp({
+    multiplicity,
+   }) {
+    const { stack, shift } = multiplicity;
+    const targets = stack.map((stk) => {
+      const { mpyType, peaks } = stk;
+      return FN.CalcMpyCenter(peaks, shift, mpyType);
+    })
+    // console.log(targets)
+    const { molecule, typ } = this.state;
+    const predictions = { running: true };
+
+    this.setState({ predictions });
+    // simulate fetching...
+    const result = typ === 'ir' ? irResult : nmrResult;
+    setTimeout(() => {
+      this.setState({ predictions: result });
+    }, 2000);
+  }
+
+  updatInput(e) {
+    const molecule = e.target.value;
+    this.setState({ molecule });
   }
 
   render() {

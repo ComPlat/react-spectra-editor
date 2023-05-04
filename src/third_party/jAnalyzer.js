@@ -1,3 +1,4 @@
+/* eslint-disable */
 // https://github.com/cheminfo-js/spectra/blob/master/packages/spectra-data/src/peakPicking/jAnalyzer.js
 
 /*
