@@ -61,7 +61,7 @@ const onClickFail = (layoutSt, simuCount, realCount) => {
   return () => alert(`Selected ${feature} count (${realCount}) must be larger than 0, and must be eqal or less than simulated count (${simuCount}).`); // eslint-disable-line
 };
 
-const onClickReady = (forecast, peaksEdit, layoutSt, scan, shiftSt, thres, analysis, integrationSt, multiplicitySt, setUiViewerTypeAct) => {
+const onClickReady = (forecast, peaksEdit, layoutSt, scan, shiftSt, thres, analysis, integrationSt, multiplicitySt, setUiViewerTypeAct, curveSt) => {
   const {
     btnCb
   } = forecast;
@@ -79,7 +79,8 @@ const onClickReady = (forecast, peaksEdit, layoutSt, scan, shiftSt, thres, analy
       analysis,
       integration: integrationSt,
       multiplicity: multiplicitySt,
-      shift: shiftSt
+      shift: shiftSt,
+      curveSt
     });
   };
 };

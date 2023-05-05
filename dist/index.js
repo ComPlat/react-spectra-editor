@@ -427,12 +427,20 @@ class DemoWriteIr extends _react.default.Component {
 
   predictOp(_ref6) {
     let {
-      multiplicity
+      multiplicity,
+      curveSt
     } = _ref6;
+    const {
+      curveIdx
+    } = curveSt;
+    const {
+      multiplicities
+    } = multiplicity;
+    const selectedMultiplicity = multiplicities[curveIdx];
     const {
       stack,
       shift
-    } = multiplicity;
+    } = selectedMultiplicity;
     const targets = stack.map(stk => {
       const {
         mpyType,
@@ -642,7 +650,8 @@ class DemoWriteIr extends _react.default.Component {
       molSvg: molSvg,
       userManualLink: {
         cv: "https://www.chemotion.net/chemotionsaurus/docs/eln/chemspectra/cvanalysis"
-      }
+      },
+      forecast: forecast
     }), /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("span", null, "Description Changed"), /*#__PURE__*/_react.default.createElement(_reactQuill.default, {
       className: 'card-sv-quill',
       value: this.state.descChanged,

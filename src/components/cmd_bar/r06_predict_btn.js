@@ -68,6 +68,7 @@ const onClickFail = (layoutSt, simuCount, realCount) => {
 const onClickReady = (
   forecast, peaksEdit, layoutSt, scan, shiftSt, thres,
   analysis, integrationSt, multiplicitySt, setUiViewerTypeAct,
+  curveSt,
 ) => {
   const { btnCb } = forecast;
   if (!btnCb) {
@@ -87,6 +88,7 @@ const onClickReady = (
         integration: integrationSt,
         multiplicity: multiplicitySt,
         shift: shiftSt,
+        curveSt,
       })
     );
   };
