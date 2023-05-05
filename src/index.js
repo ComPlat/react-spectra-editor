@@ -344,9 +344,12 @@ class DemoWriteIr extends React.Component {
   }
 
   predictOp({
-    multiplicity,
+    multiplicity, curveSt,
    }) {
-    const { stack, shift } = multiplicity;
+    const { curveIdx } = curveSt;
+    const { multiplicities } = multiplicity;
+    const selectedMultiplicity = multiplicities[curveIdx];
+    const { stack, shift } = selectedMultiplicity;
     const targets = stack.map((stk) => {
       const { mpyType, peaks } = stk;
       return FN.CalcMpyCenter(peaks, shift, mpyType);
@@ -561,6 +564,7 @@ class DemoWriteIr extends React.Component {
           onDescriptionChanged={this.onDescriptionChanged}
           molSvg={molSvg}
           userManualLink={{cv: "https://www.chemotion.net/chemotionsaurus/docs/eln/chemspectra/cvanalysis"}}
+          forecast={forecast}
         />
         <div>
           <span>Description Changed</span>
