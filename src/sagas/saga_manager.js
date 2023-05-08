@@ -7,22 +7,16 @@ import {
 const getLayout = (state) => state.layout;
 const getCurveSt = (state) => state.curve;
 const getIntegrationSt = (state) => state.integration.present;
-// const getShiftSt = (state) => state.shift;
 
 function* resetShift(action) {
-  // const curveSt = yield select(getCurveSt);
+  const curveSt = yield select(getCurveSt);
   const layout = yield select(getLayout);
-  // const shiftSt = yield select(getShiftSt);
 
   const { payload } = action;
-  // const { shift } = payload;
-  // console.log(payload);
-  // console.log(shiftSt);
-  // const { curveIdx } = curveSt;
-  // const { shifts } = shiftSt;
-  // shifts[curveIdx] = shift;
 
-  // const newPayload = Object.assign({}, shiftSt, { shifts, selectedIdx: curveIdx })
+  const { curveIdx, listCurves } = curveSt;
+
+  const numberOfCurve = listCurves.length;
 
   yield put({
     type: MANAGER.RESETSHIFT,
@@ -31,6 +25,11 @@ function* resetShift(action) {
       payload,
       {
         layout,
+        curvesInfo: {
+          isMultiCurve: numberOfCurve > 0,
+          curveIdx,
+          numberOfCurve,
+        },
       },
     ),
   });

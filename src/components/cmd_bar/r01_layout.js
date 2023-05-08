@@ -36,10 +36,19 @@ const styles = () => (
 );
 
 const shiftSelect = (
-  classes, layoutSt, shiftRefSt, setShiftRefAct,
+  classes, layoutSt, setShiftRefAct, shiftSt, curveSt,
 ) => {
   if (Cfg.hideSolvent(layoutSt)) return null;
-  const onChange = (e) => setShiftRefAct(e.target.value);
+  // const onChange = (e) => setShiftRefAct(e.target.value);
+  const { curveIdx } = curveSt;
+  const { shifts } = shiftSt;
+  const selectedShift = shifts[curveIdx];
+  const shiftRef = selectedShift.ref;
+
+  const onChange = (e) => {
+    const payload = { dataToSet: e.target.value, curveIdx };
+    setShiftRefAct(payload);
+  };
 
   const listShift = getListShift(layoutSt);
 
@@ -60,7 +69,7 @@ const shiftSelect = (
         Solvent
       </InputLabel>
       <Select
-        value={shiftRefSt}
+        value={shiftRef}
         onChange={onChange}
         input={
           (
@@ -175,12 +184,12 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
 };
 
 const Layout = ({
-  classes, feature, hasEdit, layoutSt, shiftRefSt,
-  setShiftRefAct, updateLayoutAct,
+  classes, feature, hasEdit, layoutSt,
+  setShiftRefAct, updateLayoutAct, curveSt, shiftSt,
 }) => (
   <span className={classes.groupRight}>
     { layoutSelect(classes, layoutSt, updateLayoutAct) }
-    { shiftSelect(classes, layoutSt, shiftRefSt, setShiftRefAct) }
+    { shiftSelect(classes, layoutSt, setShiftRefAct, shiftSt, curveSt) }
     <Scan feature={feature} hasEdit={hasEdit} />
   </span>
 );
@@ -188,7 +197,8 @@ const Layout = ({
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     layoutSt: state.layout,
-    shiftRefSt: state.shift.ref,
+    curveSt: state.curve,
+    shiftSt: state.shift,
   }
 );
 
@@ -204,9 +214,10 @@ Layout.propTypes = {
   feature: PropTypes.object.isRequired,
   hasEdit: PropTypes.bool.isRequired,
   layoutSt: PropTypes.string.isRequired,
-  shiftRefSt: PropTypes.object.isRequired,
   setShiftRefAct: PropTypes.func.isRequired,
   updateLayoutAct: PropTypes.func.isRequired,
+  curveSt: PropTypes.object.isRequired,
+  shiftSt: PropTypes.object.isRequired,
 };
 
 export default connect(
