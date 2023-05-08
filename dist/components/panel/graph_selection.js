@@ -89,7 +89,7 @@ const GraphSelectionPanel = _ref => {
       }
       return {
         name: `${idx + 1}.`,
-        idx: curveIdx,
+        idx,
         color,
         filename
       };

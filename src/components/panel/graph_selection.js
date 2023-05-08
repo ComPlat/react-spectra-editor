@@ -78,7 +78,7 @@ const GraphSelectionPanel = ({
         filename = entityFileNames[curveIdx];
       }
       return {
-        name: `${idx + 1}.`, idx: curveIdx, color, filename,
+        name: `${idx + 1}.`, idx, color, filename,
       };
     });
   }
