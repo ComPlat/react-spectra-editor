@@ -59,21 +59,39 @@ const resetEnable = payload => {
 };
 const resetShift = (state, action) => {
   const {
-    selectedIdx,
+    payload
+  } = action;
+  const {
+    curvesInfo
+  } = payload;
+  const {
+    isMultiCurve,
+    curveIdx,
+    numberOfCurve
+  } = curvesInfo;
+  const {
     shifts
   } = state;
-  let selectedShift = shifts[selectedIdx];
+  let selectedShift = shifts[curveIdx];
   if (selectedShift === false || selectedShift === undefined) {
     selectedShift = defaultEmptyShift;
   }
+  if (isMultiCurve) {
+    for (let idx = 0; idx < numberOfCurve; idx += 1) {
+      const checkShift = shifts[idx];
+      if (!checkShift) {
+        shifts[idx] = defaultEmptyShift;
+      }
+    }
+  }
   const newShift = Object.assign({}, selectedShift, {
-    ref: resetRef(action.payload),
-    enable: resetEnable(action.payload)
+    ref: resetRef(payload),
+    enable: resetEnable(payload)
   });
-  shifts[selectedIdx] = newShift;
+  shifts[curveIdx] = newShift;
   return Object.assign({}, state, {
     shifts,
-    selectedIdx
+    selectedIdx: curveIdx
   });
 };
 const updateShift = (state, action) => {

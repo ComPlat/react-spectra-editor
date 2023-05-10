@@ -72,13 +72,14 @@ const GraphSelectionPanel = ({
   if (selectedSubLayout && subLayoutValues.length > 1) {
     const subLayout = subLayoutsInfo[selectedSubLayout];
     itemsSubLayout = subLayout.map((spectra, idx) => {
+      const spectraIdx = spectra.curveIdx;
       const { color } = spectra;
       let filename = '';
-      if (entityFileNames && curveIdx < entityFileNames.length) {
-        filename = entityFileNames[curveIdx];
+      if (entityFileNames && spectraIdx < entityFileNames.length) {
+        filename = entityFileNames[spectraIdx];
       }
       return {
-        name: `${idx + 1}.`, idx, color, filename,
+        name: `${idx + 1}.`, idx: spectraIdx, color, filename,
       };
     });
   }
