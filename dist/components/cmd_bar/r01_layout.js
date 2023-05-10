@@ -34,9 +34,24 @@ const styles = () => Object.assign({
     width: 100
   }
 }, _common.commonStyle);
-const shiftSelect = (classes, layoutSt, shiftRefSt, setShiftRefAct) => {
+const shiftSelect = (classes, layoutSt, setShiftRefAct, shiftSt, curveSt) => {
   if (_cfg.default.hideSolvent(layoutSt)) return null;
-  const onChange = e => setShiftRefAct(e.target.value);
+  // const onChange = (e) => setShiftRefAct(e.target.value);
+  const {
+    curveIdx
+  } = curveSt;
+  const {
+    shifts
+  } = shiftSt;
+  const selectedShift = shifts[curveIdx];
+  const shiftRef = selectedShift.ref;
+  const onChange = e => {
+    const payload = {
+      dataToSet: e.target.value,
+      curveIdx
+    };
+    setShiftRefAct(payload);
+  };
   const listShift = (0, _list_shift.getListShift)(layoutSt);
   const content = listShift.map(ref => /*#__PURE__*/_react.default.createElement(_MenuItem.default, {
     value: ref,
@@ -50,7 +65,7 @@ const shiftSelect = (classes, layoutSt, shiftRefSt, setShiftRefAct) => {
   }, /*#__PURE__*/_react.default.createElement(_InputLabel.default, {
     className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label')
   }, "Solvent"), /*#__PURE__*/_react.default.createElement(_Select.default, {
-    value: shiftRefSt,
+    value: shiftRef,
     onChange: onChange,
     input: /*#__PURE__*/_react.default.createElement(_OutlinedInput.default, {
       className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-shift'),
@@ -148,13 +163,14 @@ const Layout = _ref => {
     feature,
     hasEdit,
     layoutSt,
-    shiftRefSt,
     setShiftRefAct,
-    updateLayoutAct
+    updateLayoutAct,
+    curveSt,
+    shiftSt
   } = _ref;
   return /*#__PURE__*/_react.default.createElement("span", {
     className: classes.groupRight
-  }, layoutSelect(classes, layoutSt, updateLayoutAct), shiftSelect(classes, layoutSt, shiftRefSt, setShiftRefAct), /*#__PURE__*/_react.default.createElement(_r02_scan.default, {
+  }, layoutSelect(classes, layoutSt, updateLayoutAct), shiftSelect(classes, layoutSt, setShiftRefAct, shiftSt, curveSt), /*#__PURE__*/_react.default.createElement(_r02_scan.default, {
     feature: feature,
     hasEdit: hasEdit
   }));
@@ -163,7 +179,8 @@ const mapStateToProps = (state, props) => (
 // eslint-disable-line
 {
   layoutSt: state.layout,
-  shiftRefSt: state.shift.ref
+  curveSt: state.curve,
+  shiftSt: state.shift
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   setShiftRefAct: _shift.setShiftRef,
@@ -174,9 +191,10 @@ Layout.propTypes = {
   feature: _propTypes.default.object.isRequired,
   hasEdit: _propTypes.default.bool.isRequired,
   layoutSt: _propTypes.default.string.isRequired,
-  shiftRefSt: _propTypes.default.object.isRequired,
   setShiftRefAct: _propTypes.default.func.isRequired,
-  updateLayoutAct: _propTypes.default.func.isRequired
+  updateLayoutAct: _propTypes.default.func.isRequired,
+  curveSt: _propTypes.default.object.isRequired,
+  shiftSt: _propTypes.default.object.isRequired
 };
 var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(Layout));
 exports.default = _default;

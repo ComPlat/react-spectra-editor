@@ -9,31 +9,28 @@ var _action_type = require("../constants/action_type");
 const getLayout = state => state.layout;
 const getCurveSt = state => state.curve;
 const getIntegrationSt = state => state.integration.present;
-// const getShiftSt = (state) => state.shift;
-
 function* resetShift(action) {
-  // const curveSt = yield select(getCurveSt);
+  const curveSt = yield (0, _effects.select)(getCurveSt);
   const layout = yield (0, _effects.select)(getLayout);
-  // const shiftSt = yield select(getShiftSt);
-
   const {
     payload
   } = action;
-  // const { shift } = payload;
-  // console.log(payload);
-  // console.log(shiftSt);
-  // const { curveIdx } = curveSt;
-  // const { shifts } = shiftSt;
-  // shifts[curveIdx] = shift;
-
-  // const newPayload = Object.assign({}, shiftSt, { shifts, selectedIdx: curveIdx })
-
+  const {
+    curveIdx,
+    listCurves
+  } = curveSt;
+  const numberOfCurve = listCurves.length;
   yield (0, _effects.put)({
     type: _action_type.MANAGER.RESETSHIFT,
     payload: Object.assign(
     // eslint-disable-line
     {}, payload, {
-      layout
+      layout,
+      curvesInfo: {
+        isMultiCurve: numberOfCurve > 0,
+        curveIdx,
+        numberOfCurve
+      }
     })
   });
 }
