@@ -9,9 +9,10 @@ const TfRescale = (focus) => {
 };
 
 const fetchPt = (focus, xt) => {
-  const rawMouseX = focus.isFirefox // WORKAROUND d3.mouse firefox compatibility
-    ? d3.event.offsetX
-    : d3.mouse(focus.root.node())[0];
+  // const rawMouseX = focus.isFirefox // WORKAROUND d3.mouse firefox compatibility
+  //   ? d3.event.offsetX
+  //   : d3.mouse(focus.root.node())[0];
+  const rawMouseX = d3.mouse(focus.root.node())[0];
   const mouseX = xt.invert(rawMouseX);
   const bisectDate = d3.bisector((d) => +d.x).left;
   const dt = focus.data;
@@ -22,12 +23,14 @@ const fetchPt = (focus, xt) => {
 };
 
 const fetchFreePt = (focus, xt, yt) => {
-  const rawMouseX = focus.isFirefox // WORKAROUND d3.mouse firefox compatibility
-    ? d3.event.offsetX
-    : d3.mouse(focus.root.node())[0];
-  const rawMouseY = focus.isFirefox // WORKAROUND d3.mouse firefox compatibility
-    ? d3.event.offsetY
-    : d3.mouse(focus.root.node())[1];
+  // const rawMouseX = focus.isFirefox // WORKAROUND d3.mouse firefox compatibility
+  //   ? d3.event.offsetX
+  //   : d3.mouse(focus.root.node())[0];
+  // const rawMouseY = focus.isFirefox // WORKAROUND d3.mouse firefox compatibility
+  //   ? d3.event.offsetY
+  //   : d3.mouse(focus.root.node())[1];
+  const rawMouseX = d3.mouse(focus.root.node())[0];
+  const rawMouseY = d3.mouse(focus.root.node())[1];
   const mouseX = xt.invert(rawMouseX);
   const mouseY = yt.invert(rawMouseY);
 
