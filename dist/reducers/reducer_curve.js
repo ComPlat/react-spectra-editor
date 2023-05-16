@@ -13,7 +13,8 @@ var _format = _interopRequireDefault(require("../helpers/format"));
 
 const initialState = {
   listCurves: [],
-  curveIdx: 0
+  curveIdx: 0,
+  isShowAllCurve: false
 };
 const setAllCurves = (state, action) => {
   const {
@@ -64,6 +65,10 @@ const curveReducer = function () {
       });
     case _action_type.CURVE.SET_ALL_CURVES:
       return setAllCurves(state, action);
+    case _action_type.CURVE.SET_SHOULD_SHOW_ALL_CURVES:
+      return Object.assign({}, state, {
+        isShowAllCurve: action.payload
+      });
     default:
       return state;
   }

@@ -39,6 +39,8 @@ var _sec_1_jcamp = _interopRequireDefault(require("./__tests__/fixtures/sec_1_jc
 var _sec_2_jcamp = _interopRequireDefault(require("./__tests__/fixtures/sec_2_jcamp"));
 var _sec_3_jcamp = _interopRequireDefault(require("./__tests__/fixtures/sec_3_jcamp"));
 var _sec_4_jcamp = _interopRequireDefault(require("./__tests__/fixtures/sec_4_jcamp"));
+var _aif_jcamp_ = _interopRequireDefault(require("./__tests__/fixtures/aif_jcamp_1"));
+var _aif_jcamp_2 = _interopRequireDefault(require("./__tests__/fixtures/aif_jcamp_2"));
 var _qDescValue = require("./__tests__/fixtures/qDescValue");
 require("./__tests__/style/svg.css");
 /* eslint-disable prefer-object-spread, default-param-last, no-nested-ternary */
@@ -71,6 +73,8 @@ const secEntity1 = _app.FN.ExtractJcamp(_sec_1_jcamp.default);
 const secEntity2 = _app.FN.ExtractJcamp(_sec_2_jcamp.default);
 const secEntity3 = _app.FN.ExtractJcamp(_sec_3_jcamp.default);
 const secEntity4 = _app.FN.ExtractJcamp(_sec_4_jcamp.default);
+const aifEntity1 = _app.FN.ExtractJcamp(_aif_jcamp_.default);
+const aifEntity2 = _app.FN.ExtractJcamp(_aif_jcamp_2.default);
 class DemoWriteIr extends _react.default.Component {
   constructor(props) {
     super(props);
@@ -156,6 +160,8 @@ class DemoWriteIr extends _react.default.Component {
         return cdsEntity;
       case 'sec':
         return secEntity1;
+      case 'aif':
+        return aifEntity1;
       case 'ms':
       default:
         return msEntity;
@@ -178,6 +184,8 @@ class DemoWriteIr extends _react.default.Component {
         return [xrdEntity1, xrdEntity2];
       case 'sec':
         return [secEntity1, secEntity2, secEntity3, secEntity4];
+      case 'aif':
+        return [aifEntity1, aifEntity2];
       default:
         return false;
     }
@@ -208,6 +216,7 @@ class DemoWriteIr extends _react.default.Component {
       case 'cyclic volta':
       case 'cds':
       case 'sec':
+      case 'aif':
       default:
         return false;
     }
@@ -343,7 +352,7 @@ class DemoWriteIr extends _react.default.Component {
       multiplicity,
       integration
     } = _ref3;
-    if (['1H', '13C', '19F'].indexOf(layout) < 0) return;
+    if (!_app.FN.isNmrLayout(layout)) return;
     const desc = this.formatMpy({
       multiplicity,
       integration,
@@ -490,7 +499,7 @@ class DemoWriteIr extends _react.default.Component {
       name: 'save',
       value: this.savePeaks
     }].filter(r => r.value);
-    if (['1H', '13C', '19F', '31P', '15N', '29Si'].indexOf(entity.layout) >= 0) {
+    if (_app.FN.isNmrLayout(entity.layout)) {
       operations = [{
         name: 'write multiplicity',
         value: this.writeMpy
@@ -611,6 +620,12 @@ class DemoWriteIr extends _react.default.Component {
       },
       onClick: this.onClick('sec')
     }, "SEC"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+      variant: "contained",
+      style: {
+        margin: '0 10px 0 10px'
+      },
+      onClick: this.onClick('aif')
+    }, "AIF"), /*#__PURE__*/_react.default.createElement(_Button.default, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'

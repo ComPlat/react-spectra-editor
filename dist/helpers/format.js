@@ -362,6 +362,8 @@ const isCyclicVoltaLayout = layoutSt => _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMME
 const isCDSLayout = layoutSt => _list_layout.LIST_LAYOUT.CDS === layoutSt;
 const isSECLayout = layoutSt => _list_layout.LIST_LAYOUT.SEC === layoutSt;
 const isEmWaveLayout = layoutSt => [_list_layout.LIST_LAYOUT.IR, _list_layout.LIST_LAYOUT.RAMAN, _list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS].indexOf(layoutSt) >= 0;
+const hasMultiCurves = layoutSt => [_list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY, _list_layout.LIST_LAYOUT.SEC, _list_layout.LIST_LAYOUT.AIF].indexOf(layoutSt) >= 0;
+const isAIFLayout = layoutSt => _list_layout.LIST_LAYOUT.AIF === layoutSt;
 const getNmrTyp = layout => {
   switch (layout) {
     case _list_layout.LIST_LAYOUT.H1:
@@ -444,7 +446,9 @@ const Format = {
   formatedEm,
   calcMpyCenter: _multiplicity_calc.calcMpyCenter,
   compareColors,
-  mutiEntitiesColors
+  mutiEntitiesColors,
+  hasMultiCurves,
+  isAIFLayout
 };
 var _default = Format;
 exports.default = _default;

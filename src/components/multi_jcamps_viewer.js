@@ -48,12 +48,13 @@ const seperatingSubLayout = (entities, featureCondition) => {
 class MultiJcampsViewer extends React.Component { // eslint-disable-line
   render() {
     const {
-      classes, curvSt, operations, entityFileNames, entities, userManualLink,
+      classes, curveSt, operations, entityFileNames, entities, userManualLink,
     } = this.props;
     if (!entities || entities.length === 0) return (<div />);
 
     const seperatedSubLayouts = seperatingSubLayout(entities, 'xUnit');
-    const entity = entities[curvSt.curveIdx];
+    const { curveIdx } = curveSt;
+    const entity = entities[curveIdx];
     const { feature, topic, molSvg } = entity;
 
     return (
@@ -77,7 +78,7 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
             </Grid>
             <Grid item xs={3} align="center">
               <PanelViewer
-                jcampIdx={curvSt.curveIdx}
+                jcampIdx={curveIdx}
                 entityFileNames={entityFileNames}
                 userManualLink={userManualLink}
                 feature={feature}
@@ -97,7 +98,7 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
 
 const mapStateToProps = (state, _) => ( // eslint-disable-line
   {
-    curvSt: state.curve,
+    curveSt: state.curve,
     cyclicVoltaSt: state.cyclicvolta,
     entities: state.curve.listCurves,
   }
@@ -119,7 +120,7 @@ MultiJcampsViewer.propTypes = {
   entityFileNames: PropTypes.array.isRequired,
   molSvg: PropTypes.string.isRequired,
   setAllCurvesAct: PropTypes.func.isRequired,
-  curvSt: PropTypes.object.isRequired,
+  curveSt: PropTypes.object.isRequired,
   cyclicVoltaSt: PropTypes.object.isRequired,
   addNewCylicVoltaPairPeakAct: PropTypes.func.isRequired,
   addCylicVoltaMaxPeakAct: PropTypes.func.isRequired,

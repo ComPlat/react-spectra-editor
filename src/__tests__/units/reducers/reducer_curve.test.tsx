@@ -57,4 +57,11 @@ describe('Test redux curve reducer', () => {
     expect(hasEdit).toEqual(true)
     expect(maxminPeak).toBeNull()
   })
+
+  it('Toggle show all curves', () => {
+    action.type = CURVE.SET_SHOULD_SHOW_ALL_CURVES
+    action.payload = true
+    const { isShowAllCurve } = curveReducer(curveState, action)
+    expect(isShowAllCurve).toEqual(true)
+  })
 })
