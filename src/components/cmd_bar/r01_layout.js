@@ -178,6 +178,9 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
         <MenuItem value={LIST_LAYOUT.SEC}>
           <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>SEC</span>
         </MenuItem>
+        <MenuItem value={LIST_LAYOUT.AIF}>
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>AIF</span>
+        </MenuItem>
       </Select>
     </FormControl>
   );

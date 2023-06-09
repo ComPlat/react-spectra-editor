@@ -36,6 +36,7 @@ class MultiFocus {
     } = props;
     this.entities = entities;
     this.jcampIdx = 0;
+    this.isShowAllCurves = false;
     this.rootKlass = '.d3Line';
     this.margin = {
       t: 5,
@@ -251,6 +252,9 @@ class MultiFocus {
     this.updatePathCall(xt, yt);
     this.path.attr('d', this.pathCall(this.data));
     this.path.style('stroke', this.pathColor);
+    if (this.layout === _list_layout.LIST_LAYOUT.AIF) {
+      this.path.attr('marker-mid', 'url(#arrow-left)');
+    }
   }
   drawOtherLines(layout) {
     d3.selectAll('.line-clip-compare').remove();
@@ -263,6 +267,9 @@ class MultiFocus {
       const pathColor = color ? color : _format.default.mutiEntitiesColors(idx);
       const path = (0, _mount.MountComparePath)(this, pathColor, idx, 0.4);
       path.attr('d', this.pathCall(data));
+      if (this.layout === _list_layout.LIST_LAYOUT.AIF && this.isShowAllCurves === true) {
+        path.attr('marker-mid', 'url(#arrow-left)');
+      }
     });
     return null;
   }
@@ -730,7 +737,7 @@ class MultiFocus {
     ccp.enter().append('path').attr('d', lineSymbol).attr('class', 'enter-ref').attr('fill', 'green').attr('fill-opacity', 0.8).merge(ccp).attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y)})`);
   }
   reverseXAxis(layoutSt) {
-    return [_list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS, _list_layout.LIST_LAYOUT.TGA, _list_layout.LIST_LAYOUT.XRD, _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY, _list_layout.LIST_LAYOUT.CDS, _list_layout.LIST_LAYOUT.SEC].indexOf(layoutSt) < 0;
+    return [_list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS, _list_layout.LIST_LAYOUT.TGA, _list_layout.LIST_LAYOUT.XRD, _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY, _list_layout.LIST_LAYOUT.CDS, _list_layout.LIST_LAYOUT.SEC, _list_layout.LIST_LAYOUT.AIF].indexOf(layoutSt) < 0;
   }
   create(_ref) {
     let {
@@ -751,9 +758,11 @@ class MultiFocus {
     (0, _mount.MountMainFrame)(this, 'focus');
     (0, _mount.MountClip)(this);
     const {
-      curveIdx
+      curveIdx,
+      isShowAllCurve
     } = curveSt;
     const jcampIdx = curveIdx;
+    this.isShowAllCurves = isShowAllCurve;
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt));
     this.setTip();
@@ -799,9 +808,11 @@ class MultiFocus {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt));
     const {
-      curveIdx
+      curveIdx,
+      isShowAllCurve
     } = curveSt;
     const jcampIdx = curveIdx;
+    this.isShowAllCurves = isShowAllCurve;
     this.entities = entities;
     this.setDataParams(filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
     if (this.data && this.data.length > 0) {

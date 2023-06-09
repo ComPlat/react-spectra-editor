@@ -14,6 +14,13 @@ const setAllCurves = (payload) => (
   }
 );
 
+const toggleShowAllCurves = (payload) => (
+  {
+    type: CURVE.SET_SHOULD_SHOW_ALL_CURVES,
+    payload,
+  }
+);
+
 export {
-  selectCurve, setAllCurves,
+  selectCurve, setAllCurves, toggleShowAllCurves,
 };

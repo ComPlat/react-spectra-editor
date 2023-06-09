@@ -25,6 +25,38 @@ const drawDisplay = (klass, isHidden) => {
 
 const drawDestroy = (klass) => d3.select(`${klass} > *`).remove();
 
+const drawArrowOnCurve = (klass, isHidden) => {
+  if (isHidden) {
+    d3.select(klass).selectAll('marker').remove();
+  } else {
+    d3.select(klass).selectAll('marker').remove();
+    const arrowLeft = d3.select(klass).selectAll('defs')
+      .append('marker')
+      .attr('id', 'arrow-left')
+      .attr('viewBox', '0 0 10 10')
+      .attr('refX', 5)
+      .attr('refY', 5)
+      .attr('markerWidth', 6)
+      .attr('markerHeight', 6)
+      .attr('orient', 'auto')
+      .attr('fill', '#00AA0099');
+    arrowLeft.append('path')
+      .attr('d', 'M 0 0 L 10 5 L 0 10 z');
+
+    // const arrowRight = d3.select(klass).selectAll('defs')
+    //   .append('marker')
+    //   .attr('id', 'arrow-right')
+    //   .attr('viewBox', '0 0 10 10')
+    //   .attr('refX', 5)
+    //   .attr('refY', 5)
+    //   .attr('markerWidth', 6)
+    //   .attr('markerHeight', 6)
+    //   .attr('orient', 'auto-start-reverse');
+    // arrowRight.append('path')
+    //   .attr('d', 'M 0 0 L 10 5 L 0 10 z');
+  }
+};
+
 export {
-  drawMain, drawLabel, drawDisplay, drawDestroy,
+  drawMain, drawLabel, drawDisplay, drawDestroy, drawArrowOnCurve,
 };

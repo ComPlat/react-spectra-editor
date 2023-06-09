@@ -40,6 +40,8 @@ import secJcamp1 from './__tests__/fixtures/sec_1_jcamp';
 import secJcamp2 from './__tests__/fixtures/sec_2_jcamp';
 import secJcamp3 from './__tests__/fixtures/sec_3_jcamp';
 import secJcamp4 from './__tests__/fixtures/sec_4_jcamp';
+import aifJcamp1 from './__tests__/fixtures/aif_jcamp_1';
+import aifJcamp2 from './__tests__/fixtures/aif_jcamp_2';
 import { q1H, qIR, q13C } from './__tests__/fixtures/qDescValue';
 import './__tests__/style/svg.css';
 
@@ -71,6 +73,8 @@ const secEntity1 = FN.ExtractJcamp(secJcamp1);
 const secEntity2 = FN.ExtractJcamp(secJcamp2);
 const secEntity3 = FN.ExtractJcamp(secJcamp3);
 const secEntity4 = FN.ExtractJcamp(secJcamp4);
+const aifEntity1 = FN.ExtractJcamp(aifJcamp1);
+const aifEntity2 = FN.ExtractJcamp(aifJcamp2);
 
 class DemoWriteIr extends React.Component {
   constructor(props) {
@@ -156,6 +160,8 @@ class DemoWriteIr extends React.Component {
         return cdsEntity;
       case 'sec':
         return secEntity1;
+      case 'aif':
+        return aifEntity1;
       case 'ms':
       default:
         return msEntity;
@@ -177,6 +183,8 @@ class DemoWriteIr extends React.Component {
         return [xrdEntity1, xrdEntity2];
       case 'sec':
         return [secEntity1, secEntity2, secEntity3, secEntity4];
+      case 'aif':
+        return [aifEntity1, aifEntity2];
       default:
         return false;
     }
@@ -206,6 +214,7 @@ class DemoWriteIr extends React.Component {
       case 'cyclic volta':
       case 'cds':
       case 'sec':
+      case 'aif':
       default:
         return false;
     }
@@ -295,7 +304,7 @@ class DemoWriteIr extends React.Component {
     layout, shift, isAscend, decimal,
     multiplicity, integration,
   }) {
-    if (['1H', '13C', '19F'].indexOf(layout) < 0) return;
+    if (!FN.isNmrLayout(layout)) return;
     const desc = this.formatMpy({
       multiplicity, integration, shift, isAscend, decimal, layout,
     });
@@ -384,7 +393,7 @@ class DemoWriteIr extends React.Component {
       { name: 'write peaks', value: this.writePeak },
       { name: 'save', value: this.savePeaks },
     ].filter(r => r.value);
-    if (['1H', '13C', '19F', '31P', '15N', '29Si'].indexOf(entity.layout) >= 0) {
+    if (FN.isNmrLayout(entity.layout)) {
       operations = [
         { name: 'write multiplicity', value: this.writeMpy },
         ...operations,
@@ -518,6 +527,13 @@ class DemoWriteIr extends React.Component {
             onClick={this.onClick('sec')}
           >
             SEC
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('aif')}
+          >
+            AIF
           </Button>
           <Button
             variant="contained"

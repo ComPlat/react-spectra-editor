@@ -11,9 +11,10 @@ import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import {
-  Accordion, AccordionSummary, ListItem, List, Tabs, Tab,
+  Accordion, AccordionSummary, ListItem, List, Tabs, Tab, Switch, FormControlLabel,
 } from '@material-ui/core';
-import { selectCurve } from '../../actions/curve';
+import { selectCurve, toggleShowAllCurves } from '../../actions/curve';
+import { LIST_LAYOUT } from '../../constants/list_layout';
 
 const styles = () => ({
   panelSummary: {
@@ -43,7 +44,9 @@ const styles = () => ({
 });
 
 const GraphSelectionPanel = ({
-  classes, curveSt, selectCurveAct, entityFileNames, subLayoutsInfo,
+  classes, curveSt,
+  entityFileNames, subLayoutsInfo, layoutSt,
+  selectCurveAct, toggleShowAllCurveAct,
 }) => {
   let subLayoutValues = [];
   if (subLayoutsInfo !== undefined && subLayoutsInfo !== null) {
@@ -55,7 +58,7 @@ const GraphSelectionPanel = ({
   if (!curveSt) {
     return (<span />);
   }
-  const { curveIdx, listCurves } = curveSt;
+  const { curveIdx, listCurves, isShowAllCurve } = curveSt;
   if (!listCurves) {
     return (<span />);
   }
@@ -66,6 +69,10 @@ const GraphSelectionPanel = ({
 
   const onChangeTabSubLayout = (event, newValue) => {
     setSelectedSublayout(newValue);
+  };
+
+  const onChangeSwitch = (event) => {
+    toggleShowAllCurveAct(event.target.checked);
   };
 
   let itemsSubLayout = [];
@@ -108,6 +115,16 @@ const GraphSelectionPanel = ({
         </Typography>
       </AccordionSummary>
       <Divider />
+      {
+        layoutSt === LIST_LAYOUT.AIF ? (
+          <FormControlLabel
+            control={
+              <Switch checked={isShowAllCurve} onChange={onChangeSwitch} />
+            }
+            label="Show all curves"
+          />
+        ) : null
+      }
       {
         (subLayoutValues && subLayoutValues.length > 1) ? (
           <div>
@@ -200,6 +217,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
 const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     selectCurveAct: selectCurve,
+    toggleShowAllCurveAct: toggleShowAllCurves,
   }, dispatch)
 );
 
@@ -212,6 +230,7 @@ GraphSelectionPanel.propTypes = {
   selectCurveAct: PropTypes.func.isRequired,
   entityFileNames: PropTypes.array.isRequired,
   subLayoutsInfo: PropTypes.array,
+  toggleShowAllCurveAct: PropTypes.func.isRequired,
 };
 
 export default connect(
