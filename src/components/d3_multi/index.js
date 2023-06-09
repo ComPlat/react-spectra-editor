@@ -17,7 +17,7 @@ import { addNewCylicVoltaPairPeak, addCylicVoltaMaxPeak, addCylicVoltaMinPeak } 
 import MultiFocus from './multi_focus';
 
 import {
-  drawMain, drawLabel, drawDisplay, drawDestroy,
+  drawMain, drawLabel, drawDisplay, drawDestroy, drawArrowOnCurve,
 } from '../common/draw';
 
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
@@ -72,6 +72,7 @@ class ViewerMulti extends React.Component {
     });
     drawLabel(this.rootKlass, cLabel, xLabel, yLabel);
     drawDisplay(this.rootKlass, isHidden);
+    drawArrowOnCurve(this.rootKlass, isHidden);
   }
 
   componentDidUpdate(prevProps) {
@@ -105,6 +106,7 @@ class ViewerMulti extends React.Component {
     });
     drawLabel(this.rootKlass, cLabel, xLabel, yLabel);
     drawDisplay(this.rootKlass, isHidden);
+    drawArrowOnCurve(this.rootKlass, isHidden);
   }
 
   componentWillUnmount() {

@@ -52,7 +52,7 @@ class MultiJcampsViewer extends _react.default.Component {
   render() {
     const {
       classes,
-      curvSt,
+      curveSt,
       operations,
       entityFileNames,
       entities,
@@ -60,7 +60,10 @@ class MultiJcampsViewer extends _react.default.Component {
     } = this.props;
     if (!entities || entities.length === 0) return /*#__PURE__*/_react.default.createElement("div", null);
     const seperatedSubLayouts = seperatingSubLayout(entities, 'xUnit');
-    const entity = entities[curvSt.curveIdx];
+    const {
+      curveIdx
+    } = curveSt;
+    const entity = entities[curveIdx];
     const {
       feature,
       topic,
@@ -91,7 +94,7 @@ class MultiJcampsViewer extends _react.default.Component {
       xs: 3,
       align: "center"
     }, /*#__PURE__*/_react.default.createElement(_index.default, {
-      jcampIdx: curvSt.curveIdx,
+      jcampIdx: curveIdx,
       entityFileNames: entityFileNames,
       userManualLink: userManualLink,
       feature: feature,
@@ -106,7 +109,7 @@ class MultiJcampsViewer extends _react.default.Component {
 const mapStateToProps = (state, _) => (
 // eslint-disable-line
 {
-  curvSt: state.curve,
+  curveSt: state.curve,
   cyclicVoltaSt: state.cyclicvolta,
   entities: state.curve.listCurves
 });
@@ -123,7 +126,7 @@ MultiJcampsViewer.propTypes = {
   entityFileNames: _propTypes.default.array.isRequired,
   molSvg: _propTypes.default.string.isRequired,
   setAllCurvesAct: _propTypes.default.func.isRequired,
-  curvSt: _propTypes.default.object.isRequired,
+  curveSt: _propTypes.default.object.isRequired,
   cyclicVoltaSt: _propTypes.default.object.isRequired,
   addNewCylicVoltaPairPeakAct: _propTypes.default.func.isRequired,
   addCylicVoltaMaxPeakAct: _propTypes.default.func.isRequired,

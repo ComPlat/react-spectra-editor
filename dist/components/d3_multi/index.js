@@ -84,6 +84,7 @@ class ViewerMulti extends _react.default.Component {
     });
     (0, _draw.drawLabel)(this.rootKlass, cLabel, xLabel, yLabel);
     (0, _draw.drawDisplay)(this.rootKlass, isHidden);
+    (0, _draw.drawArrowOnCurve)(this.rootKlass, isHidden);
   }
   componentDidUpdate(prevProps) {
     const {
@@ -125,6 +126,7 @@ class ViewerMulti extends _react.default.Component {
     });
     (0, _draw.drawLabel)(this.rootKlass, cLabel, xLabel, yLabel);
     (0, _draw.drawDisplay)(this.rootKlass, isHidden);
+    (0, _draw.drawArrowOnCurve)(this.rootKlass, isHidden);
   }
   componentWillUnmount() {
     (0, _draw.drawDestroy)(this.rootKlass);

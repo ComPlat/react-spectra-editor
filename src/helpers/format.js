@@ -300,6 +300,10 @@ const isEmWaveLayout = (layoutSt) => (
   [LIST_LAYOUT.IR, LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS,
     LIST_LAYOUT.HPLC_UVVIS].indexOf(layoutSt) >= 0
 );
+const hasMultiCurves = (layoutSt) => (
+  [LIST_LAYOUT.CYCLIC_VOLTAMMETRY, LIST_LAYOUT.SEC, LIST_LAYOUT.AIF].indexOf(layoutSt) >= 0
+);
+const isAIFLayout = (layoutSt) => (LIST_LAYOUT.AIF === layoutSt);
 
 const getNmrTyp = (layout) => {
   switch (layout) {
@@ -387,6 +391,8 @@ const Format = {
   calcMpyCenter,
   compareColors,
   mutiEntitiesColors,
+  hasMultiCurves,
+  isAIFLayout,
 };
 
 export default Format;

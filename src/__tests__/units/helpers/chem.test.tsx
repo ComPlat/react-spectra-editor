@@ -3,8 +3,24 @@ import {
   ToFrequency, Convert2Scan, Convert2Thres, GetComparisons, Convert2DValue, GetCyclicVoltaRatio, GetCyclicVoltaPeakSeparate, convertTopic, Convert2MaxMinPeak, Feature2MaxMinPeak
 } from "../../../helpers/chem";
 import nmr1HJcamp from "../../fixtures/nmr1h_jcamp";
+import aifJcamp1 from "../../fixtures/aif_jcamp_1";
 import { LIST_SHIFT_1H } from "../../../constants/list_shift";
 import { LIST_LAYOUT } from "../../../constants/list_layout";
+
+function checkExtractSucceed(extractedData: any, forLayout: string) {
+  const { spectra, features, layout } = extractedData
+  expect(spectra).not.toBeNull()
+  expect(features).not.toBeNull()
+  expect(layout).toEqual(forLayout)
+}
+
+function checkSpectraInfo(extractedData: any, forLayout: string) {
+  const { spectra} = extractedData
+  expect(spectra).toHaveLength(1)
+
+  const spectrum = spectra[0]
+  expect(spectrum.dataType).toEqual(forLayout)
+}
 
 describe('Test for chem helper', () => {
   describe('Test extract jcamp file', () => {
@@ -17,18 +33,27 @@ describe('Test for chem helper', () => {
       })
 
       it('Extract succeed ', () => {
-        const { spectra, features, layout } = extractedData
-        expect(spectra).not.toBeNull()
-        expect(features).not.toBeNull()
-        expect(layout).toEqual('1H')
+        checkExtractSucceed(extractedData, LIST_LAYOUT.H1)
       })
 
       it('Check spectra info ', () => {
-        const { spectra} = extractedData
-        expect(spectra).toHaveLength(1)
+        checkSpectraInfo(extractedData, 'NMR SPECTRUM')
+      })
+    })
 
-        const spectrum = spectra[0]
-        expect(spectrum.dataType).toEqual('NMR SPECTRUM')
+    describe('Extract SDM', () => {
+      let extractedData: { spectra: any, features: any, layout: any }
+
+      beforeAll(() => {
+        extractedData = ExtractJcamp(aifJcamp1)
+      })
+
+      it('Extract succeed ', () => {
+        checkExtractSucceed(extractedData, LIST_LAYOUT.AIF)
+      })
+
+      it('Check spectra info ', () => {
+        checkSpectraInfo(extractedData, 'SORPTION-DESORPTION MEASUREMENT')
       })
     })
     
