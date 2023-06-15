@@ -43,6 +43,7 @@ import secJcamp4 from './__tests__/fixtures/sec_4_jcamp';
 import aifJcamp1 from './__tests__/fixtures/aif_jcamp_1';
 import aifJcamp2 from './__tests__/fixtures/aif_jcamp_2';
 import emissionsJcamp from './__tests__/fixtures/emissions_jcamp';
+import dlsAcfJcamp from './__tests__/fixtures/dls_acf_jcamp';
 import { q1H, qIR, q13C } from './__tests__/fixtures/qDescValue';
 import './__tests__/style/svg.css';
 
@@ -77,6 +78,7 @@ const secEntity4 = FN.ExtractJcamp(secJcamp4);
 const aifEntity1 = FN.ExtractJcamp(aifJcamp1);
 const aifEntity2 = FN.ExtractJcamp(aifJcamp2);
 const emissionsEntity = FN.ExtractJcamp(emissionsJcamp);
+const dlsAcfEntity = FN.ExtractJcamp(dlsAcfJcamp);
 
 class DemoWriteIr extends React.Component {
   constructor(props) {
@@ -166,6 +168,8 @@ class DemoWriteIr extends React.Component {
         return aifEntity1;
       case 'emissions':
         return emissionsEntity;
+      case 'dls acf':
+        return dlsAcfEntity;
       case 'ms':
       default:
         return msEntity;
@@ -220,6 +224,7 @@ class DemoWriteIr extends React.Component {
       case 'sec':
       case 'aif':
       case 'emissions':
+      case 'dls acf':
       default:
         return false;
     }
@@ -546,6 +551,13 @@ class DemoWriteIr extends React.Component {
             onClick={this.onClick('emissions')}
           >
             EMISSIONS
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('dls acf')}
+          >
+            DLS ACF
           </Button>
           <Button
             variant="contained"

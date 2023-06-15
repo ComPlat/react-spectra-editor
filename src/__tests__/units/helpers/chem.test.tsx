@@ -7,6 +7,7 @@ import aifJcamp1 from "../../fixtures/aif_jcamp_1";
 import { LIST_SHIFT_1H } from "../../../constants/list_shift";
 import { LIST_LAYOUT } from "../../../constants/list_layout";
 import emissionsJcamp from "../../fixtures/emissions_jcamp";
+import dlsAcfJcamp from "../../fixtures/dls_acf_jcamp";
 
 function checkExtractSucceed(extractedData: any, forLayout: string) {
   const { spectra, features, layout } = extractedData
@@ -71,6 +72,23 @@ describe('Test for chem helper', () => {
 
       it('Check spectra info ', () => {
         checkSpectraInfo(extractedData, 'Emissions')
+      })
+    })
+    
+
+    describe('Extract DLS ACF', () => {
+      let extractedData: { spectra: any, features: any, layout: any }
+
+      beforeAll(() => {
+        extractedData = ExtractJcamp(dlsAcfJcamp)
+      })
+
+      it('Extract succeed ', () => {
+        checkExtractSucceed(extractedData, LIST_LAYOUT.DLS_ACF)
+      })
+
+      it('Check spectra info ', () => {
+        checkSpectraInfo(extractedData, 'DLS ACF')
       })
     })
     

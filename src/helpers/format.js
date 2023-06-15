@@ -294,7 +294,7 @@ const peaksWrapper = (layout, shift, atIndex = 0) => {
     solvTxt = ` (${selectedShift.ref.label})`;
   }
 
-  if (layout === LIST_LAYOUT.PLAIN) {
+  if (layout === LIST_LAYOUT.PLAIN || layout === LIST_LAYOUT.DLS_ACF) {
     return { head: '', tail: '' };
   }
 
@@ -331,6 +331,7 @@ const hasMultiCurves = (layoutSt) => (
 );
 const isAIFLayout = (layoutSt) => (LIST_LAYOUT.AIF === layoutSt);
 const isEmissionsLayout = (layoutSt) => (LIST_LAYOUT.EMISSIONS === layoutSt);
+const isDLSACFLayout = (layoutSt) => (LIST_LAYOUT.DLS_ACF === layoutSt);
 
 const getNmrTyp = (layout) => {
   switch (layout) {
@@ -421,6 +422,7 @@ const Format = {
   mutiEntitiesColors,
   hasMultiCurves,
   isAIFLayout,
+  isDLSACFLayout,
 };
 
 export default Format;
