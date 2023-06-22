@@ -158,7 +158,8 @@ const PeakPanel = _ref => {
     return null;
   }
   const {
-    pos
+    pos,
+    neg
   } = selectedEditPeaks;
   const selectedCurve = listCurves[curveIdx];
   if (!selectedCurve) {
@@ -168,7 +169,8 @@ const PeakPanel = _ref => {
     feature
   } = selectedCurve;
   const currentPeakOfCurve = (0, _chem.Convert2Peak)(feature);
-  const peaksData = [].concat(currentPeakOfCurve).concat(pos);
+  const filteredArray = currentPeakOfCurve.filter(element => neg.includes(element));
+  const peaksData = [].concat(filteredArray).concat(pos);
   const digits = _format.default.isEmWaveLayout(layoutSt) ? 0 : 4;
   return /*#__PURE__*/_react.default.createElement(_core.Accordion, {
     "data-testid": "PeaksPanelInfo",
