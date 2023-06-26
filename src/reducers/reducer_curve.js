@@ -8,6 +8,7 @@ import Format from '../helpers/format';
 const initialState = {
   listCurves: [],
   curveIdx: 0,
+  isShowAllCurve: false,
 };
 
 const setAllCurves = (state, action) => {
@@ -37,6 +38,8 @@ const curveReducer = (state = initialState, action) => {
       return Object.assign({}, state, { curveIdx: action.payload });
     case CURVE.SET_ALL_CURVES:
       return setAllCurves(state, action);
+    case CURVE.SET_SHOULD_SHOW_ALL_CURVES:
+      return Object.assign({}, state, { isShowAllCurve: action.payload });
     default:
       return state;
   }

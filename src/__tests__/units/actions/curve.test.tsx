@@ -1,4 +1,6 @@
-import { selectCurve, setAllCurves } from "../../../actions/curve";
+import {
+  selectCurve, setAllCurves, toggleShowAllCurves,
+} from "../../../actions/curve";
 import { CURVE } from "../../../constants/action_type";
 
 describe('Test redux actions for curve', () => {
@@ -29,6 +31,20 @@ describe('Test redux actions for curve', () => {
       const { payload, type } = setAllCurves(listCurves)
       expect(type).toEqual(CURVE.SET_ALL_CURVES)
       expect(payload).toEqual(listCurves)
+    })
+  })
+
+  describe('Test should display all curves', () => {
+    it('Set should display all curves', () => {
+      const { payload, type } = toggleShowAllCurves(true)
+      expect(type).toEqual(CURVE.SET_SHOULD_SHOW_ALL_CURVES)
+      expect(payload).toEqual(true)
+    })
+
+    it('Disable display all curves', () => {
+      const { payload, type } = toggleShowAllCurves(false)
+      expect(type).toEqual(CURVE.SET_SHOULD_SHOW_ALL_CURVES)
+      expect(payload).toEqual(false)
     })
   })
 })

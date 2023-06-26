@@ -337,4 +337,21 @@ describe('Test format helper', () => {
     })
   })
 
+  describe('Test layouts have multiple curves', () => {
+    const layouts = [LIST_LAYOUT.CYCLIC_VOLTAMMETRY, LIST_LAYOUT.SEC, LIST_LAYOUT.AIF]
+    it('Has multiple curves', () => {
+      layouts.forEach(layout => {
+        const hasMultipleCurves = Format.hasMultiCurves(layout)
+        expect(hasMultipleCurves).toEqual(true)
+      })
+    })
+  })
+
+  describe('Test is SDM layout', () => {
+    it('Is SDM layout', () => {
+      const hasMultipleCurves = Format.isAIFLayout(LIST_LAYOUT.AIF)
+      expect(hasMultipleCurves).toEqual(true)
+    })
+  })
+
 })

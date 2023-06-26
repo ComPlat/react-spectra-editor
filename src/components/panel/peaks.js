@@ -133,7 +133,7 @@ const PeakPanel = ({
   if (!selectedEditPeaks) {
     return null;
   }
-  const { pos } = selectedEditPeaks;
+  const { pos, neg } = selectedEditPeaks;
 
   const selectedCurve = listCurves[curveIdx];
   if (!selectedCurve) {
@@ -141,8 +141,9 @@ const PeakPanel = ({
   }
   const { feature } = selectedCurve;
   const currentPeakOfCurve = Convert2Peak(feature);
+  const filteredArray = currentPeakOfCurve.filter((element) => neg.includes(element));
 
-  const peaksData = [].concat(currentPeakOfCurve).concat(pos);
+  const peaksData = [].concat(filteredArray).concat(pos);
 
   const digits = Format.isEmWaveLayout(layoutSt) ? 0 : 4;
 

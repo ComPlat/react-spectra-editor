@@ -157,7 +157,9 @@ const Convert2Peak = function (feature, threshold, offset) {
   const {
     layout
   } = operation;
-  if (!_format.default.isSECLayout(layout) && (upperThres || lowerThres)) {
+
+  // if (!Format.isSECLayout(layout) && (upperThres || lowerThres)) {
+  if ((_format.default.isCyclicVoltaLayout(layout) || _format.default.isCDSLayout(layout)) && (upperThres || lowerThres)) {
     let upperThresVal = upThreshold || upperThres;
     if (!upperThresVal) {
       upperThresVal = 1.0;
@@ -367,6 +369,9 @@ const readLayout = jcamp => {
     }
     if (dataType.includes('SIZE EXCLUSION CHROMATOGRAPHY')) {
       return _list_layout.LIST_LAYOUT.SEC;
+    }
+    if (dataType.includes('SORPTION-DESORPTION MEASUREMENT')) {
+      return _list_layout.LIST_LAYOUT.AIF;
     }
   }
   return false;
@@ -757,9 +762,9 @@ const ExtractJcamp = source => {
   let features = {};
   if (_format.default.isMsLayout(layout)) {
     features = extrFeaturesMs(jcamp, layout, peakUp);
-  } else if (_format.default.isXRDLayout(layout) || _format.default.isCDSLayout(layout)) {
+  } else if (_format.default.isXRDLayout(layout)) {
     features = extrFeaturesXrd(jcamp, layout, peakUp);
-  } else if (_format.default.isCyclicVoltaLayout(layout) || _format.default.isSECLayout(layout)) {
+  } else if (_format.default.isCyclicVoltaLayout(layout) || _format.default.isSECLayout(layout) || _format.default.isAIFLayout(layout) || _format.default.isCDSLayout(layout)) {
     features = extrFeaturesCylicVolta(jcamp, layout, peakUp);
   } else {
     features = extrFeaturesNi(jcamp, layout, peakUp, spectra);

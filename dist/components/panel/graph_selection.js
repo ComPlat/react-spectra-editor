@@ -16,6 +16,7 @@ var _Typography = _interopRequireDefault(require("@material-ui/core/Typography")
 var _styles = require("@material-ui/core/styles");
 var _core = require("@material-ui/core");
 var _curve = require("../../actions/curve");
+var _list_layout = require("../../constants/list_layout");
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 /* eslint-disable react/function-component-definition, function-paren-newline,
@@ -51,9 +52,11 @@ const GraphSelectionPanel = _ref => {
   let {
     classes,
     curveSt,
-    selectCurveAct,
     entityFileNames,
-    subLayoutsInfo
+    subLayoutsInfo,
+    layoutSt,
+    selectCurveAct,
+    toggleShowAllCurveAct
   } = _ref;
   let subLayoutValues = [];
   if (subLayoutsInfo !== undefined && subLayoutsInfo !== null) {
@@ -65,7 +68,8 @@ const GraphSelectionPanel = _ref => {
   }
   const {
     curveIdx,
-    listCurves
+    listCurves,
+    isShowAllCurve
   } = curveSt;
   if (!listCurves) {
     return /*#__PURE__*/_react.default.createElement("span", null);
@@ -76,25 +80,32 @@ const GraphSelectionPanel = _ref => {
   const onChangeTabSubLayout = (event, newValue) => {
     setSelectedSublayout(newValue);
   };
+  const onChangeSwitch = event => {
+    toggleShowAllCurveAct(event.target.checked);
+  };
   let itemsSubLayout = [];
   if (selectedSubLayout && subLayoutValues.length > 1) {
     const subLayout = subLayoutsInfo[selectedSubLayout];
-    itemsSubLayout = subLayout.map((spectra, idx) => {
-      const spectraIdx = spectra.curveIdx;
-      const {
-        color
-      } = spectra;
-      let filename = '';
-      if (entityFileNames && spectraIdx < entityFileNames.length) {
-        filename = entityFileNames[spectraIdx];
-      }
-      return {
-        name: `${idx + 1}.`,
-        idx: spectraIdx,
-        color,
-        filename
-      };
-    });
+    try {
+      itemsSubLayout = subLayout.map((spectra, idx) => {
+        const spectraIdx = spectra.curveIdx;
+        const {
+          color
+        } = spectra;
+        let filename = '';
+        if (entityFileNames && spectraIdx < entityFileNames.length) {
+          filename = entityFileNames[spectraIdx];
+        }
+        return {
+          name: `${idx + 1}.`,
+          idx: spectraIdx,
+          color,
+          filename
+        };
+      });
+    } catch (e) {
+      console.log(e);
+    }
   }
   const items = listCurves.map((spectra, idx) => {
     const {
@@ -120,7 +131,13 @@ const GraphSelectionPanel = _ref => {
     className: "txt-panel-header"
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title')
-  }, "Graph selection"))), /*#__PURE__*/_react.default.createElement(_Divider.default, null), subLayoutValues && subLayoutValues.length > 1 ? /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement(_core.Tabs, {
+  }, "Graph selection"))), /*#__PURE__*/_react.default.createElement(_Divider.default, null), layoutSt === _list_layout.LIST_LAYOUT.AIF ? /*#__PURE__*/_react.default.createElement(_core.FormControlLabel, {
+    control: /*#__PURE__*/_react.default.createElement(_core.Switch, {
+      checked: isShowAllCurve,
+      onChange: onChangeSwitch
+    }),
+    label: "Show all curves"
+  }) : null, subLayoutValues && subLayoutValues.length > 1 ? /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement(_core.Tabs, {
     value: selectedSubLayout,
     onChange: onChangeTabSubLayout
   }, subLayoutValues.map((subLayout, i) => {
@@ -184,7 +201,8 @@ const mapStateToProps = (state, props) => (
   curveSt: state.curve
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
-  selectCurveAct: _curve.selectCurve
+  selectCurveAct: _curve.selectCurve,
+  toggleShowAllCurveAct: _curve.toggleShowAllCurves
 }, dispatch);
 GraphSelectionPanel.propTypes = {
   classes: _propTypes.default.object.isRequired,
@@ -194,7 +212,8 @@ GraphSelectionPanel.propTypes = {
   curveSt: _propTypes.default.object.isRequired,
   selectCurveAct: _propTypes.default.func.isRequired,
   entityFileNames: _propTypes.default.array.isRequired,
-  subLayoutsInfo: _propTypes.default.array
+  subLayoutsInfo: _propTypes.default.array,
+  toggleShowAllCurveAct: _propTypes.default.func.isRequired
 };
 var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(GraphSelectionPanel));
 exports.default = _default;

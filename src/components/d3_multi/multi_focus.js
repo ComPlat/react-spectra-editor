@@ -30,6 +30,7 @@ class MultiFocus {
 
     this.entities = entities;
     this.jcampIdx = 0;
+    this.isShowAllCurves = false;
     this.rootKlass = '.d3Line';
     this.margin = {
       t: 5,
@@ -140,14 +141,13 @@ class MultiFocus {
   }
 
   setDataParams(peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt, jcampIdx = 0) {
-    this.jcampIdx = jcampIdx;
     this.data = [];
     this.otherLineData = [];
     let filterSubLayoutValue = null;
     this.entities.forEach((entry, idx) => {
       const { topic, feature, color } = entry;
       const currData = convertTopic(topic, layout, feature, 0);
-      if (idx === this.jcampIdx) {
+      if (idx === jcampIdx) {
         this.data = [...currData];
         this.pathColor = color;
         filterSubLayoutValue = feature.xUnit;
@@ -161,11 +161,16 @@ class MultiFocus {
       });
     }
 
-    this.dataPks = [...peaks];
+    if (this.jcampIdx === jcampIdx) {
+      this.dataPks = [...peaks];
+    } else {
+      this.dataPks = peaks;
+    }
     this.tTrEndPts = tTrEndPts;
     this.tSfPeaks = tSfPeaks;
     this.layout = layout;
     this.cyclicvoltaSt = cyclicvoltaSt;
+    this.jcampIdx = jcampIdx;
   }
 
   updatePathCall(xt, yt) {
@@ -215,6 +220,9 @@ class MultiFocus {
     this.updatePathCall(xt, yt);
     this.path.attr('d', this.pathCall(this.data));
     this.path.style('stroke', this.pathColor);
+    if (this.layout === LIST_LAYOUT.AIF) {
+      this.path.attr('marker-mid', 'url(#arrow-left)');
+    }
   }
 
   drawOtherLines(layout) {
@@ -225,6 +233,9 @@ class MultiFocus {
       const pathColor = color ? color : Format.mutiEntitiesColors(idx);
       const path = MountComparePath(this, pathColor, idx, 0.4);
       path.attr('d', this.pathCall(data));
+      if (this.layout === LIST_LAYOUT.AIF && this.isShowAllCurves === true) {
+        path.attr('marker-mid', 'url(#arrow-left)');
+      }
     });
     return null;
   }
@@ -928,7 +939,7 @@ class MultiFocus {
   reverseXAxis(layoutSt) {
     return [LIST_LAYOUT.UVVIS, LIST_LAYOUT.HPLC_UVVIS, LIST_LAYOUT.TGA,
       LIST_LAYOUT.XRD, LIST_LAYOUT.CYCLIC_VOLTAMMETRY,
-      LIST_LAYOUT.CDS, LIST_LAYOUT.SEC].indexOf(layoutSt) < 0;
+      LIST_LAYOUT.CDS, LIST_LAYOUT.SEC, LIST_LAYOUT.AIF].indexOf(layoutSt) < 0;
   }
 
   create({
@@ -943,8 +954,9 @@ class MultiFocus {
     MountMainFrame(this, 'focus');
     MountClip(this);
 
-    const { curveIdx } = curveSt;
+    const { curveIdx, isShowAllCurve } = curveSt;
     const jcampIdx = curveIdx;
+    this.isShowAllCurves = isShowAllCurve;
 
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, this.reverseXAxis(layoutSt));
@@ -985,8 +997,9 @@ class MultiFocus {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, this.reverseXAxis(layoutSt));
 
-    const { curveIdx } = curveSt;
+    const { curveIdx, isShowAllCurve } = curveSt;
     const jcampIdx = curveIdx;
+    this.isShowAllCurves = isShowAllCurve;
     this.entities = entities;
 
     this.setDataParams(filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);

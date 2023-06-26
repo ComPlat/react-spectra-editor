@@ -4,6 +4,7 @@ import Peaks from '../../../../components/panel/peaks';
 import configureStore from 'redux-mock-store'
 import { Provider } from 'react-redux';
 import '@testing-library/jest-dom'
+import { LIST_LAYOUT } from "../../../../constants/list_layout";
 
 const mockStore = configureStore([]);
 const store = mockStore({
@@ -23,7 +24,7 @@ const store = mockStore({
     listCurves: [{feature: {}}],
     curveIdx: 0
   },
-  layout: 'SIZE EXCLUSION CHROMATOGRAPHY',
+  layout: LIST_LAYOUT.SEC,
 });
 const failedStore = mockStore({
   editPeak: {
@@ -42,7 +43,7 @@ const failedStore = mockStore({
     listCurves: [{}],
     curveIdx: 1
   },
-  layout: 'SIZE EXCLUSION CHROMATOGRAPHY',
+  layout: LIST_LAYOUT.SEC,
 });
 const dispatchMock = () => Promise.resolve({});
 store.dispatch = jest.fn(dispatchMock);
