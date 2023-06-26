@@ -141,14 +141,13 @@ class MultiFocus {
   }
 
   setDataParams(peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt, jcampIdx = 0) {
-    this.jcampIdx = jcampIdx;
     this.data = [];
     this.otherLineData = [];
     let filterSubLayoutValue = null;
     this.entities.forEach((entry, idx) => {
       const { topic, feature, color } = entry;
       const currData = convertTopic(topic, layout, feature, 0);
-      if (idx === this.jcampIdx) {
+      if (idx === jcampIdx) {
         this.data = [...currData];
         this.pathColor = color;
         filterSubLayoutValue = feature.xUnit;
@@ -162,11 +161,16 @@ class MultiFocus {
       });
     }
 
-    this.dataPks = [...peaks];
+    if (this.jcampIdx === jcampIdx) {
+      this.dataPks = [...peaks];
+    } else {
+      this.dataPks = peaks;
+    }
     this.tTrEndPts = tTrEndPts;
     this.tSfPeaks = tSfPeaks;
     this.layout = layout;
     this.cyclicvoltaSt = cyclicvoltaSt;
+    this.jcampIdx = jcampIdx;
   }
 
   updatePathCall(xt, yt) {

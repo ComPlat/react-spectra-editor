@@ -161,7 +161,6 @@ class MultiFocus {
   }
   setDataParams(peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt) {
     let jcampIdx = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 0;
-    this.jcampIdx = jcampIdx;
     this.data = [];
     this.otherLineData = [];
     let filterSubLayoutValue = null;
@@ -172,7 +171,7 @@ class MultiFocus {
         color
       } = entry;
       const currData = (0, _chem.convertTopic)(topic, layout, feature, 0);
-      if (idx === this.jcampIdx) {
+      if (idx === jcampIdx) {
         this.data = [...currData];
         this.pathColor = color;
         filterSubLayoutValue = feature.xUnit;
@@ -189,11 +188,16 @@ class MultiFocus {
         return data.filterSublayout === filterSubLayoutValue;
       });
     }
-    this.dataPks = [...peaks];
+    if (this.jcampIdx === jcampIdx) {
+      this.dataPks = [...peaks];
+    } else {
+      this.dataPks = peaks;
+    }
     this.tTrEndPts = tTrEndPts;
     this.tSfPeaks = tSfPeaks;
     this.layout = layout;
     this.cyclicvoltaSt = cyclicvoltaSt;
+    this.jcampIdx = jcampIdx;
   }
   updatePathCall(xt, yt) {
     this.pathCall = d3.line().x(d => xt(d.x)).y(d => yt(d.y));

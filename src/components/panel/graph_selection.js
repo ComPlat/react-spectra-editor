@@ -78,17 +78,21 @@ const GraphSelectionPanel = ({
   let itemsSubLayout = [];
   if (selectedSubLayout && subLayoutValues.length > 1) {
     const subLayout = subLayoutsInfo[selectedSubLayout];
-    itemsSubLayout = subLayout.map((spectra, idx) => {
-      const spectraIdx = spectra.curveIdx;
-      const { color } = spectra;
-      let filename = '';
-      if (entityFileNames && spectraIdx < entityFileNames.length) {
-        filename = entityFileNames[spectraIdx];
-      }
-      return {
-        name: `${idx + 1}.`, idx: spectraIdx, color, filename,
-      };
-    });
+    try {
+      itemsSubLayout = subLayout.map((spectra, idx) => {
+        const spectraIdx = spectra.curveIdx;
+        const { color } = spectra;
+        let filename = '';
+        if (entityFileNames && spectraIdx < entityFileNames.length) {
+          filename = entityFileNames[spectraIdx];
+        }
+        return {
+          name: `${idx + 1}.`, idx: spectraIdx, color, filename,
+        };
+      });
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   const items = listCurves.map((spectra, idx) => {

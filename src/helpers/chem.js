@@ -132,7 +132,9 @@ const Convert2Peak = (feature, threshold, offset, upThreshold = false, lowThresh
   } = feature;
   const { layout } = operation;
 
-  if (!Format.isSECLayout(layout) && (upperThres || lowerThres)) {
+  // if (!Format.isSECLayout(layout) && (upperThres || lowerThres)) {
+  if ((Format.isCyclicVoltaLayout(layout) || Format.isCDSLayout(layout))
+  && (upperThres || lowerThres)) {
     let upperThresVal = upThreshold || upperThres;
     if (!upperThresVal) {
       upperThresVal = 1.0;
@@ -727,11 +729,10 @@ const ExtractJcamp = (source) => {
   let features = {};
   if (Format.isMsLayout(layout)) {
     features = extrFeaturesMs(jcamp, layout, peakUp);
-  } else if (Format.isXRDLayout(layout)
-  || Format.isCDSLayout(layout)) {
+  } else if (Format.isXRDLayout(layout)) {
     features = extrFeaturesXrd(jcamp, layout, peakUp);
   } else if (Format.isCyclicVoltaLayout(layout) || Format.isSECLayout(layout)
-  || Format.isAIFLayout(layout)) {
+  || Format.isAIFLayout(layout) || Format.isCDSLayout(layout)) {
     features = extrFeaturesCylicVolta(jcamp, layout, peakUp);
   } else {
     features = extrFeaturesNi(jcamp, layout, peakUp, spectra);
