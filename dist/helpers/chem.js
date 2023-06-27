@@ -373,6 +373,9 @@ const readLayout = jcamp => {
     if (dataType.includes('SORPTION-DESORPTION MEASUREMENT')) {
       return _list_layout.LIST_LAYOUT.AIF;
     }
+    if (dataType.includes('Emissions')) {
+      return _list_layout.LIST_LAYOUT.EMISSIONS;
+    }
   }
   return false;
 };

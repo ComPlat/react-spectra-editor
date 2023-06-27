@@ -69,6 +69,7 @@ const spectraOps = {
   [LIST_LAYOUT.CYCLIC_VOLTAMMETRY]: { head: 'CYCLIC VOLTAMMETRY', tail: '.' },
   [LIST_LAYOUT.CDS]: { head: 'CIRCULAR DICHROISM SPECTROSCOPY', tail: '.' },
   [LIST_LAYOUT.SEC]: { head: 'SIZE EXCLUSION CHROMATOGRAPHY', tail: '.' },
+  [LIST_LAYOUT.EMISSIONS]: { head: 'EMISSION', tail: '.' },
 };
 
 const rmRef = (peaks, shift, atIndex = 0) => {
@@ -168,6 +169,28 @@ const formatedUvVis = (
     .join(', ');
 };
 
+const formatedEmissions = (
+  peaks, maxY, decimal = 2, isAscend = true,
+  isIntensity = false, boundary = {}, lowerIsStronger = false,
+) => {
+  const ascendFunc = (a, b) => parseFloat(a) - parseFloat(b);
+  const descendFunc = (a, b) => parseFloat(b) - parseFloat(a);
+  const sortFunc = isAscend ? ascendFunc : descendFunc;
+  let ordered = {};
+
+  peaks.forEach((p) => {
+    const x = fixDigit(p.x, decimal);
+    const better = !ordered[x] || (p.y > ordered[x]);
+    if (better) {
+      ordered = Object.assign({}, ordered, { [x]: p.y });
+    }
+  });
+
+  ordered = Object.keys(ordered).sort(sortFunc)
+    .map((k) => ({ x: k, y: ordered[k] }));
+  return ordered.map((o) => `${o.x} nm (${fixDigit(o.y, 2)} a.u.)`).join(', ');
+};
+
 const formatedHplcUvVis = (
   peaks, decimal = 2, integration,
 ) => {
@@ -249,6 +272,9 @@ const peaksBody = ({
   if (layout === LIST_LAYOUT.HPLC_UVVIS) {
     return formatedHplcUvVis(ordered, decimal, integration);
   }
+  if (layout === LIST_LAYOUT.EMISSIONS) {
+    return formatedEmissions(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
+  }
   if (layout === LIST_LAYOUT.RAMAN
     || layout === LIST_LAYOUT.TGA
     || layout === LIST_LAYOUT.XRD
@@ -304,6 +330,7 @@ const hasMultiCurves = (layoutSt) => (
   [LIST_LAYOUT.CYCLIC_VOLTAMMETRY, LIST_LAYOUT.SEC, LIST_LAYOUT.AIF].indexOf(layoutSt) >= 0
 );
 const isAIFLayout = (layoutSt) => (LIST_LAYOUT.AIF === layoutSt);
+const isEmissionsLayout = (layoutSt) => (LIST_LAYOUT.EMISSIONS === layoutSt);
 
 const getNmrTyp = (layout) => {
   switch (layout) {
@@ -383,6 +410,7 @@ const Format = {
   isCyclicVoltaLayout,
   isCDSLayout,
   isSECLayout,
+  isEmissionsLayout,
   isEmWaveLayout,
   fixDigit,
   formatPeaksByPrediction,
