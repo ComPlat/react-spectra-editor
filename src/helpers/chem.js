@@ -328,6 +328,9 @@ const readLayout = (jcamp) => {
     if (dataType.includes('Emissions')) {
       return LIST_LAYOUT.EMISSIONS;
     }
+    if (dataType.includes('DLS ACF')) {
+      return LIST_LAYOUT.DLS_ACF;
+    }
   }
   return false;
 };

@@ -364,7 +364,7 @@ const peaksWrapper = function (layout, shift) {
   if (selectedShift.ref.label) {
     solvTxt = ` (${selectedShift.ref.label})`;
   }
-  if (layout === _list_layout.LIST_LAYOUT.PLAIN) {
+  if (layout === _list_layout.LIST_LAYOUT.PLAIN || layout === _list_layout.LIST_LAYOUT.DLS_ACF) {
     return {
       head: '',
       tail: ''
@@ -397,6 +397,7 @@ const isEmWaveLayout = layoutSt => [_list_layout.LIST_LAYOUT.IR, _list_layout.LI
 const hasMultiCurves = layoutSt => [_list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY, _list_layout.LIST_LAYOUT.SEC, _list_layout.LIST_LAYOUT.AIF].indexOf(layoutSt) >= 0;
 const isAIFLayout = layoutSt => _list_layout.LIST_LAYOUT.AIF === layoutSt;
 const isEmissionsLayout = layoutSt => _list_layout.LIST_LAYOUT.EMISSIONS === layoutSt;
+const isDLSACFLayout = layoutSt => _list_layout.LIST_LAYOUT.DLS_ACF === layoutSt;
 const getNmrTyp = layout => {
   switch (layout) {
     case _list_layout.LIST_LAYOUT.H1:
@@ -482,7 +483,8 @@ const Format = {
   compareColors,
   mutiEntitiesColors,
   hasMultiCurves,
-  isAIFLayout
+  isAIFLayout,
+  isDLSACFLayout
 };
 var _default = Format;
 exports.default = _default;

@@ -184,6 +184,9 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
         <MenuItem value={LIST_LAYOUT.EMISSIONS}>
           <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>EMISSIONS</span>
         </MenuItem>
+        <MenuItem value={LIST_LAYOUT.DLS_ACF}>
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>DLS ACF</span>
+        </MenuItem>
       </Select>
     </FormControl>
   );

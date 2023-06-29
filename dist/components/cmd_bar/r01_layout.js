@@ -163,7 +163,11 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
     value: _list_layout.LIST_LAYOUT.EMISSIONS
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  }, "EMISSIONS"))));
+  }, "EMISSIONS")), /*#__PURE__*/_react.default.createElement(_MenuItem.default, {
+    value: _list_layout.LIST_LAYOUT.DLS_ACF
+  }, /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
+  }, "DLS ACF"))));
 };
 const Layout = _ref => {
   let {

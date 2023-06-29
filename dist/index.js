@@ -42,6 +42,7 @@ var _sec_4_jcamp = _interopRequireDefault(require("./__tests__/fixtures/sec_4_jc
 var _aif_jcamp_ = _interopRequireDefault(require("./__tests__/fixtures/aif_jcamp_1"));
 var _aif_jcamp_2 = _interopRequireDefault(require("./__tests__/fixtures/aif_jcamp_2"));
 var _emissions_jcamp = _interopRequireDefault(require("./__tests__/fixtures/emissions_jcamp"));
+var _dls_acf_jcamp = _interopRequireDefault(require("./__tests__/fixtures/dls_acf_jcamp"));
 var _qDescValue = require("./__tests__/fixtures/qDescValue");
 require("./__tests__/style/svg.css");
 /* eslint-disable prefer-object-spread, default-param-last, no-nested-ternary */
@@ -77,6 +78,7 @@ const secEntity4 = _app.FN.ExtractJcamp(_sec_4_jcamp.default);
 const aifEntity1 = _app.FN.ExtractJcamp(_aif_jcamp_.default);
 const aifEntity2 = _app.FN.ExtractJcamp(_aif_jcamp_2.default);
 const emissionsEntity = _app.FN.ExtractJcamp(_emissions_jcamp.default);
+const dlsAcfEntity = _app.FN.ExtractJcamp(_dls_acf_jcamp.default);
 class DemoWriteIr extends _react.default.Component {
   constructor(props) {
     super(props);
@@ -166,6 +168,8 @@ class DemoWriteIr extends _react.default.Component {
         return aifEntity1;
       case 'emissions':
         return emissionsEntity;
+      case 'dls acf':
+        return dlsAcfEntity;
       case 'ms':
       default:
         return msEntity;
@@ -222,6 +226,7 @@ class DemoWriteIr extends _react.default.Component {
       case 'sec':
       case 'aif':
       case 'emissions':
+      case 'dls acf':
       default:
         return false;
     }
@@ -637,6 +642,12 @@ class DemoWriteIr extends _react.default.Component {
       },
       onClick: this.onClick('emissions')
     }, "EMISSIONS"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+      variant: "contained",
+      style: {
+        margin: '0 10px 0 10px'
+      },
+      onClick: this.onClick('dls acf')
+    }, "DLS ACF"), /*#__PURE__*/_react.default.createElement(_Button.default, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'

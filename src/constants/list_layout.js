@@ -18,6 +18,7 @@ const LIST_LAYOUT = {
   SEC: 'SIZE EXCLUSION CHROMATOGRAPHY',
   AIF: 'AIF',
   EMISSIONS: 'Emissions',
+  DLS_ACF: 'DLS ACF',
 };
 
 export {
