@@ -25,6 +25,6 @@ const LIST_LAYOUT = {
   AIF: 'AIF',
   EMISSIONS: 'Emissions',
   DLS_ACF: 'DLS ACF',
-  DLS_INTENSITY: 'DLS intensity',
+  DLS_INTENSITY: 'DLS intensity'
 };
 exports.LIST_LAYOUT = LIST_LAYOUT;
