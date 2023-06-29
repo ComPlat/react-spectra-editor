@@ -133,6 +133,19 @@ describe('Test format helper', () => {
         const body = Format.peaksBody(params)
         expect(body).toEqual('2.0 (2.00), 1.0 (1.00)')
       })
+
+      it('Get peaks for Emission layout', () => {
+        params.layout = LIST_LAYOUT.EMISSIONS
+        const body = Format.peaksBody(params)
+        expect(body).toEqual('2.0 nm (2.00 a.u.), 1.0 nm (1.00 a.u.)')
+      })
+
+
+      it('Get peaks for DLS intensity layout', () => {
+        params.layout = LIST_LAYOUT.DLS_INTENSITY
+        const body = Format.peaksBody(params)
+        expect(body).toEqual('2.0 nm (2.00 %), 1.0 nm (1.00 %)')
+      })
     })
 
     describe('Test get peak wrapper string', () => {

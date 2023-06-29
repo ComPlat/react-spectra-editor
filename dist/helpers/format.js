@@ -126,6 +126,14 @@ const spectraOps = {
   [_list_layout.LIST_LAYOUT.SEC]: {
     head: 'SIZE EXCLUSION CHROMATOGRAPHY',
     tail: '.'
+  },
+  [_list_layout.LIST_LAYOUT.EMISSIONS]: {
+    head: 'EMISSION',
+    tail: '.'
+  },
+  [_list_layout.LIST_LAYOUT.DLS_INTENSITY]: {
+    head: 'DLS',
+    tail: '.'
   }
 };
 const rmRef = function (peaks, shift) {
@@ -228,6 +236,56 @@ const formatedUvVis = function (peaks, maxY) {
   //   .join(', ');
   return ordered.map(o => `${o.x}`).join(', ');
 };
+const formatedEmissions = function (peaks, maxY) {
+  let decimal = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 2;
+  let isAscend = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
+  let isIntensity = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+  let boundary = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : {};
+  let lowerIsStronger = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : false;
+  const ascendFunc = (a, b) => parseFloat(a) - parseFloat(b);
+  const descendFunc = (a, b) => parseFloat(b) - parseFloat(a);
+  const sortFunc = isAscend ? ascendFunc : descendFunc;
+  let ordered = {};
+  peaks.forEach(p => {
+    const x = fixDigit(p.x, decimal);
+    const better = !ordered[x] || p.y > ordered[x];
+    if (better) {
+      ordered = Object.assign({}, ordered, {
+        [x]: p.y
+      });
+    }
+  });
+  ordered = Object.keys(ordered).sort(sortFunc).map(k => ({
+    x: k,
+    y: ordered[k]
+  }));
+  return ordered.map(o => `${o.x} nm (${fixDigit(o.y, 2)} a.u.)`).join(', ');
+};
+const formatedDLSIntensity = function (peaks, maxY) {
+  let decimal = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 2;
+  let isAscend = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
+  let isIntensity = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+  let boundary = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : {};
+  let lowerIsStronger = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : false;
+  const ascendFunc = (a, b) => parseFloat(a) - parseFloat(b);
+  const descendFunc = (a, b) => parseFloat(b) - parseFloat(a);
+  const sortFunc = isAscend ? ascendFunc : descendFunc;
+  let ordered = {};
+  peaks.forEach(p => {
+    const x = fixDigit(p.x, decimal);
+    const better = !ordered[x] || p.y > ordered[x];
+    if (better) {
+      ordered = Object.assign({}, ordered, {
+        [x]: p.y
+      });
+    }
+  });
+  ordered = Object.keys(ordered).sort(sortFunc).map(k => ({
+    x: k,
+    y: ordered[k]
+  }));
+  return ordered.map(o => `${o.x} nm (${o.y} %)`).join(', ');
+};
 const formatedHplcUvVis = function (peaks) {
   let decimal = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
   let integration = arguments.length > 2 ? arguments[2] : undefined;
@@ -317,6 +375,12 @@ const peaksBody = _ref => {
   if (layout === _list_layout.LIST_LAYOUT.HPLC_UVVIS) {
     return formatedHplcUvVis(ordered, decimal, integration);
   }
+  if (layout === _list_layout.LIST_LAYOUT.EMISSIONS) {
+    return formatedEmissions(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
+  }
+  if (layout === _list_layout.LIST_LAYOUT.DLS_INTENSITY) {
+    return formatedDLSIntensity(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
+  }
   if (layout === _list_layout.LIST_LAYOUT.RAMAN || layout === _list_layout.LIST_LAYOUT.TGA || layout === _list_layout.LIST_LAYOUT.XRD || layout === _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY || layout === _list_layout.LIST_LAYOUT.CDS || layout === _list_layout.LIST_LAYOUT.SEC) {
     return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
@@ -332,7 +396,7 @@ const peaksWrapper = function (layout, shift) {
   if (selectedShift.ref.label) {
     solvTxt = ` (${selectedShift.ref.label})`;
   }
-  if (layout === _list_layout.LIST_LAYOUT.PLAIN) {
+  if (layout === _list_layout.LIST_LAYOUT.PLAIN || layout === _list_layout.LIST_LAYOUT.DLS_ACF) {
     return {
       head: '',
       tail: ''
@@ -364,6 +428,9 @@ const isSECLayout = layoutSt => _list_layout.LIST_LAYOUT.SEC === layoutSt;
 const isEmWaveLayout = layoutSt => [_list_layout.LIST_LAYOUT.IR, _list_layout.LIST_LAYOUT.RAMAN, _list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS].indexOf(layoutSt) >= 0;
 const hasMultiCurves = layoutSt => [_list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY, _list_layout.LIST_LAYOUT.SEC, _list_layout.LIST_LAYOUT.AIF].indexOf(layoutSt) >= 0;
 const isAIFLayout = layoutSt => _list_layout.LIST_LAYOUT.AIF === layoutSt;
+const isEmissionsLayout = layoutSt => _list_layout.LIST_LAYOUT.EMISSIONS === layoutSt;
+const isDLSACFLayout = layoutSt => _list_layout.LIST_LAYOUT.DLS_ACF === layoutSt;
+const isDLSIntensityLayout = layoutSt => _list_layout.LIST_LAYOUT.DLS_INTENSITY === layoutSt;
 const getNmrTyp = layout => {
   switch (layout) {
     case _list_layout.LIST_LAYOUT.H1:
@@ -439,6 +506,8 @@ const Format = {
   isCyclicVoltaLayout,
   isCDSLayout,
   isSECLayout,
+  isEmissionsLayout,
+  isDLSIntensityLayout,
   isEmWaveLayout,
   fixDigit,
   formatPeaksByPrediction,
@@ -448,7 +517,8 @@ const Format = {
   compareColors,
   mutiEntitiesColors,
   hasMultiCurves,
-  isAIFLayout
+  isAIFLayout,
+  isDLSACFLayout
 };
 var _default = Format;
 exports.default = _default;

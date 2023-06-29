@@ -4,8 +4,11 @@ import {
 } from "../../../helpers/chem";
 import nmr1HJcamp from "../../fixtures/nmr1h_jcamp";
 import aifJcamp1 from "../../fixtures/aif_jcamp_1";
+import dlsIntensityJcamp from '../../fixtures/dls_intensity_jcamp';
 import { LIST_SHIFT_1H } from "../../../constants/list_shift";
 import { LIST_LAYOUT } from "../../../constants/list_layout";
+import emissionsJcamp from "../../fixtures/emissions_jcamp";
+import dlsAcfJcamp from "../../fixtures/dls_acf_jcamp";
 
 function checkExtractSucceed(extractedData: any, forLayout: string) {
   const { spectra, features, layout } = extractedData
@@ -54,6 +57,56 @@ describe('Test for chem helper', () => {
 
       it('Check spectra info ', () => {
         checkSpectraInfo(extractedData, 'SORPTION-DESORPTION MEASUREMENT')
+      })
+    })
+
+    describe('Extract Emission Spec', () => {
+      let extractedData: { spectra: any, features: any, layout: any }
+
+      beforeAll(() => {
+        extractedData = ExtractJcamp(emissionsJcamp)
+      })
+
+      it('Extract succeed ', () => {
+        checkExtractSucceed(extractedData, LIST_LAYOUT.EMISSIONS)
+      })
+
+      it('Check spectra info ', () => {
+        checkSpectraInfo(extractedData, 'Emissions')
+      })
+    })
+    
+
+    describe('Extract DLS ACF', () => {
+      let extractedData: { spectra: any, features: any, layout: any }
+
+      beforeAll(() => {
+        extractedData = ExtractJcamp(dlsAcfJcamp)
+      })
+
+      it('Extract succeed ', () => {
+        checkExtractSucceed(extractedData, LIST_LAYOUT.DLS_ACF)
+      })
+
+      it('Check spectra info ', () => {
+        checkSpectraInfo(extractedData, 'DLS ACF')
+      })
+    })
+    
+
+    describe('Extract DLS Intensity', () => {
+      let extractedData: { spectra: any, features: any, layout: any }
+
+      beforeAll(() => {
+        extractedData = ExtractJcamp(dlsIntensityJcamp)
+      })
+
+      it('Extract succeed ', () => {
+        checkExtractSucceed(extractedData, LIST_LAYOUT.DLS_INTENSITY)
+      })
+
+      it('Check spectra info ', () => {
+        checkSpectraInfo(extractedData, 'DLS intensity')
       })
     })
     

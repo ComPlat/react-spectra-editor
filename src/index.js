@@ -42,6 +42,9 @@ import secJcamp3 from './__tests__/fixtures/sec_3_jcamp';
 import secJcamp4 from './__tests__/fixtures/sec_4_jcamp';
 import aifJcamp1 from './__tests__/fixtures/aif_jcamp_1';
 import aifJcamp2 from './__tests__/fixtures/aif_jcamp_2';
+import emissionsJcamp from './__tests__/fixtures/emissions_jcamp';
+import dlsAcfJcamp from './__tests__/fixtures/dls_acf_jcamp';
+import dlsIntensityJcamp from './__tests__/fixtures/dls_intensity_jcamp';
 import { q1H, qIR, q13C } from './__tests__/fixtures/qDescValue';
 import './__tests__/style/svg.css';
 
@@ -75,6 +78,9 @@ const secEntity3 = FN.ExtractJcamp(secJcamp3);
 const secEntity4 = FN.ExtractJcamp(secJcamp4);
 const aifEntity1 = FN.ExtractJcamp(aifJcamp1);
 const aifEntity2 = FN.ExtractJcamp(aifJcamp2);
+const emissionsEntity = FN.ExtractJcamp(emissionsJcamp);
+const dlsAcfEntity = FN.ExtractJcamp(dlsAcfJcamp);
+const dlsIntensityEntity = FN.ExtractJcamp(dlsIntensityJcamp);
 
 class DemoWriteIr extends React.Component {
   constructor(props) {
@@ -162,6 +168,12 @@ class DemoWriteIr extends React.Component {
         return secEntity1;
       case 'aif':
         return aifEntity1;
+      case 'emissions':
+        return emissionsEntity;
+      case 'dls acf':
+        return dlsAcfEntity;
+      case 'dls intensity':
+        return dlsIntensityEntity;
       case 'ms':
       default:
         return msEntity;
@@ -215,6 +227,9 @@ class DemoWriteIr extends React.Component {
       case 'cds':
       case 'sec':
       case 'aif':
+      case 'emissions':
+      case 'dls acf':
+      case 'dls intensity':
       default:
         return false;
     }
@@ -538,6 +553,27 @@ class DemoWriteIr extends React.Component {
           <Button
             variant="contained"
             style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('emissions')}
+          >
+            EMISSIONS
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('dls acf')}
+          >
+            DLS ACF
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('dls intensity')}
+          >
+            DLS intensity
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
             onClick={this.onClick('ms')}
           >
             MS
@@ -581,6 +617,7 @@ class DemoWriteIr extends React.Component {
           molSvg={molSvg}
           userManualLink={{cv: "https://www.chemotion.net/chemotionsaurus/docs/eln/chemspectra/cvanalysis"}}
           forecast={forecast}
+          operations={operations}
         />
         <div>
           <span>Description Changed</span>

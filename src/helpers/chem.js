@@ -325,6 +325,15 @@ const readLayout = (jcamp) => {
     if (dataType.includes('SORPTION-DESORPTION MEASUREMENT')) {
       return LIST_LAYOUT.AIF;
     }
+    if (dataType.includes('Emissions')) {
+      return LIST_LAYOUT.EMISSIONS;
+    }
+    if (dataType.includes('DLS ACF')) {
+      return LIST_LAYOUT.DLS_ACF;
+    }
+    if (dataType.includes('DLS intensity')) {
+      return LIST_LAYOUT.DLS_INTENSITY;
+    }
   }
   return false;
 };
