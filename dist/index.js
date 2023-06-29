@@ -43,6 +43,7 @@ var _aif_jcamp_ = _interopRequireDefault(require("./__tests__/fixtures/aif_jcamp
 var _aif_jcamp_2 = _interopRequireDefault(require("./__tests__/fixtures/aif_jcamp_2"));
 var _emissions_jcamp = _interopRequireDefault(require("./__tests__/fixtures/emissions_jcamp"));
 var _dls_acf_jcamp = _interopRequireDefault(require("./__tests__/fixtures/dls_acf_jcamp"));
+var _dls_intensity_jcamp = _interopRequireDefault(require("./__tests__/fixtures/dls_intensity_jcamp"));
 var _qDescValue = require("./__tests__/fixtures/qDescValue");
 require("./__tests__/style/svg.css");
 /* eslint-disable prefer-object-spread, default-param-last, no-nested-ternary */
@@ -79,6 +80,7 @@ const aifEntity1 = _app.FN.ExtractJcamp(_aif_jcamp_.default);
 const aifEntity2 = _app.FN.ExtractJcamp(_aif_jcamp_2.default);
 const emissionsEntity = _app.FN.ExtractJcamp(_emissions_jcamp.default);
 const dlsAcfEntity = _app.FN.ExtractJcamp(_dls_acf_jcamp.default);
+const dlsIntensityEntity = _app.FN.ExtractJcamp(_dls_intensity_jcamp.default);
 class DemoWriteIr extends _react.default.Component {
   constructor(props) {
     super(props);
@@ -170,6 +172,8 @@ class DemoWriteIr extends _react.default.Component {
         return emissionsEntity;
       case 'dls acf':
         return dlsAcfEntity;
+      case 'dls intensity':
+        return dlsIntensityEntity;
       case 'ms':
       default:
         return msEntity;
@@ -227,6 +231,7 @@ class DemoWriteIr extends _react.default.Component {
       case 'aif':
       case 'emissions':
       case 'dls acf':
+      case 'dls intensity':
       default:
         return false;
     }
@@ -648,6 +653,12 @@ class DemoWriteIr extends _react.default.Component {
       },
       onClick: this.onClick('dls acf')
     }, "DLS ACF"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+      variant: "contained",
+      style: {
+        margin: '0 10px 0 10px'
+      },
+      onClick: this.onClick('dls intensity')
+    }, "DLS intensity"), /*#__PURE__*/_react.default.createElement(_Button.default, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
