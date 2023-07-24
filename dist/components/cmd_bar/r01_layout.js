@@ -23,6 +23,7 @@ var _list_layout = require("../../constants/list_layout");
 var _list_shift = require("../../constants/list_shift");
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 var _common = require("./common");
+var _format = _interopRequireDefault(require("../../helpers/format"));
 /* eslint-disable prefer-object-spread, function-paren-newline,
 react/function-component-definition */
 
@@ -58,7 +59,7 @@ const shiftSelect = (classes, layoutSt, setShiftRefAct, shiftSt, curveSt) => {
     key: ref.name
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-shift')
-  }, `${ref.name}: ${ref.value} ppm`)));
+  }, `${ref.name}: ${_format.default.strNumberFixedDecimal(ref.value, 2)} ppm`)));
   return /*#__PURE__*/_react.default.createElement(_FormControl.default, {
     className: (0, _classnames.default)(classes.fieldShift),
     variant: "outlined"

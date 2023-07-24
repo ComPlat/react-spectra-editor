@@ -412,6 +412,13 @@ const compareColors = (idx) => ['#ABB2B9', '#EDBB99', '#ABEBC6', '#D2B4DE', '#F9
 
 const mutiEntitiesColors = (idx) => ['#fa8231', '#f7b731', '#0fb9b1', '#2d98da', '#3867d6', '#8854d0', '#4b6584'][idx % 7];
 
+const strNumberFixedDecimal = (number, decimal = -1) => {
+  if (decimal <= 0) {
+    return `${number}`;
+  }
+  return number.toFixed(Math.max(decimal, (number.toString().split('.')[1] || []).length));
+};
+
 const Format = {
   toPeakStr,
   buildData,
@@ -451,6 +458,7 @@ const Format = {
   hasMultiCurves,
   isAIFLayout,
   isDLSACFLayout,
+  strNumberFixedDecimal,
 };
 
 export default Format;
