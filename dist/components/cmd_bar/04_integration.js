@@ -33,12 +33,8 @@ const styles = () => Object.assign({
   txtIcon: {}
 }, _common.commonStyle);
 const iconSize = '16px';
-const setFactor = (classes, isDisable, refFactor, setIntegrationFkrAct, curveIdx) => {
-  const onBlur = e => setIntegrationFkrAct({
-    factor: e.target.value,
-    curveIdx
-  });
-  const onChange = e => setIntegrationFkrAct({
+const setFactor = (classes, isDisable, integrationSt, setIntegrationFkrAct, curveIdx) => {
+  const onFactorChanged = e => setIntegrationFkrAct({
     factor: e.target.value,
     curveIdx
   });
@@ -50,12 +46,20 @@ const setFactor = (classes, isDisable, refFactor, setIntegrationFkrAct, curveIdx
       });
     }
   };
+  let refFactor = 1.00;
+  const {
+    integrations
+  } = integrationSt;
+  if (integrations && curveIdx < integrations.length) {
+    const selectedIntegration = integrations[curveIdx];
+    refFactor = selectedIntegration.refFactor || 1.00;
+  }
   return /*#__PURE__*/_react.default.createElement(_TextField.default, {
     className: classes.field,
     disabled: isDisable,
     id: "intg-factor-name",
     type: "number",
-    value: refFactor || 1.00,
+    value: refFactor,
     margin: "none",
     InputProps: {
       className: (0, _classnames.default)(classes.txtInput, 'txtfield-sv-bar-input')
@@ -63,9 +67,9 @@ const setFactor = (classes, isDisable, refFactor, setIntegrationFkrAct, curveIdx
     label: /*#__PURE__*/_react.default.createElement("span", {
       className: (0, _classnames.default)(classes.txtLabel, 'txtfield-sv-bar-label')
     }, "Ref Area"),
-    onChange: onChange,
-    onBlur: onBlur,
-    onKeyPress: onEnterPress,
+    onChange: onFactorChanged,
+    onBlur: onFactorChanged,
+    onKeyUp: onEnterPress,
     variant: "outlined"
   });
 };
@@ -73,7 +77,6 @@ const iconColor = criteria => criteria ? '#fff' : '#000';
 const Integration = _ref => {
   let {
     classes,
-    refFactorSt,
     ignoreRef,
     isDisableSt,
     isFocusAddIntgSt,
@@ -82,7 +85,8 @@ const Integration = _ref => {
     setUiSweepTypeAct,
     setIntegrationFkrAct,
     clearIntegrationAllAct,
-    curveSt
+    curveSt,
+    integrationSt
   } = _ref;
   const onSweepIntegtAdd = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD);
   const onSweepIntegtRm = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_RM);
@@ -138,7 +142,7 @@ const Integration = _ref => {
     size: iconSize,
     color: iconColor(isFocusSetRefSt || isDisableSt),
     className: (0, _classnames.default)(classes.iconMdi, 'icon-sv-bar-refint')
-  })))), !ignoreRef ? setFactor(classes, isDisableSt, refFactorSt, setIntegrationFkrAct, curveIdx) : null, /*#__PURE__*/_react.default.createElement(_tri_btn.default, {
+  })))), !ignoreRef ? setFactor(classes, isDisableSt, integrationSt, setIntegrationFkrAct, curveIdx) : null, /*#__PURE__*/_react.default.createElement(_tri_btn.default, {
     content: {
       tp: 'Clear All Integration'
     },
@@ -159,9 +163,9 @@ const mapStateToProps = (state, props) => (
   isFocusAddIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
   isFocusRmIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_RM,
   isFocusSetRefSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF,
-  refFactorSt: state.integration.present.refFactor,
   ignoreRef: _format.default.isHplcUvVisLayout(state.layout),
-  curveSt: state.curve
+  curveSt: state.curve,
+  integrationSt: state.integration.present
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   setUiSweepTypeAct: _ui.setUiSweepType,
@@ -174,12 +178,12 @@ Integration.propTypes = {
   isFocusAddIntgSt: _propTypes.default.bool.isRequired,
   isFocusRmIntgSt: _propTypes.default.bool.isRequired,
   isFocusSetRefSt: _propTypes.default.bool.isRequired,
-  refFactorSt: _propTypes.default.number.isRequired,
   ignoreRef: _propTypes.default.bool.isRequired,
   setUiSweepTypeAct: _propTypes.default.func.isRequired,
   setIntegrationFkrAct: _propTypes.default.func.isRequired,
   clearIntegrationAllAct: _propTypes.default.func.isRequired,
-  curveSt: _propTypes.default.object.isRequired
+  curveSt: _propTypes.default.object.isRequired,
+  integrationSt: _propTypes.default.object.isRequired
 };
 var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(Integration));
 exports.default = _default;
