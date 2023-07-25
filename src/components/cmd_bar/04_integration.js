@@ -42,13 +42,9 @@ const styles = () => (
 const iconSize = '16px';
 
 const setFactor = (
-  classes, isDisable, refFactor, setIntegrationFkrAct, curveIdx,
+  classes, isDisable, integrationSt, setIntegrationFkrAct, curveIdx,
 ) => {
-  const onBlur = (e) => setIntegrationFkrAct({
-    factor: e.target.value,
-    curveIdx,
-  });
-  const onChange = (e) => setIntegrationFkrAct({
+  const onFactorChanged = (e) => setIntegrationFkrAct({
     factor: e.target.value,
     curveIdx,
   });
@@ -61,21 +57,28 @@ const setFactor = (
     }
   };
 
+  let refFactor = 1.00;
+  const { integrations } = integrationSt;
+  if (integrations && curveIdx < integrations.length) {
+    const selectedIntegration = integrations[curveIdx];
+    refFactor = selectedIntegration.refFactor || 1.00;
+  }
+
   return (
     <TextField
       className={classes.field}
       disabled={isDisable}
       id="intg-factor-name"
       type="number"
-      value={refFactor || 1.00}
+      value={refFactor}
       margin="none"
       InputProps={{
         className: classNames(classes.txtInput, 'txtfield-sv-bar-input'),
       }}
       label={<span className={classNames(classes.txtLabel, 'txtfield-sv-bar-label')}>Ref Area</span>}
-      onChange={onChange}
-      onBlur={onBlur}
-      onKeyPress={onEnterPress}
+      onChange={onFactorChanged}
+      onBlur={onFactorChanged}
+      onKeyUp={onEnterPress}
       variant="outlined"
     />
   );
@@ -84,10 +87,10 @@ const setFactor = (
 const iconColor = (criteria) => (criteria ? '#fff' : '#000');
 
 const Integration = ({
-  classes, refFactorSt, ignoreRef,
+  classes, ignoreRef,
   isDisableSt, isFocusAddIntgSt, isFocusRmIntgSt, isFocusSetRefSt,
   setUiSweepTypeAct, setIntegrationFkrAct, clearIntegrationAllAct,
-  curveSt,
+  curveSt, integrationSt,
 }) => {
   const onSweepIntegtAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.INTEGRATION_ADD);
   const onSweepIntegtRm = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.INTEGRATION_RM);
@@ -162,7 +165,7 @@ const Integration = ({
       {
         !ignoreRef
           ? setFactor(
-            classes, isDisableSt, refFactorSt, setIntegrationFkrAct, curveIdx,
+            classes, isDisableSt, integrationSt, setIntegrationFkrAct, curveIdx,
           )
           : null
       }
@@ -188,9 +191,9 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     isFocusAddIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
     isFocusRmIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_RM,
     isFocusSetRefSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF,
-    refFactorSt: state.integration.present.refFactor,
     ignoreRef: Format.isHplcUvVisLayout(state.layout),
     curveSt: state.curve,
+    integrationSt: state.integration.present,
   }
 );
 
@@ -208,12 +211,12 @@ Integration.propTypes = {
   isFocusAddIntgSt: PropTypes.bool.isRequired,
   isFocusRmIntgSt: PropTypes.bool.isRequired,
   isFocusSetRefSt: PropTypes.bool.isRequired,
-  refFactorSt: PropTypes.number.isRequired,
   ignoreRef: PropTypes.bool.isRequired,
   setUiSweepTypeAct: PropTypes.func.isRequired,
   setIntegrationFkrAct: PropTypes.func.isRequired,
   clearIntegrationAllAct: PropTypes.func.isRequired,
   curveSt: PropTypes.object.isRequired,
+  integrationSt: PropTypes.object.isRequired,
 };
 
 export default connect(
