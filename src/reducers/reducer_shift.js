@@ -77,7 +77,7 @@ const resetShift = (state, action) => {
 
   const newShift = Object.assign(
     {},
-    selectedShift,
+    defaultEmptyShift,
     {
       ref: resetRef(payload),
       enable: resetEnable(payload),
