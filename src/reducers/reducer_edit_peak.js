@@ -147,7 +147,16 @@ const editPeakReducer = (state = initialState, action) => {
     case EDITPEAK.SHIFT:
       return processShift(state, action);
     case MANAGER.RESETALL:
-      return initialState;
+      return {
+        selectedIdx: 0,
+        peaks: [
+          {
+            prevOffset: 0,
+            pos: [],
+            neg: [],
+          },
+        ],
+      };
     default:
       return undoRedoActions.indexOf(action.type) >= 0
         ? Object.assign({}, state)

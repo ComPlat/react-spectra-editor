@@ -104,7 +104,7 @@ class MultiFocus {
     const sameLySt = prevLySt === this.layout;
     const sameTePt = prevTePt === this.tTrEndPts.length;
     const sameDtPk = prevDtPk === this.dataPks.length;
-    const sameSfPk = prevSfPk === this.tSfPeaks.length;
+    const sameSfPk = JSON.stringify(prevSfPk) === JSON.stringify(this.tSfPeaks);
     const sameData = prevData === this.data.length;
     this.shouldUpdate = Object.assign(
       {},
@@ -122,7 +122,7 @@ class MultiFocus {
     const prevYt = yt(1.1);
     const prevTePt = this.tTrEndPts.length;
     const prevDtPk = this.dataPks.length;
-    const prevSfPk = this.tSfPeaks.length;
+    const prevSfPk = this.tSfPeaks;
     const prevData = this.data.length;
     const prevLySt = this.layout;
     this.shouldUpdate = Object.assign(
