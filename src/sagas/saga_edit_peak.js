@@ -23,7 +23,7 @@ function* addVirtualFactor(action) {
     };
   }
 
-  let currentOriginShift = originShift[curveIdx];
+  let currentOriginShift = originShift.shifts[curveIdx];
   if (currentOriginShift === false || currentOriginShift === undefined) {
     const shiftNone = LIST_SHIFT_1H[0];
     currentOriginShift = {

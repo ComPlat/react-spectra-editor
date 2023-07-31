@@ -276,7 +276,7 @@ const formatedDLSIntensity = function (peaks, maxY) {
     const better = !ordered[x] || p.y > ordered[x];
     if (better) {
       ordered = Object.assign({}, ordered, {
-        [x]: p.y
+        [x]: fixDigit(p.y, 2)
       });
     }
   });

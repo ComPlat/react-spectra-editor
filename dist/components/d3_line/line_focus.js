@@ -113,7 +113,7 @@ class LineFocus {
     const sameMySt = prevMySt === nextMySt;
     const sameTePt = prevTePt === this.tTrEndPts.length;
     const sameDtPk = prevDtPk === this.dataPks.length;
-    const sameSfPk = prevSfPk === this.tSfPeaks.length;
+    const sameSfPk = JSON.stringify(prevSfPk) === JSON.stringify(this.tSfPeaks);
     const sameData = prevData === this.data.length;
     const sameRef = prevEpSt.prevOffset === nextEpSt.prevOffset;
     this.shouldUpdate = Object.assign({}, this.shouldUpdate, {
@@ -140,7 +140,7 @@ class LineFocus {
     const prevYt = yt(1.1);
     const prevTePt = this.tTrEndPts.length;
     const prevDtPk = this.dataPks.length;
-    const prevSfPk = this.tSfPeaks.length;
+    const prevSfPk = this.tSfPeaks;
     const prevData = this.data.length;
     const prevLySt = this.layout;
     this.shouldUpdate = Object.assign({}, this.shouldUpdate, {
@@ -217,9 +217,10 @@ class LineFocus {
   drawLine() {
     const {
       sameXY,
-      sameRef
+      sameRef,
+      sameSfPk
     } = this.shouldUpdate;
-    if (sameXY && sameRef) return;
+    if (sameXY && sameRef && sameSfPk) return;
     const {
       xt,
       yt
@@ -246,9 +247,10 @@ class LineFocus {
   }
   drawGrid() {
     const {
-      sameXY
+      sameXY,
+      sameSfPk
     } = this.shouldUpdate;
-    if (sameXY) return;
+    if (sameXY && sameSfPk) return;
     this.grid.x.call(this.axisCall.x.tickSize(-this.h, 0, 0)).selectAll('line').attr('stroke', '#ddd').attr('stroke-opacity', 0.6).attr('fill', 'none');
     this.grid.y.call(this.axisCall.y.tickSize(-this.w, 0, 0)).selectAll('line').attr('stroke', '#ddd').attr('stroke-opacity', 0.6).attr('fill', 'none');
   }
