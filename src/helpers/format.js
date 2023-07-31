@@ -8,6 +8,7 @@ const spectraDigit = (layout) => {
     case LIST_LAYOUT.RAMAN:
     case LIST_LAYOUT.UVVIS:
     case LIST_LAYOUT.HPLC_UVVIS:
+    case LIST_LAYOUT.FLUORESCENCE:
     case LIST_LAYOUT.TGA:
     case LIST_LAYOUT.XRD:
     case LIST_LAYOUT.CYCLIC_VOLTAMMETRY:
@@ -60,6 +61,7 @@ const spectraOps = {
   [LIST_LAYOUT.RAMAN]: { head: 'RAMAN', tail: ' cm-1' },
   [LIST_LAYOUT.UVVIS]: { head: 'UV-VIS (absorption, solvent), λmax', tail: ' nm' },
   [LIST_LAYOUT.HPLC_UVVIS]: { head: 'HPLC UV/VIS (transmittance)', tail: '' },
+  [LIST_LAYOUT.FLUORESCENCE]: { head: 'FLUORESCENCE SPECTRUM', tail: '' },
   [LIST_LAYOUT.TGA]: { head: 'THERMOGRAVIMETRIC ANALYSIS', tail: ' SECONDS' },
   [LIST_LAYOUT.MS]: { head: 'MASS', tail: ' m/z' },
   [LIST_LAYOUT.XRD]: { head: 'X-RAY DIFFRACTION', tail: '.' },
@@ -236,7 +238,7 @@ const peaksBody = ({
   if (layout === LIST_LAYOUT.RAMAN) {
     return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
-  if (layout === LIST_LAYOUT.UVVIS) {
+  if (layout === LIST_LAYOUT.UVVIS || layout === LIST_LAYOUT.FLUORESCENCE) {
     return formatedUvVis(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
   if (layout === LIST_LAYOUT.HPLC_UVVIS) {
@@ -285,12 +287,13 @@ const isIrLayout = layoutSt => ([LIST_LAYOUT.IR, 'INFRARED'].indexOf(layoutSt) >
 const isRamanLayout = layoutSt => (LIST_LAYOUT.RAMAN === layoutSt);
 const isUvVisLayout = layoutSt => (LIST_LAYOUT.UVVIS === layoutSt);
 const isHplcUvVisLayout = layoutSt => (LIST_LAYOUT.HPLC_UVVIS === layoutSt);
+const isFluorescenceLayout = layoutSt => (LIST_LAYOUT.FLUORESCENCE === layoutSt);
 const isTGALayout = layoutSt => (LIST_LAYOUT.TGA === layoutSt);
 const isXRDLayout = layoutSt => (LIST_LAYOUT.XRD === layoutSt);
 const isCyclicVoltaLayout = layoutSt => (LIST_LAYOUT.CYCLIC_VOLTAMMETRY === layoutSt);
 const isCDSLayout = layoutSt => (LIST_LAYOUT.CDS === layoutSt);
 const isEmWaveLayout = layoutSt => (
-  [LIST_LAYOUT.IR, LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS, LIST_LAYOUT.HPLC_UVVIS].indexOf(layoutSt) >= 0
+  [LIST_LAYOUT.IR, LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS, LIST_LAYOUT.HPLC_UVVIS, LIST_LAYOUT.FLUORESCENCE].indexOf(layoutSt) >= 0
 );
 
 const getNmrTyp = (layout) => {
@@ -366,6 +369,7 @@ const Format = {
   isRamanLayout,
   isUvVisLayout,
   isHplcUvVisLayout,
+  isFluorescenceLayout,
   isTGALayout,
   isXRDLayout,
   isCyclicVoltaLayout,

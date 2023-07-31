@@ -26,6 +26,7 @@ import Phenylalanin from './__tests__/fixtures/phenylalanin';
 import compareUvVisJcamp from './__tests__/fixtures/compare_uv_vis_jcamp';
 import uvVisJcamp from './__tests__/fixtures/uv_vis_jcamp';
 import hplcUVVisJcamp from './__tests__/fixtures/hplc_uvvis_jcamp';
+import fluorescenceJcamp from './__tests__/fixtures/fluorescence_jcamp';
 import tgaJcamp from './__tests__/fixtures/tga_jcamp';
 import xrdJcamp1 from './__tests__/fixtures/xrd_jcamp_1';
 import xrdJcamp2 from './__tests__/fixtures/xrd_jcamp_2';
@@ -51,6 +52,7 @@ const msEntity = FN.ExtractJcamp(msJcamp);
 const uvVisEntity = FN.ExtractJcamp(uvVisJcamp);
 const compUvVisEntity = FN.ExtractJcamp(compareUvVisJcamp);
 const hplcUVVisEntity = FN.ExtractJcamp(hplcUVVisJcamp);
+const fluorescenceEntity = FN.ExtractJcamp(fluorescenceJcamp);
 const tgaEntity = FN.ExtractJcamp(tgaJcamp);
 const xrdEntity1 = FN.ExtractJcamp(xrdJcamp1);
 const xrdEntity2 = FN.ExtractJcamp(xrdJcamp2);
@@ -267,6 +269,8 @@ class DemoWriteIr extends React.Component {
         return uvVisEntity;
       case 'hplc uv/vis':
         return hplcUVVisEntity;
+      case 'fluorescence':
+        return fluorescenceEntity;
       case 'tga':
         return tgaEntity;
       case 'xrd':
@@ -309,6 +313,7 @@ class DemoWriteIr extends React.Component {
       case 'raman':
       case 'uv/vis':
       case 'hplc uv/vis':
+      case 'fluorescence':
       case 'tga':
       case 'xrd':
       case 'ms':
@@ -454,6 +459,13 @@ class DemoWriteIr extends React.Component {
             onClick={this.onClick('hplc uv/vis')}
           >
             HPLC UV/VIS
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('fluorescence')}
+          >
+            FLUORESCENCE SPECTRUM
           </Button>
           <Button
             variant="contained"

@@ -281,6 +281,9 @@ const readLayout = (jcamp) => {
       }
       return LIST_LAYOUT.UVVIS;
     }
+    if (dataType.includes('FLUORESCENCE SPECTRUM')) {
+      return LIST_LAYOUT.FLUORESCENCE;
+    }
     if (dataType.includes('THERMOGRAVIMETRIC ANALYSIS')) {
       return LIST_LAYOUT.TGA;
     }
