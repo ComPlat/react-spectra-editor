@@ -205,7 +205,7 @@ const formatedDLSIntensity = (
     const x = fixDigit(p.x, decimal);
     const better = !ordered[x] || (p.y > ordered[x]);
     if (better) {
-      ordered = Object.assign({}, ordered, { [x]: p.y });
+      ordered = Object.assign({}, ordered, { [x]: fixDigit(p.y, 2) });
     }
   });
 
