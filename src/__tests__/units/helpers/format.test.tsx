@@ -159,7 +159,7 @@ describe('Test format helper', () => {
 
       it('Wrapper from specific layout', () => {
         const wrapper = Format.peaksWrapper(LIST_LAYOUT.H1, shift, 0)
-        const expectedWrapper = {head: '1H (Actic acid-d4) = ', tail: '.'}
+        const expectedWrapper = {head: '1H (Acetic acid-d4) = ', tail: '.'}
         expect(wrapper).toEqual(expectedWrapper)
       })
     })
@@ -367,4 +367,32 @@ describe('Test format helper', () => {
     })
   })
 
+  describe('Test format string number', () => {
+    describe('.strNumberFixedDecimal()', () => {
+      it('number without fixed', () => {
+        const strNumber = Format.strNumberFixedDecimal(2.50);
+        const expected = '2.5'
+        expect(strNumber).toEqual(expected)
+      })
+
+      it('number with at least 1 decimal', () => {
+        const strNumber = Format.strNumberFixedDecimal(2.5, 1);
+        const expected = '2.5'
+        expect(strNumber).toEqual(expected)
+      })
+
+      it('number with at least 2 decimal', () => {
+        const strNumber = Format.strNumberFixedDecimal(2.5, 2);
+        const expected = '2.50'
+        expect(strNumber).toEqual(expected)
+      })
+
+      it('long number with at least 2 decimal', () => {
+        const strNumber = Format.strNumberFixedDecimal(2.567, 2);
+        const expected = '2.567'
+        expect(strNumber).toEqual(expected)
+      })
+    })
+    
+  })
 })
