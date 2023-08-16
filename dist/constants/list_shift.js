@@ -13,14 +13,14 @@ const noReference = {
   label: false
 };
 const cActicAcidD4Sept = {
-  name: 'Actic acid-d4 (sept)',
+  name: 'Acetic acid-d4 (sept)',
   value: 20.0,
-  label: 'Actic acid-d4'
+  label: 'Acetic acid-d4'
 };
 const cActicAcidD4S = {
-  name: 'Actic acid-d4 (s)',
+  name: 'Acetic acid-d4 (s)',
   value: 178.990,
-  label: 'Actic acid-d4'
+  label: 'Acetic acid-d4'
 };
 const cAcetoneD6Sep = {
   name: 'Acetone-d6 (sep)',
@@ -193,14 +193,14 @@ const cTrifluoroethanolD3Broad = {
 const LIST_SHIFT_13C = [noReference, cActicAcidD4Sept, cActicAcidD4S, cAcetoneD6Sep, cAcetoneD6Broad, cAcetonitrileD3Sep, cAcetonitrileD3S, cBenzeneT, cChloroformDT, cCyclohexaneD12Quin, cDichloromethaneD2Quin, cDmfD7Sep1, cDmfD7Sep2, cDmfD7T3, cDioxaneD8Quin, cDmsoD6, cEthanolD6Sep, cEthanolD6Quin, cMethanolD4Sep, cPyridineD5T1, cPyridineD5T2, cPyridineD5T3, cThfD8Quin1, cThfD8Quin2, cTmsS, cTolueneD8Sep1, cTolueneD8T2, cTolueneD8T3, cTolueneD8T4, cTolueneD8T5, cTfaDQ1, cTfaDQ2, cTrifluoroethanolD3Quin, cTrifluoroethanolD3Broad];
 exports.LIST_SHIFT_13C = LIST_SHIFT_13C;
 const hActicAcidD4Quin = {
-  name: 'Actic acid-d4 (quin)',
+  name: 'Acetic acid-d4 (quin)',
   value: 2.04,
-  label: 'Actic acid-d4'
+  label: 'Acetic acid-d4'
 };
 const hActicAcidD4S = {
-  name: 'Actic acid-d4 (s)',
+  name: 'Acetic acid-d4 (s)',
   value: 11.65,
-  label: 'Actic acid-d4'
+  label: 'Acetic acid-d4'
 };
 const hAcetoneD6Quin = {
   name: 'Acetone-d6 (quin)',
@@ -222,7 +222,7 @@ const hBenzeneS = {
 };
 const hChloroformDS = {
   name: 'Chloroform-d (s)',
-  value: 7.27,
+  value: 7.26,
   label: 'CDCl$3',
   nsdb: 'Chloroform-D1 (CDCl3)'
 };

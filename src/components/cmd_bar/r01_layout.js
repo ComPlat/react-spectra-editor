@@ -20,6 +20,7 @@ import { LIST_LAYOUT } from '../../constants/list_layout';
 import { getListShift } from '../../constants/list_shift';
 import Cfg from '../../helpers/cfg';
 import { commonStyle } from './common';
+import Format from '../../helpers/format';
 
 const styles = () => (
   Object.assign(
@@ -55,7 +56,7 @@ const shiftSelect = (
   const content = listShift.map((ref) => (
     <MenuItem value={ref} key={ref.name}>
       <span className={classNames(classes.txtOpt, 'option-sv-bar-shift')}>
-        { `${ref.name}: ${ref.value} ppm` }
+        { `${ref.name}: ${Format.strNumberFixedDecimal(ref.value, 2)} ppm` }
       </span>
     </MenuItem>
   ));
