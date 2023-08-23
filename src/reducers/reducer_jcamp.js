@@ -21,7 +21,7 @@ const addOthers = (state, { others, addOthersCb }) => {
   const newJcamp = Object.assign(
     {},
     selectedJcamp,
-    { others: [...selectedJcamp.others, ...decoOthers].slice(0, 5), addOthersCb },
+    { others: [...decoOthers].slice(0, 5), addOthersCb },
   );
   jcamps[selectedIdx] = newJcamp;
 

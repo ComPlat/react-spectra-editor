@@ -59,12 +59,17 @@ class ForecastViewer extends React.Component {
   render() {
     const {
       classes, topic, feature, cLabel, xLabel, yLabel, forecast,
-      isNmr, isIr, uiSt, comparisonsSt, isXRD, wavelength,
+      isNmr, isIr, uiSt, isXRD, wavelength, curveSt,
+      jcampSt,
     } = this.props;
     const { viewer } = uiSt;
     const {
       inputCb, molecule,
     } = forecast;
+
+    const { curveIdx } = curveSt;
+    const { jcamps } = jcampSt;
+    const comparisons = jcamps[curveIdx].others;
 
     return (
       <div className={classes.root}>
@@ -74,7 +79,7 @@ class ForecastViewer extends React.Component {
           cLabel={cLabel}
           xLabel={(isXRD && wavelength) ? (`${xLabel}, WL=${wavelength.value} ${wavelength.unit}`) : xLabel}
           yLabel={yLabel}
-          comparisons={comparisonsSt}
+          comparisons={comparisons}
           isHidden={viewer !== LIST_UI_VIEWER_TYPE.SPECTRUM}
         />
         {
@@ -101,8 +106,9 @@ class ForecastViewer extends React.Component {
 const mapStateToProps = (state, _) => ( // eslint-disable-line
   {
     uiSt: state.ui,
-    comparisonsSt: state.jcamp.others,
+    jcampSt: state.jcamp,
     wavelength: state.wavelength,
+    curveSt: state.curve,
   }
 );
 
@@ -126,10 +132,11 @@ ForecastViewer.propTypes = {
   isUvvis: PropTypes.bool.isRequired,
   isXRD: PropTypes.bool.isRequired,
   uiSt: PropTypes.object.isRequired,
-  comparisonsSt: PropTypes.array.isRequired,
+  jcampSt: PropTypes.object.isRequired,
   initForecastStatusAct: PropTypes.func.isRequired,
   setUiViewerTypeAct: PropTypes.func.isRequired,
   wavelength: PropTypes.object.isRequired,
+  curveSt: PropTypes.object.isRequired,
 };
 
 export default compose(

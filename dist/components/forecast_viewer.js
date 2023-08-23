@@ -75,9 +75,10 @@ class ForecastViewer extends _react.default.Component {
       isNmr,
       isIr,
       uiSt,
-      comparisonsSt,
       isXRD,
-      wavelength
+      wavelength,
+      curveSt,
+      jcampSt
     } = this.props;
     const {
       viewer
@@ -86,6 +87,13 @@ class ForecastViewer extends _react.default.Component {
       inputCb,
       molecule
     } = forecast;
+    const {
+      curveIdx
+    } = curveSt;
+    const {
+      jcamps
+    } = jcampSt;
+    const comparisons = jcamps[curveIdx].others;
     return /*#__PURE__*/_react.default.createElement("div", {
       className: classes.root
     }, /*#__PURE__*/_react.default.createElement(_index.default, {
@@ -94,7 +102,7 @@ class ForecastViewer extends _react.default.Component {
       cLabel: cLabel,
       xLabel: isXRD && wavelength ? `${xLabel}, WL=${wavelength.value} ${wavelength.unit}` : xLabel,
       yLabel: yLabel,
-      comparisons: comparisonsSt,
+      comparisons: comparisons,
       isHidden: viewer !== _list_ui.LIST_UI_VIEWER_TYPE.SPECTRUM
     }), viewer === _list_ui.LIST_UI_VIEWER_TYPE.ANALYSIS && isNmr && /*#__PURE__*/_react.default.createElement(_nmr_viewer.default, {
       molecule: molecule,
@@ -109,8 +117,9 @@ const mapStateToProps = (state, _) => (
 // eslint-disable-line
 {
   uiSt: state.ui,
-  comparisonsSt: state.jcamp.others,
-  wavelength: state.wavelength
+  jcampSt: state.jcamp,
+  wavelength: state.wavelength,
+  curveSt: state.curve
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   initForecastStatusAct: _forecast.initForecastStatus,
@@ -129,10 +138,11 @@ ForecastViewer.propTypes = {
   isUvvis: _propTypes.default.bool.isRequired,
   isXRD: _propTypes.default.bool.isRequired,
   uiSt: _propTypes.default.object.isRequired,
-  comparisonsSt: _propTypes.default.array.isRequired,
+  jcampSt: _propTypes.default.object.isRequired,
   initForecastStatusAct: _propTypes.default.func.isRequired,
   setUiViewerTypeAct: _propTypes.default.func.isRequired,
-  wavelength: _propTypes.default.object.isRequired
+  wavelength: _propTypes.default.object.isRequired,
+  curveSt: _propTypes.default.object.isRequired
 };
 var _default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(ForecastViewer);
 exports.default = _default;
