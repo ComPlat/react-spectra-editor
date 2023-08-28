@@ -205,7 +205,11 @@ const mpyList = (classes, digits, multiplicitySt, curveSt, clickMpyOneAct, rmMpy
     const onClick = e => {
       e.stopPropagation();
       e.preventDefault();
-      clickMpyOneAct(xExtent);
+      const payload = {
+        curveIdx,
+        payloadData: xExtent
+      };
+      clickMpyOneAct(payload);
     };
     return createData(idx, xExtent, peaks, shift, smExtext, mpyType, js, onClick, onRefresh);
   });

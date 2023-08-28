@@ -212,13 +212,18 @@ const InfoPanel = ({
         modules={{ toolbar: false }}
         readOnly
       /> */}
-      <ReactQuill
-        className={classNames(classes.quill, 'card-sv-quill')}
-        value={descriptions}
-        modules={{ toolbar: false }}
-        onChange={onDescriptionChanged}
-        readOnly={canChangeDescription !== undefined ? !canChangeDescription : true}
-      />
+      {
+        !Format.isCyclicVoltaLayout(layoutSt)
+          ? (
+            <ReactQuill
+              className={classNames(classes.quill, 'card-sv-quill')}
+              value={descriptions}
+              modules={{ toolbar: false }}
+              onChange={onDescriptionChanged}
+              readOnly={canChangeDescription !== undefined ? !canChangeDescription : true}
+            />
+          ) : null
+      }
       <div>
         {
             !editorOnly && Format.isNmrLayout(layoutSt)

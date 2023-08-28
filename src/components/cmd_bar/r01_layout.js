@@ -180,7 +180,7 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
           <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>SEC</span>
         </MenuItem>
         <MenuItem value={LIST_LAYOUT.AIF}>
-          <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>AIF</span>
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>SOPTION-DESORPTION</span>
         </MenuItem>
         <MenuItem value={LIST_LAYOUT.EMISSIONS}>
           <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>EMISSIONS</span>

@@ -169,10 +169,12 @@ const BtnPredict = _ref => {
     realCount = (0, _carbonFeatures.carbonFeatures)(peaksEdit, multiplicitySt).length;
   } else {
     const {
-      selectedIdx,
+      curveIdx
+    } = curveSt;
+    const {
       multiplicities
     } = multiplicitySt;
-    const selectedMultiplicity = multiplicities[selectedIdx];
+    const selectedMultiplicity = multiplicities[curveIdx];
     const {
       stack
     } = selectedMultiplicity;
