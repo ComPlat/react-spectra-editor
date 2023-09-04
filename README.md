@@ -2,6 +2,8 @@
 
 An editor to View and Edit Chemical Spectra data (NMR, IR and MS).
 
+![Testing](https://github.com/ComPlat/react-spectra-editor/actions/workflows/testing.yml/badge.svg)
+
 ### Usage
 
 #### Installing from npm

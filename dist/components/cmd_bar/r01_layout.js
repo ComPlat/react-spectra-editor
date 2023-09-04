@@ -160,7 +160,7 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
     value: _list_layout.LIST_LAYOUT.AIF
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  }, "AIF")), /*#__PURE__*/_react.default.createElement(_MenuItem.default, {
+  }, "SOPTION-DESORPTION")), /*#__PURE__*/_react.default.createElement(_MenuItem.default, {
     value: _list_layout.LIST_LAYOUT.EMISSIONS
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
