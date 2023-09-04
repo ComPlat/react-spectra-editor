@@ -47,9 +47,10 @@ function* resetInitNmr(action) {
   const {
     integrations
   } = integationSt;
-  integrations[curveIdx] = integration;
+  const newArrIntegration = [...integrations];
+  newArrIntegration[curveIdx] = integration;
   const payload = Object.assign({}, integationSt, {
-    integrations,
+    integrations: newArrIntegration,
     selectedIdx: curveIdx
   }); // eslint-disable-line
 
@@ -78,9 +79,10 @@ function* resetInitCommonWithIntergation(action) {
   const {
     integrations
   } = integationSt;
-  integrations[curveIdx] = integration;
+  const newArrIntegration = [...integrations];
+  newArrIntegration[curveIdx] = integration;
   const payload = Object.assign({}, integationSt, {
-    integrations,
+    integrations: newArrIntegration,
     selectedIdx: curveIdx
   }); // eslint-disable-line
 

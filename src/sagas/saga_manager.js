@@ -42,9 +42,10 @@ function* resetInitNmr(action) {
 
   const { integration, simulation } = action.payload;
   const { integrations } = integationSt;
-  integrations[curveIdx] = integration;
+  const newArrIntegration = [...integrations];
+  newArrIntegration[curveIdx] = integration;
 
-  const payload = Object.assign({}, integationSt, { integrations, selectedIdx: curveIdx }); // eslint-disable-line
+  const payload = Object.assign({}, integationSt, { integrations: newArrIntegration, selectedIdx: curveIdx }); // eslint-disable-line
 
   if (integration) {
     yield put({
@@ -68,9 +69,10 @@ function* resetInitCommonWithIntergation(action) {
   const { integration } = action.payload;
 
   const { integrations } = integationSt;
-  integrations[curveIdx] = integration;
+  const newArrIntegration = [...integrations];
+  newArrIntegration[curveIdx] = integration;
 
-  const payload = Object.assign({}, integationSt, { integrations, selectedIdx: curveIdx }); // eslint-disable-line
+  const payload = Object.assign({}, integationSt, { integrations: newArrIntegration, selectedIdx: curveIdx }); // eslint-disable-line
 
   if (integration) {
     yield put({

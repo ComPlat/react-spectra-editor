@@ -72,17 +72,6 @@ function* setCyclicVoltametry(action) {
     }
   }
 }
-
-// function* setInitData(action) {
-//   const layoutSt = yield select(getLayoutSt);
-//   console.log(layoutSt);
-//   const curveSt = yield select(getCurveSt);
-//   const { listCurves } = curveSt;
-//   console.log(listCurves);
-// }
-
-const multiEntitiesSagas = [(0, _effects.takeEvery)(_action_type.CURVE.SET_ALL_CURVES, setCyclicVoltametry)
-// takeEvery(CURVE.SET_ALL_CURVES, setInitData),
-];
+const multiEntitiesSagas = [(0, _effects.takeEvery)(_action_type.CURVE.SET_ALL_CURVES, setCyclicVoltametry)];
 var _default = multiEntitiesSagas;
 exports.default = _default;

@@ -35,9 +35,10 @@ const setShift = (state, action) => {
   const newSelectedMulti = Object.assign({}, selectedMulti, {
     shift
   });
-  multiplicities[selectedIdx] = newSelectedMulti;
+  const newMultiplicities = [...multiplicities];
+  newMultiplicities[selectedIdx] = newSelectedMulti;
   return Object.assign({}, state, {
-    multiplicities
+    multiplicities: newMultiplicities
   });
 };
 const rmFromStack = (state, action) => {
@@ -76,9 +77,10 @@ const rmFromStack = (state, action) => {
     stack: newStack,
     smExtext: newSmExtext
   });
-  multiplicities[curveIdx] = newSelectedMulti;
+  const newMultiplicities = [...multiplicities];
+  newMultiplicities[curveIdx] = newSelectedMulti;
   return Object.assign({}, state, {
-    multiplicities,
+    multiplicities: newMultiplicities,
     selectedIdx: curveIdx
   });
 };
@@ -115,9 +117,10 @@ const updateMpyJ = (state, action) => {
   const newSelectedMulti = Object.assign({}, selectedMulti, {
     stack: newStack
   });
-  multiplicities[selectedIdx] = newSelectedMulti;
+  const newMultiplicities = [...multiplicities];
+  newMultiplicities[selectedIdx] = newSelectedMulti;
   return Object.assign({}, state, {
-    multiplicities
+    multiplicities: newMultiplicities
   });
 };
 const clickMpyOne = (state, action) => {
@@ -135,9 +138,10 @@ const clickMpyOne = (state, action) => {
   const newSelectedMulti = Object.assign({}, selectedMulti, {
     smExtext: payloadData
   });
-  multiplicities[curveIdx] = newSelectedMulti;
+  const newMultiplicities = [...multiplicities];
+  newMultiplicities[curveIdx] = newSelectedMulti;
   return Object.assign({}, state, {
-    multiplicities,
+    multiplicities: newMultiplicities,
     selectedIdx: curveIdx
   });
 };
@@ -154,9 +158,10 @@ const clearAll = (state, action) => {
   const newSelectedMulti = Object.assign({}, defaultEmptyMultiplicity, {
     edited: true
   });
-  multiplicities[curveIdx] = newSelectedMulti;
+  const newMultiplicities = [...multiplicities];
+  newMultiplicities[curveIdx] = newSelectedMulti;
   return Object.assign({}, state, {
-    multiplicities
+    multiplicities: newMultiplicities
   });
 };
 const multiplicityReducer = function () {

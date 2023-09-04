@@ -41,17 +41,19 @@ const addToPos = (state, action) => {
     ];
 
     const newSelectedEditPeaks = Object.assign({}, selectedEditPeaks, { neg });
-    peaks[curveIdx] = newSelectedEditPeaks;
-
-    return Object.assign({}, state, { peaks });
+    const newPeaks = [...peaks];
+    newPeaks[curveIdx] = newSelectedEditPeaks;
+    return Object.assign({}, state, { peaks: newPeaks });
   }
+
   const idxP = oriPosState.findIndex((p) => almostEqual(p.x, dataToAdd.x));
   if (idxP < 0) { // add the peak
     const pos = [...oriPosState, dataToAdd];
 
     const newSelectedEditPeaks = Object.assign({}, selectedEditPeaks, { pos });
-    peaks[curveIdx] = newSelectedEditPeaks;
-    return Object.assign({}, state, { peaks, selectedIdx: curveIdx });
+    const newPeaks = [...peaks];
+    newPeaks[curveIdx] = newSelectedEditPeaks;
+    return Object.assign({}, state, { peaks: newPeaks, selectedIdx: curveIdx });
   }
   return state;
 };
@@ -68,8 +70,9 @@ const rmFromPos = (state, action) => {
   ];
 
   const newSelectedEditPeaks = Object.assign({}, selectedEditPeaks, { pos });
-  peaks[selectedIdx] = newSelectedEditPeaks;
-  return Object.assign({}, state, { peaks });
+  const newPeaks = [...peaks];
+  newPeaks[selectedIdx] = newSelectedEditPeaks;
+  return Object.assign({}, state, { peaks: newPeaks });
 };
 
 const addToNeg = (state, action) => {
@@ -90,15 +93,17 @@ const addToNeg = (state, action) => {
       ...oriPosState.slice(idxP + 1),
     ];
     const newSelectedEditPeaks = Object.assign({}, selectedEditPeaks, { pos });
-    peaks[curveIdx] = newSelectedEditPeaks;
-    return Object.assign({}, state, { peaks });
+    const newPeaks = [...peaks];
+    newPeaks[curveIdx] = newSelectedEditPeaks;
+    return Object.assign({}, state, { peaks: newPeaks });
   }
   const idxN = oriNegState.findIndex((n) => n.x === dataToAdd.x);
   if (idxN < 0) {
     const neg = [...oriNegState, dataToAdd];
     const newSelectedEditPeaks = Object.assign({}, selectedEditPeaks, { neg });
-    peaks[curveIdx] = newSelectedEditPeaks;
-    return Object.assign({}, state, { peaks, selectedIdx: curveIdx });
+    const newPeaks = [...peaks];
+    newPeaks[curveIdx] = newSelectedEditPeaks;
+    return Object.assign({}, state, { peaks: newPeaks, selectedIdx: curveIdx });
   }
   return state;
 };
@@ -114,8 +119,9 @@ const rmFromNeg = (state, action) => {
     ...oriNegState.slice(idx + 1),
   ];
   const newSelectedEditPeaks = Object.assign({}, selectedEditPeaks, { neg });
-  peaks[selectedIdx] = newSelectedEditPeaks;
-  return Object.assign({}, state, { peaks });
+  const newPeaks = [...peaks];
+  newPeaks[selectedIdx] = newSelectedEditPeaks;
+  return Object.assign({}, state, { peaks: newPeaks });
 };
 
 const processShift = (state, action) => {
@@ -130,8 +136,9 @@ const processShift = (state, action) => {
   const { pos, neg, prevOffset } = payload;
 
   const newSelectedEditPeaks = Object.assign({}, selectedEditPeaks, { pos, neg, prevOffset });
-  peaks[curveIdx] = newSelectedEditPeaks;
-  return Object.assign({}, state, { peaks });
+  const newPeaks = [...peaks];
+  newPeaks[curveIdx] = newSelectedEditPeaks;
+  return Object.assign({}, state, { peaks: newPeaks });
 };
 
 const editPeakReducer = (state = initialState, action) => {
