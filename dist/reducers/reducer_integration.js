@@ -69,9 +69,10 @@ const addToStack = (state, action) => {
     stack: newStack,
     refArea: defaultRefArea
   });
-  integrations[curveIdx] = newIntegration;
+  const newArrIntegration = [...integrations];
+  newArrIntegration[curveIdx] = newIntegration;
   return Object.assign({}, state, {
-    integrations,
+    integrations: newArrIntegration,
     selectedIdx: curveIdx
   });
 };
@@ -106,9 +107,10 @@ const rmFromStack = (state, action) => {
   const newIntegration = Object.assign({}, selectedIntegration, {
     stack: newStack
   });
-  integrations[curveIdx] = newIntegration;
+  const newArrIntegration = [...integrations];
+  newArrIntegration[curveIdx] = newIntegration;
   return Object.assign({}, state, {
-    integrations,
+    integrations: newArrIntegration,
     selectedIdx: curveIdx
   });
 };
@@ -136,9 +138,10 @@ const setRef = (state, action) => {
   const newIntegration = Object.assign({}, selectedIntegration, {
     refArea
   });
-  integrations[curveIdx] = newIntegration;
+  const newArrIntegration = [...integrations];
+  newArrIntegration[curveIdx] = newIntegration;
   return Object.assign({}, state, {
-    integrations,
+    integrations: newArrIntegration,
     selectedIdx: curveIdx
   });
 };
@@ -159,9 +162,10 @@ const setFkr = (state, action) => {
   const newIntegration = Object.assign({}, selectedIntegration, {
     refFactor
   });
-  integrations[curveIdx] = newIntegration;
+  const newArrIntegration = [...integrations];
+  newArrIntegration[curveIdx] = newIntegration;
   return Object.assign({}, state, {
-    integrations
+    integrations: newArrIntegration
   });
 };
 const setShift = (state, action) => {
@@ -174,9 +178,10 @@ const setShift = (state, action) => {
   const newIntegration = Object.assign({}, selectedIntegration, {
     shift
   });
-  integrations[selectedIdx] = newIntegration;
+  const newArrIntegration = [...integrations];
+  newArrIntegration[selectedIdx] = newIntegration;
   return Object.assign({}, state, {
-    integrations
+    integrations: newArrIntegration
   });
 };
 const resetAll = (state, action) => {
@@ -196,9 +201,10 @@ const clearAll = (state, action) => {
   const newIntegration = Object.assign({}, defaultEmptyIntegration, {
     edited: true
   });
-  integrations[curveIdx] = newIntegration;
+  const newArrIntegration = [...integrations];
+  newArrIntegration[curveIdx] = newIntegration;
   return Object.assign({}, state, {
-    integrations,
+    integrations: newArrIntegration,
     selectedIdx: curveIdx
   });
 };

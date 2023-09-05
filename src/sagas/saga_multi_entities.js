@@ -62,17 +62,8 @@ function* setCyclicVoltametry(action) { // eslint-disable-line
   }
 }
 
-// function* setInitData(action) {
-//   const layoutSt = yield select(getLayoutSt);
-//   console.log(layoutSt);
-//   const curveSt = yield select(getCurveSt);
-//   const { listCurves } = curveSt;
-//   console.log(listCurves);
-// }
-
 const multiEntitiesSagas = [
   takeEvery(CURVE.SET_ALL_CURVES, setCyclicVoltametry),
-  // takeEvery(CURVE.SET_ALL_CURVES, setInitData),
 ];
 
 export default multiEntitiesSagas;
