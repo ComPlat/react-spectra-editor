@@ -640,7 +640,7 @@ class DemoWriteIr extends _react.default.Component {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('aif')
-    }, "AIF"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+    }, "SOPTION-DESORPTION"), /*#__PURE__*/_react.default.createElement(_Button.default, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'

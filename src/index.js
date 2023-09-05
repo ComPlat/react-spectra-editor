@@ -548,7 +548,7 @@ class DemoWriteIr extends React.Component {
             style={{ margin: '0 10px 0 10px' }}
             onClick={this.onClick('aif')}
           >
-            AIF
+            SOPTION-DESORPTION
           </Button>
           <Button
             variant="contained"

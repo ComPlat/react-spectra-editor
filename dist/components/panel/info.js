@@ -199,7 +199,7 @@ const InfoPanel = _ref => {
     className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
   }, "Area under curve (AUC):"), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt')
-  }, aucValue(integration))) : null), /*#__PURE__*/_react.default.createElement(_reactQuill.default, {
+  }, aucValue(integration))) : null), !_format.default.isCyclicVoltaLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement(_reactQuill.default, {
     className: (0, _classnames.default)(classes.quill, 'card-sv-quill'),
     value: descriptions,
     modules: {
@@ -207,7 +207,7 @@ const InfoPanel = _ref => {
     },
     onChange: onDescriptionChanged,
     readOnly: canChangeDescription !== undefined ? !canChangeDescription : true
-  }), /*#__PURE__*/_react.default.createElement("div", null, !editorOnly && _format.default.isNmrLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement("div", {
+  }) : null, /*#__PURE__*/_react.default.createElement("div", null, !editorOnly && _format.default.isNmrLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement("div", {
     className: (0, _classnames.default)(classes.rowRoot, classes.rowOddSim)
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')

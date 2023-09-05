@@ -71,11 +71,12 @@ function* selectMpy(action) {
     stack: newStack,
     smExtext: newXExtemt
   });
-  multiplicities[curveIdx] = newSelectedMulti;
+  const newMultiplicities = [...multiplicities];
+  newMultiplicities[curveIdx] = newSelectedMulti;
   const payload = Object.assign(
   // eslint-disable-line
   {}, mpySt, {
-    multiplicities,
+    multiplicities: newMultiplicities,
     selectedIdx: curveIdx
   });
   yield (0, _effects.put)({
@@ -138,9 +139,10 @@ function* addUiPeakToStack(action) {
   const newSelectedMulti = Object.assign({}, selectedMulti, {
     stack: newStack
   }); // eslint-disable-line
-  multiplicities[curveIdx] = newSelectedMulti;
+  const newMultiplicities = [...multiplicities];
+  newMultiplicities[curveIdx] = newSelectedMulti;
   const payload = Object.assign({}, mpySt, {
-    multiplicities
+    multiplicities: newSelectedMulti
   }); // eslint-disable-line
 
   yield (0, _effects.put)({
@@ -193,9 +195,10 @@ const rmPeakFromStack = function (action, metaSt, mpySt) {
     stack: newStack,
     smExtext: newSmExtext
   }); // eslint-disable-line
-  multiplicities[curveIdx] = newSelectedMulti;
+  const newMultiplicities = [...multiplicities];
+  newMultiplicities[curveIdx] = newSelectedMulti;
   return Object.assign({}, mpySt, {
-    multiplicities
+    multiplicities: newMultiplicities
   }); // eslint-disable-line
 };
 
@@ -250,9 +253,10 @@ function* resetInitNmr(action) {
   const {
     multiplicities
   } = mpySt;
-  multiplicities[curveIdx] = multiplicity;
+  const newMultiplicities = [...multiplicities];
+  newMultiplicities[curveIdx] = multiplicity;
   const payload = Object.assign({}, mpySt, {
-    multiplicities,
+    multiplicities: newMultiplicities,
     selectedIdx: curveIdx
   }); // eslint-disable-line
 
@@ -327,9 +331,10 @@ function* resetOne(action) {
   const newSelectedMulti = Object.assign({}, selectedMulti, {
     stack: newStack
   }); // eslint-disable-line
-  multiplicities[curveIdx] = newSelectedMulti;
+  const newMultiplicities = [...multiplicities];
+  newMultiplicities[curveIdx] = newSelectedMulti;
   const payload = Object.assign({}, mpySt, {
-    multiplicities
+    multiplicities: newMultiplicities
   }); // eslint-disable-line
   yield (0, _effects.put)({
     type: _action_type.MULTIPLICITY.RESET_ONE_RDC,
@@ -362,9 +367,10 @@ function* selectMpyType(action) {
   const newSelectedMulti = Object.assign({}, selectedMulti, {
     stack: newStack
   }); // eslint-disable-line
-  multiplicities[curveIdx] = newSelectedMulti;
+  const newMultiplicities = [...multiplicities];
+  newMultiplicities[curveIdx] = newSelectedMulti;
   const payload = Object.assign({}, mpySt, {
-    multiplicities
+    multiplicities: newMultiplicities
   }); // eslint-disable-line
 
   yield (0, _effects.put)({

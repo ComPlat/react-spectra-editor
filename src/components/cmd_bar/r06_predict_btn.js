@@ -215,8 +215,9 @@ const BtnPredict = ({
   if (Format.is13CLayout(layoutSt)) {
     realCount = carbonFeatures(peaksEdit, multiplicitySt).length;
   } else {
-    const { selectedIdx, multiplicities } = multiplicitySt;
-    const selectedMultiplicity = multiplicities[selectedIdx];
+    const { curveIdx } = curveSt;
+    const { multiplicities } = multiplicitySt;
+    const selectedMultiplicity = multiplicities[curveIdx];
     const { stack } = selectedMultiplicity;
     realCount = stack.length;
   }
