@@ -20,7 +20,7 @@ var _graph_selection = _interopRequireDefault(require("./graph_selection"));
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 /* eslint-disable react/prop-types, react/require-default-props */
 
-const theme = (0, _styles.createMuiTheme)({
+const theme = (0, _styles.createTheme)({
   typography: {
     useNextVariants: true
   }

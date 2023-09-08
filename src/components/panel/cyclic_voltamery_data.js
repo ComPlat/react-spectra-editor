@@ -18,7 +18,7 @@ import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import {
-  ExpansionPanel, ExpansionPanelSummary, Table, TableHead, TableBody, TableCell, TableRow,
+  Accordion, AccordionSummary, Table, TableHead, TableBody, TableCell, TableRow,
 } from '@material-ui/core';
 import {
   addNewCylicVoltaPairPeak, setWorkWithMaxPeak, selectPairPeak, removeCylicVoltaPairPeak,
@@ -43,7 +43,7 @@ const styles = () => ({
   },
   table: {
     width: '100%',
-    wordWrap: 'break-all',
+    overflowWrap: 'anywhere',
     fontSize: '14px !important',
   },
   td: {
@@ -120,14 +120,14 @@ const CyclicVoltammetryPanel = ({
   };
 
   const getDelta = (data) => {
-    return (data.max && data.min) ? GetCyclicVoltaPeakSeparate(data.max.x, data.min.x) : 'undefined';
+    return (data.max && data.min) ? GetCyclicVoltaPeakSeparate(data.max.x, data.min.x).toFixed(5) : 'undefined';
   };
 
   const getRatio = (feature, data) => {
     const featureData = feature.data[0];
     const idx = featureData.x.indexOf(feature.maxX);
     const y_pecker = data.pecker ? data.pecker.y : featureData.y[idx];
-    return (data.max && data.min) ? GetCyclicVoltaRatio(data.max.y, data.min.y, y_pecker).toFixed(8) : 'undefined';
+    return (data.max && data.min) ? GetCyclicVoltaRatio(data.max.y, data.min.y, y_pecker).toFixed(5) : 'undefined';
   };
 
   const rows = list.map((o, idx) => (
@@ -145,8 +145,8 @@ const CyclicVoltammetryPanel = ({
   ));
 
   return (
-    <ExpansionPanel>
-      <ExpansionPanelSummary
+    <Accordion>
+      <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
         className={classNames(classes.panelSummary)}
       >
@@ -155,7 +155,7 @@ const CyclicVoltammetryPanel = ({
           Voltammetry data
         </span>
         </Typography>
-      </ExpansionPanelSummary>
+      </AccordionSummary>
       <Divider />
       <Table className={classes.table}>
         <TableHead>
@@ -301,7 +301,7 @@ https://doi.org/10.1021/ac60242a030</i>
           </span>
         </Tooltip>
       </div>
-    </ExpansionPanel>
+    </Accordion>
   );
 };
 

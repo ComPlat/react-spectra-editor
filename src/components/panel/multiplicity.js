@@ -6,8 +6,9 @@ import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import {
+  Accordion, AccordionSummary,
+} from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
@@ -249,13 +250,13 @@ const MultiplicityPanel = ({
   const digits = 4;
 
   return (
-    <ExpansionPanel
+    <Accordion
       expanded={expand}
       onChange={onExapnd}
       className={classNames(classes.panel)}
       TransitionProps={{ unmountOnExit: true }} // increase ExpansionPanel performance
     >
-      <ExpansionPanelSummary
+      <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
         className={classNames(classes.panelSummary)}
       >
@@ -264,7 +265,7 @@ const MultiplicityPanel = ({
             Multiplicity
           </span>
         </Typography>
-      </ExpansionPanelSummary>
+      </AccordionSummary>
       <Divider />
       <div className={classNames(classes.panelDetail)}>
         {
@@ -274,7 +275,7 @@ const MultiplicityPanel = ({
           )
         }
       </div>
-    </ExpansionPanel>
+    </Accordion>
   );
 };
 

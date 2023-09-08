@@ -39,13 +39,17 @@ const styles = () => ({
     backgroundColor: '#fff',
     fontSize: '0.8em',
     margin: '0',
-    padding: '10px 2px 2px 10px'
+    padding: '10px 2px 2px 10px',
+    maxWidth: '95%',
+    overflowWrap: 'anywhere'
   },
   curveSelected: {
     backgroundColor: '#2196f3',
     fontSize: '0.8em',
     color: '#fff',
-    padding: '10px 2px 2px 10px'
+    padding: '10px 2px 2px 10px',
+    maxWidth: '95%',
+    overflowWrap: 'anywhere'
   }
 });
 const GraphSelectionPanel = _ref => {

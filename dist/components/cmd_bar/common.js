@@ -86,6 +86,14 @@ const commonStyle = {
   },
   selectInput: {
     height: 30
+  },
+  txtLabelBottomInput: {
+    fontFamily: 'Helvetica',
+    backgroundColor: 'white',
+    fontSize: 12,
+    margin: '22% 0 0 7px',
+    padding: '0 10px 0 10px',
+    transform: 'scale(0.75)'
   }
 };
 exports.commonStyle = commonStyle;

@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
 import {
-  withStyles, createMuiTheme, MuiThemeProvider,
+  withStyles, createTheme, MuiThemeProvider,
 } from '@material-ui/core/styles';
 
 import InfoPanel from './info';
@@ -17,7 +17,7 @@ import CyclicVoltammetryPanel from './cyclic_voltamery_data';
 import GraphSelectionPanel from './graph_selection';
 import Cfg from '../../helpers/cfg';
 
-const theme = createMuiTheme({
+const theme = createTheme({
   typography: {
     useNextVariants: true,
   },
