@@ -52,7 +52,7 @@ const toPeakStr = (peaks) => {
   return str;
 };
 
-let fixedWavelength = null;
+let fixedWavelength = '';
 
 const extractFixedWavelength = (source) => {
   const jcamp = Jcampconverter.convert(
@@ -62,8 +62,13 @@ const extractFixedWavelength = (source) => {
       keepRecordsRegExp: /(CSAUTOMETADATA)/,
     },
   );
-  // eslint-disable-next-line prefer-destructuring
-  fixedWavelength = jcamp.info.$CSAUTOMETADATA.match(/FIXEDWAVELENGTH=([\d.]+)/)[1];
+  if ('$CSAUTOMETADATA' in jcamp.info) {
+    const match = jcamp.info.$CSAUTOMETADATA.match(/FIXEDWAVELENGTH=([\d.]+)/);
+    if (match !== null) {
+      // eslint-disable-next-line prefer-destructuring
+      fixedWavelength = match[1];
+    }
+  }
 
   return { fixedWavelength };
 };
@@ -86,6 +91,7 @@ const spectraOps = {
   [LIST_LAYOUT.CYCLIC_VOLTAMMETRY]: { head: 'CYCLIC VOLTAMMETRY', tail: '.' },
   [LIST_LAYOUT.CDS]: { head: 'CIRCULAR DICHROISM SPECTROSCOPY', tail: '.' },
   [LIST_LAYOUT.SEC]: { head: 'SIZE EXCLUSION CHROMATOGRAPHY', tail: '.' },
+  [LIST_LAYOUT.EMISSIONS]: { head: 'EMISSION', tail: ' nm' },
   [LIST_LAYOUT.DLS_INTENSITY]: { head: 'DLS', tail: '.' },
 };
 
@@ -340,10 +346,10 @@ const peaksWrapper = (layout, shift, atIndex = 0) => {
     return { head: '', tail: '' };
   }
 
-  if (layout === LIST_LAYOUT.EMISSIONS) {
-    return { head: `EMISSION: λex = ${fixedWavelength} nm,  λem = `, tail: ' nm' };
-  }
   const ops = spectraOps[layout];
+  if (layout === LIST_LAYOUT.EMISSIONS) {
+    return { head: `${ops.head}${solvTxt}: λex = ${fixedWavelength} nm;  λem = `, tail: ops.tail };
+  }
   return { head: `${ops.head}${solvTxt} = `, tail: ops.tail };
 };
 
