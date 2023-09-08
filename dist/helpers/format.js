@@ -1,9 +1,11 @@
 "use strict";
 
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
+var _jcampconverter = _interopRequireDefault(require("jcampconverter"));
 var _converter = require("./converter");
 var _list_layout = require("../constants/list_layout");
 var _multiplicity_calc = require("./multiplicity_calc");
@@ -57,6 +59,18 @@ const toPeakStr = peaks => {
   const arr = peaks.map(p => `${p.x},${p.y}`);
   const str = arr.join('#');
   return str;
+};
+let fixedWavelength = null;
+const extractFixedWavelength = source => {
+  const jcamp = _jcampconverter.default.convert(source, {
+    xy: true,
+    keepRecordsRegExp: /(CSAUTOMETADATA)/
+  });
+  // eslint-disable-next-line prefer-destructuring
+  fixedWavelength = jcamp.info.$CSAUTOMETADATA.match(/FIXEDWAVELENGTH=([\d.]+)/)[1];
+  return {
+    fixedWavelength
+  };
 };
 const spectraOps = {
   [_list_layout.LIST_LAYOUT.PLAIN]: {
@@ -125,10 +139,6 @@ const spectraOps = {
   },
   [_list_layout.LIST_LAYOUT.SEC]: {
     head: 'SIZE EXCLUSION CHROMATOGRAPHY',
-    tail: '.'
-  },
-  [_list_layout.LIST_LAYOUT.EMISSIONS]: {
-    head: 'EMISSION',
     tail: '.'
   },
   [_list_layout.LIST_LAYOUT.DLS_INTENSITY]: {
@@ -259,7 +269,7 @@ const formatedEmissions = function (peaks, maxY) {
     x: k,
     y: ordered[k]
   }));
-  return ordered.map(o => `${o.x} nm (${fixDigit(o.y, 2)} a.u.)`).join(', ');
+  return ordered.map(o => `${o.x}`).join(', ');
 };
 const formatedDLSIntensity = function (peaks, maxY) {
   let decimal = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 2;
@@ -402,6 +412,12 @@ const peaksWrapper = function (layout, shift) {
       tail: ''
     };
   }
+  if (layout === _list_layout.LIST_LAYOUT.EMISSIONS) {
+    return {
+      head: `EMISSION: λex = ${fixedWavelength} nm,  λem = `,
+      tail: ' nm'
+    };
+  }
   const ops = spectraOps[layout];
   return {
     head: `${ops.head}${solvTxt} = `,
@@ -526,7 +542,8 @@ const Format = {
   hasMultiCurves,
   isAIFLayout,
   isDLSACFLayout,
-  strNumberFixedDecimal
+  strNumberFixedDecimal,
+  extractFixedWavelength
 };
 var _default = Format;
 exports.default = _default;
