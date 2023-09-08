@@ -751,6 +751,10 @@ const ExtractJcamp = (source) => {
   //   : ((Format.isXRDLayout(layout) || Format.isCyclicVoltaLayout(layout))
   //     ? extrFeaturesXrd(jcamp, layout, peakUp) : extrFeaturesNi(jcamp, layout, peakUp, spectra));
 
+  if (layout === LIST_LAYOUT.EMISSIONS) {
+    Format.extractFixedWavelength(source);
+  }
+
   return { spectra, features, layout };
 };
 

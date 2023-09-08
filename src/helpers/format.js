@@ -1,5 +1,6 @@
 /* eslint-disable no-mixed-operators, prefer-object-spread,
 function-paren-newline, no-unused-vars, default-param-last */
+import Jcampconverter from 'jcampconverter';
 import { ToXY, IsSame } from './converter';
 import { LIST_LAYOUT } from '../constants/list_layout';
 import { calcMpyCenter } from './multiplicity_calc';
@@ -51,6 +52,22 @@ const toPeakStr = (peaks) => {
   return str;
 };
 
+let fixedWavelength = null;
+
+const extractFixedWavelength = (source) => {
+  const jcamp = Jcampconverter.convert(
+    source,
+    {
+      xy: true,
+      keepRecordsRegExp: /(CSAUTOMETADATA)/,
+    },
+  );
+  // eslint-disable-next-line prefer-destructuring
+  fixedWavelength = jcamp.info.$CSAUTOMETADATA.match(/FIXEDWAVELENGTH=([\d.]+)/)[1];
+
+  return { fixedWavelength };
+};
+
 const spectraOps = {
   [LIST_LAYOUT.PLAIN]: { head: '', tail: '.' },
   [LIST_LAYOUT.H1]: { head: '1H', tail: '.' },
@@ -69,7 +86,6 @@ const spectraOps = {
   [LIST_LAYOUT.CYCLIC_VOLTAMMETRY]: { head: 'CYCLIC VOLTAMMETRY', tail: '.' },
   [LIST_LAYOUT.CDS]: { head: 'CIRCULAR DICHROISM SPECTROSCOPY', tail: '.' },
   [LIST_LAYOUT.SEC]: { head: 'SIZE EXCLUSION CHROMATOGRAPHY', tail: '.' },
-  [LIST_LAYOUT.EMISSIONS]: { head: 'EMISSION', tail: '.' },
   [LIST_LAYOUT.DLS_INTENSITY]: { head: 'DLS', tail: '.' },
 };
 
@@ -189,7 +205,7 @@ const formatedEmissions = (
 
   ordered = Object.keys(ordered).sort(sortFunc)
     .map((k) => ({ x: k, y: ordered[k] }));
-  return ordered.map((o) => `${o.x} nm (${fixDigit(o.y, 2)} a.u.)`).join(', ');
+  return ordered.map((o) => `${o.x}`).join(', ');
 };
 
 const formatedDLSIntensity = (
@@ -324,6 +340,9 @@ const peaksWrapper = (layout, shift, atIndex = 0) => {
     return { head: '', tail: '' };
   }
 
+  if (layout === LIST_LAYOUT.EMISSIONS) {
+    return { head: `EMISSION: λex = ${fixedWavelength} nm,  λem = `, tail: ' nm' };
+  }
   const ops = spectraOps[layout];
   return { head: `${ops.head}${solvTxt} = `, tail: ops.tail };
 };
@@ -459,6 +478,7 @@ const Format = {
   isAIFLayout,
   isDLSACFLayout,
   strNumberFixedDecimal,
+  extractFixedWavelength,
 };
 
 export default Format;
