@@ -137,7 +137,7 @@ describe('Test format helper', () => {
       it('Get peaks for Emission layout', () => {
         params.layout = LIST_LAYOUT.EMISSIONS
         const body = Format.peaksBody(params)
-        expect(body).toEqual('2.0, 1.0')
+        expect(body).toEqual('λex =  nm; λem = 2.0, 1.0')
       })
 
 

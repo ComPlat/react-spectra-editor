@@ -211,7 +211,8 @@ const formatedEmissions = (
 
   ordered = Object.keys(ordered).sort(sortFunc)
     .map((k) => ({ x: k, y: ordered[k] }));
-  return ordered.map((o) => `${o.x}`).join(', ');
+  return `λex = ${fixedWavelength} nm; λem = ${ordered.map((o) => `${o.x}`)
+    .join(', ')}`;
 };
 
 const formatedDLSIntensity = (
@@ -347,9 +348,6 @@ const peaksWrapper = (layout, shift, atIndex = 0) => {
   }
 
   const ops = spectraOps[layout];
-  if (layout === LIST_LAYOUT.EMISSIONS) {
-    return { head: `${ops.head}${solvTxt}: λex = ${fixedWavelength} nm;  λem = `, tail: ops.tail };
-  }
   return { head: `${ops.head}${solvTxt} = `, tail: ops.tail };
 };
 

@@ -278,7 +278,7 @@ const formatedEmissions = function (peaks, maxY) {
     x: k,
     y: ordered[k]
   }));
-  return ordered.map(o => `${o.x}`).join(', ');
+  return `λex = ${fixedWavelength} nm; λem = ${ordered.map(o => `${o.x}`).join(', ')}`;
 };
 const formatedDLSIntensity = function (peaks, maxY) {
   let decimal = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 2;
@@ -422,12 +422,6 @@ const peaksWrapper = function (layout, shift) {
     };
   }
   const ops = spectraOps[layout];
-  if (layout === _list_layout.LIST_LAYOUT.EMISSIONS) {
-    return {
-      head: `${ops.head}${solvTxt}: λex = ${fixedWavelength} nm;  λem = `,
-      tail: ops.tail
-    };
-  }
   return {
     head: `${ops.head}${solvTxt} = `,
     tail: ops.tail
