@@ -12,19 +12,12 @@ var _classnames = _interopRequireDefault(require("classnames"));
 var _reactRedux = require("react-redux");
 var _redux = require("redux");
 var _reactDropzone = _interopRequireDefault(require("react-dropzone"));
-var _core = require("@material-ui/core");
-var _ExpandMore = _interopRequireDefault(require("@material-ui/icons/ExpandMore"));
-var _HighlightOff = _interopRequireDefault(require("@material-ui/icons/HighlightOff"));
-var _Table = _interopRequireDefault(require("@material-ui/core/Table"));
-var _TableBody = _interopRequireDefault(require("@material-ui/core/TableBody"));
-var _TableCell = _interopRequireDefault(require("@material-ui/core/TableCell"));
-var _TableRow = _interopRequireDefault(require("@material-ui/core/TableRow"));
-var _Divider = _interopRequireDefault(require("@material-ui/core/Divider"));
-var _Typography = _interopRequireDefault(require("@material-ui/core/Typography"));
-var _Tooltip = _interopRequireDefault(require("@material-ui/core/Tooltip"));
-var _VisibilityOutlined = _interopRequireDefault(require("@material-ui/icons/VisibilityOutlined"));
-var _VisibilityOffOutlined = _interopRequireDefault(require("@material-ui/icons/VisibilityOffOutlined"));
-var _styles = require("@material-ui/core/styles");
+var _material = require("@mui/material");
+var _ExpandMore = _interopRequireDefault(require("@mui/icons-material/ExpandMore"));
+var _HighlightOff = _interopRequireDefault(require("@mui/icons-material/HighlightOff"));
+var _VisibilityOutlined = _interopRequireDefault(require("@mui/icons-material/VisibilityOutlined"));
+var _VisibilityOffOutlined = _interopRequireDefault(require("@mui/icons-material/VisibilityOffOutlined"));
+var _styles = require("@mui/styles");
 var _format = _interopRequireDefault(require("../../helpers/format"));
 var _jcamp = require("../../actions/jcamp");
 /* eslint-disable function-paren-newline, react/jsx-props-no-spreading,
@@ -126,7 +119,7 @@ const tpHint = classes => /*#__PURE__*/_react.default.createElement("span", {
 }, "- Accept *.dx, *.jdx, *.JCAMP,"), /*#__PURE__*/_react.default.createElement("p", {
   className: (0, _classnames.default)(classes.tpLabel, 'txt-sv-tp')
 }, "- Max 5 spectra."));
-const content = (classes, desc) => /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+const content = (classes, desc) => /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
   title: tpHint(classes),
   placement: "bottom"
 }, /*#__PURE__*/_react.default.createElement("span", {
@@ -179,22 +172,22 @@ const compareList = (classes, jcampSt, rmOthersOneAct, toggleShowAct) => {
     isShow: o.show,
     toggleShowCb: () => toggleShowAct(idx)
   }));
-  return /*#__PURE__*/_react.default.createElement(_Table.default, {
+  return /*#__PURE__*/_react.default.createElement(_material.Table, {
     className: classes.table
-  }, /*#__PURE__*/_react.default.createElement(_TableBody.default, null, rows.map(row => /*#__PURE__*/_react.default.createElement(_TableRow.default, {
+  }, /*#__PURE__*/_react.default.createElement(_material.TableBody, null, rows.map(row => /*#__PURE__*/_react.default.createElement(_material.TableRow, {
     key: row.idx,
     className: classes.tRow,
     hover: true
-  }, /*#__PURE__*/_react.default.createElement(_TableCell.default, {
+  }, /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "right",
     className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt'),
     style: {
       backgroundColor: row.color
     }
-  }, row.idx + 1), /*#__PURE__*/_react.default.createElement(_TableCell.default, {
+  }, row.idx + 1), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "right",
     className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt', row.isShow ? null : classes.tTxtHide)
-  }, row.title), /*#__PURE__*/_react.default.createElement(_TableCell.default, {
+  }, row.title), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "right",
     className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
   }, row.isShow ? /*#__PURE__*/_react.default.createElement(_VisibilityOutlined.default, {
@@ -217,21 +210,21 @@ const ComparePanel = _ref2 => {
     rmOthersOneAct,
     toggleShowAct
   } = _ref2;
-  return /*#__PURE__*/_react.default.createElement(_core.Accordion, {
+  return /*#__PURE__*/_react.default.createElement(_material.Accordion, {
     expanded: expand,
     onChange: onExapnd,
     className: (0, _classnames.default)(classes.panel),
     TransitionProps: {
       unmountOnExit: true
-    } // increase ExpansionPanel performance
-  }, /*#__PURE__*/_react.default.createElement(_core.AccordionSummary, {
+    } // increase Accordion performance
+  }, /*#__PURE__*/_react.default.createElement(_material.AccordionSummary, {
     expandIcon: /*#__PURE__*/_react.default.createElement(_ExpandMore.default, null),
     className: (0, _classnames.default)(classes.panelSummary)
-  }, /*#__PURE__*/_react.default.createElement(_Typography.default, {
+  }, /*#__PURE__*/_react.default.createElement(_material.Typography, {
     className: "txt-panel-header"
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title')
-  }, "Spectra Comparisons"))), /*#__PURE__*/_react.default.createElement(_Divider.default, null), inputOthers(classes, jcampSt), /*#__PURE__*/_react.default.createElement("div", {
+  }, "Spectra Comparisons"))), /*#__PURE__*/_react.default.createElement(_material.Divider, null), inputOthers(classes, jcampSt), /*#__PURE__*/_react.default.createElement("div", {
     className: (0, _classnames.default)(classes.panelDetail)
   }, compareList(classes, jcampSt, rmOthersOneAct, toggleShowAct)));
 };
@@ -252,5 +245,4 @@ ComparePanel.propTypes = {
   rmOthersOneAct: _propTypes.default.func.isRequired,
   toggleShowAct: _propTypes.default.func.isRequired
 };
-var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(ComparePanel));
-exports.default = _default;
+var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(ComparePanel));

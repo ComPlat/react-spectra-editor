@@ -10,20 +10,11 @@ var _propTypes = _interopRequireDefault(require("prop-types"));
 var _classnames = _interopRequireDefault(require("classnames"));
 var _reactRedux = require("react-redux");
 var _redux = require("redux");
-var _core = require("@material-ui/core");
-var _ExpandMore = _interopRequireDefault(require("@material-ui/icons/ExpandMore"));
-var _Divider = _interopRequireDefault(require("@material-ui/core/Divider"));
-var _Typography = _interopRequireDefault(require("@material-ui/core/Typography"));
-var _Table = _interopRequireDefault(require("@material-ui/core/Table"));
-var _TableBody = _interopRequireDefault(require("@material-ui/core/TableBody"));
-var _TableCell = _interopRequireDefault(require("@material-ui/core/TableCell"));
-var _TableRow = _interopRequireDefault(require("@material-ui/core/TableRow"));
-var _HighlightOff = _interopRequireDefault(require("@material-ui/icons/HighlightOff"));
-var _styles = require("@material-ui/core/styles");
-var _Checkbox = _interopRequireDefault(require("@material-ui/core/Checkbox"));
-var _Button = _interopRequireDefault(require("@material-ui/core/Button"));
-var _Tooltip = _interopRequireDefault(require("@material-ui/core/Tooltip"));
-var _RefreshOutlined = _interopRequireDefault(require("@material-ui/icons/RefreshOutlined"));
+var _material = require("@mui/material");
+var _ExpandMore = _interopRequireDefault(require("@mui/icons-material/ExpandMore"));
+var _HighlightOff = _interopRequireDefault(require("@mui/icons-material/HighlightOff"));
+var _styles = require("@mui/styles");
+var _RefreshOutlined = _interopRequireDefault(require("@mui/icons-material/RefreshOutlined"));
 var _multiplicity = require("../../actions/multiplicity");
 var _multiplicity_select = _interopRequireDefault(require("./multiplicity_select"));
 var _multiplicity_coupling = _interopRequireDefault(require("./multiplicity_coupling"));
@@ -127,7 +118,7 @@ const cBoxStyle = () => ({
   },
   checked: {}
 });
-const MUCheckbox = (0, _styles.withStyles)(cBoxStyle)(_Checkbox.default);
+const MUCheckbox = (0, _styles.withStyles)(cBoxStyle)(_material.Checkbox);
 const createData = (idx, xExtent, peaks, shift, smExtext, mpyType, js, onClick, onRefresh) => ({
   idx: idx + 1,
   xExtent,
@@ -151,24 +142,24 @@ const pkList = (classes, row, shift, digits, rmMpyPeakByPanelAct) => row.peaks.m
     onClick: cb,
     className: classes.rmBtn
   });
-  return /*#__PURE__*/_react.default.createElement(_TableRow.default, {
+  return /*#__PURE__*/_react.default.createElement(_material.TableRow, {
     key: pk.x,
     className: classes.tRow,
     hover: true
-  }, /*#__PURE__*/_react.default.createElement(_TableCell.default, {
+  }, /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "right",
     className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
-  }, `(${(pk.x - shift).toFixed(digits)}, ${pk.y.toExponential(2)})`), /*#__PURE__*/_react.default.createElement(_TableCell.default, {
+  }, `(${(pk.x - shift).toFixed(digits)}, ${pk.y.toExponential(2)})`), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "right",
     className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
   }, rmBtn));
 });
-const refreshBtn = (classes, onRefresh) => /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+const refreshBtn = (classes, onRefresh) => /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
   placement: "left",
   title: /*#__PURE__*/_react.default.createElement("span", {
     className: "txt-sv-tp"
   }, "Calculate Multiplicity")
-}, /*#__PURE__*/_react.default.createElement(_Button.default, {
+}, /*#__PURE__*/_react.default.createElement(_material.Button, {
   className: classes.btnRf,
   onClick: onRefresh
 }, /*#__PURE__*/_react.default.createElement(_RefreshOutlined.default, null)));
@@ -231,9 +222,9 @@ const mpyList = (classes, digits, multiplicitySt, curveSt, clickMpyOneAct, rmMpy
     target: row
   })), refreshBtn(classes, row.onRefresh)), /*#__PURE__*/_react.default.createElement(_multiplicity_coupling.default, {
     row: row
-  })), /*#__PURE__*/_react.default.createElement(_Table.default, {
+  })), /*#__PURE__*/_react.default.createElement(_material.Table, {
     className: classes.table
-  }, /*#__PURE__*/_react.default.createElement(_TableBody.default, null, pkList(classes, row, shift, digits, rmMpyPeakByPanelAct))))));
+  }, /*#__PURE__*/_react.default.createElement(_material.TableBody, null, pkList(classes, row, shift, digits, rmMpyPeakByPanelAct))))));
 };
 const MultiplicityPanel = _ref => {
   let {
@@ -247,21 +238,21 @@ const MultiplicityPanel = _ref => {
     resetMpyOneAct
   } = _ref;
   const digits = 4;
-  return /*#__PURE__*/_react.default.createElement(_core.Accordion, {
+  return /*#__PURE__*/_react.default.createElement(_material.Accordion, {
     expanded: expand,
     onChange: onExapnd,
     className: (0, _classnames.default)(classes.panel),
     TransitionProps: {
       unmountOnExit: true
-    } // increase ExpansionPanel performance
-  }, /*#__PURE__*/_react.default.createElement(_core.AccordionSummary, {
+    } // increase Accordion performance
+  }, /*#__PURE__*/_react.default.createElement(_material.AccordionSummary, {
     expandIcon: /*#__PURE__*/_react.default.createElement(_ExpandMore.default, null),
     className: (0, _classnames.default)(classes.panelSummary)
-  }, /*#__PURE__*/_react.default.createElement(_Typography.default, {
+  }, /*#__PURE__*/_react.default.createElement(_material.Typography, {
     className: "txt-panel-header"
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title')
-  }, "Multiplicity"))), /*#__PURE__*/_react.default.createElement(_Divider.default, null), /*#__PURE__*/_react.default.createElement("div", {
+  }, "Multiplicity"))), /*#__PURE__*/_react.default.createElement(_material.Divider, null), /*#__PURE__*/_react.default.createElement("div", {
     className: (0, _classnames.default)(classes.panelDetail)
   }, mpyList(classes, digits, multiplicitySt, curveSt, clickMpyOneAct, rmMpyPeakByPanelAct, resetMpyOneAct)));
 };
@@ -287,5 +278,4 @@ MultiplicityPanel.propTypes = {
   resetMpyOneAct: _propTypes.default.func.isRequired,
   curveSt: _propTypes.default.object.isRequired
 };
-var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(MultiplicityPanel));
-exports.default = _default;
+var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(MultiplicityPanel));

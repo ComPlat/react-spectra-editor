@@ -2,9 +2,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import InputBase from '@material-ui/core/InputBase';
-import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
+import {
+  InputBase, Grid, Button,
+} from '@mui/material';
 
 import ReactQuill from 'react-quill';
 

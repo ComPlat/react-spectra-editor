@@ -9,8 +9,8 @@ var _react = _interopRequireDefault(require("react"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
 var _reactRedux = require("react-redux");
 var _redux = require("redux");
-var _Grid = _interopRequireDefault(require("@material-ui/core/Grid"));
-var _styles = require("@material-ui/core/styles");
+var _Grid = _interopRequireDefault(require("@mui/material/Grid"));
+var _styles = require("@mui/styles");
 var _index = _interopRequireDefault(require("./components/panel/index"));
 var _index2 = _interopRequireDefault(require("./components/cmd_bar/index"));
 var _layer_content = _interopRequireDefault(require("./layer_content"));
@@ -131,7 +131,6 @@ LayerPrism.propTypes = {
   canChangeDescription: _propTypes.default.bool.isRequired,
   onDescriptionChanged: _propTypes.default.func
 };
-var _default = (0, _reactRedux.connect)(
+var _default = exports.default = (0, _reactRedux.connect)(
 // eslint-disable-line
 mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(LayerPrism)); // eslint-disable-line
-exports.default = _default;

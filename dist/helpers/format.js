@@ -528,5 +528,4 @@ const Format = {
   isDLSACFLayout,
   strNumberFixedDecimal
 };
-var _default = Format;
-exports.default = _default;
+var _default = exports.default = Format;

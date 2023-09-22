@@ -7,11 +7,12 @@ import { connect } from 'react-redux';
 import classNames from 'classnames';
 import { bindActionCreators, compose } from 'redux';
 
-import Tooltip from '@material-ui/core/Tooltip';
-import GpsFixedOutlinedIcon from '@material-ui/icons/GpsFixedOutlined';
-import HelpOutlineOutlinedIcon from '@material-ui/icons/HelpOutlineOutlined';
-import Button from '@material-ui/core/Button';
-import { withStyles } from '@material-ui/core/styles';
+import {
+  Tooltip, Button,
+} from '@mui/material';
+import GpsFixedOutlinedIcon from '@mui/icons-material/GpsFixedOutlined';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import { withStyles } from '@mui/styles';
 
 import { commonStyle } from './common';
 import Format from '../../helpers/format';

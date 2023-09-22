@@ -4,8 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.mpyBasicPatterns = exports.groupInterval = exports.getInterval = void 0;
-const mpyBasicPatterns = ['s', 'd', 't', 'q', 'quint', 'h', 'sept', 'o', 'n'];
-exports.mpyBasicPatterns = mpyBasicPatterns;
+const mpyBasicPatterns = exports.mpyBasicPatterns = ['s', 'd', 't', 'q', 'quint', 'h', 'sept', 'o', 'n'];
 const getInterval = peaks => {
   let itvs = [];
   for (let idx = 0; idx < peaks.length - 1; idx += 1) {

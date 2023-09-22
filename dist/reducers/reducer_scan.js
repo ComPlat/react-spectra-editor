@@ -45,5 +45,4 @@ const scanReducer = function () {
       return state;
   }
 };
-var _default = scanReducer;
-exports.default = _default;
+var _default = exports.default = scanReducer;

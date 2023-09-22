@@ -6,8 +6,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
 
-import Grid from '@material-ui/core/Grid';
-import { withStyles } from '@material-ui/core/styles';
+import Grid from '@mui/material/Grid';
+import { withStyles } from '@mui/styles';
 
 import PanelViewer from './panel/index';
 import CmdBar from './cmd_bar/index';

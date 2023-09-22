@@ -33,5 +33,4 @@ function* updateMetaPeaks(action) {
   });
 }
 const metaSagas = [(0, _effects.takeEvery)(_action_type.META.UPDATE_PEAKS, updateMetaPeaks)];
-var _default = metaSagas;
-exports.default = _default;
+var _default = exports.default = metaSagas;

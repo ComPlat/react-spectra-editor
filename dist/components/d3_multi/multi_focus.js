@@ -835,5 +835,4 @@ class MultiFocus {
     this.resetShouldUpdate(editPeakSt);
   }
 }
-var _default = MultiFocus;
-exports.default = _default;
+var _default = exports.default = MultiFocus;

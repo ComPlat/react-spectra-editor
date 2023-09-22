@@ -9,8 +9,8 @@ var _react = _interopRequireDefault(require("react"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
 var _reactRedux = require("react-redux");
 var _redux = require("redux");
-var _Grid = _interopRequireDefault(require("@material-ui/core/Grid"));
-var _styles = require("@material-ui/core/styles");
+var _Grid = _interopRequireDefault(require("@mui/material/Grid"));
+var _styles = require("@mui/styles");
 var _index = _interopRequireDefault(require("./panel/index"));
 var _index2 = _interopRequireDefault(require("./cmd_bar/index"));
 var _index3 = _interopRequireDefault(require("./d3_multi/index"));
@@ -144,5 +144,4 @@ MultiJcampsViewer.defaultProps = {
   yLabel: '',
   entities: []
 };
-var _default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(MultiJcampsViewer);
-exports.default = _default;
+var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(MultiJcampsViewer);

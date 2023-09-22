@@ -190,8 +190,7 @@ const cTrifluoroethanolD3Broad = {
   value: 126.3,
   label: 'Trifluoroethanol-d3'
 };
-const LIST_SHIFT_13C = [noReference, cActicAcidD4Sept, cActicAcidD4S, cAcetoneD6Sep, cAcetoneD6Broad, cAcetonitrileD3Sep, cAcetonitrileD3S, cBenzeneT, cChloroformDT, cCyclohexaneD12Quin, cDichloromethaneD2Quin, cDmfD7Sep1, cDmfD7Sep2, cDmfD7T3, cDioxaneD8Quin, cDmsoD6, cEthanolD6Sep, cEthanolD6Quin, cMethanolD4Sep, cPyridineD5T1, cPyridineD5T2, cPyridineD5T3, cThfD8Quin1, cThfD8Quin2, cTmsS, cTolueneD8Sep1, cTolueneD8T2, cTolueneD8T3, cTolueneD8T4, cTolueneD8T5, cTfaDQ1, cTfaDQ2, cTrifluoroethanolD3Quin, cTrifluoroethanolD3Broad];
-exports.LIST_SHIFT_13C = LIST_SHIFT_13C;
+const LIST_SHIFT_13C = exports.LIST_SHIFT_13C = [noReference, cActicAcidD4Sept, cActicAcidD4S, cAcetoneD6Sep, cAcetoneD6Broad, cAcetonitrileD3Sep, cAcetonitrileD3S, cBenzeneT, cChloroformDT, cCyclohexaneD12Quin, cDichloromethaneD2Quin, cDmfD7Sep1, cDmfD7Sep2, cDmfD7T3, cDioxaneD8Quin, cDmsoD6, cEthanolD6Sep, cEthanolD6Quin, cMethanolD4Sep, cPyridineD5T1, cPyridineD5T2, cPyridineD5T3, cThfD8Quin1, cThfD8Quin2, cTmsS, cTolueneD8Sep1, cTolueneD8T2, cTolueneD8T3, cTolueneD8T4, cTolueneD8T5, cTfaDQ1, cTfaDQ2, cTrifluoroethanolD3Quin, cTrifluoroethanolD3Broad];
 const hActicAcidD4Quin = {
   name: 'Acetic acid-d4 (quin)',
   value: 2.04,
@@ -376,16 +375,11 @@ const hTrifluoroethanolD32 = {
   value: 5.02,
   label: 'Trifluoroethanol-d3'
 };
-const LIST_SHIFT_1H = [noReference, hActicAcidD4Quin, hActicAcidD4S, hAcetoneD6Quin, hAcetonitrileD3Qquin, hBenzeneS, hChloroformDS, hCyclohexaneD12S, hDeuteriumOxideS, hDichloroethaneD4S, hDichloromethaneD2T, hDMFD7Quin1, hDMFD7Quin2, hDMFD7Broad3, hDioxaneD8Broad, hDMSOD6Quin, hEthanolD6Broad1, hEthanolD6S2, hEthanolD6S3, hMethanolD4Quin, hMethanolD4S, hNitromethaneD3S, hPyridineD5Broad1, hPyridineD5Broad2, hPyridineD5Broad3, hTHFD8S1, hTHFD8S2, hTMSS, hTolueneD8Quin, hTolueneD8Boad2, hTolueneD8S3, hTolueneD8Broad4, hTFADS, hTrifluoroethanolD31, hTrifluoroethanolD32];
-exports.LIST_SHIFT_1H = LIST_SHIFT_1H;
-const LIST_SHIFT_19F = [];
-exports.LIST_SHIFT_19F = LIST_SHIFT_19F;
-const LIST_SHIFT_31P = [];
-exports.LIST_SHIFT_31P = LIST_SHIFT_31P;
-const LIST_SHIFT_15N = [];
-exports.LIST_SHIFT_15N = LIST_SHIFT_15N;
-const LIST_SHIFT_29Si = [];
-exports.LIST_SHIFT_29Si = LIST_SHIFT_29Si;
+const LIST_SHIFT_1H = exports.LIST_SHIFT_1H = [noReference, hActicAcidD4Quin, hActicAcidD4S, hAcetoneD6Quin, hAcetonitrileD3Qquin, hBenzeneS, hChloroformDS, hCyclohexaneD12S, hDeuteriumOxideS, hDichloroethaneD4S, hDichloromethaneD2T, hDMFD7Quin1, hDMFD7Quin2, hDMFD7Broad3, hDioxaneD8Broad, hDMSOD6Quin, hEthanolD6Broad1, hEthanolD6S2, hEthanolD6S3, hMethanolD4Quin, hMethanolD4S, hNitromethaneD3S, hPyridineD5Broad1, hPyridineD5Broad2, hPyridineD5Broad3, hTHFD8S1, hTHFD8S2, hTMSS, hTolueneD8Quin, hTolueneD8Boad2, hTolueneD8S3, hTolueneD8Broad4, hTFADS, hTrifluoroethanolD31, hTrifluoroethanolD32];
+const LIST_SHIFT_19F = exports.LIST_SHIFT_19F = [];
+const LIST_SHIFT_31P = exports.LIST_SHIFT_31P = [];
+const LIST_SHIFT_15N = exports.LIST_SHIFT_15N = [];
+const LIST_SHIFT_29Si = exports.LIST_SHIFT_29Si = [];
 const getListShift = layoutSt => {
   switch (layoutSt) {
     case _list_layout.LIST_LAYOUT.H1:

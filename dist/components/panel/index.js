@@ -10,7 +10,8 @@ var _propTypes = _interopRequireDefault(require("prop-types"));
 var _classnames = _interopRequireDefault(require("classnames"));
 var _reactRedux = require("react-redux");
 var _redux = require("redux");
-var _styles = require("@material-ui/core/styles");
+var _styles = require("@mui/material/styles");
+var _withStyles = _interopRequireDefault(require("@mui/styles/withStyles"));
 var _info = _interopRequireDefault(require("./info"));
 var _peaks = _interopRequireDefault(require("./peaks"));
 var _compare = _interopRequireDefault(require("./compare"));
@@ -20,11 +21,11 @@ var _graph_selection = _interopRequireDefault(require("./graph_selection"));
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 /* eslint-disable react/prop-types, react/require-default-props */
 
-const theme = (0, _styles.createTheme)({
+const theme = (0, _styles.createTheme)((0, _styles.adaptV4Theme)({
   typography: {
     useNextVariants: true
   }
-});
+}));
 const styles = () => ({
   panels: {
     maxHeight: 'calc(90vh - 220px)',
@@ -93,7 +94,9 @@ class PanelViewer extends _react.default.Component {
     const hideGraphSelection = listCurves === false || listCurves === undefined;
     return /*#__PURE__*/_react.default.createElement("div", {
       className: (0, _classnames.default)(classes.panels)
-    }, /*#__PURE__*/_react.default.createElement(_styles.MuiThemeProvider, {
+    }, /*#__PURE__*/_react.default.createElement(_styles.StyledEngineProvider, {
+      injectFirst: true
+    }, /*#__PURE__*/_react.default.createElement(_styles.ThemeProvider, {
       theme: theme
     }, hideGraphSelection ? null : /*#__PURE__*/_react.default.createElement(_graph_selection.default, {
       jcampIdx: jcampIdx,
@@ -126,7 +129,7 @@ class PanelViewer extends _react.default.Component {
       expand: expand === 'cyclicvolta',
       onExapnd: onExapndCyclicVolta,
       userManualLink: userManualLink ? userManualLink.cv : undefined
-    })));
+    }))));
   }
 }
 const mapStateToProps = (state, _) => (
@@ -151,7 +154,6 @@ PanelViewer.propTypes = {
   curveSt: _propTypes.default.object.isRequired,
   subLayoutsInfo: _propTypes.default.object
 };
-var _default = (0, _reactRedux.connect)(
+var _default = exports.default = (0, _reactRedux.connect)(
 // eslint-disable-line
-mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(PanelViewer)); // eslint-disable-line
-exports.default = _default;
+mapStateToProps, mapDispatchToProps)((0, _withStyles.default)(styles)(PanelViewer)); // eslint-disable-line

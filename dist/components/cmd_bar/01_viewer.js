@@ -10,10 +10,10 @@ var _reactRedux = require("react-redux");
 var _redux = require("redux");
 var _classnames = _interopRequireDefault(require("classnames"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
-var _styles = require("@material-ui/core/styles");
-var _SpellcheckOutlined = _interopRequireDefault(require("@material-ui/icons/SpellcheckOutlined"));
-var _TimelineOutlined = _interopRequireDefault(require("@material-ui/icons/TimelineOutlined"));
-var _Tooltip = _interopRequireDefault(require("@material-ui/core/Tooltip"));
+var _withStyles = _interopRequireDefault(require("@mui/styles/withStyles"));
+var _SpellcheckOutlined = _interopRequireDefault(require("@mui/icons-material/SpellcheckOutlined"));
+var _TimelineOutlined = _interopRequireDefault(require("@mui/icons-material/TimelineOutlined"));
+var _Tooltip = _interopRequireDefault(require("@mui/material/Tooltip"));
 var _ui = require("../../actions/ui");
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 var _common = require("./common");
@@ -33,7 +33,8 @@ const Viewer = _ref => {
   const onViewSpectrum = () => setUiViewerTypeAct(_list_ui.LIST_UI_VIEWER_TYPE.SPECTRUM);
   const onViewAnalysis = () => setUiViewerTypeAct(_list_ui.LIST_UI_VIEWER_TYPE.ANALYSIS);
   return /*#__PURE__*/_react.default.createElement("span", {
-    className: classes.group
+    className: classes.group,
+    "data-testid": "Viewer"
   }, /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
     title: /*#__PURE__*/_react.default.createElement("span", {
       className: "txt-sv-tp"
@@ -74,5 +75,4 @@ Viewer.propTypes = {
   disableCmdAnaViewerSt: _propTypes.default.bool.isRequired,
   setUiViewerTypeAct: _propTypes.default.func.isRequired
 };
-var _default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(Viewer);
-exports.default = _default;
+var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _withStyles.default)(styles))(Viewer);

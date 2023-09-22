@@ -196,5 +196,4 @@ const multiplicityReducer = function () {
   }
 };
 const undoableMultiplicityReducer = (0, _reduxUndo.default)(multiplicityReducer, _undo_redo_config.undoRedoConfig);
-var _default = undoableMultiplicityReducer;
-exports.default = _default;
+var _default = exports.default = undoableMultiplicityReducer;

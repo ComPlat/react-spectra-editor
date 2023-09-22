@@ -10,14 +10,11 @@ var _propTypes = _interopRequireDefault(require("prop-types"));
 var _classnames = _interopRequireDefault(require("classnames"));
 var _reactRedux = require("react-redux");
 var _redux = require("redux");
-var _TextField = _interopRequireDefault(require("@material-ui/core/TextField"));
-var _InputAdornment = _interopRequireDefault(require("@material-ui/core/InputAdornment"));
-var _core = require("@material-ui/core");
-var _styles = require("@material-ui/core/styles");
-var _Tooltip = _interopRequireDefault(require("@material-ui/core/Tooltip"));
-var _CloudDoneOutlined = _interopRequireDefault(require("@material-ui/icons/CloudDoneOutlined"));
-var _HowToRegOutlined = _interopRequireDefault(require("@material-ui/icons/HowToRegOutlined"));
-var _RefreshOutlined = _interopRequireDefault(require("@material-ui/icons/RefreshOutlined"));
+var _material = require("@mui/material");
+var _styles = require("@mui/styles");
+var _CloudDoneOutlined = _interopRequireDefault(require("@mui/icons-material/CloudDoneOutlined"));
+var _HowToRegOutlined = _interopRequireDefault(require("@mui/icons-material/HowToRegOutlined"));
+var _RefreshOutlined = _interopRequireDefault(require("@mui/icons-material/RefreshOutlined"));
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 var _threshold = require("../../actions/threshold");
 var _common = require("./common");
@@ -30,7 +27,7 @@ const styles = () => Object.assign({
   },
   txtIcon: {}
 }, _common.commonStyle);
-const txtPercent = () => /*#__PURE__*/_react.default.createElement(_InputAdornment.default, {
+const txtPercent = () => /*#__PURE__*/_react.default.createElement(_material.InputAdornment, {
   position: "end"
 }, /*#__PURE__*/_react.default.createElement("span", {
   className: "txt-percent"
@@ -43,9 +40,9 @@ const setThreshold = (classes, thresVal, updateThresholdValueAct) => {
       updateThresholdValueAct(e.target.value);
     }
   };
-  return /*#__PURE__*/_react.default.createElement(_core.FormControl, {
+  return /*#__PURE__*/_react.default.createElement(_material.FormControl, {
     variant: "outlined"
-  }, /*#__PURE__*/_react.default.createElement(_TextField.default, {
+  }, /*#__PURE__*/_react.default.createElement(_material.TextField, {
     className: classes.field,
     id: "outlined-name",
     placeholder: "N.A.",
@@ -63,7 +60,7 @@ const setThreshold = (classes, thresVal, updateThresholdValueAct) => {
     onBlur: onBlur,
     onKeyPress: onEnterPress,
     variant: "outlined"
-  }), /*#__PURE__*/_react.default.createElement(_core.InputLabel, {
+  }), /*#__PURE__*/_react.default.createElement(_material.InputLabel, {
     className: (0, _classnames.default)(classes.txtLabelBottomInput)
   }, "Threshold"));
 };
@@ -88,7 +85,7 @@ const Threshold = _ref => {
   const thresVal = thresValSt || feature.thresRef;
   return /*#__PURE__*/_react.default.createElement("span", {
     className: classes.groupRight
-  }, setThreshold(classes, thresVal, updateThresholdValueAct), /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+  }, setThreshold(classes, thresVal, updateThresholdValueAct), /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
     title: /*#__PURE__*/_react.default.createElement("span", {
       className: "txt-sv-tp"
     }, "Restore Threshold")
@@ -98,7 +95,7 @@ const Threshold = _ref => {
     onClick: resetThresholdValueAct
   }, /*#__PURE__*/_react.default.createElement(_RefreshOutlined.default, {
     className: classes.icon
-  }))), hideThresSt ? null : /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+  }))), hideThresSt ? null : /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
     title: /*#__PURE__*/_react.default.createElement("span", {
       className: "txt-sv-tp"
     }, restoreTp(hasEdit, isEditSt))
@@ -131,5 +128,4 @@ Threshold.propTypes = {
   resetThresholdValueAct: _propTypes.default.func.isRequired,
   toggleThresholdIsEditAct: _propTypes.default.func.isRequired
 };
-var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(Threshold));
-exports.default = _default;
+var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(Threshold));

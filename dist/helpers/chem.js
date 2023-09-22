@@ -87,8 +87,7 @@ const convertTopic = (topic, layout, feature, offset) => {
   return calcXY(xs, ys, maxY, offset);
 };
 exports.convertTopic = convertTopic;
-const Topic2Seed = (0, _reselect.createSelector)(getTopic, getLayout, getFeature, getShiftOffset, convertTopic);
-exports.Topic2Seed = Topic2Seed;
+const Topic2Seed = exports.Topic2Seed = (0, _reselect.createSelector)(getTopic, getLayout, getFeature, getShiftOffset, convertTopic);
 const getOthers = (_, props) => props.comparisons;
 const calcRescaleXY = (xs, ys, minY, maxY, show) => {
   const sp = [];
@@ -126,8 +125,7 @@ const convertComparisons = (layout, comparisons, feature) => {
     return calcRescaleXY(xs, ys, minY, maxY, show);
   });
 };
-const GetComparisons = (0, _reselect.createSelector)(getLayout, getOthers, getFeature, convertComparisons);
-exports.GetComparisons = GetComparisons;
+const GetComparisons = exports.GetComparisons = (0, _reselect.createSelector)(getLayout, getOthers, getFeature, convertComparisons);
 const convertFrequency = (layout, feature) => {
   if (['1H', '13C', '19F', '31P', '15N', '29Si'].indexOf(layout) < 0) return false;
   const {
@@ -136,8 +134,7 @@ const convertFrequency = (layout, feature) => {
   const freq = Array.isArray(observeFrequency) ? observeFrequency[0] : observeFrequency;
   return parseFloat(freq) || false;
 };
-const ToFrequency = (0, _reselect.createSelector)(getLayout, getFeature, convertFrequency);
-exports.ToFrequency = ToFrequency;
+const ToFrequency = exports.ToFrequency = (0, _reselect.createSelector)(getLayout, getFeature, convertFrequency);
 const getThreshold = state => state.threshold ? state.threshold.value * 1.0 : false;
 const Convert2Peak = function (feature, threshold, offset) {
   let upThreshold = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
@@ -202,8 +199,7 @@ const Convert2Peak = function (feature, threshold, offset) {
   return peak;
 };
 exports.Convert2Peak = Convert2Peak;
-const Feature2Peak = (0, _reselect.createSelector)(getFeature, getThreshold, getShiftOffset, Convert2Peak);
-exports.Feature2Peak = Feature2Peak;
+const Feature2Peak = exports.Feature2Peak = (0, _reselect.createSelector)(getFeature, getThreshold, getShiftOffset, Convert2Peak);
 const Convert2MaxMinPeak = (layout, feature, offset) => {
   const peaks = {
     max: [],
@@ -277,8 +273,7 @@ const Convert2MaxMinPeak = (layout, feature, offset) => {
   return peaks;
 };
 exports.Convert2MaxMinPeak = Convert2MaxMinPeak;
-const Feature2MaxMinPeak = (0, _reselect.createSelector)(getLayout, getFeature, getShiftOffset, Convert2MaxMinPeak);
-exports.Feature2MaxMinPeak = Feature2MaxMinPeak;
+const Feature2MaxMinPeak = exports.Feature2MaxMinPeak = (0, _reselect.createSelector)(getLayout, getFeature, getShiftOffset, Convert2MaxMinPeak);
 const convertThresEndPts = (feature, threshold) => {
   const {
     maxY,
@@ -298,8 +293,7 @@ const convertThresEndPts = (feature, threshold) => {
   }];
   return endPts;
 };
-const ToThresEndPts = (0, _reselect.createSelector)(getFeature, getThreshold, convertThresEndPts);
-exports.ToThresEndPts = ToThresEndPts;
+const ToThresEndPts = exports.ToThresEndPts = (0, _reselect.createSelector)(getFeature, getThreshold, convertThresEndPts);
 const getShiftPeak = state => {
   const {
     curve,
@@ -324,12 +318,11 @@ const convertSfPeaks = (peak, offset) => {
     y: peak.y
   }];
 };
-const ToShiftPeaks = (0, _reselect.createSelector)(getShiftPeak, getShiftOffset, convertSfPeaks);
+const ToShiftPeaks = exports.ToShiftPeaks = (0, _reselect.createSelector)(getShiftPeak, getShiftOffset, convertSfPeaks);
 
 // - - - - - - - - - - - - - - - - - - - - - -
 // ExtractJcamp
 // - - - - - - - - - - - - - - - - - - - - - -
-exports.ToShiftPeaks = ToShiftPeaks;
 const readLayout = jcamp => {
   const {
     xType,

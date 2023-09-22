@@ -24,5 +24,4 @@ const simulatioinReducer = function () {
       return state;
   }
 };
-var _default = simulatioinReducer;
-exports.default = _default;
+var _default = exports.default = simulatioinReducer;

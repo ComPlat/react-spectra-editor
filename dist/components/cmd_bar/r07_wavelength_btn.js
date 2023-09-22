@@ -10,8 +10,8 @@ var _propTypes = _interopRequireDefault(require("prop-types"));
 var _reactRedux = require("react-redux");
 var _classnames = _interopRequireDefault(require("classnames"));
 var _redux = require("redux");
-var _core = require("@material-ui/core");
-var _styles = require("@material-ui/core/styles");
+var _material = require("@mui/material");
+var _withStyles = _interopRequireDefault(require("@mui/styles/withStyles"));
 var _wavelength = require("../../actions/wavelength");
 var _format = _interopRequireDefault(require("../../helpers/format"));
 var _common = require("./common");
@@ -32,21 +32,21 @@ const wavelengthSelect = (classes, waveLengthSt, layoutSt, updateWaveLengthAct) 
     return /*#__PURE__*/_react.default.createElement("i", null);
   }
   const onChange = e => updateWaveLengthAct(e.target.value);
-  return /*#__PURE__*/_react.default.createElement(_core.FormControl, {
+  return /*#__PURE__*/_react.default.createElement(_material.FormControl, {
     className: (0, _classnames.default)(classes.fieldLayout),
     variant: "outlined"
-  }, /*#__PURE__*/_react.default.createElement(_core.InputLabel, {
+  }, /*#__PURE__*/_react.default.createElement(_material.InputLabel, {
+    id: "select-wavelength-label",
     className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label')
-  }, "Wavelength"), /*#__PURE__*/_react.default.createElement(_core.Select, {
+  }, "Wavelength"), /*#__PURE__*/_react.default.createElement(_material.Select, {
+    labelId: "select-wavelength-label",
+    label: "Wavelength",
     value: waveLengthSt,
     onChange: onChange,
-    input: /*#__PURE__*/_react.default.createElement(_core.OutlinedInput, {
-      className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-layout'),
-      labelWidth: 60
-    })
+    className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-layout')
   }, _list_wavelength.LIST_WAVE_LENGTH.map(item => {
     // eslint-disable-line
-    return /*#__PURE__*/_react.default.createElement(_core.MenuItem, {
+    return /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
       value: item
     }, /*#__PURE__*/_react.default.createElement("span", {
       className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
@@ -79,5 +79,4 @@ Wavelength.propTypes = {
   waveLengthSt: _propTypes.default.object.isRequired,
   updateWaveLengthAct: _propTypes.default.func.isRequired
 };
-var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(Wavelength));
-exports.default = _default;
+var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _withStyles.default)(styles)(Wavelength));

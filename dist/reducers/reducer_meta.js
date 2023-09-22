@@ -25,5 +25,4 @@ const metaReducer = function () {
       return state;
   }
 };
-var _default = metaReducer;
-exports.default = _default;
+var _default = exports.default = metaReducer;

@@ -11,10 +11,10 @@ var _redux = require("redux");
 var _propTypes = _interopRequireDefault(require("prop-types"));
 var _classnames = _interopRequireDefault(require("classnames"));
 var _reduxUndo = require("redux-undo");
-var _styles = require("@material-ui/core/styles");
-var _Tooltip = _interopRequireDefault(require("@material-ui/core/Tooltip"));
-var _RedoOutlined = _interopRequireDefault(require("@material-ui/icons/RedoOutlined"));
-var _UndoOutlined = _interopRequireDefault(require("@material-ui/icons/UndoOutlined"));
+var _withStyles = _interopRequireDefault(require("@mui/styles/withStyles"));
+var _Tooltip = _interopRequireDefault(require("@mui/material/Tooltip"));
+var _RedoOutlined = _interopRequireDefault(require("@mui/icons-material/RedoOutlined"));
+var _UndoOutlined = _interopRequireDefault(require("@mui/icons-material/UndoOutlined"));
 var _common = require("./common");
 /* eslint-disable prefer-object-spread, function-paren-newline,
 react/function-component-definition, react/require-default-props, max-len,
@@ -72,5 +72,4 @@ UndoRedo.propTypes = {
   onUndoAct: _propTypes.default.func.isRequired,
   onRedoAct: _propTypes.default.func.isRequired
 };
-var _default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(UndoRedo);
-exports.default = _default;
+var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _withStyles.default)(styles))(UndoRedo);

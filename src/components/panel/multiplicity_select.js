@@ -5,9 +5,10 @@ import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import FormControl from '@material-ui/core/FormControl';
-import TextField from '@material-ui/core/TextField';
-import { withStyles } from '@material-ui/core/styles';
+import {
+  FormControl, TextField,
+} from '@mui/material';
+import { withStyles } from '@mui/styles';
 
 import { selectMpyType } from '../../actions/multiplicity';
 

@@ -7,9 +7,9 @@ import { connect } from 'react-redux';
 import classNames from 'classnames';
 import { bindActionCreators, compose } from 'redux';
 
-import Tooltip from '@material-ui/core/Tooltip';
-import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
-import { withStyles } from '@material-ui/core/styles';
+import Tooltip from '@mui/material/Tooltip';
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
+import { withStyles } from '@mui/styles';
 
 import {
   Convert2Scan, Convert2Thres,

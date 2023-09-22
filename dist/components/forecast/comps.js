@@ -8,16 +8,13 @@ exports.sectionSvg = exports.sectionInput = exports.notToRenderAnalysis = export
 var _react = _interopRequireDefault(require("react"));
 var _classnames = _interopRequireDefault(require("classnames"));
 var _reactSvgFileZoomPan = _interopRequireDefault(require("@complat/react-svg-file-zoom-pan"));
-var _CheckCircleOutline = _interopRequireDefault(require("@material-ui/icons/CheckCircleOutline"));
-var _ErrorOutline = _interopRequireDefault(require("@material-ui/icons/ErrorOutline"));
-var _HighlightOff = _interopRequireDefault(require("@material-ui/icons/HighlightOff"));
-var _HelpOutline = _interopRequireDefault(require("@material-ui/icons/HelpOutline"));
-var _Help = _interopRequireDefault(require("@material-ui/icons/Help"));
-var _Tooltip = _interopRequireDefault(require("@material-ui/core/Tooltip"));
-var _Grid = _interopRequireDefault(require("@material-ui/core/Grid"));
-var _TextField = _interopRequireDefault(require("@material-ui/core/TextField"));
-var _CloudOff = _interopRequireDefault(require("@material-ui/icons/CloudOff"));
-var _CircularProgress = _interopRequireDefault(require("@material-ui/core/CircularProgress"));
+var _CheckCircleOutline = _interopRequireDefault(require("@mui/icons-material/CheckCircleOutline"));
+var _ErrorOutline = _interopRequireDefault(require("@mui/icons-material/ErrorOutline"));
+var _HighlightOff = _interopRequireDefault(require("@mui/icons-material/HighlightOff"));
+var _HelpOutline = _interopRequireDefault(require("@mui/icons-material/HelpOutline"));
+var _Help = _interopRequireDefault(require("@mui/icons-material/Help"));
+var _material = require("@mui/material");
+var _CloudOff = _interopRequireDefault(require("@mui/icons-material/CloudOff"));
 var _section_loading = _interopRequireDefault(require("./section_loading"));
 /* eslint-disable react/function-component-definition, react/destructuring-assignment,
 max-len */
@@ -46,7 +43,7 @@ exports.TxtLabel = TxtLabel;
 const StatusIcon = status => {
   switch (status) {
     case 'accept':
-      return /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+      return /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
         title: /*#__PURE__*/_react.default.createElement("span", {
           className: "txt-sv-tp"
         }, "Accept"),
@@ -57,7 +54,7 @@ const StatusIcon = status => {
         }
       }));
     case 'warning':
-      return /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+      return /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
         title: /*#__PURE__*/_react.default.createElement("span", {
           className: "txt-sv-tp"
         }, "Warning"),
@@ -68,7 +65,7 @@ const StatusIcon = status => {
         }
       }));
     case 'reject':
-      return /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+      return /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
         title: /*#__PURE__*/_react.default.createElement("span", {
           className: "txt-sv-tp"
         }, "Reject"),
@@ -79,7 +76,7 @@ const StatusIcon = status => {
         }
       }));
     case 'missing':
-      return /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+      return /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
         title: /*#__PURE__*/_react.default.createElement("span", {
           className: "txt-sv-tp"
         }, "Missing"),
@@ -90,7 +87,7 @@ const StatusIcon = status => {
         }
       }));
     case 'unknown':
-      return /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+      return /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
         title: /*#__PURE__*/_react.default.createElement("span", {
           className: "txt-sv-tp"
         }, "Not Support"),
@@ -118,12 +115,12 @@ const sectionInput = (classes, molecule, inputFuncCb) => {
   if (!inputFuncCb) return null;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: (0, _classnames.default)(classes.inputRoot)
-  }, /*#__PURE__*/_react.default.createElement(_Grid.default, {
+  }, /*#__PURE__*/_react.default.createElement(_material.Grid, {
     container: true
-  }, /*#__PURE__*/_react.default.createElement(_Grid.default, {
+  }, /*#__PURE__*/_react.default.createElement(_material.Grid, {
     item: true,
     xs: 6
-  }, /*#__PURE__*/_react.default.createElement(_TextField.default, {
+  }, /*#__PURE__*/_react.default.createElement(_material.TextField, {
     fullWidth: true,
     label: TxtLabel(classes, 'Molfile', 'txt-mol-label'),
     margin: "normal",
@@ -139,7 +136,7 @@ const SectionRunning = () => /*#__PURE__*/_react.default.createElement("div", {
   style: titleStyle
 }, /*#__PURE__*/_react.default.createElement("h2", {
   style: txtStyle
-}, /*#__PURE__*/_react.default.createElement(_CircularProgress.default, {
+}, /*#__PURE__*/_react.default.createElement(_material.CircularProgress, {
   style: {
     color: 'blue',
     fontSize: 50

@@ -208,5 +208,4 @@ const editPeakReducer = function () {
   }
 };
 const undoableEditPeakReducer = (0, _reduxUndo.default)(editPeakReducer, _undo_redo_config.undoRedoConfig);
-var _default = undoableEditPeakReducer;
-exports.default = _default;
+var _default = exports.default = undoableEditPeakReducer;

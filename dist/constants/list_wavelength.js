@@ -28,5 +28,4 @@ const MoKalpha = {
   label: 'Mo K-alpha',
   unit: 'nm'
 };
-const LIST_WAVE_LENGTH = [CuKalpha, Fe, Co, MoKalpha];
-exports.LIST_WAVE_LENGTH = LIST_WAVE_LENGTH;
+const LIST_WAVE_LENGTH = exports.LIST_WAVE_LENGTH = [CuKalpha, Fe, Co, MoKalpha];
