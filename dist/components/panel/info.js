@@ -12,8 +12,7 @@ var _reactRedux = require("react-redux");
 var _redux = require("redux");
 var _reactSvgFileZoomPan = _interopRequireDefault(require("@complat/react-svg-file-zoom-pan"));
 var _reactQuill = _interopRequireDefault(require("react-quill"));
-var _ExpansionPanel = _interopRequireDefault(require("@material-ui/core/ExpansionPanel"));
-var _ExpansionPanelSummary = _interopRequireDefault(require("@material-ui/core/ExpansionPanelSummary"));
+var _core = require("@material-ui/core");
 var _ExpandMore = _interopRequireDefault(require("@material-ui/icons/ExpandMore"));
 var _Divider = _interopRequireDefault(require("@material-ui/core/Divider"));
 var _Typography = _interopRequireDefault(require("@material-ui/core/Typography"));
@@ -155,14 +154,14 @@ const InfoPanel = _ref => {
     originStack = integration.originStack; // eslint-disable-line
   }
 
-  return /*#__PURE__*/_react.default.createElement(_ExpansionPanel.default, {
+  return /*#__PURE__*/_react.default.createElement(_core.Accordion, {
     expanded: expand,
     onChange: onExapnd,
     className: (0, _classnames.default)(classes.panel),
     TransitionProps: {
       unmountOnExit: true
     } // increase ExpansionPanel performance
-  }, /*#__PURE__*/_react.default.createElement(_ExpansionPanelSummary.default, {
+  }, /*#__PURE__*/_react.default.createElement(_core.AccordionSummary, {
     expandIcon: /*#__PURE__*/_react.default.createElement(_ExpandMore.default, null),
     className: (0, _classnames.default)(classes.panelSummary)
   }, /*#__PURE__*/_react.default.createElement(_Typography.default, {
