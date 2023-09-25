@@ -9,7 +9,7 @@ var _react = _interopRequireDefault(require("react"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
 var _reactRedux = require("react-redux");
 var _redux = require("redux");
-var _styles = require("@material-ui/core/styles");
+var _styles = require("@mui/styles");
 var _index = _interopRequireDefault(require("./d3_line/index"));
 var _nmr_viewer = _interopRequireDefault(require("./forecast/nmr_viewer"));
 var _ir_viewer = _interopRequireDefault(require("./forecast/ir_viewer"));
@@ -144,5 +144,4 @@ ForecastViewer.propTypes = {
   wavelength: _propTypes.default.object.isRequired,
   curveSt: _propTypes.default.object.isRequired
 };
-var _default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(ForecastViewer);
-exports.default = _default;
+var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(ForecastViewer);

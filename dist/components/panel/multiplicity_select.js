@@ -10,9 +10,8 @@ var _propTypes = _interopRequireDefault(require("prop-types"));
 var _classnames = _interopRequireDefault(require("classnames"));
 var _reactRedux = require("react-redux");
 var _redux = require("redux");
-var _FormControl = _interopRequireDefault(require("@material-ui/core/FormControl"));
-var _TextField = _interopRequireDefault(require("@material-ui/core/TextField"));
-var _styles = require("@material-ui/core/styles");
+var _material = require("@mui/material");
+var _styles = require("@mui/styles");
 var _multiplicity = require("../../actions/multiplicity");
 /* eslint-disable react/function-component-definition */
 
@@ -58,10 +57,10 @@ const MpySelect = _ref => {
       });
     }
   };
-  return /*#__PURE__*/_react.default.createElement(_FormControl.default, {
+  return /*#__PURE__*/_react.default.createElement(_material.FormControl, {
     className: (0, _classnames.default)(classes.formControl),
     variant: "outlined"
-  }, /*#__PURE__*/_react.default.createElement(_TextField.default, {
+  }, /*#__PURE__*/_react.default.createElement(_material.TextField, {
     className: (0, _classnames.default)(classes.txtField, 'txt-cmd-field'),
     value: mpyType,
     margin: "none",
@@ -85,5 +84,4 @@ MpySelect.propTypes = {
   target: _propTypes.default.object.isRequired,
   selectMpyTypeAct: _propTypes.default.func.isRequired
 };
-var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(Styles)(MpySelect));
-exports.default = _default;
+var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(Styles)(MpySelect));

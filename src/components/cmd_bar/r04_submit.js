@@ -6,12 +6,10 @@ import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
 
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import OutlinedInput from '@material-ui/core/OutlinedInput';
-import InputLabel from '@material-ui/core/InputLabel';
-import { withStyles } from '@material-ui/core/styles';
+import {
+  Select, MenuItem, FormControl, InputLabel,
+} from '@mui/material';
+import { withStyles } from '@mui/styles';
 
 import {
   toggleIsAscend, toggleIsIntensity,
@@ -52,20 +50,15 @@ const ascendSelect = (
       className={classNames(classes.fieldOrder)}
       variant="outlined"
     >
-      <InputLabel className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
+      <InputLabel id="select-sort-peaks-label" className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
         Write Peaks
       </InputLabel>
       <Select
+        labelId="select-sort-peaks-label"
+        label="Write Peaks"
         value={isAscendSt}
         onChange={toggleIsAscendAct}
-        input={
-          (
-            <OutlinedInput
-              className={classNames(classes.selectInput, 'input-sv-bar-order')}
-              labelWidth={90}
-            />
-          )
-        }
+        className={classNames(classes.selectInput, 'input-sv-bar-order')}
       >
         <MenuItem value key="ascend">
           <span className={classNames(classes.txtOpt, 'option-sv-bar-ascend')}>
@@ -92,20 +85,23 @@ const intensitySelect = (
       className={classNames(classes.fieldIntensity)}
       variant="outlined"
     >
-      <InputLabel className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
+      <InputLabel id="select-intensity-label" className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
         Write Intensity
       </InputLabel>
       <Select
+        labelId="select-intensity-label"
+        label="Write Intensity"
         value={isIntensitySt}
         onChange={toggleIsIntensityAct}
-        input={
-          (
-            <OutlinedInput
-              className={classNames(classes.selectInput, 'input-sv-bar-intensity')}
-              labelWidth={100}
-            />
-          )
-        }
+        className={classNames(classes.selectInput, 'input-sv-bar-intensity')}
+        // input={
+        //   (
+        //     <OutlinedInput
+        //       className={classNames(classes.selectInput, 'input-sv-bar-intensity')}
+        //       labelWidth={100}
+        //     />
+        //   )
+        // }
       >
         <MenuItem value key="ascend">
           <span className={classNames(classes.txtOpt, 'option-sv-bar-show')}>
@@ -140,20 +136,23 @@ const decimalSelect = (
       className={classNames(classes.fieldDecimal)}
       variant="outlined"
     >
-      <InputLabel className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
+      <InputLabel id="select-decimal-label" className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
         Decimal
       </InputLabel>
       <Select
+        labelId="select-decimal-label"
+        label="Decimal"
         value={decimalSt}
         onChange={updateDecimalAct}
-        input={
-          (
-            <OutlinedInput
-              className={classNames(classes.selectInput, 'input-sv-bar-decimal')}
-              labelWidth={60}
-            />
-          )
-        }
+        className={classNames(classes.selectInput, 'input-sv-bar-decimal')}
+        // input={
+        //   (
+        //     <OutlinedInput
+        //       className={classNames(classes.selectInput, 'input-sv-bar-decimal')}
+        //       labelWidth={60}
+        //     />
+        //   )
+        // }
       >
         { options }
       </Select>
@@ -177,20 +176,23 @@ const operationSelect = (
       className={classNames(classes.fieldOpertaion)}
       variant="outlined"
     >
-      <InputLabel className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
+      <InputLabel id="select-submit-label" className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
         Submit
       </InputLabel>
       <Select
+        labelId="select-submit-label"
+        label="Submit"
         value={selectedValue}
         onChange={onChangeSelect}
-        input={
-          (
-            <OutlinedInput
-              className={classNames(classes.selectInput, 'input-sv-bar-operation')}
-              labelWidth={50}
-            />
-          )
-        }
+        className={classNames(classes.selectInput, 'input-sv-bar-operation')}
+        // input={
+        //   (
+        //     <OutlinedInput
+        //       className={classNames(classes.selectInput, 'input-sv-bar-operation')}
+        //       labelWidth={50}
+        //     />
+        //   )
+        // }
       >
         { options }
       </Select>

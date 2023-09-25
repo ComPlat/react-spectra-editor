@@ -340,5 +340,4 @@ const cyclicVoltaReducer = function () {
       return state;
   }
 };
-var _default = cyclicVoltaReducer;
-exports.default = _default;
+var _default = exports.default = cyclicVoltaReducer;

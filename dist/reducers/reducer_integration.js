@@ -233,5 +233,4 @@ const integrationReducer = function () {
   }
 };
 const undoableIntegrationReducer = (0, _reduxUndo.default)(integrationReducer, _undo_redo_config.undoRedoConfig);
-var _default = undoableIntegrationReducer;
-exports.default = _default;
+var _default = exports.default = undoableIntegrationReducer;

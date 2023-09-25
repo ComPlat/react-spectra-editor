@@ -3,9 +3,7 @@
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 var _react = _interopRequireDefault(require("react"));
 var _reactDom = _interopRequireDefault(require("react-dom"));
-var _InputBase = _interopRequireDefault(require("@material-ui/core/InputBase"));
-var _Grid = _interopRequireDefault(require("@material-ui/core/Grid"));
-var _Button = _interopRequireDefault(require("@material-ui/core/Button"));
+var _material = require("@mui/material");
 var _reactQuill = _interopRequireDefault(require("react-quill"));
 var _app = require("./app");
 var _nmr1h_jcamp = _interopRequireDefault(require("./__tests__/fixtures/nmr1h_jcamp"));
@@ -538,151 +536,151 @@ class DemoWriteIr extends _react.default.Component {
       style: {
         margin: '0 0 15px 55px'
       }
-    }, /*#__PURE__*/_react.default.createElement(_Button.default, {
+    }, /*#__PURE__*/_react.default.createElement(_material.Button, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('nmr 1h')
-    }, "NMR 1H"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+    }, "NMR 1H"), /*#__PURE__*/_react.default.createElement(_material.Button, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('nmr 13c')
-    }, "NMR 13C"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+    }, "NMR 13C"), /*#__PURE__*/_react.default.createElement(_material.Button, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('nmr 13c dept')
-    }, "NMR 13C DEPT"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+    }, "NMR 13C DEPT"), /*#__PURE__*/_react.default.createElement(_material.Button, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('nmr 19f')
-    }, "NMR 19F"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+    }, "NMR 19F"), /*#__PURE__*/_react.default.createElement(_material.Button, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('nmr 31p')
-    }, "NMR 31P"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+    }, "NMR 31P"), /*#__PURE__*/_react.default.createElement(_material.Button, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('nmr 15n')
-    }, "NMR 15N"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+    }, "NMR 15N"), /*#__PURE__*/_react.default.createElement(_material.Button, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('nmr 29si')
-    }, "NMR 29Si"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+    }, "NMR 29Si"), /*#__PURE__*/_react.default.createElement(_material.Button, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('ir')
-    }, "IR"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+    }, "IR"), /*#__PURE__*/_react.default.createElement(_material.Button, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('raman')
-    }, "RAMAN"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+    }, "RAMAN"), /*#__PURE__*/_react.default.createElement(_material.Button, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('uv/vis')
-    }, "UV/VIS"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+    }, "UV/VIS"), /*#__PURE__*/_react.default.createElement(_material.Button, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('hplc uv/vis')
-    }, "HPLC UV/VIS"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+    }, "HPLC UV/VIS"), /*#__PURE__*/_react.default.createElement(_material.Button, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('tga')
-    }, "TGA"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+    }, "TGA"), /*#__PURE__*/_react.default.createElement(_material.Button, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('xrd')
-    }, "XRD"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+    }, "XRD"), /*#__PURE__*/_react.default.createElement(_material.Button, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('cyclic volta')
-    }, "CV"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+    }, "CV"), /*#__PURE__*/_react.default.createElement(_material.Button, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('cds')
-    }, "CDS"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+    }, "CDS"), /*#__PURE__*/_react.default.createElement(_material.Button, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('sec')
-    }, "SEC"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+    }, "SEC"), /*#__PURE__*/_react.default.createElement(_material.Button, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('aif')
-    }, "SOPTION-DESORPTION"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+    }, "SOPTION-DESORPTION"), /*#__PURE__*/_react.default.createElement(_material.Button, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('emissions')
-    }, "EMISSIONS"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+    }, "EMISSIONS"), /*#__PURE__*/_react.default.createElement(_material.Button, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('dls acf')
-    }, "DLS ACF"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+    }, "DLS ACF"), /*#__PURE__*/_react.default.createElement(_material.Button, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('dls intensity')
-    }, "DLS intensity"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+    }, "DLS intensity"), /*#__PURE__*/_react.default.createElement(_material.Button, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('ms')
-    }, "MS"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+    }, "MS"), /*#__PURE__*/_react.default.createElement(_material.Button, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('multi')
-    }, "Multi NMR"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+    }, "Multi NMR"), /*#__PURE__*/_react.default.createElement(_material.Button, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('multi ir')
-    }, "Multi IR"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+    }, "Multi IR"), /*#__PURE__*/_react.default.createElement(_material.Button, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('multi hplc')
-    }, "Multi HPLC"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+    }, "Multi HPLC"), /*#__PURE__*/_react.default.createElement(_material.Button, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
@@ -708,12 +706,12 @@ class DemoWriteIr extends _react.default.Component {
         toolbar: false
       },
       readOnly: true
-    })), /*#__PURE__*/_react.default.createElement(_Grid.default, {
+    })), /*#__PURE__*/_react.default.createElement(_material.Grid, {
       container: true
-    }, /*#__PURE__*/_react.default.createElement(_Grid.default, {
+    }, /*#__PURE__*/_react.default.createElement(_material.Grid, {
       item: true,
       xs: 10
-    }, /*#__PURE__*/_react.default.createElement(_InputBase.default, {
+    }, /*#__PURE__*/_react.default.createElement(_material.InputBase, {
       style: {
         margin: '0 0 0 63px'
       },

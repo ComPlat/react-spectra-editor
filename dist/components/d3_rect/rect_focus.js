@@ -224,5 +224,4 @@ class RectFocus {
     (0, _brush.default)(this, isUiAddIntgSt, isUiNoBrushSt);
   }
 }
-var _default = RectFocus;
-exports.default = _default;
+var _default = exports.default = RectFocus;

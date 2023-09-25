@@ -94,10 +94,9 @@ const MountBrush = (focus, isUiAddIntgSt, isUiNoBrushSt) => {
   }
   svg.on('wheel', wheeledCb);
 };
-var _default = MountBrush; // const resetedCb = () => reseted(main);
+var _default = exports.default = MountBrush; // const resetedCb = () => reseted(main);
 // main.svg.on('dblclick', resetedCb);
 // const reseted = (main) => {
 //   const { selectUiSweepAct } = main;
 //   selectUiSweepAct({ xExtent: false, yExtent: false });
 // };
-exports.default = _default;

@@ -685,5 +685,4 @@ class LineFocus {
     this.resetShouldUpdate(editPeakSt, integationSt, mtplySt);
   }
 }
-var _default = LineFocus;
-exports.default = _default;
+var _default = exports.default = LineFocus;

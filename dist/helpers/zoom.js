@@ -21,5 +21,4 @@ const MountZoom = (main, zoomed) => {
   main.zoom.on('zoom', zoomedCb);
   main.svg.call(main.zoom).on('contextmenu.zoom', resetZoomCb);
 };
-var _default = MountZoom;
-exports.default = _default;
+var _default = exports.default = MountZoom;

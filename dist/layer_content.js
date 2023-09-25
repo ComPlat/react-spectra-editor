@@ -101,5 +101,4 @@ Content.propTypes = {
   operations: _propTypes.default.array.isRequired,
   layoutSt: _propTypes.default.string.isRequired
 };
-var _default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps))(Content);
-exports.default = _default;
+var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps))(Content);

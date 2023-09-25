@@ -200,5 +200,4 @@ ViewerMulti.propTypes = {
   addCylicVoltaMinPeakAct: _propTypes.default.func.isRequired,
   cLabel: _propTypes.default.string
 };
-var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(ViewerMulti);
-exports.default = _default;
+var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(ViewerMulti);

@@ -10,8 +10,8 @@ var _reactRedux = require("react-redux");
 var _redux = require("redux");
 var _classnames = _interopRequireDefault(require("classnames"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
-var _styles = require("@material-ui/core/styles");
-var _Tooltip = _interopRequireDefault(require("@material-ui/core/Tooltip"));
+var _styles = require("@mui/styles");
+var _Tooltip = _interopRequireDefault(require("@mui/material/Tooltip"));
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 var _common = require("./common");
 /* eslint-disable prefer-object-spread */
@@ -114,5 +114,4 @@ TriBtn.propTypes = {
   cb: _propTypes.default.func.isRequired,
   children: _propTypes.default.node.isRequired
 };
-var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(TriBtn));
-exports.default = _default;
+var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(TriBtn));

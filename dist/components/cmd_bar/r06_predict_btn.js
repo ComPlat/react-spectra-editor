@@ -10,11 +10,10 @@ var _propTypes = _interopRequireDefault(require("prop-types"));
 var _reactRedux = require("react-redux");
 var _classnames = _interopRequireDefault(require("classnames"));
 var _redux = require("redux");
-var _Tooltip = _interopRequireDefault(require("@material-ui/core/Tooltip"));
-var _GpsFixedOutlined = _interopRequireDefault(require("@material-ui/icons/GpsFixedOutlined"));
-var _HelpOutlineOutlined = _interopRequireDefault(require("@material-ui/icons/HelpOutlineOutlined"));
-var _Button = _interopRequireDefault(require("@material-ui/core/Button"));
-var _styles = require("@material-ui/core/styles");
+var _material = require("@mui/material");
+var _GpsFixedOutlined = _interopRequireDefault(require("@mui/icons-material/GpsFixedOutlined"));
+var _HelpOutlineOutlined = _interopRequireDefault(require("@mui/icons-material/HelpOutlineOutlined"));
+var _styles = require("@mui/styles");
 var _common = require("./common");
 var _format = _interopRequireDefault(require("../../helpers/format"));
 var _carbonFeatures = require("../../helpers/carbonFeatures");
@@ -55,7 +54,7 @@ const MuPredictButton = (0, _styles.withStyles)({
     lineHeight: '20px',
     padding: 0
   }
-})(_Button.default);
+})(_material.Button);
 const onClickFail = (layoutSt, simuCount, realCount) => {
   const feature = _format.default.is13CLayout(layoutSt) ? 'peak' : 'multiplet';
   return () => alert(`Selected ${feature} count (${realCount}) must be larger than 0, and must be eqal or less than simulated count (${simuCount}).`); // eslint-disable-line
@@ -107,7 +106,7 @@ const onClicUnknown = (feature, forecast, peaksEdit, layoutSt, scan, shiftSt, th
 const counterText = (classes, isIr, realCount, uniqCount, simuCount) => isIr ? null : /*#__PURE__*/_react.default.createElement("span", {
   className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
 }, `${realCount}/${uniqCount}/${simuCount}`);
-const renderBtnPredict = (classes, isIr, realCount, uniqCount, simuCount, color, btnWidthCls, onClick) => /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+const renderBtnPredict = (classes, isIr, realCount, uniqCount, simuCount, color, btnWidthCls, onClick) => /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
   title: /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("span", {
     className: "txt-sv-tp"
   }, "Predict"), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("span", {
@@ -122,7 +121,7 @@ const renderBtnPredict = (classes, isIr, realCount, uniqCount, simuCount, color,
 }, counterText(classes, isIr, realCount, uniqCount, simuCount), /*#__PURE__*/_react.default.createElement(_GpsFixedOutlined.default, {
   className: classes.icon
 })));
-const renderBtnUnknown = (classes, onClick) => /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+const renderBtnUnknown = (classes, onClick) => /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
   title: /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("span", {
     className: "txt-sv-tp"
   }, "Refresh Simulation"), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("span", {
@@ -221,5 +220,4 @@ BtnPredict.propTypes = {
   setUiViewerTypeAct: _propTypes.default.func.isRequired,
   curveSt: _propTypes.default.object
 };
-var _default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(BtnPredict);
-exports.default = _default;
+var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(BtnPredict);

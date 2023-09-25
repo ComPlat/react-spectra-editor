@@ -7,9 +7,9 @@ import { bindActionCreators, compose } from 'redux';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
-import { withStyles } from '@material-ui/core/styles';
-import Tooltip from '@material-ui/core/Tooltip';
-import AddLocationOutlinedIcon from '@material-ui/icons/AddLocationOutlined';
+import withStyles from '@mui/styles/withStyles';
+import Tooltip from '@mui/material/Tooltip';
+import AddLocationOutlinedIcon from '@mui/icons-material/AddLocationOutlined';
 
 import { setUiSweepType } from '../../actions/ui';
 import Cfg from '../../helpers/cfg';

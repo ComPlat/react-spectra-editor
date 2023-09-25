@@ -10,9 +10,9 @@ var _propTypes = _interopRequireDefault(require("prop-types"));
 var _reactRedux = require("react-redux");
 var _classnames = _interopRequireDefault(require("classnames"));
 var _redux = require("redux");
-var _Tooltip = _interopRequireDefault(require("@material-ui/core/Tooltip"));
-var _PlayCircleOutline = _interopRequireDefault(require("@material-ui/icons/PlayCircleOutline"));
-var _styles = require("@material-ui/core/styles");
+var _Tooltip = _interopRequireDefault(require("@mui/material/Tooltip"));
+var _PlayCircleOutline = _interopRequireDefault(require("@mui/icons-material/PlayCircleOutline"));
+var _styles = require("@mui/styles");
 var _chem = require("../../helpers/chem");
 var _common = require("./common");
 var _extractPeaksEdit = require("../../helpers/extractPeaksEdit");
@@ -118,5 +118,4 @@ BtnSubmit.propTypes = {
   cyclicvoltaSt: _propTypes.default.object.isRequired,
   curveSt: _propTypes.default.object
 };
-var _default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(BtnSubmit);
-exports.default = _default;
+var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(BtnSubmit);

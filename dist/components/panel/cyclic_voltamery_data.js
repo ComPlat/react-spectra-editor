@@ -10,16 +10,13 @@ var _propTypes = _interopRequireDefault(require("prop-types"));
 var _classnames = _interopRequireDefault(require("classnames"));
 var _reactRedux = require("react-redux");
 var _redux = require("redux");
-var _ExpandMore = _interopRequireDefault(require("@material-ui/icons/ExpandMore"));
-var _AddCircleOutline = _interopRequireDefault(require("@material-ui/icons/AddCircleOutline"));
-var _RemoveCircle = _interopRequireDefault(require("@material-ui/icons/RemoveCircle"));
-var _Info = _interopRequireDefault(require("@material-ui/icons/Info"));
-var _Help = _interopRequireDefault(require("@material-ui/icons/Help"));
-var _Tooltip = _interopRequireDefault(require("@material-ui/core/Tooltip"));
-var _Divider = _interopRequireDefault(require("@material-ui/core/Divider"));
-var _Typography = _interopRequireDefault(require("@material-ui/core/Typography"));
-var _styles = require("@material-ui/core/styles");
-var _core = require("@material-ui/core");
+var _ExpandMore = _interopRequireDefault(require("@mui/icons-material/ExpandMore"));
+var _AddCircleOutline = _interopRequireDefault(require("@mui/icons-material/AddCircleOutline"));
+var _RemoveCircle = _interopRequireDefault(require("@mui/icons-material/RemoveCircle"));
+var _Info = _interopRequireDefault(require("@mui/icons-material/Info"));
+var _Help = _interopRequireDefault(require("@mui/icons-material/Help"));
+var _styles = require("@mui/styles");
+var _material = require("@mui/material");
 var _cyclic_voltammetry = require("../../actions/cyclic_voltammetry");
 var _ui = require("../../actions/ui");
 var _list_ui = require("../../constants/list_ui");
@@ -159,73 +156,73 @@ const CyclicVoltammetryPanel = _ref => {
       jcampIdx
     })
   }));
-  return /*#__PURE__*/_react.default.createElement(_core.Accordion, null, /*#__PURE__*/_react.default.createElement(_core.AccordionSummary, {
+  return /*#__PURE__*/_react.default.createElement(_material.Accordion, null, /*#__PURE__*/_react.default.createElement(_material.AccordionSummary, {
     expandIcon: /*#__PURE__*/_react.default.createElement(_ExpandMore.default, null),
     className: (0, _classnames.default)(classes.panelSummary)
-  }, /*#__PURE__*/_react.default.createElement(_Typography.default, {
+  }, /*#__PURE__*/_react.default.createElement(_material.Typography, {
     className: "txt-panel-header"
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title')
-  }, "Voltammetry data"))), /*#__PURE__*/_react.default.createElement(_Divider.default, null), /*#__PURE__*/_react.default.createElement(_core.Table, {
+  }, "Voltammetry data"))), /*#__PURE__*/_react.default.createElement(_material.Divider, null), /*#__PURE__*/_react.default.createElement(_material.Table, {
     className: classes.table
-  }, /*#__PURE__*/_react.default.createElement(_core.TableHead, null, /*#__PURE__*/_react.default.createElement(_core.TableRow, null, /*#__PURE__*/_react.default.createElement(_core.TableCell, {
+  }, /*#__PURE__*/_react.default.createElement(_material.TableHead, null, /*#__PURE__*/_react.default.createElement(_material.TableRow, null, /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, "Max"), /*#__PURE__*/_react.default.createElement(_core.TableCell, {
+  }, "Max"), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, "Min"), /*#__PURE__*/_react.default.createElement(_core.TableCell, {
+  }, "Min"), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, "I \u03BB0", /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+  }, "I \u03BB0", /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
     title: /*#__PURE__*/_react.default.createElement("p", {
       className: (0, _classnames.default)(classes.txtToolTip)
     }, "Baseline correction value for I ratio ", /*#__PURE__*/_react.default.createElement("br", null), "(a.k.a y value of pecker)")
   }, /*#__PURE__*/_react.default.createElement(_Info.default, {
     className: (0, _classnames.default)(classes.infoIcon)
-  }))), /*#__PURE__*/_react.default.createElement(_core.TableCell, {
+  }))), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, "I ratio", /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+  }, "I ratio", /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
     title: /*#__PURE__*/_react.default.createElement("div", {
       className: (0, _classnames.default)(classes.txtToolTip)
     }, /*#__PURE__*/_react.default.createElement("p", null, "Nicholson's method"), /*#__PURE__*/_react.default.createElement("i", null, "NICHOLSON, Rl S. Semiempirical Procedure for Measuring with Stationary Electrode Polarography Rates of Chemical Reactions Involving the Product of Electron Transfer. Analytical Chemistry, 1966, 38. Jg., Nr. 10, S. 1406-1406. https://doi.org/10.1021/ac60242a030"))
   }, /*#__PURE__*/_react.default.createElement(_Info.default, {
     className: (0, _classnames.default)(classes.infoIcon)
-  }))), /*#__PURE__*/_react.default.createElement(_core.TableCell, {
+  }))), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, "DeltaEp", /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+  }, "DeltaEp", /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
     title: /*#__PURE__*/_react.default.createElement("span", {
       className: (0, _classnames.default)(classes.txtToolTip)
     }, "| Epa - Epc |")
   }, /*#__PURE__*/_react.default.createElement(_Info.default, {
     className: (0, _classnames.default)(classes.infoIcon)
-  }))), /*#__PURE__*/_react.default.createElement(_core.TableCell, {
+  }))), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
   }, /*#__PURE__*/_react.default.createElement(_AddCircleOutline.default, {
     onClick: () => addNewPairPeakAct(jcampIdx)
-  })))), /*#__PURE__*/_react.default.createElement(_core.TableBody, null, rows.map(row => /*#__PURE__*/_react.default.createElement(_core.TableRow, {
+  })))), /*#__PURE__*/_react.default.createElement(_material.TableBody, null, rows.map(row => /*#__PURE__*/_react.default.createElement(_material.TableRow, {
     key: row.idx
-  }, /*#__PURE__*/_react.default.createElement(_core.TableCell, {
+  }, /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, spectra.isWorkMaxPeak && spectra.selectedIdx === row.idx ? classes.cellSelected : 'txt-sv-panel-txt'),
     onClick: row.onClickMax
-  }, row.max), /*#__PURE__*/_react.default.createElement(_core.TableCell, {
+  }, row.max), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, !spectra.isWorkMaxPeak && spectra.selectedIdx === row.idx ? classes.cellSelected : 'txt-sv-panel-txt'),
     onClick: row.onClickMin
-  }, row.min), /*#__PURE__*/_react.default.createElement(_core.TableCell, {
+  }, row.min), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, row.pecker), /*#__PURE__*/_react.default.createElement(_core.TableCell, {
+  }, row.pecker), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, row.ratio), /*#__PURE__*/_react.default.createElement(_core.TableCell, {
+  }, row.ratio), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, row.delta), /*#__PURE__*/_react.default.createElement(_core.TableCell, {
+  }, row.delta), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
   }, /*#__PURE__*/_react.default.createElement(_RemoveCircle.default, {
@@ -233,7 +230,7 @@ const CyclicVoltammetryPanel = _ref => {
     onClick: row.remove
   })))))), /*#__PURE__*/_react.default.createElement("div", {
     className: (0, _classnames.default)(classes.rowRoot, classes.rowEven)
-  }, /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+  }, /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
     title: /*#__PURE__*/_react.default.createElement("span", {
       className: (0, _classnames.default)(classes.txtToolTip)
     }, "Click here to open the User manual document")
@@ -279,5 +276,4 @@ CyclicVoltammetryPanel.propTypes = {
 CyclicVoltammetryPanel.defaultProps = {
   jcampIdx: 0
 };
-var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(CyclicVoltammetryPanel));
-exports.default = _default;
+var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(CyclicVoltammetryPanel));

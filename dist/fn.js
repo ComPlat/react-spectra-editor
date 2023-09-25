@@ -20,5 +20,4 @@ const FN = Object.assign({}, _format.default, {
   CalcMpyCenter: _multiplicity_calc.calcMpyCenter,
   CarbonFeatures: _carbonFeatures.carbonFeatures
 });
-var _default = FN;
-exports.default = _default;
+var _default = exports.default = FN;

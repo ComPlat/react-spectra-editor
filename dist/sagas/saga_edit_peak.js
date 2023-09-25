@@ -61,7 +61,7 @@ function* addVirtualFactor(action) {
   });
 }
 const editPeakSagas = [(0, _effects.takeEvery)(_action_type.SHIFT.SET_REF, addVirtualFactor), (0, _effects.takeEvery)(_action_type.SHIFT.SET_PEAK, addVirtualFactor)];
-var _default = editPeakSagas;
+var _default = exports.default = editPeakSagas;
 /* LOGIC
                                       -no        po - tg
   | picked | another | absoffset | prevOffset | relative | newOffset
@@ -73,4 +73,3 @@ var _default = editPeakSagas;
 -------------------------------------------------------------------
 
 */
-exports.default = _default;

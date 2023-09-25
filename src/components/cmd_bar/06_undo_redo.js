@@ -8,10 +8,10 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { ActionCreators as UndoActionCreators } from 'redux-undo';
 
-import { withStyles } from '@material-ui/core/styles';
-import Tooltip from '@material-ui/core/Tooltip';
-import RedoOutlinedIcon from '@material-ui/icons/RedoOutlined';
-import UndoOutlinedIcon from '@material-ui/icons/UndoOutlined';
+import withStyles from '@mui/styles/withStyles';
+import Tooltip from '@mui/material/Tooltip';
+import RedoOutlinedIcon from '@mui/icons-material/RedoOutlined';
+import UndoOutlinedIcon from '@mui/icons-material/UndoOutlined';
 import { MuButton, commonStyle } from './common';
 
 const styles = () => (

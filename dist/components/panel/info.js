@@ -12,11 +12,9 @@ var _reactRedux = require("react-redux");
 var _redux = require("redux");
 var _reactSvgFileZoomPan = _interopRequireDefault(require("@complat/react-svg-file-zoom-pan"));
 var _reactQuill = _interopRequireDefault(require("react-quill"));
-var _core = require("@material-ui/core");
-var _ExpandMore = _interopRequireDefault(require("@material-ui/icons/ExpandMore"));
-var _Divider = _interopRequireDefault(require("@material-ui/core/Divider"));
-var _Typography = _interopRequireDefault(require("@material-ui/core/Typography"));
-var _styles = require("@material-ui/core/styles");
+var _material = require("@mui/material");
+var _ExpandMore = _interopRequireDefault(require("@mui/icons-material/ExpandMore"));
+var _styles = require("@mui/styles");
 var _format = _interopRequireDefault(require("../../helpers/format"));
 /* eslint-disable no-mixed-operators, react/function-component-definition,
 react/require-default-props */
@@ -154,21 +152,21 @@ const InfoPanel = _ref => {
     originStack = integration.originStack; // eslint-disable-line
   }
 
-  return /*#__PURE__*/_react.default.createElement(_core.Accordion, {
+  return /*#__PURE__*/_react.default.createElement(_material.Accordion, {
     expanded: expand,
     onChange: onExapnd,
     className: (0, _classnames.default)(classes.panel),
     TransitionProps: {
       unmountOnExit: true
-    } // increase ExpansionPanel performance
-  }, /*#__PURE__*/_react.default.createElement(_core.AccordionSummary, {
+    } // increase Accordion performance
+  }, /*#__PURE__*/_react.default.createElement(_material.AccordionSummary, {
     expandIcon: /*#__PURE__*/_react.default.createElement(_ExpandMore.default, null),
     className: (0, _classnames.default)(classes.panelSummary)
-  }, /*#__PURE__*/_react.default.createElement(_Typography.default, {
+  }, /*#__PURE__*/_react.default.createElement(_material.Typography, {
     className: "txt-panel-header"
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title')
-  }, "Info"))), /*#__PURE__*/_react.default.createElement(_Divider.default, null), /*#__PURE__*/_react.default.createElement("div", {
+  }, "Info"))), /*#__PURE__*/_react.default.createElement(_material.Divider, null), /*#__PURE__*/_react.default.createElement("div", {
     className: (0, _classnames.default)(classes.panelDetail)
   }, /*#__PURE__*/_react.default.createElement("div", {
     className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd)
@@ -239,7 +237,6 @@ InfoPanel.propTypes = {
   canChangeDescription: _propTypes.default.bool.isRequired,
   onDescriptionChanged: _propTypes.default.func
 };
-var _default = (0, _reactRedux.connect)(
+var _default = exports.default = (0, _reactRedux.connect)(
 // eslint-disable-line
 mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(InfoPanel)); // eslint-disable-line
-exports.default = _default;

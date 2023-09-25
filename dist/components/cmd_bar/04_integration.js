@@ -10,9 +10,9 @@ var _reactRedux = require("react-redux");
 var _redux = require("redux");
 var _classnames = _interopRequireDefault(require("classnames"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
-var _styles = require("@material-ui/core/styles");
-var _Tooltip = _interopRequireDefault(require("@material-ui/core/Tooltip"));
-var _TextField = _interopRequireDefault(require("@material-ui/core/TextField"));
+var _withStyles = _interopRequireDefault(require("@mui/styles/withStyles"));
+var _Tooltip = _interopRequireDefault(require("@mui/material/Tooltip"));
+var _TextField = _interopRequireDefault(require("@mui/material/TextField"));
 var _react2 = _interopRequireDefault(require("@mdi/react"));
 var _js = require("@mdi/js");
 var _integration = require("../../actions/integration");
@@ -185,5 +185,4 @@ Integration.propTypes = {
   curveSt: _propTypes.default.object.isRequired,
   integrationSt: _propTypes.default.object.isRequired
 };
-var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(Integration));
-exports.default = _default;
+var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _withStyles.default)(styles)(Integration));

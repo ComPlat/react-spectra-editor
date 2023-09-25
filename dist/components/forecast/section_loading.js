@@ -6,8 +6,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 var _react = _interopRequireDefault(require("react"));
-var _CircularProgress = _interopRequireDefault(require("@material-ui/core/CircularProgress"));
-var _ErrorOutline = _interopRequireDefault(require("@material-ui/icons/ErrorOutline"));
+var _CircularProgress = _interopRequireDefault(require("@mui/material/CircularProgress"));
+var _ErrorOutline = _interopRequireDefault(require("@mui/icons-material/ErrorOutline"));
 const styleLoading = {
   alignItems: 'center',
   display: 'flex',
@@ -54,5 +54,4 @@ class SectionLoading extends _react.default.Component {
     return loading ? this.renderLoading() : this.renderNotFound();
   }
 }
-var _default = SectionLoading;
-exports.default = _default;
+var _default = exports.default = SectionLoading;

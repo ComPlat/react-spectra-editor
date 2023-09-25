@@ -94,5 +94,4 @@ function* resetInitCommonWithIntergation(action) {
   }
 }
 const managerSagas = [(0, _effects.takeEvery)(_action_type.MANAGER.RESETALL, resetShift), (0, _effects.takeEvery)(_action_type.MANAGER.RESET_INIT_NMR, resetInitNmr), (0, _effects.takeEvery)(_action_type.MANAGER.RESET_INIT_COMMON_WITH_INTERGATION, resetInitCommonWithIntergation)];
-var _default = managerSagas;
-exports.default = _default;
+var _default = exports.default = managerSagas;

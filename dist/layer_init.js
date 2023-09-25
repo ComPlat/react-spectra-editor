@@ -9,7 +9,7 @@ var _react = _interopRequireDefault(require("react"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
 var _reactRedux = require("react-redux");
 var _redux = require("redux");
-var _styles = require("@material-ui/core/styles");
+var _styles = require("@mui/styles");
 var _submit = require("./actions/submit");
 var _manager = require("./actions/manager");
 var _meta = require("./actions/meta");
@@ -214,7 +214,6 @@ LayerInit.propTypes = {
   setAllCurvesAct: _propTypes.default.func.isRequired,
   userManualLink: _propTypes.default.object // eslint-disable-line
 };
-var _default = (0, _reactRedux.connect)(
+var _default = exports.default = (0, _reactRedux.connect)(
 // eslint-disable-line
 mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(LayerInit)); // eslint-disable-line
-exports.default = _default;
