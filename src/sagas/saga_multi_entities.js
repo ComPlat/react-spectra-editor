@@ -4,19 +4,14 @@ import { put, takeEvery, select } from 'redux-saga/effects';
 import { CURVE, CYCLIC_VOLTA_METRY } from '../constants/action_type';
 import { LIST_LAYOUT } from '../constants/list_layout';
 
-const getCurveSt = (state) => state.curve;
 const getLayoutSt = (state) => state.layout;
+const getCurveSt = (state) => state.curve;
 
 function getMaxMinPeak(curve) {
   return curve.maxminPeak;
 }
 
 function* setCyclicVoltametry(action) { // eslint-disable-line
-  const layoutSt = yield select(getLayoutSt);
-  if (layoutSt !== LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
-    return;
-  }
-
   const curveSt = yield select(getCurveSt);
   const { listCurves } = curveSt;
 
@@ -28,6 +23,12 @@ function* setCyclicVoltametry(action) { // eslint-disable-line
 
     const numberOfCurves = listCurves.length;
     if (numberOfCurves <= 0) {
+      return;
+    }
+
+    const firstCurve = listCurves[0];
+    const { layout } = firstCurve;
+    if (layout !== LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
       return;
     }
 
@@ -58,12 +59,34 @@ function* setCyclicVoltametry(action) { // eslint-disable-line
           payload: { peak: pecker, index: pidx, jcampIdx: index },
         }));
       }
+      const { refIndex } = maxminPeak;
+      if (refIndex > -1) {
+        yield put(({
+          type: CYCLIC_VOLTA_METRY.SELECT_REF_PEAK,
+          payload: { index: refIndex, jcampIdx: index, checked: true },
+        }));
+      }
     }
   }
 }
 
+function* setCyclicVoltametryRef(action) { // eslint-disable-line
+  const layoutSt = yield select(getLayoutSt);
+  if (layoutSt !== LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
+    return;
+  }
+
+  const curveSt = yield select(getCurveSt);
+  const { curveIdx } = curveSt;
+  yield put(({
+    type: CYCLIC_VOLTA_METRY.SET_REF,
+    payload: { jcampIdx: curveIdx },
+  }));
+}
+
 const multiEntitiesSagas = [
   takeEvery(CURVE.SET_ALL_CURVES, setCyclicVoltametry),
+  takeEvery(CYCLIC_VOLTA_METRY.SET_FACTOR, setCyclicVoltametryRef),
 ];
 
 export default multiEntitiesSagas;

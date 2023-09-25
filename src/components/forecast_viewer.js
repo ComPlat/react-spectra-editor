@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
 
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles } from '@mui/styles';
 
 import ViewerLine from './d3_line/index';
 import NmrViewer from './forecast/nmr_viewer';

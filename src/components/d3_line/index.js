@@ -38,11 +38,20 @@ class ViewerLine extends React.Component {
       seed, peak, cLabel, xLabel, yLabel, feature, freq, comparisons,
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt, integationSt, mtplySt,
       sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
-      isHidden, wavelength,
+      isHidden, wavelength, axesUnitsSt,
       resetAllAct,
     } = this.props;
     drawDestroy(this.rootKlass);
     resetAllAct(feature);
+
+    let xxLabel = xLabel;
+    let yyLabel = yLabel;
+
+    if (axesUnitsSt) {
+      const { xUnit, yUnit } = axesUnitsSt;
+      xxLabel = xUnit === '' ? xLabel : xUnit;
+      yyLabel = yUnit === '' ? yLabel : yUnit;
+    }
 
     const filterSeed = seed;
     const filterPeak = peak;
@@ -64,7 +73,7 @@ class ViewerLine extends React.Component {
       isUiNoBrushSt,
       wavelength,
     });
-    drawLabel(this.rootKlass, cLabel, xLabel, yLabel);
+    drawLabel(this.rootKlass, cLabel, xxLabel, yyLabel);
     drawDisplay(this.rootKlass, isHidden);
   }
 
@@ -73,9 +82,18 @@ class ViewerLine extends React.Component {
       seed, peak, cLabel, xLabel, yLabel, freq, comparisons,
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt, integationSt, mtplySt,
       sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
-      isHidden, wavelength,
+      isHidden, wavelength, axesUnitsSt,
     } = this.props;
     this.normChange(prevProps);
+
+    let xxLabel = xLabel;
+    let yyLabel = yLabel;
+
+    if (axesUnitsSt) {
+      const { xUnit, yUnit } = axesUnitsSt;
+      xxLabel = xUnit === '' ? xLabel : xUnit;
+      yyLabel = yUnit === '' ? yLabel : yUnit;
+    }
 
     const filterSeed = seed;
     const filterPeak = peak;
@@ -96,7 +114,7 @@ class ViewerLine extends React.Component {
       isUiNoBrushSt,
       wavelength,
     });
-    drawLabel(this.rootKlass, cLabel, xLabel, yLabel);
+    drawLabel(this.rootKlass, cLabel, xxLabel, yyLabel);
     drawDisplay(this.rootKlass, isHidden);
   }
 
@@ -135,6 +153,7 @@ const mapStateToProps = (state, props) => (
     isUiAddIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
     isUiNoBrushSt: LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
     wavelength: state.wavelength,
+    axesUnitsSt: state.axesUnits,
   }
 );
 
@@ -177,6 +196,7 @@ ViewerLine.propTypes = {
   scrollUiWheelAct: PropTypes.func.isRequired,
   isHidden: PropTypes.bool.isRequired,
   wavelength: PropTypes.object.isRequired,
+  axesUnitsSt: PropTypes.object.isRequired,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ViewerLine);

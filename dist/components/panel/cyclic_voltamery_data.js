@@ -10,20 +10,18 @@ var _propTypes = _interopRequireDefault(require("prop-types"));
 var _classnames = _interopRequireDefault(require("classnames"));
 var _reactRedux = require("react-redux");
 var _redux = require("redux");
-var _ExpandMore = _interopRequireDefault(require("@material-ui/icons/ExpandMore"));
-var _AddCircleOutline = _interopRequireDefault(require("@material-ui/icons/AddCircleOutline"));
-var _RemoveCircle = _interopRequireDefault(require("@material-ui/icons/RemoveCircle"));
-var _Info = _interopRequireDefault(require("@material-ui/icons/Info"));
-var _Help = _interopRequireDefault(require("@material-ui/icons/Help"));
-var _Tooltip = _interopRequireDefault(require("@material-ui/core/Tooltip"));
-var _Divider = _interopRequireDefault(require("@material-ui/core/Divider"));
-var _Typography = _interopRequireDefault(require("@material-ui/core/Typography"));
-var _styles = require("@material-ui/core/styles");
-var _core = require("@material-ui/core");
+var _ExpandMore = _interopRequireDefault(require("@mui/icons-material/ExpandMore"));
+var _AddCircleOutline = _interopRequireDefault(require("@mui/icons-material/AddCircleOutline"));
+var _RemoveCircle = _interopRequireDefault(require("@mui/icons-material/RemoveCircle"));
+var _Info = _interopRequireDefault(require("@mui/icons-material/Info"));
+var _Help = _interopRequireDefault(require("@mui/icons-material/Help"));
+var _styles = require("@mui/styles");
+var _material = require("@mui/material");
 var _cyclic_voltammetry = require("../../actions/cyclic_voltammetry");
 var _ui = require("../../actions/ui");
 var _list_ui = require("../../constants/list_ui");
 var _chem = require("../../helpers/chem");
+var _format = _interopRequireDefault(require("../../helpers/format"));
 /* eslint-disable function-paren-newline, react/require-default-props,
 react/no-unused-prop-types, react/jsx-closing-tag-location, max-len, react/jsx-one-expression-per-line,
 react/jsx-indent, react/no-unescaped-entities, react/jsx-wrap-multilines, camelcase, no-shadow,
@@ -61,8 +59,11 @@ const styles = () => ({
   btnRemove: {
     color: 'red'
   },
+  btnAddRow: {
+    color: 'green'
+  },
   tTxt: {
-    padding: 10
+    padding: 5
   },
   infoIcon: {
     width: '15px',
@@ -100,6 +101,7 @@ const CyclicVoltammetryPanel = _ref => {
     setWorkWithMaxPeakAct,
     selectPairPeakAct,
     removePairPeakAct,
+    selectRefPeaksAct,
     sweepTypeSt,
     setUiSweepTypeAct,
     jcampIdx,
@@ -136,96 +138,126 @@ const CyclicVoltammetryPanel = _ref => {
       }
     }
   };
+  const changeCheckRefPeaks = (idx, event) => {
+    selectRefPeaksAct({
+      index: idx,
+      jcampIdx,
+      checked: event.target.checked
+    });
+  };
   const getDelta = data => {
-    return data.max && data.min ? (0, _chem.GetCyclicVoltaPeakSeparate)(data.max.x, data.min.x).toFixed(3) : 'undefined';
+    return data.max && data.min ? _format.default.strNumberFixedLength((0, _chem.GetCyclicVoltaPeakSeparate)(data.max.x, data.min.x) * 1000, 3) : 'nd';
   };
   const getRatio = (feature, data) => {
     const featureData = feature.data[0];
     const idx = featureData.x.indexOf(feature.maxX);
     const y_pecker = data.pecker ? data.pecker.y : featureData.y[idx];
-    return data.max && data.min ? (0, _chem.GetCyclicVoltaRatio)(data.max.y, data.min.y, y_pecker).toFixed(3) : 'undefined';
+    return data.max && data.min ? _format.default.strNumberFixedLength((0, _chem.GetCyclicVoltaRatio)(data.max.y, data.min.y, y_pecker), 3) : 'nd';
   };
   const rows = list.map((o, idx) => ({
     idx,
-    max: o.max ? `x:${parseFloat(o.max.x).toFixed(3)}, y:${parseFloat(o.max.y).toExponential(2)}` : 'undefined',
-    min: o.min ? `x:${parseFloat(o.min.x).toFixed(3)}, y:${parseFloat(o.min.y).toExponential(2)}` : 'undefined',
-    pecker: o.pecker ? `${parseFloat(o.pecker.y).toExponential(2)}` : 'undefined',
-    delta: getDelta(o),
+    max: o.max ? `E: ${_format.default.strNumberFixedLength(parseFloat(o.max.x), 3)} V,\nI: ${parseFloat(o.max.y * 1000).toExponential(2)} mA` : 'nd',
+    min: o.min ? `E: ${_format.default.strNumberFixedLength(parseFloat(o.min.x), 3)} V,\nI: ${parseFloat(o.min.y * 1000).toExponential(2)} mA` : 'nd',
+    pecker: o.pecker ? `${parseFloat(o.pecker.y * 1000).toExponential(2)} mA` : 'nd',
+    delta: `${getDelta(o)} mV`,
     ratio: getRatio(feature, o),
+    e12: typeof o.e12 === 'number' ? `${_format.default.strNumberFixedLength(o.e12, 3)} V` : 'nd',
+    isRef: o.isRef,
     onClickMax: () => selectCell(idx, true),
     onClickMin: () => selectCell(idx, false),
     remove: () => removePairPeakAct({
       index: idx,
       jcampIdx
-    })
+    }),
+    onCheckRefChanged: e => changeCheckRefPeaks(idx, e)
   }));
-  return /*#__PURE__*/_react.default.createElement(_core.Accordion, null, /*#__PURE__*/_react.default.createElement(_core.AccordionSummary, {
+  return /*#__PURE__*/_react.default.createElement(_material.Accordion, null, /*#__PURE__*/_react.default.createElement(_material.AccordionSummary, {
     expandIcon: /*#__PURE__*/_react.default.createElement(_ExpandMore.default, null),
     className: (0, _classnames.default)(classes.panelSummary)
-  }, /*#__PURE__*/_react.default.createElement(_Typography.default, {
+  }, /*#__PURE__*/_react.default.createElement(_material.Typography, {
     className: "txt-panel-header"
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title')
-  }, "Voltammetry data"))), /*#__PURE__*/_react.default.createElement(_Divider.default, null), /*#__PURE__*/_react.default.createElement(_core.Table, {
+  }, "Voltammetry data"))), /*#__PURE__*/_react.default.createElement(_material.Divider, null), /*#__PURE__*/_react.default.createElement(_material.Table, {
     className: classes.table
-  }, /*#__PURE__*/_react.default.createElement(_core.TableHead, null, /*#__PURE__*/_react.default.createElement(_core.TableRow, null, /*#__PURE__*/_react.default.createElement(_core.TableCell, {
+  }, /*#__PURE__*/_react.default.createElement(_material.TableHead, null, /*#__PURE__*/_react.default.createElement(_material.TableRow, null, /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, "Max"), /*#__PURE__*/_react.default.createElement(_core.TableCell, {
+  }, "Ref"), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, "Min"), /*#__PURE__*/_react.default.createElement(_core.TableCell, {
+  }, "Ox"), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, "I \u03BB0", /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+  }, "Red"), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
+    align: "left",
+    className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
+  }, "I ", /*#__PURE__*/_react.default.createElement("sub", null, "\u03BB0"), /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
     title: /*#__PURE__*/_react.default.createElement("p", {
       className: (0, _classnames.default)(classes.txtToolTip)
     }, "Baseline correction value for I ratio ", /*#__PURE__*/_react.default.createElement("br", null), "(a.k.a y value of pecker)")
   }, /*#__PURE__*/_react.default.createElement(_Info.default, {
     className: (0, _classnames.default)(classes.infoIcon)
-  }))), /*#__PURE__*/_react.default.createElement(_core.TableCell, {
+  }))), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, "I ratio", /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+  }, "I ratio", /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
     title: /*#__PURE__*/_react.default.createElement("div", {
       className: (0, _classnames.default)(classes.txtToolTip)
     }, /*#__PURE__*/_react.default.createElement("p", null, "Nicholson's method"), /*#__PURE__*/_react.default.createElement("i", null, "NICHOLSON, Rl S. Semiempirical Procedure for Measuring with Stationary Electrode Polarography Rates of Chemical Reactions Involving the Product of Electron Transfer. Analytical Chemistry, 1966, 38. Jg., Nr. 10, S. 1406-1406. https://doi.org/10.1021/ac60242a030"))
   }, /*#__PURE__*/_react.default.createElement(_Info.default, {
     className: (0, _classnames.default)(classes.infoIcon)
-  }))), /*#__PURE__*/_react.default.createElement(_core.TableCell, {
+  }))), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, "DeltaEp", /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+  }, "E1/2"), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
+    align: "left",
+    className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
+  }, "\u0394Ep", /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
     title: /*#__PURE__*/_react.default.createElement("span", {
       className: (0, _classnames.default)(classes.txtToolTip)
     }, "| Epa - Epc |")
   }, /*#__PURE__*/_react.default.createElement(_Info.default, {
     className: (0, _classnames.default)(classes.infoIcon)
-  }))), /*#__PURE__*/_react.default.createElement(_core.TableCell, {
+  }))), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
   }, /*#__PURE__*/_react.default.createElement(_AddCircleOutline.default, {
-    onClick: () => addNewPairPeakAct(jcampIdx)
-  })))), /*#__PURE__*/_react.default.createElement(_core.TableBody, null, rows.map(row => /*#__PURE__*/_react.default.createElement(_core.TableRow, {
+    onClick: () => addNewPairPeakAct(jcampIdx),
+    className: (0, _classnames.default)(classes.btnAddRow)
+  })))), /*#__PURE__*/_react.default.createElement(_material.TableBody, null, rows.map(row => /*#__PURE__*/_react.default.createElement(_material.TableRow, {
     key: row.idx
-  }, /*#__PURE__*/_react.default.createElement(_core.TableCell, {
+  }, /*#__PURE__*/_react.default.createElement(_material.TableCell, {
+    align: "left",
+    className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
+  }, /*#__PURE__*/_react.default.createElement(_material.Checkbox, {
+    checked: row.isRef,
+    onChange: row.onCheckRefChanged
+  })), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, spectra.isWorkMaxPeak && spectra.selectedIdx === row.idx ? classes.cellSelected : 'txt-sv-panel-txt'),
     onClick: row.onClickMax
-  }, row.max), /*#__PURE__*/_react.default.createElement(_core.TableCell, {
+  }, row.max.split('\n').map((s, index) => /*#__PURE__*/_react.default.createElement(_react.default.Fragment, {
+    key: index
+  }, s, /*#__PURE__*/_react.default.createElement("br", null)))), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, !spectra.isWorkMaxPeak && spectra.selectedIdx === row.idx ? classes.cellSelected : 'txt-sv-panel-txt'),
     onClick: row.onClickMin
-  }, row.min), /*#__PURE__*/_react.default.createElement(_core.TableCell, {
+  }, row.min.split('\n').map((s, index) => /*#__PURE__*/_react.default.createElement(_react.default.Fragment, {
+    key: index
+  }, s, /*#__PURE__*/_react.default.createElement("br", null)))), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, row.pecker), /*#__PURE__*/_react.default.createElement(_core.TableCell, {
+  }, row.pecker), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, row.ratio), /*#__PURE__*/_react.default.createElement(_core.TableCell, {
+  }, row.ratio), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, row.delta), /*#__PURE__*/_react.default.createElement(_core.TableCell, {
+  }, row.e12), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
+    align: "left",
+    className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
+  }, row.delta), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
   }, /*#__PURE__*/_react.default.createElement(_RemoveCircle.default, {
@@ -233,7 +265,7 @@ const CyclicVoltammetryPanel = _ref => {
     onClick: row.remove
   })))))), /*#__PURE__*/_react.default.createElement("div", {
     className: (0, _classnames.default)(classes.rowRoot, classes.rowEven)
-  }, /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+  }, /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
     title: /*#__PURE__*/_react.default.createElement("span", {
       className: (0, _classnames.default)(classes.txtToolTip)
     }, "Click here to open the User manual document")
@@ -257,6 +289,7 @@ const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   setWorkWithMaxPeakAct: _cyclic_voltammetry.setWorkWithMaxPeak,
   selectPairPeakAct: _cyclic_voltammetry.selectPairPeak,
   removePairPeakAct: _cyclic_voltammetry.removeCylicVoltaPairPeak,
+  selectRefPeaksAct: _cyclic_voltammetry.selectRefPeaks,
   setUiSweepTypeAct: _ui.setUiSweepType
 }, dispatch);
 CyclicVoltammetryPanel.propTypes = {
@@ -271,6 +304,7 @@ CyclicVoltammetryPanel.propTypes = {
   setWorkWithMaxPeakAct: _propTypes.default.func.isRequired,
   selectPairPeakAct: _propTypes.default.func.isRequired,
   removePairPeakAct: _propTypes.default.func.isRequired,
+  selectRefPeaksAct: _propTypes.default.func.isRequired,
   setUiSweepTypeAct: _propTypes.default.func.isRequired,
   sweepTypeSt: _propTypes.default.string.isRequired,
   userManualLink: _propTypes.default.string,

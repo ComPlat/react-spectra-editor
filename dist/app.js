@@ -15,6 +15,7 @@ var _react = _interopRequireDefault(require("react"));
 var _reactRedux = require("react-redux");
 var _redux = require("redux");
 var _propTypes = _interopRequireDefault(require("prop-types"));
+var _material = require("@mui/material");
 require("regenerator-runtime/runtime");
 var _reduxSaga = _interopRequireDefault(require("redux-saga"));
 var _index = _interopRequireDefault(require("./reducers/index"));
@@ -64,6 +65,8 @@ const SpectraEditor = _ref => {
   } = _ref;
   return /*#__PURE__*/_react.default.createElement(_reactRedux.Provider, {
     store: store
+  }, /*#__PURE__*/_react.default.createElement(_material.StyledEngineProvider, {
+    injectFirst: true
   }, /*#__PURE__*/_react.default.createElement(_layer_init.default, {
     entity: entity,
     multiEntities: multiEntities,
@@ -81,7 +84,7 @@ const SpectraEditor = _ref => {
     editorOnly: editorOnly,
     canChangeDescription: canChangeDescription,
     onDescriptionChanged: onDescriptionChanged
-  }));
+  })));
 };
 exports.SpectraEditor = SpectraEditor;
 SpectraEditor.propTypes = {

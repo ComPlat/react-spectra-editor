@@ -5,10 +5,10 @@ import { bindActionCreators, compose } from 'redux';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
-import { withStyles } from '@material-ui/core/styles';
-import SpellcheckOutlinedIcon from '@material-ui/icons/SpellcheckOutlined';
-import TimelineOutlinedIcon from '@material-ui/icons/TimelineOutlined';
-import Tooltip from '@material-ui/core/Tooltip';
+import withStyles from '@mui/styles/withStyles';
+import SpellcheckOutlinedIcon from '@mui/icons-material/SpellcheckOutlined';
+import TimelineOutlinedIcon from '@mui/icons-material/TimelineOutlined';
+import Tooltip from '@mui/material/Tooltip';
 
 import { setUiViewerType } from '../../actions/ui';
 import Cfg from '../../helpers/cfg';
@@ -31,7 +31,7 @@ const Viewer = ({
   const onViewAnalysis = () => setUiViewerTypeAct(LIST_UI_VIEWER_TYPE.ANALYSIS);
 
   return (
-    <span className={classes.group}>
+    <span className={classes.group} data-testid="Viewer">
       <Tooltip title={<span className="txt-sv-tp">Spectrum Viewer</span>}>
         <MuButton
           className={

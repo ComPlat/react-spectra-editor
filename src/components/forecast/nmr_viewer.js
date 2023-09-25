@@ -4,11 +4,10 @@ import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
 
-import { withStyles } from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import Paper from '@material-ui/core/Paper';
-import Grid from '@material-ui/core/Grid';
+import { withStyles } from '@mui/styles';
+import {
+  Table, TableBody, Paper, Grid,
+} from '@mui/material';
 
 import {
   sectionInput, sectionSvg,

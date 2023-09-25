@@ -9,12 +9,10 @@ import SvgFileZoomPan from '@complat/react-svg-file-zoom-pan';
 import ReactQuill from 'react-quill';
 
 import {
-  Accordion, AccordionSummary,
-} from '@material-ui/core';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import Divider from '@material-ui/core/Divider';
-import Typography from '@material-ui/core/Typography';
-import { withStyles } from '@material-ui/core/styles';
+  Accordion, AccordionSummary, Divider, Typography,
+} from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { withStyles } from '@mui/styles';
 
 import Format from '../../helpers/format';
 
@@ -144,7 +142,7 @@ const InfoPanel = ({
       expanded={expand}
       onChange={onExapnd}
       className={classNames(classes.panel)}
-      TransitionProps={{ unmountOnExit: true }} // increase ExpansionPanel performance
+      TransitionProps={{ unmountOnExit: true }} // increase Accordion performance
     >
       <AccordionSummary
         expandIcon={<ExpandMoreIcon />}

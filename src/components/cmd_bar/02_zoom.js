@@ -5,10 +5,10 @@ import { bindActionCreators, compose } from 'redux';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
-import { withStyles } from '@material-ui/core/styles';
-import ZoomInOutlinedIcon from '@material-ui/icons/ZoomInOutlined';
-import FindReplaceOutlinedIcon from '@material-ui/icons/FindReplaceOutlined';
-import Tooltip from '@material-ui/core/Tooltip';
+import withStyles from '@mui/styles/withStyles';
+import ZoomInOutlinedIcon from '@mui/icons-material/ZoomInOutlined';
+import FindReplaceOutlinedIcon from '@mui/icons-material/FindReplaceOutlined';
+import Tooltip from '@mui/material/Tooltip';
 
 import { setUiSweepType } from '../../actions/ui';
 import { MuButton, commonStyle, focusStyle } from './common';
@@ -28,7 +28,7 @@ const Zoom = ({
   const onSweepZoomReset = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.ZOOMRESET);
 
   return (
-    <span className={classes.group}>
+    <span className={classes.group} data-testid="Zoom">
       <Tooltip title={<span className="txt-sv-tp">Zoom In</span>}>
         <MuButton
           className={

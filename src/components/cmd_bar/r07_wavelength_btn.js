@@ -7,9 +7,9 @@ import classNames from 'classnames';
 import { bindActionCreators } from 'redux';
 
 import {
-  FormControl, InputLabel, Select, OutlinedInput, MenuItem,
-} from '@material-ui/core';
-import { withStyles } from '@material-ui/core/styles';
+  FormControl, InputLabel, Select, MenuItem,
+} from '@mui/material';
+import withStyles from '@mui/styles/withStyles';
 import { updateWaveLength } from '../../actions/wavelength';
 import Format from '../../helpers/format';
 import { commonStyle } from './common';
@@ -43,20 +43,15 @@ const wavelengthSelect = (classes, waveLengthSt, layoutSt, updateWaveLengthAct) 
       className={classNames(classes.fieldLayout)}
       variant="outlined"
     >
-      <InputLabel className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
+      <InputLabel id="select-wavelength-label" className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
         Wavelength
       </InputLabel>
       <Select
+        labelId="select-wavelength-label"
+        label="Wavelength"
         value={waveLengthSt}
         onChange={onChange}
-        input={
-          (
-            <OutlinedInput
-              className={classNames(classes.selectInput, 'input-sv-bar-layout')}
-              labelWidth={60}
-            />
-          )
-        }
+        className={classNames(classes.selectInput, 'input-sv-bar-layout')}
       >
         {
           LIST_WAVE_LENGTH.map(item => { // eslint-disable-line

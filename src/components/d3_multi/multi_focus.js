@@ -14,7 +14,7 @@ import { TfRescale, MountCompass } from '../../helpers/compass';
 import { LIST_LAYOUT } from '../../constants/list_layout';
 import Format from '../../helpers/format';
 import {
-  convertTopic,
+  GetCyclicVoltaPreviousShift, convertTopic,
 } from '../../helpers/chem';
 import Cfg from '../../helpers/cfg';
 import { itgIdTag, mpyIdTag } from '../../helpers/focus';
@@ -146,7 +146,8 @@ class MultiFocus {
     let filterSubLayoutValue = null;
     this.entities.forEach((entry, idx) => {
       const { topic, feature, color } = entry;
-      const currData = convertTopic(topic, layout, feature, 0);
+      const offset = GetCyclicVoltaPreviousShift(cyclicvoltaSt, jcampIdx);
+      const currData = convertTopic(topic, layout, feature, offset);
       if (idx === jcampIdx) {
         this.data = [...currData];
         this.pathColor = color;

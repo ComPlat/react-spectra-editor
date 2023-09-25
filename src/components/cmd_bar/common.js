@@ -1,8 +1,11 @@
-import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
+/* eslint-disable no-unused-vars, max-len, indent, react/function-component-definition, react/self-closing-comp, react/prop-types, react/jsx-props-no-spreading */
+import React from 'react';
+import { makeStyles } from '@mui/styles';
+import Button from '@mui/material/Button';
+import classNames from 'classnames';
 
-const MuButton = withStyles({
-  root: {
+const useStyles = makeStyles((theme) => ({
+  muiBtn: {
     border: '1px solid #ccc',
     borderRadius: 4,
     fontFamily: 'Helvetica',
@@ -12,8 +15,17 @@ const MuButton = withStyles({
     minWidth: 30,
     padding: 0,
     width: 30,
+    color: 'black',
   },
-})(Button);
+}));
+
+const MuButton = (props) => {
+  const classes = useStyles();
+  const { className, ...other } = props;
+  return (
+    <Button className={classNames(classes.muiBtn, className)} {...other} />
+  );
+};
 
 const commonStyle = {
   card: {
@@ -86,6 +98,14 @@ const commonStyle = {
     backgroundColor: 'white',
     fontSize: 12,
     margin: '22% 0 0 7px',
+    padding: '0 10px 0 10px',
+    transform: 'scale(0.75)',
+  },
+  txtLabelTopInput: {
+    fontFamily: 'Helvetica',
+    backgroundColor: 'white',
+    fontSize: 12,
+    margin: '-8% 0 0 7px',
     padding: '0 10px 0 10px',
     transform: 'scale(0.75)',
   },

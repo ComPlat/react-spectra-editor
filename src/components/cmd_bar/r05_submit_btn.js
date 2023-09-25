@@ -7,9 +7,9 @@ import { connect } from 'react-redux';
 import classNames from 'classnames';
 import { bindActionCreators, compose } from 'redux';
 
-import Tooltip from '@material-ui/core/Tooltip';
-import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
-import { withStyles } from '@material-ui/core/styles';
+import Tooltip from '@mui/material/Tooltip';
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
+import { withStyles } from '@mui/styles';
 
 import {
   Convert2Scan, Convert2Thres,
@@ -28,7 +28,7 @@ const onClickCb = (
   operation, peaksEdit, isAscend, isIntensity,
   scan, thres, layoutSt, shiftSt, analysis, decimalSt,
   integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt,
-  cyclicvoltaSt, curveSt,
+  cyclicvoltaSt, curveSt, axesUnitsSt,
 ) => (
   () => {
     operation({
@@ -48,6 +48,7 @@ const onClickCb = (
       waveLength: waveLengthSt,
       cyclicvoltaSt,
       curveSt,
+      axesUnitsSt,
     });
   }
 );
@@ -56,7 +57,7 @@ const BtnSubmit = ({
   classes, operation, feature, isAscend, isIntensity,
   editPeakSt, thresSt, layoutSt, shiftSt, scanSt, forecastSt,
   decimalSt, integrationSt, multiplicitySt, allIntegrationSt,
-  waveLengthSt, cyclicvoltaSt, curveSt,
+  waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt,
 }) => {
   const peaksEdit = extractPeaksEdit(feature, editPeakSt, thresSt, shiftSt, layoutSt);
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
@@ -79,7 +80,7 @@ const BtnSubmit = ({
           operation.value, peaksEdit, isAscend, isIntensity,
           scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt,
           integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt,
-          cyclicvoltaSt, curveSt,
+          cyclicvoltaSt, curveSt, axesUnitsSt,
         )}
       >
         <PlayCircleOutlineIcon className={classes.icon} />
@@ -103,6 +104,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     waveLengthSt: state.wavelength,
     cyclicvoltaSt: state.cyclicvolta,
     curveSt: state.curve,
+    axesUnitsSt: state.axesUnits,
   }
 );
 
@@ -135,6 +137,7 @@ BtnSubmit.propTypes = {
   waveLengthSt: PropTypes.object.isRequired,
   cyclicvoltaSt: PropTypes.object.isRequired,
   curveSt: PropTypes.object,
+  axesUnitsSt: PropTypes.object.isRequired,
 };
 
 export default compose(

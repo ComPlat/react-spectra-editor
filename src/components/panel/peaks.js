@@ -5,17 +5,13 @@ import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import { Accordion, AccordionSummary } from '@material-ui/core';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import Divider from '@material-ui/core/Divider';
-import Typography from '@material-ui/core/Typography';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import HighlightOffIcon from '@material-ui/icons/HighlightOff';
-import { withStyles } from '@material-ui/core/styles';
+import {
+  Accordion, AccordionSummary, Divider, Typography,
+  Table, TableBody, TableCell, TableHead, TableRow,
+} from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import { withStyles } from '@mui/styles';
 import { Convert2Peak } from '../../helpers/chem';
 
 import { rmFromPosList, rmFromNegList } from '../../actions/edit_peak';
@@ -153,7 +149,7 @@ const PeakPanel = ({
       expanded={expand}
       onChange={onExapnd}
       className={classNames(classes.panel)}
-      TransitionProps={{ unmountOnExit: true }} // increase ExpansionPanel performance
+      TransitionProps={{ unmountOnExit: true }} // increase Accordion performance
     >
       <AccordionSummary
         expandIcon={<ExpandMoreIcon />}

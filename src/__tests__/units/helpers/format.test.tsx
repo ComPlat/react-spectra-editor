@@ -212,8 +212,8 @@ describe('Test format helper', () => {
   describe('Get digit number of spectra based on layout', () => {
     it('Layout digit 0', () => {
       const listLayout = [LIST_LAYOUT.IR, LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS, 
-        LIST_LAYOUT.HPLC_UVVIS, LIST_LAYOUT.TGA, LIST_LAYOUT.XRD, 
-        LIST_LAYOUT.CYCLIC_VOLTAMMETRY, LIST_LAYOUT.CDS, LIST_LAYOUT.SEC, LIST_LAYOUT.MS
+        LIST_LAYOUT.HPLC_UVVIS, LIST_LAYOUT.TGA, LIST_LAYOUT.XRD,
+        LIST_LAYOUT.CDS, LIST_LAYOUT.SEC, LIST_LAYOUT.MS
       ];
 
       listLayout.forEach(layout => {
@@ -232,7 +232,8 @@ describe('Test format helper', () => {
     })
 
     it('Layout digit 2', () => {
-      const listLayout = [LIST_LAYOUT.H1, LIST_LAYOUT.F19, LIST_LAYOUT.P31, LIST_LAYOUT.N15, LIST_LAYOUT.Si29, LIST_LAYOUT.PLAIN];
+      const listLayout = [LIST_LAYOUT.H1, LIST_LAYOUT.F19, LIST_LAYOUT.P31, LIST_LAYOUT.N15, LIST_LAYOUT.Si29, LIST_LAYOUT.PLAIN, 
+        LIST_LAYOUT.CYCLIC_VOLTAMMETRY];
 
       listLayout.forEach(layout => {
         const digit = Format.spectraDigit(layout)
@@ -401,6 +402,53 @@ describe('Test format helper', () => {
         expect(strNumber).toEqual(expected)
       })
     })
-    
+  })
+
+  describe('.strNumberFixedLength()', () => {
+    it('number without fixed', () => {
+      const strNumber = Format.strNumberFixedLength(2.50);
+      const expected = '2.5'
+      expect(strNumber).toEqual(expected)
+    })
+
+    it('round the number when length is smaller that the lenght of the interger part', () => {
+      const strNumber = Format.strNumberFixedLength(12.5, 1);
+      const expected = '13'
+      expect(strNumber).toEqual(expected)
+    })
+
+    it('round the number when length is equal that the length of the interger part', () => {
+      const strNumber = Format.strNumberFixedLength(12.5, 2);
+      const expected = '13'
+      expect(strNumber).toEqual(expected)
+    })
+
+    it('return the number when it is an integer', () => {
+      const strNumber = Format.strNumberFixedLength(12, 1);
+      const expected = '12'
+      expect(strNumber).toEqual(expected)
+    })
+
+    it('return the number when it is an integer but lenght is longer', () => {
+      const strNumber = Format.strNumberFixedLength(12, 3);
+      const expected = '12.0'
+      expect(strNumber).toEqual(expected)
+    })
+
+    it('return the number when it is a negative integer but lenght is longer', () => {
+      const strNumber = Format.strNumberFixedLength(-12, 3);
+      const expected = '-12.0'
+      expect(strNumber).toEqual(expected)
+    })
+
+    it('format the number with length', () => {
+      const strNumber1 = Format.strNumberFixedLength(1.733, 3);
+      const expected1 = '1.73'
+      expect(strNumber1).toEqual(expected1)
+
+      const strNumber2 = Format.strNumberFixedLength(90.007, 3);
+      const expected2 = '90.0'
+      expect(strNumber2).toEqual(expected2)
+    })
   })
 })

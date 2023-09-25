@@ -22,7 +22,7 @@ const btnCmdAddPeak = (layoutSt) => Format.isMsLayout(layoutSt);
 
 const btnCmdRmPeak = (layoutSt) => Format.isMsLayout(layoutSt);
 
-const btnCmdSetRef = (layoutSt) => !(Format.isNmrLayout(layoutSt));
+const btnCmdSetRef = (layoutSt) => !Format.isNmrLayout(layoutSt); // eslint-disable-line
 
 const btnCmdIntg = (layoutSt) => !(Format.isNmrLayout(layoutSt)|| Format.isHplcUvVisLayout(layoutSt));  // eslint-disable-line
 

@@ -7,9 +7,9 @@ import { bindActionCreators } from 'redux';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
-import { withStyles } from '@material-ui/core/styles';
-import Tooltip from '@material-ui/core/Tooltip';
-import TextField from '@material-ui/core/TextField';
+import withStyles from '@mui/styles/withStyles';
+import Tooltip from '@mui/material/Tooltip';
+import TextField from '@mui/material/TextField';
 
 import Icon from '@mdi/react';
 import { mdiReflectVertical, mdiMathIntegral } from '@mdi/js';

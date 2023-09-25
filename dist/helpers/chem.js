@@ -4,7 +4,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.convertTopic = exports.Topic2Seed = exports.ToThresEndPts = exports.ToShiftPeaks = exports.ToFrequency = exports.GetCyclicVoltaRatio = exports.GetCyclicVoltaPeakSeparate = exports.GetComparisons = exports.Feature2Peak = exports.Feature2MaxMinPeak = exports.ExtractJcamp = exports.Convert2Thres = exports.Convert2Scan = exports.Convert2Peak = exports.Convert2MaxMinPeak = exports.Convert2DValue = void 0;
+exports.convertTopic = exports.Topic2Seed = exports.ToThresEndPts = exports.ToShiftPeaks = exports.ToFrequency = exports.GetCyclicVoltaShiftOffset = exports.GetCyclicVoltaRatio = exports.GetCyclicVoltaPreviousShift = exports.GetCyclicVoltaPeakSeparate = exports.GetComparisons = exports.Feature2Peak = exports.Feature2MaxMinPeak = exports.ExtractJcamp = exports.Convert2Thres = exports.Convert2Scan = exports.Convert2Peak = exports.Convert2MaxMinPeak = exports.Convert2DValue = void 0;
 var _jcampconverter = _interopRequireDefault(require("jcampconverter"));
 var _reselect = require("reselect");
 var _shift = require("./shift");
@@ -20,15 +20,45 @@ const getTopic = (_, props) => props.topic;
 const getFeature = (_, props) => props.feature;
 const getLayout = (state, _) => state.layout; // eslint-disable-line
 
+const GetCyclicVoltaShiftOffset = function () {
+  let volammetryData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  let curveIdx = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+  if (!volammetryData) return 0.0;
+  const {
+    spectraList
+  } = volammetryData;
+  const spectra = spectraList[curveIdx];
+  if (!spectra) return 0.0;
+  const {
+    shift
+  } = spectra;
+  const {
+    ref,
+    val
+  } = shift;
+  if (!ref) return 0.0;
+  const {
+    e12
+  } = ref;
+  return e12 - val;
+};
+exports.GetCyclicVoltaShiftOffset = GetCyclicVoltaShiftOffset;
 const getShiftOffset = (state, _) => {
   // eslint-disable-line
   const {
     curve,
-    shift
+    layout,
+    cyclicvolta
   } = state;
   const {
     curveIdx
   } = curve;
+  if (layout === _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY && cyclicvolta) {
+    return GetCyclicVoltaShiftOffset(cyclicvolta, curveIdx);
+  }
+  const {
+    shift
+  } = state;
   const {
     shifts
   } = shift;
@@ -36,8 +66,6 @@ const getShiftOffset = (state, _) => {
   if (!selectedShift) {
     return 0.0;
   }
-
-  // const { shift } = state;
   const {
     ref,
     peak
@@ -201,22 +229,21 @@ const Convert2Peak = function (feature, threshold, offset) {
 exports.Convert2Peak = Convert2Peak;
 const Feature2Peak = exports.Feature2Peak = (0, _reselect.createSelector)(getFeature, getThreshold, getShiftOffset, Convert2Peak);
 const Convert2MaxMinPeak = (layout, feature, offset) => {
+  // eslint-disable-line
   const peaks = {
     max: [],
     min: [],
-    pecker: []
+    pecker: [],
+    refIndex: -1
   };
   if (!_format.default.isCyclicVoltaLayout(layout) || !feature || !feature.data) return null; // eslint-disable-line
-  const data = feature.data[0]; // eslint-disable-line
+  // const data = feature.data[0]; // eslint-disable-line
   const {
-    maxY,
-    minY,
-    upperThres,
-    lowerThres,
     volammetryData
   } = feature;
   if (volammetryData && volammetryData.length > 0) {
     const maxArr = volammetryData.map(peakData => {
+      // peaks.refIndex = peakData.isRef === true ? idx : -1;
       if (peakData.max.x === '') return null;
       return {
         x: Number(peakData.max.x),
@@ -237,39 +264,39 @@ const Convert2MaxMinPeak = (layout, feature, offset) => {
         y: Number(peakData.pecker.y)
       };
     });
+    const refIndex = volammetryData.findIndex(peakData => peakData.isRef === true);
     peaks.max = maxArr;
     peaks.min = minArr;
     peaks.pecker = peckerArr;
+    peaks.refIndex = refIndex;
     return peaks;
   }
-  let upperThresVal = upperThres;
-  if (!upperThresVal) {
-    upperThresVal = 1.0;
-  }
-  let lowerThresVal = lowerThres;
-  if (!lowerThresVal) {
-    lowerThresVal = 1.0;
-  }
-  const yUpperThres = parseFloat(upperThresVal) / 100.0 * maxY;
-  const yLowerThres = parseFloat(lowerThresVal) / 100.0 * minY;
-  const corrOffset = offset || 0.0;
-  for (let i = 0; i < data.y.length; i += 1) {
-    const y = data.y[i];
-    const overUpperThres = y >= yUpperThres;
-    const belowThres = y <= yLowerThres;
-    const x = data.x[i] - corrOffset;
-    if (overUpperThres) {
-      peaks.max.push({
-        x,
-        y
-      });
-    } else if (belowThres) {
-      peaks.min.push({
-        x,
-        y
-      });
-    }
-  }
+
+  // // let upperThresVal = upperThres;
+  // // if (!upperThresVal) {
+  // //   upperThresVal = 1.0;
+  // // }
+
+  // // let lowerThresVal = lowerThres;
+  // // if (!lowerThresVal) {
+  // //   lowerThresVal = 1.0;
+  // // }
+
+  // // const yUpperThres = parseFloat(upperThresVal) / 100.0 * maxY;
+  // // const yLowerThres = parseFloat(lowerThresVal) / 100.0 * minY;
+
+  // // const corrOffset = offset || 0.0;
+  // // for (let i = 0; i < data.y.length; i += 1) {
+  // //   const y = data.y[i];
+  // //   const overUpperThres = y >= yUpperThres;
+  // //   const belowThres = y <= yLowerThres;
+  // //   const x = data.x[i] - corrOffset;
+  // //   if (overUpperThres) {
+  // //     peaks.max.push({ x, y });
+  // //   } else if (belowThres) {
+  // //     peaks.min.push({ x, y });
+  // //   }
+  // // }
   return peaks;
 };
 exports.Convert2MaxMinPeak = Convert2MaxMinPeak;
@@ -466,6 +493,7 @@ const extractVoltammetryData = jcamp => {
   const rawData = info.$CSCYCLICVOLTAMMETRYDATA.split('\n');
   const peakStack = rawData.map(line => {
     const splittedLine = line.replace(regx, '').split(',');
+    const isRef = splittedLine.length > 8 && splittedLine[8] === '1';
     return {
       max: {
         x: splittedLine[0],
@@ -480,7 +508,8 @@ const extractVoltammetryData = jcamp => {
       pecker: {
         x: splittedLine[6],
         y: splittedLine[7]
-      }
+      },
+      isRef
     };
   });
   return peakStack;
@@ -868,3 +897,22 @@ const GetCyclicVoltaPeakSeparate = (x_max_peak, x_min_peak) => {
   return delta;
 };
 exports.GetCyclicVoltaPeakSeparate = GetCyclicVoltaPeakSeparate;
+const GetCyclicVoltaPreviousShift = (cyclicVolta, curveIdx) => {
+  if (!cyclicVolta) {
+    return 0.0;
+  }
+  const {
+    spectraList
+  } = cyclicVolta;
+  if (spectraList.length <= curveIdx) {
+    return 0.0;
+  }
+  const {
+    shift
+  } = spectraList[curveIdx];
+  const {
+    prevValue
+  } = shift;
+  return prevValue;
+};
+exports.GetCyclicVoltaPreviousShift = GetCyclicVoltaPreviousShift;

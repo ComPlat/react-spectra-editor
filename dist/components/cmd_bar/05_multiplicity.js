@@ -10,8 +10,8 @@ var _reactRedux = require("react-redux");
 var _redux = require("redux");
 var _classnames = _interopRequireDefault(require("classnames"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
-var _styles = require("@material-ui/core/styles");
-var _Tooltip = _interopRequireDefault(require("@material-ui/core/Tooltip"));
+var _withStyles = _interopRequireDefault(require("@mui/styles/withStyles"));
+var _Tooltip = _interopRequireDefault(require("@mui/material/Tooltip"));
 var _ui = require("../../actions/ui");
 var _multiplicity = require("../../actions/multiplicity");
 var _list_ui = require("../../constants/list_ui");
@@ -130,4 +130,4 @@ Multiplicity.propTypes = {
   clearMpyAllAct: _propTypes.default.func.isRequired,
   curveSt: _propTypes.default.object.isRequired
 };
-var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(Multiplicity));
+var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _withStyles.default)(styles)(Multiplicity));
