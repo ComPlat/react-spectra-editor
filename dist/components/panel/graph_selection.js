@@ -10,15 +10,13 @@ var _propTypes = _interopRequireDefault(require("prop-types"));
 var _classnames = _interopRequireDefault(require("classnames"));
 var _reactRedux = require("react-redux");
 var _redux = require("redux");
-var _ExpandMore = _interopRequireDefault(require("@material-ui/icons/ExpandMore"));
-var _Divider = _interopRequireDefault(require("@material-ui/core/Divider"));
-var _Typography = _interopRequireDefault(require("@material-ui/core/Typography"));
-var _styles = require("@material-ui/core/styles");
-var _core = require("@material-ui/core");
+var _ExpandMore = _interopRequireDefault(require("@mui/icons-material/ExpandMore"));
+var _styles = require("@mui/styles");
+var _material = require("@mui/material");
 var _curve = require("../../actions/curve");
 var _list_layout = require("../../constants/list_layout");
-function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
-function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 /* eslint-disable react/function-component-definition, function-paren-newline,
 react/require-default-props, react/no-unused-prop-types */
 
@@ -126,22 +124,22 @@ const GraphSelectionPanel = _ref => {
       filename
     };
   });
-  return /*#__PURE__*/_react.default.createElement(_core.Accordion, {
+  return /*#__PURE__*/_react.default.createElement(_material.Accordion, {
     "data-testid": "GraphSelectionPanel"
-  }, /*#__PURE__*/_react.default.createElement(_core.AccordionSummary, {
+  }, /*#__PURE__*/_react.default.createElement(_material.AccordionSummary, {
     expandIcon: /*#__PURE__*/_react.default.createElement(_ExpandMore.default, null),
     className: (0, _classnames.default)(classes.panelSummary)
-  }, /*#__PURE__*/_react.default.createElement(_Typography.default, {
+  }, /*#__PURE__*/_react.default.createElement(_material.Typography, {
     className: "txt-panel-header"
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title')
-  }, "Graph selection"))), /*#__PURE__*/_react.default.createElement(_Divider.default, null), layoutSt === _list_layout.LIST_LAYOUT.AIF ? /*#__PURE__*/_react.default.createElement(_core.FormControlLabel, {
-    control: /*#__PURE__*/_react.default.createElement(_core.Switch, {
+  }, "Graph selection"))), /*#__PURE__*/_react.default.createElement(_material.Divider, null), layoutSt === _list_layout.LIST_LAYOUT.AIF ? /*#__PURE__*/_react.default.createElement(_material.FormControlLabel, {
+    control: /*#__PURE__*/_react.default.createElement(_material.Switch, {
       checked: isShowAllCurve,
       onChange: onChangeSwitch
     }),
     label: "Show all curves"
-  }) : null, subLayoutValues && subLayoutValues.length > 1 ? /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement(_core.Tabs, {
+  }) : null, subLayoutValues && subLayoutValues.length > 1 ? /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement(_material.Tabs, {
     value: selectedSubLayout,
     onChange: onChangeTabSubLayout
   }, subLayoutValues.map((subLayout, i) => {
@@ -156,12 +154,12 @@ const GraphSelectionPanel = _ref => {
       default:
         break;
     }
-    return /*#__PURE__*/_react.default.createElement(_core.Tab, {
+    return /*#__PURE__*/_react.default.createElement(_material.Tab, {
       key: i,
       value: subLayout,
       label: subLayoutName
     });
-  })), /*#__PURE__*/_react.default.createElement(_core.List, null, itemsSubLayout.map(item => /*#__PURE__*/_react.default.createElement(_core.ListItem, {
+  })), /*#__PURE__*/_react.default.createElement(_material.List, null, itemsSubLayout.map(item => /*#__PURE__*/_react.default.createElement(_material.ListItem, {
     key: item.idx,
     onClick: () => onChange(item.idx),
     className: (0, _classnames.default)(item.idx === curveIdx ? classes.curveSelected : classes.curveDefault) // eslint-disable-line
@@ -178,7 +176,7 @@ const GraphSelectionPanel = _ref => {
       backgroundColor: item.color
     }
   }), item.filename !== '' ? /*#__PURE__*/_react.default.createElement("span", null, "File: ", item.filename) : null // eslint-disable-line
-  )))))) : /*#__PURE__*/_react.default.createElement(_core.List, null, items.map(item => /*#__PURE__*/_react.default.createElement(_core.ListItem, {
+  )))))) : /*#__PURE__*/_react.default.createElement(_material.List, null, items.map(item => /*#__PURE__*/_react.default.createElement(_material.ListItem, {
     key: item.idx,
     onClick: () => onChange(item.idx),
     className: (0, _classnames.default)(item.idx === curveIdx ? classes.curveSelected : classes.curveDefault) // eslint-disable-line

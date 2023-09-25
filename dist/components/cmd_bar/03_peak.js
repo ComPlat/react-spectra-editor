@@ -10,9 +10,9 @@ var _reactRedux = require("react-redux");
 var _redux = require("redux");
 var _classnames = _interopRequireDefault(require("classnames"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
-var _styles = require("@material-ui/core/styles");
-var _Tooltip = _interopRequireDefault(require("@material-ui/core/Tooltip"));
-var _AddLocationOutlined = _interopRequireDefault(require("@material-ui/icons/AddLocationOutlined"));
+var _withStyles = _interopRequireDefault(require("@mui/styles/withStyles"));
+var _Tooltip = _interopRequireDefault(require("@mui/material/Tooltip"));
+var _AddLocationOutlined = _interopRequireDefault(require("@mui/icons-material/AddLocationOutlined"));
 var _ui = require("../../actions/ui");
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 var _common = require("./common");
@@ -124,4 +124,4 @@ Peak.propTypes = {
   cyclicVotaSt: _propTypes.default.object.isRequired,
   curveSt: _propTypes.default.object.isRequired
 };
-var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(Peak);
+var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _withStyles.default)(styles))(Peak);

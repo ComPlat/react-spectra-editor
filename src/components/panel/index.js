@@ -6,8 +6,10 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
 import {
-  withStyles, createTheme, MuiThemeProvider,
-} from '@material-ui/core/styles';
+  createTheme, ThemeProvider, StyledEngineProvider, adaptV4Theme,
+} from '@mui/material/styles';
+
+import withStyles from '@mui/styles/withStyles';
 
 import InfoPanel from './info';
 import PeakPanel from './peaks';
@@ -17,11 +19,11 @@ import CyclicVoltammetryPanel from './cyclic_voltamery_data';
 import GraphSelectionPanel from './graph_selection';
 import Cfg from '../../helpers/cfg';
 
-const theme = createTheme({
+const theme = createTheme(adaptV4Theme({
   typography: {
     useNextVariants: true,
   },
-});
+}));
 
 const styles = () => ({
   panels: {
@@ -79,26 +81,28 @@ class PanelViewer extends React.Component {
 
     return (
       <div className={classNames(classes.panels)}>
-        <MuiThemeProvider
-          theme={theme}
-        >
-          { hideGraphSelection ? null : <GraphSelectionPanel jcampIdx={jcampIdx} entityFileNames={entityFileNames} expand={expand === 'graph'} onExapnd={onExapndGraphSelection} subLayoutsInfo={subLayoutsInfo} />}
-          <InfoPanel
-            feature={feature}
-            integration={integration}
-            editorOnly={editorOnly}
-            expand={expand === 'info'}
-            molSvg={molSvg}
-            onExapnd={onExapndInfo}
-            descriptions={descriptions}
-            canChangeDescription={canChangeDescription}
-            onDescriptionChanged={this.handleDescriptionChanged}
-          />
-          { Cfg.hidePanelPeak(layoutSt) ? null : <PeakPanel expand={expand === 'peak'} onExapnd={onExapndPeak} /> }
-          { Cfg.hidePanelMpy(layoutSt) ? null : <MultiplicityPanel expand={expand === 'mpy'} onExapnd={onExapndMpy} /> }
-          { (Cfg.hidePanelCompare(layoutSt) || listCurves.length > 1) ? null : <ComparePanel expand={expand === 'compare'} onExapnd={onExapndCompare} /> }
-          { Cfg.hidePanelCyclicVolta(layoutSt) ? null : <CyclicVoltammetryPanel jcampIdx={jcampIdx} feature={feature} expand={expand === 'cyclicvolta'} onExapnd={onExapndCyclicVolta} userManualLink={userManualLink ? userManualLink.cv : undefined} />}
-        </MuiThemeProvider>
+        <StyledEngineProvider injectFirst>
+          <ThemeProvider
+            theme={theme}
+          >
+            { hideGraphSelection ? null : <GraphSelectionPanel jcampIdx={jcampIdx} entityFileNames={entityFileNames} expand={expand === 'graph'} onExapnd={onExapndGraphSelection} subLayoutsInfo={subLayoutsInfo} />}
+            <InfoPanel
+              feature={feature}
+              integration={integration}
+              editorOnly={editorOnly}
+              expand={expand === 'info'}
+              molSvg={molSvg}
+              onExapnd={onExapndInfo}
+              descriptions={descriptions}
+              canChangeDescription={canChangeDescription}
+              onDescriptionChanged={this.handleDescriptionChanged}
+            />
+            { Cfg.hidePanelPeak(layoutSt) ? null : <PeakPanel expand={expand === 'peak'} onExapnd={onExapndPeak} /> }
+            { Cfg.hidePanelMpy(layoutSt) ? null : <MultiplicityPanel expand={expand === 'mpy'} onExapnd={onExapndMpy} /> }
+            { (Cfg.hidePanelCompare(layoutSt) || listCurves.length > 1) ? null : <ComparePanel expand={expand === 'compare'} onExapnd={onExapndCompare} /> }
+            { Cfg.hidePanelCyclicVolta(layoutSt) ? null : <CyclicVoltammetryPanel jcampIdx={jcampIdx} feature={feature} expand={expand === 'cyclicvolta'} onExapnd={onExapndCyclicVolta} userManualLink={userManualLink ? userManualLink.cv : undefined} />}
+          </ThemeProvider>
+        </StyledEngineProvider>
       </div>
     );
   }

@@ -8,18 +8,16 @@ import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
-import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
-import InfoIcon from '@material-ui/icons/Info';
-import HelpIcon from '@material-ui/icons/Help';
-import Tooltip from '@material-ui/core/Tooltip';
-import Divider from '@material-ui/core/Divider';
-import Typography from '@material-ui/core/Typography';
-import { withStyles } from '@material-ui/core/styles';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+import InfoIcon from '@mui/icons-material/Info';
+import HelpIcon from '@mui/icons-material/Help';
+import { withStyles } from '@mui/styles';
 import {
   Accordion, AccordionSummary, Table, TableHead, TableBody, TableCell, TableRow,
-} from '@material-ui/core';
+  Tooltip, Divider, Typography,
+} from '@mui/material';
 import {
   addNewCylicVoltaPairPeak, setWorkWithMaxPeak, selectPairPeak, removeCylicVoltaPairPeak,
 } from '../../actions/cyclic_voltammetry';
