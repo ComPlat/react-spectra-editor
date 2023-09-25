@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.XRD = exports.UI = exports.THRESHOLD = exports.SUBMIT = exports.STATUS = exports.SIMULATION = exports.SHIFT = exports.SCAN = exports.MULTIPLICITY = exports.META = exports.MANAGER = exports.LAYOUT = exports.JCAMP = exports.INTEGRATION = exports.FORECAST = exports.EDITPEAK = exports.CYCLIC_VOLTA_METRY = exports.CURVE = void 0;
+exports.XRD = exports.UI = exports.THRESHOLD = exports.SUBMIT = exports.STATUS = exports.SIMULATION = exports.SHIFT = exports.SCAN = exports.MULTIPLICITY = exports.META = exports.MANAGER = exports.LAYOUT = exports.JCAMP = exports.INTEGRATION = exports.FORECAST = exports.EDITPEAK = exports.CYCLIC_VOLTA_METRY = exports.CURVE = exports.AXES = void 0;
 const THRESHOLD = exports.THRESHOLD = {
   UPDATE_VALUE: 'THRESHOLD_UPDATE_VALUE',
   RESET_VALUE: 'THRESHOLD_RESET_VALUE',
@@ -127,10 +127,16 @@ const CYCLIC_VOLTA_METRY = exports.CYCLIC_VOLTA_METRY = {
   ADD_PECKER: 'ADD_PECKER',
   REMOVE_PECKER: 'REMOVE_PECKER',
   RESETALL: 'RESETALL_VOLTA_METRY',
-  SET_REF: 'VOLTA_METRY_SET_REF'
+  SET_REF: 'VOLTA_METRY_SET_REF',
+  SELECT_REF_PEAK: 'SELECT_REF_PEAK',
+  SET_FACTOR: 'CYCLIC_VOLTA_METRY_SET_FACTOR'
 };
 const CURVE = exports.CURVE = {
   SELECT_WORKING_CURVE: 'SELECT_WORKING_CURVE',
   SET_ALL_CURVES: 'SET_ALL_CURVES',
   SET_SHOULD_SHOW_ALL_CURVES: 'SET_SHOULD_SHOW_ALL_CURVES'
+};
+const AXES = exports.AXES = {
+  UPDATE_X_AXIS: 'UPDATE_X_AXIS',
+  UPDATE_Y_AXIS: 'UPDATE_Y_AXIS'
 };

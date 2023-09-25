@@ -17,6 +17,7 @@ import jcampReducer from './reducer_jcamp';
 import wavelengthReducer from './reducer_wavelength';
 import cyclicVoltaReducer from './reducer_voltammetry';
 import curveReducer from './reducer_curve';
+import axesReducer from './reducer_axes';
 
 const rootReducer = combineReducers({
   threshold: thresholdReducer,
@@ -37,6 +38,7 @@ const rootReducer = combineReducers({
   wavelength: wavelengthReducer,
   cyclicvolta: cyclicVoltaReducer,
   curve: curveReducer,
+  axesUnits: axesReducer,
 });
 
 export default rootReducer;

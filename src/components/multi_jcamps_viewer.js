@@ -17,6 +17,7 @@ import { setAllCurves } from '../actions/curve';
 import {
   addNewCylicVoltaPairPeak, addCylicVoltaMaxPeak, addCylicVoltaMinPeak, addCylicVoltaPecker,
 } from '../actions/cyclic_voltammetry';
+import { LIST_LAYOUT } from '../constants/list_layout';
 
 const styles = () => ({
   root: {
@@ -31,7 +32,10 @@ const styles = () => ({
   },
 });
 
-const seperatingSubLayout = (entities, featureCondition) => {
+const seperatingSubLayout = (entities, featureCondition, layoutSt) => {
+  if (layoutSt === LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
+    return null;
+  }
   const storedDict = {};
   entities.forEach((entity) => {
     const { feature } = entity;
@@ -48,11 +52,11 @@ const seperatingSubLayout = (entities, featureCondition) => {
 class MultiJcampsViewer extends React.Component { // eslint-disable-line
   render() {
     const {
-      classes, curveSt, operations, entityFileNames, entities, userManualLink, molSvg,
+      classes, curveSt, operations, entityFileNames, entities, userManualLink, molSvg, layoutSt,
     } = this.props;
     if (!entities || entities.length === 0) return (<div />);
 
-    const seperatedSubLayouts = seperatingSubLayout(entities, 'xUnit');
+    const seperatedSubLayouts = seperatingSubLayout(entities, 'xUnit', layoutSt);
     const { curveIdx } = curveSt;
     const entity = entities[curveIdx];
     const { feature, topic } = entity;
@@ -101,6 +105,7 @@ const mapStateToProps = (state, _) => ( // eslint-disable-line
     curveSt: state.curve,
     cyclicVoltaSt: state.cyclicvolta,
     entities: state.curve.listCurves,
+    layoutSt: state.layout,
   }
 );
 
@@ -128,6 +133,7 @@ MultiJcampsViewer.propTypes = {
   operations: PropTypes.func.isRequired,
   userManualLink: PropTypes.object,
   entities: PropTypes.array,
+  layoutSt: PropTypes.string.isRequired,
 };
 
 MultiJcampsViewer.defaultProps = {

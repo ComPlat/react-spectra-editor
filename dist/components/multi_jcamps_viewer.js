@@ -16,6 +16,7 @@ var _index2 = _interopRequireDefault(require("./cmd_bar/index"));
 var _index3 = _interopRequireDefault(require("./d3_multi/index"));
 var _curve = require("../actions/curve");
 var _cyclic_voltammetry = require("../actions/cyclic_voltammetry");
+var _list_layout = require("../constants/list_layout");
 /* eslint-disable react/default-props-match-prop-types,
 react/require-default-props, react/no-unused-prop-types, react/jsx-boolean-value,
 prefer-object-spread */
@@ -32,7 +33,10 @@ const styles = () => ({
     fontSize: '14px'
   }
 });
-const seperatingSubLayout = (entities, featureCondition) => {
+const seperatingSubLayout = (entities, featureCondition, layoutSt) => {
+  if (layoutSt === _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
+    return null;
+  }
   const storedDict = {};
   entities.forEach(entity => {
     const {
@@ -57,10 +61,11 @@ class MultiJcampsViewer extends _react.default.Component {
       entityFileNames,
       entities,
       userManualLink,
-      molSvg
+      molSvg,
+      layoutSt
     } = this.props;
     if (!entities || entities.length === 0) return /*#__PURE__*/_react.default.createElement("div", null);
-    const seperatedSubLayouts = seperatingSubLayout(entities, 'xUnit');
+    const seperatedSubLayouts = seperatingSubLayout(entities, 'xUnit', layoutSt);
     const {
       curveIdx
     } = curveSt;
@@ -111,7 +116,8 @@ const mapStateToProps = (state, _) => (
 {
   curveSt: state.curve,
   cyclicVoltaSt: state.cyclicvolta,
-  entities: state.curve.listCurves
+  entities: state.curve.listCurves,
+  layoutSt: state.layout
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   setAllCurvesAct: _curve.setAllCurves,
@@ -133,7 +139,8 @@ MultiJcampsViewer.propTypes = {
   addCylicVoltaMinPeakAct: _propTypes.default.func.isRequired,
   operations: _propTypes.default.func.isRequired,
   userManualLink: _propTypes.default.object,
-  entities: _propTypes.default.array
+  entities: _propTypes.default.array,
+  layoutSt: _propTypes.default.string.isRequired
 };
 MultiJcampsViewer.defaultProps = {
   multiEntities: [],

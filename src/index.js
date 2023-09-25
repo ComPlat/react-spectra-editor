@@ -435,8 +435,8 @@ class DemoWriteIr extends React.Component {
       molecule: molecule,
       predictions,
     }
-
-    const molSvg = ['nmr 1h', 'ir'].indexOf(typ) >= 0 ? Phenylalanin.path : '';
+    
+    const molSvg = ['nmr 1h', 'ir', 'cyclic volta'].indexOf(typ) >= 0 ? Phenylalanin.path : '';
     const others = this.loadOthers();
 
     return (

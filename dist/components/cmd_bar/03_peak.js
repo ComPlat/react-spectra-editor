@@ -62,7 +62,8 @@ const Peak = _ref => {
     }
   }
   return /*#__PURE__*/_react.default.createElement("span", {
-    className: classes.group
+    className: classes.group,
+    "data-testid": "Peak"
   }, /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
     title: /*#__PURE__*/_react.default.createElement("span", {
       className: "txt-sv-tp"
@@ -83,7 +84,7 @@ const Peak = _ref => {
     onClick: onSweepPeakDELETE
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.txt, 'txt-sv-bar-rmpeak')
-  }, "P-")))), /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+  }, "P-")))), !disableSetRefSt ? /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
     title: /*#__PURE__*/_react.default.createElement("span", {
       className: "txt-sv-tp"
     }, "Set Reference")
@@ -93,7 +94,7 @@ const Peak = _ref => {
     onClick: onSweepAnchorShift
   }, /*#__PURE__*/_react.default.createElement(_AddLocationOutlined.default, {
     className: classes.icon
-  })))));
+  })))) : null);
 };
 const mapStateToProps = (state, _) => (
 // eslint-disable-line
@@ -102,7 +103,7 @@ const mapStateToProps = (state, _) => (
   disableAddPeakSt: _cfg.default.btnCmdAddPeak(state.layout),
   isFocusRmPeakSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.PEAK_DELETE || state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MAX_PEAK || state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MIN_PEAK,
   disableRmPeakSt: _cfg.default.btnCmdRmPeak(state.layout),
-  isFocusSetRefSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT,
+  isFocusSetRefSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT || state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_SET_REF,
   disableSetRefSt: _cfg.default.btnCmdSetRef(state.layout),
   isHandleMaxAndMinPeaksSt: !_cfg.default.hidePanelCyclicVolta(state.layout),
   cyclicVotaSt: state.cyclicvolta,

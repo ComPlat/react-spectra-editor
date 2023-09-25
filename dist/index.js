@@ -540,7 +540,7 @@ class DemoWriteIr extends _react.default.Component {
       molecule: molecule,
       predictions
     };
-    const molSvg = ['nmr 1h', 'ir'].indexOf(typ) >= 0 ? _phenylalanin.default.path : '';
+    const molSvg = ['nmr 1h', 'ir', 'cyclic volta'].indexOf(typ) >= 0 ? _phenylalanin.default.path : '';
     const others = this.loadOthers();
     return /*#__PURE__*/_react.default.createElement("div", {
       style: {

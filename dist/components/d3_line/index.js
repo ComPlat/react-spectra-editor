@@ -60,10 +60,21 @@ class ViewerLine extends _react.default.Component {
       isUiNoBrushSt,
       isHidden,
       wavelength,
+      axesUnitsSt,
       resetAllAct
     } = this.props;
     (0, _draw.drawDestroy)(this.rootKlass);
     resetAllAct(feature);
+    let xxLabel = xLabel;
+    let yyLabel = yLabel;
+    if (axesUnitsSt) {
+      const {
+        xUnit,
+        yUnit
+      } = axesUnitsSt;
+      xxLabel = xUnit === '' ? xLabel : xUnit;
+      yyLabel = yUnit === '' ? yLabel : yUnit;
+    }
     const filterSeed = seed;
     const filterPeak = peak;
     (0, _draw.drawMain)(this.rootKlass, W, H);
@@ -83,7 +94,7 @@ class ViewerLine extends _react.default.Component {
       isUiNoBrushSt,
       wavelength
     });
-    (0, _draw.drawLabel)(this.rootKlass, cLabel, xLabel, yLabel);
+    (0, _draw.drawLabel)(this.rootKlass, cLabel, xxLabel, yyLabel);
     (0, _draw.drawDisplay)(this.rootKlass, isHidden);
   }
   componentDidUpdate(prevProps) {
@@ -105,9 +116,20 @@ class ViewerLine extends _react.default.Component {
       isUiAddIntgSt,
       isUiNoBrushSt,
       isHidden,
-      wavelength
+      wavelength,
+      axesUnitsSt
     } = this.props;
     this.normChange(prevProps);
+    let xxLabel = xLabel;
+    let yyLabel = yLabel;
+    if (axesUnitsSt) {
+      const {
+        xUnit,
+        yUnit
+      } = axesUnitsSt;
+      xxLabel = xUnit === '' ? xLabel : xUnit;
+      yyLabel = yUnit === '' ? yLabel : yUnit;
+    }
     const filterSeed = seed;
     const filterPeak = peak;
     this.focus.update({
@@ -126,7 +148,7 @@ class ViewerLine extends _react.default.Component {
       isUiNoBrushSt,
       wavelength
     });
-    (0, _draw.drawLabel)(this.rootKlass, cLabel, xLabel, yLabel);
+    (0, _draw.drawLabel)(this.rootKlass, cLabel, xxLabel, yyLabel);
     (0, _draw.drawDisplay)(this.rootKlass, isHidden);
   }
   componentWillUnmount() {
@@ -162,7 +184,8 @@ const mapStateToProps = (state, props) => ({
   sweepExtentSt: state.ui.sweepExtent,
   isUiAddIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
   isUiNoBrushSt: _list_ui.LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
-  wavelength: state.wavelength
+  wavelength: state.wavelength,
+  axesUnitsSt: state.axesUnits
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   resetAllAct: _manager.resetAll,
@@ -196,6 +219,7 @@ ViewerLine.propTypes = {
   selectUiSweepAct: _propTypes.default.func.isRequired,
   scrollUiWheelAct: _propTypes.default.func.isRequired,
   isHidden: _propTypes.default.bool.isRequired,
-  wavelength: _propTypes.default.object.isRequired
+  wavelength: _propTypes.default.object.isRequired,
+  axesUnitsSt: _propTypes.default.object.isRequired
 };
 var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(ViewerLine);

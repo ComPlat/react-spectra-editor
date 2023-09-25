@@ -52,7 +52,7 @@ const Peak = ({
   }
 
   return (
-    <span className={classes.group}>
+    <span className={classes.group} data-testid="Peak">
       <Tooltip title={<span className="txt-sv-tp">Add Peak</span>}>
         <span>
           <MuButton
@@ -85,22 +85,26 @@ const Peak = ({
           </MuButton>
         </span>
       </Tooltip>
-      <Tooltip title={<span className="txt-sv-tp">Set Reference</span>}>
-        <span>
-          <MuButton
-            className={
-              classNames(
-                focusStyle(isFocusSetRefSt, classes),
-                'btn-sv-bar-setref',
-              )
-            }
-            disabled={disableSetRefSt}
-            onClick={onSweepAnchorShift}
-          >
-            <AddLocationOutlinedIcon className={classes.icon} />
-          </MuButton>
-        </span>
-      </Tooltip>
+      {
+        !disableSetRefSt ? (
+          <Tooltip title={<span className="txt-sv-tp">Set Reference</span>}>
+            <span>
+              <MuButton
+                className={
+                  classNames(
+                    focusStyle(isFocusSetRefSt, classes),
+                    'btn-sv-bar-setref',
+                  )
+                }
+                disabled={disableSetRefSt}
+                onClick={onSweepAnchorShift}
+              >
+                <AddLocationOutlinedIcon className={classes.icon} />
+              </MuButton>
+            </span>
+          </Tooltip>
+        ) : null
+      }
     </span>
   );
 };
@@ -111,7 +115,7 @@ const mapStateToProps = (state, _) => ( // eslint-disable-line
     disableAddPeakSt: Cfg.btnCmdAddPeak(state.layout),
     isFocusRmPeakSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.PEAK_DELETE || state.ui.sweepType === LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MAX_PEAK || state.ui.sweepType === LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MIN_PEAK,
     disableRmPeakSt: Cfg.btnCmdRmPeak(state.layout),
-    isFocusSetRefSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT,
+    isFocusSetRefSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT || state.ui.sweepType === LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_SET_REF,
     disableSetRefSt: Cfg.btnCmdSetRef(state.layout),
     isHandleMaxAndMinPeaksSt: !Cfg.hidePanelCyclicVolta(state.layout),
     cyclicVotaSt: state.cyclicvolta,

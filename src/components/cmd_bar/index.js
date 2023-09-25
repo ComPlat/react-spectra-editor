@@ -19,6 +19,7 @@ import Threshold from './r03_threshold';
 import Submit from './r04_submit';
 import Wavelength from './r07_wavelength_btn';
 import Pecker from './07_pecker';
+import ChangeAxes from './r08_change_axes';
 
 const styles = () => (
   Object.assign(
@@ -54,6 +55,7 @@ const CmdBar = ({
     }
     <Layout feature={feature} hasEdit={hasEdit} />
     <Wavelength />
+    <ChangeAxes />
   </div>
 );
 

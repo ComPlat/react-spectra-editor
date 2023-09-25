@@ -10,7 +10,8 @@ const btnCmdAnaViewer = layoutSt => _format.default.isMsLayout(layoutSt) || _for
 const hideCmdAnaViewer = () => false;
 const btnCmdAddPeak = layoutSt => _format.default.isMsLayout(layoutSt);
 const btnCmdRmPeak = layoutSt => _format.default.isMsLayout(layoutSt);
-const btnCmdSetRef = layoutSt => !_format.default.isNmrLayout(layoutSt);
+const btnCmdSetRef = layoutSt => !_format.default.isNmrLayout(layoutSt); // eslint-disable-line
+
 const btnCmdIntg = layoutSt => !(_format.default.isNmrLayout(layoutSt) || _format.default.isHplcUvVisLayout(layoutSt)); // eslint-disable-line
 
 const btnCmdMpy = layoutSt => !_format.default.isNmrLayout(layoutSt);

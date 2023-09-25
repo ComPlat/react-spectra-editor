@@ -1,6 +1,8 @@
 import {
   ExtractJcamp, Topic2Seed, Convert2Peak, Feature2Peak, ToThresEndPts, ToShiftPeaks,
-  ToFrequency, Convert2Scan, Convert2Thres, GetComparisons, Convert2DValue, GetCyclicVoltaRatio, GetCyclicVoltaPeakSeparate, convertTopic, Convert2MaxMinPeak, Feature2MaxMinPeak
+  ToFrequency, Convert2Scan, Convert2Thres, GetComparisons, Convert2DValue,
+  GetCyclicVoltaRatio, GetCyclicVoltaPeakSeparate, convertTopic,
+  Convert2MaxMinPeak, Feature2MaxMinPeak, GetCyclicVoltaShiftOffset, GetCyclicVoltaPreviousShift,
 } from "../../../helpers/chem";
 import nmr1HJcamp from "../../fixtures/nmr1h_jcamp";
 import aifJcamp1 from "../../fixtures/aif_jcamp_1";
@@ -441,10 +443,10 @@ describe('Test for chem helper', () => {
           upperThres: 90.0, lowerThres: 90.0, maxY: 2, minY: -1
         }
         const peaksList = Convert2MaxMinPeak(LIST_LAYOUT.CYCLIC_VOLTAMMETRY, feature, 0)
-        expect(peaksList).toEqual({max: [{x: 2, y: 2}], min: [{x: -1, y: -1}], pecker: []})
+        expect(peaksList).toEqual({max: [], min: [], pecker: [], refIndex: -1})
       })
 
-      it('Feature has voltammetry data', () => {
+      it('Feature has voltammetry data but no ref info', () => {
         const feature = { 
           data: [
             { x: [1, 2, -1], y: [1, 2, -1]}
@@ -453,7 +455,19 @@ describe('Test for chem helper', () => {
           volammetryData: [{ max: { x: 1, y: 1 }, min: { x: -1, y: -1 }, pecker: { x: 3, y: 3 } }]
         }
         const peaksList = Convert2MaxMinPeak(LIST_LAYOUT.CYCLIC_VOLTAMMETRY, feature, 0)
-        expect(peaksList).toEqual({max: [{x: 1, y: 1}], min: [{x: -1, y: -1}], pecker: [{ x: 3, y: 3 }]})
+        expect(peaksList).toEqual({max: [{x: 1, y: 1}], min: [{x: -1, y: -1}], pecker: [{ x: 3, y: 3 }], refIndex: -1})
+      })
+
+      it('Feature has voltammetry data with ref info', () => {
+        const feature = { 
+          data: [
+            { x: [1, 2, -1], y: [1, 2, -1]}
+          ],
+          upperThres: 90.0, lowerThres: 90.0, maxY: 2, minY: -1,
+          volammetryData: [{ max: { x: 1, y: 1 }, min: { x: -1, y: -1 }, pecker: { x: 3, y: 3 }, isRef: true }]
+        }
+        const peaksList = Convert2MaxMinPeak(LIST_LAYOUT.CYCLIC_VOLTAMMETRY, feature, 0)
+        expect(peaksList).toEqual({max: [{x: 1, y: 1}], min: [{x: -1, y: -1}], pecker: [{ x: 3, y: 3 }], refIndex: 0})
       })
     })
   })
@@ -469,12 +483,49 @@ describe('Test for chem helper', () => {
           { x: [1, 2, -1], y: [1, 2, -1]}
         ],
         upperThres: 90.0, lowerThres: 90.0, maxY: 2, minY: -1,
-        volammetryData: [{ max: { x: 1, y: 1 }, min: { x: -1, y: -1 }, pecker: { x: 3, y: 3 } }]
+        volammetryData: [{ max: { x: 1, y: 1 }, min: { x: -1, y: -1 }, pecker: { x: 3, y: 3 }, isRef: true }]
       }
       const props = { feature: feature}
       const peaksList = Feature2MaxMinPeak(state, props)
-      expect(peaksList).toEqual({max: [{x: 1, y: 1}], min: [{x: -1, y: -1}], pecker: [{ x: 3, y: 3 }]})
+      expect(peaksList).toEqual({max: [{x: 1, y: 1}], min: [{x: -1, y: -1}], pecker: [{ x: 3, y: 3 }], refIndex: 0})
     })
   })
 
+  describe('Test get offset CV layout', () => {
+    const voltaData = {"spectraList":[{"list":[{"min":{"x":-1.5404,"y":-0.00000307144},"max":{"x":0.10003,"y":0.00000285434},"isRef":true,"e12":-0.720185,"pecker":{"x":0.380242,"y":0.00000164361}}],"selectedIdx":0,"isWorkMaxPeak":true,"jcampIdx":0,"shift":{"ref":{"min":{"x":-1.5404,"y":-0.00000307144},"max":{"x":0.10003,"y":0.00000285434},"isRef":true,"e12":-0.720185,"pecker":{"x":0.380242,"y":0.00000164361}},"val":0}},{"list":[{"min":{"x":-1.48904,"y":-0.000033747399999999995},"max":{"x":0.929483,"y":0.00023741},"isRef":true,"e12":-0.27977849999999993}],"selectedIdx":0,"isWorkMaxPeak":true,"jcampIdx":1,"shift":{"ref":{"min":{"x":-1.48904,"y":-0.000033747399999999995},"max":{"x":0.929483,"y":0.00023741},"isRef":true,"e12":-0.27977849999999993},"val":1.5}},{"list":[{"min":{"x":0.45977,"y":-0.000226347},"max":{"x":1.00943,"y":0.000371349},"isRef":false,"e12":0.7346}],"selectedIdx":0,"isWorkMaxPeak":true,"jcampIdx":2,"shift":{"ref":null,"val":0}}]}
+    it('When it does not have volta data', () => {
+      const offset = GetCyclicVoltaShiftOffset(null)
+      expect(offset).toEqual(0.0)
+    })
+
+    it('When it has ref with Ref0V == 0', () => {
+      const offset = GetCyclicVoltaShiftOffset(voltaData, 0)
+      expect(offset).toEqual(-0.720185)
+      expect(offset.toFixed(3)).toEqual("-0.720")
+    })
+
+    it('When it has ref with Ref0V == 1.5', () => {
+      const offset = GetCyclicVoltaShiftOffset(voltaData, 1)
+      expect(offset).toEqual(-1.7797785)
+      expect(offset.toFixed(3)).toEqual("-1.780")
+    })
+
+    it('When it does not have ref value', () => {
+      const offset = GetCyclicVoltaShiftOffset(voltaData, 2)
+      expect(offset).toEqual(0.0)
+    })
+  })
+
+  describe('Test get previous offset CV layout', () => {
+    const voltaData = {"spectraList":[{"list":[{"min":{"x":-1.5404,"y":-0.00000307144},"max":{"x":0.10003,"y":0.00000285434},"isRef":true,"e12":-0.720185,"pecker":{"x":0.380242,"y":0.00000164361}}],"selectedIdx":0,"isWorkMaxPeak":true,"jcampIdx":0,"shift":{"ref":{"min":{"x":-1.5404,"y":-0.00000307144},"max":{"x":0.10003,"y":0.00000285434},"isRef":true,"e12":-0.720185,"pecker":{"x":0.380242,"y":0.00000164361}},"val":0, "prevValue":0.5}},{"list":[{"min":{"x":-1.48904,"y":-0.000033747399999999995},"max":{"x":0.929483,"y":0.00023741},"isRef":true,"e12":-0.27977849999999993}],"selectedIdx":0,"isWorkMaxPeak":true,"jcampIdx":1,"shift":{"ref":{"min":{"x":-1.48904,"y":-0.000033747399999999995},"max":{"x":0.929483,"y":0.00023741},"isRef":true,"e12":-0.27977849999999993},"val":1.5}},{"list":[{"min":{"x":0.45977,"y":-0.000226347},"max":{"x":1.00943,"y":0.000371349},"isRef":false,"e12":0.7346}],"selectedIdx":0,"isWorkMaxPeak":true,"jcampIdx":2,"shift":{"ref":null,"val":0}}]}
+    it('When it does not have volta data', () => {
+      const offset = GetCyclicVoltaPreviousShift(null)
+      expect(offset).toEqual(0.0)
+    })
+
+    it('When it has prev data', () => {
+      const offset = GetCyclicVoltaPreviousShift(voltaData, 0)
+      expect(offset).toEqual(0.5)
+    })
+  })
 })
