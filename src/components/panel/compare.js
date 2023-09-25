@@ -7,8 +7,9 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import Dropzone from 'react-dropzone';
 
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import {
+  Accordion, AccordionSummary,
+} from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import Table from '@material-ui/core/Table';
@@ -237,13 +238,13 @@ const ComparePanel = ({
   classes, expand, onExapnd, jcampSt,
   rmOthersOneAct, toggleShowAct,
 }) => (
-  <ExpansionPanel
+  <Accordion
     expanded={expand}
     onChange={onExapnd}
     className={classNames(classes.panel)}
     TransitionProps={{ unmountOnExit: true }} // increase ExpansionPanel performance
   >
-    <ExpansionPanelSummary
+    <AccordionSummary
       expandIcon={<ExpandMoreIcon />}
       className={classNames(classes.panelSummary)}
     >
@@ -252,7 +253,7 @@ const ComparePanel = ({
           Spectra Comparisons
         </span>
       </Typography>
-    </ExpansionPanelSummary>
+    </AccordionSummary>
     <Divider />
     { inputOthers(classes, jcampSt) }
     <div className={classNames(classes.panelDetail)}>
@@ -260,7 +261,7 @@ const ComparePanel = ({
         compareList(classes, jcampSt, rmOthersOneAct, toggleShowAct)
       }
     </div>
-  </ExpansionPanel>
+  </Accordion>
 );
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line

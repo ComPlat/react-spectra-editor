@@ -46,7 +46,7 @@ const styles = () => ({
   },
   table: {
     width: '100%',
-    wordWrap: 'break-all',
+    overflowWrap: 'anywhere',
     fontSize: '14px !important'
   },
   td: {
@@ -137,13 +137,13 @@ const CyclicVoltammetryPanel = _ref => {
     }
   };
   const getDelta = data => {
-    return data.max && data.min ? (0, _chem.GetCyclicVoltaPeakSeparate)(data.max.x, data.min.x) : 'undefined';
+    return data.max && data.min ? (0, _chem.GetCyclicVoltaPeakSeparate)(data.max.x, data.min.x).toFixed(5) : 'undefined';
   };
   const getRatio = (feature, data) => {
     const featureData = feature.data[0];
     const idx = featureData.x.indexOf(feature.maxX);
     const y_pecker = data.pecker ? data.pecker.y : featureData.y[idx];
-    return data.max && data.min ? (0, _chem.GetCyclicVoltaRatio)(data.max.y, data.min.y, y_pecker).toFixed(8) : 'undefined';
+    return data.max && data.min ? (0, _chem.GetCyclicVoltaRatio)(data.max.y, data.min.y, y_pecker).toFixed(5) : 'undefined';
   };
   const rows = list.map((o, idx) => ({
     idx,
@@ -159,7 +159,7 @@ const CyclicVoltammetryPanel = _ref => {
       jcampIdx
     })
   }));
-  return /*#__PURE__*/_react.default.createElement(_core.ExpansionPanel, null, /*#__PURE__*/_react.default.createElement(_core.ExpansionPanelSummary, {
+  return /*#__PURE__*/_react.default.createElement(_core.Accordion, null, /*#__PURE__*/_react.default.createElement(_core.AccordionSummary, {
     expandIcon: /*#__PURE__*/_react.default.createElement(_ExpandMore.default, null),
     className: (0, _classnames.default)(classes.panelSummary)
   }, /*#__PURE__*/_react.default.createElement(_Typography.default, {

@@ -12,6 +12,7 @@ var _reactRedux = require("react-redux");
 var _redux = require("redux");
 var _TextField = _interopRequireDefault(require("@material-ui/core/TextField"));
 var _InputAdornment = _interopRequireDefault(require("@material-ui/core/InputAdornment"));
+var _core = require("@material-ui/core");
 var _styles = require("@material-ui/core/styles");
 var _Tooltip = _interopRequireDefault(require("@material-ui/core/Tooltip"));
 var _CloudDoneOutlined = _interopRequireDefault(require("@material-ui/icons/CloudDoneOutlined"));
@@ -42,7 +43,9 @@ const setThreshold = (classes, thresVal, updateThresholdValueAct) => {
       updateThresholdValueAct(e.target.value);
     }
   };
-  return /*#__PURE__*/_react.default.createElement(_TextField.default, {
+  return /*#__PURE__*/_react.default.createElement(_core.FormControl, {
+    variant: "outlined"
+  }, /*#__PURE__*/_react.default.createElement(_TextField.default, {
     className: classes.field,
     id: "outlined-name",
     placeholder: "N.A.",
@@ -56,14 +59,13 @@ const setThreshold = (classes, thresVal, updateThresholdValueAct) => {
         min: 0.01
       }
     },
-    label: /*#__PURE__*/_react.default.createElement("span", {
-      className: (0, _classnames.default)(classes.txtLabel, 'txtfield-sv-bar-label')
-    }, "Threshold"),
     onChange: onChange,
     onBlur: onBlur,
     onKeyPress: onEnterPress,
     variant: "outlined"
-  });
+  }), /*#__PURE__*/_react.default.createElement(_core.InputLabel, {
+    className: (0, _classnames.default)(classes.txtLabelBottomInput)
+  }, "Threshold"));
 };
 const restoreIcon = (classes, hasEdit, isEdit) => hasEdit && isEdit ? /*#__PURE__*/_react.default.createElement(_HowToRegOutlined.default, {
   className: classes.icon

@@ -12,8 +12,7 @@ var _classnames = _interopRequireDefault(require("classnames"));
 var _reactRedux = require("react-redux");
 var _redux = require("redux");
 var _reactDropzone = _interopRequireDefault(require("react-dropzone"));
-var _ExpansionPanel = _interopRequireDefault(require("@material-ui/core/ExpansionPanel"));
-var _ExpansionPanelSummary = _interopRequireDefault(require("@material-ui/core/ExpansionPanelSummary"));
+var _core = require("@material-ui/core");
 var _ExpandMore = _interopRequireDefault(require("@material-ui/icons/ExpandMore"));
 var _HighlightOff = _interopRequireDefault(require("@material-ui/icons/HighlightOff"));
 var _Table = _interopRequireDefault(require("@material-ui/core/Table"));
@@ -218,14 +217,14 @@ const ComparePanel = _ref2 => {
     rmOthersOneAct,
     toggleShowAct
   } = _ref2;
-  return /*#__PURE__*/_react.default.createElement(_ExpansionPanel.default, {
+  return /*#__PURE__*/_react.default.createElement(_core.Accordion, {
     expanded: expand,
     onChange: onExapnd,
     className: (0, _classnames.default)(classes.panel),
     TransitionProps: {
       unmountOnExit: true
     } // increase ExpansionPanel performance
-  }, /*#__PURE__*/_react.default.createElement(_ExpansionPanelSummary.default, {
+  }, /*#__PURE__*/_react.default.createElement(_core.AccordionSummary, {
     expandIcon: /*#__PURE__*/_react.default.createElement(_ExpandMore.default, null),
     className: (0, _classnames.default)(classes.panelSummary)
   }, /*#__PURE__*/_react.default.createElement(_Typography.default, {

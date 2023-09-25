@@ -8,8 +8,9 @@ import { bindActionCreators } from 'redux';
 import SvgFileZoomPan from '@complat/react-svg-file-zoom-pan';
 import ReactQuill from 'react-quill';
 
-import ExpansionPanel from '@material-ui/core/ExpansionPanel';
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import {
+  Accordion, AccordionSummary,
+} from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
@@ -139,13 +140,13 @@ const InfoPanel = ({
   }
 
   return (
-    <ExpansionPanel
+    <Accordion
       expanded={expand}
       onChange={onExapnd}
       className={classNames(classes.panel)}
       TransitionProps={{ unmountOnExit: true }} // increase ExpansionPanel performance
     >
-      <ExpansionPanelSummary
+      <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
         className={classNames(classes.panelSummary)}
       >
@@ -154,7 +155,7 @@ const InfoPanel = ({
             Info
           </span>
         </Typography>
-      </ExpansionPanelSummary>
+      </AccordionSummary>
       <Divider />
       <div className={classNames(classes.panelDetail)}>
         <div className={classNames(classes.rowRoot, classes.rowOdd)}>
@@ -242,7 +243,7 @@ const InfoPanel = ({
               : null
           }
       </div>
-    </ExpansionPanel>
+    </Accordion>
   );
 };
 
