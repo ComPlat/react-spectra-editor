@@ -7,21 +7,14 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
 import {
-  Accordion, AccordionSummary,
-} from '@material-ui/core';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import Divider from '@material-ui/core/Divider';
-import Typography from '@material-ui/core/Typography';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableRow from '@material-ui/core/TableRow';
-import HighlightOffIcon from '@material-ui/icons/HighlightOff';
-import { withStyles } from '@material-ui/core/styles';
-import Checkbox from '@material-ui/core/Checkbox';
-import Button from '@material-ui/core/Button';
-import Tooltip from '@material-ui/core/Tooltip';
-import RefreshOutlinedIcon from '@material-ui/icons/RefreshOutlined';
+  Accordion, AccordionSummary, Divider, Typography,
+  Table, TableBody, TableCell, TableRow, Checkbox,
+  Button, Tooltip,
+} from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import { withStyles } from '@mui/styles';
+import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
 
 import {
   rmMpyPeakByPanel, clickMpyOne, resetMpyOne,
@@ -254,7 +247,7 @@ const MultiplicityPanel = ({
       expanded={expand}
       onChange={onExapnd}
       className={classNames(classes.panel)}
-      TransitionProps={{ unmountOnExit: true }} // increase ExpansionPanel performance
+      TransitionProps={{ unmountOnExit: true }} // increase Accordion performance
     >
       <AccordionSummary
         expandIcon={<ExpandMoreIcon />}

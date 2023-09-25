@@ -5,6 +5,8 @@ import configureStore from 'redux-mock-store'
 import { Provider } from 'react-redux';
 import '@testing-library/jest-dom'
 import { LIST_LAYOUT } from "../../../../constants/list_layout";
+import { createTheme } from "@mui/material";
+import { ThemeProvider } from "@mui/styles";
 
 const mockStore = configureStore([]);
 const store = mockStore({
@@ -48,6 +50,11 @@ const failedStore = mockStore({
 const dispatchMock = () => Promise.resolve({});
 store.dispatch = jest.fn(dispatchMock);
 
+const theme = createTheme({
+  typography: {
+    useNextVariants: true
+  },
+});
 
 describe("<Peaks />", () => {
   let AppWrapper;
@@ -60,7 +67,9 @@ describe("<Peaks />", () => {
   test('Render peaks panel info',  () => {
     const renderer = 
       <AppWrapper store={store}>
-        <Peaks expand={false} onExapnd={() => {}} />
+        <ThemeProvider theme={theme}>
+          <Peaks expand={false} onExapnd={() => {}} />
+        </ThemeProvider>
       </AppWrapper>
     ;
     const {queryByTestId} = render(renderer);
@@ -70,7 +79,9 @@ describe("<Peaks />", () => {
   test('Render peaks panel with invalid store list', () => {
     const renderer = 
       <AppWrapper store={failedStore}>
-        <Peaks expand={false} onExapnd={() => {}} />
+        <ThemeProvider theme={theme}>
+          <Peaks expand={false} onExapnd={() => {}} />
+        </ThemeProvider>
       </AppWrapper>
     ;
     const {queryByTestId} = render(renderer);

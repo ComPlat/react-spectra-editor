@@ -10,16 +10,11 @@ var _propTypes = _interopRequireDefault(require("prop-types"));
 var _classnames = _interopRequireDefault(require("classnames"));
 var _reactRedux = require("react-redux");
 var _redux = require("redux");
-var _Select = _interopRequireDefault(require("@material-ui/core/Select"));
-var _MenuItem = _interopRequireDefault(require("@material-ui/core/MenuItem"));
-var _FormControl = _interopRequireDefault(require("@material-ui/core/FormControl"));
-var _OutlinedInput = _interopRequireDefault(require("@material-ui/core/OutlinedInput"));
-var _InputLabel = _interopRequireDefault(require("@material-ui/core/InputLabel"));
-var _styles = require("@material-ui/core/styles");
-var _Tooltip = _interopRequireDefault(require("@material-ui/core/Tooltip"));
-var _CloudDoneOutlined = _interopRequireDefault(require("@material-ui/icons/CloudDoneOutlined"));
-var _HowToRegOutlined = _interopRequireDefault(require("@material-ui/icons/HowToRegOutlined"));
-var _RefreshOutlined = _interopRequireDefault(require("@material-ui/icons/RefreshOutlined"));
+var _material = require("@mui/material");
+var _styles = require("@mui/styles");
+var _CloudDoneOutlined = _interopRequireDefault(require("@mui/icons-material/CloudDoneOutlined"));
+var _HowToRegOutlined = _interopRequireDefault(require("@mui/icons-material/HowToRegOutlined"));
+var _RefreshOutlined = _interopRequireDefault(require("@mui/icons-material/RefreshOutlined"));
 var _scan = require("../../actions/scan");
 var _common = require("./common");
 /* eslint-disable prefer-object-spread, function-paren-newline,
@@ -36,7 +31,7 @@ const restoreIcon = (classes, hasEdit, isEdit) => hasEdit && isEdit ? /*#__PURE_
   className: classes.icon
 });
 const restoreTp = (hasEdit, isEdit) => hasEdit && isEdit ? 'User Defined Scan' : 'Auto Picked Scan';
-const btnRestore = (classes, hasEdit, isEdit, toggleEditAct) => /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+const btnRestore = (classes, hasEdit, isEdit, toggleEditAct) => /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
   title: /*#__PURE__*/_react.default.createElement("span", {
     className: "txt-sv-tp"
   }, restoreTp(hasEdit, isEdit))
@@ -45,7 +40,7 @@ const btnRestore = (classes, hasEdit, isEdit, toggleEditAct) => /*#__PURE__*/_re
   disabled: !hasEdit,
   onClick: toggleEditAct
 }, restoreIcon(classes, hasEdit, isEdit)));
-const btnRrfresh = (classes, disabled, refreshAct) => /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+const btnRrfresh = (classes, disabled, refreshAct) => /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
   title: /*#__PURE__*/_react.default.createElement("span", {
     className: "txt-sv-tp"
   }, "Refresh Scan")
@@ -63,7 +58,7 @@ const scanSelect = (classes, feature, layoutSt, scanSt, onChange) => {
   } = scanSt;
   if (!count) return null;
   const range = [...Array(count + 1).keys()].slice(1);
-  const content = range.map(num => /*#__PURE__*/_react.default.createElement(_MenuItem.default, {
+  const content = range.map(num => /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
     value: num,
     key: num
   }, /*#__PURE__*/_react.default.createElement("span", {
@@ -71,18 +66,18 @@ const scanSelect = (classes, feature, layoutSt, scanSt, onChange) => {
   }, `scan ${num}`)));
   const defaultValue = scanSt.isAuto || !feature.scanEditTarget ? feature.scanAutoTarget : feature.scanEditTarget;
   const selValue = target || defaultValue || 1;
-  return /*#__PURE__*/_react.default.createElement(_FormControl.default, {
+  return /*#__PURE__*/_react.default.createElement(_material.FormControl, {
     className: (0, _classnames.default)(classes.fieldScan),
     variant: "outlined"
-  }, /*#__PURE__*/_react.default.createElement(_InputLabel.default, {
+  }, /*#__PURE__*/_react.default.createElement(_material.InputLabel, {
+    id: "select-scan-label",
     className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label')
-  }, "Current Scan"), /*#__PURE__*/_react.default.createElement(_Select.default, {
+  }, "Current Scan"), /*#__PURE__*/_react.default.createElement(_material.Select, {
+    labelId: "select-scan-label",
+    label: "Current Scan",
     value: selValue,
     onChange: onChange,
-    input: /*#__PURE__*/_react.default.createElement(_OutlinedInput.default, {
-      className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-scan'),
-      labelWidth: 90
-    })
+    className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-scan')
   }, content));
 };
 const Scan = _ref => {

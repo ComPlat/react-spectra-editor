@@ -1,7 +1,7 @@
 import React from 'react';
 
-import CircularProgress from '@material-ui/core/CircularProgress';
-import ErrorOutline from '@material-ui/icons/ErrorOutline';
+import CircularProgress from '@mui/material/CircularProgress';
+import ErrorOutline from '@mui/icons-material/ErrorOutline';
 
 const styleLoading = {
   alignItems: 'center',

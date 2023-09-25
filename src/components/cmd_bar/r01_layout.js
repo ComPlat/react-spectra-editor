@@ -6,12 +6,10 @@ import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import OutlinedInput from '@material-ui/core/OutlinedInput';
-import InputLabel from '@material-ui/core/InputLabel';
-import { withStyles } from '@material-ui/core/styles';
+import {
+  Select, FormControl, MenuItem, InputLabel,
+} from '@mui/material';
+import withStyles from '@mui/styles/withStyles';
 
 import Scan from './r02_scan';
 import { updateLayout } from '../../actions/layout';
@@ -66,20 +64,15 @@ const shiftSelect = (
       className={classNames(classes.fieldShift)}
       variant="outlined"
     >
-      <InputLabel className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
+      <InputLabel id="select-solvent-label" className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
         Solvent
       </InputLabel>
       <Select
         value={shiftRef}
+        labelId="select-solvent-label"
+        label="Solvent"
         onChange={onChange}
-        input={
-          (
-            <OutlinedInput
-              className={classNames(classes.selectInput, 'input-sv-bar-shift')}
-              labelWidth={60}
-            />
-          )
-        }
+        className={classNames(classes.selectInput, 'input-sv-bar-shift')}
       >
         { content }
       </Select>
@@ -93,22 +86,16 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
   return (
     <FormControl
       className={classNames(classes.fieldLayout)}
-      variant="outlined"
     >
-      <InputLabel className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
+      <InputLabel id="select-layout-label" className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
         Layout
       </InputLabel>
       <Select
+        labelId="select-layout-label"
+        label="Layout"
         value={layoutSt}
         onChange={onChange}
-        input={
-          (
-            <OutlinedInput
-              className={classNames(classes.selectInput, 'input-sv-bar-layout')}
-              labelWidth={60}
-            />
-          )
-        }
+        className={classNames(classes.selectInput, 'input-sv-bar-layout')}
       >
         <MenuItem value={LIST_LAYOUT.PLAIN}>
           <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>plain</span>

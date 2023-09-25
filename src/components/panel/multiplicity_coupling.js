@@ -4,9 +4,10 @@ import { bindActionCreators } from 'redux';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
-import { withStyles } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
-import InputAdornment from '@material-ui/core/InputAdornment';
+import { withStyles } from '@mui/styles';
+import {
+  TextField, InputAdornment,
+} from '@mui/material';
 
 import { updateMpyJ } from '../../actions/multiplicity';
 

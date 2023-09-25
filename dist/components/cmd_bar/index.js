@@ -9,7 +9,7 @@ var _react = _interopRequireDefault(require("react"));
 var _reactRedux = require("react-redux");
 var _redux = require("redux");
 var _propTypes = _interopRequireDefault(require("prop-types"));
-var _styles = require("@material-ui/core/styles");
+var _withStyles = _interopRequireDefault(require("@mui/styles/withStyles"));
 var _common = require("./common");
 var _viewer = _interopRequireDefault(require("./01_viewer"));
 var _zoom = _interopRequireDefault(require("./02_zoom"));
@@ -74,4 +74,4 @@ CmdBar.propTypes = {
   jcampIdx: _propTypes.default.any,
   hideThreshold: _propTypes.default.bool
 };
-var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(CmdBar);
+var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _withStyles.default)(styles))(CmdBar);

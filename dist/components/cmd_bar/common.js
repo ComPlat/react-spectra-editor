@@ -5,8 +5,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.focusStyle = exports.commonStyle = exports.MuButton = void 0;
-var _styles = require("@material-ui/core/styles");
-var _Button = _interopRequireDefault(require("@material-ui/core/Button"));
+var _styles = require("@mui/styles");
+var _Button = _interopRequireDefault(require("@mui/material/Button"));
 const MuButton = exports.MuButton = (0, _styles.withStyles)({
   root: {
     border: '1px solid #ccc',
@@ -17,7 +17,8 @@ const MuButton = exports.MuButton = (0, _styles.withStyles)({
     lineHeight: '20px',
     minWidth: 30,
     padding: 0,
-    width: 30
+    width: 30,
+    color: 'black'
   }
 })(_Button.default);
 const commonStyle = exports.commonStyle = {

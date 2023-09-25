@@ -10,11 +10,8 @@ var _propTypes = _interopRequireDefault(require("prop-types"));
 var _classnames = _interopRequireDefault(require("classnames"));
 var _reactRedux = require("react-redux");
 var _redux = require("redux");
-var _styles = require("@material-ui/core/styles");
-var _Table = _interopRequireDefault(require("@material-ui/core/Table"));
-var _TableBody = _interopRequireDefault(require("@material-ui/core/TableBody"));
-var _Paper = _interopRequireDefault(require("@material-ui/core/Paper"));
-var _Grid = _interopRequireDefault(require("@material-ui/core/Grid"));
+var _styles = require("@mui/styles");
+var _material = require("@mui/material");
 var _comps = require("./comps");
 var _nmr_comps = require("./nmr_comps");
 const Styles = () => ({
@@ -62,12 +59,12 @@ const sectionTable = (classes, pds) => {
   if (renderMsg) return renderMsg;
   const dict = pds.output.result[0];
   if (!dict) return /*#__PURE__*/_react.default.createElement("div", null);
-  return /*#__PURE__*/_react.default.createElement(_Paper.default, {
+  return /*#__PURE__*/_react.default.createElement(_material.Paper, {
     className: classes.tableRoot
-  }, /*#__PURE__*/_react.default.createElement(_Table.default, {
+  }, /*#__PURE__*/_react.default.createElement(_material.Table, {
     className: classes.table,
     size: "small"
-  }, (0, _nmr_comps.NmrTableHeader)(classes), /*#__PURE__*/_react.default.createElement(_TableBody.default, null, dict.shifts.sort((a, b) => a.atom - b.atom).map((row, idx) => (0, _nmr_comps.NmrTableBodyRow)(classes, row, idx)))));
+  }, (0, _nmr_comps.NmrTableHeader)(classes), /*#__PURE__*/_react.default.createElement(_material.TableBody, null, dict.shifts.sort((a, b) => a.atom - b.atom).map((row, idx) => (0, _nmr_comps.NmrTableBodyRow)(classes, row, idx)))));
 };
 const NmrViewer = _ref => {
   let {
@@ -79,15 +76,15 @@ const NmrViewer = _ref => {
   } = _ref;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: (0, _classnames.default)(classes.root, 'card-forecast-viewer')
-  }, /*#__PURE__*/_react.default.createElement(_Grid.default, {
+  }, /*#__PURE__*/_react.default.createElement(_material.Grid, {
     className: (0, _classnames.default)(classes.container),
     container: true
-  }, /*#__PURE__*/_react.default.createElement(_Grid.default, {
+  }, /*#__PURE__*/_react.default.createElement(_material.Grid, {
     item: true,
     xs: 4
-  }, /*#__PURE__*/_react.default.createElement(_Paper.default, {
+  }, /*#__PURE__*/_react.default.createElement(_material.Paper, {
     className: classes.svgRoot
-  }, (0, _comps.sectionSvg)(classes, forecastSt.predictions))), /*#__PURE__*/_react.default.createElement(_Grid.default, {
+  }, (0, _comps.sectionSvg)(classes, forecastSt.predictions))), /*#__PURE__*/_react.default.createElement(_material.Grid, {
     item: true,
     xs: 8
   }, sectionTable(classes, forecastSt.predictions))), (0, _comps.sectionInput)(classes, molecule, inputCb), (0, _nmr_comps.SectionReference)(classes));

@@ -1,5 +1,5 @@
-import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
+import { withStyles } from '@mui/styles';
+import Button from '@mui/material/Button';
 
 const MuButton = withStyles({
   root: {
@@ -12,6 +12,7 @@ const MuButton = withStyles({
     minWidth: 30,
     padding: 0,
     width: 30,
+    color: 'black',
   },
 })(Button);
 

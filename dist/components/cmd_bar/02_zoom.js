@@ -10,10 +10,10 @@ var _reactRedux = require("react-redux");
 var _redux = require("redux");
 var _classnames = _interopRequireDefault(require("classnames"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
-var _styles = require("@material-ui/core/styles");
-var _ZoomInOutlined = _interopRequireDefault(require("@material-ui/icons/ZoomInOutlined"));
-var _FindReplaceOutlined = _interopRequireDefault(require("@material-ui/icons/FindReplaceOutlined"));
-var _Tooltip = _interopRequireDefault(require("@material-ui/core/Tooltip"));
+var _withStyles = _interopRequireDefault(require("@mui/styles/withStyles"));
+var _ZoomInOutlined = _interopRequireDefault(require("@mui/icons-material/ZoomInOutlined"));
+var _FindReplaceOutlined = _interopRequireDefault(require("@mui/icons-material/FindReplaceOutlined"));
+var _Tooltip = _interopRequireDefault(require("@mui/material/Tooltip"));
 var _ui = require("../../actions/ui");
 var _common = require("./common");
 var _list_ui = require("../../constants/list_ui");
@@ -29,7 +29,8 @@ const Zoom = _ref => {
   const onSweepZoomIn = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN);
   const onSweepZoomReset = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET);
   return /*#__PURE__*/_react.default.createElement("span", {
-    className: classes.group
+    className: classes.group,
+    "data-testid": "Zoom"
   }, /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
     title: /*#__PURE__*/_react.default.createElement("span", {
       className: "txt-sv-tp"
@@ -63,4 +64,4 @@ Zoom.propTypes = {
   isfocusZoomSt: _propTypes.default.bool.isRequired,
   setUiSweepTypeAct: _propTypes.default.func.isRequired
 };
-var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(Zoom);
+var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _withStyles.default)(styles))(Zoom);
