@@ -38,6 +38,21 @@ $ yarn start
 
 [demo & step-by-step manual](https://github.com/ComPlat/react-spectra-editor/blob/master/DEMO_MANUAL.md)
 
+### Testing
+#### Unit test
+```
+$ yarn test
+```
+
+#### E2E test
+```
+$ yarn start
+```
+
+Open another terminal
+```
+$ yarn e2e
+```
 
 
 ## Acknowledgments

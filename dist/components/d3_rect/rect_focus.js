@@ -136,22 +136,22 @@ class RectFocus {
     const bars = this.bars.selectAll('rect').data(this.data);
     bars.exit().attr('class', 'exit').remove();
     const gnd = yt(0);
-    bars.enter().append('rect').attr('class', 'enter-bar').attr('width', 1.5).merge(bars).attr('fill', d => this.barColor(d.y, yRef)).attr('height', d => this.posHeight(gnd, yt(d.y))).attr('id', d => `mpp${Math.round(1000 * d.x)}`).attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y)})`).on('mouseover', (d, i, n) => {
+    bars.enter().append('rect').attr('class', 'enter-bar').attr('width', 1.5).merge(bars).attr('fill', d => this.barColor(d.y, yRef)).attr('height', d => this.posHeight(gnd, yt(d.y))).attr('id', d => `mpp${Math.round(1000 * d.x)}`).attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y)})`).on('mouseover', (event, d) => {
       d3.select(`#mpp${Math.round(1000 * d.x)}`).attr('stroke-opacity', '1.0');
       d3.select(`#bpt${Math.round(1000 * d.x)}`).style('fill', 'blue');
       const tipParams = {
         d,
         layout: this.layout
       };
-      this.tip.show(tipParams, n[i]);
-    }).on('mouseout', (d, i, n) => {
+      this.tip.show(tipParams, event.target);
+    }).on('mouseout', (event, d) => {
       d3.select(`#mpp${Math.round(1000 * d.x)}`).attr('stroke-opacity', '1.0');
       d3.select(`#bpt${Math.round(1000 * d.x)}`).style('fill', 'red');
       const tipParams = {
         d,
         layout: this.layout
       };
-      this.tip.hide(tipParams, n[i]);
+      this.tip.hide(tipParams, event.target);
     });
   }
   drawThres() {

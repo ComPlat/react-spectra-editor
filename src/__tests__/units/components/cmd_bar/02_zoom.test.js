@@ -24,7 +24,7 @@ describe('<Zoom />', () => {
   it('Render Zoom', async () => {
     const renderer = 
       <AppWrapper store={store}>
-          <Zoom editorOnly={false} />
+        <Zoom editorOnly={false} />
       </AppWrapper>
     ;
     const { queryByTestId } = render(renderer);

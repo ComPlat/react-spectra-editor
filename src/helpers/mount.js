@@ -65,7 +65,7 @@ const MountPath = (target, color) => {
     .style('fill', 'none')
     .style('stroke', color)
     .style('stroke-width', 1)
-    .on('click', () => ClickCompass(target));
+    .on('click', (event) => ClickCompass(event, target));
   return path;
 };
 
@@ -81,7 +81,7 @@ const MountComparePath = (target, color, id, alpha = 1) => {
     .style('stroke-opacity', alpha)
     .style('stroke-width', 1)
     .style('stroke-dasharray', ('30, 3'))
-    .on('click', () => ClickCompass(target));
+    .on('click', (event) => ClickCompass(event, target));
   return path;
 };
 

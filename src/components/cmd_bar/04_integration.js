@@ -106,6 +106,7 @@ const Integration = ({
             className={
               classNames(
                 focusStyle(isFocusAddIntgSt, classes),
+                'btn-add-inter',
               )
             }
             disabled={isDisableSt}
@@ -127,6 +128,7 @@ const Integration = ({
             className={
               classNames(
                 focusStyle(isFocusRmIntgSt, classes),
+                'btn-remove-inter',
               )
             }
             disabled={isDisableSt}
@@ -148,6 +150,7 @@ const Integration = ({
             className={
               classNames(
                 focusStyle(isFocusSetRefSt, classes),
+                'btn-set-inter-ref',
               )
             }
             disabled={isDisableSt}
