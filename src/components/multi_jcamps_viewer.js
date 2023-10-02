@@ -48,14 +48,14 @@ const seperatingSubLayout = (entities, featureCondition) => {
 class MultiJcampsViewer extends React.Component { // eslint-disable-line
   render() {
     const {
-      classes, curveSt, operations, entityFileNames, entities, userManualLink,
+      classes, curveSt, operations, entityFileNames, entities, userManualLink, molSvg,
     } = this.props;
     if (!entities || entities.length === 0) return (<div />);
 
     const seperatedSubLayouts = seperatingSubLayout(entities, 'xUnit');
     const { curveIdx } = curveSt;
     const entity = entities[curveIdx];
-    const { feature, topic, molSvg } = entity;
+    const { feature, topic } = entity;
 
     return (
       <div className={classes.root}>

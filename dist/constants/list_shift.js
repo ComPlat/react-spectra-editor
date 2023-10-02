@@ -24,37 +24,37 @@ const cActicAcidD4S = {
 };
 const cAcetoneD6Sep = {
   name: 'Acetone-d6 (sep)',
-  value: 29.920,
+  value: 29.640,
   label: 'Acetone-d6',
   nsdb: 'Acetone-D6 ((CD3)2CO)'
 };
 const cAcetoneD6Broad = {
   name: 'Acetone-d6 (broad)',
-  value: 206.68,
+  value: 206.260,
   label: 'Acetone-d6',
   nsdb: 'Acetone-D6 ((CD3)2CO)'
 };
 const cAcetonitrileD3Sep = {
   name: 'Acetonitrile-d3 (sep)',
-  value: 1.39,
+  value: 1.32,
   label: 'Acetonitrile-d3',
   nsdb: 'Acetonitrile-D3(CD3CN)'
 };
 const cAcetonitrileD3S = {
   name: 'Acetonitrile-d3 (s)',
-  value: 118.69,
+  value: 118.26,
   label: 'Acetonitrile-d3',
   nsdb: 'Acetonitrile-D3(CD3CN)'
 };
 const cBenzeneT = {
   name: 'Benzene (t)',
-  value: 128.390,
+  value: 128.060,
   label: 'Benzene-d6',
   nsdb: 'Benzene-D6 (C6D6)'
 };
 const cChloroformDT = {
   name: 'Chloroform-d (t)',
-  value: 77.00,
+  value: 77.16,
   label: 'CDCl$3',
   nsdb: 'Chloroform-D1 (CDCl3)'
 };
@@ -65,7 +65,7 @@ const cCyclohexaneD12Quin = {
 };
 const cDichloromethaneD2Quin = {
   name: 'Dichloromethane-d2 (quin)',
-  value: 54.0,
+  value: 53.84,
   label: 'CD$2Cl$2'
 };
 const cDmfD7Sep1 = {
@@ -90,7 +90,7 @@ const cDioxaneD8Quin = {
 };
 const cDmsoD6 = {
   name: 'DMSO-d6',
-  value: 39.51,
+  value: 39.52,
   label: 'DMSO-d6',
   nsdb: 'Dimethylsulphoxide-D6 (DMSO-D6, C2D6SO)'
 };
@@ -106,7 +106,7 @@ const cEthanolD6Quin = {
 };
 const cMethanolD4Sep = {
   name: 'Methanol-d4 (sep)',
-  value: 49.15,
+  value: 49.00,
   label: 'Methanol-d4',
   nsdb: 'Methanol-D4 (CD3OD)'
 };
@@ -182,15 +182,35 @@ const cTfaDQ2 = {
 };
 const cTrifluoroethanolD3Quin = {
   name: 'Trifluoroethanol-d3 (quin)',
-  value: 61.50,
+  value: 61.80,
   label: 'Trifluoroethanol-d3'
 };
 const cTrifluoroethanolD3Broad = {
   name: 'Trifluoroethanol-d3 (broad)',
-  value: 126.3,
+  value: 126.28,
   label: 'Trifluoroethanol-d3'
 };
-const LIST_SHIFT_13C = [noReference, cActicAcidD4Sept, cActicAcidD4S, cAcetoneD6Sep, cAcetoneD6Broad, cAcetonitrileD3Sep, cAcetonitrileD3S, cBenzeneT, cChloroformDT, cCyclohexaneD12Quin, cDichloromethaneD2Quin, cDmfD7Sep1, cDmfD7Sep2, cDmfD7T3, cDioxaneD8Quin, cDmsoD6, cEthanolD6Sep, cEthanolD6Quin, cMethanolD4Sep, cPyridineD5T1, cPyridineD5T2, cPyridineD5T3, cThfD8Quin1, cThfD8Quin2, cTmsS, cTolueneD8Sep1, cTolueneD8T2, cTolueneD8T3, cTolueneD8T4, cTolueneD8T5, cTfaDQ1, cTfaDQ2, cTrifluoroethanolD3Quin, cTrifluoroethanolD3Broad];
+const cC6D5Cl1 = {
+  name: 'C6D5Cl (s)',
+  value: 134.19,
+  label: 'C6D5Cl'
+};
+const cC6D5Cl2 = {
+  name: 'C6D5Cl (t)-1',
+  value: 129.26,
+  label: 'C6D5Cl'
+};
+const cC6D5Cl3 = {
+  name: 'C6D5Cl (t)-2',
+  value: 128.25,
+  label: 'C6D5Cl'
+};
+const cC6D5Cl4 = {
+  name: 'C6D5Cl (t)-3',
+  value: 125.96,
+  label: 'C6D5Cl'
+};
+const LIST_SHIFT_13C = [noReference, cActicAcidD4Sept, cActicAcidD4S, cAcetoneD6Sep, cAcetoneD6Broad, cAcetonitrileD3Sep, cAcetonitrileD3S, cBenzeneT, cChloroformDT, cCyclohexaneD12Quin, cDichloromethaneD2Quin, cDmfD7Sep1, cDmfD7Sep2, cDmfD7T3, cDioxaneD8Quin, cDmsoD6, cEthanolD6Sep, cEthanolD6Quin, cMethanolD4Sep, cPyridineD5T1, cPyridineD5T2, cPyridineD5T3, cThfD8Quin1, cThfD8Quin2, cTmsS, cTolueneD8Sep1, cTolueneD8T2, cTolueneD8T3, cTolueneD8T4, cTolueneD8T5, cTfaDQ1, cTfaDQ2, cTrifluoroethanolD3Quin, cTrifluoroethanolD3Broad, cC6D5Cl1, cC6D5Cl2, cC6D5Cl3, cC6D5Cl4];
 exports.LIST_SHIFT_13C = LIST_SHIFT_13C;
 const hActicAcidD4Quin = {
   name: 'Acetic acid-d4 (quin)',
@@ -232,8 +252,8 @@ const hCyclohexaneD12S = {
   label: 'C$6D$1$2'
 };
 const hDeuteriumOxideS = {
-  name: 'Deuterium oxide (s)',
-  value: 4.75,
+  name: 'D2O (s)',
+  value: 4.79,
   label: 'D$2O',
   nsdb: 'Deuteriumoxide (D2O)'
 };
