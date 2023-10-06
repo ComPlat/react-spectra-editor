@@ -137,18 +137,18 @@ const CyclicVoltammetryPanel = _ref => {
     }
   };
   const getDelta = data => {
-    return data.max && data.min ? (0, _chem.GetCyclicVoltaPeakSeparate)(data.max.x, data.min.x).toFixed(5) : 'undefined';
+    return data.max && data.min ? (0, _chem.GetCyclicVoltaPeakSeparate)(data.max.x, data.min.x).toFixed(3) : 'undefined';
   };
   const getRatio = (feature, data) => {
     const featureData = feature.data[0];
     const idx = featureData.x.indexOf(feature.maxX);
     const y_pecker = data.pecker ? data.pecker.y : featureData.y[idx];
-    return data.max && data.min ? (0, _chem.GetCyclicVoltaRatio)(data.max.y, data.min.y, y_pecker).toFixed(5) : 'undefined';
+    return data.max && data.min ? (0, _chem.GetCyclicVoltaRatio)(data.max.y, data.min.y, y_pecker).toFixed(3) : 'undefined';
   };
   const rows = list.map((o, idx) => ({
     idx,
-    max: o.max ? `x:${parseFloat(o.max.x)}, y:${parseFloat(o.max.y).toExponential(2)}` : 'undefined',
-    min: o.min ? `x:${parseFloat(o.min.x)}, y:${parseFloat(o.min.y).toExponential(2)}` : 'undefined',
+    max: o.max ? `x:${parseFloat(o.max.x).toFixed(3)}, y:${parseFloat(o.max.y).toExponential(2)}` : 'undefined',
+    min: o.min ? `x:${parseFloat(o.min.x).toFixed(3)}, y:${parseFloat(o.min.y).toExponential(2)}` : 'undefined',
     pecker: o.pecker ? `${parseFloat(o.pecker.y).toExponential(2)}` : 'undefined',
     delta: getDelta(o),
     ratio: getRatio(feature, o),

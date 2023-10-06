@@ -391,7 +391,32 @@ const extrSpectraShare = (spectra, layout) => spectra.map(s => Object.assign({
 const extrSpectraMs = (jcamp, layout) => {
   const scanCount = jcamp.info.$CSSCANCOUNT || 1;
   const spc = extrSpectraShare(jcamp.spectra.slice(0, scanCount), layout);
-  return spc || [];
+  let spectra = spc || [];
+  if (jcamp.info.UNITS && jcamp.info.SYMBOL) {
+    const units = jcamp.info.UNITS.split(',');
+    const symbol = jcamp.info.SYMBOL.split(',');
+    let xUnit = null;
+    let yUnit = null;
+    symbol.forEach((sym, idx) => {
+      const currSymbol = sym.replace(' ', '').toLowerCase();
+      if (currSymbol === 'x') {
+        xUnit = units[idx].trim();
+      } else if (currSymbol === 'y') {
+        yUnit = units[idx].trim();
+      }
+    });
+    spectra = spectra.map(sp => {
+      const spectrum = sp;
+      if (xUnit) {
+        spectrum.xUnit = xUnit;
+      }
+      if (yUnit) {
+        spectrum.yUnit = yUnit;
+      }
+      return spectrum;
+    });
+  }
+  return spectra;
 };
 const extrSpectraNi = (jcamp, layout) => {
   const categorys = jcamp.info.$CSCATEGORY || ['SPECTRUM'];
@@ -762,7 +787,7 @@ const extrFeaturesMs = (jcamp, layout, peakUp) => {
 const ExtractJcamp = source => {
   const jcamp = _jcampconverter.default.convert(source, {
     xy: true,
-    keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS|\$CSUPPERTHRESHOLD|\$CSLOWERTHRESHOLD|\$CSCYCLICVOLTAMMETRYDATA)/ // eslint-disable-line
+    keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS|\$CSUPPERTHRESHOLD|\$CSLOWERTHRESHOLD|\$CSCYCLICVOLTAMMETRYDATA|UNITS|SYMBOL)/ // eslint-disable-line
   });
 
   const layout = readLayout(jcamp);

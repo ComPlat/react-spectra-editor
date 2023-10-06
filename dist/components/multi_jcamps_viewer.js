@@ -56,7 +56,8 @@ class MultiJcampsViewer extends _react.default.Component {
       operations,
       entityFileNames,
       entities,
-      userManualLink
+      userManualLink,
+      molSvg
     } = this.props;
     if (!entities || entities.length === 0) return /*#__PURE__*/_react.default.createElement("div", null);
     const seperatedSubLayouts = seperatingSubLayout(entities, 'xUnit');
@@ -66,8 +67,7 @@ class MultiJcampsViewer extends _react.default.Component {
     const entity = entities[curveIdx];
     const {
       feature,
-      topic,
-      molSvg
+      topic
     } = entity;
     return /*#__PURE__*/_react.default.createElement("div", {
       className: classes.root
