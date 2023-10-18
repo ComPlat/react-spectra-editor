@@ -167,7 +167,11 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
     value: _list_layout.LIST_LAYOUT.DLS_INTENSITY
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  }, "DLS INTENSITY"))));
+  }, "DLS INTENSITY")), /*#__PURE__*/_react.default.createElement(_MenuItem.default, {
+    value: _list_layout.LIST_LAYOUT.MASS_CHROMATOGRAM
+  }, /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
+  }, "MASS CHROMATOGRAM"))));
 };
 const Layout = _ref => {
   let {

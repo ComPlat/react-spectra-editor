@@ -44,6 +44,7 @@ var _dls_acf_jcamp = _interopRequireDefault(require("./__tests__/fixtures/dls_ac
 var _dls_intensity_jcamp = _interopRequireDefault(require("./__tests__/fixtures/dls_intensity_jcamp"));
 var _qDescValue = require("./__tests__/fixtures/qDescValue");
 require("./__tests__/style/svg.css");
+var _mass_chromatogram_jcamp = _interopRequireDefault(require("./__tests__/fixtures/mass_chromatogram_jcamp"));
 /* eslint-disable prefer-object-spread, default-param-last, no-nested-ternary */
 
 const nmr1HEntity = _app.FN.ExtractJcamp(_nmr1h_jcamp.default);
@@ -79,6 +80,7 @@ const aifEntity2 = _app.FN.ExtractJcamp(_aif_jcamp_2.default);
 const emissionsEntity = _app.FN.ExtractJcamp(_emissions_jcamp.default);
 const dlsAcfEntity = _app.FN.ExtractJcamp(_dls_acf_jcamp.default);
 const dlsIntensityEntity = _app.FN.ExtractJcamp(_dls_intensity_jcamp.default);
+const massChromatogramEntity = _app.FN.ExtractJcamp(_mass_chromatogram_jcamp.default);
 class DemoWriteIr extends _react.default.Component {
   constructor(props) {
     super(props);
@@ -172,6 +174,8 @@ class DemoWriteIr extends _react.default.Component {
         return dlsAcfEntity;
       case 'dls intensity':
         return dlsIntensityEntity;
+      case 'mass chromatogram':
+        return massChromatogramEntity;
       case 'ms':
       default:
         return msEntity;
@@ -230,6 +234,7 @@ class DemoWriteIr extends _react.default.Component {
       case 'emissions':
       case 'dls acf':
       case 'dls intensity':
+      case 'mass chromatogram':
       default:
         return false;
     }
@@ -663,6 +668,12 @@ class DemoWriteIr extends _react.default.Component {
       },
       onClick: this.onClick('ms')
     }, "MS"), /*#__PURE__*/_react.default.createElement(_material.Button, {
+      variant: "contained",
+      style: {
+        margin: '0 10px 0 10px'
+      },
+      onClick: this.onClick('mass chromatogram')
+    }, "Mass chromatogram"), /*#__PURE__*/_react.default.createElement(_Button.default, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'

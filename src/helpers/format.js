@@ -71,6 +71,7 @@ const spectraOps = {
   [LIST_LAYOUT.SEC]: { head: 'SIZE EXCLUSION CHROMATOGRAPHY', tail: '.' },
   [LIST_LAYOUT.EMISSIONS]: { head: 'EMISSION', tail: '.' },
   [LIST_LAYOUT.DLS_INTENSITY]: { head: 'DLS', tail: '.' },
+  [LIST_LAYOUT.MASS_CHROMATOGRAM]: { head: 'MASS CHROMATOGRAM', tail: '.' },
 };
 
 const rmRef = (peaks, shift, atIndex = 0) => {
@@ -359,6 +360,7 @@ const isAIFLayout = (layoutSt) => (LIST_LAYOUT.AIF === layoutSt);
 const isEmissionsLayout = (layoutSt) => (LIST_LAYOUT.EMISSIONS === layoutSt);
 const isDLSACFLayout = (layoutSt) => (LIST_LAYOUT.DLS_ACF === layoutSt);
 const isDLSIntensityLayout = (layoutSt) => (LIST_LAYOUT.DLS_INTENSITY === layoutSt);
+const isMassChromatogramLayout = (layoutSt) => (LIST_LAYOUT.MASS_CHROMATOGRAM === layoutSt);
 
 const getNmrTyp = (layout) => {
   switch (layout) {
@@ -459,6 +461,7 @@ const Format = {
   isAIFLayout,
   isDLSACFLayout,
   strNumberFixedDecimal,
+  isMassChromatogramLayout,
 };
 
 export default Format;

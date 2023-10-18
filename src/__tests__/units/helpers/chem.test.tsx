@@ -9,6 +9,7 @@ import { LIST_SHIFT_1H } from "../../../constants/list_shift";
 import { LIST_LAYOUT } from "../../../constants/list_layout";
 import emissionsJcamp from "../../fixtures/emissions_jcamp";
 import dlsAcfJcamp from "../../fixtures/dls_acf_jcamp";
+import massChromatogramJcamp from "../../fixtures/mass_chromatogram_jcamp";
 
 function checkExtractSucceed(extractedData: any, forLayout: string) {
   const { spectra, features, layout } = extractedData
@@ -107,6 +108,22 @@ describe('Test for chem helper', () => {
 
       it('Check spectra info ', () => {
         checkSpectraInfo(extractedData, 'DLS intensity')
+      })
+    })
+
+    describe('Extract Mass Chromatogram', () => {
+      let extractedData: { spectra: any, features: any, layout: any }
+
+      beforeAll(() => {
+        extractedData = ExtractJcamp(massChromatogramJcamp)
+      })
+
+      it('Extract succeed ', () => {
+        checkExtractSucceed(extractedData, LIST_LAYOUT.MASS_CHROMATOGRAM)
+      })
+
+      it('Check spectra info ', () => {
+        checkSpectraInfo(extractedData, 'MASS CHROMATOGRAM')
       })
     })
     

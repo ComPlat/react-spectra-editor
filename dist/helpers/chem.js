@@ -375,6 +375,9 @@ const readLayout = jcamp => {
     if (dataType.includes('DLS intensity')) {
       return _list_layout.LIST_LAYOUT.DLS_INTENSITY;
     }
+    if (dataType.includes('MASS CHROMATOGRAM')) {
+      return _list_layout.LIST_LAYOUT.MASS_CHROMATOGRAM;
+    }
   }
   return false;
 };

@@ -178,6 +178,9 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
         <MenuItem value={LIST_LAYOUT.DLS_INTENSITY}>
           <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>DLS INTENSITY</span>
         </MenuItem>
+        <MenuItem value={LIST_LAYOUT.MASS_CHROMATOGRAM}>
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>MASS CHROMATOGRAM</span>
+        </MenuItem>
       </Select>
     </FormControl>
   );

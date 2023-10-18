@@ -134,6 +134,10 @@ const spectraOps = {
   [_list_layout.LIST_LAYOUT.DLS_INTENSITY]: {
     head: 'DLS',
     tail: '.'
+  },
+  [_list_layout.LIST_LAYOUT.MASS_CHROMATOGRAM]: {
+    head: 'MASS CHROMATOGRAM',
+    tail: '.'
   }
 };
 const rmRef = function (peaks, shift) {
@@ -431,6 +435,7 @@ const isAIFLayout = layoutSt => _list_layout.LIST_LAYOUT.AIF === layoutSt;
 const isEmissionsLayout = layoutSt => _list_layout.LIST_LAYOUT.EMISSIONS === layoutSt;
 const isDLSACFLayout = layoutSt => _list_layout.LIST_LAYOUT.DLS_ACF === layoutSt;
 const isDLSIntensityLayout = layoutSt => _list_layout.LIST_LAYOUT.DLS_INTENSITY === layoutSt;
+const isMassChromatogramLayout = layoutSt => _list_layout.LIST_LAYOUT.MASS_CHROMATOGRAM === layoutSt;
 const getNmrTyp = layout => {
   switch (layout) {
     case _list_layout.LIST_LAYOUT.H1:
@@ -526,6 +531,7 @@ const Format = {
   hasMultiCurves,
   isAIFLayout,
   isDLSACFLayout,
-  strNumberFixedDecimal
+  strNumberFixedDecimal,
+  isMassChromatogramLayout
 };
 var _default = exports.default = Format;
