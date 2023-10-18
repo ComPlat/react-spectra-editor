@@ -47,6 +47,7 @@ import dlsAcfJcamp from './__tests__/fixtures/dls_acf_jcamp';
 import dlsIntensityJcamp from './__tests__/fixtures/dls_intensity_jcamp';
 import { q1H, qIR, q13C } from './__tests__/fixtures/qDescValue';
 import './__tests__/style/svg.css';
+import massChromatogramJcamp from './__tests__/fixtures/mass_chromatogram_jcamp';
 
 const nmr1HEntity = FN.ExtractJcamp(nmr1HJcamp);
 const nmr1HEntity2 = FN.ExtractJcamp(nmr1H2Jcamp);
@@ -81,6 +82,7 @@ const aifEntity2 = FN.ExtractJcamp(aifJcamp2);
 const emissionsEntity = FN.ExtractJcamp(emissionsJcamp);
 const dlsAcfEntity = FN.ExtractJcamp(dlsAcfJcamp);
 const dlsIntensityEntity = FN.ExtractJcamp(dlsIntensityJcamp);
+const massChromatogramEntity = FN.ExtractJcamp(massChromatogramJcamp);
 
 class DemoWriteIr extends React.Component {
   constructor(props) {
@@ -174,6 +176,8 @@ class DemoWriteIr extends React.Component {
         return dlsAcfEntity;
       case 'dls intensity':
         return dlsIntensityEntity;
+      case 'mass chromatogram':
+        return massChromatogramEntity;
       case 'ms':
       default:
         return msEntity;
@@ -230,6 +234,7 @@ class DemoWriteIr extends React.Component {
       case 'emissions':
       case 'dls acf':
       case 'dls intensity':
+      case 'mass chromatogram':
       default:
         return false;
     }
@@ -577,6 +582,13 @@ class DemoWriteIr extends React.Component {
             onClick={this.onClick('ms')}
           >
             MS
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('mass chromatogram')}
+          >
+            Mass chromatogram
           </Button>
           <Button
             variant="contained"
