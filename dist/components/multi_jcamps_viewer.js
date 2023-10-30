@@ -92,7 +92,7 @@ class MultiJcampsViewer extends _react.default.Component {
       entities: entities,
       topic: topic,
       xLabel: feature.xUnit,
-      yLabel: feature.yUnit,
+      yLabel: entity.layout === 'THERMOGRAVIMETRIC ANALYSIS' ? 'WEIGHT %' : feature.yUnit,
       feature: feature
     })), /*#__PURE__*/_react.default.createElement(_Grid.default, {
       item: true,

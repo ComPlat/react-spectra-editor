@@ -19,6 +19,8 @@ var _multiplicity = _interopRequireDefault(require("./multiplicity"));
 var _cyclic_voltamery_data = _interopRequireDefault(require("./cyclic_voltamery_data"));
 var _graph_selection = _interopRequireDefault(require("./graph_selection"));
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
+var _tga_data = _interopRequireDefault(require("./tga_data"));
+var _tga_decomposition_temperatures = _interopRequireDefault(require("./tga_decomposition_temperatures"));
 /* eslint-disable react/prop-types, react/require-default-props */
 
 const theme = (0, _styles.createTheme)((0, _styles.adaptV4Theme)({
@@ -88,6 +90,8 @@ class PanelViewer extends _react.default.Component {
     const onExapndCompare = () => this.onExapnd('compare');
     const onExapndCyclicVolta = () => this.onExapnd('cyclicvolta');
     const onExapndGraphSelection = () => this.onExapnd('graph');
+    const onExapndTga = () => this.onExapnd('tga');
+    const onExapndTgaTemperature = () => this.onExapnd('tga_temp');
     const {
       listCurves
     } = curveSt;
@@ -129,6 +133,12 @@ class PanelViewer extends _react.default.Component {
       expand: expand === 'cyclicvolta',
       onExapnd: onExapndCyclicVolta,
       userManualLink: userManualLink ? userManualLink.cv : undefined
+    }), _cfg.default.hidePanelTGA(layoutSt) ? null : /*#__PURE__*/_react.default.createElement(_tga_data.default, {
+      expand: expand === 'tga',
+      onExapnd: onExapndTga
+    }), _cfg.default.hidePanelTGA(layoutSt) ? null : /*#__PURE__*/_react.default.createElement(_tga_decomposition_temperatures.default, {
+      expand: expand === 'tga_temp',
+      onExapnd: onExapndTgaTemperature
     }))));
   }
 }

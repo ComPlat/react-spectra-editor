@@ -59,6 +59,15 @@ function* selectUiSweep(action) {
         }
       });
       break;
+    case _list_ui.LIST_UI_SWEEP_TYPE.OFFSET_ADD:
+      yield (0, _effects.put)({
+        type: _action_type.UI.SWEEP.SELECT_OFFSET,
+        payload: {
+          newData: payload,
+          curveIdx
+        }
+      });
+      break;
     case _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD:
       const peaks = calcPeaks(payload); // eslint-disable-line
       if (peaks.length === 0) {
@@ -198,6 +207,14 @@ function* clickUiTarget(action) {
   } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_RM && onPeak) {
     yield (0, _effects.put)({
       type: _action_type.INTEGRATION.RM_ONE,
+      payload: {
+        dataToRemove: payload,
+        curveIdx
+      }
+    });
+  } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.OFFSET_RM && onPeak) {
+    yield (0, _effects.put)({
+      type: _action_type.OFFSET.RM_ONE,
       payload: {
         dataToRemove: payload,
         curveIdx

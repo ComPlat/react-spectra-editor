@@ -1,7 +1,7 @@
 import { put, takeEvery, select } from 'redux-saga/effects';
 
 import {
-  UI, EDITPEAK, SHIFT, INTEGRATION, MULTIPLICITY, CYCLIC_VOLTA_METRY,
+  UI, EDITPEAK, SHIFT, INTEGRATION, MULTIPLICITY, CYCLIC_VOLTA_METRY, OFFSET,
 } from '../constants/action_type';
 import { LIST_UI_SWEEP_TYPE } from '../constants/list_ui';
 import { LIST_LAYOUT } from '../constants/list_layout';
@@ -41,6 +41,12 @@ function* selectUiSweep(action) {
     case LIST_UI_SWEEP_TYPE.INTEGRATION_ADD:
       yield put({
         type: UI.SWEEP.SELECT_INTEGRATION,
+        payload: { newData: payload, curveIdx },
+      });
+      break;
+    case LIST_UI_SWEEP_TYPE.OFFSET_ADD:
+      yield put({
+        type: UI.SWEEP.SELECT_OFFSET,
         payload: { newData: payload, curveIdx },
       });
       break;
@@ -136,6 +142,11 @@ function* clickUiTarget(action) {
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_RM && onPeak) {
     yield put({
       type: INTEGRATION.RM_ONE,
+      payload: { dataToRemove: payload, curveIdx },
+    });
+  } else if (uiSweepType === LIST_UI_SWEEP_TYPE.OFFSET_RM && onPeak) {
+    yield put({
+      type: OFFSET.RM_ONE,
       payload: { dataToRemove: payload, curveIdx },
     });
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_RM && onPeak) {

@@ -29,7 +29,8 @@ import compareUvVisJcamp from './__tests__/fixtures/compare_uv_vis_jcamp';
 import uvVisJcamp from './__tests__/fixtures/uv_vis_jcamp';
 import hplcUVVisJcamp from './__tests__/fixtures/hplc_uvvis_jcamp';
 import hplcUVVisJcamp2 from './__tests__/fixtures/hplc_uvvis_jcamp_2';
-import tgaJcamp from './__tests__/fixtures/tga_jcamp';
+import tgaJcamp1 from './__tests__/fixtures/tga_jcamp_1';
+import tgaJcamp2 from './__tests__/fixtures/tga_jcamp_2';
 import xrdJcamp1 from './__tests__/fixtures/xrd_jcamp_1';
 import xrdJcamp2 from './__tests__/fixtures/xrd_jcamp_2';
 import cyclicVoltaJcamp1 from './__tests__/fixtures/cyclic_voltammetry_1';
@@ -65,7 +66,8 @@ const uvVisEntity = FN.ExtractJcamp(uvVisJcamp);
 const compUvVisEntity = FN.ExtractJcamp(compareUvVisJcamp);
 const hplcUVVisEntity = FN.ExtractJcamp(hplcUVVisJcamp);
 const hplcUVVisEntity2 = FN.ExtractJcamp(hplcUVVisJcamp2);
-const tgaEntity = FN.ExtractJcamp(tgaJcamp);
+const tgaEntity1 = FN.ExtractJcamp(tgaJcamp1);
+const tgaEntity2 = FN.ExtractJcamp(tgaJcamp2);
 const xrdEntity1 = FN.ExtractJcamp(xrdJcamp1);
 const xrdEntity2 = FN.ExtractJcamp(xrdJcamp2);
 const cyclicVoltaEntity1 = FN.ExtractJcamp(cyclicVoltaJcamp1);
@@ -157,7 +159,7 @@ class DemoWriteIr extends React.Component {
       case 'hplc uv/vis':
         return hplcUVVisEntity;
       case 'tga':
-        return tgaEntity;
+        return tgaEntity1;
       case 'xrd':
         return xrdEntity1;
       case 'cyclic volta':
@@ -197,6 +199,8 @@ class DemoWriteIr extends React.Component {
         return [secEntity1, secEntity2, secEntity3, secEntity4];
       case 'aif':
         return [aifEntity1, aifEntity2];
+      case 'tga':
+        return [tgaEntity1, tgaEntity2];
       default:
         return false;
     }

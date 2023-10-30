@@ -65,7 +65,8 @@ class TriBtn extends React.Component {
                 'btn-sv-bar-one',
               )
             }
-            disabled={Cfg.btnCmdMpy(layoutSt) && Cfg.btnCmdIntg(layoutSt)}
+            disabled={Cfg.btnCmdMpy(layoutSt) && Cfg.btnCmdIntg(layoutSt)
+              && Cfg.btnCmdOffset(layoutSt)}
             onClick={this.onToggle}
           >
             { children }
@@ -85,7 +86,9 @@ class TriBtn extends React.Component {
     };
 
     return (
-      <span disabled={Cfg.btnCmdMpy(layoutSt) && Cfg.btnCmdIntg(layoutSt)}>
+      <span disabled={Cfg.btnCmdMpy(layoutSt) && Cfg.btnCmdIntg(layoutSt)
+          && Cfg.btnCmdOffset(layoutSt)}
+      >
         <span className={classNames(classes.txtLabel, 'txt-sv-bar-desc')}>
           Delete ALL?
         </span>

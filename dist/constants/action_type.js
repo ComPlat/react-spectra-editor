@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.XRD = exports.UI = exports.THRESHOLD = exports.SUBMIT = exports.STATUS = exports.SIMULATION = exports.SHIFT = exports.SCAN = exports.MULTIPLICITY = exports.META = exports.MANAGER = exports.LAYOUT = exports.JCAMP = exports.INTEGRATION = exports.FORECAST = exports.EDITPEAK = exports.CYCLIC_VOLTA_METRY = exports.CURVE = exports.AXES = void 0;
+exports.XRD = exports.UI = exports.THRESHOLD = exports.SUBMIT = exports.STATUS = exports.SIMULATION = exports.SHIFT = exports.SCAN = exports.OFFSET = exports.MULTIPLICITY = exports.META = exports.MANAGER = exports.LAYOUT = exports.JCAMP = exports.INTEGRATION = exports.FORECAST = exports.EDITPEAK = exports.CYCLIC_VOLTA_METRY = exports.CURVE = exports.AXES = void 0;
 const THRESHOLD = exports.THRESHOLD = {
   UPDATE_VALUE: 'THRESHOLD_UPDATE_VALUE',
   RESET_VALUE: 'THRESHOLD_RESET_VALUE',
@@ -56,7 +56,8 @@ const UI = exports.UI = {
     SELECT_ZOOMRESET: 'UI_SWEEP_SELECT_ZOOMRESET',
     SELECT_INTEGRATION: 'UI_SWEEP_SELECT_INTEGRATION',
     SELECT_MULTIPLICITY: 'UI_SWEEP_SELECT_MULTIPLICITY',
-    SELECT_MULTIPLICITY_RDC: 'UI_SWEEP_SELECT_MULTIPLICITY_RDC'
+    SELECT_MULTIPLICITY_RDC: 'UI_SWEEP_SELECT_MULTIPLICITY_RDC',
+    SELECT_OFFSET: 'UI_SWEEP_SELECT_OFFSET'
   },
   WHEEL: {
     SCROLL: 'UI_WHEEL_SCROLL'
@@ -139,4 +140,9 @@ const CURVE = exports.CURVE = {
 const AXES = exports.AXES = {
   UPDATE_X_AXIS: 'UPDATE_X_AXIS',
   UPDATE_Y_AXIS: 'UPDATE_Y_AXIS'
+};
+const OFFSET = exports.OFFSET = {
+  RM_ONE: 'OFFSET_RM_ONE',
+  CLEAR_ALL: 'OFFSET_CLEAR_ALL',
+  SWEEP: 'OFFSET_SWEEP'
 };

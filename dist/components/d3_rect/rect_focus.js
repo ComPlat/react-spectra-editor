@@ -179,7 +179,8 @@ class RectFocus {
       tSfPeaks,
       sweepExtentSt,
       isUiAddIntgSt,
-      isUiNoBrushSt
+      isUiNoBrushSt,
+      isUiAddOffsetSt
     } = _ref;
     this.svg = d3.select('.d3Svg');
     (0, _mount.MountMainFrame)(this, 'focus');
@@ -201,7 +202,7 @@ class RectFocus {
       this.drawThres();
       this.drawGrid();
     }
-    (0, _brush.default)(this, isUiAddIntgSt, isUiNoBrushSt);
+    (0, _brush.default)(this, isUiAddIntgSt, isUiNoBrushSt, isUiAddOffsetSt);
   }
   update(_ref2) {
     let {
@@ -211,7 +212,8 @@ class RectFocus {
       tSfPeaks,
       sweepExtentSt,
       isUiAddIntgSt,
-      isUiNoBrushSt
+      isUiNoBrushSt,
+      isUiAddOffsetSt
     } = _ref2;
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks);
@@ -221,7 +223,7 @@ class RectFocus {
       this.drawThres();
       this.drawGrid();
     }
-    (0, _brush.default)(this, isUiAddIntgSt, isUiNoBrushSt);
+    (0, _brush.default)(this, isUiAddIntgSt, isUiNoBrushSt, isUiAddOffsetSt);
   }
 }
 var _default = exports.default = RectFocus;

@@ -84,6 +84,7 @@ class LineFocus {
     this.isFirefox = typeof InstallTrigger !== 'undefined';
 
     this.wavelength = null;
+    this.drawOffset = this.drawOffset.bind(this);
   }
 
   getShouldUpdate(nextEpSt, nextItSt, nextMySt) {
@@ -375,6 +376,100 @@ class LineFocus {
         .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(d.y) - 25})`)
         .on('click', (d) => this.onClickTarget(d));
     }
+  }
+
+  drawOffset(offsetSt) {
+    const {
+      sameXY, sameLySt, sameItSt, sameData,
+    } = this.shouldUpdate;
+    if (sameXY && sameLySt && sameItSt && sameData) return;
+
+    const { selectedIdx, offsets } = offsetSt;
+    const selectedOffset = offsets[selectedIdx];
+
+    const { stack } = selectedOffset;
+
+    const isDisable = Cfg.btnCmdOffset(this.layout);
+    const offsetData = isDisable ? [] : stack;
+
+    const offp = this.tags.offPath.selectAll('path').data(offsetData);
+    offp.exit()
+      .attr('class', 'exit')
+      .remove();
+
+    const offp2 = this.tags.offPath2.selectAll('path').data(offsetData);
+    offp2.exit()
+      .attr('class', 'exit')
+      .remove();
+
+    if (offsetData.length === 0 || isDisable) {
+      return;
+    }
+
+    const { xt, yt } = TfRescale(this);
+    const offsetBarHorizontal = (data) => (
+      d3.line()([
+        [xt(data.xL), yt(data.yL)],
+        [xt(data.xU), yt(data.yL)],
+      ])
+    );
+
+    const offsetBarVertical = (data) => (
+      d3.line()([
+        [xt(data.xU), yt(data.yL)],
+        [xt(data.xU), yt(data.yU)],
+      ])
+    );
+
+    offp.enter()
+      .append('path')
+      .attr('class', 'offp')
+      .attr('fill', 'none')
+      .attr('stroke', 'black')
+      .attr('stroke-width', 1.5)
+      .attr('stroke-dasharray', '5,5')
+      .merge(offp)
+      .attr('id', (d) => `offp${itgIdTag(d)}`)
+      .attr('d', (d) => offsetBarHorizontal(d))
+      .on('mouseover', (d) => {
+        d3.select(`#offp${itgIdTag(d)}`)
+          .attr('stroke', 'blue');
+        d3.select(`#offp-vertical${itgIdTag(d)}`)
+          .attr('stroke', 'blue');
+      })
+      .on('mouseout', (d) => {
+        d3.select(`#offp${itgIdTag(d)}`)
+          .attr('stroke', 'black');
+        d3.select(`#offp-vertical${itgIdTag(d)}`)
+          .attr('stroke', 'black');
+      })
+      .on('click', (d) => this.onClickTarget(d));
+
+    // Vertical line
+    offp2.enter()
+      .append('path')
+      .attr('class', 'offp-vertical')
+      .attr('fill', 'none')
+      .attr('stroke', 'black')
+      .attr('stroke-width', 1.5)
+      .attr('stroke-dasharray', '5,5')
+      .attr('marker-end', 'url(#arrow-left-black)')
+      .merge(offp2)
+      .attr('id', (d) => `offp-vertical${itgIdTag(d)}`)
+      .attr('d', (d) => offsetBarVertical(d))
+      .on('mouseover', (d) => {
+        d3.select(`#offp-vertical${itgIdTag(d)}`)
+          .attr('stroke', 'blue');
+        d3.select(`#offp${itgIdTag(d)}`)
+          .attr('stroke', 'blue');
+      })
+      .on('mouseout', (d) => {
+        d3.select(`#offp-vertical${itgIdTag(d)}`)
+          .attr('stroke', 'black');
+        d3.select(`#offp${itgIdTag(d)}`)
+          .attr('stroke', 'black');
+      })
+      .on('click', (d) => this.onClickTarget(d));
   }
 
   drawInteg(integationSt) {
@@ -792,7 +887,7 @@ class LineFocus {
     filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, comparisons,
     editPeakSt, layoutSt, integationSt, mtplySt,
     sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
-    wavelength,
+    wavelength, isUiAddOffsetSt, offsetSt,
   }) {
     this.svg = d3.select('.d3Svg');
     MountMainFrame(this, 'focus');
@@ -823,16 +918,17 @@ class LineFocus {
       this.drawInteg(integationSt);
       this.drawMtply(mtplySt);
       this.drawComparisons(comparisons);
+      this.drawOffset(offsetSt);
     }
-    MountBrush(this, isUiAddIntgSt, isUiNoBrushSt);
-    this.resetShouldUpdate(editPeakSt, integationSt, mtplySt);
+    MountBrush(this, isUiAddIntgSt, isUiNoBrushSt, isUiAddOffsetSt);
+    this.resetShouldUpdate(editPeakSt, integationSt, mtplySt, offsetSt);
   }
 
   update({
     filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, comparisons,
     editPeakSt, layoutSt, integationSt, mtplySt,
     sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
-    wavelength,
+    wavelength, isUiAddOffsetSt, offsetSt,
   }) {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, this.reverseXAxis(layoutSt));
@@ -840,7 +936,7 @@ class LineFocus {
 
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);
-      this.getShouldUpdate(editPeakSt, integationSt, mtplySt);
+      this.getShouldUpdate(editPeakSt, integationSt, mtplySt, offsetSt);
       this.drawLine();
       this.drawThres();
       this.drawGrid();
@@ -849,9 +945,10 @@ class LineFocus {
       this.drawInteg(integationSt);
       this.drawMtply(mtplySt);
       this.drawComparisons(comparisons);
+      this.drawOffset(offsetSt);
     }
-    MountBrush(this, isUiAddIntgSt, isUiNoBrushSt);
-    this.resetShouldUpdate(editPeakSt, integationSt, mtplySt);
+    MountBrush(this, isUiAddIntgSt, isUiNoBrushSt, isUiAddOffsetSt);
+    this.resetShouldUpdate(editPeakSt, integationSt, mtplySt, offsetSt);
   }
 }
 

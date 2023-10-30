@@ -76,7 +76,7 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
                 entities={entities}
                 topic={topic}
                 xLabel={feature.xUnit}
-                yLabel={feature.yUnit}
+                yLabel={entity.layout === 'THERMOGRAVIMETRIC ANALYSIS' ? 'WEIGHT %' : feature.yUnit}
                 feature={feature}
               />
             </Grid>

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.MountThresLine = exports.MountTags = exports.MountRef = exports.MountPath = exports.MountMarker = exports.MountMainFrame = exports.MountGrid = exports.MountComparePath = exports.MountClip = exports.MountBars = exports.MountAxisLabelY = exports.MountAxisLabelX = exports.MountAxis = void 0;
+exports.MountThresLine = exports.MountTags = exports.MountSecondaryYLabel = exports.MountSecondaryAxis = exports.MountRef = exports.MountPath = exports.MountMarker = exports.MountMainFrame = exports.MountGrid = exports.MountComparePath = exports.MountClip = exports.MountBars = exports.MountAxisLabelY = exports.MountAxisLabelX = exports.MountAxis = void 0;
 var _compass = require("./compass");
 const MountTags = target => {
   const igbPath = target.root.append('g').attr('class', 'igbPath-clip').attr('clip-path', 'url(#clip)');
@@ -18,6 +18,8 @@ const MountTags = target => {
   const mpypPath = target.root.append('g').attr('class', 'mpypPath-clip').attr('clip-path', 'url(#clip)');
   const aucPath = target.root.append('g').attr('class', 'aucPath-clip').attr('clip-path', 'url(#clip)');
   const peckerPath = target.root.append('g').attr('class', 'peckerPath-clip').attr('clip-path', 'url(#clip)');
+  const offPath = target.root.append('g').attr('class', 'offPath-clip').attr('clip-path', 'url(#clip)');
+  const offPath2 = target.root.append('g').attr('class', 'offPath2-clip').attr('clip-path', 'url(#clip)');
   return {
     pPath,
     bpPath,
@@ -30,7 +32,9 @@ const MountTags = target => {
     mpyt2Path,
     mpypPath,
     aucPath,
-    peckerPath // eslint-disable-line
+    peckerPath,
+    offPath,
+    offPath2 // eslint-disable-line
   };
 };
 exports.MountTags = MountTags;
@@ -81,6 +85,21 @@ const MountAxis = target => {
   };
 };
 exports.MountAxis = MountAxis;
+const MountSecondaryAxis = target => {
+  const yAxisTrans = `translate(${target.w}, 0)`;
+  const yAxis = target.root.append('g').attr('class', 'y-secondary-axis').attr('transform', yAxisTrans);
+  return {
+    y: yAxis
+  };
+};
+exports.MountSecondaryAxis = MountSecondaryAxis;
+const MountSecondaryYLabel = target => {
+  const secondaryYLabel = target.otherLineData[0].yUnits;
+  const yR = 'rotate(-90)';
+  const yTrans = `translate(${target.w + 45}, ${target.h / 2}) ${yR}`;
+  target.root.append('text').attr('text-anchor', 'middle').attr('transform', yTrans).attr('class', 'secondaryYLabel').attr('font-family', 'Helvetica').style('font-size', '12px').text(secondaryYLabel);
+};
+exports.MountSecondaryYLabel = MountSecondaryYLabel;
 const MountAxisLabelX = target => {
   const xTrans = `translate(${target.w / 2}, ${target.h + 30})`;
   target.root.append('text').attr('text-anchor', 'middle').attr('transform', xTrans).attr('class', 'xLabel').attr('font-family', 'Helvetica').style('font-size', '12px');

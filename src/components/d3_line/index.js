@@ -39,7 +39,7 @@ class ViewerLine extends React.Component {
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt, integationSt, mtplySt,
       sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
       isHidden, wavelength, axesUnitsSt,
-      resetAllAct,
+      resetAllAct, offsetSt, isUiAddOffsetSt,
     } = this.props;
     drawDestroy(this.rootKlass);
     resetAllAct(feature);
@@ -72,6 +72,8 @@ class ViewerLine extends React.Component {
       isUiAddIntgSt,
       isUiNoBrushSt,
       wavelength,
+      offsetSt,
+      isUiAddOffsetSt,
     });
     drawLabel(this.rootKlass, cLabel, xxLabel, yyLabel);
     drawDisplay(this.rootKlass, isHidden);
@@ -82,7 +84,7 @@ class ViewerLine extends React.Component {
       seed, peak, cLabel, xLabel, yLabel, freq, comparisons,
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt, integationSt, mtplySt,
       sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
-      isHidden, wavelength, axesUnitsSt,
+      isHidden, wavelength, axesUnitsSt, offsetSt, isUiAddOffsetSt,
     } = this.props;
     this.normChange(prevProps);
 
@@ -113,6 +115,8 @@ class ViewerLine extends React.Component {
       isUiAddIntgSt,
       isUiNoBrushSt,
       wavelength,
+      offsetSt,
+      isUiAddOffsetSt,
     });
     drawLabel(this.rootKlass, cLabel, xxLabel, yyLabel);
     drawDisplay(this.rootKlass, isHidden);
@@ -154,6 +158,8 @@ const mapStateToProps = (state, props) => (
     isUiNoBrushSt: LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
     wavelength: state.wavelength,
     axesUnitsSt: state.axesUnits,
+    offsetSt: state.offset.present,
+    isUiAddOffsetSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.OFFSET_ADD,
   }
 );
 
@@ -197,6 +203,8 @@ ViewerLine.propTypes = {
   isHidden: PropTypes.bool.isRequired,
   wavelength: PropTypes.object.isRequired,
   axesUnitsSt: PropTypes.object.isRequired,
+  offsetSt: PropTypes.object.isRequired,
+  isUiAddOffsetSt: PropTypes.bool.isRequired,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ViewerLine);

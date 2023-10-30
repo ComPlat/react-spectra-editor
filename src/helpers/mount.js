@@ -37,8 +37,14 @@ const MountTags = (target) => {
   const peckerPath = target.root.append('g')
     .attr('class', 'peckerPath-clip')
     .attr('clip-path', 'url(#clip)');
+  const offPath = target.root.append('g')
+    .attr('class', 'offPath-clip')
+    .attr('clip-path', 'url(#clip)');
+  const offPath2 = target.root.append('g')
+    .attr('class', 'offPath2-clip')
+    .attr('clip-path', 'url(#clip)');
   return {
-    pPath, bpPath, bpTxt, igbPath, igcPath, igtPath, mpybPath, mpyt1Path, mpyt2Path, mpypPath, aucPath, peckerPath, // eslint-disable-line
+    pPath, bpPath, bpTxt, igbPath, igcPath, igtPath, mpybPath, mpyt1Path, mpyt2Path, mpypPath, aucPath, peckerPath, offPath, offPath2 // eslint-disable-line
   };
 };
 
@@ -127,6 +133,28 @@ const MountAxis = (target) => {
   return { x: xAxis, y: yAxis };
 };
 
+const MountSecondaryAxis = (target) => {
+  const yAxisTrans = `translate(${target.w}, 0)`;
+  const yAxis = target.root.append('g')
+    .attr('class', 'y-secondary-axis')
+    .attr('transform', yAxisTrans);
+  return { y: yAxis };
+};
+
+const MountSecondaryYLabel = (target) => {
+  const secondaryYLabel = target.otherLineData[0].yUnits;
+  const yR = 'rotate(-90)';
+  const yTrans = `translate(${target.w + 45}, ${target.h / 2}) ${yR}`;
+
+  target.root.append('text')
+    .attr('text-anchor', 'middle')
+    .attr('transform', yTrans)
+    .attr('class', 'secondaryYLabel')
+    .attr('font-family', 'Helvetica')
+    .style('font-size', '12px')
+    .text(secondaryYLabel);
+};
+
 const MountAxisLabelX = (target) => {
   const xTrans = `translate(${target.w / 2}, ${target.h + 30})`;
   target.root.append('text')
@@ -188,5 +216,6 @@ const MountMainFrame = (target, name) => {
 export {
   MountTags, MountRef, MountPath, MountThresLine, MountGrid, MountAxis,
   MountComparePath, MountAxisLabelX, MountAxisLabelY,
-  MountMarker, MountClip, MountMainFrame, MountBars,
+  MountMarker, MountClip, MountMainFrame, MountBars, MountSecondaryAxis,
+  MountSecondaryYLabel,
 };

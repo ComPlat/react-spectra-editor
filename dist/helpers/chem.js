@@ -837,7 +837,7 @@ const ExtractJcamp = source => {
       layout,
       temperature
     };
-  } else if (_format.default.isCyclicVoltaLayout(layout) || _format.default.isSECLayout(layout) || _format.default.isAIFLayout(layout) || _format.default.isCDSLayout(layout)) {
+  } else if (_format.default.isCyclicVoltaLayout(layout) || _format.default.isSECLayout(layout) || _format.default.isAIFLayout(layout) || _format.default.isCDSLayout(layout) || _format.default.isTGALayout(layout)) {
     features = extrFeaturesCylicVolta(jcamp, layout, peakUp);
   } else {
     features = extrFeaturesNi(jcamp, layout, peakUp, spectra);

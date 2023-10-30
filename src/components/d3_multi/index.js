@@ -17,7 +17,7 @@ import { addNewCylicVoltaPairPeak, addCylicVoltaMaxPeak, addCylicVoltaMinPeak } 
 import MultiFocus from './multi_focus';
 
 import {
-  drawMain, drawLabel, drawDisplay, drawDestroy, drawArrowOnCurve,
+  drawMain, drawLabel, drawDisplay, drawDestroy, drawArrowOnCurve, drawDestroySecondaryAxis,
 } from '../common/draw';
 
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
@@ -46,7 +46,7 @@ class ViewerMulti extends React.Component {
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt,
       sweepExtentSt, isUiNoBrushSt,
       isHidden, resetAllAct, cyclicvoltaSt,
-      integationSt, mtplySt, axesUnitsSt,
+      integationSt, mtplySt, axesUnitsSt, offsetSt,
     } = this.props;
 
     drawDestroy(this.rootKlass);
@@ -64,7 +64,12 @@ class ViewerMulti extends React.Component {
     const filterSeed = seed;
     const filterPeak = peak;
 
-    drawMain(this.rootKlass, W, H);
+    if (feature.dataType === 'THERMOGRAVIMETRIC ANALYSIS') {
+      drawMain(this.rootKlass, W, H, true);
+    } else {
+      drawMain(this.rootKlass, W, H, false);
+    }
+
     this.focus.create({
       curveSt,
       filterSeed,
@@ -78,6 +83,7 @@ class ViewerMulti extends React.Component {
       cyclicvoltaSt,
       integationSt,
       mtplySt,
+      offsetSt,
     });
     drawLabel(this.rootKlass, cLabel, xxLabel, yyLabel);
     drawDisplay(this.rootKlass, isHidden);
@@ -91,7 +97,7 @@ class ViewerMulti extends React.Component {
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt,
       sweepExtentSt, isUiNoBrushSt,
       isHidden, cyclicvoltaSt,
-      integationSt, mtplySt, axesUnitsSt,
+      integationSt, mtplySt, axesUnitsSt, feature, offsetSt,
     } = this.props;
     this.normChange(prevProps);
 
@@ -121,7 +127,14 @@ class ViewerMulti extends React.Component {
       cyclicvoltaSt,
       integationSt,
       mtplySt,
+      offsetSt,
     });
+
+    if (feature.dataType !== 'THERMOGRAVIMETRIC ANALYSIS') {
+      drawDestroySecondaryAxis(this.rootKlass);
+      this.focus.secondaryAxisDrawn = false;
+    }
+
     drawLabel(this.rootKlass, cLabel, xxLabel, yyLabel);
     drawDisplay(this.rootKlass, isHidden);
     drawArrowOnCurve(this.rootKlass, isHidden);
@@ -162,6 +175,7 @@ const mapStateToProps = (state, props) => (
     integationSt: state.integration.present,
     mtplySt: state.multiplicity.present,
     axesUnitsSt: state.axesUnits,
+    offsetSt: state.offset.present,
   }
 );
 
@@ -205,6 +219,7 @@ ViewerMulti.propTypes = {
   addCylicVoltaMinPeakAct: PropTypes.func.isRequired,
   cLabel: PropTypes.string,
   axesUnitsSt: PropTypes.object.isRequired,
+  offsetSt: PropTypes.object.isRequired,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ViewerMulti);

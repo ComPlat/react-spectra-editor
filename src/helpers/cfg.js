@@ -58,6 +58,10 @@ const showTwoThreshold = (layoutSt) => Format.isCyclicVoltaLayout(layoutSt);
 
 const hidePanelCyclicVolta = (layoutSt) => !Format.isCyclicVoltaLayout(layoutSt);
 
+const btnCmdOffset = (layoutSt) => !Format.isTGALayout(layoutSt);
+
+const hidePanelTGA = (layoutSt) => !Format.isTGALayout(layoutSt);
+
 const Config = {
   btnCmdAnaViewer,
   hideCmdAnaViewer,
@@ -75,6 +79,8 @@ const Config = {
   hideSolvent,
   showTwoThreshold,
   hidePanelCyclicVolta,
+  btnCmdOffset,
+  hidePanelTGA,
 };
 
 export default Config;

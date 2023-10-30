@@ -62,7 +62,8 @@ class ViewerMulti extends _react.default.Component {
       cyclicvoltaSt,
       integationSt,
       mtplySt,
-      axesUnitsSt
+      axesUnitsSt,
+      offsetSt
     } = this.props;
     (0, _draw.drawDestroy)(this.rootKlass);
     resetAllAct(feature);
@@ -78,7 +79,11 @@ class ViewerMulti extends _react.default.Component {
     }
     const filterSeed = seed;
     const filterPeak = peak;
-    (0, _draw.drawMain)(this.rootKlass, W, H);
+    if (feature.dataType === 'THERMOGRAVIMETRIC ANALYSIS') {
+      (0, _draw.drawMain)(this.rootKlass, W, H, true);
+    } else {
+      (0, _draw.drawMain)(this.rootKlass, W, H, false);
+    }
     this.focus.create({
       curveSt,
       filterSeed,
@@ -91,7 +96,8 @@ class ViewerMulti extends _react.default.Component {
       isUiNoBrushSt,
       cyclicvoltaSt,
       integationSt,
-      mtplySt
+      mtplySt,
+      offsetSt
     });
     (0, _draw.drawLabel)(this.rootKlass, cLabel, xxLabel, yyLabel);
     (0, _draw.drawDisplay)(this.rootKlass, isHidden);
@@ -116,7 +122,9 @@ class ViewerMulti extends _react.default.Component {
       cyclicvoltaSt,
       integationSt,
       mtplySt,
-      axesUnitsSt
+      axesUnitsSt,
+      feature,
+      offsetSt
     } = this.props;
     this.normChange(prevProps);
     let xxLabel = xLabel;
@@ -144,8 +152,13 @@ class ViewerMulti extends _react.default.Component {
       isUiNoBrushSt,
       cyclicvoltaSt,
       integationSt,
-      mtplySt
+      mtplySt,
+      offsetSt
     });
+    if (feature.dataType !== 'THERMOGRAVIMETRIC ANALYSIS') {
+      (0, _draw.drawDestroySecondaryAxis)(this.rootKlass);
+      this.focus.secondaryAxisDrawn = false;
+    }
     (0, _draw.drawLabel)(this.rootKlass, cLabel, xxLabel, yyLabel);
     (0, _draw.drawDisplay)(this.rootKlass, isHidden);
     (0, _draw.drawArrowOnCurve)(this.rootKlass, isHidden);
@@ -184,7 +197,8 @@ const mapStateToProps = (state, props) => ({
   maxminPeakSt: (0, _chem.Feature2MaxMinPeak)(state, props),
   integationSt: state.integration.present,
   mtplySt: state.multiplicity.present,
-  axesUnitsSt: state.axesUnits
+  axesUnitsSt: state.axesUnits,
+  offsetSt: state.offset.present
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   resetAllAct: _manager.resetAll,
@@ -222,6 +236,7 @@ ViewerMulti.propTypes = {
   addCylicVoltaMaxPeakAct: _propTypes.default.func.isRequired,
   addCylicVoltaMinPeakAct: _propTypes.default.func.isRequired,
   cLabel: _propTypes.default.string,
-  axesUnitsSt: _propTypes.default.object.isRequired
+  axesUnitsSt: _propTypes.default.object.isRequired,
+  offsetSt: _propTypes.default.object.isRequired
 };
 var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(ViewerMulti);

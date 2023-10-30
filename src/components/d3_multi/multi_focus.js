@@ -6,7 +6,8 @@ import {
 } from '../../helpers/init';
 import {
   MountPath, MountGrid, MountAxis, MountAxisLabelX, MountAxisLabelY,
-  MountClip, MountMainFrame, MountTags, MountComparePath, MountRef,
+  MountClip, MountMainFrame, MountTags, MountComparePath, MountRef, MountSecondaryAxis,
+  MountSecondaryYLabel,
 } from '../../helpers/mount';
 import { PksEdit, PeckersEdit } from '../../helpers/converter';
 import MountBrush from '../../helpers/brush';
@@ -65,9 +66,14 @@ class MultiFocus {
     this.tip = null;
     this.factor = 0.125;
     this.currentExtent = null;
+    this.primaryExtent = { xExtent: null, yExtent: { yL: null, yU: null } };
+    this.secondaryExtent = { xExtent: null, yExtent: { yL: null, yU: null } };
     this.shouldUpdate = {};
     // this.freq = false;
     this.layout = LIST_LAYOUT.CYCLIC_VOLTAMMETRY;
+    this.secondaryAxisDrawn = false;
+    this.secondaryYScale = null;
+    this.secondaryPathCall = null;
 
     this.getShouldUpdate = this.getShouldUpdate.bind(this);
     this.resetShouldUpdate = this.resetShouldUpdate.bind(this);
@@ -91,6 +97,9 @@ class MultiFocus {
     this.onClickPecker = this.onClickPecker.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
     this.cyclicvoltaSt = null;
+    this.drawSecondaryAxis = this.drawSecondaryAxis.bind(this);
+    this.secondaryAxis = null;
+    this.handleConfigMultiTGA = this.handleConfigMultiTGA.bind(this);
   }
 
   getShouldUpdate(nextEpSt) {
@@ -153,7 +162,12 @@ class MultiFocus {
         this.pathColor = color;
         filterSubLayoutValue = feature.xUnit;
       } else {
-        this.otherLineData.push({ data: currData, color, filterSublayout: feature.xUnit });
+        this.otherLineData.push({
+          data: currData,
+          color,
+          filterSublayout: feature.xUnit,
+          yUnits: feature.yUnit,
+        });
       }
     });
     if (Format.isSECLayout(layout)) {
@@ -180,6 +194,110 @@ class MultiFocus {
       .y((d) => yt(d.y));
   }
 
+  updateSecondaryPathCall(xt, secondaryYScale) {
+    this.secondaryPathCall = d3.line()
+      .x((d) => xt(d.x))
+      .y((d) => secondaryYScale(d.y));
+  }
+
+  handleConfigMultiTGA(xExtent, yExtent, sweepExtentSt, xt, yt) {
+    const isWeight = this.otherLineData[0].yUnits.toUpperCase().includes('DERIV');
+    // case 1: zoom in secondary axis and rescale primary
+    // case 2: switch from primary to secondary after zooming in
+    // case 3: switch from secondary to primary after zooming in
+    // case 4: zoomed in primary axis and rescale secondary / switch between initial graphs
+
+    if (!isWeight && yExtent.yL !== this.primaryExtent.yExtent.yL
+    && yExtent.yU !== this.primaryExtent.yExtent.yU) {
+      // rescale secondary axis
+      this.secondaryYScale = d3.scaleLinear()
+        .domain([(yExtent.yL),
+          (yExtent.yU)])
+        .range([this.h, 0]);
+      this.scales.x.domain([xExtent.xL, xExtent.xU]);
+      const yAxisSecondary = d3.axisRight(this.secondaryYScale);
+      this.secondaryAxis.y.call(yAxisSecondary);
+
+      // rescale primary axis
+      if (sweepExtentSt.newOtherGraphExtents) {
+        this.scales.y.domain([sweepExtentSt.newOtherGraphExtents.yL,
+          sweepExtentSt.newOtherGraphExtents.yU]);
+
+        this.primaryExtent = {
+          xExtent,
+          yExtent: {
+            yL: sweepExtentSt.newOtherGraphExtents.yL,
+            yU: sweepExtentSt.newOtherGraphExtents.yU,
+          },
+        };
+        this.axisCall.y.scale(yt);
+        this.updatePathCall(xt, yt);
+      }
+
+      this.axisCall.x.scale(xt);
+      this.currentExtent = { xExtent, yExtent };
+      this.secondaryExtent = { xExtent, yExtent };
+    } else if (!isWeight && yExtent.yL === this.primaryExtent.yExtent.yL
+    && yExtent.yU === this.primaryExtent.yExtent.yU
+    && sweepExtentSt.newOtherGraphExtents) {
+      // rescale secondary axis
+      this.secondaryYScale = d3.scaleLinear()
+        .domain([(sweepExtentSt.newOtherGraphExtents.yL),
+          (sweepExtentSt.newOtherGraphExtents.yU)])
+        .range([this.h, 0]);
+      this.scales.x.domain([xExtent.xL, xExtent.xU]);
+
+      const yAxisSecondary = d3.axisRight(this.secondaryYScale);
+      this.secondaryAxis.y.call(yAxisSecondary);
+
+      // call primary y axis
+      this.scales.y.domain([yExtent.yL, yExtent.yU]);
+      this.axisCall.y.scale(yt);
+    } else if (isWeight && yExtent.yL === this.secondaryExtent.yExtent.yL
+    && yExtent.yU === this.secondaryExtent.yExtent.yU
+    && sweepExtentSt.newOtherGraphExtents) {
+      this.scales.y.domain([sweepExtentSt.newOtherGraphExtents.yL,
+        sweepExtentSt.newOtherGraphExtents.yU]);
+      this.scales.x.domain([xExtent.xL, xExtent.xU]);
+      this.axisCall.x.scale(xt);
+      this.axisCall.y.scale(yt);
+
+      this.secondaryYScale = d3.scaleLinear()
+        .domain([yExtent.yL, yExtent.yU])
+        .range([this.h, 0]);
+      const yAxisSecondary = d3.axisRight(this.secondaryYScale);
+      this.secondaryAxis.y.call(yAxisSecondary);
+
+      this.updateSecondaryPathCall(xt, this.secondaryYScale);
+    } else {
+      this.scales.y.domain([yExtent.yL, yExtent.yU]);
+      this.scales.x.domain([xExtent.xL, xExtent.xU]);
+      this.axisCall.x.scale(xt);
+      this.axisCall.y.scale(yt);
+
+      if (sweepExtentSt.newOtherGraphExtents) {
+        this.secondaryYScale = d3.scaleLinear()
+          .domain([(sweepExtentSt.newOtherGraphExtents.yL),
+            (sweepExtentSt.newOtherGraphExtents.yU)])
+          .range([this.h, 0]);
+        const yAxisSecondary = d3.axisRight(this.secondaryYScale);
+        this.secondaryAxis.y.call(yAxisSecondary);
+
+        this.updateSecondaryPathCall(xt, this.secondaryYScale);
+        this.secondaryExtent = {
+          xExtent,
+          yExtent: {
+            yL: sweepExtentSt.newOtherGraphExtents.yL,
+            yU: sweepExtentSt.newOtherGraphExtents.yU,
+          },
+        };
+      }
+
+      this.currentExtent = { xExtent, yExtent };
+      this.primaryExtent = { xExtent, yExtent };
+    }
+  }
+
   setConfig(sweepExtentSt) {
     // Domain Calculate
     let { xExtent, yExtent } = sweepExtentSt || { xExtent: false, yExtent: false };
@@ -187,9 +305,11 @@ class MultiFocus {
     if (!xExtent || !yExtent) {
       let allData = [...this.data];
       if (this.otherLineData) {
-        this.otherLineData.forEach((lineData) => {
-          allData = [...allData, ...lineData.data];
-        });
+        if (!Format.isTGALayout(this.layout)) {
+          this.otherLineData.forEach((lineData) => {
+            allData = [...allData, ...lineData.data];
+          });
+        }
       }
 
       const xes = d3.extent(allData, (d) => d.x).sort((a, b) => a - b);
@@ -203,24 +323,37 @@ class MultiFocus {
       };
     }
 
-    this.scales.x.domain([xExtent.xL, xExtent.xU]);
-    this.scales.y.domain([yExtent.yL, yExtent.yU]);
-
     // rescale for zoom
     const { xt, yt } = TfRescale(this);
-
-    // Axis Call
-    this.axisCall.x.scale(xt);
-    this.axisCall.y.scale(yt);
-
-    this.currentExtent = { xExtent, yExtent };
+    if (Format.isTGALayout(this.layout) && this.otherLineData) {
+      this.handleConfigMultiTGA(xExtent, yExtent, sweepExtentSt, xt, yt);
+    } else {
+      this.scales.x.domain([xExtent.xL, xExtent.xU]);
+      this.scales.y.domain([yExtent.yL, yExtent.yU]);
+      // Axis Call
+      this.axisCall.x.scale(xt);
+      this.axisCall.y.scale(yt);
+      this.currentExtent = { xExtent, yExtent };
+    }
   }
 
   drawLine() {
     const { xt, yt } = TfRescale(this);
-    this.updatePathCall(xt, yt);
-    this.path.attr('d', this.pathCall(this.data));
-    this.path.style('stroke', this.pathColor);
+    if (Format.isTGALayout(this.layout) && this.otherLineData) {
+      if (!this.otherLineData[0].yUnits.toUpperCase().includes('DERIV')) {
+        this.updateSecondaryPathCall(xt, this.secondaryYScale);
+        this.path.attr('d', this.secondaryPathCall(this.data));
+        this.path.style('stroke', this.pathColor);
+      } else {
+        this.updatePathCall(xt, yt);
+        this.path.attr('d', this.pathCall(this.data));
+        this.path.style('stroke', this.pathColor);
+      }
+    } else {
+      this.updatePathCall(xt, yt);
+      this.path.attr('d', this.pathCall(this.data));
+      this.path.style('stroke', this.pathColor);
+    }
     if (this.layout === LIST_LAYOUT.AIF) {
       this.path.attr('marker-mid', 'url(#arrow-left)');
     }
@@ -229,16 +362,74 @@ class MultiFocus {
   drawOtherLines(layout) {
     d3.selectAll('.line-clip-compare').remove();
     if (!this.otherLineData) return null;
-    this.otherLineData.forEach((entry, idx) => {
-      const { data, color } = entry;
-      const pathColor = color ? color : Format.mutiEntitiesColors(idx);
-      const path = MountComparePath(this, pathColor, idx, 0.4);
-      path.attr('d', this.pathCall(data));
-      if (this.layout === LIST_LAYOUT.AIF && this.isShowAllCurves === true) {
-        path.attr('marker-mid', 'url(#arrow-left)');
-      }
-    });
+    const { xt, yt } = TfRescale(this);
+    if (Format.isTGALayout(this.layout)
+    && this.otherLineData[0].yUnits.toUpperCase().includes('DERIV')) {
+      const { secondaryYScale } = this.drawSecondaryAxis();
+      this.otherLineData.forEach((entry, idx) => {
+        const { data, color } = entry;
+        const pathColor = color ? color : Format.mutiEntitiesColors(idx);
+        const path = MountComparePath(this, pathColor, idx, 0.4);
+        const secondaryPathCall = d3.line()
+          .x((d) => xt(d.x))
+          .y((d) => secondaryYScale(d.y));
+        path.attr('d', secondaryPathCall(data));
+      });
+    } else {
+      this.otherLineData.forEach((entry, idx) => {
+        const { data, color } = entry;
+        const pathColor = color ? color : Format.mutiEntitiesColors(idx);
+        const path = MountComparePath(this, pathColor, idx, 0.4);
+        path.attr('d', this.pathCall(data));
+        if (this.layout === LIST_LAYOUT.AIF && this.isShowAllCurves === true) {
+          path.attr('marker-mid', 'url(#arrow-left)');
+        }
+      });
+    }
     return null;
+  }
+
+  drawSecondaryAxis() {
+    if (Format.isTGALayout(this.layout) && !this.secondaryAxisDrawn) {
+      const secondaryAxes = MountSecondaryAxis(this);
+      let minY = Infinity;
+      let maxY = -Infinity;
+      let height = Infinity;
+      let yExtent = { yL: -Infinity, yU: Infinity };
+      this.otherLineData.forEach((entry) => {
+        const { data } = entry;
+        const minData = d3.min(data, (d) => d.y);
+        const maxData = d3.max(data, (d) => d.y);
+        minY = Math.min(minY, minData);
+        maxY = Math.max(maxY, maxData);
+        height = maxY - minY;
+
+        yExtent = {
+          yL: (minY - this.factor * height),
+          yU: (maxY + this.factor * height),
+        };
+      });
+
+      const secondaryYScale = d3.scaleLinear()
+        .domain([yExtent.yL, yExtent.yU])
+        .range([this.h, 0]);
+
+      const { xExtent } = this.currentExtent;
+      this.secondaryExtent = { xExtent, yExtent };
+
+      const yAxisSecondary = d3.axisRight(secondaryYScale);
+      secondaryAxes.y.call(yAxisSecondary);
+      MountSecondaryYLabel(this);
+
+      this.secondaryAxisDrawn = true;
+      this.secondaryYScale = secondaryYScale;
+      this.secondaryAxis = secondaryAxes;
+    }
+    return {
+      secondaryYScale: this.secondaryYScale,
+      secondaryAxisDrawn: this.secondaryAxisDrawn,
+      secondaryAxes: this.secondaryAxis,
+    };
   }
 
   drawGrid() {
@@ -499,6 +690,100 @@ class MultiFocus {
         this.tip.hide(tipParams, n[i]);
       })
       .on('click', (d) => this.onClickPecker(d));
+  }
+
+  drawOffset(offsetSt) {
+    const {
+      sameXY, sameLySt, sameItSt, sameData,
+    } = this.shouldUpdate;
+    if (sameXY && sameLySt && sameItSt && sameData) return;
+
+    const { selectedIdx, offsets } = offsetSt;
+    const selectedOffset = offsets[selectedIdx];
+
+    const { stack } = selectedOffset;
+
+    const isDisable = Cfg.btnCmdOffset(this.layout);
+    const offsetData = isDisable ? [] : stack;
+
+    const offp = this.tags.offPath.selectAll('path').data(offsetData);
+    offp.exit()
+      .attr('class', 'exit')
+      .remove();
+
+    const offp2 = this.tags.offPath2.selectAll('path').data(offsetData);
+    offp2.exit()
+      .attr('class', 'exit')
+      .remove();
+
+    if (offsetData.length === 0 || isDisable) {
+      return;
+    }
+
+    const { xt, yt } = TfRescale(this);
+    const offsetBarHorizontal = (data) => (
+      d3.line()([
+        [xt(data.xL), yt(data.yL)],
+        [xt(data.xU), yt(data.yL)],
+      ])
+    );
+
+    const offsetBarVertical = (data) => (
+      d3.line()([
+        [xt(data.xU), yt(data.yL)],
+        [xt(data.xU), yt(data.yU)],
+      ])
+    );
+
+    offp.enter()
+      .append('path')
+      .attr('class', 'offp')
+      .attr('fill', 'none')
+      .attr('stroke', 'black')
+      .attr('stroke-width', 1.5)
+      .attr('stroke-dasharray', '5,5')
+      .merge(offp)
+      .attr('id', (d) => `offp${itgIdTag(d)}`)
+      .attr('d', (d) => offsetBarHorizontal(d))
+      .on('mouseover', (d) => {
+        d3.select(`#offp${itgIdTag(d)}`)
+          .attr('stroke', 'blue');
+        d3.select(`#offp-vertical${itgIdTag(d)}`)
+          .attr('stroke', 'blue');
+      })
+      .on('mouseout', (d) => {
+        d3.select(`#offp${itgIdTag(d)}`)
+          .attr('stroke', 'black');
+        d3.select(`#offp-vertical${itgIdTag(d)}`)
+          .attr('stroke', 'black');
+      })
+      .on('click', (d) => this.onClickTarget(d));
+
+    // Vertical line
+    offp2.enter()
+      .append('path')
+      .attr('class', 'offp-vertical')
+      .attr('fill', 'none')
+      .attr('stroke', 'black')
+      .attr('stroke-width', 1.5)
+      .attr('stroke-dasharray', '5,5')
+      .attr('marker-end', 'url(#arrow-left-black)')
+      .merge(offp2)
+      .attr('id', (d) => `offp-vertical${itgIdTag(d)}`)
+      .attr('d', (d) => offsetBarVertical(d))
+      .on('mouseover', (d) => {
+        d3.select(`#offp-vertical${itgIdTag(d)}`)
+          .attr('stroke', 'blue');
+        d3.select(`#offp${itgIdTag(d)}`)
+          .attr('stroke', 'blue');
+      })
+      .on('mouseout', (d) => {
+        d3.select(`#offp-vertical${itgIdTag(d)}`)
+          .attr('stroke', 'black');
+        d3.select(`#offp${itgIdTag(d)}`)
+          .attr('stroke', 'black');
+      })
+      .on('click', (d) => this.onClickTarget(d));
   }
 
   drawInteg(integationSt) {
@@ -949,7 +1234,7 @@ class MultiFocus {
     editPeakSt, layoutSt,
     sweepExtentSt, isUiNoBrushSt,
     cyclicvoltaSt,
-    integationSt, mtplySt,
+    integationSt, mtplySt, offsetSt,
   }) {
     this.svg = d3.select(this.rootKlass).select('.d3Svg');
     MountMainFrame(this, 'focus');
@@ -983,6 +1268,7 @@ class MultiFocus {
       this.drawPeckers();
       this.drawInteg(integationSt);
       this.drawMtply(mtplySt);
+      this.drawOffset(offsetSt);
     }
     MountBrush(this, false, isUiNoBrushSt);
     this.resetShouldUpdate(editPeakSt);
@@ -993,7 +1279,7 @@ class MultiFocus {
     filterSeed, filterPeak, tTrEndPts, tSfPeaks,
     editPeakSt, layoutSt,
     sweepExtentSt, isUiNoBrushSt, cyclicvoltaSt,
-    integationSt, mtplySt,
+    integationSt, mtplySt, offsetSt,
   }) {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, this.reverseXAxis(layoutSt));
@@ -1016,6 +1302,7 @@ class MultiFocus {
       this.drawPeckers();
       this.drawInteg(integationSt);
       this.drawMtply(mtplySt);
+      this.drawOffset(offsetSt);
     }
     MountBrush(this, false, isUiNoBrushSt);
     this.resetShouldUpdate(editPeakSt);

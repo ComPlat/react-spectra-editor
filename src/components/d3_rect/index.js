@@ -36,7 +36,7 @@ class ViewerRect extends React.Component {
       seed, peak, cLabel, xLabel, yLabel, feature,
       tTrEndPts, tSfPeaks, isHidden,
       sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
-      resetAllAct,
+      resetAllAct, isUiAddOffsetSt,
     } = this.props;
     drawDestroy(this.rootKlass);
     resetAllAct(feature);
@@ -53,6 +53,7 @@ class ViewerRect extends React.Component {
       sweepExtentSt,
       isUiAddIntgSt,
       isUiNoBrushSt,
+      isUiAddOffsetSt,
     });
     drawLabel(this.rootKlass, cLabel, xLabel, yLabel);
     drawDisplay(this.rootKlass, isHidden);
@@ -62,7 +63,7 @@ class ViewerRect extends React.Component {
     const {
       seed, peak,
       tTrEndPts, tSfPeaks, isHidden,
-      sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
+      sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt, isUiAddOffsetSt,
     } = this.props;
     this.normChange(prevProps);
 
@@ -77,6 +78,7 @@ class ViewerRect extends React.Component {
       sweepExtentSt,
       isUiAddIntgSt,
       isUiNoBrushSt,
+      isUiAddOffsetSt,
     });
     drawDisplay(this.rootKlass, isHidden);
   }
@@ -108,6 +110,7 @@ const mapStateToProps = (state, props) => (
     tSfPeaks: ToShiftPeaks(state, props),
     sweepExtentSt: state.ui.sweepExtent,
     isUiAddIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
+    isUiAddOffsetSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.OFFSET_ADD,
     isUiNoBrushSt: LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
   }
 );
@@ -132,6 +135,7 @@ ViewerRect.propTypes = {
   tSfPeaks: PropTypes.array.isRequired,
   sweepExtentSt: PropTypes.object.isRequired,
   isUiAddIntgSt: PropTypes.bool.isRequired,
+  isUiAddOffsetSt: PropTypes.bool.isRequired,
   isUiNoBrushSt: PropTypes.bool.isRequired,
   resetAllAct: PropTypes.func.isRequired,
   clickUiTargetAct: PropTypes.func.isRequired,

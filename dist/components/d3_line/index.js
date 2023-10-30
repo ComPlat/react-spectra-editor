@@ -61,7 +61,9 @@ class ViewerLine extends _react.default.Component {
       isHidden,
       wavelength,
       axesUnitsSt,
-      resetAllAct
+      resetAllAct,
+      offsetSt,
+      isUiAddOffsetSt
     } = this.props;
     (0, _draw.drawDestroy)(this.rootKlass);
     resetAllAct(feature);
@@ -92,7 +94,9 @@ class ViewerLine extends _react.default.Component {
       sweepExtentSt,
       isUiAddIntgSt,
       isUiNoBrushSt,
-      wavelength
+      wavelength,
+      offsetSt,
+      isUiAddOffsetSt
     });
     (0, _draw.drawLabel)(this.rootKlass, cLabel, xxLabel, yyLabel);
     (0, _draw.drawDisplay)(this.rootKlass, isHidden);
@@ -117,7 +121,9 @@ class ViewerLine extends _react.default.Component {
       isUiNoBrushSt,
       isHidden,
       wavelength,
-      axesUnitsSt
+      axesUnitsSt,
+      offsetSt,
+      isUiAddOffsetSt
     } = this.props;
     this.normChange(prevProps);
     let xxLabel = xLabel;
@@ -146,7 +152,9 @@ class ViewerLine extends _react.default.Component {
       sweepExtentSt,
       isUiAddIntgSt,
       isUiNoBrushSt,
-      wavelength
+      wavelength,
+      offsetSt,
+      isUiAddOffsetSt
     });
     (0, _draw.drawLabel)(this.rootKlass, cLabel, xxLabel, yyLabel);
     (0, _draw.drawDisplay)(this.rootKlass, isHidden);
@@ -185,7 +193,9 @@ const mapStateToProps = (state, props) => ({
   isUiAddIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
   isUiNoBrushSt: _list_ui.LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
   wavelength: state.wavelength,
-  axesUnitsSt: state.axesUnits
+  axesUnitsSt: state.axesUnits,
+  offsetSt: state.offset.present,
+  isUiAddOffsetSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.OFFSET_ADD
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   resetAllAct: _manager.resetAll,
@@ -220,6 +230,8 @@ ViewerLine.propTypes = {
   scrollUiWheelAct: _propTypes.default.func.isRequired,
   isHidden: _propTypes.default.bool.isRequired,
   wavelength: _propTypes.default.object.isRequired,
-  axesUnitsSt: _propTypes.default.object.isRequired
+  axesUnitsSt: _propTypes.default.object.isRequired,
+  offsetSt: _propTypes.default.object.isRequired,
+  isUiAddOffsetSt: _propTypes.default.bool.isRequired
 };
 var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(ViewerLine);

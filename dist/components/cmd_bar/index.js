@@ -23,6 +23,7 @@ var _r04_submit = _interopRequireDefault(require("./r04_submit"));
 var _r07_wavelength_btn = _interopRequireDefault(require("./r07_wavelength_btn"));
 var _pecker = _interopRequireDefault(require("./07_pecker"));
 var _r08_change_axes = _interopRequireDefault(require("./r08_change_axes"));
+var _offsets = _interopRequireDefault(require("./08_offsets"));
 /* eslint-disable prefer-object-spread, function-paren-newline,
 react/function-component-definition, react/require-default-props */
 
@@ -46,7 +47,7 @@ const CmdBar = _ref => {
     jcampIdx: jcampIdx
   }), /*#__PURE__*/_react.default.createElement(_pecker.default, {
     jcampIdx: jcampIdx
-  }), /*#__PURE__*/_react.default.createElement(_integration.default, null), /*#__PURE__*/_react.default.createElement(_multiplicity.default, null), /*#__PURE__*/_react.default.createElement(_undo_redo.default, null), /*#__PURE__*/_react.default.createElement(_r04_submit.default, {
+  }), /*#__PURE__*/_react.default.createElement(_integration.default, null), /*#__PURE__*/_react.default.createElement(_multiplicity.default, null), /*#__PURE__*/_react.default.createElement(_offsets.default, null), /*#__PURE__*/_react.default.createElement(_undo_redo.default, null), /*#__PURE__*/_react.default.createElement(_r04_submit.default, {
     operations: operations,
     feature: feature,
     forecast: forecast,
