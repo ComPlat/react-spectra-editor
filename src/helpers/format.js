@@ -1,5 +1,6 @@
 /* eslint-disable no-mixed-operators, prefer-object-spread,
 function-paren-newline, no-unused-vars, default-param-last */
+import Jcampconverter from 'jcampconverter';
 import { ToXY, IsSame } from './converter';
 import { LIST_LAYOUT } from '../constants/list_layout';
 import { calcMpyCenter } from './multiplicity_calc';
@@ -51,6 +52,27 @@ const toPeakStr = (peaks) => {
   return str;
 };
 
+let fixedWavelength = '';
+
+const extractFixedWavelength = (source) => {
+  const jcamp = Jcampconverter.convert(
+    source,
+    {
+      xy: true,
+      keepRecordsRegExp: /(CSAUTOMETADATA)/,
+    },
+  );
+  if ('$CSAUTOMETADATA' in jcamp.info) {
+    const match = jcamp.info.$CSAUTOMETADATA.match(/FIXEDWAVELENGTH=([\d.]+)/);
+    if (match !== null) {
+      // eslint-disable-next-line prefer-destructuring
+      fixedWavelength = match[1];
+    }
+  }
+
+  return { fixedWavelength };
+};
+
 const spectraOps = {
   [LIST_LAYOUT.PLAIN]: { head: '', tail: '.' },
   [LIST_LAYOUT.H1]: { head: '1H', tail: '.' },
@@ -69,7 +91,7 @@ const spectraOps = {
   [LIST_LAYOUT.CYCLIC_VOLTAMMETRY]: { head: 'CYCLIC VOLTAMMETRY', tail: '.' },
   [LIST_LAYOUT.CDS]: { head: 'CIRCULAR DICHROISM SPECTROSCOPY', tail: '.' },
   [LIST_LAYOUT.SEC]: { head: 'SIZE EXCLUSION CHROMATOGRAPHY', tail: '.' },
-  [LIST_LAYOUT.EMISSIONS]: { head: 'EMISSION', tail: '.' },
+  [LIST_LAYOUT.EMISSIONS]: { head: 'EMISSION', tail: ' nm' },
   [LIST_LAYOUT.DLS_INTENSITY]: { head: 'DLS', tail: '.' },
 };
 
@@ -189,7 +211,8 @@ const formatedEmissions = (
 
   ordered = Object.keys(ordered).sort(sortFunc)
     .map((k) => ({ x: k, y: ordered[k] }));
-  return ordered.map((o) => `${o.x} nm (${fixDigit(o.y, 2)} a.u.)`).join(', ');
+  return `λex = ${fixedWavelength} nm; λem = ${ordered.map((o) => `${o.x}`)
+    .join(', ')}`;
 };
 
 const formatedDLSIntensity = (
@@ -459,6 +482,7 @@ const Format = {
   isAIFLayout,
   isDLSACFLayout,
   strNumberFixedDecimal,
+  extractFixedWavelength,
 };
 
 export default Format;

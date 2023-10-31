@@ -1,9 +1,11 @@
 "use strict";
 
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
+var _jcampconverter = _interopRequireDefault(require("jcampconverter"));
 var _converter = require("./converter");
 var _list_layout = require("../constants/list_layout");
 var _multiplicity_calc = require("./multiplicity_calc");
@@ -57,6 +59,23 @@ const toPeakStr = peaks => {
   const arr = peaks.map(p => `${p.x},${p.y}`);
   const str = arr.join('#');
   return str;
+};
+let fixedWavelength = '';
+const extractFixedWavelength = source => {
+  const jcamp = _jcampconverter.default.convert(source, {
+    xy: true,
+    keepRecordsRegExp: /(CSAUTOMETADATA)/
+  });
+  if ('$CSAUTOMETADATA' in jcamp.info) {
+    const match = jcamp.info.$CSAUTOMETADATA.match(/FIXEDWAVELENGTH=([\d.]+)/);
+    if (match !== null) {
+      // eslint-disable-next-line prefer-destructuring
+      fixedWavelength = match[1];
+    }
+  }
+  return {
+    fixedWavelength
+  };
 };
 const spectraOps = {
   [_list_layout.LIST_LAYOUT.PLAIN]: {
@@ -129,7 +148,7 @@ const spectraOps = {
   },
   [_list_layout.LIST_LAYOUT.EMISSIONS]: {
     head: 'EMISSION',
-    tail: '.'
+    tail: ' nm'
   },
   [_list_layout.LIST_LAYOUT.DLS_INTENSITY]: {
     head: 'DLS',
@@ -259,7 +278,7 @@ const formatedEmissions = function (peaks, maxY) {
     x: k,
     y: ordered[k]
   }));
-  return ordered.map(o => `${o.x} nm (${fixDigit(o.y, 2)} a.u.)`).join(', ');
+  return `λex = ${fixedWavelength} nm; λem = ${ordered.map(o => `${o.x}`).join(', ')}`;
 };
 const formatedDLSIntensity = function (peaks, maxY) {
   let decimal = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 2;
@@ -526,6 +545,7 @@ const Format = {
   hasMultiCurves,
   isAIFLayout,
   isDLSACFLayout,
-  strNumberFixedDecimal
+  strNumberFixedDecimal,
+  extractFixedWavelength
 };
 var _default = exports.default = Format;
