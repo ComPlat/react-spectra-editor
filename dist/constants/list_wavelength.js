@@ -7,7 +7,7 @@ exports.LIST_WAVE_LENGTH = void 0;
 const CuKalpha = {
   name: 'CuKalpha',
   value: 0.15406,
-  label: 'Cu K-alpha',
+  label: 'Cu K\u03B1',
   unit: 'nm'
 };
 const Fe = {
@@ -25,8 +25,7 @@ const Co = {
 const MoKalpha = {
   name: 'MoKalpha',
   value: 0.07107,
-  label: 'Mo K-alpha',
+  label: 'Mo K\u03B1',
   unit: 'nm'
 };
-const LIST_WAVE_LENGTH = [CuKalpha, Fe, Co, MoKalpha];
-exports.LIST_WAVE_LENGTH = LIST_WAVE_LENGTH;
+const LIST_WAVE_LENGTH = exports.LIST_WAVE_LENGTH = [CuKalpha, Fe, Co, MoKalpha];

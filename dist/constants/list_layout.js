@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.LIST_LAYOUT = void 0;
-const LIST_LAYOUT = {
+const LIST_LAYOUT = exports.LIST_LAYOUT = {
   PLAIN: 'PLAIN',
   IR: 'IR',
   RAMAN: 'RAMAN',
@@ -27,4 +27,3 @@ const LIST_LAYOUT = {
   DLS_ACF: 'DLS ACF',
   DLS_INTENSITY: 'DLS intensity'
 };
-exports.LIST_LAYOUT = LIST_LAYOUT;

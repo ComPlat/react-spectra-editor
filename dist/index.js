@@ -260,11 +260,15 @@ class DemoWriteIr extends _react.default.Component {
       isAscend,
       decimal,
       isIntensity,
-      integration
+      integration,
+      waveLength
     } = _ref;
     const entity = this.loadEntity();
     const {
       features
+    } = entity;
+    const {
+      temperature
     } = entity;
     const {
       maxY,
@@ -282,7 +286,9 @@ class DemoWriteIr extends _react.default.Component {
       isAscend,
       isIntensity,
       boundary,
-      integration
+      integration,
+      waveLength,
+      temperature
     });
     const wrapper = _app.FN.peaksWrapper(layout, shift);
     const desc = this.rmDollarSign(wrapper.head) + body + wrapper.tail;
@@ -388,7 +394,8 @@ class DemoWriteIr extends _react.default.Component {
       isAscend,
       decimal,
       isIntensity,
-      integration
+      integration,
+      waveLength
     } = _ref4;
     const desc = this.formatPks({
       peaks,
@@ -397,7 +404,8 @@ class DemoWriteIr extends _react.default.Component {
       isAscend,
       decimal,
       isIntensity,
-      integration
+      integration,
+      waveLength
     });
     this.setState({
       desc
@@ -413,11 +421,15 @@ class DemoWriteIr extends _react.default.Component {
       analysis,
       isIntensity,
       integration,
-      multiplicity
+      multiplicity,
+      waveLength
     } = _ref5;
     const entity = this.loadEntity();
     const {
       features
+    } = entity;
+    const {
+      temperature
     } = entity;
     const {
       maxY,
@@ -434,7 +446,9 @@ class DemoWriteIr extends _react.default.Component {
       shift,
       isAscend,
       isIntensity,
-      boundary
+      boundary,
+      waveLength,
+      temperature
     });
     /*eslint-disable */
     console.log(analysis);
@@ -640,7 +654,7 @@ class DemoWriteIr extends _react.default.Component {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('aif')
-    }, "SOPTION-DESORPTION"), /*#__PURE__*/_react.default.createElement(_Button.default, {
+    }, "SORPTION-DESORPTION"), /*#__PURE__*/_react.default.createElement(_Button.default, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'

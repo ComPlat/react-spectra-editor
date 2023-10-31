@@ -44,5 +44,4 @@ const rootReducer = (0, _redux.combineReducers)({
   cyclicvolta: _reducer_voltammetry.default,
   curve: _reducer_curve.default
 });
-var _default = rootReducer;
-exports.default = _default;
+var _default = exports.default = rootReducer;

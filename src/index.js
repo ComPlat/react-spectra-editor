@@ -254,14 +254,24 @@ class DemoWriteIr extends React.Component {
   }
 
   formatPks({
-    peaks, layout, shift, isAscend, decimal, isIntensity, integration,
+    peaks, layout, shift, isAscend, decimal, isIntensity, integration, waveLength,
   }) {
     const entity = this.loadEntity();
     const { features } = entity;
+    const { temperature } = entity;
     const { maxY, minY } = Array.isArray(features) ? {} : (features.editPeak || features.autoPeak);
     const boundary = { maxY, minY };
     const body = FN.peaksBody({
-      peaks, layout, decimal, shift, isAscend, isIntensity, boundary, integration,
+      peaks,
+      layout,
+      decimal,
+      shift,
+      isAscend,
+      isIntensity,
+      boundary,
+      integration,
+      waveLength,
+      temperature,
     });
     const wrapper = FN.peaksWrapper(layout, shift);
     const desc = this.rmDollarSign(wrapper.head) + body + wrapper.tail;
@@ -327,26 +337,27 @@ class DemoWriteIr extends React.Component {
   }
 
   writePeak({
-    peaks, layout, shift, isAscend, decimal, isIntensity, integration,
+    peaks, layout, shift, isAscend, decimal, isIntensity, integration, waveLength,
   }) {
     const desc = this.formatPks({
-      peaks, layout, shift, isAscend, decimal, isIntensity, integration,
+      peaks, layout, shift, isAscend, decimal, isIntensity, integration, waveLength,
     });
     this.setState({ desc });
   }
 
   savePeaks({
     peaks, layout, shift, isAscend, decimal, analysis, isIntensity,
-    integration, multiplicity,
+    integration, multiplicity, waveLength,
   }) {
     const entity = this.loadEntity();
     const { features } = entity;
+    const { temperature } = entity;
     const { maxY, minY } = Array.isArray(features)
       ? features[0]
       : (features.editPeak || features.autoPeak);
     const boundary = { maxY, minY };
     const body = FN.peaksBody({
-      peaks, layout, decimal, shift, isAscend, isIntensity, boundary,
+      peaks, layout, decimal, shift, isAscend, isIntensity, boundary, waveLength, temperature,
     });
     /*eslint-disable */
     console.log(analysis);
@@ -548,7 +559,7 @@ class DemoWriteIr extends React.Component {
             style={{ margin: '0 10px 0 10px' }}
             onClick={this.onClick('aif')}
           >
-            SOPTION-DESORPTION
+            SORPTION-DESORPTION
           </Button>
           <Button
             variant="contained"

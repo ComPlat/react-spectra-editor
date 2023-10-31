@@ -46,5 +46,4 @@ const statusReducer = function () {
       return initialState;
   }
 };
-var _default = statusReducer;
-exports.default = _default;
+var _default = exports.default = statusReducer;

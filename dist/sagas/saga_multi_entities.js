@@ -73,5 +73,4 @@ function* setCyclicVoltametry(action) {
   }
 }
 const multiEntitiesSagas = [(0, _effects.takeEvery)(_action_type.CURVE.SET_ALL_CURVES, setCyclicVoltametry)];
-var _default = multiEntitiesSagas;
-exports.default = _default;
+var _default = exports.default = multiEntitiesSagas;

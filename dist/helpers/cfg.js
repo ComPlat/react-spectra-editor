@@ -50,5 +50,4 @@ const Config = {
   showTwoThreshold,
   hidePanelCyclicVolta
 };
-var _default = Config;
-exports.default = _default;
+var _default = exports.default = Config;

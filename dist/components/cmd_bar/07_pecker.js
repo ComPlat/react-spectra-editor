@@ -72,5 +72,4 @@ Pecker.propTypes = {
   cyclicVotaSt: _propTypes.default.object.isRequired,
   jcampIdx: _propTypes.default.any
 };
-var _default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(Pecker);
-exports.default = _default;
+var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(Pecker);

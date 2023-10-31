@@ -49,5 +49,4 @@ const thresholdReducer = function () {
       return state;
   }
 };
-var _default = thresholdReducer;
-exports.default = _default;
+var _default = exports.default = thresholdReducer;

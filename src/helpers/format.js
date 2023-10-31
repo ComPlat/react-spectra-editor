@@ -1,5 +1,7 @@
+/* eslint-disable prefer-destructuring */
 /* eslint-disable no-mixed-operators, prefer-object-spread,
 function-paren-newline, no-unused-vars, default-param-last */
+import Jcampconverter from 'jcampconverter';
 import { ToXY, IsSame } from './converter';
 import { LIST_LAYOUT } from '../constants/list_layout';
 import { calcMpyCenter } from './multiplicity_calc';
@@ -65,7 +67,7 @@ const spectraOps = {
   [LIST_LAYOUT.HPLC_UVVIS]: { head: 'HPLC UV/VIS (transmittance)', tail: '' },
   [LIST_LAYOUT.TGA]: { head: 'THERMOGRAVIMETRIC ANALYSIS', tail: ' SECONDS' },
   [LIST_LAYOUT.MS]: { head: 'MASS', tail: ' m/z' },
-  [LIST_LAYOUT.XRD]: { head: 'X-RAY DIFFRACTION', tail: '.' },
+  [LIST_LAYOUT.XRD]: { head: 'XRD', tail: '.' },
   [LIST_LAYOUT.CYCLIC_VOLTAMMETRY]: { head: 'CYCLIC VOLTAMMETRY', tail: '.' },
   [LIST_LAYOUT.CDS]: { head: 'CIRCULAR DICHROISM SPECTROSCOPY', tail: '.' },
   [LIST_LAYOUT.SEC]: { head: 'SIZE EXCLUSION CHROMATOGRAPHY', tail: '.' },
@@ -251,6 +253,30 @@ const formatedHplcUvVis = (
   return arrResult.join(', ');
 };
 
+const formatedXRD = (
+  peaks, isAscend = true, waveLength, temperature,
+) => {
+  const ascendFunc = (a, b) => parseFloat(a) - parseFloat(b);
+  const descendFunc = (a, b) => parseFloat(b) - parseFloat(a);
+  const sortFunc = isAscend ? ascendFunc : descendFunc;
+  let ordered = {};
+
+  peaks.forEach((p) => {
+    const x = fixDigit(p.x, 1);
+    const better = !ordered[x] || (p.y > ordered[x]);
+    if (better) {
+      ordered = Object.assign({}, ordered, { [x]: p.y });
+    }
+  });
+
+  const XRDSource = waveLength.label;
+  const XRDWavelength = `${waveLength.value} ${waveLength.unit}`;
+
+  ordered = Object.keys(ordered).sort(sortFunc)
+    .map((k) => ({ x: k, y: ordered[k] }));
+  return `(${XRDSource}, ${XRDWavelength}, ${temperature} °C), 2θ [°] (d [nm]): ${ordered.map((o) => `${o.x} (${fixDigit(o.y, 2)})`).join(', ')}`;
+};
+
 const rmShiftFromPeaks = (peaks, shift, atIndex = 0) => {
   const peaksXY = ToXY(peaks);
   const { shifts } = shift;
@@ -273,7 +299,7 @@ const rmShiftFromPeaks = (peaks, shift, atIndex = 0) => {
 const peaksBody = ({
   peaks, layout, decimal, shift, isAscend,
   isIntensity = false, boundary = {},
-  integration, atIndex = 0,
+  integration, atIndex = 0, waveLength, temperature,
 }) => {
   const result = rmShiftFromPeaks(peaks, shift, atIndex);
 
@@ -303,11 +329,13 @@ const peaksBody = ({
   }
   if (layout === LIST_LAYOUT.RAMAN
     || layout === LIST_LAYOUT.TGA
-    || layout === LIST_LAYOUT.XRD
     || layout === LIST_LAYOUT.CYCLIC_VOLTAMMETRY
     || layout === LIST_LAYOUT.CDS
     || layout === LIST_LAYOUT.SEC) {
     return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
+  }
+  if (layout === LIST_LAYOUT.XRD) {
+    return formatedXRD(ordered, isAscend, waveLength, temperature);
   }
   return ordered.map((o) => fixDigit(o.x, decimal)).join(', ');
 };
@@ -459,6 +487,7 @@ const Format = {
   isAIFLayout,
   isDLSACFLayout,
   strNumberFixedDecimal,
+  formatedXRD,
 };
 
 export default Format;

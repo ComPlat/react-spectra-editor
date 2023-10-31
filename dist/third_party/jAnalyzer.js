@@ -15,7 +15,7 @@ const patterns = ['s', 'd', 't', 'q', 'quint', 'h', 'sept', 'o', 'n'];
 let symRatio = 1.5;
 let maxErrorIter1 = 2.5; // Hz
 let maxErrorIter2 = 1; // Hz
-var _default = {
+var _default = exports.default = {
   /**
    * The compilation process implements at the first stage a normalization procedure described by Golotvin et al.
    * embedding in peak-component-counting method described by Hoyes et al.
@@ -138,7 +138,6 @@ var _default = {
  * @param {*} signal
  * @param {*} Jc
  */
-exports.default = _default;
 function updateSignal(signal, Jc) {
   // Update the limits of the signal
   let peaks = signal.peaksComp; // Always in Hz

@@ -160,7 +160,7 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
     value: _list_layout.LIST_LAYOUT.AIF
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  }, "SOPTION-DESORPTION")), /*#__PURE__*/_react.default.createElement(_MenuItem.default, {
+  }, "SORPTION-DESORPTION")), /*#__PURE__*/_react.default.createElement(_MenuItem.default, {
     value: _list_layout.LIST_LAYOUT.EMISSIONS
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
@@ -213,5 +213,4 @@ Layout.propTypes = {
   curveSt: _propTypes.default.object.isRequired,
   shiftSt: _propTypes.default.object.isRequired
 };
-var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(Layout));
-exports.default = _default;
+var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(Layout));

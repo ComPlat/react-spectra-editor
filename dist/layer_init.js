@@ -214,7 +214,6 @@ LayerInit.propTypes = {
   setAllCurvesAct: _propTypes.default.func.isRequired,
   userManualLink: _propTypes.default.object // eslint-disable-line
 };
-var _default = (0, _reactRedux.connect)(
+var _default = exports.default = (0, _reactRedux.connect)(
 // eslint-disable-line
 mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(LayerInit)); // eslint-disable-line
-exports.default = _default;

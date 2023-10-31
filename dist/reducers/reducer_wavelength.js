@@ -19,5 +19,4 @@ const wavelengthReducer = function () {
       return state;
   }
 };
-var _default = wavelengthReducer;
-exports.default = _default;
+var _default = exports.default = wavelengthReducer;

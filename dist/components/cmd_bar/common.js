@@ -7,7 +7,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.focusStyle = exports.commonStyle = exports.MuButton = void 0;
 var _styles = require("@material-ui/core/styles");
 var _Button = _interopRequireDefault(require("@material-ui/core/Button"));
-const MuButton = (0, _styles.withStyles)({
+const MuButton = exports.MuButton = (0, _styles.withStyles)({
   root: {
     border: '1px solid #ccc',
     borderRadius: 4,
@@ -20,8 +20,7 @@ const MuButton = (0, _styles.withStyles)({
     width: 30
   }
 })(_Button.default);
-exports.MuButton = MuButton;
-const commonStyle = {
+const commonStyle = exports.commonStyle = {
   card: {
     margin: '0 0 5px 52px',
     border: '1px solid white',
@@ -96,7 +95,6 @@ const commonStyle = {
     transform: 'scale(0.75)'
   }
 };
-exports.commonStyle = commonStyle;
 const focusStyle = (criteria, cls) => criteria ? [cls.btnHt] : [];
 
 // eslint-disable-line

@@ -148,5 +148,4 @@ ViewerRect.propTypes = {
   scrollUiWheelAct: _propTypes.default.func.isRequired,
   isHidden: _propTypes.default.bool.isRequired
 };
-var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(ViewerRect);
-exports.default = _default;
+var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(ViewerRect);

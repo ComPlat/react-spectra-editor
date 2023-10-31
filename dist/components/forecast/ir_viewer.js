@@ -110,5 +110,4 @@ IrViewer.propTypes = {
 IrViewer.defaultProps = {
   inputCb: false
 };
-var _default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(Styles))(IrViewer);
-exports.default = _default;
+var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(Styles))(IrViewer);

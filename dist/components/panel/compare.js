@@ -252,5 +252,4 @@ ComparePanel.propTypes = {
   rmOthersOneAct: _propTypes.default.func.isRequired,
   toggleShowAct: _propTypes.default.func.isRequired
 };
-var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(ComparePanel));
-exports.default = _default;
+var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(ComparePanel));

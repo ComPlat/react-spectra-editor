@@ -242,5 +242,4 @@ const shiftReducer = function () {
       return state;
   }
 };
-var _default = shiftReducer;
-exports.default = _default;
+var _default = exports.default = shiftReducer;

@@ -130,5 +130,4 @@ MpyCoupling.propTypes = {
   row: _propTypes.default.object.isRequired,
   updateMpyJAct: _propTypes.default.func.isRequired
 };
-var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(MpyCoupling));
-exports.default = _default;
+var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(MpyCoupling));

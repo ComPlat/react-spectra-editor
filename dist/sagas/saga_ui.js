@@ -317,5 +317,4 @@ function* clickUiTarget(action) {
   }
 }
 const managerSagas = [(0, _effects.takeEvery)(_action_type.UI.CLICK_TARGET, clickUiTarget), (0, _effects.takeEvery)(_action_type.UI.SWEEP.SELECT, selectUiSweep), (0, _effects.takeEvery)(_action_type.UI.WHEEL.SCROLL, scrollUiWheel)];
-var _default = managerSagas;
-exports.default = _default;
+var _default = exports.default = managerSagas;

@@ -198,5 +198,4 @@ ViewerLine.propTypes = {
   isHidden: _propTypes.default.bool.isRequired,
   wavelength: _propTypes.default.object.isRequired
 };
-var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(ViewerLine);
-exports.default = _default;
+var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(ViewerLine);
