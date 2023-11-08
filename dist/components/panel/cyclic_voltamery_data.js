@@ -279,5 +279,4 @@ CyclicVoltammetryPanel.propTypes = {
 CyclicVoltammetryPanel.defaultProps = {
   jcampIdx: 0
 };
-var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(CyclicVoltammetryPanel));
-exports.default = _default;
+var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(CyclicVoltammetryPanel));

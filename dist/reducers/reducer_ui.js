@@ -48,5 +48,4 @@ const uiReducer = function () {
       return state;
   }
 };
-var _default = uiReducer;
-exports.default = _default;
+var _default = exports.default = uiReducer;

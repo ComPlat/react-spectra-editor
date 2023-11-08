@@ -85,5 +85,4 @@ MpySelect.propTypes = {
   target: _propTypes.default.object.isRequired,
   selectMpyTypeAct: _propTypes.default.func.isRequired
 };
-var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(Styles)(MpySelect));
-exports.default = _default;
+var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(Styles)(MpySelect));

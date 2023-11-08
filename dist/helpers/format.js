@@ -1,12 +1,15 @@
 "use strict";
 
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
+var _jcampconverter = _interopRequireDefault(require("jcampconverter"));
 var _converter = require("./converter");
 var _list_layout = require("../constants/list_layout");
 var _multiplicity_calc = require("./multiplicity_calc");
+/* eslint-disable prefer-destructuring */
 /* eslint-disable no-mixed-operators, prefer-object-spread,
 function-paren-newline, no-unused-vars, default-param-last */
 
@@ -112,7 +115,7 @@ const spectraOps = {
     tail: ' m/z'
   },
   [_list_layout.LIST_LAYOUT.XRD]: {
-    head: 'X-RAY DIFFRACTION',
+    head: 'XRD',
     tail: '.'
   },
   [_list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY]: {
@@ -321,6 +324,31 @@ const formatedHplcUvVis = function (peaks) {
   });
   return arrResult.join(', ');
 };
+const formatedXRD = function (peaks) {
+  let isAscend = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+  let waveLength = arguments.length > 2 ? arguments[2] : undefined;
+  let temperature = arguments.length > 3 ? arguments[3] : undefined;
+  const ascendFunc = (a, b) => parseFloat(a) - parseFloat(b);
+  const descendFunc = (a, b) => parseFloat(b) - parseFloat(a);
+  const sortFunc = isAscend ? ascendFunc : descendFunc;
+  let ordered = {};
+  peaks.forEach(p => {
+    const x = fixDigit(p.x, 1);
+    const better = !ordered[x] || p.y > ordered[x];
+    if (better) {
+      ordered = Object.assign({}, ordered, {
+        [x]: p.y
+      });
+    }
+  });
+  const XRDSource = waveLength.label;
+  const XRDWavelength = `${waveLength.value} ${waveLength.unit}`;
+  ordered = Object.keys(ordered).sort(sortFunc).map(k => ({
+    x: k,
+    y: ordered[k]
+  }));
+  return `(${XRDSource}, ${XRDWavelength}, ${temperature} °C), 2θ [°] (d [nm]): ${ordered.map(o => `${o.x} (${fixDigit(o.y, 2)})`).join(', ')}`;
+};
 const rmShiftFromPeaks = function (peaks, shift) {
   let atIndex = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
   const peaksXY = (0, _converter.ToXY)(peaks);
@@ -355,7 +383,9 @@ const peaksBody = _ref => {
     isIntensity = false,
     boundary = {},
     integration,
-    atIndex = 0
+    atIndex = 0,
+    waveLength,
+    temperature
   } = _ref;
   const result = rmShiftFromPeaks(peaks, shift, atIndex);
   const ascendFunc = (a, b) => parseFloat(a.x) - parseFloat(b.x);
@@ -381,8 +411,11 @@ const peaksBody = _ref => {
   if (layout === _list_layout.LIST_LAYOUT.DLS_INTENSITY) {
     return formatedDLSIntensity(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
-  if (layout === _list_layout.LIST_LAYOUT.RAMAN || layout === _list_layout.LIST_LAYOUT.TGA || layout === _list_layout.LIST_LAYOUT.XRD || layout === _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY || layout === _list_layout.LIST_LAYOUT.CDS || layout === _list_layout.LIST_LAYOUT.SEC) {
+  if (layout === _list_layout.LIST_LAYOUT.RAMAN || layout === _list_layout.LIST_LAYOUT.TGA || layout === _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY || layout === _list_layout.LIST_LAYOUT.CDS || layout === _list_layout.LIST_LAYOUT.SEC) {
     return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
+  }
+  if (layout === _list_layout.LIST_LAYOUT.XRD) {
+    return formatedXRD(ordered, isAscend, waveLength, temperature);
   }
   return ordered.map(o => fixDigit(o.x, decimal)).join(', ');
 };
@@ -526,7 +559,7 @@ const Format = {
   hasMultiCurves,
   isAIFLayout,
   isDLSACFLayout,
-  strNumberFixedDecimal
+  strNumberFixedDecimal,
+  formatedXRD
 };
-var _default = Format;
-exports.default = _default;
+var _default = exports.default = Format;

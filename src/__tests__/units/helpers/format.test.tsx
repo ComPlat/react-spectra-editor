@@ -40,7 +40,9 @@ describe('Test format helper', () => {
       interface ParamForPeaks {
         peaks: any, layout: string, decimal: number, shift: any, isAscend: boolean,
         isIntensity: boolean, boundary: any,
-        integration: any, atIndex: number
+        integration: any, atIndex: number,
+        temperature: string,
+        waveLength: any,
       }
 
       let params: ParamForPeaks
@@ -52,7 +54,9 @@ describe('Test format helper', () => {
           shift: { shifts: [{ ref: LIST_SHIFT_1H[1], peak: { x: 2, y: 2 } }] },
           isAscend: false,
           isIntensity: false, boundary: {},
-          integration: null, atIndex: 0
+          integration: null, atIndex: 0,
+          temperature: '300',
+          waveLength: {label: "Cu Kα", name: "CuKalpha", unit: "nm", value: 0.15406 }
         }
       })
 
@@ -89,7 +93,9 @@ describe('Test format helper', () => {
       interface ParamForPeaks {
         peaks: any, layout: string, decimal: number, shift: any, isAscend: boolean,
         isIntensity: boolean, boundary: any,
-        integration: any, atIndex: number
+        integration: any, atIndex: number,
+        temperature: string,
+        waveLength: any,
       }
       let params: ParamForPeaks
       beforeEach(() => {
@@ -100,7 +106,9 @@ describe('Test format helper', () => {
           shift: { shifts: [{ ref: LIST_SHIFT_1H[1], peak: { x: 2, y: 2 } }] },
           isAscend: false,
           isIntensity: false, boundary: {},
-          integration: null, atIndex: 0
+          integration: null, atIndex: 0,
+          temperature: '300',
+          waveLength: {label: "Cu Kα", name: "CuKalpha", unit: "nm", value: 0.15406 }
         }
       })
 
@@ -119,7 +127,7 @@ describe('Test format helper', () => {
       it('Get peaks for XRD layout', () => {
         params.layout = LIST_LAYOUT.XRD
         const body = Format.peaksBody(params)
-        expect(body).toEqual('2.0, 1.0')
+        expect(body).toEqual('(Cu Kα, 0.15406 nm, 300 °C), 2θ [°] (d [nm]): 2.0 (2.00), 1.0 (1.00)')
       })
 
       it('Get peaks for UVVIS layout', () => {

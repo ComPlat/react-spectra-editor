@@ -54,5 +54,4 @@ class SectionLoading extends _react.default.Component {
     return loading ? this.renderLoading() : this.renderNotFound();
   }
 }
-var _default = SectionLoading;
-exports.default = _default;
+var _default = exports.default = SectionLoading;

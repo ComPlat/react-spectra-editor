@@ -1,7 +1,7 @@
 const CuKalpha = {
   name: 'CuKalpha',
   value: 0.15406,
-  label: 'Cu K-alpha',
+  label: 'Cu K\u03B1',
   unit: 'nm',
 };
 
@@ -22,7 +22,7 @@ const Co = {
 const MoKalpha = {
   name: 'MoKalpha',
   value: 0.07107,
-  label: 'Mo K-alpha',
+  label: 'Mo K\u03B1',
   unit: 'nm',
 };
 

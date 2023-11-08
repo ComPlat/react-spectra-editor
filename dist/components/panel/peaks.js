@@ -212,7 +212,6 @@ PeakPanel.propTypes = {
   rmFromNegListAct: _propTypes.default.func.isRequired,
   curveSt: _propTypes.default.object.isRequired
 };
-var _default = (0, _reactRedux.connect)(
+var _default = exports.default = (0, _reactRedux.connect)(
 // eslint-disable-line
 mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(PeakPanel)); // eslint-disable-line
-exports.default = _default;

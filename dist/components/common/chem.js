@@ -112,5 +112,4 @@ const SmaToSvg = sma => {
 };
 
 /* eslint-enable */
-var _default = SmaToSvg;
-exports.default = _default;
+var _default = exports.default = SmaToSvg;

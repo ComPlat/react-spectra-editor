@@ -73,5 +73,4 @@ const curveReducer = function () {
       return state;
   }
 };
-var _default = curveReducer;
-exports.default = _default;
+var _default = exports.default = curveReducer;

@@ -16,5 +16,4 @@ const managerReducer = function () {
       return state;
   }
 };
-var _default = managerReducer;
-exports.default = _default;
+var _default = exports.default = managerReducer;

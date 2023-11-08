@@ -1,6 +1,6 @@
 /* eslint-disable
 no-mixed-operators, react/function-component-definition,
-prefer-object-spread, camelcase,  no-plusplus */
+prefer-object-spread, camelcase,  no-plusplus, prefer-destructuring */
 import Jcampconverter from 'jcampconverter';
 import { createSelector } from 'reselect';
 
@@ -747,12 +747,23 @@ const extrFeaturesMs = (jcamp, layout, peakUp) => {
   return features;
 };
 
+const extractTemperature = (jcamp) => {
+  if ('$CSAUTOMETADATA' in jcamp.info) {
+    const match = jcamp.info.$CSAUTOMETADATA.match(/TEMPERATURE=([\d.]+)/);
+    if (match !== null) {
+      const temperature = match[1];
+      return temperature;
+    }
+  }
+  return 'xxx';
+};
+
 const ExtractJcamp = (source) => {
   const jcamp = Jcampconverter.convert(
     source,
     {
       xy: true,
-      keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS|\$CSUPPERTHRESHOLD|\$CSLOWERTHRESHOLD|\$CSCYCLICVOLTAMMETRYDATA|UNITS|SYMBOL)/, // eslint-disable-line
+      keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS|\$CSUPPERTHRESHOLD|\$CSLOWERTHRESHOLD|\$CSCYCLICVOLTAMMETRYDATA|UNITS|SYMBOL|CSAUTOMETADATA)/, // eslint-disable-line
     },
   );
   const layout = readLayout(jcamp);
@@ -766,6 +777,10 @@ const ExtractJcamp = (source) => {
     features = extrFeaturesMs(jcamp, layout, peakUp);
   } else if (Format.isXRDLayout(layout)) {
     features = extrFeaturesXrd(jcamp, layout, peakUp);
+    const temperature = extractTemperature(jcamp);
+    return {
+      spectra, features, layout, temperature,
+    };
   } else if (Format.isCyclicVoltaLayout(layout) || Format.isSECLayout(layout)
   || Format.isAIFLayout(layout) || Format.isCDSLayout(layout)) {
     features = extrFeaturesCylicVolta(jcamp, layout, peakUp);

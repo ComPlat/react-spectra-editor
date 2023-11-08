@@ -119,5 +119,4 @@ const forecastReducer = function () {
       return state;
   }
 };
-var _default = forecastReducer;
-exports.default = _default;
+var _default = exports.default = forecastReducer;

@@ -287,5 +287,4 @@ MultiplicityPanel.propTypes = {
   resetMpyOneAct: _propTypes.default.func.isRequired,
   curveSt: _propTypes.default.object.isRequired
 };
-var _default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(MultiplicityPanel));
-exports.default = _default;
+var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(MultiplicityPanel));

@@ -58,5 +58,4 @@ const submitReducer = function () {
       return state;
   }
 };
-var _default = submitReducer;
-exports.default = _default;
+var _default = exports.default = submitReducer;

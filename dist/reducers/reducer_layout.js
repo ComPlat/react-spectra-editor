@@ -21,5 +21,4 @@ const layoutReducer = function () {
       return state;
   }
 };
-var _default = layoutReducer;
-exports.default = _default;
+var _default = exports.default = layoutReducer;

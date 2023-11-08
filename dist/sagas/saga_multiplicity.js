@@ -379,5 +379,4 @@ function* selectMpyType(action) {
   });
 }
 const multiplicitySagas = [(0, _effects.takeEvery)(_action_type.UI.SWEEP.SELECT_MULTIPLICITY, selectMpy), (0, _effects.takeEvery)(_action_type.MULTIPLICITY.PEAK_ADD_BY_UI_SAG, addUiPeakToStack), (0, _effects.takeEvery)(_action_type.MULTIPLICITY.PEAK_RM_BY_PANEL, rmPanelPeakFromStack), (0, _effects.takeEvery)(_action_type.MULTIPLICITY.PEAK_RM_BY_UI, rmUiPeakFromStack), (0, _effects.takeEvery)(_action_type.MULTIPLICITY.TYPE_SELECT, selectMpyType), (0, _effects.takeEvery)(_action_type.MULTIPLICITY.RESET_ONE, resetOne), (0, _effects.takeEvery)(_action_type.MANAGER.RESET_INIT_NMR, resetInitNmr)];
-var _default = multiplicitySagas;
-exports.default = _default;
+var _default = exports.default = multiplicitySagas;
