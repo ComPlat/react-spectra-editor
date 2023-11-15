@@ -106,11 +106,11 @@ function* addUiPeakToStack(action) {
   });
   if (isDuplicate) return;
 
-  const newSelectedMulti = Object.assign({}, selectedMulti,{ stack: newStack });  // eslint-disable-line
+  const newSelectedMulti = Object.assign({}, selectedMulti, { stack: newStack });  // eslint-disable-line
   const newMultiplicities = [...multiplicities];
   newMultiplicities[curveIdx] = newSelectedMulti;
 
-  const payload = Object.assign({}, mpySt, { multiplicities: newSelectedMulti }); // eslint-disable-line
+  const payload = Object.assign({}, mpySt, { multiplicities: newMultiplicities }); // eslint-disable-line
 
   yield put({
     type: MULTIPLICITY.PEAK_ADD_BY_UI_RDC,

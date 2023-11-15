@@ -142,7 +142,7 @@ function* addUiPeakToStack(action) {
   const newMultiplicities = [...multiplicities];
   newMultiplicities[curveIdx] = newSelectedMulti;
   const payload = Object.assign({}, mpySt, {
-    multiplicities: newSelectedMulti
+    multiplicities: newMultiplicities
   }); // eslint-disable-line
 
   yield (0, _effects.put)({

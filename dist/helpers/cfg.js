@@ -14,11 +14,20 @@ const btnCmdSetRef = layoutSt => !_format.default.isNmrLayout(layoutSt);
 const btnCmdIntg = layoutSt => !(_format.default.isNmrLayout(layoutSt) || _format.default.isHplcUvVisLayout(layoutSt)); // eslint-disable-line
 
 const btnCmdMpy = layoutSt => !_format.default.isNmrLayout(layoutSt);
-const btnCmdMpyPeak = (layoutSt, mpySt) => {
+const btnCmdMpyPeak = function (layoutSt, mpySt) {
+  let curveIdx = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
   const {
-    smExtext
+    multiplicities
   } = mpySt;
-  return btnCmdMpy(layoutSt) || !smExtext;
+  let smExtextVal = false;
+  if (multiplicities) {
+    const selectedMultiplicity = multiplicities[curveIdx];
+    const {
+      smExtext
+    } = selectedMultiplicity;
+    smExtextVal = smExtext;
+  }
+  return btnCmdMpy(layoutSt) || !smExtextVal;
 };
 const hideCmdThres = layoutSt => _format.default.isMsLayout(layoutSt);
 const btnCmdThres = thresVal => !thresVal;

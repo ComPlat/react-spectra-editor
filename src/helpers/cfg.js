@@ -28,9 +28,15 @@ const btnCmdIntg = (layoutSt) => !(Format.isNmrLayout(layoutSt)|| Format.isHplcU
 
 const btnCmdMpy = (layoutSt) => !Format.isNmrLayout(layoutSt);
 
-const btnCmdMpyPeak = (layoutSt, mpySt) => {
-  const { smExtext } = mpySt;
-  return btnCmdMpy(layoutSt) || !smExtext;
+const btnCmdMpyPeak = (layoutSt, mpySt, curveIdx = 0) => {
+  const { multiplicities } = mpySt;
+  let smExtextVal = false;
+  if (multiplicities) {
+    const selectedMultiplicity = multiplicities[curveIdx];
+    const { smExtext } = selectedMultiplicity;
+    smExtextVal = smExtext;
+  }
+  return btnCmdMpy(layoutSt) || !smExtextVal;
 };
 
 const hideCmdThres = (layoutSt) => Format.isMsLayout(layoutSt);
