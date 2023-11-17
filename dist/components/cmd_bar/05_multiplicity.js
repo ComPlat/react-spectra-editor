@@ -110,7 +110,7 @@ const mapStateToProps = (state, props) => (
   disableRmMpySt: _cfg.default.btnCmdMpy(state.layout),
   isFocusAddPeakSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_ADD,
   isFocusRmPeakSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_RM,
-  disableMpyPeakSt: _cfg.default.btnCmdMpyPeak(state.layout, state.multiplicity.present),
+  disableMpyPeakSt: _cfg.default.btnCmdMpyPeak(state.layout, state.multiplicity.present, state.curve.curveIdx),
   curveSt: state.curve
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({

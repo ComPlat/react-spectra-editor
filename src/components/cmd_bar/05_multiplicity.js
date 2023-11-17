@@ -128,7 +128,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     disableRmMpySt: Cfg.btnCmdMpy(state.layout),
     isFocusAddPeakSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_ADD,
     isFocusRmPeakSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_RM,
-    disableMpyPeakSt: Cfg.btnCmdMpyPeak(state.layout, state.multiplicity.present),
+    disableMpyPeakSt: Cfg.btnCmdMpyPeak(state.layout, state.multiplicity.present, state.curve.curveIdx),
     curveSt: state.curve,
   }
 );
