@@ -33,8 +33,10 @@ const btnCmdMpyPeak = (layoutSt, mpySt, curveIdx = 0) => {
   let smExtextVal = false;
   if (multiplicities) {
     const selectedMultiplicity = multiplicities[curveIdx];
-    const { smExtext } = selectedMultiplicity;
-    smExtextVal = smExtext;
+    if (selectedMultiplicity) {
+      const { smExtext } = selectedMultiplicity;
+      smExtextVal = smExtext;
+    }
   }
   return btnCmdMpy(layoutSt) || !smExtextVal;
 };

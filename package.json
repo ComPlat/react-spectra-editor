@@ -1,6 +1,6 @@
 {
   "name": "@complat/react-spectra-editor",
-  "version": "1.0.0-rc20",
+  "version": "1.0.0-rc20.patch-1",
   "description": "An editor to View and Edit Chemical Spectra data (NMR, IR and MS, CV, UIVIS, XRD).",
   "repository": {
     "type": "git",
