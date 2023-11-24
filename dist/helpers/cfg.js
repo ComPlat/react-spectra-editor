@@ -22,10 +22,12 @@ const btnCmdMpyPeak = function (layoutSt, mpySt) {
   let smExtextVal = false;
   if (multiplicities) {
     const selectedMultiplicity = multiplicities[curveIdx];
-    const {
-      smExtext
-    } = selectedMultiplicity;
-    smExtextVal = smExtext;
+    if (selectedMultiplicity) {
+      const {
+        smExtext
+      } = selectedMultiplicity;
+      smExtextVal = smExtext;
+    }
   }
   return btnCmdMpy(layoutSt) || !smExtextVal;
 };
