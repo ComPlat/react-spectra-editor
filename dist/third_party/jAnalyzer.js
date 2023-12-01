@@ -174,7 +174,7 @@ function abstractPattern(signal, Jc) {
   let newNmrJs = [];
   if (Jc && Jc.length > 0) {
     Jc.sort(function (a, b) {
-      return b - a;
+      return Math.abs(b) - Math.abs(a);
     });
     for (i = 0; i < Jc.length - 1; i++) {
       if (Math.abs(Jc[i] - Jc[i + 1]) < tol) {
