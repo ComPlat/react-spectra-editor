@@ -21,6 +21,7 @@ var _multiplicity_calc = require("../../helpers/multiplicity_calc");
 var _calc = require("../../helpers/calc");
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
 function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
+/* eslint-disable no-multi-assign */
 /* eslint-disable no-unused-vars, prefer-object-spread, no-mixed-operators,
 no-unneeded-ternary, arrow-body-style */
 
@@ -78,6 +79,13 @@ class MultiFocus {
       }
     };
     this.secondaryExtent = {
+      xExtent: null,
+      yExtent: {
+        yL: null,
+        yU: null
+      }
+    };
+    this.initialSecondaryExtent = {
       xExtent: null,
       yExtent: {
         yL: null,
@@ -287,24 +295,21 @@ class MultiFocus {
       this.scales.x.domain([xExtent.xL, xExtent.xU]);
       this.axisCall.x.scale(xt);
       this.axisCall.y.scale(yt);
-      if (sweepExtentSt.newOtherGraphExtents) {
-        this.secondaryYScale = d3.scaleLinear().domain([sweepExtentSt.newOtherGraphExtents.yL, sweepExtentSt.newOtherGraphExtents.yU]).range([this.h, 0]);
+      if (sweepExtentSt.newOtherGraphExtents || this.secondaryExtent.yExtent.yU !== this.initialSecondaryExtent.yExtent.yL) {
+        const yExtentValues = sweepExtentSt.newOtherGraphExtents ? [sweepExtentSt.newOtherGraphExtents.yL, sweepExtentSt.newOtherGraphExtents.yU] : [this.initialSecondaryExtent.yExtent.yL, this.initialSecondaryExtent.yExtent.yU];
+        this.secondaryYScale = d3.scaleLinear().domain(yExtentValues).range([this.h, 0]);
         const yAxisSecondary = d3.axisRight(this.secondaryYScale);
         this.secondaryAxis.y.call(yAxisSecondary);
         this.updateSecondaryPathCall(xt, this.secondaryYScale);
         this.secondaryExtent = {
           xExtent,
           yExtent: {
-            yL: sweepExtentSt.newOtherGraphExtents.yL,
-            yU: sweepExtentSt.newOtherGraphExtents.yU
+            yL: yExtentValues[0],
+            yU: yExtentValues[1]
           }
         };
       }
-      this.currentExtent = {
-        xExtent,
-        yExtent
-      };
-      this.primaryExtent = {
+      this.currentExtent = this.primaryExtent = {
         xExtent,
         yExtent
       };
@@ -460,6 +465,7 @@ class MultiFocus {
       this.secondaryAxisDrawn = true;
       this.secondaryYScale = secondaryYScale;
       this.secondaryAxis = secondaryAxes;
+      this.initialSecondaryExtent = this.secondaryExtent;
     }
     return {
       secondaryYScale: this.secondaryYScale,

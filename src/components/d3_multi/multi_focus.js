@@ -1,3 +1,4 @@
+/* eslint-disable no-multi-assign */
 /* eslint-disable no-unused-vars, prefer-object-spread, no-mixed-operators,
 no-unneeded-ternary, arrow-body-style */
 import * as d3 from 'd3';
@@ -68,6 +69,7 @@ class MultiFocus {
     this.currentExtent = null;
     this.primaryExtent = { xExtent: null, yExtent: { yL: null, yU: null } };
     this.secondaryExtent = { xExtent: null, yExtent: { yL: null, yU: null } };
+    this.initialSecondaryExtent = { xExtent: null, yExtent: { yL: null, yU: null } };
     this.shouldUpdate = {};
     // this.freq = false;
     this.layout = LIST_LAYOUT.CYCLIC_VOLTAMMETRY;
@@ -275,26 +277,30 @@ class MultiFocus {
       this.axisCall.x.scale(xt);
       this.axisCall.y.scale(yt);
 
-      if (sweepExtentSt.newOtherGraphExtents) {
+      if (sweepExtentSt.newOtherGraphExtents
+        || this.secondaryExtent.yExtent.yU !== this.initialSecondaryExtent.yExtent.yL) {
+        const yExtentValues = sweepExtentSt.newOtherGraphExtents
+          ? [sweepExtentSt.newOtherGraphExtents.yL, sweepExtentSt.newOtherGraphExtents.yU]
+          : [this.initialSecondaryExtent.yExtent.yL, this.initialSecondaryExtent.yExtent.yU];
+
         this.secondaryYScale = d3.scaleLinear()
-          .domain([(sweepExtentSt.newOtherGraphExtents.yL),
-            (sweepExtentSt.newOtherGraphExtents.yU)])
+          .domain(yExtentValues)
           .range([this.h, 0]);
+
         const yAxisSecondary = d3.axisRight(this.secondaryYScale);
         this.secondaryAxis.y.call(yAxisSecondary);
-
         this.updateSecondaryPathCall(xt, this.secondaryYScale);
+
         this.secondaryExtent = {
           xExtent,
           yExtent: {
-            yL: sweepExtentSt.newOtherGraphExtents.yL,
-            yU: sweepExtentSt.newOtherGraphExtents.yU,
+            yL: yExtentValues[0],
+            yU: yExtentValues[1],
           },
         };
       }
 
-      this.currentExtent = { xExtent, yExtent };
-      this.primaryExtent = { xExtent, yExtent };
+      this.currentExtent = this.primaryExtent = { xExtent, yExtent };
     }
   }
 
@@ -424,6 +430,7 @@ class MultiFocus {
       this.secondaryAxisDrawn = true;
       this.secondaryYScale = secondaryYScale;
       this.secondaryAxis = secondaryAxes;
+      this.initialSecondaryExtent = this.secondaryExtent;
     }
     return {
       secondaryYScale: this.secondaryYScale,
