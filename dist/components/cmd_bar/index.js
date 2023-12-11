@@ -9,7 +9,7 @@ var _react = _interopRequireDefault(require("react"));
 var _reactRedux = require("react-redux");
 var _redux = require("redux");
 var _propTypes = _interopRequireDefault(require("prop-types"));
-var _styles = require("@material-ui/core/styles");
+var _withStyles = _interopRequireDefault(require("@mui/styles/withStyles"));
 var _common = require("./common");
 var _viewer = _interopRequireDefault(require("./01_viewer"));
 var _zoom = _interopRequireDefault(require("./02_zoom"));
@@ -22,6 +22,7 @@ var _r03_threshold = _interopRequireDefault(require("./r03_threshold"));
 var _r04_submit = _interopRequireDefault(require("./r04_submit"));
 var _r07_wavelength_btn = _interopRequireDefault(require("./r07_wavelength_btn"));
 var _pecker = _interopRequireDefault(require("./07_pecker"));
+var _r08_change_axes = _interopRequireDefault(require("./r08_change_axes"));
 /* eslint-disable prefer-object-spread, function-paren-newline,
 react/function-component-definition, react/require-default-props */
 
@@ -58,7 +59,7 @@ const CmdBar = _ref => {
   }), /*#__PURE__*/_react.default.createElement(_r01_layout.default, {
     feature: feature,
     hasEdit: hasEdit
-  }), /*#__PURE__*/_react.default.createElement(_r07_wavelength_btn.default, null));
+  }), /*#__PURE__*/_react.default.createElement(_r07_wavelength_btn.default, null), /*#__PURE__*/_react.default.createElement(_r08_change_axes.default, null));
 };
 const mapStateToProps = (state, _) => (
 // eslint-disable-line
@@ -74,4 +75,4 @@ CmdBar.propTypes = {
   jcampIdx: _propTypes.default.any,
   hideThreshold: _propTypes.default.bool
 };
-var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(CmdBar);
+var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _withStyles.default)(styles))(CmdBar);

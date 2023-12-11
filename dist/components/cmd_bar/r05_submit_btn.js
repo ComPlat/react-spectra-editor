@@ -10,9 +10,9 @@ var _propTypes = _interopRequireDefault(require("prop-types"));
 var _reactRedux = require("react-redux");
 var _classnames = _interopRequireDefault(require("classnames"));
 var _redux = require("redux");
-var _Tooltip = _interopRequireDefault(require("@material-ui/core/Tooltip"));
-var _PlayCircleOutline = _interopRequireDefault(require("@material-ui/icons/PlayCircleOutline"));
-var _styles = require("@material-ui/core/styles");
+var _Tooltip = _interopRequireDefault(require("@mui/material/Tooltip"));
+var _PlayCircleOutline = _interopRequireDefault(require("@mui/icons-material/PlayCircleOutline"));
+var _styles = require("@mui/styles");
 var _chem = require("../../helpers/chem");
 var _common = require("./common");
 var _extractPeaksEdit = require("../../helpers/extractPeaksEdit");
@@ -21,7 +21,7 @@ react/function-component-definition, function-call-argument-newline,
 react/require-default-props */
 
 const styles = () => Object.assign({}, _common.commonStyle);
-const onClickCb = (operation, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, analysis, decimalSt, integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt, cyclicvoltaSt, curveSt) => () => {
+const onClickCb = (operation, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, analysis, decimalSt, integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt) => () => {
   operation({
     peaks: peaksEdit,
     layout: layoutSt,
@@ -38,7 +38,8 @@ const onClickCb = (operation, peaksEdit, isAscend, isIntensity, scan, thres, lay
     aucValues,
     waveLength: waveLengthSt,
     cyclicvoltaSt,
-    curveSt
+    curveSt,
+    axesUnitsSt
   });
 };
 const BtnSubmit = _ref => {
@@ -60,7 +61,8 @@ const BtnSubmit = _ref => {
     allIntegrationSt,
     waveLengthSt,
     cyclicvoltaSt,
-    curveSt
+    curveSt,
+    axesUnitsSt
   } = _ref;
   const peaksEdit = (0, _extractPeaksEdit.extractPeaksEdit)(feature, editPeakSt, thresSt, shiftSt, layoutSt);
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
@@ -75,7 +77,7 @@ const BtnSubmit = _ref => {
   }, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
     className: (0, _classnames.default)('btn-sv-bar-submit'),
     color: "primary",
-    onClick: onClickCb(operation.value, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt, integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt, cyclicvoltaSt, curveSt)
+    onClick: onClickCb(operation.value, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt, integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt)
   }, /*#__PURE__*/_react.default.createElement(_PlayCircleOutline.default, {
     className: classes.icon
   })));
@@ -95,7 +97,8 @@ const mapStateToProps = (state, props) => (
   allIntegrationSt: state.integration.past.concat(state.integration.present),
   waveLengthSt: state.wavelength,
   cyclicvoltaSt: state.cyclicvolta,
-  curveSt: state.curve
+  curveSt: state.curve,
+  axesUnitsSt: state.axesUnits
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({}, dispatch);
 BtnSubmit.propTypes = {
@@ -116,6 +119,7 @@ BtnSubmit.propTypes = {
   allIntegrationSt: _propTypes.default.object.isRequired,
   waveLengthSt: _propTypes.default.object.isRequired,
   cyclicvoltaSt: _propTypes.default.object.isRequired,
-  curveSt: _propTypes.default.object
+  curveSt: _propTypes.default.object,
+  axesUnitsSt: _propTypes.default.object.isRequired
 };
 var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(BtnSubmit);

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.setWorkWithMaxPeak = exports.selectPairPeak = exports.removeCylicVoltaPecker = exports.removeCylicVoltaPairPeak = exports.removeCylicVoltaMinPeak = exports.removeCylicVoltaMaxPeak = exports.addNewCylicVoltaPairPeak = exports.addCylicVoltaPecker = exports.addCylicVoltaMinPeak = exports.addCylicVoltaMaxPeak = void 0;
+exports.setWorkWithMaxPeak = exports.setCylicVoltaRefFactor = exports.setCylicVoltaRef = exports.selectRefPeaks = exports.selectPairPeak = exports.removeCylicVoltaPecker = exports.removeCylicVoltaPairPeak = exports.removeCylicVoltaMinPeak = exports.removeCylicVoltaMaxPeak = exports.addNewCylicVoltaPairPeak = exports.addCylicVoltaPecker = exports.addCylicVoltaMinPeak = exports.addCylicVoltaMaxPeak = void 0;
 var _action_type = require("../constants/action_type");
 const addNewCylicVoltaPairPeak = payload => ({
   type: _action_type.CYCLIC_VOLTA_METRY.ADD_PAIR_PEAKS,
@@ -55,3 +55,18 @@ const removeCylicVoltaPecker = payload => ({
   payload
 });
 exports.removeCylicVoltaPecker = removeCylicVoltaPecker;
+const selectRefPeaks = payload => ({
+  type: _action_type.CYCLIC_VOLTA_METRY.SELECT_REF_PEAK,
+  payload
+});
+exports.selectRefPeaks = selectRefPeaks;
+const setCylicVoltaRefFactor = payload => ({
+  type: _action_type.CYCLIC_VOLTA_METRY.SET_FACTOR,
+  payload
+});
+exports.setCylicVoltaRefFactor = setCylicVoltaRefFactor;
+const setCylicVoltaRef = payload => ({
+  type: _action_type.CYCLIC_VOLTA_METRY.SET_REF,
+  payload
+});
+exports.setCylicVoltaRef = setCylicVoltaRef;

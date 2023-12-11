@@ -8,24 +8,23 @@ import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
-import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
-import InfoIcon from '@material-ui/icons/Info';
-import HelpIcon from '@material-ui/icons/Help';
-import Tooltip from '@material-ui/core/Tooltip';
-import Divider from '@material-ui/core/Divider';
-import Typography from '@material-ui/core/Typography';
-import { withStyles } from '@material-ui/core/styles';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+import InfoIcon from '@mui/icons-material/Info';
+import HelpIcon from '@mui/icons-material/Help';
+import { withStyles } from '@mui/styles';
 import {
   Accordion, AccordionSummary, Table, TableHead, TableBody, TableCell, TableRow,
-} from '@material-ui/core';
+  Tooltip, Divider, Typography, Checkbox,
+} from '@mui/material';
 import {
-  addNewCylicVoltaPairPeak, setWorkWithMaxPeak, selectPairPeak, removeCylicVoltaPairPeak,
+  addNewCylicVoltaPairPeak, setWorkWithMaxPeak, selectPairPeak, removeCylicVoltaPairPeak, selectRefPeaks,
 } from '../../actions/cyclic_voltammetry';
 import { setUiSweepType } from '../../actions/ui';
 import { LIST_UI_SWEEP_TYPE } from '../../constants/list_ui';
 import { GetCyclicVoltaRatio, GetCyclicVoltaPeakSeparate } from '../../helpers/chem';
+import Format from '../../helpers/format';
 
 const styles = () => ({
   panel: {
@@ -58,8 +57,11 @@ const styles = () => ({
   btnRemove: {
     color: 'red',
   },
+  btnAddRow: {
+    color: 'green',
+  },
   tTxt: {
-    padding: 10,
+    padding: 5,
   },
   infoIcon: {
     width: '15px',
@@ -92,7 +94,7 @@ const styles = () => ({
 const CyclicVoltammetryPanel = ({
   classes, cyclicVotaSt, feature,
   addNewPairPeakAct, setWorkWithMaxPeakAct, selectPairPeakAct, removePairPeakAct,
-  sweepTypeSt, setUiSweepTypeAct, jcampIdx, userManualLink,
+  selectRefPeaksAct, sweepTypeSt, setUiSweepTypeAct, jcampIdx, userManualLink,
 }) => {
   const { spectraList } = cyclicVotaSt;
   const spectra = spectraList[jcampIdx];
@@ -119,28 +121,35 @@ const CyclicVoltammetryPanel = ({
     }
   };
 
+  const changeCheckRefPeaks = (idx, event) => {
+    selectRefPeaksAct({ index: idx, jcampIdx, checked: event.target.checked });
+  };
+
   const getDelta = (data) => {
-    return (data.max && data.min) ? GetCyclicVoltaPeakSeparate(data.max.x, data.min.x).toFixed(3) : 'undefined';
+    return (data.max && data.min) ? Format.strNumberFixedLength(GetCyclicVoltaPeakSeparate(data.max.x, data.min.x) * 1000, 3) : 'nd';
   };
 
   const getRatio = (feature, data) => {
     const featureData = feature.data[0];
     const idx = featureData.x.indexOf(feature.maxX);
     const y_pecker = data.pecker ? data.pecker.y : featureData.y[idx];
-    return (data.max && data.min) ? GetCyclicVoltaRatio(data.max.y, data.min.y, y_pecker).toFixed(3) : 'undefined';
+    return (data.max && data.min) ? Format.strNumberFixedLength(GetCyclicVoltaRatio(data.max.y, data.min.y, y_pecker), 3) : 'nd';
   };
 
   const rows = list.map((o, idx) => (
     {
       idx,
-      max: o.max ? `x:${parseFloat(o.max.x).toFixed(3)}, y:${parseFloat(o.max.y).toExponential(2)}` : 'undefined',
-      min: o.min ? `x:${parseFloat(o.min.x).toFixed(3)}, y:${parseFloat(o.min.y).toExponential(2)}` : 'undefined',
-      pecker: o.pecker ? `${parseFloat(o.pecker.y).toExponential(2)}` : 'undefined',
-      delta: getDelta(o),
+      max: o.max ? `E: ${Format.strNumberFixedLength(parseFloat(o.max.x), 3)} V,\nI: ${parseFloat((o.max.y) * 1000).toExponential(2)} mA` : 'nd',
+      min: o.min ? `E: ${Format.strNumberFixedLength(parseFloat(o.min.x), 3)} V,\nI: ${parseFloat((o.min.y) * 1000).toExponential(2)} mA` : 'nd',
+      pecker: o.pecker ? `${parseFloat((o.pecker.y) * 1000).toExponential(2)} mA` : 'nd',
+      delta: `${getDelta(o)} mV`,
       ratio: getRatio(feature, o),
+      e12: (typeof o.e12 === 'number') ? `${Format.strNumberFixedLength(o.e12, 3)} V` : 'nd',
+      isRef: o.isRef,
       onClickMax: () => selectCell(idx, true),
       onClickMin: () => selectCell(idx, false),
       remove: () => removePairPeakAct({ index: idx, jcampIdx }),
+      onCheckRefChanged: (e) => changeCheckRefPeaks(idx, e),
     }
   ));
 
@@ -164,19 +173,25 @@ const CyclicVoltammetryPanel = ({
               align="left"
               className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
             >
-              Max
+              Ref
             </TableCell>
             <TableCell
               align="left"
               className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
             >
-              Min
+              Ox
             </TableCell>
             <TableCell
               align="left"
               className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
             >
-              I λ0
+              Red
+            </TableCell>
+            <TableCell
+              align="left"
+              className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
+            >
+              I <sub>λ0</sub>
               <Tooltip
                 title={
                   <p className={classNames(classes.txtToolTip)}>
@@ -209,7 +224,13 @@ https://doi.org/10.1021/ac60242a030</i>
               align="left"
               className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
             >
-              DeltaEp
+              E1/2
+            </TableCell>
+            <TableCell
+              align="left"
+              className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
+            >
+              ΔEp
               <Tooltip
                 title={
                   (
@@ -226,7 +247,7 @@ https://doi.org/10.1021/ac60242a030</i>
               align="left"
               className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
             >
-              <AddCircleOutlineIcon onClick={() => addNewPairPeakAct(jcampIdx)} />
+              <AddCircleOutlineIcon onClick={() => addNewPairPeakAct(jcampIdx)} className={classNames(classes.btnAddRow)} />
             </TableCell>
           </TableRow>
         </TableHead>
@@ -236,12 +257,25 @@ https://doi.org/10.1021/ac60242a030</i>
               <TableRow key={row.idx}>
                 <TableCell
                   align="left"
+                  className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
+                >
+                  <Checkbox checked={row.isRef} onChange={row.onCheckRefChanged} />
+                </TableCell>
+                <TableCell
+                  align="left"
                   className={
                     classNames(classes.tTxt, classes.square, (spectra.isWorkMaxPeak && spectra.selectedIdx === row.idx ? classes.cellSelected : 'txt-sv-panel-txt'))
                   }
                   onClick={row.onClickMax}
                 >
-                  { row.max }
+                  {
+                    row.max.split('\n').map((s, index) => (
+                      <React.Fragment key={index}>
+                        {s}
+                        <br />
+                      </React.Fragment>
+                    ))
+                  }
                 </TableCell>
                 <TableCell
                   align="left"
@@ -250,7 +284,14 @@ https://doi.org/10.1021/ac60242a030</i>
                   }
                   onClick={row.onClickMin}
                 >
-                  { row.min }
+                  {
+                    row.min.split('\n').map((s, index) => (
+                      <React.Fragment key={index}>
+                        {s}
+                        <br />
+                      </React.Fragment>
+                    ))
+                  }
                 </TableCell>
                 <TableCell
                   align="left"
@@ -263,6 +304,12 @@ https://doi.org/10.1021/ac60242a030</i>
                   className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
                 >
                   { row.ratio }
+                </TableCell>
+                <TableCell
+                  align="left"
+                  className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
+                >
+                  { row.e12 }
                 </TableCell>
                 <TableCell
                   align="left"
@@ -319,6 +366,7 @@ const mapDispatchToProps = (dispatch) => (
     setWorkWithMaxPeakAct: setWorkWithMaxPeak,
     selectPairPeakAct: selectPairPeak,
     removePairPeakAct: removeCylicVoltaPairPeak,
+    selectRefPeaksAct: selectRefPeaks,
     setUiSweepTypeAct: setUiSweepType,
   }, dispatch)
 );
@@ -335,6 +383,7 @@ CyclicVoltammetryPanel.propTypes = {
   setWorkWithMaxPeakAct: PropTypes.func.isRequired,
   selectPairPeakAct: PropTypes.func.isRequired,
   removePairPeakAct: PropTypes.func.isRequired,
+  selectRefPeaksAct: PropTypes.func.isRequired,
   setUiSweepTypeAct: PropTypes.func.isRequired,
   sweepTypeSt: PropTypes.string.isRequired,
   userManualLink: PropTypes.string,

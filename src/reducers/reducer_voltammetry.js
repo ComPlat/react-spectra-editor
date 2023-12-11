@@ -1,5 +1,6 @@
 /* eslint-disable prefer-object-spread, default-param-last */
 import { CYCLIC_VOLTA_METRY } from '../constants/action_type';
+import { GetCyclicVoltaPeakSeparate } from '../helpers/chem';
 
 const initialState = {
   spectraList: [],
@@ -10,6 +11,7 @@ const initSpectra = {
   selectedIdx: -1,
   isWorkMaxPeak: true,
   jcampIdx: -1,
+  shift: { ref: null, val: 0, prevValue: 0 },
 };
 
 const addPairPeak = (state, action) => {
@@ -27,7 +29,9 @@ const addPairPeak = (state, action) => {
     const newList = list.map((item) => {  // eslint-disable-line
       return { ...item };
     });
-    newList.push({ min: null, max: null });
+    newList.push({
+      min: null, max: null, isRef: false, e12: null,
+    });
 
     spectraList[payload] = Object.assign({}, spectra, { list: newList, selectedIdx: index });
     return Object.assign({}, state, { spectraList });
@@ -52,6 +56,15 @@ const removePairPeak = (state, action) => {
   return state;
 };
 
+const getE12 = (data) => {
+  if (data.max && data.min) {
+    const { max, min } = data;
+    const delta = GetCyclicVoltaPeakSeparate(max.x, min.x);
+    return Math.min(max.x, min.x) + 0.5 * delta;
+  }
+  return null;
+};
+
 const addPeak = (state, action, isMax = true) => {
   const { payload } = action;
   const { spectraList } = state;
@@ -68,6 +81,7 @@ const addPeak = (state, action, isMax = true) => {
     } else {
       pairPeak = Object.assign({}, pairPeak, { min: peak });
     }
+    pairPeak.e12 = getE12(pairPeak);
     newList[index] = pairPeak;
 
     spectraList[jcampIdx] = Object.assign(
@@ -94,6 +108,7 @@ const removePeak = (state, action, isMax = true) => {
     } else {
       pairPeak.min = null;
     }
+    pairPeak.e12 = getE12(pairPeak);
     newList[index] = pairPeak;
 
     spectraList[jcampIdx] = Object.assign(
@@ -182,25 +197,100 @@ const removePecker = (state, action) => {
 
 const setRef = (state, action) => {
   const { payload } = action;
-  // const { spectraList } = state;
+  const { spectraList } = state;
   if (payload) {
-    // const { index, jcampIdx } = payload;
-    // const spectra = spectraList[jcampIdx];
-    // const { list } = spectra;
-    // const newList = list;
-    // const pairPeak = newList[index];
-    // pairPeak.pecker = null;
-    // newList[index] = pairPeak;
+    const { jcampIdx } = payload;
+    const spectra = spectraList[jcampIdx];
+    const { list, shift } = spectra;
+    const newShift = Object.assign({}, shift);
+    const refPeaks = list.filter((pairPeak) => pairPeak.isRef === true);
+    let offset = 0.0;
+    if (refPeaks.length > 0) {
+      const currRefPeaks = refPeaks[0];
+      newShift.ref = currRefPeaks;
+      const { val } = shift;
+      const { e12 } = currRefPeaks;
+      offset = e12 - val;
+    } else {
+      newShift.ref = null;
+    }
+    const newList = spectra.list.map((pairPeak) => { //eslint-disable-line
+      const {
+        max, min, pecker, isRef,
+      } = pairPeak;
+      let newMax = null;
+      let newMin = null;
+      let newPecker = null;
+      if (max) {
+        newMax = { x: max.x - offset, y: max.y };
+      }
+      if (min) {
+        newMin = { x: min.x - offset, y: min.y };
+      }
+      if (pecker) {
+        newPecker = { x: pecker.x - offset, y: pecker.y };
+      }
+      const newPairPeak = Object.assign({}, pairPeak, { max: newMax , min: newMin, pecker: newPecker }); //eslint-disable-line
+      newPairPeak.e12 = getE12(newPairPeak);
+      if (isRef) {
+        newShift.ref = newPairPeak;
+        newShift.prevValue += offset;
+      }
+      return newPairPeak;
+    });
+    spectra.list = newList;
+    spectraList[jcampIdx] = Object.assign(
+      {},
+      spectra,
+      { shift: newShift, jcampIdx },
+    );
+    return Object.assign({}, state, { spectraList });
+  }
+  return state;
+};
 
-    // spectraList[jcampIdx] = Object.assign(
-    //   {},
-    //   spectra,
-    //   { list: newList, selectedIdx: index, jcampIdx },
-    // );
-    // return Object.assign({}, state, { spectraList: spectraList });
+const selectRefPeaks = (state, action) => {
+  const { payload } = action;
+  const { spectraList } = state;
+  if (payload) {
+    const { index, jcampIdx, checked } = payload;
+    const spectra = spectraList[jcampIdx];
+    const { list } = spectra;
+    const newList = list;
+    newList.forEach((pairPeak, idx) => {
+      const newPairPeak = pairPeak;
+      newPairPeak.isRef = false;
+      if (idx === index) {
+        newPairPeak.isRef = checked;
+        newList[index] = newPairPeak;
+      }
+    });
 
-    // TODO: implement ref
-    // console.log(pairPeak);
+    spectraList[jcampIdx] = Object.assign(
+      {},
+      spectra,
+      { list: newList, selectedIdx: index, jcampIdx },
+    );
+    return Object.assign({}, state, { spectraList });
+  }
+  return state;
+};
+
+const selectRefFactor = (state, action) => {
+  const { payload } = action;
+  const { spectraList } = state;
+  if (payload) {
+    const { factor, curveIdx } = payload;
+    const spectra = spectraList[curveIdx];
+    const { shift } = spectra;
+    const newShift = Object.assign({}, shift);
+    newShift.val = factor;
+    spectraList[curveIdx] = Object.assign(
+      {},
+      spectra,
+      { shift: newShift, jcampIdx: curveIdx },
+    );
+    return Object.assign({}, state, { spectraList });
   }
   return state;
 };
@@ -229,6 +319,10 @@ const cyclicVoltaReducer = (state = initialState, action) => {
       return removePecker(state, action);
     case CYCLIC_VOLTA_METRY.SET_REF:
       return setRef(state, action);
+    case CYCLIC_VOLTA_METRY.SELECT_REF_PEAK:
+      return selectRefPeaks(state, action);
+    case CYCLIC_VOLTA_METRY.SET_FACTOR:
+      return selectRefFactor(state, action);
     case CYCLIC_VOLTA_METRY.RESETALL:
       return Object.assign({}, state, { spectraList: [] });
     default:

@@ -10,11 +10,9 @@ var _propTypes = _interopRequireDefault(require("prop-types"));
 var _classnames = _interopRequireDefault(require("classnames"));
 var _reactRedux = require("react-redux");
 var _redux = require("redux");
-var _ExpandMore = _interopRequireDefault(require("@material-ui/icons/ExpandMore"));
-var _Divider = _interopRequireDefault(require("@material-ui/core/Divider"));
-var _Typography = _interopRequireDefault(require("@material-ui/core/Typography"));
-var _styles = require("@material-ui/core/styles");
-var _core = require("@material-ui/core");
+var _ExpandMore = _interopRequireDefault(require("@mui/icons-material/ExpandMore"));
+var _styles = require("@mui/styles");
+var _material = require("@mui/material");
 var _curve = require("../../actions/curve");
 var _list_layout = require("../../constants/list_layout");
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
@@ -108,9 +106,10 @@ const GraphSelectionPanel = _ref => {
         };
       });
     } catch (e) {
-      console.log(e);
+      console.log(e); //eslint-disable-line
     }
   }
+
   const items = listCurves.map((spectra, idx) => {
     const {
       color
@@ -126,22 +125,22 @@ const GraphSelectionPanel = _ref => {
       filename
     };
   });
-  return /*#__PURE__*/_react.default.createElement(_core.Accordion, {
+  return /*#__PURE__*/_react.default.createElement(_material.Accordion, {
     "data-testid": "GraphSelectionPanel"
-  }, /*#__PURE__*/_react.default.createElement(_core.AccordionSummary, {
+  }, /*#__PURE__*/_react.default.createElement(_material.AccordionSummary, {
     expandIcon: /*#__PURE__*/_react.default.createElement(_ExpandMore.default, null),
     className: (0, _classnames.default)(classes.panelSummary)
-  }, /*#__PURE__*/_react.default.createElement(_Typography.default, {
+  }, /*#__PURE__*/_react.default.createElement(_material.Typography, {
     className: "txt-panel-header"
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title')
-  }, "Graph selection"))), /*#__PURE__*/_react.default.createElement(_Divider.default, null), layoutSt === _list_layout.LIST_LAYOUT.AIF ? /*#__PURE__*/_react.default.createElement(_core.FormControlLabel, {
-    control: /*#__PURE__*/_react.default.createElement(_core.Switch, {
+  }, "Graph selection"))), /*#__PURE__*/_react.default.createElement(_material.Divider, null), layoutSt === _list_layout.LIST_LAYOUT.AIF ? /*#__PURE__*/_react.default.createElement(_material.FormControlLabel, {
+    control: /*#__PURE__*/_react.default.createElement(_material.Switch, {
       checked: isShowAllCurve,
       onChange: onChangeSwitch
     }),
     label: "Show all curves"
-  }) : null, subLayoutValues && subLayoutValues.length > 1 ? /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement(_core.Tabs, {
+  }) : null, subLayoutValues && subLayoutValues.length > 1 ? /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement(_material.Tabs, {
     value: selectedSubLayout,
     onChange: onChangeTabSubLayout
   }, subLayoutValues.map((subLayout, i) => {
@@ -156,12 +155,12 @@ const GraphSelectionPanel = _ref => {
       default:
         break;
     }
-    return /*#__PURE__*/_react.default.createElement(_core.Tab, {
+    return /*#__PURE__*/_react.default.createElement(_material.Tab, {
       key: i,
       value: subLayout,
       label: subLayoutName
     });
-  })), /*#__PURE__*/_react.default.createElement(_core.List, null, itemsSubLayout.map(item => /*#__PURE__*/_react.default.createElement(_core.ListItem, {
+  })), /*#__PURE__*/_react.default.createElement(_material.List, null, itemsSubLayout.map(item => /*#__PURE__*/_react.default.createElement(_material.ListItem, {
     key: item.idx,
     onClick: () => onChange(item.idx),
     className: (0, _classnames.default)(item.idx === curveIdx ? classes.curveSelected : classes.curveDefault) // eslint-disable-line
@@ -178,7 +177,7 @@ const GraphSelectionPanel = _ref => {
       backgroundColor: item.color
     }
   }), item.filename !== '' ? /*#__PURE__*/_react.default.createElement("span", null, "File: ", item.filename) : null // eslint-disable-line
-  )))))) : /*#__PURE__*/_react.default.createElement(_core.List, null, items.map(item => /*#__PURE__*/_react.default.createElement(_core.ListItem, {
+  )))))) : /*#__PURE__*/_react.default.createElement(_material.List, null, items.map(item => /*#__PURE__*/_react.default.createElement(_material.ListItem, {
     key: item.idx,
     onClick: () => onChange(item.idx),
     className: (0, _classnames.default)(item.idx === curveIdx ? classes.curveSelected : classes.curveDefault) // eslint-disable-line

@@ -46,11 +46,20 @@ class ViewerMulti extends React.Component {
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt,
       sweepExtentSt, isUiNoBrushSt,
       isHidden, resetAllAct, cyclicvoltaSt,
-      integationSt, mtplySt,
+      integationSt, mtplySt, axesUnitsSt,
     } = this.props;
 
     drawDestroy(this.rootKlass);
     resetAllAct(feature);
+
+    let xxLabel = xLabel;
+    let yyLabel = yLabel;
+
+    if (axesUnitsSt) {
+      const { xUnit, yUnit } = axesUnitsSt;
+      xxLabel = xUnit === '' ? xLabel : xUnit;
+      yyLabel = yUnit === '' ? yLabel : yUnit;
+    }
 
     const filterSeed = seed;
     const filterPeak = peak;
@@ -70,7 +79,7 @@ class ViewerMulti extends React.Component {
       integationSt,
       mtplySt,
     });
-    drawLabel(this.rootKlass, cLabel, xLabel, yLabel);
+    drawLabel(this.rootKlass, cLabel, xxLabel, yyLabel);
     drawDisplay(this.rootKlass, isHidden);
     drawArrowOnCurve(this.rootKlass, isHidden);
   }
@@ -82,9 +91,18 @@ class ViewerMulti extends React.Component {
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt,
       sweepExtentSt, isUiNoBrushSt,
       isHidden, cyclicvoltaSt,
-      integationSt, mtplySt,
+      integationSt, mtplySt, axesUnitsSt,
     } = this.props;
     this.normChange(prevProps);
+
+    let xxLabel = xLabel;
+    let yyLabel = yLabel;
+
+    if (axesUnitsSt) {
+      const { xUnit, yUnit } = axesUnitsSt;
+      xxLabel = xUnit === '' ? xLabel : xUnit;
+      yyLabel = yUnit === '' ? yLabel : yUnit;
+    }
 
     const filterSeed = seed;
     const filterPeak = peak;
@@ -104,7 +122,7 @@ class ViewerMulti extends React.Component {
       integationSt,
       mtplySt,
     });
-    drawLabel(this.rootKlass, cLabel, xLabel, yLabel);
+    drawLabel(this.rootKlass, cLabel, xxLabel, yyLabel);
     drawDisplay(this.rootKlass, isHidden);
     drawArrowOnCurve(this.rootKlass, isHidden);
   }
@@ -143,6 +161,7 @@ const mapStateToProps = (state, props) => (
     maxminPeakSt: Feature2MaxMinPeak(state, props),
     integationSt: state.integration.present,
     mtplySt: state.multiplicity.present,
+    axesUnitsSt: state.axesUnits,
   }
 );
 
@@ -185,6 +204,7 @@ ViewerMulti.propTypes = {
   addCylicVoltaMaxPeakAct: PropTypes.func.isRequired,
   addCylicVoltaMinPeakAct: PropTypes.func.isRequired,
   cLabel: PropTypes.string,
+  axesUnitsSt: PropTypes.object.isRequired,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ViewerMulti);

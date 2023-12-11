@@ -21,7 +21,6 @@ const spectraDigit = layout => {
     case _list_layout.LIST_LAYOUT.HPLC_UVVIS:
     case _list_layout.LIST_LAYOUT.TGA:
     case _list_layout.LIST_LAYOUT.XRD:
-    case _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY:
     case _list_layout.LIST_LAYOUT.CDS:
     case _list_layout.LIST_LAYOUT.SEC:
     case _list_layout.LIST_LAYOUT.MS:
@@ -34,6 +33,7 @@ const spectraDigit = layout => {
     case _list_layout.LIST_LAYOUT.N15:
     case _list_layout.LIST_LAYOUT.Si29:
     case _list_layout.LIST_LAYOUT.PLAIN:
+    case _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY:
     default:
       return 2;
   }
@@ -520,6 +520,24 @@ const strNumberFixedDecimal = function (number) {
   }
   return number.toFixed(Math.max(decimal, (number.toString().split('.')[1] || []).length));
 };
+const strNumberFixedLength = function (number) {
+  let maxLength = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : -1;
+  if (maxLength <= 0) {
+    return `${number}`;
+  }
+  const splittedNum = number.toString().split('.') || [];
+  if (splittedNum.length === 0) {
+    return `${number}`;
+  }
+  const integerPart = splittedNum[0];
+  if (number >= 0 && maxLength <= integerPart.length || number < 0 && maxLength <= integerPart.length - 1) {
+    // eslint-disable-line
+    return `${Math.round(number)}`;
+  }
+  const lengthToFix = number >= 0 ? maxLength - integerPart.length : maxLength - integerPart.length + 1; // eslint-disable-line
+
+  return number.toFixed(lengthToFix);
+};
 const Format = {
   toPeakStr,
   buildData,
@@ -560,6 +578,7 @@ const Format = {
   isAIFLayout,
   isDLSACFLayout,
   strNumberFixedDecimal,
-  formatedXRD
+  formatedXRD,
+  strNumberFixedLength
 };
 var _default = exports.default = Format;

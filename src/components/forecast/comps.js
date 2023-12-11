@@ -4,16 +4,15 @@ import React from 'react';
 import classNames from 'classnames';
 import SvgFileZoomPan from '@complat/react-svg-file-zoom-pan';
 
-import CheckCircleOutline from '@material-ui/icons/CheckCircleOutline';
-import ErrorOutline from '@material-ui/icons/ErrorOutline';
-import HighlightOff from '@material-ui/icons/HighlightOff';
-import HelpOutline from '@material-ui/icons/HelpOutline';
-import Help from '@material-ui/icons/Help';
-import Tooltip from '@material-ui/core/Tooltip';
-import Grid from '@material-ui/core/Grid';
-import TextField from '@material-ui/core/TextField';
-import CloudOff from '@material-ui/icons/CloudOff';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
+import ErrorOutline from '@mui/icons-material/ErrorOutline';
+import HighlightOff from '@mui/icons-material/HighlightOff';
+import HelpOutline from '@mui/icons-material/HelpOutline';
+import Help from '@mui/icons-material/Help';
+import {
+  Grid, Tooltip, TextField, CircularProgress,
+} from '@mui/material';
+import CloudOff from '@mui/icons-material/CloudOff';
 
 import SectionLoading from './section_loading';
 

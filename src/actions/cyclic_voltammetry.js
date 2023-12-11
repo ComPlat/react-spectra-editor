@@ -70,10 +70,33 @@ const removeCylicVoltaPecker = (payload) => (
   }
 );
 
+const selectRefPeaks = (payload) => (
+  {
+    type: CYCLIC_VOLTA_METRY.SELECT_REF_PEAK,
+    payload,
+  }
+);
+
+const setCylicVoltaRefFactor = (payload) => (
+  {
+    type: CYCLIC_VOLTA_METRY.SET_FACTOR,
+    payload,
+  }
+);
+
+const setCylicVoltaRef = (payload) => (
+  {
+    type: CYCLIC_VOLTA_METRY.SET_REF,
+    payload,
+  }
+);
+
 export {
   addNewCylicVoltaPairPeak, removeCylicVoltaPairPeak,
   addCylicVoltaMaxPeak, removeCylicVoltaMaxPeak,
   addCylicVoltaMinPeak, removeCylicVoltaMinPeak,
   setWorkWithMaxPeak, selectPairPeak,
   addCylicVoltaPecker, removeCylicVoltaPecker,
+  selectRefPeaks, setCylicVoltaRefFactor,
+  setCylicVoltaRef,
 };

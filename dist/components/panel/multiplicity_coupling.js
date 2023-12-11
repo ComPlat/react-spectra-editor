@@ -10,9 +10,8 @@ var _reactRedux = require("react-redux");
 var _redux = require("redux");
 var _classnames = _interopRequireDefault(require("classnames"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
-var _styles = require("@material-ui/core/styles");
-var _TextField = _interopRequireDefault(require("@material-ui/core/TextField"));
-var _InputAdornment = _interopRequireDefault(require("@material-ui/core/InputAdornment"));
+var _styles = require("@mui/styles");
+var _material = require("@mui/material");
 var _multiplicity = require("../../actions/multiplicity");
 const styles = () => ({
   jDiv: {
@@ -37,12 +36,12 @@ const styles = () => ({
     height: 24
   }
 });
-const txtJ = () => /*#__PURE__*/_react.default.createElement(_InputAdornment.default, {
+const txtJ = () => /*#__PURE__*/_react.default.createElement(_material.InputAdornment, {
   position: "start"
 }, /*#__PURE__*/_react.default.createElement("span", {
   className: "txt-cmd-j"
 }, "J\xA0="));
-const txtHz = () => /*#__PURE__*/_react.default.createElement(_InputAdornment.default, {
+const txtHz = () => /*#__PURE__*/_react.default.createElement(_material.InputAdornment, {
   position: "end"
 }, /*#__PURE__*/_react.default.createElement("span", {
   className: "txt-cmd-hz"
@@ -102,7 +101,7 @@ class MpyCoupling extends _react.default.Component {
       className: (0, _classnames.default)(classes.jDiv)
     }, /*#__PURE__*/_react.default.createElement("span", {
       className: (0, _classnames.default)(classes.moExtTxt, classes.jTxt, 'txt-sv-panel-head')
-    }, /*#__PURE__*/_react.default.createElement(_TextField.default, {
+    }, /*#__PURE__*/_react.default.createElement(_material.TextField, {
       className: (0, _classnames.default)(classes.txtField, 'txt-cmd-field'),
       placeholder: "-",
       value: value,

@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
 import PropTypes from 'prop-types';
 
-import { withStyles } from '@material-ui/core/styles';
+import withStyles from '@mui/styles/withStyles';
 
 import { commonStyle } from './common';
 import Viewer from './01_viewer';
@@ -19,6 +19,7 @@ import Threshold from './r03_threshold';
 import Submit from './r04_submit';
 import Wavelength from './r07_wavelength_btn';
 import Pecker from './07_pecker';
+import ChangeAxes from './r08_change_axes';
 
 const styles = () => (
   Object.assign(
@@ -54,6 +55,7 @@ const CmdBar = ({
     }
     <Layout feature={feature} hasEdit={hasEdit} />
     <Wavelength />
+    <ChangeAxes />
   </div>
 );
 

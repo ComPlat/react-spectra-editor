@@ -3,6 +3,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { createStore, compose, applyMiddleware } from 'redux';
 import PropTypes from 'prop-types';
+import { StyledEngineProvider } from '@mui/material';
 
 import 'regenerator-runtime/runtime'; // eslint-disable-line
 import createSagaMiddleware from 'redux-saga';
@@ -37,24 +38,26 @@ const SpectraEditor = ({
   multiEntities, multiMolSvgs, entityFileNames, userManualLink,
 }) => (
   <Provider store={store}>
-    <LayerInit
-      entity={entity}
-      multiEntities={multiEntities}
-      entityFileNames={entityFileNames}
-      userManualLink={userManualLink}
-      others={others}
-      cLabel={cLabel}
-      xLabel={xLabel}
-      yLabel={yLabel}
-      forecast={forecast}
-      operations={operations}
-      descriptions={ensureQuillDelta(descriptions)}
-      molSvg={molSvg}
-      multiMolSvgs={multiMolSvgs}
-      editorOnly={editorOnly}
-      canChangeDescription={canChangeDescription}
-      onDescriptionChanged={onDescriptionChanged}
-    />
+    <StyledEngineProvider injectFirst>
+      <LayerInit
+        entity={entity}
+        multiEntities={multiEntities}
+        entityFileNames={entityFileNames}
+        userManualLink={userManualLink}
+        others={others}
+        cLabel={cLabel}
+        xLabel={xLabel}
+        yLabel={yLabel}
+        forecast={forecast}
+        operations={operations}
+        descriptions={ensureQuillDelta(descriptions)}
+        molSvg={molSvg}
+        multiMolSvgs={multiMolSvgs}
+        editorOnly={editorOnly}
+        canChangeDescription={canChangeDescription}
+        onDescriptionChanged={onDescriptionChanged}
+      />
+    </StyledEngineProvider>
   </Provider>
 );
 

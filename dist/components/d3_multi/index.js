@@ -61,10 +61,21 @@ class ViewerMulti extends _react.default.Component {
       resetAllAct,
       cyclicvoltaSt,
       integationSt,
-      mtplySt
+      mtplySt,
+      axesUnitsSt
     } = this.props;
     (0, _draw.drawDestroy)(this.rootKlass);
     resetAllAct(feature);
+    let xxLabel = xLabel;
+    let yyLabel = yLabel;
+    if (axesUnitsSt) {
+      const {
+        xUnit,
+        yUnit
+      } = axesUnitsSt;
+      xxLabel = xUnit === '' ? xLabel : xUnit;
+      yyLabel = yUnit === '' ? yLabel : yUnit;
+    }
     const filterSeed = seed;
     const filterPeak = peak;
     (0, _draw.drawMain)(this.rootKlass, W, H);
@@ -82,7 +93,7 @@ class ViewerMulti extends _react.default.Component {
       integationSt,
       mtplySt
     });
-    (0, _draw.drawLabel)(this.rootKlass, cLabel, xLabel, yLabel);
+    (0, _draw.drawLabel)(this.rootKlass, cLabel, xxLabel, yyLabel);
     (0, _draw.drawDisplay)(this.rootKlass, isHidden);
     (0, _draw.drawArrowOnCurve)(this.rootKlass, isHidden);
   }
@@ -104,9 +115,20 @@ class ViewerMulti extends _react.default.Component {
       isHidden,
       cyclicvoltaSt,
       integationSt,
-      mtplySt
+      mtplySt,
+      axesUnitsSt
     } = this.props;
     this.normChange(prevProps);
+    let xxLabel = xLabel;
+    let yyLabel = yLabel;
+    if (axesUnitsSt) {
+      const {
+        xUnit,
+        yUnit
+      } = axesUnitsSt;
+      xxLabel = xUnit === '' ? xLabel : xUnit;
+      yyLabel = yUnit === '' ? yLabel : yUnit;
+    }
     const filterSeed = seed;
     const filterPeak = peak;
     this.focus.update({
@@ -124,7 +146,7 @@ class ViewerMulti extends _react.default.Component {
       integationSt,
       mtplySt
     });
-    (0, _draw.drawLabel)(this.rootKlass, cLabel, xLabel, yLabel);
+    (0, _draw.drawLabel)(this.rootKlass, cLabel, xxLabel, yyLabel);
     (0, _draw.drawDisplay)(this.rootKlass, isHidden);
     (0, _draw.drawArrowOnCurve)(this.rootKlass, isHidden);
   }
@@ -161,7 +183,8 @@ const mapStateToProps = (state, props) => ({
   cyclicvoltaSt: state.cyclicvolta,
   maxminPeakSt: (0, _chem.Feature2MaxMinPeak)(state, props),
   integationSt: state.integration.present,
-  mtplySt: state.multiplicity.present
+  mtplySt: state.multiplicity.present,
+  axesUnitsSt: state.axesUnits
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   resetAllAct: _manager.resetAll,
@@ -198,6 +221,7 @@ ViewerMulti.propTypes = {
   addNewCylicVoltaPairPeakAct: _propTypes.default.func.isRequired,
   addCylicVoltaMaxPeakAct: _propTypes.default.func.isRequired,
   addCylicVoltaMinPeakAct: _propTypes.default.func.isRequired,
-  cLabel: _propTypes.default.string
+  cLabel: _propTypes.default.string,
+  axesUnitsSt: _propTypes.default.object.isRequired
 };
 var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(ViewerMulti);

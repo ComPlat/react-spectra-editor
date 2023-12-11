@@ -9,17 +9,13 @@ var _action_type = require("../constants/action_type");
 var _list_layout = require("../constants/list_layout");
 /* eslint-disable no-plusplus */
 
-const getCurveSt = state => state.curve;
 const getLayoutSt = state => state.layout;
+const getCurveSt = state => state.curve;
 function getMaxMinPeak(curve) {
   return curve.maxminPeak;
 }
 function* setCyclicVoltametry(action) {
   // eslint-disable-line
-  const layoutSt = yield (0, _effects.select)(getLayoutSt);
-  if (layoutSt !== _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
-    return;
-  }
   const curveSt = yield (0, _effects.select)(getCurveSt);
   const {
     listCurves
@@ -31,6 +27,13 @@ function* setCyclicVoltametry(action) {
     });
     const numberOfCurves = listCurves.length;
     if (numberOfCurves <= 0) {
+      return;
+    }
+    const firstCurve = listCurves[0];
+    const {
+      layout
+    } = firstCurve;
+    if (layout !== _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
       return;
     }
     for (let index = 0; index < listCurves.length; index++) {
@@ -69,8 +72,38 @@ function* setCyclicVoltametry(action) {
           }
         });
       }
+      const {
+        refIndex
+      } = maxminPeak;
+      if (refIndex > -1) {
+        yield (0, _effects.put)({
+          type: _action_type.CYCLIC_VOLTA_METRY.SELECT_REF_PEAK,
+          payload: {
+            index: refIndex,
+            jcampIdx: index,
+            checked: true
+          }
+        });
+      }
     }
   }
 }
-const multiEntitiesSagas = [(0, _effects.takeEvery)(_action_type.CURVE.SET_ALL_CURVES, setCyclicVoltametry)];
+function* setCyclicVoltametryRef(action) {
+  // eslint-disable-line
+  const layoutSt = yield (0, _effects.select)(getLayoutSt);
+  if (layoutSt !== _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
+    return;
+  }
+  const curveSt = yield (0, _effects.select)(getCurveSt);
+  const {
+    curveIdx
+  } = curveSt;
+  yield (0, _effects.put)({
+    type: _action_type.CYCLIC_VOLTA_METRY.SET_REF,
+    payload: {
+      jcampIdx: curveIdx
+    }
+  });
+}
+const multiEntitiesSagas = [(0, _effects.takeEvery)(_action_type.CURVE.SET_ALL_CURVES, setCyclicVoltametry), (0, _effects.takeEvery)(_action_type.CYCLIC_VOLTA_METRY.SET_FACTOR, setCyclicVoltametryRef)];
 var _default = exports.default = multiEntitiesSagas;

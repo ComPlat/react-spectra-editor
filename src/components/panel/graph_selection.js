@@ -6,13 +6,12 @@ import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import Divider from '@material-ui/core/Divider';
-import Typography from '@material-ui/core/Typography';
-import { withStyles } from '@material-ui/core/styles';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { withStyles } from '@mui/styles';
 import {
   Accordion, AccordionSummary, ListItem, List, Tabs, Tab, Switch, FormControlLabel,
-} from '@material-ui/core';
+  Divider, Typography,
+} from '@mui/material';
 import { selectCurve, toggleShowAllCurves } from '../../actions/curve';
 import { LIST_LAYOUT } from '../../constants/list_layout';
 
@@ -95,7 +94,7 @@ const GraphSelectionPanel = ({
         };
       });
     } catch (e) {
-      console.log(e);
+      console.log(e); //eslint-disable-line
     }
   }
 

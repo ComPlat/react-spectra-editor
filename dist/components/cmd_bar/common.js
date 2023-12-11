@@ -5,10 +5,16 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.focusStyle = exports.commonStyle = exports.MuButton = void 0;
-var _styles = require("@material-ui/core/styles");
-var _Button = _interopRequireDefault(require("@material-ui/core/Button"));
-const MuButton = exports.MuButton = (0, _styles.withStyles)({
-  root: {
+var _extends2 = _interopRequireDefault(require("@babel/runtime/helpers/extends"));
+var _objectWithoutProperties2 = _interopRequireDefault(require("@babel/runtime/helpers/objectWithoutProperties"));
+var _react = _interopRequireDefault(require("react"));
+var _styles = require("@mui/styles");
+var _Button = _interopRequireDefault(require("@mui/material/Button"));
+var _classnames = _interopRequireDefault(require("classnames"));
+/* eslint-disable no-unused-vars, max-len, indent, react/function-component-definition, react/self-closing-comp, react/prop-types, react/jsx-props-no-spreading */
+
+const useStyles = (0, _styles.makeStyles)(theme => ({
+  muiBtn: {
     border: '1px solid #ccc',
     borderRadius: 4,
     fontFamily: 'Helvetica',
@@ -17,9 +23,21 @@ const MuButton = exports.MuButton = (0, _styles.withStyles)({
     lineHeight: '20px',
     minWidth: 30,
     padding: 0,
-    width: 30
+    width: 30,
+    color: 'black'
   }
-})(_Button.default);
+}));
+const MuButton = props => {
+  const classes = useStyles();
+  const {
+      className
+    } = props,
+    other = (0, _objectWithoutProperties2.default)(props, ["className"]);
+  return /*#__PURE__*/_react.default.createElement(_Button.default, (0, _extends2.default)({
+    className: (0, _classnames.default)(classes.muiBtn, className)
+  }, other));
+};
+exports.MuButton = MuButton;
 const commonStyle = exports.commonStyle = {
   card: {
     margin: '0 0 5px 52px',
@@ -91,6 +109,14 @@ const commonStyle = exports.commonStyle = {
     backgroundColor: 'white',
     fontSize: 12,
     margin: '22% 0 0 7px',
+    padding: '0 10px 0 10px',
+    transform: 'scale(0.75)'
+  },
+  txtLabelTopInput: {
+    fontFamily: 'Helvetica',
+    backgroundColor: 'white',
+    fontSize: 12,
+    margin: '-8% 0 0 7px',
     padding: '0 10px 0 10px',
     transform: 'scale(0.75)'
   }

@@ -6,16 +6,13 @@ import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
 
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import OutlinedInput from '@material-ui/core/OutlinedInput';
-import InputLabel from '@material-ui/core/InputLabel';
-import { withStyles } from '@material-ui/core/styles';
-import Tooltip from '@material-ui/core/Tooltip';
-import CloudDoneOutlinedIcon from '@material-ui/icons/CloudDoneOutlined';
-import HowToRegOutlinedIcon from '@material-ui/icons/HowToRegOutlined';
-import RefreshOutlinedIcon from '@material-ui/icons/RefreshOutlined';
+import {
+  Select, MenuItem, FormControl, InputLabel, Tooltip,
+} from '@mui/material';
+import { withStyles } from '@mui/styles';
+import CloudDoneOutlinedIcon from '@mui/icons-material/CloudDoneOutlined';
+import HowToRegOutlinedIcon from '@mui/icons-material/HowToRegOutlined';
+import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
 
 import {
   setScanTarget, resetScanTarget, toggleScanIsAuto,
@@ -103,20 +100,15 @@ const scanSelect = (
       className={classNames(classes.fieldScan)}
       variant="outlined"
     >
-      <InputLabel className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
+      <InputLabel id="select-scan-label" className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
         Current Scan
       </InputLabel>
       <Select
+        labelId="select-scan-label"
+        label="Current Scan"
         value={selValue}
         onChange={onChange}
-        input={
-          (
-            <OutlinedInput
-              className={classNames(classes.selectInput, 'input-sv-bar-scan')}
-              labelWidth={90}
-            />
-          )
-        }
+        className={classNames(classes.selectInput, 'input-sv-bar-scan')}
       >
         { content }
       </Select>

@@ -170,7 +170,8 @@ class MultiFocus {
         feature,
         color
       } = entry;
-      const currData = (0, _chem.convertTopic)(topic, layout, feature, 0);
+      const offset = (0, _chem.GetCyclicVoltaPreviousShift)(cyclicvoltaSt, jcampIdx);
+      const currData = (0, _chem.convertTopic)(topic, layout, feature, offset);
       if (idx === jcampIdx) {
         this.data = [...currData];
         this.pathColor = color;
