@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable no-multi-assign */
 /* eslint-disable no-unused-vars, prefer-object-spread, no-mixed-operators,
 no-unneeded-ternary, arrow-body-style */
@@ -102,6 +103,7 @@ class MultiFocus {
     this.drawSecondaryAxis = this.drawSecondaryAxis.bind(this);
     this.secondaryAxis = null;
     this.handleConfigMultiTGA = this.handleConfigMultiTGA.bind(this);
+    this.offsetSt = null;
   }
 
   getShouldUpdate(nextEpSt) {
@@ -151,7 +153,7 @@ class MultiFocus {
     this.root.call(this.tip);
   }
 
-  setDataParams(peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt, jcampIdx = 0) {
+  setDataParams(peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt, offsetSt, jcampIdx = 0) {
     this.data = [];
     this.otherLineData = [];
     let filterSubLayoutValue = null;
@@ -188,6 +190,7 @@ class MultiFocus {
     this.layout = layout;
     this.cyclicvoltaSt = cyclicvoltaSt;
     this.jcampIdx = jcampIdx;
+    this.offsetSt = offsetSt;
   }
 
   updatePathCall(xt, yt) {
@@ -1254,7 +1257,7 @@ class MultiFocus {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, this.reverseXAxis(layoutSt));
     this.setTip();
-    this.setDataParams(filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
+    this.setDataParams(filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, offsetSt, jcampIdx);
     MountCompass(this);
 
     this.axis = MountAxis(this);
@@ -1296,7 +1299,7 @@ class MultiFocus {
     this.isShowAllCurves = isShowAllCurve;
     this.entities = entities;
 
-    this.setDataParams(filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
+    this.setDataParams(filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, offsetSt, jcampIdx);
 
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);

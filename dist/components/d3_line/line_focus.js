@@ -20,6 +20,7 @@ var _list_layout = require("../../constants/list_layout");
 var _calc = require("../../helpers/calc");
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
 function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
+/* eslint-disable max-len */
 /* eslint-disable prefer-object-spread, no-mixed-operators */
 
 class LineFocus {
@@ -163,7 +164,7 @@ class LineFocus {
     this.tip = (0, _init.InitTip)();
     this.root.call(this.tip);
   }
-  setDataParams(data, peaks, tTrEndPts, tSfPeaks, freq, layout, wavelength) {
+  setDataParams(data, peaks, tTrEndPts, tSfPeaks, freq, layout, wavelength, offsetSt) {
     this.data = [...data];
     this.dataPks = [...peaks];
     this.tTrEndPts = tTrEndPts;
@@ -171,6 +172,7 @@ class LineFocus {
     this.freq = freq;
     this.layout = layout;
     this.wavelength = wavelength;
+    this.offsetSt = offsetSt;
   }
   updatePathCall(xt, yt) {
     this.pathCall = d3.line().x(d => xt(d.x)).y(d => yt(d.y));
@@ -676,7 +678,7 @@ class LineFocus {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt));
     this.setTip();
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt, wavelength);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt, wavelength, offsetSt);
     (0, _compass.MountCompass)(this);
     this.axis = (0, _mount.MountAxis)(this);
     this.path = (0, _mount.MountPath)(this, 'steelblue');
@@ -722,7 +724,7 @@ class LineFocus {
     } = _ref2;
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt));
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt, wavelength);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt, wavelength, offsetSt);
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);
       this.getShouldUpdate(editPeakSt, integationSt, mtplySt, offsetSt);

@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable prefer-object-spread, no-mixed-operators */
 import * as d3 from 'd3';
 import {
@@ -137,7 +138,7 @@ class LineFocus {
     this.root.call(this.tip);
   }
 
-  setDataParams(data, peaks, tTrEndPts, tSfPeaks, freq, layout, wavelength) {
+  setDataParams(data, peaks, tTrEndPts, tSfPeaks, freq, layout, wavelength, offsetSt) {
     this.data = [...data];
     this.dataPks = [...peaks];
     this.tTrEndPts = tTrEndPts;
@@ -145,6 +146,7 @@ class LineFocus {
     this.freq = freq;
     this.layout = layout;
     this.wavelength = wavelength;
+    this.offsetSt = offsetSt;
   }
 
   updatePathCall(xt, yt) {
@@ -896,7 +898,7 @@ class LineFocus {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, this.reverseXAxis(layoutSt));
     this.setTip();
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt, wavelength);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt, wavelength, offsetSt);
     MountCompass(this);
 
     this.axis = MountAxis(this);
@@ -932,7 +934,7 @@ class LineFocus {
   }) {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, this.reverseXAxis(layoutSt));
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt, wavelength);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt, wavelength, offsetSt);
 
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);
