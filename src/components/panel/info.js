@@ -83,6 +83,10 @@ const simTitle = () => (
   'Simulated signals from NMRshiftDB'
 );
 
+const valueFromAnalysisTitle = () => (
+  'Values obtained from the analysis'
+);
+
 const simContent = (nmrSimPeaks) => (
   nmrSimPeaks && nmrSimPeaks.sort((a, b) => a - b).join(', ')
 );
@@ -222,13 +226,20 @@ const InfoPanel = ({
       {
         !Format.isCyclicVoltaLayout(layoutSt)
           ? (
-            <ReactQuill
-              className={classNames(classes.quill, 'card-sv-quill')}
-              value={descriptions}
-              modules={{ toolbar: false }}
-              onChange={onDescriptionChanged}
-              readOnly={canChangeDescription !== undefined ? !canChangeDescription : true}
-            />
+            <div className={classNames(classes.rowRoot, classes.rowOddSim)}>
+              <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>
+                { valueFromAnalysisTitle() }
+                :
+              </span>
+              <br />
+              <ReactQuill
+                className={classNames(classes.quill, 'txt-sv-panel-txt')}
+                value={descriptions}
+                modules={{ toolbar: false }}
+                onChange={onDescriptionChanged}
+                readOnly={canChangeDescription !== undefined ? !canChangeDescription : true}
+              />
+            </div>
           ) : null
       }
       <div>
