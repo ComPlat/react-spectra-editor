@@ -73,17 +73,18 @@ const styles = () => ({
     marginRight: 3,
   },
   quill: {
-    backgroundColor: '#fafafa',
-    border: '1px solid #eee',
     fontSize: '0.8rem',
     fontFamily: 'Helvetica',
-    padding: '0 10px 0 10px',
     textAlign: 'left',
   },
 });
 
 const simTitle = () => (
   'Simulated signals from NMRshiftDB'
+);
+
+const valueFromAnalysisTitle = () => (
+  'Values obtained from the analysis'
 );
 
 const simContent = (nmrSimPeaks) => (
@@ -139,6 +140,7 @@ const InfoPanel = ({
 
   return (
     <Accordion
+      data-testid="PanelInfo"
       expanded={expand}
       onChange={onExapnd}
       className={classNames(classes.panel)}
@@ -165,7 +167,7 @@ const InfoPanel = ({
             ? (
               <div className={classNames(classes.rowRoot, classes.rowEven)}>
                 <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Freq : </span>
-                <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{ parseInt(observeFrequency, 10) || ' - ' }</span>
+                <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{ `${parseInt(observeFrequency, 10)} Hz` || ' - ' }</span>
               </div>
             )
             : null
@@ -214,13 +216,20 @@ const InfoPanel = ({
       {
         !Format.isCyclicVoltaLayout(layoutSt)
           ? (
-            <ReactQuill
-              className={classNames(classes.quill, 'card-sv-quill')}
-              value={descriptions}
-              modules={{ toolbar: false }}
-              onChange={onDescriptionChanged}
-              readOnly={canChangeDescription !== undefined ? !canChangeDescription : true}
-            />
+            <div className={classNames(classes.rowRoot, classes.rowOddSim)}>
+              <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>
+                { valueFromAnalysisTitle() }
+                :
+              </span>
+              <br />
+              <ReactQuill
+                className={classNames(classes.quill, 'txt-sv-panel-txt')}
+                value={descriptions}
+                modules={{ toolbar: false }}
+                onChange={onDescriptionChanged}
+                readOnly={canChangeDescription !== undefined ? !canChangeDescription : true}
+              />
+            </div>
           ) : null
       }
       <div>

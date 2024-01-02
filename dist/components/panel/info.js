@@ -77,15 +77,13 @@ const styles = () => ({
     marginRight: 3
   },
   quill: {
-    backgroundColor: '#fafafa',
-    border: '1px solid #eee',
     fontSize: '0.8rem',
     fontFamily: 'Helvetica',
-    padding: '0 10px 0 10px',
     textAlign: 'left'
   }
 });
 const simTitle = () => 'Simulated signals from NMRshiftDB';
+const valueFromAnalysisTitle = () => 'Values obtained from the analysis';
 const simContent = nmrSimPeaks => nmrSimPeaks && nmrSimPeaks.sort((a, b) => a - b).join(', ');
 const aucValue = integration => {
   if (!integration) {
@@ -153,6 +151,7 @@ const InfoPanel = _ref => {
   }
 
   return /*#__PURE__*/_react.default.createElement(_material.Accordion, {
+    "data-testid": "PanelInfo",
     expanded: expand,
     onChange: onExapnd,
     className: (0, _classnames.default)(classes.panel),
@@ -180,7 +179,7 @@ const InfoPanel = _ref => {
     className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
   }, "Freq : "), /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
-  }, parseInt(observeFrequency, 10) || ' - ')) : null, _format.default.isNmrLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement("div", {
+  }, `${parseInt(observeFrequency, 10)} Hz` || ' - ')) : null, _format.default.isNmrLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement("div", {
     className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd)
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
@@ -196,15 +195,19 @@ const InfoPanel = _ref => {
     className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
   }, "Area under curve (AUC):"), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt')
-  }, aucValue(integration))) : null), !_format.default.isCyclicVoltaLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement(_reactQuill.default, {
-    className: (0, _classnames.default)(classes.quill, 'card-sv-quill'),
+  }, aucValue(integration))) : null), !_format.default.isCyclicVoltaLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement("div", {
+    className: (0, _classnames.default)(classes.rowRoot, classes.rowOddSim)
+  }, /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
+  }, valueFromAnalysisTitle(), ":"), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement(_reactQuill.default, {
+    className: (0, _classnames.default)(classes.quill, 'txt-sv-panel-txt'),
     value: descriptions,
     modules: {
       toolbar: false
     },
     onChange: onDescriptionChanged,
     readOnly: canChangeDescription !== undefined ? !canChangeDescription : true
-  }) : null, /*#__PURE__*/_react.default.createElement("div", null, !editorOnly && _format.default.isNmrLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement("div", {
+  })) : null, /*#__PURE__*/_react.default.createElement("div", null, !editorOnly && _format.default.isNmrLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement("div", {
     className: (0, _classnames.default)(classes.rowRoot, classes.rowOddSim)
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
