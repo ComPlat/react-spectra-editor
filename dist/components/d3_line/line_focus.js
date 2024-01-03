@@ -130,7 +130,6 @@ class LineFocus {
       sameRef // eslint-disable-line
     });
   }
-
   resetShouldUpdate(prevEpSt, prevItSt, prevMySt) {
     const {
       xt,
@@ -157,7 +156,6 @@ class LineFocus {
       prevData // eslint-disable-line
     });
   }
-
   setTip() {
     this.tip = (0, _init.InitTip)();
     this.root.call(this.tip);

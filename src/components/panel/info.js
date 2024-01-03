@@ -58,7 +58,7 @@ const styles = () => ({
     backgroundColor: '#fff',
     height: 108,
     lineHeight: '24px',
-    overflowY: 'scroll',
+    overflowY: 'hidden',
     overflowWrap: 'word-break',
   },
   tHead: {
@@ -81,10 +81,6 @@ const styles = () => ({
 
 const simTitle = () => (
   'Simulated signals from NMRshiftDB'
-);
-
-const valueFromAnalysisTitle = () => (
-  'Values obtained from the analysis'
 );
 
 const simContent = (nmrSimPeaks) => (
@@ -119,7 +115,7 @@ const aucValue = (integration) => {
 
 const InfoPanel = ({
   classes, expand, feature, integration, editorOnly, molSvg, descriptions,
-  layoutSt, simulationSt, shiftSt, curveSt,
+  layoutSt, simulationSt, shiftSt, curveSt, theoryMass,
   onExapnd, canChangeDescription, onDescriptionChanged,
 }) => {
   if (!feature) return null;
@@ -183,6 +179,16 @@ const InfoPanel = ({
             : null
         }
         {
+          Format.isMsLayout(layoutSt) && theoryMass
+            ? (
+              <div className={classNames(classes.rowRoot, classes.rowOdd)}>
+                <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Theoretical mass: </span>
+                <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{`${parseFloat(theoryMass).toFixed(6)} g/mol`}</span>
+              </div>
+            )
+            : null
+        }
+        {
           !molSvg
             ? null
             : (
@@ -216,20 +222,13 @@ const InfoPanel = ({
       {
         !Format.isCyclicVoltaLayout(layoutSt)
           ? (
-            <div className={classNames(classes.rowRoot, classes.rowOddSim)}>
-              <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>
-                { valueFromAnalysisTitle() }
-                :
-              </span>
-              <br />
-              <ReactQuill
-                className={classNames(classes.quill, 'txt-sv-panel-txt')}
-                value={descriptions}
-                modules={{ toolbar: false }}
-                onChange={onDescriptionChanged}
-                readOnly={canChangeDescription !== undefined ? !canChangeDescription : true}
-              />
-            </div>
+            <ReactQuill
+              className={classNames(classes.quill, 'card-sv-quill')}
+              value={descriptions}
+              modules={{ toolbar: false }}
+              onChange={onDescriptionChanged}
+              readOnly={canChangeDescription !== undefined ? !canChangeDescription : true}
+            />
           ) : null
       }
       <div>
@@ -283,6 +282,7 @@ InfoPanel.propTypes = {
   onExapnd: PropTypes.func.isRequired,
   canChangeDescription: PropTypes.bool.isRequired,
   onDescriptionChanged: PropTypes.func,
+  theoryMass: PropTypes.string,
 };
 
 export default connect( // eslint-disable-line

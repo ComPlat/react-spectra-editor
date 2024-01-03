@@ -188,7 +188,6 @@ const rmPeakFromStack = function (action, metaSt, mpySt) {
       multiplicities
     }); // eslint-disable-line
   }
-
   const noSmExtext = newStack.map(k => k.xExtent.xL === xExtent.xL && k.xExtent.xU === xExtent.xU ? 1 : 0).reduce((a, s) => a + s) === 0;
   const newSmExtext = noSmExtext ? newStack[0].xExtent : xExtent;
   const newSelectedMulti = Object.assign({}, selectedMulti, {
@@ -201,7 +200,6 @@ const rmPeakFromStack = function (action, metaSt, mpySt) {
     multiplicities: newMultiplicities
   }); // eslint-disable-line
 };
-
 function* rmPanelPeakFromStack(action) {
   const metaSt = yield (0, _effects.select)(getMetaSt);
   const mpySt = yield (0, _effects.select)(getMultiplicitySt);
@@ -296,7 +294,6 @@ function* resetInitNmr(action) {
   //   payload,
   // });
 }
-
 function* resetOne(action) {
   const xExtent = action.payload;
   const metaSt = yield (0, _effects.select)(getMetaSt);

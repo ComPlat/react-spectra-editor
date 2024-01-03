@@ -59,7 +59,6 @@ const onClickFail = (layoutSt, simuCount, realCount) => {
   const feature = _format.default.is13CLayout(layoutSt) ? 'peak' : 'multiplet';
   return () => alert(`Selected ${feature} count (${realCount}) must be larger than 0, and must be eqal or less than simulated count (${simuCount}).`); // eslint-disable-line
 };
-
 const onClickReady = (forecast, peaksEdit, layoutSt, scan, shiftSt, thres, analysis, integrationSt, multiplicitySt, setUiViewerTypeAct, curveSt) => {
   const {
     btnCb
@@ -67,7 +66,6 @@ const onClickReady = (forecast, peaksEdit, layoutSt, scan, shiftSt, thres, analy
   if (!btnCb) {
     return () => alert('[Developer Warning] You need to implement btnCb in forecast!'); // eslint-disable-line
   }
-
   return () => {
     setUiViewerTypeAct(_list_ui.LIST_UI_VIEWER_TYPE.ANALYSIS);
     return btnCb({
@@ -90,7 +88,6 @@ const onClicUnknown = (feature, forecast, peaksEdit, layoutSt, scan, shiftSt, th
   if (!refreshCb) {
     return () => alert('[Developer Warning] You need to implement refreshCb in forecast!'); // eslint-disable-line
   }
-
   return () => refreshCb({
     peaks: peaksEdit,
     layout: layoutSt,

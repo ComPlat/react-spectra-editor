@@ -52,7 +52,8 @@ const seperatingSubLayout = (entities, featureCondition, layoutSt) => {
 class MultiJcampsViewer extends React.Component { // eslint-disable-line
   render() {
     const {
-      classes, curveSt, operations, entityFileNames, entities, userManualLink, molSvg, layoutSt,
+      classes, curveSt, operations, entityFileNames,
+      entities, userManualLink, molSvg, theoryMass, layoutSt,
     } = this.props;
     if (!entities || entities.length === 0) return (<div />);
 
@@ -87,6 +88,7 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
                 userManualLink={userManualLink}
                 feature={feature}
                 molSvg={molSvg}
+                theoryMass={theoryMass}
                 subLayoutsInfo={seperatedSubLayouts}
                 descriptions=""
                 canChangeDescription={() => {}}
@@ -134,6 +136,7 @@ MultiJcampsViewer.propTypes = {
   userManualLink: PropTypes.object,
   entities: PropTypes.array,
   layoutSt: PropTypes.string.isRequired,
+  theoryMass: PropTypes.string,
 };
 
 MultiJcampsViewer.defaultProps = {

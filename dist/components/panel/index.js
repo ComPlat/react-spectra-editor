@@ -21,11 +21,16 @@ var _graph_selection = _interopRequireDefault(require("./graph_selection"));
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 /* eslint-disable react/prop-types, react/require-default-props */
 
-const theme = (0, _styles.createTheme)((0, _styles.adaptV4Theme)({
+const theme = (0, _styles.createTheme)({
   typography: {
     useNextVariants: true
+  },
+  palette: {
+    background: {
+      default: '#D3D3D3'
+    }
   }
-}));
+});
 const styles = () => ({
   panels: {
     maxHeight: 'calc(90vh - 220px)',
@@ -53,7 +58,6 @@ class PanelViewer extends _react.default.Component {
       this.props.onDescriptionChanged(contentChanged); // eslint-disable-line
     }
   }
-
   onExapnd(input) {
     const {
       expand
@@ -80,7 +84,8 @@ class PanelViewer extends _react.default.Component {
       entityFileNames,
       curveSt,
       userManualLink,
-      subLayoutsInfo
+      subLayoutsInfo,
+      theoryMass
     } = this.props;
     const onExapndInfo = () => this.onExapnd('info');
     const onExapndPeak = () => this.onExapnd('peak');
@@ -110,6 +115,7 @@ class PanelViewer extends _react.default.Component {
       editorOnly: editorOnly,
       expand: expand === 'info',
       molSvg: molSvg,
+      theoryMass: theoryMass,
       onExapnd: onExapndInfo,
       descriptions: descriptions,
       canChangeDescription: canChangeDescription,
@@ -152,7 +158,8 @@ PanelViewer.propTypes = {
   entityFileNames: _propTypes.default.array,
   userManualLink: _propTypes.default.object,
   curveSt: _propTypes.default.object.isRequired,
-  subLayoutsInfo: _propTypes.default.object
+  subLayoutsInfo: _propTypes.default.object,
+  theoryMass: _propTypes.default.string
 };
 var _default = exports.default = (0, _reactRedux.connect)(
 // eslint-disable-line
