@@ -62,7 +62,7 @@ const styles = () => ({
     backgroundColor: '#fff',
     height: 108,
     lineHeight: '24px',
-    overflowY: 'scroll',
+    overflowY: 'hidden',
     overflowWrap: 'word-break'
   },
   tHead: {
@@ -83,7 +83,6 @@ const styles = () => ({
   }
 });
 const simTitle = () => 'Simulated signals from NMRshiftDB';
-const valueFromAnalysisTitle = () => 'Values obtained from the analysis';
 const simContent = nmrSimPeaks => nmrSimPeaks && nmrSimPeaks.sort((a, b) => a - b).join(', ');
 const aucValue = integration => {
   if (!integration) {
@@ -123,6 +122,7 @@ const InfoPanel = _ref => {
     simulationSt,
     shiftSt,
     curveSt,
+    theoryMass,
     onExapnd,
     canChangeDescription,
     onDescriptionChanged
@@ -149,7 +149,6 @@ const InfoPanel = _ref => {
   if (integration) {
     originStack = integration.originStack; // eslint-disable-line
   }
-
   return /*#__PURE__*/_react.default.createElement(_material.Accordion, {
     "data-testid": "PanelInfo",
     expanded: expand,
@@ -185,7 +184,13 @@ const InfoPanel = _ref => {
     className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
   }, "Solv : "), /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
-  }, showSolvName)) : null, !molSvg ? null : /*#__PURE__*/_react.default.createElement(_reactSvgFileZoomPan.default, {
+  }, showSolvName)) : null, _format.default.isMsLayout(layoutSt) && theoryMass ? /*#__PURE__*/_react.default.createElement("div", {
+    className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd)
+  }, /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
+  }, "Theoretical mass: "), /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
+  }, `${parseFloat(theoryMass).toFixed(6)} g/mol`)) : null, !molSvg ? null : /*#__PURE__*/_react.default.createElement(_reactSvgFileZoomPan.default, {
     svg: molSvg,
     duration: 300,
     resize: true
@@ -195,19 +200,15 @@ const InfoPanel = _ref => {
     className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
   }, "Area under curve (AUC):"), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt')
-  }, aucValue(integration))) : null), !_format.default.isCyclicVoltaLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement("div", {
-    className: (0, _classnames.default)(classes.rowRoot, classes.rowOddSim)
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
-  }, valueFromAnalysisTitle(), ":"), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement(_reactQuill.default, {
-    className: (0, _classnames.default)(classes.quill, 'txt-sv-panel-txt'),
+  }, aucValue(integration))) : null), !_format.default.isCyclicVoltaLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement(_reactQuill.default, {
+    className: (0, _classnames.default)(classes.quill, 'card-sv-quill'),
     value: descriptions,
     modules: {
       toolbar: false
     },
     onChange: onDescriptionChanged,
     readOnly: canChangeDescription !== undefined ? !canChangeDescription : true
-  })) : null, /*#__PURE__*/_react.default.createElement("div", null, !editorOnly && _format.default.isNmrLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement("div", {
+  }) : null, /*#__PURE__*/_react.default.createElement("div", null, !editorOnly && _format.default.isNmrLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement("div", {
     className: (0, _classnames.default)(classes.rowRoot, classes.rowOddSim)
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
@@ -238,7 +239,8 @@ InfoPanel.propTypes = {
   curveSt: _propTypes.default.object.isRequired,
   onExapnd: _propTypes.default.func.isRequired,
   canChangeDescription: _propTypes.default.bool.isRequired,
-  onDescriptionChanged: _propTypes.default.func
+  onDescriptionChanged: _propTypes.default.func,
+  theoryMass: _propTypes.default.string
 };
 var _default = exports.default = (0, _reactRedux.connect)(
 // eslint-disable-line

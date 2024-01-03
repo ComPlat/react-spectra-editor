@@ -128,6 +128,7 @@ class LayerInit extends _react.default.Component {
       descriptions,
       molSvg,
       editorOnly,
+      theoryMass,
       canChangeDescription,
       onDescriptionChanged,
       multiEntities,
@@ -146,6 +147,7 @@ class LayerInit extends _react.default.Component {
         entityFileNames: entityFileNames,
         userManualLink: userManualLink,
         molSvg: molSvg,
+        theoryMass: theoryMass,
         operations: operations
       });
     } else if (_format.default.isCyclicVoltaLayout(layout)) {
@@ -155,6 +157,7 @@ class LayerInit extends _react.default.Component {
         entityFileNames: entityFileNames,
         userManualLink: userManualLink,
         molSvg: molSvg,
+        theoryMass: theoryMass,
         operations: operations
       });
     }
@@ -168,6 +171,7 @@ class LayerInit extends _react.default.Component {
       descriptions: descriptions,
       molSvg: molSvg,
       editorOnly: editorOnly,
+      theoryMass: theoryMass,
       canChangeDescription: canChangeDescription,
       onDescriptionChanged: onDescriptionChanged
     });
@@ -198,6 +202,7 @@ LayerInit.propTypes = {
   yLabel: _propTypes.default.string.isRequired,
   molSvg: _propTypes.default.string.isRequired,
   editorOnly: _propTypes.default.bool.isRequired,
+  theoryMass: _propTypes.default.string.isRequired,
   forecast: _propTypes.default.object.isRequired,
   operations: _propTypes.default.array.isRequired,
   descriptions: _propTypes.default.array.isRequired,

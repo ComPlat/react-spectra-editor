@@ -129,7 +129,6 @@ class MultiFocus {
       sameData // eslint-disable-line
     });
   }
-
   resetShouldUpdate(prevEpSt) {
     const {
       xt,
@@ -154,7 +153,6 @@ class MultiFocus {
       prevData // eslint-disable-line
     });
   }
-
   setTip() {
     this.tip = (0, _init.InitTip)();
     this.root.call(this.tip);

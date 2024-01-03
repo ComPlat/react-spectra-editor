@@ -62,6 +62,7 @@ class MultiJcampsViewer extends _react.default.Component {
       entities,
       userManualLink,
       molSvg,
+      theoryMass,
       layoutSt
     } = this.props;
     if (!entities || entities.length === 0) return /*#__PURE__*/_react.default.createElement("div", null);
@@ -104,6 +105,7 @@ class MultiJcampsViewer extends _react.default.Component {
       userManualLink: userManualLink,
       feature: feature,
       molSvg: molSvg,
+      theoryMass: theoryMass,
       subLayoutsInfo: seperatedSubLayouts,
       descriptions: "",
       canChangeDescription: () => {},
@@ -140,7 +142,8 @@ MultiJcampsViewer.propTypes = {
   operations: _propTypes.default.func.isRequired,
   userManualLink: _propTypes.default.object,
   entities: _propTypes.default.array,
-  layoutSt: _propTypes.default.string.isRequired
+  layoutSt: _propTypes.default.string.isRequired,
+  theoryMass: _propTypes.default.string
 };
 MultiJcampsViewer.defaultProps = {
   multiEntities: [],

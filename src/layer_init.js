@@ -103,7 +103,7 @@ class LayerInit extends React.Component {
   render() {
     const {
       entity, cLabel, xLabel, yLabel, forecast, operations,
-      descriptions, molSvg, editorOnly,
+      descriptions, molSvg, editorOnly, theoryMass,
       canChangeDescription, onDescriptionChanged,
       multiEntities, entityFileNames, userManualLink,
     } = this.props;
@@ -121,6 +121,7 @@ class LayerInit extends React.Component {
           entityFileNames={entityFileNames}
           userManualLink={userManualLink}
           molSvg={molSvg}
+          theoryMass={theoryMass}
           operations={operations}
         />
       );
@@ -131,6 +132,7 @@ class LayerInit extends React.Component {
           entityFileNames={entityFileNames}
           userManualLink={userManualLink}
           molSvg={molSvg}
+          theoryMass={theoryMass}
           operations={operations}
         />
       );
@@ -147,6 +149,7 @@ class LayerInit extends React.Component {
         descriptions={descriptions}
         molSvg={molSvg}
         editorOnly={editorOnly}
+        theoryMass={theoryMass}
         canChangeDescription={canChangeDescription}
         onDescriptionChanged={onDescriptionChanged}
       />
@@ -181,6 +184,7 @@ LayerInit.propTypes = {
   yLabel: PropTypes.string.isRequired,
   molSvg: PropTypes.string.isRequired,
   editorOnly: PropTypes.bool.isRequired,
+  theoryMass: PropTypes.string.isRequired,
   forecast: PropTypes.object.isRequired,
   operations: PropTypes.array.isRequired,
   descriptions: PropTypes.array.isRequired,

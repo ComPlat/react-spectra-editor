@@ -32,6 +32,7 @@ const LayerPrism = _ref => {
     descriptions,
     molSvg,
     editorOnly,
+    theoryMass,
     thresSt,
     scanSt,
     uiSt,
@@ -102,6 +103,7 @@ const LayerPrism = _ref => {
     integration: integration,
     editorOnly: editorOnly,
     molSvg: molSvg,
+    theoryMass: theoryMass,
     descriptions: descriptions,
     canChangeDescription: canChangeDescription,
     onDescriptionChanged: onDescriptionChanged
@@ -122,6 +124,7 @@ LayerPrism.propTypes = {
   yLabel: _propTypes.default.string.isRequired,
   molSvg: _propTypes.default.string.isRequired,
   editorOnly: _propTypes.default.bool.isRequired,
+  theoryMass: _propTypes.default.string,
   forecast: _propTypes.default.object.isRequired,
   operations: _propTypes.default.array.isRequired,
   descriptions: _propTypes.default.array.isRequired,

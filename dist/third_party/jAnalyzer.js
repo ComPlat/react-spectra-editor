@@ -200,7 +200,6 @@ function abstractPattern(signal, Jc) {
     //   pattern = 'br s';
     // }
   }
-
   return pattern;
 }
 

@@ -19,13 +19,11 @@ const statusReducer = function () {
         btnSubmit: false
       } // !state.btnSubmit
       );
-
     case _action_type.STATUS.TOGGLEBTNALL:
       return Object.assign({}, state, {
         btnSubmit: false
       } // !state.btnSubmit
       );
-
     case _action_type.STATUS.ENABLEBTNALL:
     case _action_type.EDITPEAK.ADDPOSITIVE:
     case _action_type.EDITPEAK.RMPOSITIVE:

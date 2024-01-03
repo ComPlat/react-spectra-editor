@@ -821,7 +821,6 @@ const ExtractJcamp = source => {
     xy: true,
     keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS|\$CSUPPERTHRESHOLD|\$CSLOWERTHRESHOLD|\$CSCYCLICVOLTAMMETRYDATA|UNITS|SYMBOL|CSAUTOMETADATA)/ // eslint-disable-line
   });
-
   const layout = readLayout(jcamp);
   const peakUp = !_format.default.isIrLayout(layout);
   const spectra = _format.default.isMsLayout(layout) ? extrSpectraMs(jcamp, layout) : extrSpectraNi(jcamp, layout);

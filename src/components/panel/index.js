@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
 import {
-  createTheme, ThemeProvider, StyledEngineProvider, adaptV4Theme,
+  createTheme, ThemeProvider, StyledEngineProvider,
 } from '@mui/material/styles';
 
 import withStyles from '@mui/styles/withStyles';
@@ -19,11 +19,16 @@ import CyclicVoltammetryPanel from './cyclic_voltamery_data';
 import GraphSelectionPanel from './graph_selection';
 import Cfg from '../../helpers/cfg';
 
-const theme = createTheme(adaptV4Theme({
+const theme = createTheme({
   typography: {
     useNextVariants: true,
   },
-}));
+  palette: {
+    background: {
+      default: '#D3D3D3',
+    },
+  },
+});
 
 const styles = () => ({
   panels: {
@@ -67,7 +72,7 @@ class PanelViewer extends React.Component {
     const {
       classes, feature, integration, editorOnly, molSvg, descriptions, layoutSt,
       canChangeDescription, jcampIdx, entityFileNames, curveSt, userManualLink,
-      subLayoutsInfo,
+      subLayoutsInfo, theoryMass,
     } = this.props;
     const onExapndInfo = () => this.onExapnd('info');
     const onExapndPeak = () => this.onExapnd('peak');
@@ -92,6 +97,7 @@ class PanelViewer extends React.Component {
               editorOnly={editorOnly}
               expand={expand === 'info'}
               molSvg={molSvg}
+              theoryMass={theoryMass}
               onExapnd={onExapndInfo}
               descriptions={descriptions}
               canChangeDescription={canChangeDescription}
@@ -134,6 +140,7 @@ PanelViewer.propTypes = {
   userManualLink: PropTypes.object,
   curveSt: PropTypes.object.isRequired,
   subLayoutsInfo: PropTypes.object,
+  theoryMass: PropTypes.string,
 };
 
 export default connect( // eslint-disable-line

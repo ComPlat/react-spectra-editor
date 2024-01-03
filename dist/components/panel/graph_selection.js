@@ -109,7 +109,6 @@ const GraphSelectionPanel = _ref => {
       console.log(e); //eslint-disable-line
     }
   }
-
   const items = listCurves.map((spectra, idx) => {
     const {
       color
@@ -196,7 +195,6 @@ const GraphSelectionPanel = _ref => {
   }), item.filename !== '' ? /*#__PURE__*/_react.default.createElement("span", null, "File: ", item.filename) : null // eslint-disable-line
   ))))));
 };
-
 const mapStateToProps = (state, props) => (
 // eslint-disable-line
 {
