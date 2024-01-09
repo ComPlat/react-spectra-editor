@@ -18,6 +18,8 @@ import MultiplicityPanel from './multiplicity';
 import CyclicVoltammetryPanel from './cyclic_voltamery_data';
 import GraphSelectionPanel from './graph_selection';
 import Cfg from '../../helpers/cfg';
+import OffsetPanel from './tga_data';
+import DecompostionTemperaturePanel from './tga_decomposition_temperatures';
 
 const theme = createTheme({
   typography: {
@@ -80,6 +82,8 @@ class PanelViewer extends React.Component {
     const onExapndCompare = () => this.onExapnd('compare');
     const onExapndCyclicVolta = () => this.onExapnd('cyclicvolta');
     const onExapndGraphSelection = () => this.onExapnd('graph');
+    const onExapndTga = () => this.onExapnd('tga');
+    const onExapndTgaTemperature = () => this.onExapnd('tga_temp');
 
     const { listCurves } = curveSt;
     const hideGraphSelection = listCurves === false || listCurves === undefined;
@@ -107,6 +111,8 @@ class PanelViewer extends React.Component {
             { Cfg.hidePanelMpy(layoutSt) ? null : <MultiplicityPanel expand={expand === 'mpy'} onExapnd={onExapndMpy} /> }
             { (Cfg.hidePanelCompare(layoutSt) || listCurves.length > 1) ? null : <ComparePanel expand={expand === 'compare'} onExapnd={onExapndCompare} /> }
             { Cfg.hidePanelCyclicVolta(layoutSt) ? null : <CyclicVoltammetryPanel jcampIdx={jcampIdx} feature={feature} expand={expand === 'cyclicvolta'} onExapnd={onExapndCyclicVolta} userManualLink={userManualLink ? userManualLink.cv : undefined} />}
+            { Cfg.hidePanelTGA(layoutSt) ? null : <OffsetPanel expand={expand === 'tga'} onExapnd={onExapndTga} /> }
+            { Cfg.hidePanelTGA(layoutSt) ? null : <DecompostionTemperaturePanel expand={expand === 'tga_temp'} onExapnd={onExapndTgaTemperature} /> }
           </ThemeProvider>
         </StyledEngineProvider>
       </div>

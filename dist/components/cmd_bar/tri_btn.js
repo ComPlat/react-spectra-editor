@@ -64,7 +64,7 @@ class TriBtn extends _react.default.Component {
       title: title
     }, /*#__PURE__*/_react.default.createElement("span", null, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
       className: (0, _classnames.default)('btn-sv-bar-one'),
-      disabled: _cfg.default.btnCmdMpy(layoutSt) && _cfg.default.btnCmdIntg(layoutSt),
+      disabled: _cfg.default.btnCmdMpy(layoutSt) && _cfg.default.btnCmdIntg(layoutSt) && _cfg.default.btnCmdOffset(layoutSt),
       onClick: this.onToggle
     }, children)));
   }
@@ -79,7 +79,7 @@ class TriBtn extends _react.default.Component {
       this.onToggle(e);
     };
     return /*#__PURE__*/_react.default.createElement("span", {
-      disabled: _cfg.default.btnCmdMpy(layoutSt) && _cfg.default.btnCmdIntg(layoutSt)
+      disabled: _cfg.default.btnCmdMpy(layoutSt) && _cfg.default.btnCmdIntg(layoutSt) && _cfg.default.btnCmdOffset(layoutSt)
     }, /*#__PURE__*/_react.default.createElement("span", {
       className: (0, _classnames.default)(classes.txtLabel, 'txt-sv-bar-desc')
     }, "Delete ALL?"), /*#__PURE__*/_react.default.createElement(_common.MuButton, {

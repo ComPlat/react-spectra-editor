@@ -28,7 +28,7 @@ const onClickCb = (
   operation, peaksEdit, isAscend, isIntensity,
   scan, thres, layoutSt, shiftSt, analysis, decimalSt,
   integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt,
-  cyclicvoltaSt, curveSt, axesUnitsSt,
+  cyclicvoltaSt, curveSt, axesUnitsSt, offsetSt,
 ) => (
   () => {
     operation({
@@ -49,6 +49,7 @@ const onClickCb = (
       cyclicvoltaSt,
       curveSt,
       axesUnitsSt,
+      offsetSt,
     });
   }
 );
@@ -57,7 +58,7 @@ const BtnSubmit = ({
   classes, operation, feature, isAscend, isIntensity,
   editPeakSt, thresSt, layoutSt, shiftSt, scanSt, forecastSt,
   decimalSt, integrationSt, multiplicitySt, allIntegrationSt,
-  waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt,
+  waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, offsetSt,
 }) => {
   const peaksEdit = extractPeaksEdit(feature, editPeakSt, thresSt, shiftSt, layoutSt);
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
@@ -80,7 +81,7 @@ const BtnSubmit = ({
           operation.value, peaksEdit, isAscend, isIntensity,
           scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt,
           integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt,
-          cyclicvoltaSt, curveSt, axesUnitsSt,
+          cyclicvoltaSt, curveSt, axesUnitsSt, offsetSt,
         )}
       >
         <PlayCircleOutlineIcon className={classes.icon} />
@@ -105,6 +106,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     cyclicvoltaSt: state.cyclicvolta,
     curveSt: state.curve,
     axesUnitsSt: state.axesUnits,
+    offsetSt: state.offset.present,
   }
 );
 
@@ -138,6 +140,7 @@ BtnSubmit.propTypes = {
   cyclicvoltaSt: PropTypes.object.isRequired,
   curveSt: PropTypes.object,
   axesUnitsSt: PropTypes.object.isRequired,
+  offsetSt: PropTypes.object.isRequired,
 };
 
 export default compose(

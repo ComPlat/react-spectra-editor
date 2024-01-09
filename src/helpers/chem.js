@@ -807,7 +807,7 @@ const ExtractJcamp = (source) => {
       spectra, features, layout, temperature,
     };
   } else if (Format.isCyclicVoltaLayout(layout) || Format.isSECLayout(layout)
-  || Format.isAIFLayout(layout) || Format.isCDSLayout(layout)) {
+  || Format.isAIFLayout(layout) || Format.isCDSLayout(layout) || Format.isTGALayout(layout)) {
     features = extrFeaturesCylicVolta(jcamp, layout, peakUp);
   } else {
     features = extrFeaturesNi(jcamp, layout, peakUp, spectra);

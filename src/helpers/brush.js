@@ -11,7 +11,7 @@ const wheeled = (focus) => {
   scrollUiWheelAct(Object.assign({}, currentExtent, { direction }));
 };
 
-const brushed = (focus, isUiAddIntgSt) => {
+const brushed = (focus, isUiAddIntgSt, isUiAddOffsetSt) => {
   const {
     selectUiSweepAct, data, dataPks, brush, w, h, scales,
   } = focus;
@@ -21,40 +21,64 @@ const brushed = (focus, isUiAddIntgSt) => {
   let yes = [h, 0].map(scales.y.invert).sort((a, b) => a - b);
   let xExtent = { xL: xes[0], xU: xes[1] };
   let yExtent = { yL: yes[0], yU: yes[1] };
-  if (isUiAddIntgSt) {
+  let newOtherGraphExtents = null;
+  if (isUiAddIntgSt || isUiAddOffsetSt) {
     xes = selection.map(scales.x.invert).sort((a, b) => a - b);
     xExtent = { xL: xes[0], xU: xes[1] };
   } else {
     const [begPt, endPt] = selection;
-    xes = [begPt[0], endPt[0]].map(scales.x.invert).sort((a, b) => a - b);
-    yes = [begPt[1], endPt[1]].map(scales.y.invert).sort((a, b) => a - b);
-    xExtent = { xL: xes[0], xU: xes[1] };
-    yExtent = { yL: yes[0], yU: yes[1] };
+    if (focus.secondaryAxisDrawn) {
+      if (!focus.otherLineData[0].yUnits.toUpperCase().includes('DERIV')) {
+        yes = [begPt[1], endPt[1]].map(focus.secondaryYScale.invert).sort((a, b) => a - b);
+        // get yExtent for alternate graph
+        const yp = [begPt[1], endPt[1]].map(scales.y.invert).sort((a, b) => a - b);
+        const diff = focus.primaryExtent.yExtent.yU - focus.primaryExtent.yExtent.yL;
+        newOtherGraphExtents = {
+          yL: focus.primaryExtent.yExtent.yL + diff * yp[0],
+          yU: focus.primaryExtent.yExtent.yL + diff * yp[1],
+        };
+      } else {
+        yes = [begPt[1], endPt[1]].map(scales.y.invert).sort((a, b) => a - b);
+        const ys = [begPt[1], endPt[1]].map(focus.secondaryYScale.invert).sort((a, b) => a - b);
+        newOtherGraphExtents = {
+          yL: ys[0],
+          yU: ys[1],
+        };
+      }
+      xes = [begPt[0], endPt[0]].map(scales.x.invert).sort((a, b) => a - b);
+      xExtent = { xL: xes[0], xU: xes[1] };
+      yExtent = { yL: yes[0], yU: yes[1] };
+    } else {
+      yes = [begPt[1], endPt[1]].map(scales.y.invert).sort((a, b) => a - b);
+      xes = [begPt[0], endPt[0]].map(scales.x.invert).sort((a, b) => a - b);
+      xExtent = { xL: xes[0], xU: xes[1] };
+      yExtent = { yL: yes[0], yU: yes[1] };
+    }
   }
   selectUiSweepAct({
-    xExtent, yExtent, data, dataPks,
+    xExtent, yExtent, data, dataPks, newOtherGraphExtents,
   });
   d3.select('.d3Svg').selectAll('.brush').call(brush.move, null);
 };
 
-const MountBrush = (focus, isUiAddIntgSt, isUiNoBrushSt) => {
+const MountBrush = (focus, isUiAddIntgSt, isUiNoBrushSt, isUiAddOffsetSt) => {
   const {
     root, svg, brush, brushX, w, h,
   } = focus;
   svg.selectAll('.brush').remove();
   svg.selectAll('.brushX').remove();
 
-  const brushedCb = () => brushed(focus, isUiAddIntgSt);
+  const brushedCb = () => brushed(focus, isUiAddIntgSt, isUiAddOffsetSt);
   const wheeledCb = () => wheeled(focus);
 
   if (isUiNoBrushSt) {
-    const target = isUiAddIntgSt ? brushX : brush;
+    const target = isUiAddIntgSt || isUiAddOffsetSt ? brushX : brush;
     target.handleSize(10)
       .extent([[0, 0], [w, h]])
       .on('end', brushedCb);
 
     // append brush components
-    const klass = isUiAddIntgSt ? 'brushX' : 'brush';
+    const klass = isUiAddIntgSt || isUiAddOffsetSt ? 'brushX' : 'brush';
     root.append('g')
       .attr('class', klass)
       .on('mousemove', () => MouseMove(focus))

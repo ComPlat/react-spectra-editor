@@ -44,6 +44,8 @@ const hidePanelCompare = layoutSt => !(_format.default.isIrLayout(layoutSt) || _
 const hideSolvent = layoutSt => !_format.default.isNmrLayout(layoutSt);
 const showTwoThreshold = layoutSt => _format.default.isCyclicVoltaLayout(layoutSt);
 const hidePanelCyclicVolta = layoutSt => !_format.default.isCyclicVoltaLayout(layoutSt);
+const btnCmdOffset = layoutSt => !_format.default.isTGALayout(layoutSt);
+const hidePanelTGA = layoutSt => !_format.default.isTGALayout(layoutSt);
 const Config = {
   btnCmdAnaViewer,
   hideCmdAnaViewer,
@@ -60,6 +62,8 @@ const Config = {
   hidePanelCompare,
   hideSolvent,
   showTwoThreshold,
-  hidePanelCyclicVolta
+  hidePanelCyclicVolta,
+  btnCmdOffset,
+  hidePanelTGA
 };
 var _default = exports.default = Config;

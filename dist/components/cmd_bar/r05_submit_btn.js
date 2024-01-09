@@ -21,7 +21,7 @@ react/function-component-definition, function-call-argument-newline,
 react/require-default-props */
 
 const styles = () => Object.assign({}, _common.commonStyle);
-const onClickCb = (operation, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, analysis, decimalSt, integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt) => () => {
+const onClickCb = (operation, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, analysis, decimalSt, integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, offsetSt) => () => {
   operation({
     peaks: peaksEdit,
     layout: layoutSt,
@@ -39,7 +39,8 @@ const onClickCb = (operation, peaksEdit, isAscend, isIntensity, scan, thres, lay
     waveLength: waveLengthSt,
     cyclicvoltaSt,
     curveSt,
-    axesUnitsSt
+    axesUnitsSt,
+    offsetSt
   });
 };
 const BtnSubmit = _ref => {
@@ -62,7 +63,8 @@ const BtnSubmit = _ref => {
     waveLengthSt,
     cyclicvoltaSt,
     curveSt,
-    axesUnitsSt
+    axesUnitsSt,
+    offsetSt
   } = _ref;
   const peaksEdit = (0, _extractPeaksEdit.extractPeaksEdit)(feature, editPeakSt, thresSt, shiftSt, layoutSt);
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
@@ -77,7 +79,7 @@ const BtnSubmit = _ref => {
   }, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
     className: (0, _classnames.default)('btn-sv-bar-submit'),
     color: "primary",
-    onClick: onClickCb(operation.value, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt, integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt)
+    onClick: onClickCb(operation.value, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt, integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, offsetSt)
   }, /*#__PURE__*/_react.default.createElement(_PlayCircleOutline.default, {
     className: classes.icon
   })));
@@ -98,7 +100,8 @@ const mapStateToProps = (state, props) => (
   waveLengthSt: state.wavelength,
   cyclicvoltaSt: state.cyclicvolta,
   curveSt: state.curve,
-  axesUnitsSt: state.axesUnits
+  axesUnitsSt: state.axesUnits,
+  offsetSt: state.offset.present
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({}, dispatch);
 BtnSubmit.propTypes = {
@@ -120,6 +123,7 @@ BtnSubmit.propTypes = {
   waveLengthSt: _propTypes.default.object.isRequired,
   cyclicvoltaSt: _propTypes.default.object.isRequired,
   curveSt: _propTypes.default.object,
-  axesUnitsSt: _propTypes.default.object.isRequired
+  axesUnitsSt: _propTypes.default.object.isRequired,
+  offsetSt: _propTypes.default.object.isRequired
 };
 var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(BtnSubmit);

@@ -20,6 +20,7 @@ import Submit from './r04_submit';
 import Wavelength from './r07_wavelength_btn';
 import Pecker from './07_pecker';
 import ChangeAxes from './r08_change_axes';
+import Offset from './08_offsets';
 
 const styles = () => (
   Object.assign(
@@ -41,6 +42,7 @@ const CmdBar = ({
     <Pecker jcampIdx={jcampIdx} />
     <Integration />
     <Multiplicity />
+    <Offset />
     <UndoRedo />
     <Submit
       operations={operations}

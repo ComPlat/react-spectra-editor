@@ -52,7 +52,8 @@ class ViewerRect extends _react.default.Component {
       sweepExtentSt,
       isUiAddIntgSt,
       isUiNoBrushSt,
-      resetAllAct
+      resetAllAct,
+      isUiAddOffsetSt
     } = this.props;
     (0, _draw.drawDestroy)(this.rootKlass);
     resetAllAct(feature);
@@ -66,7 +67,8 @@ class ViewerRect extends _react.default.Component {
       tSfPeaks,
       sweepExtentSt,
       isUiAddIntgSt,
-      isUiNoBrushSt
+      isUiNoBrushSt,
+      isUiAddOffsetSt
     });
     (0, _draw.drawLabel)(this.rootKlass, cLabel, xLabel, yLabel);
     (0, _draw.drawDisplay)(this.rootKlass, isHidden);
@@ -80,7 +82,8 @@ class ViewerRect extends _react.default.Component {
       isHidden,
       sweepExtentSt,
       isUiAddIntgSt,
-      isUiNoBrushSt
+      isUiNoBrushSt,
+      isUiAddOffsetSt
     } = this.props;
     this.normChange(prevProps);
     const filterSeed = seed;
@@ -92,7 +95,8 @@ class ViewerRect extends _react.default.Component {
       tSfPeaks,
       sweepExtentSt,
       isUiAddIntgSt,
-      isUiNoBrushSt
+      isUiNoBrushSt,
+      isUiAddOffsetSt
     });
     (0, _draw.drawDisplay)(this.rootKlass, isHidden);
   }
@@ -122,6 +126,7 @@ const mapStateToProps = (state, props) => ({
   tSfPeaks: (0, _chem.ToShiftPeaks)(state, props),
   sweepExtentSt: state.ui.sweepExtent,
   isUiAddIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
+  isUiAddOffsetSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.OFFSET_ADD,
   isUiNoBrushSt: _list_ui.LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
@@ -141,6 +146,7 @@ ViewerRect.propTypes = {
   tSfPeaks: _propTypes.default.array.isRequired,
   sweepExtentSt: _propTypes.default.object.isRequired,
   isUiAddIntgSt: _propTypes.default.bool.isRequired,
+  isUiAddOffsetSt: _propTypes.default.bool.isRequired,
   isUiNoBrushSt: _propTypes.default.bool.isRequired,
   resetAllAct: _propTypes.default.func.isRequired,
   clickUiTargetAct: _propTypes.default.func.isRequired,

@@ -26,7 +26,8 @@ var _compare_uv_vis_jcamp = _interopRequireDefault(require("./__tests__/fixtures
 var _uv_vis_jcamp = _interopRequireDefault(require("./__tests__/fixtures/uv_vis_jcamp"));
 var _hplc_uvvis_jcamp = _interopRequireDefault(require("./__tests__/fixtures/hplc_uvvis_jcamp"));
 var _hplc_uvvis_jcamp_ = _interopRequireDefault(require("./__tests__/fixtures/hplc_uvvis_jcamp_2"));
-var _tga_jcamp = _interopRequireDefault(require("./__tests__/fixtures/tga_jcamp"));
+var _tga_jcamp_ = _interopRequireDefault(require("./__tests__/fixtures/tga_jcamp_1"));
+var _tga_jcamp_2 = _interopRequireDefault(require("./__tests__/fixtures/tga_jcamp_2"));
 var _xrd_jcamp_ = _interopRequireDefault(require("./__tests__/fixtures/xrd_jcamp_1"));
 var _xrd_jcamp_2 = _interopRequireDefault(require("./__tests__/fixtures/xrd_jcamp_2"));
 var _cyclic_voltammetry_ = _interopRequireDefault(require("./__tests__/fixtures/cyclic_voltammetry_1"));
@@ -63,7 +64,8 @@ const uvVisEntity = _app.FN.ExtractJcamp(_uv_vis_jcamp.default);
 const compUvVisEntity = _app.FN.ExtractJcamp(_compare_uv_vis_jcamp.default);
 const hplcUVVisEntity = _app.FN.ExtractJcamp(_hplc_uvvis_jcamp.default);
 const hplcUVVisEntity2 = _app.FN.ExtractJcamp(_hplc_uvvis_jcamp_.default);
-const tgaEntity = _app.FN.ExtractJcamp(_tga_jcamp.default);
+const tgaEntity1 = _app.FN.ExtractJcamp(_tga_jcamp_.default);
+const tgaEntity2 = _app.FN.ExtractJcamp(_tga_jcamp_2.default);
 const xrdEntity1 = _app.FN.ExtractJcamp(_xrd_jcamp_.default);
 const xrdEntity2 = _app.FN.ExtractJcamp(_xrd_jcamp_2.default);
 const cyclicVoltaEntity1 = _app.FN.ExtractJcamp(_cyclic_voltammetry_.default);
@@ -155,7 +157,7 @@ class DemoWriteIr extends _react.default.Component {
       case 'hplc uv/vis':
         return hplcUVVisEntity;
       case 'tga':
-        return tgaEntity;
+        return tgaEntity1;
       case 'xrd':
         return xrdEntity1;
       case 'cyclic volta':
@@ -196,6 +198,8 @@ class DemoWriteIr extends _react.default.Component {
         return [secEntity1, secEntity2, secEntity3, secEntity4];
       case 'aif':
         return [aifEntity1, aifEntity2];
+      case 'tga':
+        return [tgaEntity1, tgaEntity2];
       default:
         return false;
     }
