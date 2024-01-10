@@ -25,6 +25,7 @@ var _reducer_wavelength = _interopRequireDefault(require("./reducer_wavelength")
 var _reducer_voltammetry = _interopRequireDefault(require("./reducer_voltammetry"));
 var _reducer_curve = _interopRequireDefault(require("./reducer_curve"));
 var _reducer_axes = _interopRequireDefault(require("./reducer_axes"));
+var _reducer_detector = _interopRequireDefault(require("./reducer_detector"));
 const rootReducer = (0, _redux.combineReducers)({
   threshold: _reducer_threshold.default,
   editPeak: _reducer_edit_peak.default,
@@ -44,6 +45,7 @@ const rootReducer = (0, _redux.combineReducers)({
   wavelength: _reducer_wavelength.default,
   cyclicvolta: _reducer_voltammetry.default,
   curve: _reducer_curve.default,
-  axesUnits: _reducer_axes.default
+  axesUnits: _reducer_axes.default,
+  detector: _reducer_detector.default
 });
 var _default = exports.default = rootReducer;

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.XRD = exports.UI = exports.THRESHOLD = exports.SUBMIT = exports.STATUS = exports.SIMULATION = exports.SHIFT = exports.SCAN = exports.MULTIPLICITY = exports.META = exports.MANAGER = exports.LAYOUT = exports.JCAMP = exports.INTEGRATION = exports.FORECAST = exports.EDITPEAK = exports.CYCLIC_VOLTA_METRY = exports.CURVE = exports.AXES = void 0;
+exports.XRD = exports.UI = exports.THRESHOLD = exports.SUBMIT = exports.STATUS = exports.SIMULATION = exports.SHIFT = exports.SEC = exports.SCAN = exports.MULTIPLICITY = exports.META = exports.MANAGER = exports.LAYOUT = exports.JCAMP = exports.INTEGRATION = exports.FORECAST = exports.EDITPEAK = exports.CYCLIC_VOLTA_METRY = exports.CURVE = exports.AXES = void 0;
 const THRESHOLD = exports.THRESHOLD = {
   UPDATE_VALUE: 'THRESHOLD_UPDATE_VALUE',
   RESET_VALUE: 'THRESHOLD_RESET_VALUE',
@@ -29,7 +29,8 @@ const MANAGER = exports.MANAGER = {
   RESET_INIT_COMMON: 'RESET_INIT_COMMON',
   RESET_INIT_NMR: 'RESET_INIT_NMR',
   RESET_INIT_MS: 'RESET_INIT_MS',
-  RESET_INIT_COMMON_WITH_INTERGATION: 'RESET_INIT_COMMON_WITH_INTERGATION'
+  RESET_INIT_COMMON_WITH_INTERGATION: 'RESET_INIT_COMMON_WITH_INTERGATION',
+  RESET_DETECTOR: 'RESET_DETECTOR'
 };
 const LAYOUT = exports.LAYOUT = {
   UPDATE: 'UPDATE_LAYOUT'
@@ -139,4 +140,7 @@ const CURVE = exports.CURVE = {
 const AXES = exports.AXES = {
   UPDATE_X_AXIS: 'UPDATE_X_AXIS',
   UPDATE_Y_AXIS: 'UPDATE_Y_AXIS'
+};
+const SEC = exports.SEC = {
+  UPDATE_DETECTOR: 'UPDATE_DETECTOR'
 };

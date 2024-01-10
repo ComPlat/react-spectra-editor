@@ -125,7 +125,8 @@ const InfoPanel = _ref => {
     theoryMass,
     onExapnd,
     canChangeDescription,
-    onDescriptionChanged
+    onDescriptionChanged,
+    detectorSt
   } = _ref;
   if (!feature) return null;
   const {
@@ -136,6 +137,19 @@ const InfoPanel = _ref => {
   const {
     curveIdx
   } = curveSt;
+  const {
+    curves
+  } = detectorSt;
+  const getSelectedDetectorForCurve = (_detectorSt, targetCurveIdx) => {
+    const targetCurve = curves.find(curve => curve.curveIdx === targetCurveIdx);
+    return targetCurve ? targetCurve.selectedDetector.name : '';
+  };
+  let selectedDetector = getSelectedDetectorForCurve(detectorSt, curveIdx);
+
+  // default detector from jcamp
+  if (!selectedDetector && feature.detector) {
+    selectedDetector = feature.detector;
+  }
   const {
     shifts
   } = shiftSt;
@@ -190,7 +204,13 @@ const InfoPanel = _ref => {
     className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
   }, "Theoretical mass: "), /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
-  }, `${parseFloat(theoryMass).toFixed(6)} g/mol`)) : null, !molSvg ? null : /*#__PURE__*/_react.default.createElement(_reactSvgFileZoomPan.default, {
+  }, `${parseFloat(theoryMass).toFixed(6)} g/mol`)) : null, _format.default.isSECLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement("div", {
+    className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd)
+  }, /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
+  }, "Detector: "), /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
+  }, selectedDetector)) : null, !molSvg ? null : /*#__PURE__*/_react.default.createElement(_reactSvgFileZoomPan.default, {
     svg: molSvg,
     duration: 300,
     resize: true
@@ -222,7 +242,8 @@ const mapStateToProps = (state, props) => (
   layoutSt: state.layout,
   simulationSt: state.simulation,
   shiftSt: state.shift,
-  curveSt: state.curve
+  curveSt: state.curve,
+  detectorSt: state.detector
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({}, dispatch);
 InfoPanel.propTypes = {
@@ -240,7 +261,8 @@ InfoPanel.propTypes = {
   onExapnd: _propTypes.default.func.isRequired,
   canChangeDescription: _propTypes.default.bool.isRequired,
   onDescriptionChanged: _propTypes.default.func,
-  theoryMass: _propTypes.default.string
+  theoryMass: _propTypes.default.string,
+  detectorSt: _propTypes.default.object.isRequired
 };
 var _default = exports.default = (0, _reactRedux.connect)(
 // eslint-disable-line

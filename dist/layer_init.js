@@ -60,9 +60,11 @@ class LayerInit extends _react.default.Component {
       resetInitCommonAct,
       resetInitMsAct,
       resetInitNmrAct,
-      resetInitCommonWithIntergationAct
+      resetInitCommonWithIntergationAct,
+      resetDetectorAct
     } = this.props;
     resetInitCommonAct();
+    resetDetectorAct();
     const {
       layout,
       features
@@ -185,6 +187,7 @@ const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   resetInitNmrAct: _manager.resetInitNmr,
   resetInitMsAct: _manager.resetInitMs,
   resetInitCommonWithIntergationAct: _manager.resetInitCommonWithIntergation,
+  resetDetectorAct: _manager.resetDetector,
   updateOperationAct: _submit.updateOperation,
   updateMetaPeaksAct: _meta.updateMetaPeaks,
   addOthersAct: _jcamp.addOthers,
@@ -217,7 +220,9 @@ LayerInit.propTypes = {
   onDescriptionChanged: _propTypes.default.func,
   // eslint-disable-line
   setAllCurvesAct: _propTypes.default.func.isRequired,
-  userManualLink: _propTypes.default.object // eslint-disable-line
+  userManualLink: _propTypes.default.object,
+  // eslint-disable-line
+  resetDetectorAct: _propTypes.default.func.isRequired
 };
 var _default = exports.default = (0, _reactRedux.connect)(
 // eslint-disable-line

@@ -8,7 +8,7 @@ import { withStyles } from '@mui/styles';
 
 import { updateOperation } from './actions/submit';
 import {
-  resetInitCommon, resetInitNmr, resetInitMs, resetInitCommonWithIntergation,
+  resetInitCommon, resetInitNmr, resetInitMs, resetInitCommonWithIntergation, resetDetector,
 } from './actions/manager';
 import { updateMetaPeaks } from './actions/meta';
 import { addOthers } from './actions/jcamp';
@@ -60,8 +60,10 @@ class LayerInit extends React.Component {
     const {
       entity, updateMetaPeaksAct,
       resetInitCommonAct, resetInitMsAct, resetInitNmrAct, resetInitCommonWithIntergationAct,
+      resetDetectorAct,
     } = this.props;
     resetInitCommonAct();
+    resetDetectorAct();
     const { layout, features } = entity;
     if (Format.isMsLayout(layout)) {
       // const { autoPeak, editPeak } = features; // TBD
@@ -167,6 +169,7 @@ const mapDispatchToProps = (dispatch) => (
     resetInitNmrAct: resetInitNmr,
     resetInitMsAct: resetInitMs,
     resetInitCommonWithIntergationAct: resetInitCommonWithIntergation,
+    resetDetectorAct: resetDetector,
     updateOperationAct: updateOperation,
     updateMetaPeaksAct: updateMetaPeaks,
     addOthersAct: addOthers,
@@ -199,6 +202,7 @@ LayerInit.propTypes = {
   onDescriptionChanged: PropTypes.func, // eslint-disable-line
   setAllCurvesAct: PropTypes.func.isRequired,
   userManualLink: PropTypes.object, // eslint-disable-line
+  resetDetectorAct: PropTypes.func.isRequired,
 };
 
 export default connect( // eslint-disable-line

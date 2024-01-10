@@ -18,6 +18,7 @@ import wavelengthReducer from './reducer_wavelength';
 import cyclicVoltaReducer from './reducer_voltammetry';
 import curveReducer from './reducer_curve';
 import axesReducer from './reducer_axes';
+import detectorReducer from './reducer_detector';
 
 const rootReducer = combineReducers({
   threshold: thresholdReducer,
@@ -39,6 +40,7 @@ const rootReducer = combineReducers({
   cyclicvolta: cyclicVoltaReducer,
   curve: curveReducer,
   axesUnits: axesReducer,
+  detector: detectorReducer,
 });
 
 export default rootReducer;

@@ -23,6 +23,7 @@ var _r04_submit = _interopRequireDefault(require("./r04_submit"));
 var _r07_wavelength_btn = _interopRequireDefault(require("./r07_wavelength_btn"));
 var _pecker = _interopRequireDefault(require("./07_pecker"));
 var _r08_change_axes = _interopRequireDefault(require("./r08_change_axes"));
+var _r09_detector = _interopRequireDefault(require("./r09_detector"));
 /* eslint-disable prefer-object-spread, function-paren-newline,
 react/function-component-definition, react/require-default-props */
 
@@ -59,7 +60,7 @@ const CmdBar = _ref => {
   }), /*#__PURE__*/_react.default.createElement(_r01_layout.default, {
     feature: feature,
     hasEdit: hasEdit
-  }), /*#__PURE__*/_react.default.createElement(_r07_wavelength_btn.default, null), /*#__PURE__*/_react.default.createElement(_r08_change_axes.default, null));
+  }), /*#__PURE__*/_react.default.createElement(_r07_wavelength_btn.default, null), /*#__PURE__*/_react.default.createElement(_r08_change_axes.default, null), /*#__PURE__*/_react.default.createElement(_r09_detector.default, null));
 };
 const mapStateToProps = (state, _) => (
 // eslint-disable-line
