@@ -97,6 +97,10 @@ const MouseMove = (event, focus) => {
         focus.root.select('.cursor-txt-hz')
           .attr('transform', `translate(${tx},${ty - 30})`)
           .text(`2Theta: ${pt.x.toExponential(2)}, d-value: ${dValue}`);
+      } else if (Format.isTGALayout(layout)) {
+        focus.root.select('.cursor-txt')
+          .attr('transform', `translate(${tx},${10})`)
+          .text(`X: ${pt.x.toFixed(3)}, Y: ${pt.y.toFixed(3)}`);
       } else {
         focus.root.select('.cursor-txt')
           .attr('transform', `translate(${tx},${10})`)
