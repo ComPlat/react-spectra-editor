@@ -58,7 +58,7 @@ const styles = () => ({
     backgroundColor: '#fff',
     height: 108,
     lineHeight: '24px',
-    overflowY: 'scroll',
+    overflowY: 'hidden',
     overflowWrap: 'word-break',
   },
   tHead: {
@@ -73,11 +73,8 @@ const styles = () => ({
     marginRight: 3,
   },
   quill: {
-    backgroundColor: '#fafafa',
-    border: '1px solid #eee',
     fontSize: '0.8rem',
     fontFamily: 'Helvetica',
-    padding: '0 10px 0 10px',
     textAlign: 'left',
   },
 });
@@ -118,7 +115,7 @@ const aucValue = (integration) => {
 
 const InfoPanel = ({
   classes, expand, feature, integration, editorOnly, molSvg, descriptions,
-  layoutSt, simulationSt, shiftSt, curveSt,
+  layoutSt, simulationSt, shiftSt, curveSt, theoryMass,
   onExapnd, canChangeDescription, onDescriptionChanged,
 }) => {
   if (!feature) return null;
@@ -139,6 +136,7 @@ const InfoPanel = ({
 
   return (
     <Accordion
+      data-testid="PanelInfo"
       expanded={expand}
       onChange={onExapnd}
       className={classNames(classes.panel)}
@@ -165,7 +163,7 @@ const InfoPanel = ({
             ? (
               <div className={classNames(classes.rowRoot, classes.rowEven)}>
                 <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Freq : </span>
-                <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{ parseInt(observeFrequency, 10) || ' - ' }</span>
+                <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{ `${parseInt(observeFrequency, 10)} Hz` || ' - ' }</span>
               </div>
             )
             : null
@@ -176,6 +174,16 @@ const InfoPanel = ({
               <div className={classNames(classes.rowRoot, classes.rowOdd)}>
                 <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Solv : </span>
                 <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{showSolvName}</span>
+              </div>
+            )
+            : null
+        }
+        {
+          Format.isMsLayout(layoutSt) && theoryMass
+            ? (
+              <div className={classNames(classes.rowRoot, classes.rowOdd)}>
+                <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Theoretical mass: </span>
+                <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{`${parseFloat(theoryMass).toFixed(6)} g/mol`}</span>
               </div>
             )
             : null
@@ -274,6 +282,7 @@ InfoPanel.propTypes = {
   onExapnd: PropTypes.func.isRequired,
   canChangeDescription: PropTypes.bool.isRequired,
   onDescriptionChanged: PropTypes.func,
+  theoryMass: PropTypes.string,
 };
 
 export default connect( // eslint-disable-line

@@ -33,7 +33,7 @@ const ensureQuillDelta = (descs) => {
 // - - - React - - -
 const SpectraEditor = ({
   entity, others, cLabel, xLabel, yLabel,
-  operations, forecast, molSvg, editorOnly, descriptions,
+  operations, forecast, molSvg, editorOnly, descriptions, theoryMass,
   canChangeDescription, onDescriptionChanged,
   multiEntities, multiMolSvgs, entityFileNames, userManualLink,
 }) => (
@@ -54,6 +54,7 @@ const SpectraEditor = ({
         molSvg={molSvg}
         multiMolSvgs={multiMolSvgs}
         editorOnly={editorOnly}
+        theoryMass={theoryMass}
         canChangeDescription={canChangeDescription}
         onDescriptionChanged={onDescriptionChanged}
       />
@@ -81,6 +82,7 @@ SpectraEditor.propTypes = {
   canChangeDescription: PropTypes.bool,
   onDescriptionChanged: PropTypes.func,
   userManualLink: PropTypes.object,
+  theoryMass: PropTypes.string,
 };
 
 SpectraEditor.defaultProps = {
@@ -94,6 +96,7 @@ SpectraEditor.defaultProps = {
   operations: [],
   descriptions: [],
   molSvg: '',
+  theoryMass: '',
   multiMolSvgs: [],
   editorOnly: false,
   canChangeDescription: false,

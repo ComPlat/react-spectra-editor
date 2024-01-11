@@ -62,7 +62,7 @@ const styles = () => ({
     backgroundColor: '#fff',
     height: 108,
     lineHeight: '24px',
-    overflowY: 'scroll',
+    overflowY: 'hidden',
     overflowWrap: 'word-break'
   },
   tHead: {
@@ -77,11 +77,8 @@ const styles = () => ({
     marginRight: 3
   },
   quill: {
-    backgroundColor: '#fafafa',
-    border: '1px solid #eee',
     fontSize: '0.8rem',
     fontFamily: 'Helvetica',
-    padding: '0 10px 0 10px',
     textAlign: 'left'
   }
 });
@@ -125,6 +122,7 @@ const InfoPanel = _ref => {
     simulationSt,
     shiftSt,
     curveSt,
+    theoryMass,
     onExapnd,
     canChangeDescription,
     onDescriptionChanged
@@ -151,8 +149,8 @@ const InfoPanel = _ref => {
   if (integration) {
     originStack = integration.originStack; // eslint-disable-line
   }
-
   return /*#__PURE__*/_react.default.createElement(_material.Accordion, {
+    "data-testid": "PanelInfo",
     expanded: expand,
     onChange: onExapnd,
     className: (0, _classnames.default)(classes.panel),
@@ -180,13 +178,19 @@ const InfoPanel = _ref => {
     className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
   }, "Freq : "), /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
-  }, parseInt(observeFrequency, 10) || ' - ')) : null, _format.default.isNmrLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement("div", {
+  }, `${parseInt(observeFrequency, 10)} Hz` || ' - ')) : null, _format.default.isNmrLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement("div", {
     className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd)
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
   }, "Solv : "), /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
-  }, showSolvName)) : null, !molSvg ? null : /*#__PURE__*/_react.default.createElement(_reactSvgFileZoomPan.default, {
+  }, showSolvName)) : null, _format.default.isMsLayout(layoutSt) && theoryMass ? /*#__PURE__*/_react.default.createElement("div", {
+    className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd)
+  }, /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
+  }, "Theoretical mass: "), /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
+  }, `${parseFloat(theoryMass).toFixed(6)} g/mol`)) : null, !molSvg ? null : /*#__PURE__*/_react.default.createElement(_reactSvgFileZoomPan.default, {
     svg: molSvg,
     duration: 300,
     resize: true
@@ -235,7 +239,8 @@ InfoPanel.propTypes = {
   curveSt: _propTypes.default.object.isRequired,
   onExapnd: _propTypes.default.func.isRequired,
   canChangeDescription: _propTypes.default.bool.isRequired,
-  onDescriptionChanged: _propTypes.default.func
+  onDescriptionChanged: _propTypes.default.func,
+  theoryMass: _propTypes.default.string
 };
 var _default = exports.default = (0, _reactRedux.connect)(
 // eslint-disable-line

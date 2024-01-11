@@ -64,7 +64,7 @@ const styles = (theme) => ({
   tRow: {
     height: 28,
     '&:nth-of-type(even)': {
-      backgroundColor: theme.palette.background.default,
+      backgroundColor: theme.palette ? theme.palette.background.default : '#d3d3d3',
     },
   },
   rmBtn: {

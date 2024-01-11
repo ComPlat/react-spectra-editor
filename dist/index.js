@@ -460,7 +460,6 @@ class DemoWriteIr extends _react.default.Component {
     }
     /*eslint-disable */
   }
-
   predictOp(_ref6) {
     let {
       multiplicity,
@@ -708,6 +707,7 @@ class DemoWriteIr extends _react.default.Component {
       canChangeDescription: true,
       onDescriptionChanged: this.onDescriptionChanged,
       molSvg: molSvg,
+      theoryMass: '123.0',
       userManualLink: {
         cv: "https://www.chemotion.net/chemotionsaurus/docs/eln/chemspectra/cvanalysis"
       },
