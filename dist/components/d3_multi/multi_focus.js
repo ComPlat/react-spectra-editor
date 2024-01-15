@@ -284,9 +284,9 @@ class MultiFocus {
     this.grid.x.call(this.axisCall.x.tickSize(-this.h, 0, 0)).selectAll('line').attr('stroke', '#ddd').attr('stroke-opacity', 0.6).attr('fill', 'none');
     this.grid.y.call(this.axisCall.y.tickSize(-this.w, 0, 0)).selectAll('line').attr('stroke', '#ddd').attr('stroke-opacity', 0.6).attr('fill', 'none');
   }
-  onClickTarget(data) {
-    d3.event.stopPropagation();
-    d3.event.preventDefault();
+  onClickTarget(event, data) {
+    event.stopPropagation();
+    event.preventDefault();
     const onPeak = true;
     if (this.layout === _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
       const {
@@ -299,9 +299,9 @@ class MultiFocus {
       this.clickUiTargetAct(data, onPeak, false, this.jcampIdx);
     }
   }
-  onClickPecker(data) {
-    d3.event.stopPropagation();
-    d3.event.preventDefault();
+  onClickPecker(event, data) {
+    event.stopPropagation();
+    event.preventDefault();
     const onPecker = true;
     const {
       spectraList
@@ -365,15 +365,15 @@ class MultiFocus {
         return yt(0);
       }).y1(d => yt(d.y))(ps);
     };
-    auc.enter().append('path').attr('class', 'auc').attr('fill', 'red').attr('stroke', 'none').attr('fill-opacity', 0.2).attr('stroke-width', 2).merge(auc).attr('d', d => integCurve(d)).attr('id', d => `auc${(0, _focus.itgIdTag)(d)}`).on('mouseover', d => {
+    auc.enter().append('path').attr('class', 'auc').attr('fill', 'red').attr('stroke', 'none').attr('fill-opacity', 0.2).attr('stroke-width', 2).merge(auc).attr('d', d => integCurve(d)).attr('id', d => `auc${(0, _focus.itgIdTag)(d)}`).on('mouseover', (event, d) => {
       d3.select(`#auc${(0, _focus.itgIdTag)(d)}`).attr('stroke', 'blue');
       d3.select(`#auc${(0, _focus.itgIdTag)(d)}`).attr('stroke', 'blue');
       d3.select(`#auc${(0, _focus.itgIdTag)(d)}`).style('fill', 'blue');
-    }).on('mouseout', d => {
+    }).on('mouseout', (event, d) => {
       d3.select(`#auc${(0, _focus.itgIdTag)(d)}`).attr('stroke', 'none');
       d3.select(`#auc${(0, _focus.itgIdTag)(d)}`).style('fill', 'red');
       d3.select(`#auc${(0, _focus.itgIdTag)(d)}`).style('fill-opacity', 0.2);
-    }).on('click', d => this.onClickTarget(d));
+    }).on('click', (event, d) => this.onClickTarget(event, d));
   }
   drawPeaks(editPeakSt) {
     const {
@@ -406,28 +406,28 @@ class MultiFocus {
       y: 10
     }];
     const lineSymbol = d3.line().x(d => d.x).y(d => d.y)(linePath);
-    mpp.enter().append('path').attr('d', lineSymbol).attr('class', 'enter-peak').attr('fill', 'red').attr('stroke', 'pink').attr('stroke-width', 3).attr('stroke-opacity', 0.0).merge(mpp).attr('id', d => `mpp${Math.round(1000 * d.x)}`).attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y)})`).on('mouseover', (d, i, n) => {
+    mpp.enter().append('path').attr('d', lineSymbol).attr('class', 'enter-peak').attr('fill', 'red').attr('stroke', 'pink').attr('stroke-width', 3).attr('stroke-opacity', 0.0).merge(mpp).attr('id', d => `mpp${Math.round(1000 * d.x)}`).attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y)})`).on('mouseover', (event, d) => {
       d3.select(`#mpp${Math.round(1000 * d.x)}`).attr('stroke-opacity', '1.0');
       d3.select(`#bpt${Math.round(1000 * d.x)}`).style('fill', 'blue');
       const tipParams = {
         d,
         layout: this.layout
       };
-      this.tip.show(tipParams, n[i]);
-    }).on('mouseout', (d, i, n) => {
+      this.tip.show(tipParams, event.target);
+    }).on('mouseout', (event, d) => {
       d3.select(`#mpp${Math.round(1000 * d.x)}`).attr('stroke-opacity', '0.0');
       d3.select(`#bpt${Math.round(1000 * d.x)}`).style('fill', 'red');
       const tipParams = {
         d,
         layout: this.layout
       };
-      this.tip.hide(tipParams, n[i]);
-    }).on('click', d => this.onClickTarget(d));
+      this.tip.hide(tipParams, event.target);
+    }).on('click', (event, d) => this.onClickTarget(event, d));
     const ignoreRef = _format.default.isHplcUvVisLayout(this.layout);
     if (ignoreRef) {
       const bpTxt = this.tags.bpTxt.selectAll('text').data(dPks);
       bpTxt.exit().attr('class', 'exit').remove();
-      bpTxt.enter().append('text').attr('class', 'peak-text').attr('font-family', 'Helvetica').style('font-size', '12px').attr('fill', '#228B22').style('text-anchor', 'middle').merge(bpTxt).attr('id', d => `mpp${Math.round(1000 * d.x)}`).text(d => d.x.toFixed(2)).attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y) - 25})`).on('click', d => this.onClickTarget(d));
+      bpTxt.enter().append('text').attr('class', 'peak-text').attr('font-family', 'Helvetica').style('font-size', '12px').attr('fill', '#228B22').style('text-anchor', 'middle').merge(bpTxt).attr('id', d => `mpp${Math.round(1000 * d.x)}`).text(d => d.x.toFixed(2)).attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y) - 25})`).on('click', (event, d) => this.onClickTarget(event, d));
     }
   }
   drawPeckers() {
@@ -461,23 +461,23 @@ class MultiFocus {
       y: 10
     }];
     const lineSymbol = d3.line().x(d => d.x).y(d => d.y)(linePath);
-    mpp.enter().append('path').attr('d', lineSymbol).attr('class', 'enter-peak').attr('fill', '#228B22').attr('stroke', 'pink').attr('stroke-width', 3).attr('stroke-opacity', 0.0).merge(mpp).attr('id', d => `mpp${Math.round(1000 * d.x)}`).attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y)})`).on('mouseover', (d, i, n) => {
+    mpp.enter().append('path').attr('d', lineSymbol).attr('class', 'enter-peak').attr('fill', '#228B22').attr('stroke', 'pink').attr('stroke-width', 3).attr('stroke-opacity', 0.0).merge(mpp).attr('id', d => `mpp${Math.round(1000 * d.x)}`).attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y)})`).on('mouseover', (event, d) => {
       d3.select(`#mpp${Math.round(1000 * d.x)}`).attr('stroke-opacity', '1.0');
       d3.select(`#bpt${Math.round(1000 * d.x)}`).style('fill', 'blue');
       const tipParams = {
         d,
         layout: this.layout
       };
-      this.tip.show(tipParams, n[i]);
-    }).on('mouseout', (d, i, n) => {
+      this.tip.show(tipParams, event.target);
+    }).on('mouseout', (event, d) => {
       d3.select(`#mpp${Math.round(1000 * d.x)}`).attr('stroke-opacity', '0.0');
       d3.select(`#bpt${Math.round(1000 * d.x)}`).style('fill', '#228B22');
       const tipParams = {
         d,
         layout: this.layout
       };
-      this.tip.hide(tipParams, n[i]);
-    }).on('click', d => this.onClickPecker(d));
+      this.tip.hide(tipParams, event.target);
+    }).on('click', (event, d) => this.onClickPecker(event, d));
   }
   drawInteg(integationSt) {
     const {
@@ -532,15 +532,15 @@ class MultiFocus {
       } = (0, _compass.TfRescale)(this);
       const dh = 50;
       const integBar = data => d3.line()([[xt(data.xL - shift), dh], [xt(data.xL - shift), dh - 10], [xt(data.xL - shift), dh - 5], [xt(data.xU - shift), dh - 5], [xt(data.xU - shift), dh - 10], [xt(data.xU - shift), dh]]);
-      igbp.enter().append('path').attr('class', 'igbp').attr('fill', 'none').attr('stroke', '#228B22').attr('stroke-width', 2).merge(igbp).attr('id', d => `igbp${(0, _focus.itgIdTag)(d)}`).attr('d', d => integBar(d)).on('mouseover', d => {
+      igbp.enter().append('path').attr('class', 'igbp').attr('fill', 'none').attr('stroke', '#228B22').attr('stroke-width', 2).merge(igbp).attr('id', d => `igbp${(0, _focus.itgIdTag)(d)}`).attr('d', d => integBar(d)).on('mouseover', (event, d) => {
         d3.select(`#igbp${(0, _focus.itgIdTag)(d)}`).attr('stroke', 'blue');
         d3.select(`#igbc${(0, _focus.itgIdTag)(d)}`).attr('stroke', 'blue');
         d3.select(`#igtp${(0, _focus.itgIdTag)(d)}`).style('fill', 'blue');
-      }).on('mouseout', d => {
+      }).on('mouseout', (event, d) => {
         d3.select(`#igbp${(0, _focus.itgIdTag)(d)}`).attr('stroke', '#228B22');
         d3.select(`#igbc${(0, _focus.itgIdTag)(d)}`).attr('stroke', '#228B22');
         d3.select(`#igtp${(0, _focus.itgIdTag)(d)}`).style('fill', '#228B22');
-      }).on('click', d => this.onClickTarget(d));
+      }).on('click', (event, d) => this.onClickTarget(event, d));
       const integCurve = border => {
         const {
           xL,
@@ -556,24 +556,24 @@ class MultiFocus {
         }
         return d3.line().x(d => xt(d.x)).y(d => 300 - (d.k - kRef) * 400 / kMax)(ps);
       };
-      igcp.enter().append('path').attr('class', 'igcp').attr('fill', 'none').attr('stroke', '#228B22').attr('stroke-width', 2).merge(igcp).attr('id', d => `igbc${(0, _focus.itgIdTag)(d)}`).attr('d', d => integCurve(d)).on('mouseover', d => {
+      igcp.enter().append('path').attr('class', 'igcp').attr('fill', 'none').attr('stroke', '#228B22').attr('stroke-width', 2).merge(igcp).attr('id', d => `igbc${(0, _focus.itgIdTag)(d)}`).attr('d', d => integCurve(d)).on('mouseover', (event, d) => {
         d3.select(`#igbp${(0, _focus.itgIdTag)(d)}`).attr('stroke', 'blue');
         d3.select(`#igbc${(0, _focus.itgIdTag)(d)}`).attr('stroke', 'blue');
         d3.select(`#igtp${(0, _focus.itgIdTag)(d)}`).style('fill', 'blue');
-      }).on('mouseout', d => {
+      }).on('mouseout', (event, d) => {
         d3.select(`#igbp${(0, _focus.itgIdTag)(d)}`).attr('stroke', '#228B22');
         d3.select(`#igbc${(0, _focus.itgIdTag)(d)}`).attr('stroke', '#228B22');
         d3.select(`#igtp${(0, _focus.itgIdTag)(d)}`).style('fill', '#228B22');
-      }).on('click', d => this.onClickTarget(d));
-      igtp.enter().append('text').attr('class', 'igtp').attr('font-family', 'Helvetica').style('font-size', '12px').attr('fill', '#228B22').style('text-anchor', 'middle').merge(igtp).attr('id', d => `igtp${(0, _focus.itgIdTag)(d)}`).text(d => (0, _integration.calcArea)(d, refArea, refFactor, ignoreRef)).attr('transform', d => `translate(${xt((d.xL + d.xU) / 2 - shift)}, ${dh - 12})`).on('mouseover', d => {
+      }).on('click', (event, d) => this.onClickTarget(event, d));
+      igtp.enter().append('text').attr('class', 'igtp').attr('font-family', 'Helvetica').style('font-size', '12px').attr('fill', '#228B22').style('text-anchor', 'middle').merge(igtp).attr('id', d => `igtp${(0, _focus.itgIdTag)(d)}`).text(d => (0, _integration.calcArea)(d, refArea, refFactor, ignoreRef)).attr('transform', d => `translate(${xt((d.xL + d.xU) / 2 - shift)}, ${dh - 12})`).on('mouseover', (event, d) => {
         d3.select(`#igbp${(0, _focus.itgIdTag)(d)}`).attr('stroke', 'blue');
         d3.select(`#igbc${(0, _focus.itgIdTag)(d)}`).attr('stroke', 'blue');
         d3.select(`#igtp${(0, _focus.itgIdTag)(d)}`).style('fill', 'blue');
-      }).on('mouseout', d => {
+      }).on('mouseout', (event, d) => {
         d3.select(`#igbp${(0, _focus.itgIdTag)(d)}`).attr('stroke', '#228B22');
         d3.select(`#igbc${(0, _focus.itgIdTag)(d)}`).attr('stroke', '#228B22');
         d3.select(`#igtp${(0, _focus.itgIdTag)(d)}`).style('fill', '#228B22');
-      }).on('click', d => this.onClickTarget(d));
+      }).on('click', (event, d) => this.onClickTarget(event, d));
     }
   }
   drawMtply(mtplySt) {
@@ -649,42 +649,42 @@ class MultiFocus {
       } = d.xExtent;
       return smExtext.xL === xL && smExtext.xU === xU ? 'purple' : '#DA70D6';
     };
-    mpyb.enter().append('path').attr('class', 'mpyb').attr('fill', 'none').attr('stroke-width', 2).merge(mpyb).attr('stroke', d => mpyColor(d)).attr('id', d => `mpyb${(0, _focus.mpyIdTag)(d)}`).attr('d', d => mpyBar(d)).on('mouseover', d => {
+    mpyb.enter().append('path').attr('class', 'mpyb').attr('fill', 'none').attr('stroke-width', 2).merge(mpyb).attr('stroke', d => mpyColor(d)).attr('id', d => `mpyb${(0, _focus.mpyIdTag)(d)}`).attr('d', d => mpyBar(d)).on('mouseover', (event, d) => {
       d3.selectAll(`#mpyb${(0, _focus.mpyIdTag)(d)}`).attr('stroke', 'blue');
       d3.selectAll(`#mpyt1${(0, _focus.mpyIdTag)(d)}`).style('fill', 'blue');
       d3.selectAll(`#mpyt2${(0, _focus.mpyIdTag)(d)}`).style('fill', 'blue');
       d3.selectAll(`#mpyp${(0, _focus.mpyIdTag)(d)}`).attr('stroke', 'blue');
-    }).on('mouseout', d => {
+    }).on('mouseout', (event, d) => {
       const dColor = mpyColor(d);
       d3.selectAll(`#mpyb${(0, _focus.mpyIdTag)(d)}`).attr('stroke', dColor);
       d3.selectAll(`#mpyt1${(0, _focus.mpyIdTag)(d)}`).style('fill', dColor);
       d3.selectAll(`#mpyt2${(0, _focus.mpyIdTag)(d)}`).style('fill', dColor);
       d3.selectAll(`#mpyp${(0, _focus.mpyIdTag)(d)}`).attr('stroke', dColor);
-    }).on('click', d => this.onClickTarget(d));
-    mpyt1.enter().append('text').attr('class', 'mpyt1').attr('font-family', 'Helvetica').style('font-size', '12px').style('text-anchor', 'middle').merge(mpyt1).attr('fill', d => mpyColor(d)).attr('id', d => `mpyt1${(0, _focus.mpyIdTag)(d)}`).text(d => `${(0, _multiplicity_calc.calcMpyCenter)(d.peaks, shift, d.mpyType).toFixed(3)}`).attr('transform', d => `translate(${xt((d.xExtent.xL + d.xExtent.xU) / 2 - shift)}, ${height - dh + 12})`).on('mouseover', d => {
+    }).on('click', (event, d) => this.onClickTarget(event, d));
+    mpyt1.enter().append('text').attr('class', 'mpyt1').attr('font-family', 'Helvetica').style('font-size', '12px').style('text-anchor', 'middle').merge(mpyt1).attr('fill', d => mpyColor(d)).attr('id', d => `mpyt1${(0, _focus.mpyIdTag)(d)}`).text(d => `${(0, _multiplicity_calc.calcMpyCenter)(d.peaks, shift, d.mpyType).toFixed(3)}`).attr('transform', d => `translate(${xt((d.xExtent.xL + d.xExtent.xU) / 2 - shift)}, ${height - dh + 12})`).on('mouseover', (event, d) => {
       d3.selectAll(`#mpyb${(0, _focus.mpyIdTag)(d)}`).attr('stroke', 'blue');
       d3.selectAll(`#mpyt1${(0, _focus.mpyIdTag)(d)}`).style('fill', 'blue');
       d3.selectAll(`#mpyt2${(0, _focus.mpyIdTag)(d)}`).style('fill', 'blue');
       d3.selectAll(`#mpyp${(0, _focus.mpyIdTag)(d)}`).attr('stroke', 'blue');
-    }).on('mouseout', d => {
+    }).on('mouseout', (event, d) => {
       const dColor = mpyColor(d);
       d3.selectAll(`#mpyb${(0, _focus.mpyIdTag)(d)}`).attr('stroke', dColor);
       d3.selectAll(`#mpyt1${(0, _focus.mpyIdTag)(d)}`).style('fill', dColor);
       d3.selectAll(`#mpyt2${(0, _focus.mpyIdTag)(d)}`).style('fill', dColor);
       d3.selectAll(`#mpyp${(0, _focus.mpyIdTag)(d)}`).attr('stroke', dColor);
-    }).on('click', d => this.onClickTarget(d));
-    mpyt2.enter().append('text').attr('class', 'mpyt2').attr('font-family', 'Helvetica').style('font-size', '12px').style('text-anchor', 'middle').merge(mpyt2).attr('fill', d => mpyColor(d)).attr('id', d => `mpyt2${(0, _focus.mpyIdTag)(d)}`).text(d => `(${d.mpyType})`).attr('transform', d => `translate(${xt((d.xExtent.xL + d.xExtent.xU) / 2 - shift)}, ${height - dh + 24})`).on('mouseover', d => {
+    }).on('click', (event, d) => this.onClickTarget(event, d));
+    mpyt2.enter().append('text').attr('class', 'mpyt2').attr('font-family', 'Helvetica').style('font-size', '12px').style('text-anchor', 'middle').merge(mpyt2).attr('fill', d => mpyColor(d)).attr('id', d => `mpyt2${(0, _focus.mpyIdTag)(d)}`).text(d => `(${d.mpyType})`).attr('transform', d => `translate(${xt((d.xExtent.xL + d.xExtent.xU) / 2 - shift)}, ${height - dh + 24})`).on('mouseover', (event, d) => {
       d3.selectAll(`#mpyb${(0, _focus.mpyIdTag)(d)}`).attr('stroke', 'blue');
       d3.selectAll(`#mpyt1${(0, _focus.mpyIdTag)(d)}`).style('fill', 'blue');
       d3.selectAll(`#mpyt2${(0, _focus.mpyIdTag)(d)}`).style('fill', 'blue');
       d3.selectAll(`#mpyp${(0, _focus.mpyIdTag)(d)}`).attr('stroke', 'blue');
-    }).on('mouseout', d => {
+    }).on('mouseout', (event, d) => {
       const dColor = mpyColor(d);
       d3.selectAll(`#mpyb${(0, _focus.mpyIdTag)(d)}`).attr('stroke', dColor);
       d3.selectAll(`#mpyt1${(0, _focus.mpyIdTag)(d)}`).style('fill', dColor);
       d3.selectAll(`#mpyt2${(0, _focus.mpyIdTag)(d)}`).style('fill', dColor);
       d3.selectAll(`#mpyp${(0, _focus.mpyIdTag)(d)}`).attr('stroke', dColor);
-    }).on('click', d => this.onClickTarget(d));
+    }).on('click', (event, d) => this.onClickTarget(event, d));
     const mpypH = height - dh;
     const mpypPath = pk => [{
       x: xt(pk.x - shift) - 0.5,
@@ -701,18 +701,18 @@ class MultiFocus {
     }];
     // const faktor = layoutSt === LIST_LAYOUT.IR ? -1 : 1;
     const lineSymbol = d3.line().x(d => d.x).y(d => d.y);
-    mpyp.enter().append('path').attr('class', 'mpyp').attr('fill', 'none').merge(mpyp).attr('stroke', d => mpyColor(d)).attr('d', d => lineSymbol(mpypPath(d))).attr('id', d => `mpyp${(0, _focus.mpyIdTag)(d)}`).on('mouseover', d => {
+    mpyp.enter().append('path').attr('class', 'mpyp').attr('fill', 'none').merge(mpyp).attr('stroke', d => mpyColor(d)).attr('d', d => lineSymbol(mpypPath(d))).attr('id', d => `mpyp${(0, _focus.mpyIdTag)(d)}`).on('mouseover', (event, d) => {
       d3.selectAll(`#mpyb${(0, _focus.mpyIdTag)(d)}`).attr('stroke', 'blue');
       d3.selectAll(`#mpyt1${(0, _focus.mpyIdTag)(d)}`).style('fill', 'blue');
       d3.selectAll(`#mpyt2${(0, _focus.mpyIdTag)(d)}`).style('fill', 'blue');
       d3.selectAll(`#mpyp${(0, _focus.mpyIdTag)(d)}`).attr('stroke', 'blue');
-    }).on('mouseout', d => {
+    }).on('mouseout', (event, d) => {
       const dColor = mpyColor(d);
       d3.selectAll(`#mpyb${(0, _focus.mpyIdTag)(d)}`).attr('stroke', dColor);
       d3.selectAll(`#mpyt1${(0, _focus.mpyIdTag)(d)}`).style('fill', dColor);
       d3.selectAll(`#mpyt2${(0, _focus.mpyIdTag)(d)}`).style('fill', dColor);
       d3.selectAll(`#mpyp${(0, _focus.mpyIdTag)(d)}`).attr('stroke', dColor);
-    }).on('click', d => this.onClickTarget(d));
+    }).on('click', (event, d) => this.onClickTarget(event, d));
   }
   drawRef() {
     // rescale for zoom

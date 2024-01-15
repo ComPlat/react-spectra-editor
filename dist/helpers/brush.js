@@ -10,19 +10,19 @@ function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return 
 function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 /* eslint-disable prefer-object-spread */
 
-const wheeled = focus => {
+const wheeled = (focus, event) => {
   const {
     currentExtent,
     scrollUiWheelAct
   } = focus;
   // WORKAROUND: firefox wheel compatibilty
-  const wheelEvent = focus.isFirefox ? -d3.event.deltaY : d3.event.wheelDelta; // eslint-disable-line
+  const wheelEvent = focus.isFirefox ? -event.deltaY : event.wheelDelta; // eslint-disable-line
   const direction = wheelEvent > 0;
   scrollUiWheelAct(Object.assign({}, currentExtent, {
     direction
   }));
 };
-const brushed = (focus, isUiAddIntgSt) => {
+const brushed = (focus, isUiAddIntgSt, event) => {
   const {
     selectUiSweepAct,
     data,
@@ -32,7 +32,7 @@ const brushed = (focus, isUiAddIntgSt) => {
     h,
     scales
   } = focus;
-  const selection = d3.event.selection && d3.event.selection.reverse();
+  const selection = event.selection && event.selection.reverse();
   if (!selection) return;
   let xes = [w, 0].map(scales.x.invert).sort((a, b) => a - b);
   let yes = [h, 0].map(scales.y.invert).sort((a, b) => a - b);
@@ -82,15 +82,15 @@ const MountBrush = (focus, isUiAddIntgSt, isUiNoBrushSt) => {
   } = focus;
   svg.selectAll('.brush').remove();
   svg.selectAll('.brushX').remove();
-  const brushedCb = () => brushed(focus, isUiAddIntgSt);
-  const wheeledCb = () => wheeled(focus);
+  const brushedCb = event => brushed(focus, isUiAddIntgSt, event);
+  const wheeledCb = event => wheeled(focus, event);
   if (isUiNoBrushSt) {
     const target = isUiAddIntgSt ? brushX : brush;
     target.handleSize(10).extent([[0, 0], [w, h]]).on('end', brushedCb);
 
     // append brush components
     const klass = isUiAddIntgSt ? 'brushX' : 'brush';
-    root.append('g').attr('class', klass).on('mousemove', () => (0, _compass.MouseMove)(focus)).call(target);
+    root.append('g').attr('class', klass).on('mousemove', event => (0, _compass.MouseMove)(event, focus)).call(target);
   }
   svg.on('wheel', wheeledCb);
 };

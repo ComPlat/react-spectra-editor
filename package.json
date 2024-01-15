@@ -1,6 +1,6 @@
 {
   "name": "@complat/react-spectra-editor",
-  "version": "1.0.1",
+  "version": "1.0.1-beta.2",
   "description": "An editor to View and Edit Chemical Spectra data (NMR, IR and MS, CV, UIVIS, XRD).",
   "repository": {
     "type": "git",
@@ -23,9 +23,7 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "browserslist": "^4.21.5",
     "classnames": "^2.3.2",
-    "d3": "^5.16.0",
-    "d3-brush": "3.0.0",
-    "d3-selection": "^2.0.0",
+    "d3": "^7.8.5",
     "d3-tip": "^0.9.1",
     "jcampconverter": "4.1.0",
     "ml-savitzky-golay-generalized": "1.1.1",
@@ -48,7 +46,8 @@
     "test:coverage": "CI=true react-scripts test --env=jsdom --verbose --testPathIgnorePatterns=./src/__tests__/fixtures/ --coverage",
     "eject": "react-scripts eject",
     "storybook": "start-storybook -p 3001 -c .storybook",
-    "buildbook": "build-storybook -c .storybook -o .out"
+    "buildbook": "build-storybook -c .storybook -o .out",
+    "e2e": "cypress open"
   },
   "peerDependencies": {
     "react": "^17.0.2",
@@ -65,6 +64,7 @@
     "@types/enzyme": "^3.10.13",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.8.0",
     "babel-loader": "8.2.5",
+    "cypress": "^13.6.2",
     "enzyme": "^3.11.0",
     "enzyme-to-json": "^3.6.2",
     "eslint-config-airbnb": "^19.0.4",
@@ -90,5 +90,10 @@
   ],
   "publishConfig": {
     "access": "public"
+  },
+  "jest": {
+    "transformIgnorePatterns": [
+      "/node_modules/(?!d3|d3-array|internmap|delaunator|robust-predicates)"
+    ]
   }
 }

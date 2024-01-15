@@ -102,7 +102,7 @@ const Pecker = _ref => {
       className: "txt-sv-tp"
     }, "Add Pecker")
   }, /*#__PURE__*/_react.default.createElement("span", null, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
-    className: (0, _classnames.default)((0, _common.focusStyle)(isFocusAddPeckerSt, classes), 'btn-sv-bar-addpeak'),
+    className: (0, _classnames.default)((0, _common.focusStyle)(isFocusAddPeckerSt, classes), 'btn-sv-bar-addpecker'),
     onClick: onSweepPeckerAdd
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.txt, 'txt-sv-bar-addpeak')
@@ -111,7 +111,7 @@ const Pecker = _ref => {
       className: "txt-sv-tp"
     }, "Remove Pecker")
   }, /*#__PURE__*/_react.default.createElement("span", null, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
-    className: (0, _classnames.default)((0, _common.focusStyle)(isFocusRmPeckerSt, classes), 'btn-sv-bar-rmpeak'),
+    className: (0, _classnames.default)((0, _common.focusStyle)(isFocusRmPeckerSt, classes), 'btn-sv-bar-rmpecker'),
     onClick: onSweepPeckerDELETE
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.txt, 'txt-sv-bar-rmpeak')

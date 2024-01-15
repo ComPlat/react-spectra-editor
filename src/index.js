@@ -506,6 +506,7 @@ class DemoWriteIr extends React.Component {
             RAMAN
           </Button>
           <Button
+            id='btn-uv-vis'
             variant="contained"
             style={{ margin: '0 10px 0 10px' }}
             onClick={this.onClick('uv/vis')}
@@ -513,6 +514,7 @@ class DemoWriteIr extends React.Component {
             UV/VIS
           </Button>
           <Button
+            id='btn-hplc'
             variant="contained"
             style={{ margin: '0 10px 0 10px' }}
             onClick={this.onClick('hplc uv/vis')}
@@ -520,6 +522,7 @@ class DemoWriteIr extends React.Component {
             HPLC UV/VIS
           </Button>
           <Button
+            id='btn-tga'
             variant="contained"
             style={{ margin: '0 10px 0 10px' }}
             onClick={this.onClick('tga')}
@@ -527,6 +530,7 @@ class DemoWriteIr extends React.Component {
             TGA
           </Button>
           <Button
+            id='btn-xrd'
             variant="contained"
             style={{ margin: '0 10px 0 10px' }}
             onClick={this.onClick('xrd')}
@@ -534,6 +538,7 @@ class DemoWriteIr extends React.Component {
             XRD
           </Button>
           <Button
+            id='btn-cv'
             variant="contained"
             style={{ margin: '0 10px 0 10px' }}
             onClick={this.onClick('cyclic volta')}
@@ -548,6 +553,7 @@ class DemoWriteIr extends React.Component {
             CDS
           </Button>
           <Button
+            id='btn-sec'
             variant="contained"
             style={{ margin: '0 10px 0 10px' }}
             onClick={this.onClick('sec')}
@@ -555,6 +561,7 @@ class DemoWriteIr extends React.Component {
             SEC
           </Button>
           <Button
+            id='btn-sod'
             variant="contained"
             style={{ margin: '0 10px 0 10px' }}
             onClick={this.onClick('aif')}

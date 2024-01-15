@@ -96,7 +96,7 @@ const Pecker = ({
               className={
                 classNames(
                   focusStyle(isFocusAddPeckerSt, classes),
-                  'btn-sv-bar-addpeak',
+                  'btn-sv-bar-addpecker',
                 )
               }
               onClick={onSweepPeckerAdd}
@@ -115,7 +115,7 @@ const Pecker = ({
               className={
                 classNames(
                   focusStyle(isFocusRmPeckerSt, classes),
-                  'btn-sv-bar-rmpeak',
+                  'btn-sv-bar-rmpecker',
                 )
               }
               onClick={onSweepPeckerDELETE}

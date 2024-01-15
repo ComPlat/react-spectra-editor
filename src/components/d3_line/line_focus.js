@@ -225,9 +225,9 @@ class LineFocus {
       .attr('fill', 'none');
   }
 
-  onClickTarget(data) {
-    d3.event.stopPropagation();
-    d3.event.preventDefault();
+  onClickTarget(event, data) {
+    event.stopPropagation();
+    event.preventDefault();
     const onPeak = true;
     this.clickUiTargetAct(data, onPeak);
   }
@@ -279,7 +279,7 @@ class LineFocus {
       .merge(auc)
       .attr('d', (d) => integCurve(d))
       .attr('id', (d) => `auc${itgIdTag(d)}`)
-      .on('mouseover', (d) => {
+      .on('mouseover', (event, d) => {
         d3.select(`#auc${itgIdTag(d)}`)
           .attr('stroke', 'blue');
         d3.select(`#auc${itgIdTag(d)}`)
@@ -287,7 +287,7 @@ class LineFocus {
         d3.select(`#auc${itgIdTag(d)}`)
           .style('fill', 'blue');
       })
-      .on('mouseout', (d) => {
+      .on('mouseout', (event, d) => {
         d3.select(`#auc${itgIdTag(d)}`)
           .attr('stroke', 'none');
         d3.select(`#auc${itgIdTag(d)}`)
@@ -295,7 +295,7 @@ class LineFocus {
         d3.select(`#auc${itgIdTag(d)}`)
           .style('fill-opacity', 0.2);
       })
-      .on('click', (d) => this.onClickTarget(d));
+      .on('click', (event, d) => this.onClickTarget(event, d));
   }
 
   drawPeaks(editPeakSt) {
@@ -337,23 +337,23 @@ class LineFocus {
       .merge(mpp)
       .attr('id', (d) => `mpp${Math.round(1000 * d.x)}`)
       .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(d.y)})`)
-      .on('mouseover', (d, i, n) => {
+      .on('mouseover', (event, d) => {
         d3.select(`#mpp${Math.round(1000 * d.x)}`)
           .attr('stroke-opacity', '1.0');
         d3.select(`#bpt${Math.round(1000 * d.x)}`)
           .style('fill', 'blue');
         const tipParams = { d, layout: this.layout };
-        this.tip.show(tipParams, n[i]);
+        this.tip.show(tipParams, event.target);
       })
-      .on('mouseout', (d, i, n) => {
+      .on('mouseout', (event, d) => {
         d3.select(`#mpp${Math.round(1000 * d.x)}`)
           .attr('stroke-opacity', '0.0');
         d3.select(`#bpt${Math.round(1000 * d.x)}`)
           .style('fill', 'red');
         const tipParams = { d, layout: this.layout };
-        this.tip.hide(tipParams, n[i]);
+        this.tip.hide(tipParams, event.target);
       })
-      .on('click', (d) => this.onClickTarget(d));
+      .on('click', (event, d) => this.onClickTarget(event, d));
 
     const ignoreRef = Format.isHplcUvVisLayout(this.layout);
     if (ignoreRef) {
@@ -373,7 +373,7 @@ class LineFocus {
         .attr('id', (d) => `mpp${Math.round(1000 * d.x)}`)
         .text((d) => d.x.toFixed(2))
         .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(d.y) - 25})`)
-        .on('click', (d) => this.onClickTarget(d));
+        .on('click', (event, d) => this.onClickTarget(event, d));
     }
   }
 
@@ -445,7 +445,7 @@ class LineFocus {
         .merge(igbp)
         .attr('id', (d) => `igbp${itgIdTag(d)}`)
         .attr('d', (d) => integBar(d))
-        .on('mouseover', (d) => {
+        .on('mouseover', (event, d) => {
           d3.select(`#igbp${itgIdTag(d)}`)
             .attr('stroke', 'blue');
           d3.select(`#igbc${itgIdTag(d)}`)
@@ -453,7 +453,7 @@ class LineFocus {
           d3.select(`#igtp${itgIdTag(d)}`)
             .style('fill', 'blue');
         })
-        .on('mouseout', (d) => {
+        .on('mouseout', (event, d) => {
           d3.select(`#igbp${itgIdTag(d)}`)
             .attr('stroke', '#228B22');
           d3.select(`#igbc${itgIdTag(d)}`)
@@ -461,7 +461,7 @@ class LineFocus {
           d3.select(`#igtp${itgIdTag(d)}`)
             .style('fill', '#228B22');
         })
-        .on('click', (d) => this.onClickTarget(d));
+        .on('click', (event, d) => this.onClickTarget(event, d));
 
       const integCurve = (border) => {
         const { xL, xU } = border;
@@ -489,7 +489,7 @@ class LineFocus {
         .merge(igcp)
         .attr('id', (d) => `igbc${itgIdTag(d)}`)
         .attr('d', (d) => integCurve(d))
-        .on('mouseover', (d) => {
+        .on('mouseover', (event, d) => {
           d3.select(`#igbp${itgIdTag(d)}`)
             .attr('stroke', 'blue');
           d3.select(`#igbc${itgIdTag(d)}`)
@@ -497,7 +497,7 @@ class LineFocus {
           d3.select(`#igtp${itgIdTag(d)}`)
             .style('fill', 'blue');
         })
-        .on('mouseout', (d) => {
+        .on('mouseout', (event, d) => {
           d3.select(`#igbp${itgIdTag(d)}`)
             .attr('stroke', '#228B22');
           d3.select(`#igbc${itgIdTag(d)}`)
@@ -505,7 +505,7 @@ class LineFocus {
           d3.select(`#igtp${itgIdTag(d)}`)
             .style('fill', '#228B22');
         })
-        .on('click', (d) => this.onClickTarget(d));
+        .on('click', (event, d) => this.onClickTarget(event, d));
 
       igtp.enter()
         .append('text')
@@ -518,7 +518,7 @@ class LineFocus {
         .attr('id', (d) => `igtp${itgIdTag(d)}`)
         .text((d) => calcArea(d, refArea, refFactor, ignoreRef))
         .attr('transform', (d) => `translate(${xt((d.xL + d.xU) / 2 - shift)}, ${dh - 12})`)
-        .on('mouseover', (d) => {
+        .on('mouseover', (event, d) => {
           d3.select(`#igbp${itgIdTag(d)}`)
             .attr('stroke', 'blue');
           d3.select(`#igbc${itgIdTag(d)}`)
@@ -526,7 +526,7 @@ class LineFocus {
           d3.select(`#igtp${itgIdTag(d)}`)
             .style('fill', 'blue');
         })
-        .on('mouseout', (d) => {
+        .on('mouseout', (event, d) => {
           d3.select(`#igbp${itgIdTag(d)}`)
             .attr('stroke', '#228B22');
           d3.select(`#igbc${itgIdTag(d)}`)
@@ -534,7 +534,7 @@ class LineFocus {
           d3.select(`#igtp${itgIdTag(d)}`)
             .style('fill', '#228B22');
         })
-        .on('click', (d) => this.onClickTarget(d));
+        .on('click', (event, d) => this.onClickTarget(event, d));
     }
   }
 
@@ -601,7 +601,7 @@ class LineFocus {
       .attr('stroke', (d) => mpyColor(d))
       .attr('id', (d) => `mpyb${mpyIdTag(d)}`)
       .attr('d', (d) => mpyBar(d))
-      .on('mouseover', (d) => {
+      .on('mouseover', (event, d) => {
         d3.selectAll(`#mpyb${mpyIdTag(d)}`)
           .attr('stroke', 'blue');
         d3.selectAll(`#mpyt1${mpyIdTag(d)}`)
@@ -611,7 +611,7 @@ class LineFocus {
         d3.selectAll(`#mpyp${mpyIdTag(d)}`)
           .attr('stroke', 'blue');
       })
-      .on('mouseout', (d) => {
+      .on('mouseout', (event, d) => {
         const dColor = mpyColor(d);
         d3.selectAll(`#mpyb${mpyIdTag(d)}`)
           .attr('stroke', dColor);
@@ -622,7 +622,7 @@ class LineFocus {
         d3.selectAll(`#mpyp${mpyIdTag(d)}`)
           .attr('stroke', dColor);
       })
-      .on('click', (d) => this.onClickTarget(d));
+      .on('click', (event, d) => this.onClickTarget(event, d));
 
     mpyt1.enter()
       .append('text')
@@ -635,7 +635,7 @@ class LineFocus {
       .attr('id', (d) => `mpyt1${mpyIdTag(d)}`)
       .text((d) => `${calcMpyCenter(d.peaks, shift, d.mpyType).toFixed(3)}`)
       .attr('transform', (d) => `translate(${xt((d.xExtent.xL + d.xExtent.xU) / 2 - shift)}, ${height - dh + 12})`)
-      .on('mouseover', (d) => {
+      .on('mouseover', (event, d) => {
         d3.selectAll(`#mpyb${mpyIdTag(d)}`)
           .attr('stroke', 'blue');
         d3.selectAll(`#mpyt1${mpyIdTag(d)}`)
@@ -645,7 +645,7 @@ class LineFocus {
         d3.selectAll(`#mpyp${mpyIdTag(d)}`)
           .attr('stroke', 'blue');
       })
-      .on('mouseout', (d) => {
+      .on('mouseout', (event, d) => {
         const dColor = mpyColor(d);
         d3.selectAll(`#mpyb${mpyIdTag(d)}`)
           .attr('stroke', dColor);
@@ -656,7 +656,7 @@ class LineFocus {
         d3.selectAll(`#mpyp${mpyIdTag(d)}`)
           .attr('stroke', dColor);
       })
-      .on('click', (d) => this.onClickTarget(d));
+      .on('click', (event, d) => this.onClickTarget(event, d));
 
     mpyt2.enter()
       .append('text')
@@ -669,7 +669,7 @@ class LineFocus {
       .attr('id', (d) => `mpyt2${mpyIdTag(d)}`)
       .text((d) => `(${d.mpyType})`)
       .attr('transform', (d) => `translate(${xt((d.xExtent.xL + d.xExtent.xU) / 2 - shift)}, ${height - dh + 24})`)
-      .on('mouseover', (d) => {
+      .on('mouseover', (event, d) => {
         d3.selectAll(`#mpyb${mpyIdTag(d)}`)
           .attr('stroke', 'blue');
         d3.selectAll(`#mpyt1${mpyIdTag(d)}`)
@@ -679,7 +679,7 @@ class LineFocus {
         d3.selectAll(`#mpyp${mpyIdTag(d)}`)
           .attr('stroke', 'blue');
       })
-      .on('mouseout', (d) => {
+      .on('mouseout', (event, d) => {
         const dColor = mpyColor(d);
         d3.selectAll(`#mpyb${mpyIdTag(d)}`)
           .attr('stroke', dColor);
@@ -690,7 +690,7 @@ class LineFocus {
         d3.selectAll(`#mpyp${mpyIdTag(d)}`)
           .attr('stroke', dColor);
       })
-      .on('click', (d) => this.onClickTarget(d));
+      .on('click', (event, d) => this.onClickTarget(event, d));
 
     const mpypH = height - dh;
     const mpypPath = (pk) => (
@@ -714,7 +714,7 @@ class LineFocus {
       .attr('stroke', (d) => mpyColor(d))
       .attr('d', (d) => lineSymbol(mpypPath(d)))
       .attr('id', (d) => `mpyp${mpyIdTag(d)}`)
-      .on('mouseover', (d) => {
+      .on('mouseover', (event, d) => {
         d3.selectAll(`#mpyb${mpyIdTag(d)}`)
           .attr('stroke', 'blue');
         d3.selectAll(`#mpyt1${mpyIdTag(d)}`)
@@ -724,7 +724,7 @@ class LineFocus {
         d3.selectAll(`#mpyp${mpyIdTag(d)}`)
           .attr('stroke', 'blue');
       })
-      .on('mouseout', (d) => {
+      .on('mouseout', (event, d) => {
         const dColor = mpyColor(d);
         d3.selectAll(`#mpyb${mpyIdTag(d)}`)
           .attr('stroke', dColor);
@@ -735,7 +735,7 @@ class LineFocus {
         d3.selectAll(`#mpyp${mpyIdTag(d)}`)
           .attr('stroke', dColor);
       })
-      .on('click', (d) => this.onClickTarget(d));
+      .on('click', (event, d) => this.onClickTarget(event, d));
   }
 
   drawRef() {
