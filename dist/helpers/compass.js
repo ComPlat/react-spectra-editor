@@ -99,6 +99,8 @@ const MouseMove = (event, focus) => {
           dValue = (0, _chem.Convert2DValue)(pt.x).toExponential(2);
         }
         focus.root.select('.cursor-txt-hz').attr('transform', `translate(${tx},${ty - 30})`).text(`2Theta: ${pt.x.toExponential(2)}, d-value: ${dValue}`);
+      } else if (_format.default.isTGALayout(layout)) {
+        focus.root.select('.cursor-txt').attr('transform', `translate(${tx},${10})`).text(`X: ${pt.x.toFixed(3)}, Y: ${pt.y.toFixed(3)}`);
       } else {
         focus.root.select('.cursor-txt').attr('transform', `translate(${tx},${10})`).text(pt.x.toFixed(3));
         if (freq) {
