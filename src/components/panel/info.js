@@ -116,11 +116,26 @@ const aucValue = (integration) => {
 const InfoPanel = ({
   classes, expand, feature, integration, editorOnly, molSvg, descriptions,
   layoutSt, simulationSt, shiftSt, curveSt, theoryMass,
-  onExapnd, canChangeDescription, onDescriptionChanged,
+  onExapnd, canChangeDescription, onDescriptionChanged, detectorSt,
 }) => {
   if (!feature) return null;
   const { title, observeFrequency, solventName } = feature;
   const { curveIdx } = curveSt;
+  const { curves } = detectorSt;
+
+  const getSelectedDetectorForCurve = (_detectorSt, targetCurveIdx) => {
+    const targetCurve = curves.find((curve) => curve.curveIdx === targetCurveIdx);
+
+    return targetCurve ? targetCurve.selectedDetector.name : '';
+  };
+
+  let selectedDetector = getSelectedDetectorForCurve(detectorSt, curveIdx);
+
+  // default detector from jcamp
+  if (!selectedDetector && feature.detector) {
+    selectedDetector = feature.detector;
+  }
+
   const { shifts } = shiftSt;
   const selectedShift = shifts[curveIdx];
   let showSolvName = solventName;
@@ -184,6 +199,16 @@ const InfoPanel = ({
               <div className={classNames(classes.rowRoot, classes.rowOdd)}>
                 <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Theoretical mass: </span>
                 <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{`${parseFloat(theoryMass).toFixed(6)} g/mol`}</span>
+              </div>
+            )
+            : null
+        }
+        {
+          Format.isSECLayout(layoutSt)
+            ? (
+              <div className={classNames(classes.rowRoot, classes.rowOdd)}>
+                <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Detector: </span>
+                <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{selectedDetector}</span>
               </div>
             )
             : null
@@ -259,6 +284,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     simulationSt: state.simulation,
     shiftSt: state.shift,
     curveSt: state.curve,
+    detectorSt: state.detector,
   }
 );
 
@@ -283,6 +309,7 @@ InfoPanel.propTypes = {
   canChangeDescription: PropTypes.bool.isRequired,
   onDescriptionChanged: PropTypes.func,
   theoryMass: PropTypes.string,
+  detectorSt: PropTypes.object.isRequired,
 };
 
 export default connect( // eslint-disable-line

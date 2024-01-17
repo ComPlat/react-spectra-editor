@@ -154,7 +154,9 @@ const CyclicVoltammetryPanel = ({
   ));
 
   return (
-    <Accordion>
+    <Accordion
+      data-testid="PanelVoltammetry"
+    >
       <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
         className={classNames(classes.panelSummary)}

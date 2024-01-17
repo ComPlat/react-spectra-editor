@@ -35,6 +35,15 @@ const resetInitCommonWithIntergation = (payload) => (
   }
 );
 
+const resetDetector = () => ({
+  type: MANAGER.RESET_DETECTOR,
+});
+
 export {
-  resetAll, resetInitCommon, resetInitNmr, resetInitMs, resetInitCommonWithIntergation,
+  resetAll,
+  resetInitCommon,
+  resetInitNmr,
+  resetInitMs,
+  resetInitCommonWithIntergation,
+  resetDetector,
 }; // eslint-disable-line

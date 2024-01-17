@@ -20,6 +20,7 @@ import Submit from './r04_submit';
 import Wavelength from './r07_wavelength_btn';
 import Pecker from './07_pecker';
 import ChangeAxes from './r08_change_axes';
+import Detector from './r09_detector';
 
 const styles = () => (
   Object.assign(
@@ -56,6 +57,7 @@ const CmdBar = ({
     <Layout feature={feature} hasEdit={hasEdit} />
     <Wavelength />
     <ChangeAxes />
+    <Detector />
   </div>
 );
 

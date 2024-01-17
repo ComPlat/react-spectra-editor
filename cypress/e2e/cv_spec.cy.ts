@@ -66,10 +66,8 @@ describe('CV', () => {
   }
 
   it('Zoom in and zoom out on peaks', () => {
-    /* ==== Generated with Cypress Studio ==== */
-    cy.get('[data-testid="GraphSelectionPanel"] > .MuiButtonBase-root > .MuiAccordionSummary-content').click();
-    cy.get(':nth-child(2) > .GraphSelectionPanel-curve-603').click();
-    /* ==== End Cypress Studio ==== */
+    cy.get('[data-testid="GraphSelectionPanel"]').click();
+    cy.get('[data-testid="GraphSelectionPanel"] ul > li:nth-child(2)').click();
 
     cy.window().then(win => {
       cy.get('.d3Svg')
@@ -95,18 +93,14 @@ describe('CV', () => {
 
   it('Add peak and pecker', () => {
     cy.window().then(win => {
-      /* ==== Generated with Cypress Studio ==== */
-      cy.get('[data-testid="GraphSelectionPanel"] > .MuiButtonBase-root > .MuiAccordionSummary-content').click();
-      cy.get(':nth-child(2) > .GraphSelectionPanel-curve-603').click();
-      cy.get(':nth-child(3) > .MuiAccordionSummary-root > .MuiAccordionSummary-content').click();
-      cy.get('.CyclicVoltammetryPanel-cellSelected-643').click();
-      /* ==== End Cypress Studio ==== */
+      cy.get('[data-testid="GraphSelectionPanel"]').click();
+      cy.get('[data-testid="GraphSelectionPanel"] ul > li:nth-child(2)').click();
+      cy.get('[data-testid="PanelVoltammetry"]').click();
+      cy.get('[data-testid="PanelVoltammetry"] table > tbody > tr:nth-child(1) > td:nth-child(2)').click();
 
       addMaxPeak(win);
 
-      /* ==== Generated with Cypress Studio ==== */
-      cy.get('.MuiTableBody-root > .MuiTableRow-root > :nth-child(3)').click();
-      /* ==== End Cypress Studio ==== */
+      cy.get('[data-testid="PanelVoltammetry"] table > tbody > tr:nth-child(1) > td:nth-child(3)').click();
 
       addMinPeak(win);
 
@@ -116,31 +110,25 @@ describe('CV', () => {
 
   it('Remove peak and pecker', () => {
     cy.window().then(win => {
-      /* ==== Generated with Cypress Studio ==== */
-      cy.get('[data-testid="GraphSelectionPanel"] > .MuiButtonBase-root > .MuiAccordionSummary-content').click();
-      cy.get(':nth-child(2) > .GraphSelectionPanel-curve-603').click();
-      cy.get(':nth-child(3) > .MuiAccordionSummary-root > .MuiAccordionSummary-content').click();
-      cy.get('.CyclicVoltammetryPanel-cellSelected-643').click();
-      /* ==== End Cypress Studio ==== */
+      cy.get('[data-testid="GraphSelectionPanel"]').click();
+      cy.get('[data-testid="GraphSelectionPanel"] ul > li:nth-child(2)').click();
+      cy.get('[data-testid="PanelVoltammetry"]').click();
+      cy.get('[data-testid="PanelVoltammetry"] table > tbody > tr:nth-child(1) > td:nth-child(2)').click();
 
       addMaxPeak(win);
 
-      /* ==== Generated with Cypress Studio ==== */
-      cy.get('.MuiTableBody-root > .MuiTableRow-root > :nth-child(3)').click();
-      /* ==== End Cypress Studio ==== */
+      cy.get('[data-testid="PanelVoltammetry"] table > tbody > tr:nth-child(1) > td:nth-child(3)').click();
 
       addMinPeak(win);
 
       addPecker(win);
 
-      /* ==== Generated with Cypress Studio ==== */
-      cy.get('.MuiTableBody-root > .MuiTableRow-root > :nth-child(2)').click();
-      /* ==== End Cypress Studio ==== */
+      cy.get('[data-testid="PanelVoltammetry"] table > tbody > tr:nth-child(1) > td:nth-child(2)').click();
+
       removeMaxPeak(win);
 
-      /* ==== Generated with Cypress Studio ==== */
-      cy.get('.MuiTableBody-root > .MuiTableRow-root > :nth-child(3)').click();
-      /* ==== End Cypress Studio ==== */
+      cy.get('[data-testid="PanelVoltammetry"] table > tbody > tr:nth-child(1) > td:nth-child(3)').click();
+
       removeMinPeak(win);
 
       removePecker(win);
@@ -149,18 +137,14 @@ describe('CV', () => {
 
   it('Add new list peak and pecker', () => {
     cy.window().then(win => {
-      /* ==== Generated with Cypress Studio ==== */
-      cy.get('[data-testid="GraphSelectionPanel"] > .MuiButtonBase-root > .MuiAccordionSummary-content').click();
-      cy.get(':nth-child(2) > .GraphSelectionPanel-curve-603').click();
-      cy.get(':nth-child(3) > .MuiAccordionSummary-root > .MuiAccordionSummary-content').click();
-      cy.get('.CyclicVoltammetryPanel-cellSelected-643').click();
-      /* ==== End Cypress Studio ==== */
+      cy.get('[data-testid="GraphSelectionPanel"]').click();
+      cy.get('[data-testid="GraphSelectionPanel"] ul > li:nth-child(2)').click();
+      cy.get('[data-testid="PanelVoltammetry"]').click();
+      cy.get('[data-testid="PanelVoltammetry"] table > tbody > tr:nth-child(1) > td:nth-child(2)').click();
 
       addMaxPeak(win);
 
-      /* ==== Generated with Cypress Studio ==== */
-      cy.get('.MuiTableBody-root > .MuiTableRow-root > :nth-child(3)').click();
-      /* ==== End Cypress Studio ==== */
+      cy.get('[data-testid="PanelVoltammetry"] table > tbody > tr:nth-child(1) > td:nth-child(3)').click();
 
       addMinPeak(win);
 
@@ -169,14 +153,13 @@ describe('CV', () => {
 
       /* ==== Generated with Cypress Studio ==== */
       cy.get('[data-testid="AddCircleOutlineIcon"] > path').click();
-      cy.get('.MuiTableBody-root > :nth-child(2) > :nth-child(2)').click();
       /* ==== End Cypress Studio ==== */
+
+      cy.get('[data-testid="PanelVoltammetry"] table > tbody > tr:nth-child(2) > td:nth-child(2)').click();
 
       addMaxPeak(win, 50);
 
-      /* ==== Generated with Cypress Studio ==== */
-      cy.get('.MuiTableBody-root > :nth-child(2) > :nth-child(3)').click();
-      /* ==== End Cypress Studio ==== */
+      cy.get('[data-testid="PanelVoltammetry"] table > tbody > tr:nth-child(2) > td:nth-child(3)').click();
 
       addMinPeak(win, 50);
 
@@ -190,18 +173,14 @@ describe('CV', () => {
 
   it('Set reference peaks', () => {
     cy.window().then(win => {
-      /* ==== Generated with Cypress Studio ==== */
-      cy.get('[data-testid="GraphSelectionPanel"] > .MuiButtonBase-root > .MuiAccordionSummary-content').click();
-      cy.get(':nth-child(2) > .GraphSelectionPanel-curve-603').click();
-      cy.get(':nth-child(3) > .MuiAccordionSummary-root > .MuiAccordionSummary-content').click();
-      cy.get('.CyclicVoltammetryPanel-cellSelected-643').click();
-      /* ==== End Cypress Studio ==== */
+      cy.get('[data-testid="GraphSelectionPanel"]').click();
+      cy.get('[data-testid="GraphSelectionPanel"] ul > li:nth-child(2)').click();
+      cy.get('[data-testid="PanelVoltammetry"]').click();
+      cy.get('[data-testid="PanelVoltammetry"] table > tbody > tr:nth-child(1) > td:nth-child(2)').click();
 
       addMaxPeak(win);
 
-      /* ==== Generated with Cypress Studio ==== */
-      cy.get('.MuiTableBody-root > .MuiTableRow-root > :nth-child(3)').click();
-      /* ==== End Cypress Studio ==== */
+      cy.get('[data-testid="PanelVoltammetry"] table > tbody > tr:nth-child(1) > td:nth-child(3)').click();
 
       addMinPeak(win);
 
@@ -210,14 +189,13 @@ describe('CV', () => {
 
       /* ==== Generated with Cypress Studio ==== */
       cy.get('[data-testid="AddCircleOutlineIcon"] > path').click();
-      cy.get('.MuiTableBody-root > :nth-child(2) > :nth-child(2)').click();
       /* ==== End Cypress Studio ==== */
+
+      cy.get('[data-testid="PanelVoltammetry"] table > tbody > tr:nth-child(2) > td:nth-child(2)').click();
 
       addMaxPeak(win, 50);
 
-      /* ==== Generated with Cypress Studio ==== */
-      cy.get('.MuiTableBody-root > :nth-child(2) > :nth-child(3)').click();
-      /* ==== End Cypress Studio ==== */
+      cy.get('[data-testid="PanelVoltammetry"] table > tbody > tr:nth-child(2) > td:nth-child(3)').click();
 
       addMinPeak(win, 50);
 
