@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 import thresholdReducer from './reducer_threshold';
-import editPeakReducer from './reducer_edit_peak';
+import undoableEditPeakReducer from './reducer_edit_peak';
 import statusReducer from './reducer_status';
 import managerReducer from './reducer_manager';
 import layoutReducer from './reducer_layout';
@@ -22,7 +22,7 @@ import detectorReducer from './reducer_detector';
 
 const rootReducer = combineReducers({
   threshold: thresholdReducer,
-  editPeak: editPeakReducer,
+  editPeak: undoableEditPeakReducer,
   status: statusReducer,
   manager: managerReducer,
   layout: layoutReducer,

@@ -4,7 +4,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.editPeakReducer = exports.default = void 0;
 var _reduxUndo = _interopRequireDefault(require("redux-undo"));
 var _action_type = require("../constants/action_type");
 var _undo_redo_config = require("./undo_redo_config");
@@ -180,6 +180,28 @@ const processShift = (state, action) => {
     peaks: newPeaks
   });
 };
+const clearAllPeaks = (state, action) => {
+  const {
+    curveIdx,
+    dataPeaks
+  } = action.payload;
+  const {
+    peaks
+  } = state;
+  const selectedEditPeaks = peaks[curveIdx];
+  const {
+    pos
+  } = selectedEditPeaks;
+  const newSelectedEditPeaks = Object.assign({}, selectedEditPeaks, {
+    pos: [],
+    neg: [...pos, ...dataPeaks]
+  });
+  const newPeaks = [...peaks];
+  newPeaks[curveIdx] = newSelectedEditPeaks;
+  return Object.assign({}, state, {
+    peaks: newPeaks
+  });
+};
 const editPeakReducer = function () {
   let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
   let action = arguments.length > 1 ? arguments[1] : undefined;
@@ -194,6 +216,8 @@ const editPeakReducer = function () {
       return rmFromNeg(state, action);
     case _action_type.EDITPEAK.SHIFT:
       return processShift(state, action);
+    case _action_type.EDITPEAK.CLEAR_ALL:
+      return clearAllPeaks(state, action);
     case _action_type.MANAGER.RESETALL:
       return {
         selectedIdx: 0,
@@ -207,5 +231,6 @@ const editPeakReducer = function () {
       return _undo_redo_config.undoRedoActions.indexOf(action.type) >= 0 ? Object.assign({}, state) : state;
   }
 };
+exports.editPeakReducer = editPeakReducer;
 const undoableEditPeakReducer = (0, _reduxUndo.default)(editPeakReducer, _undo_redo_config.undoRedoConfig);
 var _default = exports.default = undoableEditPeakReducer;

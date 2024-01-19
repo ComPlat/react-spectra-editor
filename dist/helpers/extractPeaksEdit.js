@@ -4,7 +4,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.extractPeaksEdit = exports.extractAreaUnderCurve = void 0;
+exports.extractPeaksEdit = exports.extractAutoPeaks = exports.extractAreaUnderCurve = void 0;
 var _converter = require("./converter");
 var _chem = require("./chem");
 var _shift = require("./shift");
@@ -35,6 +35,13 @@ const extractPeaksEdit = function (feature, editPeakSt, thresSt, shiftSt, layout
   return peaksEdit;
 };
 exports.extractPeaksEdit = extractPeaksEdit;
+const extractAutoPeaks = function (feature, thresSt, shiftSt, layoutSt) {
+  let atIndex = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 0;
+  const offset = _format.default.isMsLayout(layoutSt) ? msOffset() : niOffset(shiftSt, atIndex);
+  const peaks = (0, _chem.Convert2Peak)(feature, thresSt.value, offset);
+  return peaks;
+};
+exports.extractAutoPeaks = extractAutoPeaks;
 const getAUCValue = (integrationSt, layoutSt) => {
   const {
     refArea,

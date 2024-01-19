@@ -19,7 +19,7 @@ var _list_layout = require("../../constants/list_layout");
 var _calc = require("../../helpers/calc");
 /* eslint-disable prefer-object-spread, no-mixed-operators */
 
-import('d3').then(d3 => {
+const d3 = require('d3');
 class LineFocus {
   constructor(props) {
     const {
@@ -682,4 +682,3 @@ class LineFocus {
   }
 }
 var _default = exports.default = LineFocus;
-});

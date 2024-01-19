@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.drawMain = exports.drawLabel = exports.drawDisplay = exports.drawDestroy = exports.drawArrowOnCurve = void 0;
-import('d3').then(d3 => {
+const d3 = require('d3');
 const drawMain = (klass, w, h) => {
   d3.select(klass).append('svg').attr('class', 'd3Svg').attr('preserveAspectRatio', 'xMinYMin meet').attr('viewBox', `0 0 ${w} ${h}`);
 };
@@ -49,4 +49,3 @@ const drawArrowOnCurve = (klass, isHidden) => {
   }
 };
 exports.drawArrowOnCurve = drawArrowOnCurve;
-});

@@ -17,7 +17,10 @@ var _ui = require("../../actions/ui");
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 var _common = require("./common");
 var _list_ui = require("../../constants/list_ui");
-/* eslint-disable prefer-object-spread, function-paren-newline,
+var _tri_btn = _interopRequireDefault(require("./tri_btn"));
+var _edit_peak = require("../../actions/edit_peak");
+var _extractPeaksEdit = require("../../helpers/extractPeaksEdit");
+/* eslint-disable prefer-object-spread, function-paren-newline, no-unused-vars,
 react/function-component-definition, react/require-default-props, max-len,
 react/no-unused-prop-types */
 
@@ -34,15 +37,28 @@ const Peak = _ref => {
     disableSetRefSt,
     isHandleMaxAndMinPeaksSt,
     cyclicVotaSt,
-    curveSt
+    curveSt,
+    clearAllPeaksAct,
+    feature,
+    editPeakSt,
+    thresSt,
+    shiftSt,
+    layoutSt
   } = _ref;
   let onSweepPeakAdd = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.PEAK_ADD);
   let onSweepPeakDELETE = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.PEAK_DELETE);
   let onSweepAnchorShift = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT);
+  const {
+    curveIdx
+  } = curveSt;
+  const onClearAll = () => {
+    const dataPeaks = (0, _extractPeaksEdit.extractAutoPeaks)(feature, thresSt, shiftSt, layoutSt);
+    clearAllPeaksAct({
+      curveIdx,
+      dataPeaks
+    });
+  };
   if (isHandleMaxAndMinPeaksSt) {
-    const {
-      curveIdx
-    } = curveSt;
     const {
       spectraList
     } = cyclicVotaSt;
@@ -84,7 +100,17 @@ const Peak = _ref => {
     onClick: onSweepPeakDELETE
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.txt, 'txt-sv-bar-rmpeak')
-  }, "P-")))), !disableSetRefSt ? /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+  }, "P-")))), /*#__PURE__*/_react.default.createElement(_tri_btn.default, {
+    content: {
+      tp: 'Clear All Peaks'
+    },
+    cb: onClearAll,
+    isClearAllDisabled: disableRmPeakSt
+  }, /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.txt, 'txt-sv-bar-rmallpeaks')
+  }, "P"), /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.txt, classes.txtIcon, 'txt-sv-bar-rmallpeaks')
+  }, "x")), !disableSetRefSt ? /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
     title: /*#__PURE__*/_react.default.createElement("span", {
       className: "txt-sv-tp"
     }, "Set Reference")
@@ -96,7 +122,7 @@ const Peak = _ref => {
     className: classes.icon
   })))) : null);
 };
-const mapStateToProps = (state, _) => (
+const mapStateToProps = (state, props) => (
 // eslint-disable-line
 {
   isFocusAddPeakSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.PEAK_ADD || state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MAX_PEAK || state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MIN_PEAK,
@@ -107,10 +133,15 @@ const mapStateToProps = (state, _) => (
   disableSetRefSt: _cfg.default.btnCmdSetRef(state.layout),
   isHandleMaxAndMinPeaksSt: !_cfg.default.hidePanelCyclicVolta(state.layout),
   cyclicVotaSt: state.cyclicvolta,
-  curveSt: state.curve
+  curveSt: state.curve,
+  editPeakSt: state.editPeak.present,
+  thresSt: state.threshold,
+  layoutSt: state.layout,
+  shiftSt: state.shift
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
-  setUiSweepTypeAct: _ui.setUiSweepType
+  setUiSweepTypeAct: _ui.setUiSweepType,
+  clearAllPeaksAct: _edit_peak.clearAllPeaks
 }, dispatch);
 Peak.propTypes = {
   classes: _propTypes.default.object.isRequired,
@@ -123,6 +154,12 @@ Peak.propTypes = {
   setUiSweepTypeAct: _propTypes.default.func.isRequired,
   isHandleMaxAndMinPeaksSt: _propTypes.default.bool.isRequired,
   cyclicVotaSt: _propTypes.default.object.isRequired,
-  curveSt: _propTypes.default.object.isRequired
+  curveSt: _propTypes.default.object.isRequired,
+  clearAllPeaksAct: _propTypes.default.func.isRequired,
+  feature: _propTypes.default.object.isRequired,
+  editPeakSt: _propTypes.default.object.isRequired,
+  thresSt: _propTypes.default.object.isRequired,
+  layoutSt: _propTypes.default.string.isRequired,
+  shiftSt: _propTypes.default.object.isRequired
 };
 var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _withStyles.default)(styles))(Peak);

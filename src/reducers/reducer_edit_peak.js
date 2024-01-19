@@ -141,6 +141,21 @@ const processShift = (state, action) => {
   return Object.assign({}, state, { peaks: newPeaks });
 };
 
+const clearAllPeaks = (state, action) => {
+  const { curveIdx, dataPeaks } = action.payload;
+  const { peaks } = state;
+  const selectedEditPeaks = peaks[curveIdx];
+
+  const { pos } = selectedEditPeaks;
+
+  const newSelectedEditPeaks = Object.assign({}, selectedEditPeaks, {
+    pos: [], neg: [...pos, ...dataPeaks],
+  });
+  const newPeaks = [...peaks];
+  newPeaks[curveIdx] = newSelectedEditPeaks;
+  return Object.assign({}, state, { peaks: newPeaks });
+};
+
 const editPeakReducer = (state = initialState, action) => {
   switch (action.type) {
     case EDITPEAK.ADD_POSITIVE:
@@ -153,6 +168,8 @@ const editPeakReducer = (state = initialState, action) => {
       return rmFromNeg(state, action);
     case EDITPEAK.SHIFT:
       return processShift(state, action);
+    case EDITPEAK.CLEAR_ALL:
+      return clearAllPeaks(state, action);
     case MANAGER.RESETALL:
       return {
         selectedIdx: 0,
@@ -175,5 +192,9 @@ const undoableEditPeakReducer = undoable(
   editPeakReducer,
   undoRedoConfig,
 );
+
+export {
+  editPeakReducer,
+};
 
 export default undoableEditPeakReducer;

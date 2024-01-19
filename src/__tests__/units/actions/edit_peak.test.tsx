@@ -1,4 +1,4 @@
-import { rmFromNegList, rmFromPosList } from "../../../actions/edit_peak";
+import { rmFromNegList, rmFromPosList, clearAllPeaks } from "../../../actions/edit_peak";
 import { EDITPEAK } from "../../../constants/action_type";
 
 describe('Test redux action for edit peaks', () => {
@@ -14,5 +14,12 @@ describe('Test redux action for edit peaks', () => {
     const { type, payload } = rmFromNegList(peak)
     expect(type).toEqual(EDITPEAK.RM_NEGATIVE)
     expect(payload).toEqual(peak)
+  })
+
+  it('Remove all peaks', () => {
+    const curveIdx = 0
+    const { type, payload } = clearAllPeaks(curveIdx)
+    expect(type).toEqual(EDITPEAK.CLEAR_ALL)
+    expect(payload).toEqual(curveIdx)
   })
 })

@@ -21,7 +21,7 @@ var _calc = require("../../helpers/calc");
 /* eslint-disable no-unused-vars, prefer-object-spread, no-mixed-operators,
 no-unneeded-ternary, arrow-body-style */
 
-import('d3').then(d3 => {
+const d3 = require('d3');
 class MultiFocus {
   constructor(props) {
     const {
@@ -833,4 +833,3 @@ class MultiFocus {
   }
 }
 var _default = exports.default = MultiFocus;
-});

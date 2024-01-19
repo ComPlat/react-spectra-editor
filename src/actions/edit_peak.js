@@ -14,7 +14,15 @@ const rmFromNegList = (payload) => (
   }
 );
 
+const clearAllPeaks = (payload) => (
+  {
+    type: EDITPEAK.CLEAR_ALL,
+    payload,
+  }
+);
+
 export {
   rmFromPosList,
   rmFromNegList,
+  clearAllPeaks,
 };
