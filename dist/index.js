@@ -604,30 +604,35 @@ class DemoWriteIr extends _react.default.Component {
       },
       onClick: this.onClick('raman')
     }, "RAMAN"), /*#__PURE__*/_react.default.createElement(_material.Button, {
+      id: "btn-uv-vis",
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('uv/vis')
     }, "UV/VIS"), /*#__PURE__*/_react.default.createElement(_material.Button, {
+      id: "btn-hplc",
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('hplc uv/vis')
     }, "HPLC UV/VIS"), /*#__PURE__*/_react.default.createElement(_material.Button, {
+      id: "btn-tga",
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('tga')
     }, "TGA"), /*#__PURE__*/_react.default.createElement(_material.Button, {
+      id: "btn-xrd",
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('xrd')
     }, "XRD"), /*#__PURE__*/_react.default.createElement(_material.Button, {
+      id: "btn-cv",
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
@@ -640,12 +645,14 @@ class DemoWriteIr extends _react.default.Component {
       },
       onClick: this.onClick('cds')
     }, "CDS"), /*#__PURE__*/_react.default.createElement(_material.Button, {
+      id: "btn-sec",
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('sec')
     }, "SEC"), /*#__PURE__*/_react.default.createElement(_material.Button, {
+      id: "btn-sod",
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'

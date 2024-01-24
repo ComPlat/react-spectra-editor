@@ -104,7 +104,7 @@ const Integration = _ref => {
       className: "txt-sv-tp"
     }, "Add Integration")
   }, /*#__PURE__*/_react.default.createElement("span", null, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
-    className: (0, _classnames.default)((0, _common.focusStyle)(isFocusAddIntgSt, classes)),
+    className: (0, _classnames.default)((0, _common.focusStyle)(isFocusAddIntgSt, classes), 'btn-add-inter'),
     disabled: isDisableSt,
     onClick: onSweepIntegtAdd
   }, /*#__PURE__*/_react.default.createElement(_react2.default, {
@@ -119,7 +119,7 @@ const Integration = _ref => {
       className: "txt-sv-tp"
     }, "Remove Integration")
   }, /*#__PURE__*/_react.default.createElement("span", null, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
-    className: (0, _classnames.default)((0, _common.focusStyle)(isFocusRmIntgSt, classes)),
+    className: (0, _classnames.default)((0, _common.focusStyle)(isFocusRmIntgSt, classes), 'btn-remove-inter'),
     disabled: isDisableSt,
     onClick: onSweepIntegtRm
   }, /*#__PURE__*/_react.default.createElement(_react2.default, {
@@ -134,7 +134,7 @@ const Integration = _ref => {
       className: "txt-sv-tp"
     }, "Set Integration Reference")
   }, /*#__PURE__*/_react.default.createElement("span", null, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
-    className: (0, _classnames.default)((0, _common.focusStyle)(isFocusSetRefSt, classes)),
+    className: (0, _classnames.default)((0, _common.focusStyle)(isFocusSetRefSt, classes), 'btn-set-inter-ref'),
     disabled: isDisableSt,
     onClick: onSweepIntegtSR
   }, /*#__PURE__*/_react.default.createElement(_react2.default, {

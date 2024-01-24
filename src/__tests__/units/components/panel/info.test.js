@@ -20,10 +20,18 @@ const store = mockStore({
   },
   simulation: {
 
-  }
+  },
+  detector: {
+    curves: [
+      {
+        curveIdx: 0,
+        selectedDetector: { name: 'Refractive index', label: 'RI' },
+      },
+    ],
+  },
 });
 const failedStore = mockStore({
-  
+
 });
 const dispatchMock = () => Promise.resolve({});
 store.dispatch = jest.fn(dispatchMock);

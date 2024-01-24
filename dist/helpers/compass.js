@@ -19,11 +19,11 @@ const TfRescale = focus => {
   };
 };
 exports.TfRescale = TfRescale;
-const fetchPt = (focus, xt) => {
+const fetchPt = (event, focus, xt) => {
   // const rawMouseX = focus.isFirefox // WORKAROUND d3.mouse firefox compatibility
   //   ? d3.event.offsetX
   //   : d3.mouse(focus.root.node())[0];
-  const rawMouseX = d3.mouse(focus.root.node())[0];
+  const rawMouseX = d3.pointer(event, focus.root.node())[0];
   const mouseX = xt.invert(rawMouseX);
   const bisectDate = d3.bisector(d => +d.x).left;
   const dt = focus.data;
@@ -32,15 +32,15 @@ const fetchPt = (focus, xt) => {
   const idx = bisectDate(sortData, +mouseX);
   return sortData[idx];
 };
-const fetchFreePt = (focus, xt, yt) => {
+const fetchFreePt = (event, focus, xt, yt) => {
   // const rawMouseX = focus.isFirefox // WORKAROUND d3.mouse firefox compatibility
   //   ? d3.event.offsetX
   //   : d3.mouse(focus.root.node())[0];
   // const rawMouseY = focus.isFirefox // WORKAROUND d3.mouse firefox compatibility
   //   ? d3.event.offsetY
   //   : d3.mouse(focus.root.node())[1];
-  const rawMouseX = d3.mouse(focus.root.node())[0];
-  const rawMouseY = d3.mouse(focus.root.node())[1];
+  const rawMouseX = d3.pointer(event, focus.root.node())[0];
+  const rawMouseY = d3.pointer(event, focus.root.node())[1];
   const mouseX = xt.invert(rawMouseX);
   const mouseY = yt.invert(rawMouseY);
   const distance2 = (x1, x2, y1, y2) => {
@@ -60,7 +60,7 @@ const fetchFreePt = (focus, xt, yt) => {
   });
   return selectPoint;
 };
-const MouseMove = focus => {
+const MouseMove = (event, focus) => {
   const {
     xt,
     yt
@@ -71,7 +71,7 @@ const MouseMove = focus => {
     wavelength
   } = focus;
   if (_format.default.isCyclicVoltaLayout(layout)) {
-    const pt = fetchFreePt(focus, xt, yt);
+    const pt = fetchFreePt(event, focus, xt, yt);
     if (pt) {
       const tx = xt(pt.x);
       const ty = yt(pt.y);
@@ -85,7 +85,7 @@ const MouseMove = focus => {
       }
     }
   } else {
-    const pt = fetchPt(focus, xt);
+    const pt = fetchPt(event, focus, xt);
     if (pt) {
       const tx = xt(pt.x);
       const ty = yt(pt.y);
@@ -99,6 +99,8 @@ const MouseMove = focus => {
           dValue = (0, _chem.Convert2DValue)(pt.x).toExponential(2);
         }
         focus.root.select('.cursor-txt-hz').attr('transform', `translate(${tx},${ty - 30})`).text(`2Theta: ${pt.x.toExponential(2)}, d-value: ${dValue}`);
+      } else if (_format.default.isTGALayout(layout)) {
+        focus.root.select('.cursor-txt').attr('transform', `translate(${tx},${10})`).text(`X: ${pt.x.toFixed(3)}, Y: ${pt.y.toFixed(3)}`);
       } else {
         focus.root.select('.cursor-txt').attr('transform', `translate(${tx},${10})`).text(pt.x.toFixed(3));
         if (freq) {
@@ -111,21 +113,21 @@ const MouseMove = focus => {
   }
 };
 exports.MouseMove = MouseMove;
-const ClickCompass = focus => {
-  d3.event.stopPropagation();
-  d3.event.preventDefault();
+const ClickCompass = (event, focus) => {
+  event.stopPropagation();
+  event.preventDefault();
   const {
     xt,
     yt
   } = TfRescale(focus);
-  let pt = fetchPt(focus, xt);
+  let pt = fetchPt(event, focus, xt);
   const {
     layout,
     cyclicvoltaSt,
     jcampIdx
   } = focus;
   if (_format.default.isCyclicVoltaLayout(layout)) {
-    pt = fetchFreePt(focus, xt, yt);
+    pt = fetchFreePt(event, focus, xt, yt);
     const onPeak = false;
     if (cyclicvoltaSt) {
       const {
@@ -155,6 +157,6 @@ const MountCompass = focus => {
   compass.append('circle').attr('r', 4).attr('fill', 'none').attr('stroke', '#777').attr('stroke-width', 2);
   cursor.append('text').attr('class', 'cursor-txt').attr('font-family', 'Helvetica').style('font-size', '12px').style('text-anchor', 'middle');
   cursor.append('text').attr('class', 'cursor-txt-hz').attr('font-family', 'Helvetica').style('font-size', '12px').style('text-anchor', 'middle').style('fill', '#D68910');
-  overlay.on('mousemove', () => MouseMove(focus)).on('click', () => ClickCompass(focus));
+  overlay.on('mousemove', event => MouseMove(event, focus)).on('click', event => ClickCompass(event, focus));
 };
 exports.MountCompass = MountCompass;

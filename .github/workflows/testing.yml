@@ -1,4 +1,4 @@
-name: Testing
+name: Units Testing
 
 on: push
 

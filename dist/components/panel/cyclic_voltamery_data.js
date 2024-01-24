@@ -171,7 +171,9 @@ const CyclicVoltammetryPanel = _ref => {
     }),
     onCheckRefChanged: e => changeCheckRefPeaks(idx, e)
   }));
-  return /*#__PURE__*/_react.default.createElement(_material.Accordion, null, /*#__PURE__*/_react.default.createElement(_material.AccordionSummary, {
+  return /*#__PURE__*/_react.default.createElement(_material.Accordion, {
+    "data-testid": "PanelVoltammetry"
+  }, /*#__PURE__*/_react.default.createElement(_material.AccordionSummary, {
     expandIcon: /*#__PURE__*/_react.default.createElement(_ExpandMore.default, null),
     className: (0, _classnames.default)(classes.panelSummary)
   }, /*#__PURE__*/_react.default.createElement(_material.Typography, {

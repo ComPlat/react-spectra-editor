@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.resetInitNmr = exports.resetInitMs = exports.resetInitCommonWithIntergation = exports.resetInitCommon = exports.resetAll = void 0;
+exports.resetInitNmr = exports.resetInitMs = exports.resetInitCommonWithIntergation = exports.resetInitCommon = exports.resetDetector = exports.resetAll = void 0;
 var _action_type = require("../constants/action_type");
 const resetAll = payload => ({
   type: _action_type.MANAGER.RESETALL,
@@ -29,6 +29,10 @@ const resetInitCommonWithIntergation = payload => ({
   type: _action_type.MANAGER.RESET_INIT_COMMON_WITH_INTERGATION,
   payload
 });
+exports.resetInitCommonWithIntergation = resetInitCommonWithIntergation;
+const resetDetector = () => ({
+  type: _action_type.MANAGER.RESET_DETECTOR
+});
 
 // eslint-disable-line
-exports.resetInitCommonWithIntergation = resetInitCommonWithIntergation;
+exports.resetDetector = resetDetector;

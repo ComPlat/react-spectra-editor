@@ -773,7 +773,10 @@ const extrFeaturesCylicVolta = (jcamp, layout, peakUp) => {
     const lowerThres = _format.default.isXRDLayout(layout) ? 100 : calcLowerThres(s);
     const cpo = buildPeakFeature(jcamp, layout, peakUp, s, 100, upperThres, lowerThres);
     const bnd = getBoundary(s);
-    return Object.assign({}, base, cpo, bnd);
+    const detector = _format.default.isSECLayout(layout) && jcamp.info.$DETECTOR ? jcamp.info.$DETECTOR : '';
+    return Object.assign({}, base, cpo, bnd, {
+      detector
+    });
   }).filter(r => r != null);
   return features;
 };
@@ -819,7 +822,7 @@ const extractTemperature = jcamp => {
 const ExtractJcamp = source => {
   const jcamp = _jcampconverter.default.convert(source, {
     xy: true,
-    keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS|\$CSUPPERTHRESHOLD|\$CSLOWERTHRESHOLD|\$CSCYCLICVOLTAMMETRYDATA|UNITS|SYMBOL|CSAUTOMETADATA)/ // eslint-disable-line
+    keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS|\$CSUPPERTHRESHOLD|\$CSLOWERTHRESHOLD|\$CSCYCLICVOLTAMMETRYDATA|UNITS|SYMBOL|CSAUTOMETADATA|\$DETECTOR)/ // eslint-disable-line
   });
   const layout = readLayout(jcamp);
   const peakUp = !_format.default.isIrLayout(layout);

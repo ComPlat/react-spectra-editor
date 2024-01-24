@@ -8,11 +8,11 @@ const TfRescale = (focus) => {
   return { xt, yt };
 };
 
-const fetchPt = (focus, xt) => {
+const fetchPt = (event, focus, xt) => {
   // const rawMouseX = focus.isFirefox // WORKAROUND d3.mouse firefox compatibility
   //   ? d3.event.offsetX
   //   : d3.mouse(focus.root.node())[0];
-  const rawMouseX = d3.mouse(focus.root.node())[0];
+  const rawMouseX = d3.pointer(event, focus.root.node())[0];
   const mouseX = xt.invert(rawMouseX);
   const bisectDate = d3.bisector((d) => +d.x).left;
   const dt = focus.data;
@@ -22,15 +22,15 @@ const fetchPt = (focus, xt) => {
   return sortData[idx];
 };
 
-const fetchFreePt = (focus, xt, yt) => {
+const fetchFreePt = (event, focus, xt, yt) => {
   // const rawMouseX = focus.isFirefox // WORKAROUND d3.mouse firefox compatibility
   //   ? d3.event.offsetX
   //   : d3.mouse(focus.root.node())[0];
   // const rawMouseY = focus.isFirefox // WORKAROUND d3.mouse firefox compatibility
   //   ? d3.event.offsetY
   //   : d3.mouse(focus.root.node())[1];
-  const rawMouseX = d3.mouse(focus.root.node())[0];
-  const rawMouseY = d3.mouse(focus.root.node())[1];
+  const rawMouseX = d3.pointer(event, focus.root.node())[0];
+  const rawMouseY = d3.pointer(event, focus.root.node())[1];
   const mouseX = xt.invert(rawMouseX);
   const mouseY = yt.invert(rawMouseY);
 
@@ -54,11 +54,11 @@ const fetchFreePt = (focus, xt, yt) => {
   return selectPoint;
 };
 
-const MouseMove = (focus) => {
+const MouseMove = (event, focus) => {
   const { xt, yt } = TfRescale(focus);
   const { freq, layout, wavelength } = focus;
   if (Format.isCyclicVoltaLayout(layout)) {
-    const pt = fetchFreePt(focus, xt, yt);
+    const pt = fetchFreePt(event, focus, xt, yt);
     if (pt) {
       const tx = xt(pt.x);
       const ty = yt(pt.y);
@@ -79,7 +79,7 @@ const MouseMove = (focus) => {
       }
     }
   } else {
-    const pt = fetchPt(focus, xt);
+    const pt = fetchPt(event, focus, xt);
     if (pt) {
       const tx = xt(pt.x);
       const ty = yt(pt.y);
@@ -97,6 +97,10 @@ const MouseMove = (focus) => {
         focus.root.select('.cursor-txt-hz')
           .attr('transform', `translate(${tx},${ty - 30})`)
           .text(`2Theta: ${pt.x.toExponential(2)}, d-value: ${dValue}`);
+      } else if (Format.isTGALayout(layout)) {
+        focus.root.select('.cursor-txt')
+          .attr('transform', `translate(${tx},${10})`)
+          .text(`X: ${pt.x.toFixed(3)}, Y: ${pt.y.toFixed(3)}`);
       } else {
         focus.root.select('.cursor-txt')
           .attr('transform', `translate(${tx},${10})`)
@@ -114,14 +118,14 @@ const MouseMove = (focus) => {
   }
 };
 
-const ClickCompass = (focus) => {
-  d3.event.stopPropagation();
-  d3.event.preventDefault();
+const ClickCompass = (event, focus) => {
+  event.stopPropagation();
+  event.preventDefault();
   const { xt, yt } = TfRescale(focus);
-  let pt = fetchPt(focus, xt);
+  let pt = fetchPt(event, focus, xt);
   const { layout, cyclicvoltaSt, jcampIdx } = focus;
   if (Format.isCyclicVoltaLayout(layout)) {
-    pt = fetchFreePt(focus, xt, yt);
+    pt = fetchFreePt(event, focus, xt, yt);
     const onPeak = false;
     if (cyclicvoltaSt) {
       const { spectraList } = cyclicvoltaSt;
@@ -170,8 +174,8 @@ const MountCompass = (focus) => {
     .style('fill', '#D68910');
 
   overlay
-    .on('mousemove', () => MouseMove(focus))
-    .on('click', () => ClickCompass(focus));
+    .on('mousemove', (event) => MouseMove(event, focus))
+    .on('click', (event) => ClickCompass(event, focus));
 };
 
 export {

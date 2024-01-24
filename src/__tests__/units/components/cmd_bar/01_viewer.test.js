@@ -26,7 +26,7 @@ describe('<Viewer />', () => {
   it('Render Viewer', async () => {
     const renderer = 
       <AppWrapper store={store}>
-          <Viewer editorOnly={false} />
+        <Viewer editorOnly={false} />
       </AppWrapper>
     ;
     const { queryByTestId } = render(renderer);
@@ -38,7 +38,7 @@ describe('<Viewer />', () => {
   it('Render Viewer in editor only mode',  () => {
     const renderer = 
       <AppWrapper store={store}>
-          <Viewer editorOnly={true} />
+        <Viewer editorOnly={true} />
       </AppWrapper>
     ;
     const { queryByTestId } = render(renderer);

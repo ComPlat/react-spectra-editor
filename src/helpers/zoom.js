@@ -6,10 +6,10 @@ const resetZoom = (main) => {
 };
 
 const MountZoom = (main, zoomed) => {
-  const zoomedCb = () => zoomed(main);
-  const resetZoomCb = () => {
-    d3.event.stopPropagation();
-    d3.event.preventDefault();
+  const zoomedCb = (event) => zoomed(event, main);
+  const resetZoomCb = (event) => {
+    event.stopPropagation();
+    event.preventDefault();
     resetZoom(main);
   };
 
