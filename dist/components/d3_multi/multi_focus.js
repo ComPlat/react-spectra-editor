@@ -5,7 +5,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-var d3 = _interopRequireWildcard(require("d3"));
 var _init = require("../../helpers/init");
 var _mount = require("../../helpers/mount");
 var _converter = require("../../helpers/converter");
@@ -19,11 +18,10 @@ var _focus = require("../../helpers/focus");
 var _integration = require("../../helpers/integration");
 var _multiplicity_calc = require("../../helpers/multiplicity_calc");
 var _calc = require("../../helpers/calc");
-function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
-function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 /* eslint-disable no-unused-vars, prefer-object-spread, no-mixed-operators,
 no-unneeded-ternary, arrow-body-style */
 
+import('d3').then(d3 => {
 class MultiFocus {
   constructor(props) {
     const {
@@ -835,3 +833,4 @@ class MultiFocus {
   }
 }
 var _default = exports.default = MultiFocus;
+});

@@ -2,7 +2,7 @@ import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { drawArrowOnCurve, drawDestroy, drawDisplay, drawLabel, drawMain } from '../../../../components/common/draw';
 import { useEffect } from 'react';
-import * as d3 from 'd3';
+const d3 = require('d3');
 
 describe('common/draw', () => {
   describe('.drawMain()', () => {

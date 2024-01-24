@@ -1,5 +1,4 @@
 /* eslint-disable prefer-object-spread, no-mixed-operators */
-import * as d3 from 'd3';
 import {
   InitScale, InitAxisCall, InitTip,
 } from '../../helpers/init';
@@ -17,6 +16,8 @@ import Format from '../../helpers/format';
 import Cfg from '../../helpers/cfg';
 import { LIST_LAYOUT } from '../../constants/list_layout';
 import { calcSlope } from '../../helpers/calc';
+
+const d3 = require('d3');
 
 class LineFocus {
   constructor(props) {

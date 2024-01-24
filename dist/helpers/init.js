@@ -5,11 +5,9 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.InitTip = exports.InitScale = exports.InitPathCall = exports.InitAxisCall = void 0;
-var d3 = _interopRequireWildcard(require("d3"));
 var _d3Tip = _interopRequireDefault(require("d3-tip"));
 var _format = _interopRequireDefault(require("./format"));
-function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
-function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
+import('d3').then(d3 => {
 const InitScale = function (target) {
   let reverse = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
   const xRange = reverse ? [target.w, 0] : [0, target.w];
@@ -70,3 +68,4 @@ const InitTip = () => {
   return tip;
 };
 exports.InitTip = InitTip;
+});

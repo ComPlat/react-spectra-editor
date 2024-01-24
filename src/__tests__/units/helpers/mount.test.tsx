@@ -2,8 +2,8 @@ import { useEffect } from "react";
 import { MountBars, MountPath, MountRef, MountTags } from "../../../helpers/mount";
 import { render } from "@testing-library/react";
 import { drawMain } from "../../../components/common/draw";
-import * as d3 from 'd3';
 import '@testing-library/jest-dom';
+const d3 = require('d3');
 
 describe('helpers/mount', () => {
   const enum MountType { TAG, BAR, REF, PATH }

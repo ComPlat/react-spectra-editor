@@ -1,6 +1,5 @@
 /* eslint-disable no-unused-vars, prefer-object-spread, no-mixed-operators,
 no-unneeded-ternary, arrow-body-style */
-import * as d3 from 'd3';
 import {
   InitScale, InitAxisCall, InitTip,
 } from '../../helpers/init';
@@ -21,6 +20,8 @@ import { itgIdTag, mpyIdTag } from '../../helpers/focus';
 import { calcArea } from '../../helpers/integration';
 import { calcMpyCenter } from '../../helpers/multiplicity_calc';
 import { calcSlope } from '../../helpers/calc';
+
+const d3 = require('d3');
 
 class MultiFocus {
   constructor(props) {
