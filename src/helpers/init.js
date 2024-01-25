@@ -1,6 +1,7 @@
-import * as d3 from 'd3';
 import d3Tip from 'd3-tip';
 import FN from './format';
+
+const d3 = require('d3');
 
 const InitScale = (target, reverse = true) => {
   const xRange = reverse ? [target.w, 0] : [0, target.w];

@@ -1,5 +1,5 @@
 import MountBrush from "../../../helpers/brush";
-import * as d3 from 'd3';
+const d3 = require('d3');
 
 describe('Test MountBrush', () => {
   //TODO: add more test

@@ -1,4 +1,3 @@
-import * as d3 from 'd3';
 import {
   InitScale, InitAxisCall, InitTip,
 } from '../../helpers/init';
@@ -10,6 +9,8 @@ import {
 import { TfRescale, MountCompass } from '../../helpers/compass';
 import { PksEdit } from '../../helpers/converter';
 import { LIST_LAYOUT } from '../../constants/list_layout';
+
+const d3 = require('d3');
 
 class RectFocus {
   constructor(props) {

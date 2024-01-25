@@ -1,6 +1,7 @@
-import * as d3 from 'd3';
 import Format from './format';
 import { Convert2DValue } from './chem';
+
+const d3 = require('d3');
 
 const TfRescale = (focus) => {
   const xt = focus.scales.x;
