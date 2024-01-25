@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+const d3 = require('d3');
 
 const resetZoom = (main) => {
   main.svg.call(main.zoom.transform, d3.zoomIdentity);

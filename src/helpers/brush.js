@@ -1,7 +1,8 @@
 /* eslint-disable prefer-object-spread */
-import * as d3 from 'd3';
 
 import { MouseMove } from './compass';
+
+const d3 = require('d3');
 
 const wheeled = (focus, event) => {
   const { currentExtent, scrollUiWheelAct } = focus;
