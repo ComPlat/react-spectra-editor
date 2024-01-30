@@ -11,7 +11,7 @@ var _mount = require("../../helpers/mount");
 var _compass = require("../../helpers/compass");
 var _converter = require("../../helpers/converter");
 var _list_layout = require("../../constants/list_layout");
-import('d3').then(d3 => {
+const d3 = require('d3');
 class RectFocus {
   constructor(props) {
     const {
@@ -223,4 +223,3 @@ class RectFocus {
   }
 }
 var _default = exports.default = RectFocus;
-});

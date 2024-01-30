@@ -7,7 +7,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.TfRescale = exports.MouseMove = exports.MountCompass = exports.ClickCompass = void 0;
 var _format = _interopRequireDefault(require("./format"));
 var _chem = require("./chem");
-import('d3').then(d3 => {
+const d3 = require('d3');
 const TfRescale = focus => {
   const xt = focus.scales.x;
   const yt = focus.scales.y;
@@ -158,4 +158,3 @@ const MountCompass = focus => {
   overlay.on('mousemove', event => MouseMove(event, focus)).on('click', event => ClickCompass(event, focus));
 };
 exports.MountCompass = MountCompass;
-});

@@ -38,7 +38,7 @@ const CmdBar = ({
   <div className={classes.card}>
     <Viewer editorOnly={editorOnly} />
     <Zoom />
-    <Peak jcampIdx={jcampIdx} />
+    <Peak jcampIdx={jcampIdx} feature={feature} />
     <Pecker jcampIdx={jcampIdx} />
     <Integration />
     <Multiplicity />

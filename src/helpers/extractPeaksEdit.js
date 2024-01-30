@@ -24,6 +24,12 @@ const extractPeaksEdit = (feature, editPeakSt, thresSt, shiftSt, layoutSt, atInd
   return peaksEdit;
 };
 
+const extractAutoPeaks = (feature, thresSt, shiftSt, layoutSt, atIndex = 0) => {
+  const offset = Format.isMsLayout(layoutSt) ? msOffset() : niOffset(shiftSt, atIndex);
+  const peaks = Convert2Peak(feature, thresSt.value, offset);
+  return peaks;
+};
+
 const getAUCValue = (integrationSt, layoutSt) => {
   const { refArea, refFactor, stack } = integrationSt;
   if (Array.isArray(stack) && stack.length > 0) {
@@ -47,4 +53,4 @@ const extractAreaUnderCurve = (allIntegrationSt, presentIntegrationSt, layoutSt)
   return null;
 };
 
-export { extractPeaksEdit, extractAreaUnderCurve }; // eslint-disable-line
+export { extractPeaksEdit, extractAreaUnderCurve, extractAutoPeaks }; // eslint-disable-line

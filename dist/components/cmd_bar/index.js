@@ -44,7 +44,8 @@ const CmdBar = _ref => {
   }, /*#__PURE__*/_react.default.createElement(_viewer.default, {
     editorOnly: editorOnly
   }), /*#__PURE__*/_react.default.createElement(_zoom.default, null), /*#__PURE__*/_react.default.createElement(_peak.default, {
-    jcampIdx: jcampIdx
+    jcampIdx: jcampIdx,
+    feature: feature
   }), /*#__PURE__*/_react.default.createElement(_pecker.default, {
     jcampIdx: jcampIdx
   }), /*#__PURE__*/_react.default.createElement(_integration.default, null), /*#__PURE__*/_react.default.createElement(_multiplicity.default, null), /*#__PURE__*/_react.default.createElement(_undo_redo.default, null), /*#__PURE__*/_react.default.createElement(_r04_submit.default, {

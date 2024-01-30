@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-import('d3').then(d3 => {
+const d3 = require('d3');
 const resetZoom = main => {
   main.svg.call(main.zoom.transform, d3.zoomIdentity);
   main.svg.selectAll('.brush').call(main.brush.move, null);
@@ -20,4 +20,3 @@ const MountZoom = (main, zoomed) => {
   main.svg.call(main.zoom).on('contextmenu.zoom', resetZoomCb);
 };
 var _default = exports.default = MountZoom;
-});

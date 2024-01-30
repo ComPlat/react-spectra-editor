@@ -52,7 +52,8 @@ class TriBtn extends _react.default.Component {
     const {
       content,
       layoutSt,
-      children
+      children,
+      isClearAllDisabled
     } = this.props;
     const {
       tp
@@ -64,7 +65,7 @@ class TriBtn extends _react.default.Component {
       title: title
     }, /*#__PURE__*/_react.default.createElement("span", null, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
       className: (0, _classnames.default)('btn-sv-bar-one'),
-      disabled: _cfg.default.btnCmdMpy(layoutSt) && _cfg.default.btnCmdIntg(layoutSt),
+      disabled: isClearAllDisabled === false ? false : _cfg.default.btnCmdMpy(layoutSt) && _cfg.default.btnCmdIntg(layoutSt),
       onClick: this.onToggle
     }, children)));
   }
@@ -112,6 +113,7 @@ TriBtn.propTypes = {
   layoutSt: _propTypes.default.string.isRequired,
   content: _propTypes.default.object.isRequired,
   cb: _propTypes.default.func.isRequired,
-  children: _propTypes.default.node.isRequired
+  children: _propTypes.default.node.isRequired,
+  isClearAllDisabled: _propTypes.default.bool.isRequired
 };
 var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(TriBtn));
