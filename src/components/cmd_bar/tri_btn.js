@@ -51,7 +51,7 @@ class TriBtn extends React.Component {
 
   renderStageOne() {
     const {
-      content, layoutSt, children,
+      content, layoutSt, children, isClearAllDisabled,
     } = this.props;
     const { tp } = content;
     const title = <span className="txt-sv-tp">{ tp }</span>;
@@ -65,7 +65,8 @@ class TriBtn extends React.Component {
                 'btn-sv-bar-one',
               )
             }
-            disabled={Cfg.btnCmdMpy(layoutSt) && Cfg.btnCmdIntg(layoutSt)}
+            disabled={(isClearAllDisabled === false ? false : (Cfg.btnCmdMpy(layoutSt)
+              && Cfg.btnCmdIntg(layoutSt)))}
             onClick={this.onToggle}
           >
             { children }
@@ -141,6 +142,7 @@ TriBtn.propTypes = {
   content: PropTypes.object.isRequired,
   cb: PropTypes.func.isRequired,
   children: PropTypes.node.isRequired,
+  isClearAllDisabled: PropTypes.bool.isRequired,
 };
 
 export default connect(

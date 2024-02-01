@@ -1,4 +1,4 @@
-/* eslint-disable prefer-object-spread, function-paren-newline,
+/* eslint-disable prefer-object-spread, function-paren-newline, no-unused-vars,
 react/function-component-definition, react/require-default-props, max-len,
 react/no-unused-prop-types */
 import React from 'react';
@@ -15,6 +15,9 @@ import { setUiSweepType } from '../../actions/ui';
 import Cfg from '../../helpers/cfg';
 import { MuButton, commonStyle, focusStyle } from './common';
 import { LIST_UI_SWEEP_TYPE } from '../../constants/list_ui';
+import TriBtn from './tri_btn';
+import { clearAllPeaks } from '../../actions/edit_peak';
+import { extractAutoPeaks } from '../../helpers/extractPeaksEdit';
 
 const styles = () => (
   Object.assign(
@@ -30,12 +33,18 @@ const Peak = ({
   isFocusSetRefSt, disableSetRefSt,
   isHandleMaxAndMinPeaksSt,
   cyclicVotaSt, curveSt,
+  clearAllPeaksAct, feature,
+  editPeakSt, thresSt, shiftSt, layoutSt,
 }) => {
   let onSweepPeakAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.PEAK_ADD);
   let onSweepPeakDELETE = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.PEAK_DELETE);
   let onSweepAnchorShift = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT);
+  const { curveIdx } = curveSt;
+  const onClearAll = () => {
+    const dataPeaks = extractAutoPeaks(feature, thresSt, shiftSt, layoutSt);
+    clearAllPeaksAct({ curveIdx, dataPeaks });
+  };
   if (isHandleMaxAndMinPeaksSt) {
-    const { curveIdx } = curveSt;
     const { spectraList } = cyclicVotaSt;
     const spectra = spectraList[curveIdx];
     if (spectra) {
@@ -85,6 +94,14 @@ const Peak = ({
           </MuButton>
         </span>
       </Tooltip>
+      <TriBtn
+        content={{ tp: 'Clear All Peaks' }}
+        cb={onClearAll}
+        isClearAllDisabled={disableRmPeakSt}
+      >
+        <span className={classNames(classes.txt, 'txt-sv-bar-rmallpeaks')}>P</span>
+        <span className={classNames(classes.txt, classes.txtIcon, 'txt-sv-bar-rmallpeaks')}>x</span>
+      </TriBtn>
       {
         !disableSetRefSt ? (
           <Tooltip title={<span className="txt-sv-tp">Set Reference</span>}>
@@ -109,7 +126,7 @@ const Peak = ({
   );
 };
 
-const mapStateToProps = (state, _) => ( // eslint-disable-line
+const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     isFocusAddPeakSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.PEAK_ADD || state.ui.sweepType === LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MAX_PEAK || state.ui.sweepType === LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MIN_PEAK,
     disableAddPeakSt: Cfg.btnCmdAddPeak(state.layout),
@@ -120,12 +137,17 @@ const mapStateToProps = (state, _) => ( // eslint-disable-line
     isHandleMaxAndMinPeaksSt: !Cfg.hidePanelCyclicVolta(state.layout),
     cyclicVotaSt: state.cyclicvolta,
     curveSt: state.curve,
+    editPeakSt: state.editPeak.present,
+    thresSt: state.threshold,
+    layoutSt: state.layout,
+    shiftSt: state.shift,
   }
 );
 
 const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     setUiSweepTypeAct: setUiSweepType,
+    clearAllPeaksAct: clearAllPeaks,
   }, dispatch)
 );
 
@@ -141,6 +163,12 @@ Peak.propTypes = {
   isHandleMaxAndMinPeaksSt: PropTypes.bool.isRequired,
   cyclicVotaSt: PropTypes.object.isRequired,
   curveSt: PropTypes.object.isRequired,
+  clearAllPeaksAct: PropTypes.func.isRequired,
+  feature: PropTypes.object.isRequired,
+  editPeakSt: PropTypes.object.isRequired,
+  thresSt: PropTypes.object.isRequired,
+  layoutSt: PropTypes.string.isRequired,
+  shiftSt: PropTypes.object.isRequired,
 };
 
 export default compose(

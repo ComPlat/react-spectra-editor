@@ -7,7 +7,7 @@ exports.default = void 0;
 var _compass = require("./compass");
 /* eslint-disable prefer-object-spread */
 
-import('d3').then(d3 => {
+const d3 = require('d3');
 const wheeled = (focus, event) => {
   const {
     currentExtent,
@@ -93,7 +93,6 @@ const MountBrush = (focus, isUiAddIntgSt, isUiNoBrushSt) => {
   svg.on('wheel', wheeledCb);
 };
 var _default = exports.default = MountBrush; // const resetedCb = () => reseted(main);
-});
 // main.svg.on('dblclick', resetedCb);
 // const reseted = (main) => {
 //   const { selectUiSweepAct } = main;

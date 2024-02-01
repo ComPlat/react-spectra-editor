@@ -10,10 +10,52 @@ const mockStore = configureStore([]);
 const store = mockStore({
   ui:{ sweepType: LIST_UI_SWEEP_TYPE.ZOOMIN },
   layout: LIST_LAYOUT.MS,
+  curve: { curveIdx: 0 },
+  editPeak: {
+    present: {
+      selectedIdx: 0,
+      peaks: [
+        {
+          prevOffset: 0,
+          pos: [],
+          neg: [],
+        },
+      ],
+    }
+  },
+  threshold: {
+    isEdit: true,
+    value: false,
+    upper: false,
+    lower: false,
+  },
+  shift: { shifts: [] },
+  cyclicvolta: {}
 });
 const nmrStore = mockStore({
   ui:{ sweepType: LIST_UI_SWEEP_TYPE.ZOOMIN },
   layout: LIST_LAYOUT.H1,
+  curve: { curveIdx: 0 },
+  editPeak: {
+    present: {
+      selectedIdx: 0,
+      peaks: [
+        {
+          prevOffset: 0,
+          pos: [],
+          neg: [],
+        },
+      ],
+    }
+  },
+  threshold: {
+    isEdit: true,
+    value: false,
+    upper: false,
+    lower: false,
+  },
+  shift: { shifts: [] },
+  cyclicvolta: {}
 });
 
 const dispatchMock = () => Promise.resolve({});
@@ -31,24 +73,24 @@ describe('<Peak />', () => {
   it('render when has Set reference button', async () => {
     const renderer = 
       <AppWrapper store={nmrStore}>
-        <Peak />
+        <Peak feature={{}} />
+      </AppWrapper>
+    ;
+    const { queryByTestId } = render(renderer);
+    const renderResult = queryByTestId('Peak');
+    expect(renderResult).toBeInTheDocument();
+    expect(renderResult.childElementCount).toEqual(4);
+  });
+
+  it('render when does not hav Set reference button', async () => {
+    const renderer = 
+      <AppWrapper store={store}>
+        <Peak feature={{}} />
       </AppWrapper>
     ;
     const { queryByTestId } = render(renderer);
     const renderResult = queryByTestId('Peak');
     expect(renderResult).toBeInTheDocument();
     expect(renderResult.childElementCount).toEqual(3);
-  });
-
-  it('render when does not hav Set reference button', async () => {
-    const renderer = 
-      <AppWrapper store={store}>
-        <Peak />
-      </AppWrapper>
-    ;
-    const { queryByTestId } = render(renderer);
-    const renderResult = queryByTestId('Peak');
-    expect(renderResult).toBeInTheDocument();
-    expect(renderResult.childElementCount).toEqual(2);
   });
 })

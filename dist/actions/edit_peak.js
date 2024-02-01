@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.rmFromPosList = exports.rmFromNegList = void 0;
+exports.rmFromPosList = exports.rmFromNegList = exports.clearAllPeaks = void 0;
 var _action_type = require("../constants/action_type");
 const rmFromPosList = payload => ({
   type: _action_type.EDITPEAK.RM_POSITIVE,
@@ -15,3 +15,8 @@ const rmFromNegList = payload => ({
   payload
 });
 exports.rmFromNegList = rmFromNegList;
+const clearAllPeaks = payload => ({
+  type: _action_type.EDITPEAK.CLEAR_ALL,
+  payload
+});
+exports.clearAllPeaks = clearAllPeaks;

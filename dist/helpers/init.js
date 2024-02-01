@@ -7,7 +7,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.InitTip = exports.InitScale = exports.InitPathCall = exports.InitAxisCall = void 0;
 var _d3Tip = _interopRequireDefault(require("d3-tip"));
 var _format = _interopRequireDefault(require("./format"));
-import('d3').then(d3 => {
+const d3 = require('d3');
 const InitScale = function (target) {
   let reverse = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
   const xRange = reverse ? [target.w, 0] : [0, target.w];
@@ -68,4 +68,3 @@ const InitTip = () => {
   return tip;
 };
 exports.InitTip = InitTip;
-});
