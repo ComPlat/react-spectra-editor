@@ -65,7 +65,7 @@ const shiftSelect = (
       variant="outlined"
     >
       <InputLabel id="select-solvent-label" className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
-        Solvent
+        Reference
       </InputLabel>
       <Select
         value={shiftRef}
