@@ -62,7 +62,7 @@ const shiftSelect = (classes, layoutSt, setShiftRefAct, shiftSt, curveSt) => {
   }, /*#__PURE__*/_react.default.createElement(_material.InputLabel, {
     id: "select-solvent-label",
     className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label')
-  }, "Solvent"), /*#__PURE__*/_react.default.createElement(_material.Select, {
+  }, "Reference"), /*#__PURE__*/_react.default.createElement(_material.Select, {
     value: shiftRef,
     labelId: "select-solvent-label",
     label: "Solvent",
