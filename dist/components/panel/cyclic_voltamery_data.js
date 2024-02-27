@@ -212,10 +212,10 @@ const CyclicVoltammetryPanel = _ref => {
   }))), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, "E1/2"), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
+  }, "E", /*#__PURE__*/_react.default.createElement("sub", null, "1/2")), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, "\u0394Ep", /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
+  }, "\u0394E", /*#__PURE__*/_react.default.createElement("sub", null, "p"), /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
     title: /*#__PURE__*/_react.default.createElement("span", {
       className: (0, _classnames.default)(classes.txtToolTip)
     }, "| Epa - Epc |")

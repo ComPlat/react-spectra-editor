@@ -34,10 +34,13 @@ const styles = () => Object.assign({
 }, _common.commonStyle);
 const iconSize = '16px';
 const setFactor = (classes, isDisable, integrationSt, setIntegrationFkrAct, curveIdx) => {
-  const onFactorChanged = e => setIntegrationFkrAct({
-    factor: e.target.value,
-    curveIdx
-  });
+  const onFactorChanged = e => {
+    e.target.blur();
+    setIntegrationFkrAct({
+      factor: e.target.value,
+      curveIdx
+    });
+  };
   const onEnterPress = e => {
     if (e.key === 'Enter') {
       setIntegrationFkrAct({

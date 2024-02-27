@@ -226,13 +226,13 @@ https://doi.org/10.1021/ac60242a030</i>
               align="left"
               className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
             >
-              E1/2
+              E<sub>1/2</sub>
             </TableCell>
             <TableCell
               align="left"
               className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
             >
-              ΔEp
+              ΔE<sub>p</sub>
               <Tooltip
                 title={
                   (
