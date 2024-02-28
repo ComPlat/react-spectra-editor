@@ -124,7 +124,7 @@ const spectraOps = {
     tail: '.'
   },
   [_list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY]: {
-    head: 'CYCLIC VOLTAMMETRY',
+    head: 'CV',
     tail: '.'
   },
   [_list_layout.LIST_LAYOUT.CDS]: {
@@ -544,6 +544,92 @@ const strNumberFixedLength = function (number) {
 
   return number.toFixed(lengthToFix);
 };
+const inlineNotation = function (layout, data) {
+  let sampleName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+  let formattedString = '';
+  let quillData = [];
+  const {
+    scanRate,
+    voltaData
+  } = data;
+  switch (layout) {
+    case _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY:
+      {
+        if (!voltaData) {
+          break;
+        }
+        let refString = '';
+        let nonRefString = '';
+        let refOps = [];
+        const nonRefOps = [];
+        const {
+          listPeaks,
+          xyData
+        } = voltaData;
+        const {
+          x
+        } = xyData;
+        listPeaks.forEach(item => {
+          const {
+            isRef,
+            e12,
+            max,
+            min
+          } = item;
+          const e12Str = e12 ? strNumberFixedLength(e12, 3) : '0';
+          const scanRateStr = scanRate ? strNumberFixedLength(scanRate, 3) : '0';
+          if (isRef) {
+            const posNegString = x[0] > x[1] ? 'neg.' : 'pos.';
+            refString = `CV (<conc. of sample> mM in <solvent> vs. Ref (Fc+/Fc) = ${e12Str} V, v = ${scanRateStr} V/s, to ${posNegString}):`;
+            refOps = [{
+              insert: 'CV (<conc. of sample> mM in <solvent> vs. Ref '
+            }, {
+              insert: '(Fc'
+            }, {
+              insert: '+',
+              attributes: {
+                script: 'super'
+              }
+            }, {
+              insert: '/Fc) '
+            }, {
+              insert: `= ${e12Str} V, v = ${scanRateStr} V/s, to ${posNegString}):`
+            }];
+          } else {
+            const delta = max && min ? strNumberFixedLength(Math.abs(max.x - min.x) * 1000, 3) : '0';
+            nonRefString += `\nE1/2 = ([${sampleName}] , ΔEp) = ${e12Str} V (${delta} mV)`;
+            const currentNoneOps = [{
+              insert: '\nE'
+            }, {
+              insert: '1/2',
+              attributes: {
+                script: 'sub'
+              }
+            }, {
+              insert: ` = ([${sampleName}] , ΔE`
+            }, {
+              insert: 'p',
+              attributes: {
+                script: 'sub'
+              }
+            }, {
+              insert: `) = ${e12Str} V (${delta} mV)`
+            }];
+            nonRefOps.push(...currentNoneOps);
+          }
+        });
+        formattedString = refString + nonRefString;
+        quillData = [...refOps, ...nonRefOps];
+        break;
+      }
+    default:
+      break;
+  }
+  return {
+    quillData,
+    formattedString
+  };
+};
 const Format = {
   toPeakStr,
   buildData,
@@ -586,6 +672,7 @@ const Format = {
   isDLSACFLayout,
   strNumberFixedDecimal,
   formatedXRD,
-  strNumberFixedLength
+  strNumberFixedLength,
+  inlineNotation
 };
 var _default = exports.default = Format;

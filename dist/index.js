@@ -264,7 +264,9 @@ class DemoWriteIr extends _react.default.Component {
       decimal,
       isIntensity,
       integration,
-      waveLength
+      waveLength,
+      cyclicvoltaSt,
+      curveSt
     } = _ref;
     const entity = this.loadEntity();
     const {
@@ -294,7 +296,36 @@ class DemoWriteIr extends _react.default.Component {
       temperature
     });
     const wrapper = _app.FN.peaksWrapper(layout, shift);
-    const desc = this.rmDollarSign(wrapper.head) + body + wrapper.tail;
+    let desc = this.rmDollarSign(wrapper.head) + body + wrapper.tail;
+    if (_app.FN.isCyclicVoltaLayout(layout)) {
+      const {
+        spectraList
+      } = cyclicvoltaSt;
+      const {
+        curveIdx,
+        listCurves
+      } = curveSt;
+      const selectedVolta = spectraList[curveIdx];
+      const selectedCurve = listCurves[curveIdx];
+      const {
+        feature
+      } = selectedCurve;
+      const {
+        scanRate
+      } = feature;
+      const data = {
+        scanRate,
+        voltaData: {
+          listPeaks: selectedVolta.list,
+          xyData: feature.data[0]
+        }
+      };
+      const inlineData = _app.FN.inlineNotation(layout, data);
+      const {
+        formattedString
+      } = inlineData;
+      desc = formattedString;
+    }
     return desc;
   }
   formatMpy(_ref2) {
@@ -398,7 +429,9 @@ class DemoWriteIr extends _react.default.Component {
       decimal,
       isIntensity,
       integration,
-      waveLength
+      waveLength,
+      cyclicvoltaSt,
+      curveSt
     } = _ref4;
     const desc = this.formatPks({
       peaks,
@@ -408,7 +441,10 @@ class DemoWriteIr extends _react.default.Component {
       decimal,
       isIntensity,
       integration,
-      waveLength
+      waveLength,
+      // eslint-disable-line
+      cyclicvoltaSt,
+      curveSt // eslint-disable-line
     });
     this.setState({
       desc
