@@ -87,6 +87,14 @@ const Pecker = ({
   const onSweepPeckerDELETE = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_PECKER, curveIdx);
   const onConfirmSetRef = () => setCylicVoltaRefAct({ jcampIdx: curveIdx });
 
+  const { spectraList } = cyclicVotaSt;
+  const spectra = spectraList[curveIdx];
+  let hasRefPeaks = false;
+  if (spectra) {
+    const { hasRefPeak } = spectra;
+    hasRefPeaks = hasRefPeak;
+  }
+
   return (
     (!Cfg.hidePanelCyclicVolta(layoutSt)) ? (
       <span data-testid="Pecker">
@@ -131,7 +139,7 @@ const Pecker = ({
         {
           setRef(classes, cyclicVotaSt, curveIdx, setCylicVoltaRefFactorAct)
         }
-        <Tooltip title={<span className="txt-sv-tp">Set Reference</span>}>
+        <Tooltip title={<span className="txt-sv-tp">{hasRefPeaks ? 'Set Reference' : 'Set Shift'}</span>}>
           <span>
             <MuButton
               className={

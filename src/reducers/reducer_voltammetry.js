@@ -12,6 +12,7 @@ const initSpectra = {
   isWorkMaxPeak: true,
   jcampIdx: -1,
   shift: { ref: null, val: 0, prevValue: 0 },
+  hasRefPeak: false,
 };
 
 const addPairPeak = (state, action) => {
@@ -201,11 +202,11 @@ const setRef = (state, action) => {
   if (payload) {
     const { jcampIdx } = payload;
     const spectra = spectraList[jcampIdx];
-    const { list, shift } = spectra;
+    const { list, shift, hasRefPeak } = spectra;
     const newShift = Object.assign({}, shift);
     const refPeaks = list.filter((pairPeak) => pairPeak.isRef === true);
     let offset = 0.0;
-    if (refPeaks.length > 0) {
+    if (hasRefPeak) {
       const currRefPeaks = refPeaks[0];
       newShift.ref = currRefPeaks;
       const { val } = shift;
@@ -213,6 +214,8 @@ const setRef = (state, action) => {
       offset = e12 - val;
     } else {
       newShift.ref = null;
+      const { val, prevValue } = newShift;
+      offset = val - prevValue;
     }
     const newList = spectra.list.map((pairPeak) => { //eslint-disable-line
       const {
@@ -222,19 +225,24 @@ const setRef = (state, action) => {
       let newMin = null;
       let newPecker = null;
       if (max) {
-        newMax = { x: max.x - offset, y: max.y };
+        newMax = hasRefPeak
+          ? { x: max.x - offset, y: max.y } : { x: max.x + parseFloat(offset), y: max.y };
       }
       if (min) {
-        newMin = { x: min.x - offset, y: min.y };
+        newMin = hasRefPeak
+          ? { x: min.x - offset, y: min.y } : { x: min.x + parseFloat(offset), y: min.y };
       }
       if (pecker) {
-        newPecker = { x: pecker.x - offset, y: pecker.y };
+        newPecker = hasRefPeak
+          ? { x: pecker.x - offset, y: pecker.y } : { x: pecker.x + parseFloat(offset), y: min.y };
       }
       const newPairPeak = Object.assign({}, pairPeak, { max: newMax , min: newMin, pecker: newPecker }); //eslint-disable-line
       newPairPeak.e12 = getE12(newPairPeak);
       if (isRef) {
         newShift.ref = newPairPeak;
         newShift.prevValue += offset;
+      } else if (!hasRefPeak) {
+        newShift.prevValue += parseFloat(offset);
       }
       return newPairPeak;
     });
@@ -265,11 +273,14 @@ const selectRefPeaks = (state, action) => {
         newList[index] = newPairPeak;
       }
     });
-
+    const refPeaks = newList.filter((pairPeak) => pairPeak.isRef === true);
+    const hasRefPeak = refPeaks.length > 0;
     spectraList[jcampIdx] = Object.assign(
       {},
       spectra,
-      { list: newList, selectedIdx: index, jcampIdx },
+      {
+        list: newList, selectedIdx: index, jcampIdx, hasRefPeak,
+      },
     );
     return Object.assign({}, state, { spectraList });
   }
