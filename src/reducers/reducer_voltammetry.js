@@ -234,7 +234,7 @@ const setRef = (state, action) => {
       }
       if (pecker) {
         newPecker = hasRefPeak
-          ? { x: pecker.x - offset, y: pecker.y } : { x: pecker.x + parseFloat(offset), y: min.y };
+          ? { x: pecker.x - offset, y: pecker.y } : { x: pecker.x + parseFloat(offset), y: pecker.y }; //eslint-disable-line
       }
       const newPairPeak = Object.assign({}, pairPeak, { max: newMax , min: newMin, pecker: newPecker }); //eslint-disable-line
       newPairPeak.e12 = getE12(newPairPeak);
