@@ -69,9 +69,12 @@ class ViewerLine extends _react.default.Component {
     let yyLabel = yLabel;
     if (axesUnitsSt) {
       const {
+        axes
+      } = axesUnitsSt;
+      const {
         xUnit,
         yUnit
-      } = axesUnitsSt;
+      } = axes[0];
       xxLabel = xUnit === '' ? xLabel : xUnit;
       yyLabel = yUnit === '' ? yLabel : yUnit;
     }
@@ -124,9 +127,12 @@ class ViewerLine extends _react.default.Component {
     let yyLabel = yLabel;
     if (axesUnitsSt) {
       const {
+        axes
+      } = axesUnitsSt;
+      const {
         xUnit,
         yUnit
-      } = axesUnitsSt;
+      } = axes[0];
       xxLabel = xUnit === '' ? xLabel : xUnit;
       yyLabel = yUnit === '' ? yLabel : yUnit;
     }

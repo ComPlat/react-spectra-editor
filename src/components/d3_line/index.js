@@ -48,7 +48,8 @@ class ViewerLine extends React.Component {
     let yyLabel = yLabel;
 
     if (axesUnitsSt) {
-      const { xUnit, yUnit } = axesUnitsSt;
+      const { axes } = axesUnitsSt;
+      const { xUnit, yUnit } = axes[0];
       xxLabel = xUnit === '' ? xLabel : xUnit;
       yyLabel = yUnit === '' ? yLabel : yUnit;
     }
@@ -90,7 +91,8 @@ class ViewerLine extends React.Component {
     let yyLabel = yLabel;
 
     if (axesUnitsSt) {
-      const { xUnit, yUnit } = axesUnitsSt;
+      const { axes } = axesUnitsSt;
+      const { xUnit, yUnit } = axes[0];
       xxLabel = xUnit === '' ? xLabel : xUnit;
       yyLabel = yUnit === '' ? yLabel : yUnit;
     }

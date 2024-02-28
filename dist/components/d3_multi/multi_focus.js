@@ -388,6 +388,29 @@ class MultiFocus {
       yt
     } = (0, _compass.TfRescale)(this);
     const dPks = this.mergedPeaks(editPeakSt);
+    const {
+      spectraList
+    } = this.cyclicvoltaSt;
+    const spectra = spectraList[this.jcampIdx];
+    let indexOfCVRefPeaks = [];
+    if (spectra) {
+      const {
+        shift,
+        hasRefPeak
+      } = spectra;
+      const {
+        ref
+      } = shift;
+      if (ref && hasRefPeak) {
+        const {
+          min,
+          max
+        } = ref;
+        indexOfCVRefPeaks = dPks.map((p, index) => {
+          return p === min || p === max ? -1 : index;
+        });
+      }
+    }
     const mpp = this.tags.pPath.selectAll('path').data(dPks);
     mpp.exit().attr('class', 'exit').remove();
     const linePath = [{
@@ -404,7 +427,25 @@ class MultiFocus {
       y: 10
     }];
     const lineSymbol = d3.line().x(d => d.x).y(d => d.y)(linePath);
-    mpp.enter().append('path').attr('d', lineSymbol).attr('class', 'enter-peak').attr('fill', 'red').attr('stroke', 'pink').attr('stroke-width', 3).attr('stroke-opacity', 0.0).merge(mpp).attr('id', d => `mpp${Math.round(1000 * d.x)}`).attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y)})`).on('mouseover', (event, d) => {
+    const lineRefPath = [{
+      x: -0.5,
+      y: 10
+    }, {
+      x: -4,
+      y: -20
+    }, {
+      x: 4,
+      y: -20
+    }, {
+      x: 0.5,
+      y: 10
+    }];
+    const lineSymbolRef = d3.line().x(d => d.x).y(d => d.y)(lineRefPath);
+    mpp.enter().append('path').attr('d', (_, index) => {
+      return indexOfCVRefPeaks[index] === -1 ? lineSymbolRef : lineSymbol;
+    }).attr('class', 'enter-peak').attr('fill', (_, index) => {
+      return indexOfCVRefPeaks[index] === -1 ? 'blue' : 'red';
+    }).attr('stroke', 'pink').attr('stroke-width', 3).attr('stroke-opacity', 0.0).merge(mpp).attr('id', d => `mpp${Math.round(1000 * d.x)}`).attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y)})`).on('mouseover', (event, d) => {
       d3.select(`#mpp${Math.round(1000 * d.x)}`).attr('stroke-opacity', '1.0');
       d3.select(`#bpt${Math.round(1000 * d.x)}`).style('fill', 'blue');
       const tipParams = {
@@ -427,6 +468,12 @@ class MultiFocus {
       bpTxt.exit().attr('class', 'exit').remove();
       bpTxt.enter().append('text').attr('class', 'peak-text').attr('font-family', 'Helvetica').style('font-size', '12px').attr('fill', '#228B22').style('text-anchor', 'middle').merge(bpTxt).attr('id', d => `mpp${Math.round(1000 * d.x)}`).text(d => d.x.toFixed(2)).attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y) - 25})`).on('click', (event, d) => this.onClickTarget(event, d));
     }
+    mpp.attr('fill', (_, index) => {
+      return indexOfCVRefPeaks[index] === -1 ? 'blue' : 'red';
+    });
+    mpp.attr('d', (_, index) => {
+      return indexOfCVRefPeaks[index] === -1 ? lineSymbolRef : lineSymbol;
+    });
   }
   drawPeckers() {
     const {

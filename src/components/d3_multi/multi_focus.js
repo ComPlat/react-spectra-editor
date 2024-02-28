@@ -379,6 +379,20 @@ class MultiFocus {
     const { xt, yt } = TfRescale(this);
     const dPks = this.mergedPeaks(editPeakSt);
 
+    const { spectraList } = this.cyclicvoltaSt;
+    const spectra = spectraList[this.jcampIdx];
+    let indexOfCVRefPeaks = [];
+    if (spectra) {
+      const { shift, hasRefPeak } = spectra;
+      const { ref } = shift;
+      if (ref && hasRefPeak) {
+        const { min, max } = ref;
+        indexOfCVRefPeaks = dPks.map((p, index) => {
+          return p === min || p === max ? -1 : index;
+        });
+      }
+    }
+
     const mpp = this.tags.pPath.selectAll('path').data(dPks);
     mpp.exit()
       .attr('class', 'exit')
@@ -394,11 +408,26 @@ class MultiFocus {
       .x((d) => d.x)
       .y((d) => d.y)(linePath);
 
+    const lineRefPath = [
+      { x: -0.5, y: 10 },
+      { x: -4, y: -20 },
+      { x: 4, y: -20 },
+      { x: 0.5, y: 10 },
+    ];
+
+    const lineSymbolRef = d3.line()
+      .x((d) => d.x)
+      .y((d) => d.y)(lineRefPath);
+
     mpp.enter()
       .append('path')
-      .attr('d', lineSymbol)
+      .attr('d', (_, index) => {
+        return indexOfCVRefPeaks[index] === -1 ? lineSymbolRef : lineSymbol;
+      })
       .attr('class', 'enter-peak')
-      .attr('fill', 'red')
+      .attr('fill', (_, index) => {
+        return indexOfCVRefPeaks[index] === -1 ? 'blue' : 'red';
+      })
       .attr('stroke', 'pink')
       .attr('stroke-width', 3)
       .attr('stroke-opacity', 0.0)
@@ -443,6 +472,14 @@ class MultiFocus {
         .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(d.y) - 25})`)
         .on('click', (event, d) => this.onClickTarget(event, d));
     }
+
+    mpp.attr('fill', (_, index) => {
+      return indexOfCVRefPeaks[index] === -1 ? 'blue' : 'red';
+    });
+
+    mpp.attr('d', (_, index) => {
+      return indexOfCVRefPeaks[index] === -1 ? lineSymbolRef : lineSymbol;
+    });
   }
 
   drawPeckers() {

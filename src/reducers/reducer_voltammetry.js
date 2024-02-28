@@ -8,10 +8,15 @@ const initialState = {
 
 const initSpectra = {
   list: [],
+  origin: [],
   selectedIdx: -1,
   isWorkMaxPeak: true,
   jcampIdx: -1,
-  shift: { ref: null, val: 0, prevValue: 0 },
+  shift: {
+    ref: null, val: 0, prevValue: 0,
+  },
+  hasRefPeak: false,
+  history: [],
 };
 
 const addPairPeak = (state, action) => {
@@ -30,10 +35,10 @@ const addPairPeak = (state, action) => {
       return { ...item };
     });
     newList.push({
-      min: null, max: null, isRef: false, e12: null,
+      min: null, max: null, isRef: false, e12: null, createdAt: Date.now(),
     });
 
-    spectraList[payload] = Object.assign({}, spectra, { list: newList, selectedIdx: index });
+    spectraList[payload] = Object.assign({}, spectra, { list: newList, selectedIdx: index, origin: [...newList] }); // eslint-disable-line
     return Object.assign({}, state, { spectraList });
   }
   return state;
@@ -46,9 +51,10 @@ const removePairPeak = (state, action) => {
     const { index, jcampIdx } = payload;
     const spectra = spectraList[jcampIdx];
     if (spectra) {
-      const { list } = spectra;
+      const { list, origin } = spectra;
       list.splice(index, 1);
-      spectraList[jcampIdx] = Object.assign({}, spectra, { list, selectedIdx: index });
+      origin.splice(index, 1);
+      spectraList[jcampIdx] = Object.assign({}, spectra, { list, selectedIdx: index, origin });
       return Object.assign({}, state, { spectraList });
     }
     return state;
@@ -82,12 +88,15 @@ const addPeak = (state, action, isMax = true) => {
       pairPeak = Object.assign({}, pairPeak, { min: peak });
     }
     pairPeak.e12 = getE12(pairPeak);
+    pairPeak.updatedAt = Date.now();
     newList[index] = pairPeak;
 
     spectraList[jcampIdx] = Object.assign(
       {},
       spectra,
-      { list: newList, selectedIdx: index, jcampIdx },
+      {
+        list: newList, selectedIdx: index, jcampIdx, origin: [...newList],
+      },
     );
     return Object.assign({}, state, { spectraList });
   }
@@ -109,12 +118,15 @@ const removePeak = (state, action, isMax = true) => {
       pairPeak.min = null;
     }
     pairPeak.e12 = getE12(pairPeak);
+    pairPeak.updatedAt = Date.now();
     newList[index] = pairPeak;
 
     spectraList[jcampIdx] = Object.assign(
       {},
       spectra,
-      { list: newList, selectedIdx: index, jcampIdx },
+      {
+        list: newList, selectedIdx: index, jcampIdx, origin: [...newList],
+      },
     );
     return Object.assign({}, state, { spectraList });
   }
@@ -161,12 +173,15 @@ const addPecker = (state, action) => {
     const newList = list;
     const pairPeak = newList[index];
     pairPeak.pecker = peak;
+    pairPeak.updatedAt = Date.now();
     newList[index] = pairPeak;
 
     spectraList[jcampIdx] = Object.assign(
       {},
       spectra,
-      { list: newList, selectedIdx: index, jcampIdx },
+      {
+        list: newList, selectedIdx: index, jcampIdx, origin: [...newList],
+      },
     );
     return Object.assign({}, state, { spectraList });
   }
@@ -183,12 +198,15 @@ const removePecker = (state, action) => {
     const newList = list;
     const pairPeak = newList[index];
     pairPeak.pecker = null;
+    pairPeak.updatedAt = Date.now();
     newList[index] = pairPeak;
 
     spectraList[jcampIdx] = Object.assign(
       {},
       spectra,
-      { list: newList, selectedIdx: index, jcampIdx },
+      {
+        list: newList, selectedIdx: index, jcampIdx, origin: [...newList],
+      },
     );
     return Object.assign({}, state, { spectraList });
   }
@@ -201,44 +219,80 @@ const setRef = (state, action) => {
   if (payload) {
     const { jcampIdx } = payload;
     const spectra = spectraList[jcampIdx];
-    const { list, shift } = spectra;
+    const {
+      list, shift, hasRefPeak, history,
+    } = spectra;
     const newShift = Object.assign({}, shift);
     const refPeaks = list.filter((pairPeak) => pairPeak.isRef === true);
     let offset = 0.0;
-    if (refPeaks.length > 0) {
+    if (hasRefPeak) {
       const currRefPeaks = refPeaks[0];
       newShift.ref = currRefPeaks;
       const { val } = shift;
       const { e12 } = currRefPeaks;
       offset = e12 - val;
+      const newList = spectra.list.map((pairPeak) => { //eslint-disable-line
+        const {
+          max, min, pecker, isRef,
+        } = pairPeak;
+        let newMax = null;
+        let newMin = null;
+        let newPecker = null;
+        if (max) {
+          newMax = hasRefPeak
+            ? { x: max.x - offset, y: max.y } : { x: max.x + parseFloat(offset), y: max.y };
+        }
+        if (min) {
+          newMin = hasRefPeak
+            ? { x: min.x - offset, y: min.y } : { x: min.x + parseFloat(offset), y: min.y };
+        }
+        if (pecker) {
+          newPecker = hasRefPeak
+            ? { x: pecker.x - offset, y: pecker.y } : { x: pecker.x + parseFloat(offset), y: pecker.y }; //eslint-disable-line
+        }
+        const newPairPeak = Object.assign({}, pairPeak, { max: newMax , min: newMin, pecker: newPecker }); //eslint-disable-line
+        newPairPeak.e12 = getE12(newPairPeak);
+        newPairPeak.updatedAt = Date.now();
+        if (isRef) {
+          newShift.ref = newPairPeak;
+          newShift.prevValue += offset;
+        }
+        return newPairPeak;
+      });
+      history.push(...[newList]);
+      spectra.list = newList;
     } else {
       newShift.ref = null;
+      const { val } = newShift;
+      offset = val;
+
+      const newList = spectra.origin.map((pairPeak) => { //eslint-disable-line
+        const {
+          max, min, pecker,
+        } = pairPeak;
+        let newMax = null;
+        let newMin = null;
+        let newPecker = null;
+        if (max) {
+          newMax = { x: max.x + parseFloat(val), y: max.y };
+        }
+        if (min) {
+          newMin = { x: min.x + parseFloat(val), y: min.y };
+        }
+        if (pecker) {
+          newPecker = { x: pecker.x + parseFloat(val), y: pecker.y };
+        }
+        const newPairPeak = Object.assign({}, pairPeak, { max: newMax , min: newMin, pecker: newPecker, isRef: false }); //eslint-disable-line
+        newPairPeak.e12 = getE12(newPairPeak);
+        newPairPeak.updatedAt = Date.now();
+        return newPairPeak;
+      });
+
+      history.push(...[newList]);
+      spectra.list = newList;
+      newShift.prevValue = parseFloat(offset);
     }
-    const newList = spectra.list.map((pairPeak) => { //eslint-disable-line
-      const {
-        max, min, pecker, isRef,
-      } = pairPeak;
-      let newMax = null;
-      let newMin = null;
-      let newPecker = null;
-      if (max) {
-        newMax = { x: max.x - offset, y: max.y };
-      }
-      if (min) {
-        newMin = { x: min.x - offset, y: min.y };
-      }
-      if (pecker) {
-        newPecker = { x: pecker.x - offset, y: pecker.y };
-      }
-      const newPairPeak = Object.assign({}, pairPeak, { max: newMax , min: newMin, pecker: newPecker }); //eslint-disable-line
-      newPairPeak.e12 = getE12(newPairPeak);
-      if (isRef) {
-        newShift.ref = newPairPeak;
-        newShift.prevValue += offset;
-      }
-      return newPairPeak;
-    });
-    spectra.list = newList;
+
     spectraList[jcampIdx] = Object.assign(
       {},
       spectra,
@@ -255,21 +309,27 @@ const selectRefPeaks = (state, action) => {
   if (payload) {
     const { index, jcampIdx, checked } = payload;
     const spectra = spectraList[jcampIdx];
-    const { list } = spectra;
+    const { list, shift, history } = spectra;
+    const newShift = shift;
     const newList = list;
     newList.forEach((pairPeak, idx) => {
       const newPairPeak = pairPeak;
       newPairPeak.isRef = false;
+      newPairPeak.updatedAt = Date.now();
       if (idx === index) {
         newPairPeak.isRef = checked;
         newList[index] = newPairPeak;
       }
     });
-
+    const refPeaks = newList.filter((pairPeak) => pairPeak.isRef === true);
+    const hasRefPeak = refPeaks.length > 0;
+    history.push(...[newList]);
     spectraList[jcampIdx] = Object.assign(
       {},
       spectra,
-      { list: newList, selectedIdx: index, jcampIdx },
+      {
+        list: newList, selectedIdx: index, jcampIdx, hasRefPeak, shift: newShift,
+      },
     );
     return Object.assign({}, state, { spectraList });
   }

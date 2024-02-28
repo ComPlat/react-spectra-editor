@@ -7,6 +7,9 @@ import { LIST_LAYOUT } from '../../../../constants/list_layout';
 
 const mockStore = configureStore([]);
 const store = mockStore({
+  axesUnits: { axes: [{ xUnit: '', yUnit: '' }]},
+  curve: { curveIdx: 0 },
+  layout: LIST_LAYOUT.CYCLIC_VOLTAMMETRY
 });
 const dispatchMock = () => Promise.resolve({});
 store.dispatch = jest.fn(dispatchMock);

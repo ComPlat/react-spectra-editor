@@ -181,13 +181,13 @@ const CyclicVoltammetryPanel = ({
               align="left"
               className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
             >
-              Ox
+              Anodic
             </TableCell>
             <TableCell
               align="left"
               className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
             >
-              Red
+              Cathodic
             </TableCell>
             <TableCell
               align="left"

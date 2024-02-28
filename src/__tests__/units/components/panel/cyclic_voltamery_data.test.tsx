@@ -70,7 +70,7 @@ describe('<CyclicVoltammetryPanel />', () => {
       const tableHeaders = document?.querySelectorAll('th')
       expect(tableHeaders?.length).toEqual(8)
 
-      const arrHeaderLabel = ['Ref', 'Ox', 'Red', 'I λ0', 'I ratio', 'E1/2', 'ΔEp', '']
+      const arrHeaderLabel = ['Ref', 'Anodic', 'Cathodic', 'I λ0', 'I ratio', 'E1/2', 'ΔEp', '']
       tableHeaders?.forEach((header, idx) => {
         expect(header).toHaveTextContent(arrHeaderLabel[idx])
         expect(header).toHaveClass('txt-sv-panel-txt')
