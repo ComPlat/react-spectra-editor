@@ -38,10 +38,12 @@ const setRef = (
   const { spectraList } = cyclicVotaSt;
   const spectra = spectraList[curveIdx];
   let refFactor = 0.0;
+  let hasRefPeaks = false;
   if (spectra) {
-    const { shift } = spectra;
+    const { shift, hasRefPeak } = spectra;
     const { val } = shift;
     refFactor = val;
+    hasRefPeaks = hasRefPeak;
   }
   const onFactorChanged = (e) => setCylicVoltaRefFactorAct({
     factor: e.target.value,
@@ -66,7 +68,7 @@ const setRef = (
       InputProps={{
         className: classNames(classes.txtInput, 'txtfield-sv-bar-input'),
       }}
-      label={<span className={classNames(classes.txtLabel, 'txtfield-sv-bar-label')}>Ref Value (V)</span>}
+      label={<span className={classNames(classes.txtLabel, 'txtfield-sv-bar-label')}>{hasRefPeaks ? 'Ref Value (V)' : 'Shift'}</span>}
       variant="outlined"
       onChange={onFactorChanged}
       onBlur={onFactorChanged}

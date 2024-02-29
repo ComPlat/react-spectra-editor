@@ -241,11 +241,12 @@ const setRef = (state, action) => {
       if (isRef) {
         newShift.ref = newPairPeak;
         newShift.prevValue += offset;
-      } else if (!hasRefPeak) {
-        newShift.prevValue += parseFloat(offset);
       }
       return newPairPeak;
     });
+    if (!hasRefPeak) {
+      newShift.prevValue += parseFloat(offset);
+    }
     spectra.list = newList;
     spectraList[jcampIdx] = Object.assign(
       {},
