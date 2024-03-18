@@ -188,10 +188,10 @@ const CyclicVoltammetryPanel = _ref => {
   }, "Ref"), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, "Ox"), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
+  }, "Anodic"), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, "Red"), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
+  }, "Cathodic"), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
     align: "left",
     className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
   }, "I ", /*#__PURE__*/_react.default.createElement("sub", null, "\u03BB0"), /*#__PURE__*/_react.default.createElement(_material.Tooltip, {

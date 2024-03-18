@@ -35,14 +35,17 @@ const setRef = (classes, cyclicVotaSt, curveIdx, setCylicVoltaRefFactorAct) => {
   } = cyclicVotaSt;
   const spectra = spectraList[curveIdx];
   let refFactor = 0.0;
+  let hasRefPeaks = false;
   if (spectra) {
     const {
-      shift
+      shift,
+      hasRefPeak
     } = spectra;
     const {
       val
     } = shift;
     refFactor = val;
+    hasRefPeaks = hasRefPeak;
   }
   const onFactorChanged = e => setCylicVoltaRefFactorAct({
     factor: e.target.value,
@@ -67,7 +70,7 @@ const setRef = (classes, cyclicVotaSt, curveIdx, setCylicVoltaRefFactorAct) => {
     },
     label: /*#__PURE__*/_react.default.createElement("span", {
       className: (0, _classnames.default)(classes.txtLabel, 'txtfield-sv-bar-label')
-    }, "Ref Value (V)"),
+    }, hasRefPeaks ? 'Ref Value (V)' : 'Shift'),
     variant: "outlined",
     onChange: onFactorChanged,
     onBlur: onFactorChanged,
@@ -95,6 +98,17 @@ const Pecker = _ref => {
   const onConfirmSetRef = () => setCylicVoltaRefAct({
     jcampIdx: curveIdx
   });
+  const {
+    spectraList
+  } = cyclicVotaSt;
+  const spectra = spectraList[curveIdx];
+  let hasRefPeaks = false;
+  if (spectra) {
+    const {
+      hasRefPeak
+    } = spectra;
+    hasRefPeaks = hasRefPeak;
+  }
   return !_cfg.default.hidePanelCyclicVolta(layoutSt) ? /*#__PURE__*/_react.default.createElement("span", {
     "data-testid": "Pecker"
   }, /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
@@ -118,7 +132,7 @@ const Pecker = _ref => {
   }, "I", /*#__PURE__*/_react.default.createElement("sub", null, "\u03BB0"), "-")))), setRef(classes, cyclicVotaSt, curveIdx, setCylicVoltaRefFactorAct), /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
     title: /*#__PURE__*/_react.default.createElement("span", {
       className: "txt-sv-tp"
-    }, "Set Reference")
+    }, hasRefPeaks ? 'Set Reference' : 'Set Shift')
   }, /*#__PURE__*/_react.default.createElement("span", null, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
     className: (0, _classnames.default)((0, _common.focusStyle)(isFocusSetRefSt, classes), 'btn-sv-bar-setref'),
     onClick: onConfirmSetRef

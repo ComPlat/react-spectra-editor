@@ -38,10 +38,12 @@ const setRef = (
   const { spectraList } = cyclicVotaSt;
   const spectra = spectraList[curveIdx];
   let refFactor = 0.0;
+  let hasRefPeaks = false;
   if (spectra) {
-    const { shift } = spectra;
+    const { shift, hasRefPeak } = spectra;
     const { val } = shift;
     refFactor = val;
+    hasRefPeaks = hasRefPeak;
   }
   const onFactorChanged = (e) => setCylicVoltaRefFactorAct({
     factor: e.target.value,
@@ -66,7 +68,7 @@ const setRef = (
       InputProps={{
         className: classNames(classes.txtInput, 'txtfield-sv-bar-input'),
       }}
-      label={<span className={classNames(classes.txtLabel, 'txtfield-sv-bar-label')}>Ref Value (V)</span>}
+      label={<span className={classNames(classes.txtLabel, 'txtfield-sv-bar-label')}>{hasRefPeaks ? 'Ref Value (V)' : 'Shift'}</span>}
       variant="outlined"
       onChange={onFactorChanged}
       onBlur={onFactorChanged}
@@ -86,6 +88,14 @@ const Pecker = ({
   const onSweepPeckerAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_PECKER, curveIdx);
   const onSweepPeckerDELETE = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_PECKER, curveIdx);
   const onConfirmSetRef = () => setCylicVoltaRefAct({ jcampIdx: curveIdx });
+
+  const { spectraList } = cyclicVotaSt;
+  const spectra = spectraList[curveIdx];
+  let hasRefPeaks = false;
+  if (spectra) {
+    const { hasRefPeak } = spectra;
+    hasRefPeaks = hasRefPeak;
+  }
 
   return (
     (!Cfg.hidePanelCyclicVolta(layoutSt)) ? (
@@ -131,7 +141,7 @@ const Pecker = ({
         {
           setRef(classes, cyclicVotaSt, curveIdx, setCylicVoltaRefFactorAct)
         }
-        <Tooltip title={<span className="txt-sv-tp">Set Reference</span>}>
+        <Tooltip title={<span className="txt-sv-tp">{hasRefPeaks ? 'Set Reference' : 'Set Shift'}</span>}>
           <span>
             <MuButton
               className={
