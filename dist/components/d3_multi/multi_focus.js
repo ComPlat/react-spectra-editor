@@ -406,7 +406,7 @@ class MultiFocus {
           max
         } = ref;
         indexOfCVRefPeaks = dPks.map((p, index) => {
-          return p === min || p === max ? index : -1;
+          return p === min || p === max ? -1 : index;
         });
       }
     }
