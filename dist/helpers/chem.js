@@ -14,7 +14,8 @@ var _list_layout = require("../constants/list_layout");
 var _integration = require("./integration");
 /* eslint-disable
 no-mixed-operators, react/function-component-definition,
-prefer-object-spread, camelcase,  no-plusplus, prefer-destructuring */
+prefer-object-spread, camelcase,  no-plusplus, prefer-destructuring,
+max-len */
 
 const getTopic = (_, props) => props.topic;
 const getFeature = (_, props) => props.feature;
@@ -271,32 +272,6 @@ const Convert2MaxMinPeak = (layout, feature, offset) => {
     peaks.refIndex = refIndex;
     return peaks;
   }
-
-  // // let upperThresVal = upperThres;
-  // // if (!upperThresVal) {
-  // //   upperThresVal = 1.0;
-  // // }
-
-  // // let lowerThresVal = lowerThres;
-  // // if (!lowerThresVal) {
-  // //   lowerThresVal = 1.0;
-  // // }
-
-  // // const yUpperThres = parseFloat(upperThresVal) / 100.0 * maxY;
-  // // const yLowerThres = parseFloat(lowerThresVal) / 100.0 * minY;
-
-  // // const corrOffset = offset || 0.0;
-  // // for (let i = 0; i < data.y.length; i += 1) {
-  // //   const y = data.y[i];
-  // //   const overUpperThres = y >= yUpperThres;
-  // //   const belowThres = y <= yLowerThres;
-  // //   const x = data.x[i] - corrOffset;
-  // //   if (overUpperThres) {
-  // //     peaks.max.push({ x, y });
-  // //   } else if (belowThres) {
-  // //     peaks.min.push({ x, y });
-  // //   }
-  // // }
   return peaks;
 };
 exports.Convert2MaxMinPeak = Convert2MaxMinPeak;
@@ -773,9 +748,30 @@ const extrFeaturesCylicVolta = (jcamp, layout, peakUp) => {
     const lowerThres = _format.default.isXRDLayout(layout) ? 100 : calcLowerThres(s);
     const cpo = buildPeakFeature(jcamp, layout, peakUp, s, 100, upperThres, lowerThres);
     const bnd = getBoundary(s);
-    const detector = _format.default.isSECLayout(layout) && jcamp.info.$DETECTOR ? jcamp.info.$DETECTOR : '';
+    let detector = '';
+    let secData = null;
+    if (_format.default.isSECLayout(layout)) {
+      const {
+        info
+      } = jcamp;
+      detector = info.$DETECTOR ? info.$DETECTOR : '';
+      const {
+        D,
+        MN,
+        MP,
+        MW
+      } = info;
+      secData = {
+        d: D,
+        mn: MN,
+        mp: MP,
+        mw: MW
+      };
+    }
+    // const detector = Format.isSECLayout(layout) && jcamp.info.$DETECTOR ? jcamp.info.$DETECTOR : '';
     return Object.assign({}, base, cpo, bnd, {
-      detector
+      detector,
+      secData
     });
   }).filter(r => r != null);
   return features;
@@ -822,7 +818,7 @@ const extractTemperature = jcamp => {
 const ExtractJcamp = source => {
   const jcamp = _jcampconverter.default.convert(source, {
     xy: true,
-    keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS|\$CSUPPERTHRESHOLD|\$CSLOWERTHRESHOLD|\$CSCYCLICVOLTAMMETRYDATA|UNITS|SYMBOL|CSAUTOMETADATA|\$DETECTOR)/ // eslint-disable-line
+    keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS|\$CSUPPERTHRESHOLD|\$CSLOWERTHRESHOLD|\$CSCYCLICVOLTAMMETRYDATA|UNITS|SYMBOL|CSAUTOMETADATA|\$DETECTOR|MN|MW|D|MP)/ // eslint-disable-line
   });
   const layout = readLayout(jcamp);
   const peakUp = !_format.default.isIrLayout(layout);
