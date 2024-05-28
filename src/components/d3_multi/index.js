@@ -56,7 +56,13 @@ class ViewerMulti extends React.Component {
     let yyLabel = yLabel;
 
     if (axesUnitsSt) {
-      const { xUnit, yUnit } = axesUnitsSt;
+      const { curveIdx } = curveSt;
+      const { axes } = axesUnitsSt;
+      let selectedAxes = axes[curveIdx];
+      if (!selectedAxes) {
+        selectedAxes = { xUnit: '', yUnit: '' };
+      }
+      const { xUnit, yUnit } = selectedAxes;
       xxLabel = xUnit === '' ? xLabel : xUnit;
       yyLabel = yUnit === '' ? yLabel : yUnit;
     }
@@ -99,7 +105,13 @@ class ViewerMulti extends React.Component {
     let yyLabel = yLabel;
 
     if (axesUnitsSt) {
-      const { xUnit, yUnit } = axesUnitsSt;
+      const { curveIdx } = curveSt;
+      const { axes } = axesUnitsSt;
+      let selectedAxes = axes[curveIdx];
+      if (!selectedAxes) {
+        selectedAxes = { xUnit: '', yUnit: '' };
+      }
+      const { xUnit, yUnit } = selectedAxes;
       xxLabel = xUnit === '' ? xLabel : xUnit;
       yyLabel = yUnit === '' ? yLabel : yUnit;
     }

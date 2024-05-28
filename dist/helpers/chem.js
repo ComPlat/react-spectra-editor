@@ -910,11 +910,12 @@ const GetCyclicVoltaPreviousShift = (cyclicVolta, curveIdx) => {
     return 0.0;
   }
   const {
-    shift
+    shift,
+    hasRefPeak
   } = spectraList[curveIdx];
   const {
     prevValue
   } = shift;
-  return prevValue;
+  return hasRefPeak ? prevValue : -prevValue;
 };
 exports.GetCyclicVoltaPreviousShift = GetCyclicVoltaPreviousShift;

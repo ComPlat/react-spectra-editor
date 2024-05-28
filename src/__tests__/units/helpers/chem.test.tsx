@@ -517,7 +517,8 @@ describe('Test for chem helper', () => {
   })
 
   describe('Test get previous offset CV layout', () => {
-    const voltaData = {"spectraList":[{"list":[{"min":{"x":-1.5404,"y":-0.00000307144},"max":{"x":0.10003,"y":0.00000285434},"isRef":true,"e12":-0.720185,"pecker":{"x":0.380242,"y":0.00000164361}}],"selectedIdx":0,"isWorkMaxPeak":true,"jcampIdx":0,"shift":{"ref":{"min":{"x":-1.5404,"y":-0.00000307144},"max":{"x":0.10003,"y":0.00000285434},"isRef":true,"e12":-0.720185,"pecker":{"x":0.380242,"y":0.00000164361}},"val":0, "prevValue":0.5}},{"list":[{"min":{"x":-1.48904,"y":-0.000033747399999999995},"max":{"x":0.929483,"y":0.00023741},"isRef":true,"e12":-0.27977849999999993}],"selectedIdx":0,"isWorkMaxPeak":true,"jcampIdx":1,"shift":{"ref":{"min":{"x":-1.48904,"y":-0.000033747399999999995},"max":{"x":0.929483,"y":0.00023741},"isRef":true,"e12":-0.27977849999999993},"val":1.5}},{"list":[{"min":{"x":0.45977,"y":-0.000226347},"max":{"x":1.00943,"y":0.000371349},"isRef":false,"e12":0.7346}],"selectedIdx":0,"isWorkMaxPeak":true,"jcampIdx":2,"shift":{"ref":null,"val":0}}]}
+    const voltaData = {"spectraList":[{"list":[{"min":{"x":-1.5404,"y":-0.00000307144},"max":{"x":0.10003,"y":0.00000285434},"isRef":true,"e12":-0.720185,"pecker":{"x":0.380242,"y":0.00000164361}}],"selectedIdx":0,"isWorkMaxPeak":true,"jcampIdx":0,"shift":{"ref":{"min":{"x":-1.5404,"y":-0.00000307144},"max":{"x":0.10003,"y":0.00000285434},"isRef":true,"e12":-0.720185,"pecker":{"x":0.380242,"y":0.00000164361}},"val":0, "prevValue":0.5},"hasRefPeak":true},{"list":[{"min":{"x":-1.48904,"y":-0.000033747399999999995},"max":{"x":0.929483,"y":0.00023741},"isRef":true,"e12":-0.27977849999999993}],"selectedIdx":0,"isWorkMaxPeak":true,"jcampIdx":1,"shift":{"ref":{"min":{"x":-1.48904,"y":-0.000033747399999999995},"max":{"x":0.929483,"y":0.00023741},"isRef":true,"e12":-0.27977849999999993},"val":1.5}},{"list":[{"min":{"x":0.45977,"y":-0.000226347},"max":{"x":1.00943,"y":0.000371349},"isRef":false,"e12":0.7346}],"selectedIdx":0,"isWorkMaxPeak":true,"jcampIdx":2,"shift":{"ref":null,"val":0}}]}
+    const voltaDataNoRef = {"spectraList":[{"list":[{"min":{"x":-1.5404,"y":-0.00000307144},"max":{"x":0.10003,"y":0.00000285434},"isRef":false,"e12":-0.720185,"pecker":{"x":0.380242,"y":0.00000164361}}],"selectedIdx":0,"isWorkMaxPeak":true,"jcampIdx":0,"shift":{"ref":null,"val":0, "prevValue":0.5},"hasRefPeak":false},{"list":[{"min":{"x":-1.48904,"y":-0.000033747399999999995},"max":{"x":0.929483,"y":0.00023741},"isRef":true,"e12":-0.27977849999999993}],"selectedIdx":0,"isWorkMaxPeak":true,"jcampIdx":1,"shift":{"ref":null,"val":1.5}},{"list":[{"min":{"x":0.45977,"y":-0.000226347},"max":{"x":1.00943,"y":0.000371349},"isRef":false,"e12":0.7346}],"selectedIdx":0,"isWorkMaxPeak":true,"jcampIdx":2,"shift":{"ref":null,"val":0}}]}
     it('When it does not have volta data', () => {
       const offset = GetCyclicVoltaPreviousShift(null)
       expect(offset).toEqual(0.0)
@@ -526,6 +527,11 @@ describe('Test for chem helper', () => {
     it('When it has prev data', () => {
       const offset = GetCyclicVoltaPreviousShift(voltaData, 0)
       expect(offset).toEqual(0.5)
+    })
+
+    it('When it has prev data but volta data does not have any ref peaks', () => {
+      const offset = GetCyclicVoltaPreviousShift(voltaDataNoRef, 0)
+      expect(offset).toEqual(-0.5)
     })
   })
 })

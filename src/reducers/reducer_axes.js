@@ -2,16 +2,27 @@
 import { AXES } from '../constants/action_type';
 
 const initialState = {
-  xUnit: '',
-  yUnit: '',
+  axes: [
+    { xUnit: '', yUnit: '' },
+  ],
 };
 
 const updateAxis = (state, payload, isYAxis = false) => {
+  const { value, curveIndex } = payload;
+  const { axes } = state;
+  let selectedAxes = axes[curveIndex];
+  if (!selectedAxes) {
+    selectedAxes = { xUnit: '', yUnit: '' };
+  }
+  let newAxes = null;
   if (isYAxis) {
-    return Object.assign({}, state, { yUnit: payload });
+    newAxes = Object.assign({}, selectedAxes, { yUnit: value });
+  } else {
+    newAxes = Object.assign({}, selectedAxes, { xUnit: value });
   }
 
-  return Object.assign({}, state, { xUnit: payload });
+  axes[curveIndex] = newAxes;
+  return Object.assign({}, state, { axes });
 };
 
 const axesReducer = (state = initialState, action) => {

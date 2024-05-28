@@ -29,13 +29,29 @@ const styles = () => Object.assign({
     width: 100
   }
 }, _common.commonStyle);
-const axisX = (classes, layoutSt, axesUnitsSt, updateXAxisAct) => {
+const axisX = (classes, layoutSt, axesUnitsSt, updateXAxisAct, curveSt) => {
   const optionsAxisX = _list_axes.LIST_AXES.x;
   const options = optionsAxisX[layoutSt];
-  const onChange = e => updateXAxisAct(e.target.value);
+  const {
+    curveIdx
+  } = curveSt;
+  const onChange = e => updateXAxisAct({
+    value: e.target.value,
+    curveIndex: curveIdx
+  });
+  const {
+    axes
+  } = axesUnitsSt;
+  let selectedAxes = axes[curveIdx];
+  if (!selectedAxes) {
+    selectedAxes = {
+      xUnit: '',
+      yUnit: ''
+    };
+  }
   const {
     xUnit
-  } = axesUnitsSt;
+  } = selectedAxes;
   return /*#__PURE__*/_react.default.createElement(_material.FormControl, {
     className: (0, _classnames.default)(classes.fieldLayout),
     variant: "outlined"
@@ -58,15 +74,30 @@ const axisX = (classes, layoutSt, axesUnitsSt, updateXAxisAct) => {
     className: (0, _classnames.default)(classes.txtLabelTopInput)
   }, "x-Axis"));
 };
-const axisY = (classes, layoutSt, axesUnitsSt, updateYAxisAct) => {
+const axisY = (classes, layoutSt, axesUnitsSt, updateYAxisAct, curveSt) => {
   const optionsAxisX = _list_axes.LIST_AXES.y;
   const options = optionsAxisX[layoutSt];
-  const onChange = e => updateYAxisAct(e.target.value);
+  const {
+    curveIdx
+  } = curveSt;
+  const onChange = e => updateYAxisAct({
+    value: e.target.value,
+    curveIndex: curveIdx
+  });
+  const {
+    axes
+  } = axesUnitsSt;
+  let selectedAxes = axes[curveIdx];
+  if (!selectedAxes) {
+    selectedAxes = {
+      xUnit: '',
+      yUnit: ''
+    };
+  }
   const {
     yUnit
-  } = axesUnitsSt;
+  } = selectedAxes;
   return /*#__PURE__*/_react.default.createElement(_material.FormControl, {
-    "data-testid": "ChangeAxes",
     className: (0, _classnames.default)(classes.fieldLayout),
     variant: "outlined"
   }, /*#__PURE__*/_react.default.createElement(_material.Select, {
@@ -88,11 +119,11 @@ const axisY = (classes, layoutSt, axesUnitsSt, updateYAxisAct) => {
     className: (0, _classnames.default)(classes.txtLabelTopInput)
   }, "y-Axis"));
 };
-const showSelect = (classes, layoutSt, curveSt, axesUnitsSt, updateXAxisAct, updateYAxisActt) => {
+const showSelect = (classes, layoutSt, curveSt, axesUnitsSt, updateXAxisAct, updateYAxisAct) => {
   if (!listLayoutToShow.includes(layoutSt)) {
     return /*#__PURE__*/_react.default.createElement("i", null);
   }
-  return /*#__PURE__*/_react.default.createElement("span", null, axisX(classes, layoutSt, axesUnitsSt, updateXAxisAct), axisY(classes, layoutSt, axesUnitsSt, updateYAxisActt));
+  return /*#__PURE__*/_react.default.createElement("span", null, axisX(classes, layoutSt, axesUnitsSt, updateXAxisAct, curveSt), axisY(classes, layoutSt, axesUnitsSt, updateYAxisAct, curveSt));
 };
 const ChangeAxes = _ref => {
   let {
@@ -122,7 +153,7 @@ const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
 ChangeAxes.propTypes = {
   classes: _propTypes.default.object.isRequired,
   layoutSt: _propTypes.default.string.isRequired,
-  curveSt: _propTypes.default.string.isRequired,
+  curveSt: _propTypes.default.object.isRequired,
   axesUnitsSt: _propTypes.default.object.isRequired,
   updateXAxisAct: _propTypes.default.func.isRequired,
   updateYAxisAct: _propTypes.default.func.isRequired
