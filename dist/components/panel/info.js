@@ -17,7 +17,7 @@ var _ExpandMore = _interopRequireDefault(require("@mui/icons-material/ExpandMore
 var _styles = require("@mui/styles");
 var _format = _interopRequireDefault(require("../../helpers/format"));
 /* eslint-disable no-mixed-operators, react/function-component-definition,
-react/require-default-props */
+react/require-default-props, max-len */
 
 const styles = () => ({
   chip: {
@@ -109,7 +109,61 @@ const aucValue = integration => {
   }
   return values.join(', ');
 };
-const InfoPanel = _ref => {
+const SECData = _ref => {
+  let {
+    classes,
+    layout,
+    detector,
+    secData
+  } = _ref;
+  if (_format.default.isSECLayout(layout) && secData !== undefined) {
+    const {
+      d,
+      mn,
+      mp,
+      mw
+    } = secData;
+    return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("div", {
+      className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd)
+    }, /*#__PURE__*/_react.default.createElement("span", {
+      className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
+    }, "Detector: "), /*#__PURE__*/_react.default.createElement("span", {
+      className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
+    }, detector)), /*#__PURE__*/_react.default.createElement("div", {
+      className: (0, _classnames.default)(classes.rowRoot, classes.rowEven)
+    }, /*#__PURE__*/_react.default.createElement("span", {
+      className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
+    }, "D: "), /*#__PURE__*/_react.default.createElement("span", {
+      className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
+    }, d)), /*#__PURE__*/_react.default.createElement("div", {
+      className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd)
+    }, /*#__PURE__*/_react.default.createElement("span", {
+      className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
+    }, "MN: "), /*#__PURE__*/_react.default.createElement("span", {
+      className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
+    }, mn)), /*#__PURE__*/_react.default.createElement("div", {
+      className: (0, _classnames.default)(classes.rowRoot, classes.rowEven)
+    }, /*#__PURE__*/_react.default.createElement("span", {
+      className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
+    }, "MP: "), /*#__PURE__*/_react.default.createElement("span", {
+      className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
+    }, mp)), /*#__PURE__*/_react.default.createElement("div", {
+      className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd)
+    }, /*#__PURE__*/_react.default.createElement("span", {
+      className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
+    }, "MW: "), /*#__PURE__*/_react.default.createElement("span", {
+      className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
+    }, mw)));
+  }
+  return null;
+};
+SECData.propTypes = {
+  classes: _propTypes.default.object.isRequired,
+  layout: _propTypes.default.string.isRequired,
+  detector: _propTypes.default.object.isRequired,
+  secData: _propTypes.default.object.isRequired
+};
+const InfoPanel = _ref2 => {
   let {
     classes,
     expand,
@@ -127,12 +181,13 @@ const InfoPanel = _ref => {
     canChangeDescription,
     onDescriptionChanged,
     detectorSt
-  } = _ref;
+  } = _ref2;
   if (!feature) return null;
   const {
     title,
     observeFrequency,
-    solventName
+    solventName,
+    secData
   } = feature;
   const {
     curveIdx
@@ -204,13 +259,12 @@ const InfoPanel = _ref => {
     className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
   }, "Theoretical mass: "), /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
-  }, `${parseFloat(theoryMass).toFixed(6)} g/mol`)) : null, _format.default.isSECLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement("div", {
-    className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd)
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
-  }, "Detector: "), /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
-  }, selectedDetector)) : null, !molSvg ? null : /*#__PURE__*/_react.default.createElement(_reactSvgFileZoomPan.default, {
+  }, `${parseFloat(theoryMass).toFixed(6)} g/mol`)) : null, /*#__PURE__*/_react.default.createElement(SECData, {
+    classes: classes,
+    layout: layoutSt,
+    detector: selectedDetector,
+    secData: secData
+  }), !molSvg ? null : /*#__PURE__*/_react.default.createElement(_reactSvgFileZoomPan.default, {
     svg: molSvg,
     duration: 300,
     resize: true

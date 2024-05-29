@@ -1,5 +1,5 @@
 /* eslint-disable no-mixed-operators, react/function-component-definition,
-react/require-default-props */
+react/require-default-props, max-len */
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -113,13 +113,57 @@ const aucValue = (integration) => {
   return values.join(', ');
 };
 
+const SECData = ({
+  classes, layout, detector, secData,
+}) => {
+  if (Format.isSECLayout(layout) && secData !== undefined) {
+    const {
+      d, mn, mp, mw,
+    } = secData;
+    return (
+      <div>
+        <div className={classNames(classes.rowRoot, classes.rowOdd)}>
+          <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Detector: </span>
+          <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{detector}</span>
+        </div>
+        <div className={classNames(classes.rowRoot, classes.rowEven)}>
+          <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>D: </span>
+          <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{d}</span>
+        </div>
+        <div className={classNames(classes.rowRoot, classes.rowOdd)}>
+          <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>MN: </span>
+          <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{mn}</span>
+        </div>
+        <div className={classNames(classes.rowRoot, classes.rowEven)}>
+          <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>MP: </span>
+          <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{mp}</span>
+        </div>
+        <div className={classNames(classes.rowRoot, classes.rowOdd)}>
+          <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>MW: </span>
+          <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{mw}</span>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
+SECData.propTypes = {
+  classes: PropTypes.object.isRequired,
+  layout: PropTypes.string.isRequired,
+  detector: PropTypes.object.isRequired,
+  secData: PropTypes.object.isRequired,
+};
+
 const InfoPanel = ({
   classes, expand, feature, integration, editorOnly, molSvg, descriptions,
   layoutSt, simulationSt, shiftSt, curveSt, theoryMass,
   onExapnd, canChangeDescription, onDescriptionChanged, detectorSt,
 }) => {
   if (!feature) return null;
-  const { title, observeFrequency, solventName } = feature;
+  const {
+    title, observeFrequency, solventName, secData,
+  } = feature;
   const { curveIdx } = curveSt;
   const { curves } = detectorSt;
 
@@ -203,7 +247,7 @@ const InfoPanel = ({
             )
             : null
         }
-        {
+        {/* {
           Format.isSECLayout(layoutSt)
             ? (
               <div className={classNames(classes.rowRoot, classes.rowOdd)}>
@@ -212,7 +256,8 @@ const InfoPanel = ({
               </div>
             )
             : null
-        }
+        } */}
+        <SECData classes={classes} layout={layoutSt} detector={selectedDetector} secData={secData} />
         {
           !molSvg
             ? null
