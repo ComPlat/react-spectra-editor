@@ -21,7 +21,7 @@ react/function-component-definition, function-call-argument-newline,
 react/require-default-props */
 
 const styles = () => Object.assign({}, _common.commonStyle);
-const onClickCb = (operation, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, analysis, decimalSt, integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt) => () => {
+const onClickCb = (operation, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, analysis, decimalSt, integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData) => () => {
   operation({
     peaks: peaksEdit,
     layout: layoutSt,
@@ -40,7 +40,8 @@ const onClickCb = (operation, peaksEdit, isAscend, isIntensity, scan, thres, lay
     cyclicvoltaSt,
     curveSt,
     axesUnitsSt,
-    detectorSt
+    detectorSt,
+    dscMetaData
   });
 };
 const BtnSubmit = _ref => {
@@ -64,13 +65,17 @@ const BtnSubmit = _ref => {
     cyclicvoltaSt,
     curveSt,
     axesUnitsSt,
-    detectorSt
+    detectorSt,
+    metaSt
   } = _ref;
   const peaksEdit = (0, _extractPeaksEdit.extractPeaksEdit)(feature, editPeakSt, thresSt, shiftSt, layoutSt);
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
   const scan = (0, _chem.Convert2Scan)(feature, scanSt);
   const thres = (0, _chem.Convert2Thres)(feature, thresSt);
   const aucValues = (0, _extractPeaksEdit.extractAreaUnderCurve)(allIntegrationSt, integrationSt, layoutSt);
+  const {
+    dscMetaData
+  } = metaSt;
   if (!operation) return null;
   return /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
     title: /*#__PURE__*/_react.default.createElement("span", {
@@ -79,7 +84,7 @@ const BtnSubmit = _ref => {
   }, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
     className: (0, _classnames.default)('btn-sv-bar-submit'),
     color: "primary",
-    onClick: onClickCb(operation.value, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt, integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt)
+    onClick: onClickCb(operation.value, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt, integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData)
   }, /*#__PURE__*/_react.default.createElement(_PlayCircleOutline.default, {
     className: classes.icon
   })));
@@ -101,7 +106,8 @@ const mapStateToProps = (state, props) => (
   cyclicvoltaSt: state.cyclicvolta,
   curveSt: state.curve,
   axesUnitsSt: state.axesUnits,
-  detectorSt: state.detector
+  detectorSt: state.detector,
+  metaSt: state.meta
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({}, dispatch);
 BtnSubmit.propTypes = {
@@ -124,6 +130,7 @@ BtnSubmit.propTypes = {
   cyclicvoltaSt: _propTypes.default.object.isRequired,
   curveSt: _propTypes.default.object,
   axesUnitsSt: _propTypes.default.object.isRequired,
-  detectorSt: _propTypes.default.object.isRequired
+  detectorSt: _propTypes.default.object.isRequired,
+  metaSt: _propTypes.default.object.isRequired
 };
 var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(BtnSubmit);

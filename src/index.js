@@ -30,6 +30,7 @@ import uvVisJcamp from './__tests__/fixtures/uv_vis_jcamp';
 import hplcUVVisJcamp from './__tests__/fixtures/hplc_uvvis_jcamp';
 import hplcUVVisJcamp2 from './__tests__/fixtures/hplc_uvvis_jcamp_2';
 import tgaJcamp from './__tests__/fixtures/tga_jcamp';
+import dscJcamp from './__tests__/fixtures/dsc_jcamp';
 import xrdJcamp1 from './__tests__/fixtures/xrd_jcamp_1';
 import xrdJcamp2 from './__tests__/fixtures/xrd_jcamp_2';
 import cyclicVoltaJcamp1 from './__tests__/fixtures/cyclic_voltammetry_1';
@@ -66,6 +67,7 @@ const compUvVisEntity = FN.ExtractJcamp(compareUvVisJcamp);
 const hplcUVVisEntity = FN.ExtractJcamp(hplcUVVisJcamp);
 const hplcUVVisEntity2 = FN.ExtractJcamp(hplcUVVisJcamp2);
 const tgaEntity = FN.ExtractJcamp(tgaJcamp);
+const dscEntity = FN.ExtractJcamp(dscJcamp);
 const xrdEntity1 = FN.ExtractJcamp(xrdJcamp1);
 const xrdEntity2 = FN.ExtractJcamp(xrdJcamp2);
 const cyclicVoltaEntity1 = FN.ExtractJcamp(cyclicVoltaJcamp1);
@@ -158,6 +160,8 @@ class DemoWriteIr extends React.Component {
         return hplcUVVisEntity;
       case 'tga':
         return tgaEntity;
+      case 'dsc':
+        return dscEntity;
       case 'xrd':
         return xrdEntity1;
       case 'cyclic volta':
@@ -221,6 +225,7 @@ class DemoWriteIr extends React.Component {
       case 'uv/vis':
       case 'hplc uv/vis':
       case 'tga':
+      case 'dsc':
       case 'xrd':
       case 'ms':
       case 'cyclic volta':
@@ -528,6 +533,14 @@ class DemoWriteIr extends React.Component {
             onClick={this.onClick('tga')}
           >
             TGA
+          </Button>
+          <Button
+            id='btn-dsc'
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('dsc')}
+          >
+            DSC
           </Button>
           <Button
             id='btn-xrd'
