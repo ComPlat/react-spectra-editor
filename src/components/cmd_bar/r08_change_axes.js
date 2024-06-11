@@ -32,11 +32,17 @@ const styles = () => (
   )
 );
 
-const axisX = (classes, layoutSt, axesUnitsSt, updateXAxisAct) => {
+const axisX = (classes, layoutSt, axesUnitsSt, updateXAxisAct, curveSt) => {
   const optionsAxisX = LIST_AXES.x;
   const options = optionsAxisX[layoutSt];
-  const onChange = (e) => updateXAxisAct(e.target.value);
-  const { xUnit } = axesUnitsSt;
+  const { curveIdx } = curveSt;
+  const onChange = (e) => updateXAxisAct({ value: e.target.value, curveIndex: curveIdx });
+  const { axes } = axesUnitsSt;
+  let selectedAxes = axes[curveIdx];
+  if (!selectedAxes) {
+    selectedAxes = { xUnit: '', yUnit: '' };
+  }
+  const { xUnit } = selectedAxes;
   return (
     <FormControl
       className={classNames(classes.fieldLayout)}
@@ -70,14 +76,19 @@ const axisX = (classes, layoutSt, axesUnitsSt, updateXAxisAct) => {
   );
 };
 
-const axisY = (classes, layoutSt, axesUnitsSt, updateYAxisAct) => {
+const axisY = (classes, layoutSt, axesUnitsSt, updateYAxisAct, curveSt) => {
   const optionsAxisX = LIST_AXES.y;
   const options = optionsAxisX[layoutSt];
-  const onChange = (e) => updateYAxisAct(e.target.value);
-  const { yUnit } = axesUnitsSt;
+  const { curveIdx } = curveSt;
+  const onChange = (e) => updateYAxisAct({ value: e.target.value, curveIndex: curveIdx });
+  const { axes } = axesUnitsSt;
+  let selectedAxes = axes[curveIdx];
+  if (!selectedAxes) {
+    selectedAxes = { xUnit: '', yUnit: '' };
+  }
+  const { yUnit } = selectedAxes;
   return (
     <FormControl
-      data-testid="ChangeAxes"
       className={classNames(classes.fieldLayout)}
       variant="outlined"
     >
@@ -109,7 +120,7 @@ const axisY = (classes, layoutSt, axesUnitsSt, updateYAxisAct) => {
   );
 };
 
-const showSelect = (classes, layoutSt, curveSt, axesUnitsSt, updateXAxisAct, updateYAxisActt) => {
+const showSelect = (classes, layoutSt, curveSt, axesUnitsSt, updateXAxisAct, updateYAxisAct) => {
   if (!listLayoutToShow.includes(layoutSt)) {
     return (
       <i />
@@ -118,8 +129,8 @@ const showSelect = (classes, layoutSt, curveSt, axesUnitsSt, updateXAxisAct, upd
 
   return (
     <span>
-      { axisX(classes, layoutSt, axesUnitsSt, updateXAxisAct) }
-      { axisY(classes, layoutSt, axesUnitsSt, updateYAxisActt) }
+      { axisX(classes, layoutSt, axesUnitsSt, updateXAxisAct, curveSt) }
+      { axisY(classes, layoutSt, axesUnitsSt, updateYAxisAct, curveSt) }
     </span>
   );
 };
@@ -150,7 +161,7 @@ const mapDispatchToProps = (dispatch) => (
 ChangeAxes.propTypes = {
   classes: PropTypes.object.isRequired,
   layoutSt: PropTypes.string.isRequired,
-  curveSt: PropTypes.string.isRequired,
+  curveSt: PropTypes.object.isRequired,
   axesUnitsSt: PropTypes.object.isRequired,
   updateXAxisAct: PropTypes.func.isRequired,
   updateYAxisAct: PropTypes.func.isRequired,

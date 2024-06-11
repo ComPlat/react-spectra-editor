@@ -8,18 +8,40 @@ var _action_type = require("../constants/action_type");
 /* eslint-disable default-param-last, prefer-object-spread */
 
 const initialState = {
-  xUnit: '',
-  yUnit: ''
+  axes: [{
+    xUnit: '',
+    yUnit: ''
+  }]
 };
 const updateAxis = function (state, payload) {
   let isYAxis = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+  const {
+    value,
+    curveIndex
+  } = payload;
+  const {
+    axes
+  } = state;
+  let selectedAxes = axes[curveIndex];
+  if (!selectedAxes) {
+    selectedAxes = {
+      xUnit: '',
+      yUnit: ''
+    };
+  }
+  let newAxes = null;
   if (isYAxis) {
-    return Object.assign({}, state, {
-      yUnit: payload
+    newAxes = Object.assign({}, selectedAxes, {
+      yUnit: value
+    });
+  } else {
+    newAxes = Object.assign({}, selectedAxes, {
+      xUnit: value
     });
   }
+  axes[curveIndex] = newAxes;
   return Object.assign({}, state, {
-    xUnit: payload
+    axes
   });
 };
 const axesReducer = function () {
