@@ -116,7 +116,7 @@ const aucValue = (integration) => {
 const SECData = ({
   classes, layout, detector, secData,
 }) => {
-  if (Format.isSECLayout(layout) && secData !== undefined) {
+  if (Format.isSECLayout(layout) && secData) {
     const {
       d, mn, mp, mw,
     } = secData;

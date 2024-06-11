@@ -116,7 +116,7 @@ const SECData = _ref => {
     detector,
     secData
   } = _ref;
-  if (_format.default.isSECLayout(layout) && secData !== undefined) {
+  if (_format.default.isSECLayout(layout) && secData) {
     const {
       d,
       mn,
