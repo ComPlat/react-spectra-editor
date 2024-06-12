@@ -213,7 +213,7 @@ describe('Test format helper', () => {
     it('Layout digit 0', () => {
       const listLayout = [LIST_LAYOUT.IR, LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS, 
         LIST_LAYOUT.HPLC_UVVIS, LIST_LAYOUT.TGA, LIST_LAYOUT.DSC, LIST_LAYOUT.XRD,
-        LIST_LAYOUT.CDS, LIST_LAYOUT.SEC, LIST_LAYOUT.MS
+        LIST_LAYOUT.CDS, LIST_LAYOUT.SEC, LIST_LAYOUT.GC, LIST_LAYOUT.MS
       ];
 
       listLayout.forEach(layout => {
@@ -360,7 +360,7 @@ describe('Test format helper', () => {
   })
 
   describe('Test layouts have multiple curves', () => {
-    const layouts = [LIST_LAYOUT.CYCLIC_VOLTAMMETRY, LIST_LAYOUT.SEC, LIST_LAYOUT.AIF]
+    const layouts = [LIST_LAYOUT.CYCLIC_VOLTAMMETRY, LIST_LAYOUT.SEC, LIST_LAYOUT.GC, LIST_LAYOUT.AIF]
     it('Has multiple curves', () => {
       layouts.forEach(layout => {
         const hasMultipleCurves = Format.hasMultiCurves(layout)

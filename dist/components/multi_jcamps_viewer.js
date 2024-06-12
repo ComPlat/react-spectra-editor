@@ -17,6 +17,7 @@ var _index3 = _interopRequireDefault(require("./d3_multi/index"));
 var _curve = require("../actions/curve");
 var _cyclic_voltammetry = require("../actions/cyclic_voltammetry");
 var _list_layout = require("../constants/list_layout");
+var _format = _interopRequireDefault(require("../helpers/format"));
 /* eslint-disable react/default-props-match-prop-types,
 react/require-default-props, react/no-unused-prop-types, react/jsx-boolean-value,
 prefer-object-spread */
@@ -66,7 +67,8 @@ class MultiJcampsViewer extends _react.default.Component {
       layoutSt
     } = this.props;
     if (!entities || entities.length === 0) return /*#__PURE__*/_react.default.createElement("div", null);
-    const seperatedSubLayouts = seperatingSubLayout(entities, 'xUnit', layoutSt);
+    const separateCondition = _format.default.isGCLayout(layoutSt) ? 'yUnit' : 'xUnit';
+    const seperatedSubLayouts = seperatingSubLayout(entities, separateCondition, layoutSt);
     const {
       curveIdx
     } = curveSt;
