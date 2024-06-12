@@ -169,6 +169,9 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
         <MenuItem value={LIST_LAYOUT.SEC}>
           <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>SEC</span>
         </MenuItem>
+        <MenuItem value={LIST_LAYOUT.GC}>
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>GC (GAS CHROMATOGRAPHY)</span>
+        </MenuItem>
         <MenuItem value={LIST_LAYOUT.AIF}>
           <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>SORPTION-DESORPTION</span>
         </MenuItem>

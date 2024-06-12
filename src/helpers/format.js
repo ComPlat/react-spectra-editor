@@ -17,6 +17,7 @@ const spectraDigit = (layout) => {
     case LIST_LAYOUT.XRD:
     case LIST_LAYOUT.CDS:
     case LIST_LAYOUT.SEC:
+    case LIST_LAYOUT.GC:
     case LIST_LAYOUT.MS:
       return 0;
     case LIST_LAYOUT.C13:
@@ -73,6 +74,7 @@ const spectraOps = {
   [LIST_LAYOUT.CYCLIC_VOLTAMMETRY]: { head: 'CV', tail: '.' },
   [LIST_LAYOUT.CDS]: { head: 'CIRCULAR DICHROISM SPECTROSCOPY', tail: '.' },
   [LIST_LAYOUT.SEC]: { head: 'SIZE EXCLUSION CHROMATOGRAPHY', tail: '.' },
+  [LIST_LAYOUT.GC]: { head: 'GAS CHROMATOGRAPHY', tail: '.' },
   [LIST_LAYOUT.EMISSIONS]: { head: 'EMISSION', tail: '.' },
   [LIST_LAYOUT.DLS_INTENSITY]: { head: 'DLS', tail: '.' },
 };
@@ -334,7 +336,8 @@ const peaksBody = ({
     || layout === LIST_LAYOUT.DSC
     || layout === LIST_LAYOUT.CYCLIC_VOLTAMMETRY
     || layout === LIST_LAYOUT.CDS
-    || layout === LIST_LAYOUT.SEC) {
+    || layout === LIST_LAYOUT.SEC
+    || layout === LIST_LAYOUT.GC) {
     return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
   if (layout === LIST_LAYOUT.XRD) {
@@ -380,12 +383,15 @@ const isXRDLayout = (layoutSt) => (LIST_LAYOUT.XRD === layoutSt);
 const isCyclicVoltaLayout = (layoutSt) => (LIST_LAYOUT.CYCLIC_VOLTAMMETRY === layoutSt);
 const isCDSLayout = (layoutSt) => (LIST_LAYOUT.CDS === layoutSt);
 const isSECLayout = (layoutSt) => (LIST_LAYOUT.SEC === layoutSt);
+const isGCLayout = (layoutSt) => (LIST_LAYOUT.GC === layoutSt);
 const isEmWaveLayout = (layoutSt) => (
   [LIST_LAYOUT.IR, LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS,
     LIST_LAYOUT.HPLC_UVVIS].indexOf(layoutSt) >= 0
 );
 const hasMultiCurves = (layoutSt) => (
-  [LIST_LAYOUT.CYCLIC_VOLTAMMETRY, LIST_LAYOUT.SEC, LIST_LAYOUT.AIF].indexOf(layoutSt) >= 0
+  [
+    LIST_LAYOUT.CYCLIC_VOLTAMMETRY, LIST_LAYOUT.SEC, LIST_LAYOUT.GC, LIST_LAYOUT.AIF,
+  ].indexOf(layoutSt) >= 0
 );
 const isAIFLayout = (layoutSt) => (LIST_LAYOUT.AIF === layoutSt);
 const isEmissionsLayout = (layoutSt) => (LIST_LAYOUT.EMISSIONS === layoutSt);
@@ -556,6 +562,7 @@ const Format = {
   isEmissionsLayout,
   isDLSIntensityLayout,
   isEmWaveLayout,
+  isGCLayout,
   fixDigit,
   formatPeaksByPrediction,
   formatedMS,
