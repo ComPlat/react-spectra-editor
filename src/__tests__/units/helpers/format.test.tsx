@@ -212,7 +212,7 @@ describe('Test format helper', () => {
   describe('Get digit number of spectra based on layout', () => {
     it('Layout digit 0', () => {
       const listLayout = [LIST_LAYOUT.IR, LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS, 
-        LIST_LAYOUT.HPLC_UVVIS, LIST_LAYOUT.TGA, LIST_LAYOUT.XRD,
+        LIST_LAYOUT.HPLC_UVVIS, LIST_LAYOUT.TGA, LIST_LAYOUT.DSC, LIST_LAYOUT.XRD,
         LIST_LAYOUT.CDS, LIST_LAYOUT.SEC, LIST_LAYOUT.MS
       ];
 

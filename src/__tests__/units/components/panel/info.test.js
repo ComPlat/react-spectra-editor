@@ -29,6 +29,7 @@ const store = mockStore({
       },
     ],
   },
+  meta: {}
 });
 const failedStore = mockStore({
 

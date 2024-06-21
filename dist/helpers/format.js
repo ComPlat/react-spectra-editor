@@ -20,6 +20,7 @@ const spectraDigit = layout => {
     case _list_layout.LIST_LAYOUT.UVVIS:
     case _list_layout.LIST_LAYOUT.HPLC_UVVIS:
     case _list_layout.LIST_LAYOUT.TGA:
+    case _list_layout.LIST_LAYOUT.DSC:
     case _list_layout.LIST_LAYOUT.XRD:
     case _list_layout.LIST_LAYOUT.CDS:
     case _list_layout.LIST_LAYOUT.SEC:
@@ -108,6 +109,10 @@ const spectraOps = {
   },
   [_list_layout.LIST_LAYOUT.TGA]: {
     head: 'THERMOGRAVIMETRIC ANALYSIS',
+    tail: ' SECONDS'
+  },
+  [_list_layout.LIST_LAYOUT.DSC]: {
+    head: 'DIFFERENTIAL SCANNING CALORIMETRY',
     tail: ' SECONDS'
   },
   [_list_layout.LIST_LAYOUT.MS]: {
@@ -411,7 +416,7 @@ const peaksBody = _ref => {
   if (layout === _list_layout.LIST_LAYOUT.DLS_INTENSITY) {
     return formatedDLSIntensity(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
-  if (layout === _list_layout.LIST_LAYOUT.RAMAN || layout === _list_layout.LIST_LAYOUT.TGA || layout === _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY || layout === _list_layout.LIST_LAYOUT.CDS || layout === _list_layout.LIST_LAYOUT.SEC) {
+  if (layout === _list_layout.LIST_LAYOUT.RAMAN || layout === _list_layout.LIST_LAYOUT.TGA || layout === _list_layout.LIST_LAYOUT.DSC || layout === _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY || layout === _list_layout.LIST_LAYOUT.CDS || layout === _list_layout.LIST_LAYOUT.SEC) {
     return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
   if (layout === _list_layout.LIST_LAYOUT.XRD) {
@@ -454,6 +459,7 @@ const isRamanLayout = layoutSt => _list_layout.LIST_LAYOUT.RAMAN === layoutSt;
 const isUvVisLayout = layoutSt => _list_layout.LIST_LAYOUT.UVVIS === layoutSt;
 const isHplcUvVisLayout = layoutSt => _list_layout.LIST_LAYOUT.HPLC_UVVIS === layoutSt;
 const isTGALayout = layoutSt => _list_layout.LIST_LAYOUT.TGA === layoutSt;
+const isDSCLayout = layoutSt => _list_layout.LIST_LAYOUT.DSC === layoutSt;
 const isXRDLayout = layoutSt => _list_layout.LIST_LAYOUT.XRD === layoutSt;
 const isCyclicVoltaLayout = layoutSt => _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY === layoutSt;
 const isCDSLayout = layoutSt => _list_layout.LIST_LAYOUT.CDS === layoutSt;
@@ -560,6 +566,7 @@ const Format = {
   isUvVisLayout,
   isHplcUvVisLayout,
   isTGALayout,
+  isDSCLayout,
   isXRDLayout,
   isCyclicVoltaLayout,
   isCDSLayout,

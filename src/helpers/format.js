@@ -13,6 +13,7 @@ const spectraDigit = (layout) => {
     case LIST_LAYOUT.UVVIS:
     case LIST_LAYOUT.HPLC_UVVIS:
     case LIST_LAYOUT.TGA:
+    case LIST_LAYOUT.DSC:
     case LIST_LAYOUT.XRD:
     case LIST_LAYOUT.CDS:
     case LIST_LAYOUT.SEC:
@@ -66,6 +67,7 @@ const spectraOps = {
   [LIST_LAYOUT.UVVIS]: { head: 'UV-VIS (absorption, solvent), λmax', tail: ' nm' },
   [LIST_LAYOUT.HPLC_UVVIS]: { head: 'HPLC UV/VIS (transmittance)', tail: '' },
   [LIST_LAYOUT.TGA]: { head: 'THERMOGRAVIMETRIC ANALYSIS', tail: ' SECONDS' },
+  [LIST_LAYOUT.DSC]: { head: 'DIFFERENTIAL SCANNING CALORIMETRY', tail: ' SECONDS' },
   [LIST_LAYOUT.MS]: { head: 'MASS', tail: ' m/z' },
   [LIST_LAYOUT.XRD]: { head: 'XRD', tail: '.' },
   [LIST_LAYOUT.CYCLIC_VOLTAMMETRY]: { head: 'CYCLIC VOLTAMMETRY', tail: '.' },
@@ -329,6 +331,7 @@ const peaksBody = ({
   }
   if (layout === LIST_LAYOUT.RAMAN
     || layout === LIST_LAYOUT.TGA
+    || layout === LIST_LAYOUT.DSC
     || layout === LIST_LAYOUT.CYCLIC_VOLTAMMETRY
     || layout === LIST_LAYOUT.CDS
     || layout === LIST_LAYOUT.SEC) {
@@ -372,6 +375,7 @@ const isRamanLayout = (layoutSt) => (LIST_LAYOUT.RAMAN === layoutSt);
 const isUvVisLayout = (layoutSt) => (LIST_LAYOUT.UVVIS === layoutSt);
 const isHplcUvVisLayout = (layoutSt) => (LIST_LAYOUT.HPLC_UVVIS === layoutSt);
 const isTGALayout = (layoutSt) => (LIST_LAYOUT.TGA === layoutSt);
+const isDSCLayout = (layoutSt) => (LIST_LAYOUT.DSC === layoutSt);
 const isXRDLayout = (layoutSt) => (LIST_LAYOUT.XRD === layoutSt);
 const isCyclicVoltaLayout = (layoutSt) => (LIST_LAYOUT.CYCLIC_VOLTAMMETRY === layoutSt);
 const isCDSLayout = (layoutSt) => (LIST_LAYOUT.CDS === layoutSt);
@@ -488,6 +492,7 @@ const Format = {
   isUvVisLayout,
   isHplcUvVisLayout,
   isTGALayout,
+  isDSCLayout,
   isXRDLayout,
   isCyclicVoltaLayout,
   isCDSLayout,
