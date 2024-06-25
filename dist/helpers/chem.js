@@ -350,6 +350,9 @@ const readLayout = jcamp => {
     if (dataType.includes('THERMOGRAVIMETRIC ANALYSIS')) {
       return _list_layout.LIST_LAYOUT.TGA;
     }
+    if (dataType.includes('DIFFERENTIAL SCANNING CALORIMETRY')) {
+      return _list_layout.LIST_LAYOUT.DSC;
+    }
     if (dataType.includes('X-RAY DIFFRACTION')) {
       return _list_layout.LIST_LAYOUT.XRD;
     }
@@ -514,7 +517,8 @@ const buildPeakFeature = function (jcamp, layout, peakUp, s, thresRef) {
     solventName: info['.SOLVENTNAME'],
     upperThres,
     lowerThres,
-    volammetryData: extractVoltammetryData(jcamp)
+    volammetryData: extractVoltammetryData(jcamp),
+    scanRate: +info.$CSSCANRATE || 0.1
   }, s);
 };
 const maxArray = arr => {
@@ -683,6 +687,7 @@ const extrFeaturesNi = (jcamp, layout, peakUp, spectra) => {
     nfs.simulation = buildSimFeature(jcamp);
     return nfs;
   }
+
   // workaround for legacy design
   const features = jcamp.spectra.map(s => {
     const thresRef = calcThresRef(s, peakUp);
@@ -768,7 +773,6 @@ const extrFeaturesCylicVolta = (jcamp, layout, peakUp) => {
         mw: MW
       };
     }
-    // const detector = Format.isSECLayout(layout) && jcamp.info.$DETECTOR ? jcamp.info.$DETECTOR : '';
     return Object.assign({}, base, cpo, bnd, {
       detector,
       secData
@@ -818,7 +822,7 @@ const extractTemperature = jcamp => {
 const ExtractJcamp = source => {
   const jcamp = _jcampconverter.default.convert(source, {
     xy: true,
-    keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS|\$CSUPPERTHRESHOLD|\$CSLOWERTHRESHOLD|\$CSCYCLICVOLTAMMETRYDATA|UNITS|SYMBOL|CSAUTOMETADATA|\$DETECTOR|MN|MW|D|MP)/ // eslint-disable-line
+    keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS|\$CSUPPERTHRESHOLD|\$CSLOWERTHRESHOLD|\$CSCYCLICVOLTAMMETRYDATA|UNITS|SYMBOL|CSAUTOMETADATA|\$DETECTOR|MN|MW|D|MP|MELTINGPOINT|TG|\$CSSCANRATE|\$CSSPECTRUMDIRECTION)/ // eslint-disable-line
   });
   const layout = readLayout(jcamp);
   const peakUp = !_format.default.isIrLayout(layout);
@@ -839,6 +843,22 @@ const ExtractJcamp = source => {
     features = extrFeaturesCylicVolta(jcamp, layout, peakUp);
   } else {
     features = extrFeaturesNi(jcamp, layout, peakUp, spectra);
+    if (_format.default.isDSCLayout(layout)) {
+      const {
+        info
+      } = jcamp;
+      const {
+        MELTINGPOINT,
+        TG
+      } = info;
+      const dscMetaData = {
+        meltingPoint: MELTINGPOINT,
+        tg: TG
+      };
+      features = Object.assign({}, features, {
+        dscMetaData
+      });
+    }
   }
   // const features = Format.isMsLayout(layout)
   //   ? extrFeaturesMs(jcamp, layout, peakUp)

@@ -61,7 +61,8 @@ class LayerInit extends _react.default.Component {
       resetInitMsAct,
       resetInitNmrAct,
       resetInitCommonWithIntergationAct,
-      resetDetectorAct
+      resetDetectorAct,
+      updateDSCMetaDataAct
     } = this.props;
     resetInitCommonAct();
     resetDetectorAct();
@@ -96,6 +97,11 @@ class LayerInit extends _react.default.Component {
       resetInitCommonWithIntergationAct({
         integration
       });
+    } else if (_format.default.isDSCLayout(layout)) {
+      const {
+        dscMetaData
+      } = features;
+      updateDSCMetaDataAct(dscMetaData);
     }
   }
   initReducer() {
@@ -191,7 +197,8 @@ const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   updateOperationAct: _submit.updateOperation,
   updateMetaPeaksAct: _meta.updateMetaPeaks,
   addOthersAct: _jcamp.addOthers,
-  setAllCurvesAct: _curve.setAllCurves
+  setAllCurvesAct: _curve.setAllCurves,
+  updateDSCMetaDataAct: _meta.updateDSCMetaData
 }, dispatch);
 LayerInit.propTypes = {
   entity: _propTypes.default.object.isRequired,
@@ -222,7 +229,8 @@ LayerInit.propTypes = {
   setAllCurvesAct: _propTypes.default.func.isRequired,
   userManualLink: _propTypes.default.object,
   // eslint-disable-line
-  resetDetectorAct: _propTypes.default.func.isRequired
+  resetDetectorAct: _propTypes.default.func.isRequired,
+  updateDSCMetaDataAct: _propTypes.default.func.isRequired
 };
 var _default = exports.default = (0, _reactRedux.connect)(
 // eslint-disable-line

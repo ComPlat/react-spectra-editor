@@ -30,6 +30,7 @@ import uvVisJcamp from './__tests__/fixtures/uv_vis_jcamp';
 import hplcUVVisJcamp from './__tests__/fixtures/hplc_uvvis_jcamp';
 import hplcUVVisJcamp2 from './__tests__/fixtures/hplc_uvvis_jcamp_2';
 import tgaJcamp from './__tests__/fixtures/tga_jcamp';
+import dscJcamp from './__tests__/fixtures/dsc_jcamp';
 import xrdJcamp1 from './__tests__/fixtures/xrd_jcamp_1';
 import xrdJcamp2 from './__tests__/fixtures/xrd_jcamp_2';
 import cyclicVoltaJcamp1 from './__tests__/fixtures/cyclic_voltammetry_1';
@@ -66,6 +67,7 @@ const compUvVisEntity = FN.ExtractJcamp(compareUvVisJcamp);
 const hplcUVVisEntity = FN.ExtractJcamp(hplcUVVisJcamp);
 const hplcUVVisEntity2 = FN.ExtractJcamp(hplcUVVisJcamp2);
 const tgaEntity = FN.ExtractJcamp(tgaJcamp);
+const dscEntity = FN.ExtractJcamp(dscJcamp);
 const xrdEntity1 = FN.ExtractJcamp(xrdJcamp1);
 const xrdEntity2 = FN.ExtractJcamp(xrdJcamp2);
 const cyclicVoltaEntity1 = FN.ExtractJcamp(cyclicVoltaJcamp1);
@@ -158,6 +160,8 @@ class DemoWriteIr extends React.Component {
         return hplcUVVisEntity;
       case 'tga':
         return tgaEntity;
+      case 'dsc':
+        return dscEntity;
       case 'xrd':
         return xrdEntity1;
       case 'cyclic volta':
@@ -221,6 +225,7 @@ class DemoWriteIr extends React.Component {
       case 'uv/vis':
       case 'hplc uv/vis':
       case 'tga':
+      case 'dsc':
       case 'xrd':
       case 'ms':
       case 'cyclic volta':
@@ -255,6 +260,7 @@ class DemoWriteIr extends React.Component {
 
   formatPks({
     peaks, layout, shift, isAscend, decimal, isIntensity, integration, waveLength,
+    cyclicvoltaSt, curveSt,
   }) {
     const entity = this.loadEntity();
     const { features } = entity;
@@ -274,7 +280,25 @@ class DemoWriteIr extends React.Component {
       temperature,
     });
     const wrapper = FN.peaksWrapper(layout, shift);
-    const desc = this.rmDollarSign(wrapper.head) + body + wrapper.tail;
+    let desc = this.rmDollarSign(wrapper.head) + body + wrapper.tail;
+    if (FN.isCyclicVoltaLayout(layout)) {
+      const { spectraList } = cyclicvoltaSt;
+      const { curveIdx, listCurves } = curveSt;
+      const selectedVolta = spectraList[curveIdx];
+      const selectedCurve = listCurves[curveIdx];
+      const { feature } = selectedCurve;
+      const { scanRate } = feature;
+      const data = {
+        scanRate,
+        voltaData: {
+          listPeaks: selectedVolta.list,
+          xyData: feature.data[0],
+        },
+      };
+      const inlineData = FN.inlineNotation(layout, data);
+      const { formattedString } = inlineData;
+      desc = formattedString;
+    }
     return desc;
   }
 
@@ -338,9 +362,11 @@ class DemoWriteIr extends React.Component {
 
   writePeak({
     peaks, layout, shift, isAscend, decimal, isIntensity, integration, waveLength,
+    cyclicvoltaSt, curveSt,
   }) {
     const desc = this.formatPks({
-      peaks, layout, shift, isAscend, decimal, isIntensity, integration, waveLength,
+      peaks, layout, shift, isAscend, decimal, isIntensity, integration, waveLength, // eslint-disable-line
+      cyclicvoltaSt, curveSt, // eslint-disable-line
     });
     this.setState({ desc });
   }
@@ -528,6 +554,14 @@ class DemoWriteIr extends React.Component {
             onClick={this.onClick('tga')}
           >
             TGA
+          </Button>
+          <Button
+            id='btn-dsc'
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('dsc')}
+          >
+            DSC
           </Button>
           <Button
             id='btn-xrd'

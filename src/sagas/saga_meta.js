@@ -19,8 +19,18 @@ function* updateMetaPeaks(action) {
   });
 }
 
+function* updateMetaData(action) {
+  yield put({
+    type: META.UPDATE_META_DATA_RDC,
+    payload: {
+      dscMetaData: action.payload,
+    },
+  });
+}
+
 const metaSagas = [
   takeEvery(META.UPDATE_PEAKS, updateMetaPeaks),
+  takeEvery(META.UPDATE_META_DATA, updateMetaData),
 ];
 
 export default metaSagas;

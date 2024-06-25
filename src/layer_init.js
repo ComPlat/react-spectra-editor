@@ -10,7 +10,7 @@ import { updateOperation } from './actions/submit';
 import {
   resetInitCommon, resetInitNmr, resetInitMs, resetInitCommonWithIntergation, resetDetector,
 } from './actions/manager';
-import { updateMetaPeaks } from './actions/meta';
+import { updateMetaPeaks, updateDSCMetaData } from './actions/meta';
 import { addOthers } from './actions/jcamp';
 import LayerPrism from './layer_prism';
 import Format from './helpers/format';
@@ -60,7 +60,7 @@ class LayerInit extends React.Component {
     const {
       entity, updateMetaPeaksAct,
       resetInitCommonAct, resetInitMsAct, resetInitNmrAct, resetInitCommonWithIntergationAct,
-      resetDetectorAct,
+      resetDetectorAct, updateDSCMetaDataAct,
     } = this.props;
     resetInitCommonAct();
     resetDetectorAct();
@@ -84,6 +84,9 @@ class LayerInit extends React.Component {
       resetInitCommonWithIntergationAct({
         integration,
       });
+    } else if (Format.isDSCLayout(layout)) {
+      const { dscMetaData } = features;
+      updateDSCMetaDataAct(dscMetaData);
     }
   }
 
@@ -174,6 +177,7 @@ const mapDispatchToProps = (dispatch) => (
     updateMetaPeaksAct: updateMetaPeaks,
     addOthersAct: addOthers,
     setAllCurvesAct: setAllCurves,
+    updateDSCMetaDataAct: updateDSCMetaData,
   }, dispatch)
 );
 
@@ -203,6 +207,7 @@ LayerInit.propTypes = {
   setAllCurvesAct: PropTypes.func.isRequired,
   userManualLink: PropTypes.object, // eslint-disable-line
   resetDetectorAct: PropTypes.func.isRequired,
+  updateDSCMetaDataAct: PropTypes.func.isRequired,
 };
 
 export default connect( // eslint-disable-line

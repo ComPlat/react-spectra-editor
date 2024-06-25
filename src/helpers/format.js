@@ -13,6 +13,7 @@ const spectraDigit = (layout) => {
     case LIST_LAYOUT.UVVIS:
     case LIST_LAYOUT.HPLC_UVVIS:
     case LIST_LAYOUT.TGA:
+    case LIST_LAYOUT.DSC:
     case LIST_LAYOUT.XRD:
     case LIST_LAYOUT.CDS:
     case LIST_LAYOUT.SEC:
@@ -66,9 +67,10 @@ const spectraOps = {
   [LIST_LAYOUT.UVVIS]: { head: 'UV-VIS (absorption, solvent), λmax', tail: ' nm' },
   [LIST_LAYOUT.HPLC_UVVIS]: { head: 'HPLC UV/VIS (transmittance)', tail: '' },
   [LIST_LAYOUT.TGA]: { head: 'THERMOGRAVIMETRIC ANALYSIS', tail: ' SECONDS' },
+  [LIST_LAYOUT.DSC]: { head: 'DIFFERENTIAL SCANNING CALORIMETRY', tail: ' SECONDS' },
   [LIST_LAYOUT.MS]: { head: 'MASS', tail: ' m/z' },
   [LIST_LAYOUT.XRD]: { head: 'XRD', tail: '.' },
-  [LIST_LAYOUT.CYCLIC_VOLTAMMETRY]: { head: 'CYCLIC VOLTAMMETRY', tail: '.' },
+  [LIST_LAYOUT.CYCLIC_VOLTAMMETRY]: { head: 'CV', tail: '.' },
   [LIST_LAYOUT.CDS]: { head: 'CIRCULAR DICHROISM SPECTROSCOPY', tail: '.' },
   [LIST_LAYOUT.SEC]: { head: 'SIZE EXCLUSION CHROMATOGRAPHY', tail: '.' },
   [LIST_LAYOUT.EMISSIONS]: { head: 'EMISSION', tail: '.' },
@@ -329,6 +331,7 @@ const peaksBody = ({
   }
   if (layout === LIST_LAYOUT.RAMAN
     || layout === LIST_LAYOUT.TGA
+    || layout === LIST_LAYOUT.DSC
     || layout === LIST_LAYOUT.CYCLIC_VOLTAMMETRY
     || layout === LIST_LAYOUT.CDS
     || layout === LIST_LAYOUT.SEC) {
@@ -372,6 +375,7 @@ const isRamanLayout = (layoutSt) => (LIST_LAYOUT.RAMAN === layoutSt);
 const isUvVisLayout = (layoutSt) => (LIST_LAYOUT.UVVIS === layoutSt);
 const isHplcUvVisLayout = (layoutSt) => (LIST_LAYOUT.HPLC_UVVIS === layoutSt);
 const isTGALayout = (layoutSt) => (LIST_LAYOUT.TGA === layoutSt);
+const isDSCLayout = (layoutSt) => (LIST_LAYOUT.DSC === layoutSt);
 const isXRDLayout = (layoutSt) => (LIST_LAYOUT.XRD === layoutSt);
 const isCyclicVoltaLayout = (layoutSt) => (LIST_LAYOUT.CYCLIC_VOLTAMMETRY === layoutSt);
 const isCDSLayout = (layoutSt) => (LIST_LAYOUT.CDS === layoutSt);
@@ -466,6 +470,62 @@ const strNumberFixedLength = (number, maxLength = -1) => {
   return number.toFixed(lengthToFix);
 };
 
+const inlineNotation = (layout, data, sampleName = '') => {
+  let formattedString = '';
+  let quillData = [];
+  const { scanRate, voltaData } = data;
+  switch (layout) {
+    case LIST_LAYOUT.CYCLIC_VOLTAMMETRY: {
+      if (!voltaData) {
+        break;
+      }
+      let refString = '';
+      let nonRefString = '';
+      let refOps = [];
+      const nonRefOps = [];
+      const { listPeaks, xyData } = voltaData;
+      const { x } = xyData;
+      listPeaks.forEach((item) => {
+        const {
+          isRef, e12, max, min,
+        } = item;
+        const e12Str = e12 ? strNumberFixedLength(e12, 3) : '0';
+        const scanRateStr = scanRate ? strNumberFixedLength(scanRate, 3) : '0';
+        if (isRef) {
+          const posNegString = x[0] > x[1] ? 'neg.' : 'pos.';
+          refString = `CV (<conc. of sample> mM in <solvent> vs. Ref (Fc+/Fc) = ${e12Str} V, v = ${scanRateStr} V/s, to ${posNegString}):`;
+          refOps = [
+            { insert: 'CV (<conc. of sample> mM in <solvent> vs. Ref ' },
+            { insert: '(Fc' },
+            { insert: '+', attributes: { script: 'super' } },
+            { insert: '/Fc) ' },
+            { insert: `= ${e12Str} V, v = ${scanRateStr} V/s, to ${posNegString}):` },
+          ];
+        } else {
+          const delta = (max && min) ? strNumberFixedLength(Math.abs(max.x - min.x) * 1000, 3) : '0';
+          nonRefString += `\nE1/2 = ([${sampleName}] , ΔEp) = ${e12Str} V (${delta} mV)`;
+          const currentNoneOps = [
+            { insert: '\nE' },
+            { insert: '1/2', attributes: { script: 'sub' } },
+            { insert: ` = ([${sampleName}] , ΔE` },
+            { insert: 'p', attributes: { script: 'sub' } },
+            { insert: `) = ${e12Str} V (${delta} mV)` },
+          ];
+          nonRefOps.push(...currentNoneOps);
+        }
+      });
+
+      formattedString = refString + nonRefString;
+      quillData = [...refOps, ...nonRefOps];
+      break;
+    }
+    default:
+      break;
+  }
+
+  return { quillData, formattedString };
+};
+
 const Format = {
   toPeakStr,
   buildData,
@@ -488,6 +548,7 @@ const Format = {
   isUvVisLayout,
   isHplcUvVisLayout,
   isTGALayout,
+  isDSCLayout,
   isXRDLayout,
   isCyclicVoltaLayout,
   isCDSLayout,
@@ -508,6 +569,7 @@ const Format = {
   strNumberFixedDecimal,
   formatedXRD,
   strNumberFixedLength,
+  inlineNotation,
 };
 
 export default Format;

@@ -212,7 +212,7 @@ describe('Test format helper', () => {
   describe('Get digit number of spectra based on layout', () => {
     it('Layout digit 0', () => {
       const listLayout = [LIST_LAYOUT.IR, LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS, 
-        LIST_LAYOUT.HPLC_UVVIS, LIST_LAYOUT.TGA, LIST_LAYOUT.XRD,
+        LIST_LAYOUT.HPLC_UVVIS, LIST_LAYOUT.TGA, LIST_LAYOUT.DSC, LIST_LAYOUT.XRD,
         LIST_LAYOUT.CDS, LIST_LAYOUT.SEC, LIST_LAYOUT.MS
       ];
 
@@ -449,6 +449,59 @@ describe('Test format helper', () => {
       const strNumber2 = Format.strNumberFixedLength(90.007, 3);
       const expected2 = '90.0'
       expect(strNumber2).toEqual(expected2)
+    })
+  })
+
+  describe('Format inline notation', () => {
+    it('Inline notation for Cyclic voltammetry layout', () => {
+      const expectedString = "CV (<conc. of sample> mM in <solvent> vs. Ref (Fc+/Fc) = -0.72 V, v = 0.10 V/s, to neg.):\nE1/2 = ([Cu(TMGqu)] , ΔEp) = -0.73 V (1650 mV)"
+      const expectedQuillData = [
+        {
+          insert: "CV (<conc. of sample> mM in <solvent> vs. Ref "
+        },
+        {
+          insert: "(Fc"
+        },
+        {
+          insert: "+", attributes: { script: 'super' }
+        },
+        {
+          insert: "/Fc) "
+        },
+        {
+          insert: "= -0.72 V, v = 0.10 V/s, to neg.):"
+        },
+        {
+          insert: "\nE"
+        },
+        {
+          insert: "1/2", attributes: { script: 'sub' }
+        },
+        {
+          insert: " = ([Cu(TMGqu)] , ΔE"
+        },
+        {
+          insert: "p", attributes: { script: 'sub' }
+        },
+        {
+          insert: ") = -0.73 V (1650 mV)"
+        },
+      ]
+      const layout = LIST_LAYOUT.CYCLIC_VOLTAMMETRY
+      const data = {
+        scanRate: 0.1,
+        voltaData: {
+          listPeaks: [{"min":{"x":-1.5404,"y":-0.00000307144},"max":{"x":0.10003,"y":0.00000285434},"isRef":true,"e12":-0.720185,"createdAt":1716803991732,"updatedAt":1716803991733,"pecker":{"x":0.380242,"y":0.00000164361}},{"max":{"x":0.10002,"y":0.00000283434},"e12":-0.72519,"updatedAt":1716803991733,"min":{"x":-1.5504,"y":-0.00000317144},"pecker":{"x":0.480242,"y":0.00000174361},"isRef":false}],
+          xyData: {
+              x: [1.49048, 1.48049],
+              y: [0.00000534724, 0.00000481545]
+          }
+        }
+      }
+      const formattedData = Format.inlineNotation(layout, data, 'Cu(TMGqu)')
+      const { formattedString, quillData } = formattedData;
+      expect(formattedString).toEqual(expectedString)
+      expect(quillData).toEqual(expectedQuillData)
     })
   })
 })

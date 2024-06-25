@@ -28,7 +28,7 @@ const onClickCb = (
   operation, peaksEdit, isAscend, isIntensity,
   scan, thres, layoutSt, shiftSt, analysis, decimalSt,
   integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt,
-  cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt,
+  cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData,
 ) => (
   () => {
     operation({
@@ -50,6 +50,7 @@ const onClickCb = (
       curveSt,
       axesUnitsSt,
       detectorSt,
+      dscMetaData,
     });
   }
 );
@@ -59,12 +60,14 @@ const BtnSubmit = ({
   editPeakSt, thresSt, layoutSt, shiftSt, scanSt, forecastSt,
   decimalSt, integrationSt, multiplicitySt, allIntegrationSt,
   waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt,
+  metaSt,
 }) => {
   const peaksEdit = extractPeaksEdit(feature, editPeakSt, thresSt, shiftSt, layoutSt);
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
   const scan = Convert2Scan(feature, scanSt);
   const thres = Convert2Thres(feature, thresSt);
   const aucValues = extractAreaUnderCurve(allIntegrationSt, integrationSt, layoutSt);
+  const { dscMetaData } = metaSt;
 
   if (!operation) return null;
 
@@ -81,7 +84,7 @@ const BtnSubmit = ({
           operation.value, peaksEdit, isAscend, isIntensity,
           scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt,
           integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt,
-          cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt,
+          cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData,
         )}
       >
         <PlayCircleOutlineIcon className={classes.icon} />
@@ -107,6 +110,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     curveSt: state.curve,
     axesUnitsSt: state.axesUnits,
     detectorSt: state.detector,
+    metaSt: state.meta,
   }
 );
 
@@ -141,6 +145,7 @@ BtnSubmit.propTypes = {
   curveSt: PropTypes.object,
   axesUnitsSt: PropTypes.object.isRequired,
   detectorSt: PropTypes.object.isRequired,
+  metaSt: PropTypes.object.isRequired,
 };
 
 export default compose(
