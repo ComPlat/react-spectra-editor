@@ -20,6 +20,7 @@ const LIST_LAYOUT = {
   EMISSIONS: 'Emissions',
   DLS_ACF: 'DLS ACF',
   DLS_INTENSITY: 'DLS intensity',
+  DSC: 'DIFFERENTIAL SCANNING CALORIMETRY',
 };
 
 export {

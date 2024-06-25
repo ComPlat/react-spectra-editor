@@ -7,6 +7,13 @@ const updateMetaPeaks = (payload) => (
   }
 );
 
+const updateDSCMetaData = (payload) => (
+  {
+    type: META.UPDATE_META_DATA,
+    payload,
+  }
+);
+
 export {
-  updateMetaPeaks, // eslint-disable-line
+  updateMetaPeaks, updateDSCMetaData, // eslint-disable-line
 };

@@ -115,6 +115,9 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
         <MenuItem value={LIST_LAYOUT.TGA}>
           <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>TGA (THERMOGRAVIMETRIC ANALYSIS)</span>
         </MenuItem>
+        <MenuItem value={LIST_LAYOUT.DSC}>
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>DSC (DIFFERENTIAL SCANNING CALORIMETRY)</span>
+        </MenuItem>
         <MenuItem value={LIST_LAYOUT.XRD}>
           <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>XRD (X-RAY DIFFRACTION)</span>
         </MenuItem>

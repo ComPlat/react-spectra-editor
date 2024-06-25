@@ -15,6 +15,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { withStyles } from '@mui/styles';
 
 import Format from '../../helpers/format';
+import { updateDSCMetaData } from '../../actions/meta';
 
 const styles = () => ({
   chip: {
@@ -155,15 +156,55 @@ SECData.propTypes = {
   secData: PropTypes.object.isRequired,
 };
 
+const DSCData = ({
+  classes, layout, dscMetaData, updateAction,
+}) => {
+  if (Format.isDSCLayout(layout) && dscMetaData !== undefined) {
+    const {
+      meltingPoint, tg,
+    } = dscMetaData;
+
+    const onChange = (e) => {
+      const { name, value } = e.target;
+      const dataToUpdate = { meltingPoint, tg };
+      dataToUpdate[name] = value;
+      updateAction(dataToUpdate);
+    };
+
+    return (
+      <div>
+        <div className={classNames(classes.rowRoot, classes.rowOdd)}>
+          <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Melting Point: </span>
+          <input type="text" name="meltingPoint" className={classNames(classes.tTxt, 'txt-sv-panel-txt')} value={meltingPoint} onChange={onChange} />
+        </div>
+        <div className={classNames(classes.rowRoot, classes.rowEven)}>
+          <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>TG: </span>
+          <input type="text" name="tg" className={classNames(classes.tTxt, 'txt-sv-panel-txt')} value={tg} onChange={onChange} />
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
+DSCData.propTypes = {
+  classes: PropTypes.object.isRequired,
+  layout: PropTypes.string.isRequired,
+  dscMetaData: PropTypes.object.isRequired,
+  updateAction: PropTypes.func.isRequired,
+};
+
 const InfoPanel = ({
   classes, expand, feature, integration, editorOnly, molSvg, descriptions,
   layoutSt, simulationSt, shiftSt, curveSt, theoryMass,
   onExapnd, canChangeDescription, onDescriptionChanged, detectorSt,
+  metaSt, updateDSCMetaDataAct,
 }) => {
   if (!feature) return null;
   const {
     title, observeFrequency, solventName, secData,
   } = feature;
+  const { dscMetaData } = metaSt;
   const { curveIdx } = curveSt;
   const { curves } = detectorSt;
 
@@ -247,16 +288,6 @@ const InfoPanel = ({
             )
             : null
         }
-        {/* {
-          Format.isSECLayout(layoutSt)
-            ? (
-              <div className={classNames(classes.rowRoot, classes.rowOdd)}>
-                <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Detector: </span>
-                <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{selectedDetector}</span>
-              </div>
-            )
-            : null
-        } */}
         <SECData classes={classes} layout={layoutSt} detector={selectedDetector} secData={secData} />
         {
           !molSvg
@@ -282,6 +313,7 @@ const InfoPanel = ({
             </div>
           ) : null
         }
+        <DSCData classes={classes} layout={layoutSt} dscMetaData={dscMetaData} updateAction={updateDSCMetaDataAct} />
       </div>
       {/* <ReactQuill
         className={classNames(classes.quill, 'card-sv-quill')}
@@ -330,11 +362,13 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     shiftSt: state.shift,
     curveSt: state.curve,
     detectorSt: state.detector,
+    metaSt: state.meta,
   }
 );
 
 const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
+    updateDSCMetaDataAct: updateDSCMetaData,
   }, dispatch)
 );
 
@@ -355,6 +389,8 @@ InfoPanel.propTypes = {
   onDescriptionChanged: PropTypes.func,
   theoryMass: PropTypes.string,
   detectorSt: PropTypes.object.isRequired,
+  metaSt: PropTypes.object.isRequired,
+  updateDSCMetaDataAct: PropTypes.func.isRequired,
 };
 
 export default connect( // eslint-disable-line

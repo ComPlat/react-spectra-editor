@@ -70,9 +70,9 @@ describe('NMR 1H', () => {
     cy.get('.btn-sv-bar-spctrum').click()
     cy.get('.input-sv-bar-layout').click()
     cy.get('.option-sv-bar-layout').should($li => {
-      expect($li).to.have.length(22)
+      expect($li).to.have.length(23)
     })
-    cy.get('ul li:nth-child(8)').click()
+    cy.get('ul li:nth-child(9)').click()
 
     cy.get('.d3Line').children().should('have.class', 'd3Svg')
     cy.get('.d3Svg text.xLabel').should('have.text', 'X (PPM)')

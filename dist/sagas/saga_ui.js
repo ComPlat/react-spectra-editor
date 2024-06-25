@@ -139,6 +139,7 @@ function* scrollUiWheel(action) {
     case _list_layout.LIST_LAYOUT.UVVIS:
     case _list_layout.LIST_LAYOUT.HPLC_UVVIS:
     case _list_layout.LIST_LAYOUT.TGA:
+    case _list_layout.LIST_LAYOUT.DSC:
     case _list_layout.LIST_LAYOUT.XRD:
     default:
       [nyeL, nyeU] = [yeL, yeL + (yeU - yeL) * scale];

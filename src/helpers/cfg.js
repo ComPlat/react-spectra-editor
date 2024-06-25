@@ -7,6 +7,7 @@ const btnCmdAnaViewer = (layoutSt) => (
     || Format.isUvVisLayout(layoutSt)
     || Format.isHplcUvVisLayout(layoutSt)
     || Format.isTGALayout(layoutSt)
+    || Format.isDSCLayout(layoutSt)
     || Format.isXRDLayout(layoutSt)
     || Format.is31PLayout(layoutSt)
     || Format.is15NLayout(layoutSt)

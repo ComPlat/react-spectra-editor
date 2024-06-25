@@ -16,6 +16,7 @@ var _material = require("@mui/material");
 var _ExpandMore = _interopRequireDefault(require("@mui/icons-material/ExpandMore"));
 var _styles = require("@mui/styles");
 var _format = _interopRequireDefault(require("../../helpers/format"));
+var _meta = require("../../actions/meta");
 /* eslint-disable no-mixed-operators, react/function-component-definition,
 react/require-default-props, max-len */
 
@@ -163,7 +164,61 @@ SECData.propTypes = {
   detector: _propTypes.default.object.isRequired,
   secData: _propTypes.default.object.isRequired
 };
-const InfoPanel = _ref2 => {
+const DSCData = _ref2 => {
+  let {
+    classes,
+    layout,
+    dscMetaData,
+    updateAction
+  } = _ref2;
+  if (_format.default.isDSCLayout(layout) && dscMetaData !== undefined) {
+    const {
+      meltingPoint,
+      tg
+    } = dscMetaData;
+    const onChange = e => {
+      const {
+        name,
+        value
+      } = e.target;
+      const dataToUpdate = {
+        meltingPoint,
+        tg
+      };
+      dataToUpdate[name] = value;
+      updateAction(dataToUpdate);
+    };
+    return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("div", {
+      className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd)
+    }, /*#__PURE__*/_react.default.createElement("span", {
+      className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
+    }, "Melting Point: "), /*#__PURE__*/_react.default.createElement("input", {
+      type: "text",
+      name: "meltingPoint",
+      className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
+      value: meltingPoint,
+      onChange: onChange
+    })), /*#__PURE__*/_react.default.createElement("div", {
+      className: (0, _classnames.default)(classes.rowRoot, classes.rowEven)
+    }, /*#__PURE__*/_react.default.createElement("span", {
+      className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
+    }, "TG: "), /*#__PURE__*/_react.default.createElement("input", {
+      type: "text",
+      name: "tg",
+      className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
+      value: tg,
+      onChange: onChange
+    })));
+  }
+  return null;
+};
+DSCData.propTypes = {
+  classes: _propTypes.default.object.isRequired,
+  layout: _propTypes.default.string.isRequired,
+  dscMetaData: _propTypes.default.object.isRequired,
+  updateAction: _propTypes.default.func.isRequired
+};
+const InfoPanel = _ref3 => {
   let {
     classes,
     expand,
@@ -180,8 +235,10 @@ const InfoPanel = _ref2 => {
     onExapnd,
     canChangeDescription,
     onDescriptionChanged,
-    detectorSt
-  } = _ref2;
+    detectorSt,
+    metaSt,
+    updateDSCMetaDataAct
+  } = _ref3;
   if (!feature) return null;
   const {
     title,
@@ -189,6 +246,9 @@ const InfoPanel = _ref2 => {
     solventName,
     secData
   } = feature;
+  const {
+    dscMetaData
+  } = metaSt;
   const {
     curveIdx
   } = curveSt;
@@ -274,7 +334,12 @@ const InfoPanel = _ref2 => {
     className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
   }, "Area under curve (AUC):"), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt')
-  }, aucValue(integration))) : null), !_format.default.isCyclicVoltaLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement(_reactQuill.default, {
+  }, aucValue(integration))) : null, /*#__PURE__*/_react.default.createElement(DSCData, {
+    classes: classes,
+    layout: layoutSt,
+    dscMetaData: dscMetaData,
+    updateAction: updateDSCMetaDataAct
+  })), !_format.default.isCyclicVoltaLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement(_reactQuill.default, {
     className: (0, _classnames.default)(classes.quill, 'card-sv-quill'),
     value: descriptions,
     modules: {
@@ -297,9 +362,12 @@ const mapStateToProps = (state, props) => (
   simulationSt: state.simulation,
   shiftSt: state.shift,
   curveSt: state.curve,
-  detectorSt: state.detector
+  detectorSt: state.detector,
+  metaSt: state.meta
 });
-const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({}, dispatch);
+const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
+  updateDSCMetaDataAct: _meta.updateDSCMetaData
+}, dispatch);
 InfoPanel.propTypes = {
   classes: _propTypes.default.object.isRequired,
   expand: _propTypes.default.bool.isRequired,
@@ -316,7 +384,9 @@ InfoPanel.propTypes = {
   canChangeDescription: _propTypes.default.bool.isRequired,
   onDescriptionChanged: _propTypes.default.func,
   theoryMass: _propTypes.default.string,
-  detectorSt: _propTypes.default.object.isRequired
+  detectorSt: _propTypes.default.object.isRequired,
+  metaSt: _propTypes.default.object.isRequired,
+  updateDSCMetaDataAct: _propTypes.default.func.isRequired
 };
 var _default = exports.default = (0, _reactRedux.connect)(
 // eslint-disable-line
