@@ -517,7 +517,8 @@ const buildPeakFeature = function (jcamp, layout, peakUp, s, thresRef) {
     solventName: info['.SOLVENTNAME'],
     upperThres,
     lowerThres,
-    volammetryData: extractVoltammetryData(jcamp)
+    volammetryData: extractVoltammetryData(jcamp),
+    scanRate: +info.$CSSCANRATE || 0.1
   }, s);
 };
 const maxArray = arr => {
@@ -821,7 +822,7 @@ const extractTemperature = jcamp => {
 const ExtractJcamp = source => {
   const jcamp = _jcampconverter.default.convert(source, {
     xy: true,
-    keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS|\$CSUPPERTHRESHOLD|\$CSLOWERTHRESHOLD|\$CSCYCLICVOLTAMMETRYDATA|UNITS|SYMBOL|CSAUTOMETADATA|\$DETECTOR|MN|MW|D|MP|MELTINGPOINT|TG)/ // eslint-disable-line
+    keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS|\$CSUPPERTHRESHOLD|\$CSLOWERTHRESHOLD|\$CSCYCLICVOLTAMMETRYDATA|UNITS|SYMBOL|CSAUTOMETADATA|\$DETECTOR|MN|MW|D|MP|MELTINGPOINT|TG|\$CSSCANRATE|\$CSSPECTRUMDIRECTION)/ // eslint-disable-line
   });
   const layout = readLayout(jcamp);
   const peakUp = !_format.default.isIrLayout(layout);

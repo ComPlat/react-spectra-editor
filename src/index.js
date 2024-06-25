@@ -260,6 +260,7 @@ class DemoWriteIr extends React.Component {
 
   formatPks({
     peaks, layout, shift, isAscend, decimal, isIntensity, integration, waveLength,
+    cyclicvoltaSt, curveSt,
   }) {
     const entity = this.loadEntity();
     const { features } = entity;
@@ -279,7 +280,25 @@ class DemoWriteIr extends React.Component {
       temperature,
     });
     const wrapper = FN.peaksWrapper(layout, shift);
-    const desc = this.rmDollarSign(wrapper.head) + body + wrapper.tail;
+    let desc = this.rmDollarSign(wrapper.head) + body + wrapper.tail;
+    if (FN.isCyclicVoltaLayout(layout)) {
+      const { spectraList } = cyclicvoltaSt;
+      const { curveIdx, listCurves } = curveSt;
+      const selectedVolta = spectraList[curveIdx];
+      const selectedCurve = listCurves[curveIdx];
+      const { feature } = selectedCurve;
+      const { scanRate } = feature;
+      const data = {
+        scanRate,
+        voltaData: {
+          listPeaks: selectedVolta.list,
+          xyData: feature.data[0],
+        },
+      };
+      const inlineData = FN.inlineNotation(layout, data);
+      const { formattedString } = inlineData;
+      desc = formattedString;
+    }
     return desc;
   }
 
@@ -343,9 +362,11 @@ class DemoWriteIr extends React.Component {
 
   writePeak({
     peaks, layout, shift, isAscend, decimal, isIntensity, integration, waveLength,
+    cyclicvoltaSt, curveSt,
   }) {
     const desc = this.formatPks({
-      peaks, layout, shift, isAscend, decimal, isIntensity, integration, waveLength,
+      peaks, layout, shift, isAscend, decimal, isIntensity, integration, waveLength, // eslint-disable-line
+      cyclicvoltaSt, curveSt, // eslint-disable-line
     });
     this.setState({ desc });
   }
