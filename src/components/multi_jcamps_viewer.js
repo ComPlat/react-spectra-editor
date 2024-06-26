@@ -18,6 +18,7 @@ import {
   addNewCylicVoltaPairPeak, addCylicVoltaMaxPeak, addCylicVoltaMinPeak, addCylicVoltaPecker,
 } from '../actions/cyclic_voltammetry';
 import { LIST_LAYOUT } from '../constants/list_layout';
+import Format from '../helpers/format';
 
 const styles = () => ({
   root: {
@@ -57,7 +58,8 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
     } = this.props;
     if (!entities || entities.length === 0) return (<div />);
 
-    const seperatedSubLayouts = seperatingSubLayout(entities, 'xUnit', layoutSt);
+    const separateCondition = Format.isGCLayout(layoutSt) ? 'yUnit' : 'xUnit';
+    const seperatedSubLayouts = seperatingSubLayout(entities, separateCondition, layoutSt);
     const { curveIdx } = curveSt;
     const entity = entities[curveIdx];
     const { feature, topic } = entity;

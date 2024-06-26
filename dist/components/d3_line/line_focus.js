@@ -596,7 +596,7 @@ class LineFocus {
     return null;
   }
   reverseXAxis(layoutSt) {
-    return [_list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS, _list_layout.LIST_LAYOUT.TGA, _list_layout.LIST_LAYOUT.DSC, _list_layout.LIST_LAYOUT.XRD, _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY, _list_layout.LIST_LAYOUT.CDS, _list_layout.LIST_LAYOUT.DLS_ACF, _list_layout.LIST_LAYOUT.SEC, _list_layout.LIST_LAYOUT.EMISSIONS, _list_layout.LIST_LAYOUT.DLS_INTENSITY].indexOf(layoutSt) < 0;
+    return [_list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS, _list_layout.LIST_LAYOUT.TGA, _list_layout.LIST_LAYOUT.DSC, _list_layout.LIST_LAYOUT.XRD, _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY, _list_layout.LIST_LAYOUT.CDS, _list_layout.LIST_LAYOUT.DLS_ACF, _list_layout.LIST_LAYOUT.SEC, _list_layout.LIST_LAYOUT.GC, _list_layout.LIST_LAYOUT.EMISSIONS, _list_layout.LIST_LAYOUT.DLS_INTENSITY].indexOf(layoutSt) < 0;
   }
   create(_ref) {
     let {

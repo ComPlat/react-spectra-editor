@@ -342,7 +342,7 @@ describe('Test for chem helper', () => {
       LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS, 
       LIST_LAYOUT.MS,
       LIST_LAYOUT.TGA, LIST_LAYOUT.DSC, LIST_LAYOUT.CYCLIC_VOLTAMMETRY,
-      LIST_LAYOUT.CDS, LIST_LAYOUT.SEC]
+      LIST_LAYOUT.CDS, LIST_LAYOUT.SEC, LIST_LAYOUT.GC]
 
     describe('Layouts do not have comparison', () => {
       it('No other spectra', () => {

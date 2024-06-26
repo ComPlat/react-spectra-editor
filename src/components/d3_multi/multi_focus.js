@@ -152,12 +152,13 @@ class MultiFocus {
       if (idx === jcampIdx) {
         this.data = [...currData];
         this.pathColor = color;
-        filterSubLayoutValue = feature.xUnit;
+        filterSubLayoutValue = Format.isSECLayout(layout) ? feature.xUnit : feature.yUnit;
       } else {
-        this.otherLineData.push({ data: currData, color, filterSublayout: feature.xUnit });
+        const filterValue = Format.isSECLayout(layout) ? feature.xUnit : feature.yUnit;
+        this.otherLineData.push({ data: currData, color, filterSublayout: filterValue });
       }
     });
-    if (Format.isSECLayout(layout)) {
+    if (Format.isSECLayout(layout) || Format.isGCLayout(layout)) {
       this.otherLineData = this.otherLineData.filter((data) => {
         return data.filterSublayout === filterSubLayoutValue;
       });
@@ -979,7 +980,7 @@ class MultiFocus {
     return [LIST_LAYOUT.UVVIS, LIST_LAYOUT.HPLC_UVVIS,
       LIST_LAYOUT.TGA, LIST_LAYOUT.DSC,
       LIST_LAYOUT.XRD, LIST_LAYOUT.CYCLIC_VOLTAMMETRY,
-      LIST_LAYOUT.CDS, LIST_LAYOUT.SEC, LIST_LAYOUT.AIF].indexOf(layoutSt) < 0;
+      LIST_LAYOUT.CDS, LIST_LAYOUT.SEC, LIST_LAYOUT.GC, LIST_LAYOUT.AIF].indexOf(layoutSt) < 0;
   }
 
   create({

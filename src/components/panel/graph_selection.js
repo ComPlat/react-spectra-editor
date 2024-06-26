@@ -1,6 +1,6 @@
 /* eslint-disable react/function-component-definition, function-paren-newline,
 react/require-default-props, react/no-unused-prop-types */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
@@ -52,11 +52,15 @@ const GraphSelectionPanel = ({
   selectCurveAct, toggleShowAllCurveAct,
 }) => {
   let subLayoutValues = [];
-  if (subLayoutsInfo !== undefined && subLayoutsInfo !== null) {
+  if (subLayoutsInfo) {
     subLayoutValues = Object.keys(subLayoutsInfo);
   }
 
   const [selectedSubLayout, setSelectedSublayout] = useState(subLayoutValues[0]);
+
+  useEffect(() => {
+    setSelectedSublayout(subLayoutValues[0]);
+  }, subLayoutValues);
 
   if (!curveSt) {
     return (<span />);
@@ -139,12 +143,18 @@ const GraphSelectionPanel = ({
               {
                 subLayoutValues.map((subLayout, i) => {
                   let subLayoutName = '';
-                  switch (subLayout) {
+                  switch (subLayout.toUpperCase()) {
                     case 'G/MOL':
                       subLayoutName = 'MWD';
                       break;
                     case 'MILLILITERS':
                       subLayoutName = 'ELU';
+                      break;
+                    case 'INTENSITY':
+                      subLayoutName = 'Chromatogram';
+                      break;
+                    case 'DEGREES CELSIUS':
+                      subLayoutName = 'Temperature';
                       break;
                     default:
                       break;

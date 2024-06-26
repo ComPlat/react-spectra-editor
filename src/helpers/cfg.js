@@ -15,6 +15,7 @@ const btnCmdAnaViewer = (layoutSt) => (
     || Format.isCyclicVoltaLayout(layoutSt)
     || Format.isCDSLayout(layoutSt)
     || Format.isSECLayout(layoutSt)
+    || Format.isGCLayout(layoutSt)
 );
 
 const hideCmdAnaViewer = () => false;

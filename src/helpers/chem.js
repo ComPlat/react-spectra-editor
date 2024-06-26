@@ -324,6 +324,9 @@ const readLayout = (jcamp) => {
     if (dataType.includes('SIZE EXCLUSION CHROMATOGRAPHY')) {
       return LIST_LAYOUT.SEC;
     }
+    if (dataType.includes('GAS CHROMATOGRAPHY')) {
+      return LIST_LAYOUT.GC;
+    }
     if (dataType.includes('SORPTION-DESORPTION MEASUREMENT')) {
       return LIST_LAYOUT.AIF;
     }
@@ -800,7 +803,7 @@ const ExtractJcamp = (source) => {
       spectra, features, layout, temperature,
     };
   } else if (Format.isCyclicVoltaLayout(layout) || Format.isSECLayout(layout)
-  || Format.isAIFLayout(layout) || Format.isCDSLayout(layout)) {
+  || Format.isAIFLayout(layout) || Format.isCDSLayout(layout) || Format.isGCLayout(layout)) {
     features = extrFeaturesCylicVolta(jcamp, layout, peakUp);
   } else {
     features = extrFeaturesNi(jcamp, layout, peakUp, spectra);
