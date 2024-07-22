@@ -32,5 +32,13 @@ function* updateMetaPeaks(action) {
     }
   });
 }
-const metaSagas = [(0, _effects.takeEvery)(_action_type.META.UPDATE_PEAKS, updateMetaPeaks)];
+function* updateMetaData(action) {
+  yield (0, _effects.put)({
+    type: _action_type.META.UPDATE_META_DATA_RDC,
+    payload: {
+      dscMetaData: action.payload
+    }
+  });
+}
+const metaSagas = [(0, _effects.takeEvery)(_action_type.META.UPDATE_PEAKS, updateMetaPeaks), (0, _effects.takeEvery)(_action_type.META.UPDATE_META_DATA, updateMetaData)];
 var _default = exports.default = metaSagas;

@@ -108,6 +108,10 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
   }, "TGA (THERMOGRAVIMETRIC ANALYSIS)")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
+    value: _list_layout.LIST_LAYOUT.DSC
+  }, /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
+  }, "DSC (DIFFERENTIAL SCANNING CALORIMETRY)")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
     value: _list_layout.LIST_LAYOUT.XRD
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
