@@ -156,6 +156,10 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
   }, "SEC")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
+    value: _list_layout.LIST_LAYOUT.GC
+  }, /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
+  }, "GC (GAS CHROMATOGRAPHY)")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
     value: _list_layout.LIST_LAYOUT.AIF
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')

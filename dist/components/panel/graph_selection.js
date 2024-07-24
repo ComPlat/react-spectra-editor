@@ -61,10 +61,13 @@ const GraphSelectionPanel = _ref => {
     toggleShowAllCurveAct
   } = _ref;
   let subLayoutValues = [];
-  if (subLayoutsInfo !== undefined && subLayoutsInfo !== null) {
+  if (subLayoutsInfo) {
     subLayoutValues = Object.keys(subLayoutsInfo);
   }
   const [selectedSubLayout, setSelectedSublayout] = (0, _react.useState)(subLayoutValues[0]);
+  (0, _react.useEffect)(() => {
+    setSelectedSublayout(subLayoutValues[0]);
+  }, subLayoutValues);
   if (!curveSt) {
     return /*#__PURE__*/_react.default.createElement("span", null);
   }
@@ -144,12 +147,18 @@ const GraphSelectionPanel = _ref => {
     onChange: onChangeTabSubLayout
   }, subLayoutValues.map((subLayout, i) => {
     let subLayoutName = '';
-    switch (subLayout) {
+    switch (subLayout.toUpperCase()) {
       case 'G/MOL':
         subLayoutName = 'MWD';
         break;
       case 'MILLILITERS':
         subLayoutName = 'ELU';
+        break;
+      case 'INTENSITY':
+        subLayoutName = 'Chromatogram';
+        break;
+      case 'DEGREES CELSIUS':
+        subLayoutName = 'Temperature';
         break;
       default:
         break;
