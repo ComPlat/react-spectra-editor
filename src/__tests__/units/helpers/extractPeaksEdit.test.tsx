@@ -52,17 +52,18 @@ describe('Test extract edited peaks and area under curve', () => {
   })
 
   describe('Test extract AUC', () => {
-    type Integration = { area: number }
-    type IntegrationState = { refArea: number, refFactor: number, stack: Array<Integration>}
+    type IntegrationValue = { area: number }
+    type Integration = { refArea: number, refFactor: number, stack: Array<IntegrationValue>}
+    type IntegrationState = { integrations: Array<Integration>}
     const allIntegrationSt: IntegrationState[] = [
       { 
-        refArea: 1.0,
-        refFactor: 1.0,
-        stack: [
-          //TODO: need to check
-          // { area: 5 },
-          // { area: 6 }
-        ]
+        integrations: [
+          {
+            stack: [],
+            refArea: 1.0,
+            refFactor: 1.0,
+          },
+        ],
       }
     ]
     const presentIntegrationSt = true

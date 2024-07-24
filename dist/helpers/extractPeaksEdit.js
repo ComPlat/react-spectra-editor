@@ -59,8 +59,15 @@ const extractAreaUnderCurve = (allIntegrationSt, presentIntegrationSt, layoutSt)
   if (_format.default.isHplcUvVisLayout(layoutSt) && Array.isArray(allIntegrationSt) && presentIntegrationSt) {
     const results = [];
     allIntegrationSt.forEach(inte => {
-      const aucVal = getAUCValue(inte, layoutSt);
-      results.push(aucVal);
+      const {
+        integrations
+      } = inte;
+      const subResults = [];
+      integrations.forEach(subInte => {
+        const aucVal = getAUCValue(subInte, layoutSt);
+        subResults.push(aucVal);
+      });
+      results.push(subResults);
     });
     return results;
   }

@@ -47,7 +47,10 @@ exports.getAbsoluteArea = getAbsoluteArea;
 const calcArea = function (d, refArea, refFactor) {
   let ignoreRef = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
   if (ignoreRef) {
-    return d.absoluteArea.toFixed(2);
+    const {
+      absoluteArea
+    } = d;
+    return !absoluteArea ? 0 : d.absoluteArea.toFixed(2);
   }
   return (d.area * refFactor / refArea).toFixed(2);
 };
