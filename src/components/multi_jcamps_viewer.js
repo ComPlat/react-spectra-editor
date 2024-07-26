@@ -55,6 +55,7 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
     const {
       classes, curveSt, operations, entityFileNames,
       entities, userManualLink, molSvg, theoryMass, layoutSt,
+      integrationSt,
     } = this.props;
     if (!entities || entities.length === 0) return (<div />);
 
@@ -63,6 +64,8 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
     const { curveIdx } = curveSt;
     const entity = entities[curveIdx];
     const { feature, topic } = entity;
+    const { integrations } = integrationSt;
+    const currentIntegration = integrations[curveIdx];
 
     return (
       <div className={classes.root}>
@@ -92,6 +95,7 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
                 molSvg={molSvg}
                 theoryMass={theoryMass}
                 subLayoutsInfo={seperatedSubLayouts}
+                integration={currentIntegration}
                 descriptions=""
                 canChangeDescription={() => {}}
                 onDescriptionChanged={() => {}}
@@ -110,6 +114,7 @@ const mapStateToProps = (state, _) => ( // eslint-disable-line
     cyclicVoltaSt: state.cyclicvolta,
     entities: state.curve.listCurves,
     layoutSt: state.layout,
+    integrationSt: state.integration.present,
   }
 );
 
@@ -139,6 +144,7 @@ MultiJcampsViewer.propTypes = {
   entities: PropTypes.array,
   layoutSt: PropTypes.string.isRequired,
   theoryMass: PropTypes.string,
+  integrationSt: PropTypes.object.isRequired,
 };
 
 MultiJcampsViewer.defaultProps = {
