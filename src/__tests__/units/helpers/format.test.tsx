@@ -213,7 +213,7 @@ describe('Test format helper', () => {
     it('Layout digit 0', () => {
       const listLayout = [LIST_LAYOUT.IR, LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS, 
         LIST_LAYOUT.HPLC_UVVIS, LIST_LAYOUT.TGA, LIST_LAYOUT.DSC, LIST_LAYOUT.XRD,
-        LIST_LAYOUT.CDS, LIST_LAYOUT.SEC, LIST_LAYOUT.MS
+        LIST_LAYOUT.CDS, LIST_LAYOUT.SEC, LIST_LAYOUT.GC, LIST_LAYOUT.MS
       ];
 
       listLayout.forEach(layout => {
@@ -339,28 +339,28 @@ describe('Test format helper', () => {
   describe('Test get multi curves colors', () => {
     it('Get the first color', () => {
       const index = 7
-      const expectedColor = '#fa8231'
+      const expectedColor = '#d35400'
       const color = Format.mutiEntitiesColors(index)
       expect(color).toEqual(expectedColor)
     })
 
     it('Get the last color', () => {
       const index = 20
-      const expectedColor = '#4b6584'
+      const expectedColor = '#BDC581'
       const color = Format.mutiEntitiesColors(index)
       expect(color).toEqual(expectedColor)
     })
 
     it('Get the middle color', () => {
       const index = 10
-      const expectedColor = '#2d98da'
+      const expectedColor = '#2c3e50'
       const color = Format.mutiEntitiesColors(index)
       expect(color).toEqual(expectedColor)
     })
   })
 
   describe('Test layouts have multiple curves', () => {
-    const layouts = [LIST_LAYOUT.CYCLIC_VOLTAMMETRY, LIST_LAYOUT.SEC, LIST_LAYOUT.AIF]
+    const layouts = [LIST_LAYOUT.CYCLIC_VOLTAMMETRY, LIST_LAYOUT.SEC, LIST_LAYOUT.GC, LIST_LAYOUT.AIF]
     it('Has multiple curves', () => {
       layouts.forEach(layout => {
         const hasMultipleCurves = Format.hasMultiCurves(layout)

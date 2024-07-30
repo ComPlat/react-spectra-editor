@@ -17,6 +17,7 @@ var _index3 = _interopRequireDefault(require("./d3_multi/index"));
 var _curve = require("../actions/curve");
 var _cyclic_voltammetry = require("../actions/cyclic_voltammetry");
 var _list_layout = require("../constants/list_layout");
+var _format = _interopRequireDefault(require("../helpers/format"));
 /* eslint-disable react/default-props-match-prop-types,
 react/require-default-props, react/no-unused-prop-types, react/jsx-boolean-value,
 prefer-object-spread */
@@ -63,10 +64,12 @@ class MultiJcampsViewer extends _react.default.Component {
       userManualLink,
       molSvg,
       theoryMass,
-      layoutSt
+      layoutSt,
+      integrationSt
     } = this.props;
     if (!entities || entities.length === 0) return /*#__PURE__*/_react.default.createElement("div", null);
-    const seperatedSubLayouts = seperatingSubLayout(entities, 'xUnit', layoutSt);
+    const separateCondition = _format.default.isGCLayout(layoutSt) ? 'yUnit' : 'xUnit';
+    const seperatedSubLayouts = seperatingSubLayout(entities, separateCondition, layoutSt);
     const {
       curveIdx
     } = curveSt;
@@ -75,6 +78,10 @@ class MultiJcampsViewer extends _react.default.Component {
       feature,
       topic
     } = entity;
+    const {
+      integrations
+    } = integrationSt;
+    const currentIntegration = integrations[curveIdx];
     return /*#__PURE__*/_react.default.createElement("div", {
       className: classes.root
     }, /*#__PURE__*/_react.default.createElement(_index2.default, {
@@ -107,6 +114,7 @@ class MultiJcampsViewer extends _react.default.Component {
       molSvg: molSvg,
       theoryMass: theoryMass,
       subLayoutsInfo: seperatedSubLayouts,
+      integration: currentIntegration,
       descriptions: "",
       canChangeDescription: () => {},
       onDescriptionChanged: () => {}
@@ -119,7 +127,8 @@ const mapStateToProps = (state, _) => (
   curveSt: state.curve,
   cyclicVoltaSt: state.cyclicvolta,
   entities: state.curve.listCurves,
-  layoutSt: state.layout
+  layoutSt: state.layout,
+  integrationSt: state.integration.present
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   setAllCurvesAct: _curve.setAllCurves,
@@ -143,7 +152,8 @@ MultiJcampsViewer.propTypes = {
   userManualLink: _propTypes.default.object,
   entities: _propTypes.default.array,
   layoutSt: _propTypes.default.string.isRequired,
-  theoryMass: _propTypes.default.string
+  theoryMass: _propTypes.default.string,
+  integrationSt: _propTypes.default.object.isRequired
 };
 MultiJcampsViewer.defaultProps = {
   multiEntities: [],

@@ -40,7 +40,8 @@ const getAbsoluteArea = (xL, xU, data) => {
 
 const calcArea = (d, refArea, refFactor, ignoreRef = false) => {
   if (ignoreRef) {
-    return d.absoluteArea.toFixed(2);
+    const { absoluteArea } = d;
+    return !absoluteArea ? 0 : d.absoluteArea.toFixed(2);
   }
   return (d.area * refFactor / refArea).toFixed(2);
 };

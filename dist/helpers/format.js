@@ -24,6 +24,7 @@ const spectraDigit = layout => {
     case _list_layout.LIST_LAYOUT.XRD:
     case _list_layout.LIST_LAYOUT.CDS:
     case _list_layout.LIST_LAYOUT.SEC:
+    case _list_layout.LIST_LAYOUT.GC:
     case _list_layout.LIST_LAYOUT.MS:
       return 0;
     case _list_layout.LIST_LAYOUT.C13:
@@ -133,6 +134,10 @@ const spectraOps = {
   },
   [_list_layout.LIST_LAYOUT.SEC]: {
     head: 'SIZE EXCLUSION CHROMATOGRAPHY',
+    tail: '.'
+  },
+  [_list_layout.LIST_LAYOUT.GC]: {
+    head: 'GAS CHROMATOGRAPHY',
     tail: '.'
   },
   [_list_layout.LIST_LAYOUT.EMISSIONS]: {
@@ -416,7 +421,7 @@ const peaksBody = _ref => {
   if (layout === _list_layout.LIST_LAYOUT.DLS_INTENSITY) {
     return formatedDLSIntensity(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
-  if (layout === _list_layout.LIST_LAYOUT.RAMAN || layout === _list_layout.LIST_LAYOUT.TGA || layout === _list_layout.LIST_LAYOUT.DSC || layout === _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY || layout === _list_layout.LIST_LAYOUT.CDS || layout === _list_layout.LIST_LAYOUT.SEC) {
+  if (layout === _list_layout.LIST_LAYOUT.RAMAN || layout === _list_layout.LIST_LAYOUT.TGA || layout === _list_layout.LIST_LAYOUT.DSC || layout === _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY || layout === _list_layout.LIST_LAYOUT.CDS || layout === _list_layout.LIST_LAYOUT.SEC || layout === _list_layout.LIST_LAYOUT.GC) {
     return formatedEm(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
   if (layout === _list_layout.LIST_LAYOUT.XRD) {
@@ -464,8 +469,9 @@ const isXRDLayout = layoutSt => _list_layout.LIST_LAYOUT.XRD === layoutSt;
 const isCyclicVoltaLayout = layoutSt => _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY === layoutSt;
 const isCDSLayout = layoutSt => _list_layout.LIST_LAYOUT.CDS === layoutSt;
 const isSECLayout = layoutSt => _list_layout.LIST_LAYOUT.SEC === layoutSt;
+const isGCLayout = layoutSt => _list_layout.LIST_LAYOUT.GC === layoutSt;
 const isEmWaveLayout = layoutSt => [_list_layout.LIST_LAYOUT.IR, _list_layout.LIST_LAYOUT.RAMAN, _list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS].indexOf(layoutSt) >= 0;
-const hasMultiCurves = layoutSt => [_list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY, _list_layout.LIST_LAYOUT.SEC, _list_layout.LIST_LAYOUT.AIF].indexOf(layoutSt) >= 0;
+const hasMultiCurves = layoutSt => [_list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY, _list_layout.LIST_LAYOUT.SEC, _list_layout.LIST_LAYOUT.GC, _list_layout.LIST_LAYOUT.AIF].indexOf(layoutSt) >= 0;
 const isAIFLayout = layoutSt => _list_layout.LIST_LAYOUT.AIF === layoutSt;
 const isEmissionsLayout = layoutSt => _list_layout.LIST_LAYOUT.EMISSIONS === layoutSt;
 const isDLSACFLayout = layoutSt => _list_layout.LIST_LAYOUT.DLS_ACF === layoutSt;
@@ -518,7 +524,7 @@ const formatPeaksByPrediction = function (peaks, layout, isAscend, decimal) {
   return body;
 };
 const compareColors = idx => ['#ABB2B9', '#EDBB99', '#ABEBC6', '#D2B4DE', '#F9E79F'][idx % 5];
-const mutiEntitiesColors = idx => ['#fa8231', '#f7b731', '#0fb9b1', '#2d98da', '#3867d6', '#8854d0', '#4b6584'][idx % 7];
+const mutiEntitiesColors = idx => ['#d35400', '#2980b9', '#8e44ad', '#2c3e50', '#6D214F', '#182C61', '#BDC581'][idx % 7];
 const strNumberFixedDecimal = function (number) {
   let decimal = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : -1;
   if (decimal <= 0) {
@@ -660,6 +666,7 @@ const Format = {
   isEmissionsLayout,
   isDLSIntensityLayout,
   isEmWaveLayout,
+  isGCLayout,
   fixDigit,
   formatPeaksByPrediction,
   formatedMS,

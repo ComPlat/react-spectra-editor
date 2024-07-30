@@ -11,6 +11,7 @@ var _list_layout = require("../constants/list_layout");
 
 const getLayoutSt = state => state.layout;
 const getCurveSt = state => state.curve;
+const getIntegrationSt = state => state.integration.present;
 function getMaxMinPeak(curve) {
   return curve.maxminPeak;
 }
@@ -105,5 +106,48 @@ function* setCyclicVoltametryRef(action) {
     }
   });
 }
-const multiEntitiesSagas = [(0, _effects.takeEvery)(_action_type.CURVE.SET_ALL_CURVES, setCyclicVoltametry), (0, _effects.takeEvery)(_action_type.CYCLIC_VOLTA_METRY.SET_FACTOR, setCyclicVoltametryRef)];
+function* setInitIntegrations(action) {
+  // eslint-disable-line
+  const curveSt = yield (0, _effects.select)(getCurveSt);
+  const {
+    listCurves
+  } = curveSt;
+  if (listCurves) {
+    for (let index = 0; index < listCurves.length; index++) {
+      const integationSt = yield (0, _effects.select)(getIntegrationSt);
+      const curve = listCurves[index];
+      const {
+        integration,
+        simulation
+      } = curve;
+      const {
+        integrations
+      } = integationSt;
+      const newArrIntegration = [...integrations];
+      if (index < newArrIntegration.length) {
+        newArrIntegration[index] = integration;
+      } else {
+        newArrIntegration.push(integration);
+      }
+      const payload = Object.assign({}, integationSt, {
+        integrations: newArrIntegration,
+        selectedIdx: index
+      }); // eslint-disable-line
+
+      if (integration) {
+        yield (0, _effects.put)({
+          type: _action_type.INTEGRATION.RESET_ALL_RDC,
+          payload
+        });
+      }
+      if (simulation) {
+        yield (0, _effects.put)({
+          type: _action_type.SIMULATION.RESET_ALL_RDC,
+          payload: simulation
+        });
+      }
+    }
+  }
+}
+const multiEntitiesSagas = [(0, _effects.takeEvery)(_action_type.CURVE.SET_ALL_CURVES, setCyclicVoltametry), (0, _effects.takeEvery)(_action_type.CURVE.SET_ALL_CURVES, setInitIntegrations), (0, _effects.takeEvery)(_action_type.CYCLIC_VOLTA_METRY.SET_FACTOR, setCyclicVoltametryRef)];
 var _default = exports.default = multiEntitiesSagas;

@@ -40,6 +40,9 @@ var _sec_3_jcamp = _interopRequireDefault(require("./__tests__/fixtures/sec_3_jc
 var _sec_4_jcamp = _interopRequireDefault(require("./__tests__/fixtures/sec_4_jcamp"));
 var _aif_jcamp_ = _interopRequireDefault(require("./__tests__/fixtures/aif_jcamp_1"));
 var _aif_jcamp_2 = _interopRequireDefault(require("./__tests__/fixtures/aif_jcamp_2"));
+var _gc_1_jcamp = _interopRequireDefault(require("./__tests__/fixtures/gc_1_jcamp"));
+var _gc_2_jcamp = _interopRequireDefault(require("./__tests__/fixtures/gc_2_jcamp"));
+var _gc_3_jcamp = _interopRequireDefault(require("./__tests__/fixtures/gc_3_jcamp"));
 var _emissions_jcamp = _interopRequireDefault(require("./__tests__/fixtures/emissions_jcamp"));
 var _dls_acf_jcamp = _interopRequireDefault(require("./__tests__/fixtures/dls_acf_jcamp"));
 var _dls_intensity_jcamp = _interopRequireDefault(require("./__tests__/fixtures/dls_intensity_jcamp"));
@@ -78,6 +81,9 @@ const secEntity3 = _app.FN.ExtractJcamp(_sec_3_jcamp.default);
 const secEntity4 = _app.FN.ExtractJcamp(_sec_4_jcamp.default);
 const aifEntity1 = _app.FN.ExtractJcamp(_aif_jcamp_.default);
 const aifEntity2 = _app.FN.ExtractJcamp(_aif_jcamp_2.default);
+const gcEntity1 = _app.FN.ExtractJcamp(_gc_1_jcamp.default);
+const gcEntity2 = _app.FN.ExtractJcamp(_gc_2_jcamp.default);
+const gcEntity3 = _app.FN.ExtractJcamp(_gc_3_jcamp.default);
 const emissionsEntity = _app.FN.ExtractJcamp(_emissions_jcamp.default);
 const dlsAcfEntity = _app.FN.ExtractJcamp(_dls_acf_jcamp.default);
 const dlsIntensityEntity = _app.FN.ExtractJcamp(_dls_intensity_jcamp.default);
@@ -176,6 +182,8 @@ class DemoWriteIr extends _react.default.Component {
         return dlsAcfEntity;
       case 'dls intensity':
         return dlsIntensityEntity;
+      case 'gc':
+        return gcEntity1;
       case 'ms':
       default:
         return msEntity;
@@ -200,6 +208,8 @@ class DemoWriteIr extends _react.default.Component {
         return [secEntity1, secEntity2, secEntity3, secEntity4];
       case 'aif':
         return [aifEntity1, aifEntity2];
+      case 'gc':
+        return [gcEntity1, gcEntity2, gcEntity3];
       default:
         return false;
     }
@@ -235,6 +245,7 @@ class DemoWriteIr extends _react.default.Component {
       case 'emissions':
       case 'dls acf':
       case 'dls intensity':
+      case 'gc':
       default:
         return false;
     }
@@ -700,6 +711,13 @@ class DemoWriteIr extends _react.default.Component {
       },
       onClick: this.onClick('sec')
     }, "SEC"), /*#__PURE__*/_react.default.createElement(_material.Button, {
+      id: "btn-sec",
+      variant: "contained",
+      style: {
+        margin: '0 10px 0 10px'
+      },
+      onClick: this.onClick('gc')
+    }, "GC"), /*#__PURE__*/_react.default.createElement(_material.Button, {
       id: "btn-sod",
       variant: "contained",
       style: {

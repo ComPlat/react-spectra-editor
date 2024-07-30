@@ -43,6 +43,9 @@ import secJcamp3 from './__tests__/fixtures/sec_3_jcamp';
 import secJcamp4 from './__tests__/fixtures/sec_4_jcamp';
 import aifJcamp1 from './__tests__/fixtures/aif_jcamp_1';
 import aifJcamp2 from './__tests__/fixtures/aif_jcamp_2';
+import gcJcamp1 from './__tests__/fixtures/gc_1_jcamp';
+import gcJcamp2 from './__tests__/fixtures/gc_2_jcamp';
+import gcJcamp3 from './__tests__/fixtures/gc_3_jcamp';
 import emissionsJcamp from './__tests__/fixtures/emissions_jcamp';
 import dlsAcfJcamp from './__tests__/fixtures/dls_acf_jcamp';
 import dlsIntensityJcamp from './__tests__/fixtures/dls_intensity_jcamp';
@@ -80,6 +83,9 @@ const secEntity3 = FN.ExtractJcamp(secJcamp3);
 const secEntity4 = FN.ExtractJcamp(secJcamp4);
 const aifEntity1 = FN.ExtractJcamp(aifJcamp1);
 const aifEntity2 = FN.ExtractJcamp(aifJcamp2);
+const gcEntity1 = FN.ExtractJcamp(gcJcamp1);
+const gcEntity2 = FN.ExtractJcamp(gcJcamp2);
+const gcEntity3 = FN.ExtractJcamp(gcJcamp3);
 const emissionsEntity = FN.ExtractJcamp(emissionsJcamp);
 const dlsAcfEntity = FN.ExtractJcamp(dlsAcfJcamp);
 const dlsIntensityEntity = FN.ExtractJcamp(dlsIntensityJcamp);
@@ -178,6 +184,8 @@ class DemoWriteIr extends React.Component {
         return dlsAcfEntity;
       case 'dls intensity':
         return dlsIntensityEntity;
+      case 'gc':
+        return gcEntity1;
       case 'ms':
       default:
         return msEntity;
@@ -201,6 +209,8 @@ class DemoWriteIr extends React.Component {
         return [secEntity1, secEntity2, secEntity3, secEntity4];
       case 'aif':
         return [aifEntity1, aifEntity2];
+      case 'gc':
+        return [gcEntity1, gcEntity2, gcEntity3];
       default:
         return false;
     }
@@ -235,6 +245,7 @@ class DemoWriteIr extends React.Component {
       case 'emissions':
       case 'dls acf':
       case 'dls intensity':
+      case 'gc':
       default:
         return false;
     }
@@ -593,6 +604,14 @@ class DemoWriteIr extends React.Component {
             onClick={this.onClick('sec')}
           >
             SEC
+          </Button>
+          <Button
+            id='btn-sec'
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('gc')}
+          >
+            GC
           </Button>
           <Button
             id='btn-sod'

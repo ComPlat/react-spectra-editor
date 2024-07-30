@@ -70,7 +70,7 @@ describe('NMR 1H', () => {
     cy.get('.btn-sv-bar-spctrum').click()
     cy.get('.input-sv-bar-layout').click()
     cy.get('.option-sv-bar-layout').should($li => {
-      expect($li).to.have.length(23)
+      expect($li).to.have.length(24)
     })
     cy.get('ul li:nth-child(9)').click()
 

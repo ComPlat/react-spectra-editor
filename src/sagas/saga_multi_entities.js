@@ -1,11 +1,15 @@
 /* eslint-disable no-plusplus */
 import { put, takeEvery, select } from 'redux-saga/effects';
 
-import { CURVE, CYCLIC_VOLTA_METRY } from '../constants/action_type';
+import {
+  CURVE, CYCLIC_VOLTA_METRY, INTEGRATION, SIMULATION,
+} from '../constants/action_type';
+
 import { LIST_LAYOUT } from '../constants/list_layout';
 
 const getLayoutSt = (state) => state.layout;
 const getCurveSt = (state) => state.curve;
+const getIntegrationSt = (state) => state.integration.present;
 
 function getMaxMinPeak(curve) {
   return curve.maxminPeak;
@@ -84,8 +88,43 @@ function* setCyclicVoltametryRef(action) { // eslint-disable-line
   }));
 }
 
+function* setInitIntegrations(action) { // eslint-disable-line
+  const curveSt = yield select(getCurveSt);
+  const { listCurves } = curveSt;
+  if (listCurves) {
+    for (let index = 0; index < listCurves.length; index++) {
+      const integationSt = yield select(getIntegrationSt);
+      const curve = listCurves[index];
+      const { integration, simulation } = curve;
+      const { integrations } = integationSt;
+      const newArrIntegration = [...integrations];
+      if (index < newArrIntegration.length) {
+        newArrIntegration[index] = integration;
+      } else {
+        newArrIntegration.push(integration);
+      }
+
+      const payload = Object.assign({}, integationSt, { integrations: newArrIntegration, selectedIdx: index }); // eslint-disable-line
+
+      if (integration) {
+        yield put({
+          type: INTEGRATION.RESET_ALL_RDC,
+          payload,
+        });
+      }
+      if (simulation) {
+        yield put({
+          type: SIMULATION.RESET_ALL_RDC,
+          payload: simulation,
+        });
+      }
+    }
+  }
+}
+
 const multiEntitiesSagas = [
   takeEvery(CURVE.SET_ALL_CURVES, setCyclicVoltametry),
+  takeEvery(CURVE.SET_ALL_CURVES, setInitIntegrations),
   takeEvery(CYCLIC_VOLTA_METRY.SET_FACTOR, setCyclicVoltametryRef),
 ];
 
