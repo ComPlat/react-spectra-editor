@@ -339,21 +339,21 @@ describe('Test format helper', () => {
   describe('Test get multi curves colors', () => {
     it('Get the first color', () => {
       const index = 7
-      const expectedColor = '#fa8231'
+      const expectedColor = '#d35400'
       const color = Format.mutiEntitiesColors(index)
       expect(color).toEqual(expectedColor)
     })
 
     it('Get the last color', () => {
       const index = 20
-      const expectedColor = '#4b6584'
+      const expectedColor = '#BDC581'
       const color = Format.mutiEntitiesColors(index)
       expect(color).toEqual(expectedColor)
     })
 
     it('Get the middle color', () => {
       const index = 10
-      const expectedColor = '#2d98da'
+      const expectedColor = '#2c3e50'
       const color = Format.mutiEntitiesColors(index)
       expect(color).toEqual(expectedColor)
     })
