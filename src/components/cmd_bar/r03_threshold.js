@@ -42,13 +42,14 @@ const txtPercent = () => (
 );
 
 const setThreshold = (
-  classes, thresVal, updateThresholdValueAct,
+  classes, thresVal, updateThresholdValueAct, curveSt,
 ) => {
-  const onBlur = (e) => updateThresholdValueAct(e.target.value);
-  const onChange = (e) => updateThresholdValueAct(e.target.value);
+  const { curveIdx } = curveSt;
+  const onBlur = (e) => updateThresholdValueAct({ value: e.target.value, curveIdx });
+  const onChange = (e) => updateThresholdValueAct({ value: e.target.value, curveIdx });
   const onEnterPress = (e) => {
     if (e.key === 'Enter') {
-      updateThresholdValueAct(e.target.value);
+      updateThresholdValueAct({ value: e.target.value, curveIdx });
     }
   };
 
@@ -88,14 +89,14 @@ const restoreTp = (hasEdit, isEdit) => (
 
 const Threshold = ({
   classes, feature, hasEdit,
-  hideThresSt, thresValSt, isEditSt,
+  hideThresSt, thresValSt, isEditSt, curveSt,
   updateThresholdValueAct, resetThresholdValueAct, toggleThresholdIsEditAct,
 }) => {
   const thresVal = thresValSt || feature.thresRef;
 
   return (
     <span className={classes.groupRight}>
-      { setThreshold(classes, thresVal, updateThresholdValueAct) }
+      { setThreshold(classes, thresVal, updateThresholdValueAct, curveSt) }
       <Tooltip title={<span className="txt-sv-tp">Restore Threshold</span>}>
         <MuButton
           className={
@@ -135,8 +136,9 @@ const Threshold = ({
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     hideThresSt: Cfg.hideCmdThres(state.layout),
-    isEditSt: state.threshold.isEdit,
-    thresValSt: parseFloat(state.threshold.value) || 0,
+    isEditSt: state.threshold.list[state.curve.curveIdx].isEdit,
+    thresValSt: parseFloat(state.threshold.list[state.curve.curveIdx].value) || 0,
+    curveSt: state.curve,
   }
 );
 
@@ -155,6 +157,7 @@ Threshold.propTypes = {
   hideThresSt: PropTypes.bool.isRequired,
   isEditSt: PropTypes.bool.isRequired,
   thresValSt: PropTypes.number.isRequired,
+  curveSt: PropTypes.object.isRequired,
   updateThresholdValueAct: PropTypes.func.isRequired,
   resetThresholdValueAct: PropTypes.func.isRequired,
   toggleThresholdIsEditAct: PropTypes.func.isRequired,

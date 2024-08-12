@@ -164,7 +164,7 @@ const convertFrequency = (layout, feature) => {
   return parseFloat(freq) || false;
 };
 const ToFrequency = exports.ToFrequency = (0, _reselect.createSelector)(getLayout, getFeature, convertFrequency);
-const getThreshold = state => state.threshold ? state.threshold.value * 1.0 : false;
+const getThreshold = state => state.threshold ? state.threshold.list[state.curve.curveIdx].value * 1.0 : false;
 const Convert2Peak = function (feature, threshold, offset) {
   let upThreshold = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
   let lowThreshold = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;

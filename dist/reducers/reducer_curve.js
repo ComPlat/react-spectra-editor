@@ -27,7 +27,9 @@ const setAllCurves = (state, action) => {
         feature,
         hasEdit,
         integration
-      } = (0, _extractParams.extractParams)(entity, 1);
+      } = (0, _extractParams.extractParams)(entity, {
+        isEdit: true
+      });
       // const layout = entity.layout;
       const {
         layout

@@ -6,6 +6,7 @@ import {
 import {
   MountPath, MountGrid, MountAxis, MountAxisLabelX, MountAxisLabelY,
   MountClip, MountMainFrame, MountTags, MountComparePath, MountRef,
+  MountThresLine,
 } from '../../helpers/mount';
 import { PksEdit, PeckersEdit } from '../../helpers/converter';
 import MountBrush from '../../helpers/brush';
@@ -49,6 +50,8 @@ class MultiFocus {
 
     this.axis = null;
     this.path = null;
+    this.thresLineUp = null;
+    this.thresLineDw = null;
     this.grid = null;
     this.tags = null;
     this.ref = null;
@@ -78,6 +81,7 @@ class MultiFocus {
     this.update = this.update.bind(this);
     this.setConfig = this.setConfig.bind(this);
     this.drawLine = this.drawLine.bind(this);
+    this.drawThres = this.drawThres.bind(this);
     this.drawOtherLines = this.drawOtherLines.bind(this);
     this.drawGrid = this.drawGrid.bind(this);
     this.drawPeaks = this.drawPeaks.bind(this);
@@ -225,6 +229,23 @@ class MultiFocus {
     this.path.style('stroke', this.pathColor);
     if (this.layout === LIST_LAYOUT.AIF) {
       this.path.attr('marker-mid', 'url(#arrow-left)');
+    }
+  }
+
+  drawThres() {
+    if (this.tTrEndPts.length > 0) {
+      this.thresLineUp.attr('d', this.pathCall(this.tTrEndPts));
+      this.thresLineUp.attr('visibility', 'visible');
+      const [left, right] = this.tTrEndPts;
+      const dwMirrorEndPts = [
+        Object.assign({}, left, { y: -left.y }),
+        Object.assign({}, right, { y: -right.y }),
+      ];
+      this.thresLineDw.attr('d', this.pathCall(dwMirrorEndPts));
+      this.thresLineDw.attr('visibility', 'visible');
+    } else {
+      this.thresLineUp.attr('visibility', 'hidden');
+      this.thresLineDw.attr('visibility', 'hidden');
     }
   }
 
@@ -1007,6 +1028,7 @@ class MultiFocus {
 
     this.axis = MountAxis(this);
     this.path = MountPath(this, this.pathColor);
+    [this.thresLineUp, this.thresLineDw] = MountThresLine(this, 'green');
     this.grid = MountGrid(this);
     this.tags = MountTags(this);
     this.ref = MountRef(this);
@@ -1016,6 +1038,7 @@ class MultiFocus {
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);
       this.drawLine();
+      this.drawThres();
       this.drawGrid();
       this.drawOtherLines(layoutSt);
       this.drawPeaks(editPeakSt);
@@ -1049,6 +1072,7 @@ class MultiFocus {
       this.setConfig(sweepExtentSt);
       this.getShouldUpdate(editPeakSt);
       this.drawLine();
+      this.drawThres();
       this.drawGrid();
       this.drawOtherLines(layoutSt);
       this.drawPeaks(editPeakSt);

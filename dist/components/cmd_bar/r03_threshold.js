@@ -32,12 +32,24 @@ const txtPercent = () => /*#__PURE__*/_react.default.createElement(_material.Inp
 }, /*#__PURE__*/_react.default.createElement("span", {
   className: "txt-percent"
 }, "%"));
-const setThreshold = (classes, thresVal, updateThresholdValueAct) => {
-  const onBlur = e => updateThresholdValueAct(e.target.value);
-  const onChange = e => updateThresholdValueAct(e.target.value);
+const setThreshold = (classes, thresVal, updateThresholdValueAct, curveSt) => {
+  const {
+    curveIdx
+  } = curveSt;
+  const onBlur = e => updateThresholdValueAct({
+    value: e.target.value,
+    curveIdx
+  });
+  const onChange = e => updateThresholdValueAct({
+    value: e.target.value,
+    curveIdx
+  });
   const onEnterPress = e => {
     if (e.key === 'Enter') {
-      updateThresholdValueAct(e.target.value);
+      updateThresholdValueAct({
+        value: e.target.value,
+        curveIdx
+      });
     }
   };
   return /*#__PURE__*/_react.default.createElement(_material.FormControl, {
@@ -78,6 +90,7 @@ const Threshold = _ref => {
     hideThresSt,
     thresValSt,
     isEditSt,
+    curveSt,
     updateThresholdValueAct,
     resetThresholdValueAct,
     toggleThresholdIsEditAct
@@ -85,7 +98,7 @@ const Threshold = _ref => {
   const thresVal = thresValSt || feature.thresRef;
   return /*#__PURE__*/_react.default.createElement("span", {
     className: classes.groupRight
-  }, setThreshold(classes, thresVal, updateThresholdValueAct), /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
+  }, setThreshold(classes, thresVal, updateThresholdValueAct, curveSt), /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
     title: /*#__PURE__*/_react.default.createElement("span", {
       className: "txt-sv-tp"
     }, "Restore Threshold")
@@ -109,8 +122,9 @@ const mapStateToProps = (state, props) => (
 // eslint-disable-line
 {
   hideThresSt: _cfg.default.hideCmdThres(state.layout),
-  isEditSt: state.threshold.isEdit,
-  thresValSt: parseFloat(state.threshold.value) || 0
+  isEditSt: state.threshold.list[state.curve.curveIdx].isEdit,
+  thresValSt: parseFloat(state.threshold.list[state.curve.curveIdx].value) || 0,
+  curveSt: state.curve
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   updateThresholdValueAct: _threshold.updateThresholdValue,
@@ -124,6 +138,7 @@ Threshold.propTypes = {
   hideThresSt: _propTypes.default.bool.isRequired,
   isEditSt: _propTypes.default.bool.isRequired,
   thresValSt: _propTypes.default.number.isRequired,
+  curveSt: _propTypes.default.object.isRequired,
   updateThresholdValueAct: _propTypes.default.func.isRequired,
   resetThresholdValueAct: _propTypes.default.func.isRequired,
   toggleThresholdIsEditAct: _propTypes.default.func.isRequired
