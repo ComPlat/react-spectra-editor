@@ -201,7 +201,7 @@ describe('Test for chem helper', () => {
       const state = {
         curve: { curveIdx: 0 },
         shift: { shifts: [] },
-        layout: LIST_LAYOUT.H1, threshold: { value: 55 } } // threshold at 55%
+        layout: LIST_LAYOUT.H1, threshold: { selectedIdx: 0, list: [{ value: 55 }]} } // threshold at 55%
       const props = { feature: { data: [{ x: [1, 2], y: [1, 2] }],  operation: { layout: LIST_LAYOUT.H1 }, maxY: 2, peakUp: true }}
       const peaks = Feature2Peak(state, props)
       expect(peaks).toEqual([{x: 2, y: 2}])
@@ -223,7 +223,10 @@ describe('Test for chem helper', () => {
 
   describe('Test get threshold position in the render view', () => {
     it('Get threshold position', () => {
-      const state = { shift: { ref: null }, layout: '1H', threshold: {value: 55} } // threshold at 55%
+      const state = {
+        shift: { ref: null }, layout: '1H',
+        curve: { curveIdx: 0 },
+        threshold: { selectedIdx: 0, list: [{ value: 55 }]} } // threshold at 55%
       const props = { feature: { data: [{ x: [1, 2], y: [1, 2] }],  operation: { layout: '1H'}, maxY: 2, maxX: 2, minX: 1, peakUp: true }}
       const thresholdsAt = ToThresEndPts(state, props)
       expect(thresholdsAt).toEqual([{"x": -199, "y": 1.1}, {"x": 202, "y": 1.1}])

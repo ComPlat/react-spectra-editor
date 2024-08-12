@@ -194,7 +194,7 @@ const mapStateToProps = (state, props) => (
   editPeakSt: state.editPeak.present,
   scanSt: state.scan,
   shiftSt: state.shift,
-  thresSt: state.threshold,
+  thresSt: state.threshold.list[state.curve.curveIdx],
   integrationSt: state.integration.present,
   multiplicitySt: state.multiplicity.present,
   curveSt: state.curve
