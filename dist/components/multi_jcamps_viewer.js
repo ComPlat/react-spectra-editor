@@ -88,7 +88,7 @@ class MultiJcampsViewer extends _react.default.Component {
       feature: feature,
       operations: operations,
       editorOnly: true,
-      hideThreshold: true
+      hideThreshold: !_format.default.isNmrLayout(layoutSt)
     }), /*#__PURE__*/_react.default.createElement("div", {
       className: "react-spectrum-editor"
     }, /*#__PURE__*/_react.default.createElement(_Grid.default, {
