@@ -17,7 +17,7 @@ const setAllCurves = (state, action) => {
     const entities = payload.map((entity, idx) => {
       const {
         topic, feature, hasEdit, integration,
-      } = extractParams(entity, 1);
+      } = extractParams(entity, { isEdit: true });
       // const layout = entity.layout;
       const { layout } = entity;
       const maxminPeak = Convert2MaxMinPeak(layout, feature, 0);
