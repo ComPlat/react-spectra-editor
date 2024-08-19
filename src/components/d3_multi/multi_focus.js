@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars, prefer-object-spread, no-mixed-operators,
-no-unneeded-ternary, arrow-body-style */
+no-unneeded-ternary, arrow-body-style, max-len */
 import {
   InitScale, InitAxisCall, InitTip,
 } from '../../helpers/init';
@@ -145,15 +145,18 @@ class MultiFocus {
     this.root.call(this.tip);
   }
 
-  setDataParams(peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt, jcampIdx = 0) {
+  setDataParams(filterSeed, peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt, jcampIdx = 0) {
     this.data = [];
     this.otherLineData = [];
     let filterSubLayoutValue = null;
     this.entities.forEach((entry, idx) => {
       const { topic, feature, color } = entry;
       const offset = GetCyclicVoltaPreviousShift(cyclicvoltaSt, jcampIdx);
-      const currData = convertTopic(topic, layout, feature, offset);
+      let currData = convertTopic(topic, layout, feature, offset);
       if (idx === jcampIdx) {
+        if (!Format.isCyclicVoltaLayout(layout)) {
+          currData = filterSeed;
+        }
         this.data = [...currData];
         this.pathColor = color;
         filterSubLayoutValue = Format.isSECLayout(layout) ? feature.xUnit : feature.yUnit;
@@ -1023,7 +1026,7 @@ class MultiFocus {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, this.reverseXAxis(layoutSt));
     this.setTip();
-    this.setDataParams(filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
     MountCompass(this);
 
     this.axis = MountAxis(this);
@@ -1066,7 +1069,7 @@ class MultiFocus {
     this.isShowAllCurves = isShowAllCurve;
     this.entities = entities;
 
-    this.setDataParams(filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
 
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);

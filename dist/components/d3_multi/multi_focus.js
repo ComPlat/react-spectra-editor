@@ -19,7 +19,7 @@ var _integration = require("../../helpers/integration");
 var _multiplicity_calc = require("../../helpers/multiplicity_calc");
 var _calc = require("../../helpers/calc");
 /* eslint-disable no-unused-vars, prefer-object-spread, no-mixed-operators,
-no-unneeded-ternary, arrow-body-style */
+no-unneeded-ternary, arrow-body-style, max-len */
 
 const d3 = require('d3');
 class MultiFocus {
@@ -158,8 +158,8 @@ class MultiFocus {
     this.tip = (0, _init.InitTip)();
     this.root.call(this.tip);
   }
-  setDataParams(peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt) {
-    let jcampIdx = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 0;
+  setDataParams(filterSeed, peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt) {
+    let jcampIdx = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : 0;
     this.data = [];
     this.otherLineData = [];
     let filterSubLayoutValue = null;
@@ -170,8 +170,11 @@ class MultiFocus {
         color
       } = entry;
       const offset = (0, _chem.GetCyclicVoltaPreviousShift)(cyclicvoltaSt, jcampIdx);
-      const currData = (0, _chem.convertTopic)(topic, layout, feature, offset);
+      let currData = (0, _chem.convertTopic)(topic, layout, feature, offset);
       if (idx === jcampIdx) {
+        if (!_format.default.isCyclicVoltaLayout(layout)) {
+          currData = filterSeed;
+        }
         this.data = [...currData];
         this.pathColor = color;
         filterSubLayoutValue = _format.default.isSECLayout(layout) ? feature.xUnit : feature.yUnit;
@@ -835,7 +838,7 @@ class MultiFocus {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt));
     this.setTip();
-    this.setDataParams(filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
     (0, _compass.MountCompass)(this);
     this.axis = (0, _mount.MountAxis)(this);
     this.path = (0, _mount.MountPath)(this, this.pathColor);
@@ -885,7 +888,7 @@ class MultiFocus {
     const jcampIdx = curveIdx;
     this.isShowAllCurves = isShowAllCurve;
     this.entities = entities;
-    this.setDataParams(filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);
       this.getShouldUpdate(editPeakSt);
