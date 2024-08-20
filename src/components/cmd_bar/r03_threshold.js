@@ -89,10 +89,10 @@ const restoreTp = (hasEdit, isEdit) => (
 
 const Threshold = ({
   classes, feature, hasEdit,
-  hideThresSt, thresValSt, isEditSt, curveSt,
+  hideThresSt, thresValSt, isEditSt, curveSt, hplcMsSt,
   updateThresholdValueAct, resetThresholdValueAct, toggleThresholdIsEditAct,
 }) => {
-  const thresVal = thresValSt || feature.thresRef;
+  const thresVal = thresValSt || (feature ? feature.thresRef : hplcMsSt.threshold.value);
 
   return (
     <span className={classes.groupRight}>
@@ -143,6 +143,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     isEditSt: state.threshold.list[state.curve.curveIdx].isEdit,
     thresValSt: parseFloat(state.threshold.list[state.curve.curveIdx].value) || 0,
     curveSt: state.curve,
+    hplcMsSt: state.hplcMs,
   }
 );
 
@@ -165,6 +166,7 @@ Threshold.propTypes = {
   updateThresholdValueAct: PropTypes.func.isRequired,
   resetThresholdValueAct: PropTypes.func.isRequired,
   toggleThresholdIsEditAct: PropTypes.func.isRequired,
+  hplcMsSt: PropTypes.bool.isRequired,
 };
 
 export default connect(

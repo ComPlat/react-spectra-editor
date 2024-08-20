@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { PksEdit } from './converter';
 import { Convert2Peak } from './chem';
 import { FromManualToOffset } from './shift';
@@ -18,14 +19,14 @@ const niOffset = (shiftSt, atIndex = 0) => {
 const msOffset = () => 0;
 
 const extractPeaksEdit = (feature, editPeakSt, thresSt, shiftSt, layoutSt, atIndex = 0) => {
-  const offset = Format.isMsLayout(layoutSt) ? msOffset() : niOffset(shiftSt, atIndex);
+  const offset = (Format.isMsLayout(layoutSt) || Format.isLCMsLayout(layoutSt)) ? msOffset() : niOffset(shiftSt, atIndex);
   const peaks = Convert2Peak(feature, thresSt.value, offset);
   const peaksEdit = PksEdit(peaks, editPeakSt);
   return peaksEdit;
 };
 
 const extractAutoPeaks = (feature, thresSt, shiftSt, layoutSt, atIndex = 0) => {
-  const offset = Format.isMsLayout(layoutSt) ? msOffset() : niOffset(shiftSt, atIndex);
+  const offset = (Format.isMsLayout(layoutSt) || Format.isLCMsLayout(layoutSt)) ? msOffset() : niOffset(shiftSt, atIndex);
   const peaks = Convert2Peak(feature, thresSt.value, offset);
   return peaks;
 };

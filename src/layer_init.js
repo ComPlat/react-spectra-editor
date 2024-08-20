@@ -16,6 +16,7 @@ import { addOthers } from './actions/jcamp';
 import LayerPrism from './layer_prism';
 import Format from './helpers/format';
 import MultiJcampsViewer from './components/multi_jcamps_viewer';
+import HPLCViewer from './components/hplc_viewer';
 import { setAllCurves } from './actions/curve';
 
 const styles = () => ({
@@ -119,7 +120,7 @@ class LayerInit extends React.Component {
   render() {
     const {
       entity, cLabel, xLabel, yLabel, forecast, operations,
-      descriptions, molSvg, editorOnly, exactMass,
+      descriptions, molSvg, editorOnly, exactMass, theoryMass,
       canChangeDescription, onDescriptionChanged,
       multiEntities, entityFileNames, userManualLink,
     } = this.props;
@@ -130,7 +131,19 @@ class LayerInit extends React.Component {
     const xxLabel = !xLabel && xLabel === '' ? `X (${target.xUnit})` : xLabel;
     const yyLabel = !yLabel && yLabel === '' ? `Y (${target.yUnit})` : yLabel;
 
+    const hasMultiEntities = Array.isArray(multiEntities) && multiEntities.length > 0;
     const isMultiSpectra = Array.isArray(multiEntities) && multiEntities.length > 1;
+    if (Format.isLCMsLayout(layout) && hasMultiEntities) {
+      return (
+        <HPLCViewer
+          entityFileNames={entityFileNames}
+          userManualLink={userManualLink}
+          molSvg={molSvg}
+          theoryMass={theoryMass}
+          operations={operations}
+        />
+      );
+    }
     if (isMultiSpectra) {
       return (
         <MultiJcampsViewer
@@ -211,6 +224,7 @@ LayerInit.propTypes = {
   molSvg: PropTypes.string.isRequired,
   editorOnly: PropTypes.bool.isRequired,
   exactMass: PropTypes.string.isRequired,
+  theoryMass: PropTypes.string,
   forecast: PropTypes.object.isRequired,
   operations: PropTypes.array.isRequired,
   descriptions: PropTypes.array.isRequired,
