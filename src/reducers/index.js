@@ -19,6 +19,7 @@ import cyclicVoltaReducer from './reducer_voltammetry';
 import curveReducer from './reducer_curve';
 import axesReducer from './reducer_axes';
 import detectorReducer from './reducer_detector';
+import hplcmsReducer from './reducer_hplc_ms';
 
 const rootReducer = combineReducers({
   threshold: thresholdReducer,
@@ -41,6 +42,7 @@ const rootReducer = combineReducers({
   curve: curveReducer,
   axesUnits: axesReducer,
   detector: detectorReducer,
+  hplcMs: hplcmsReducer,
 });
 
 export default rootReducer;

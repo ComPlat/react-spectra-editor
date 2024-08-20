@@ -43,7 +43,8 @@ const LayerPrism = _ref => {
     topic,
     feature,
     hasEdit,
-    integration
+    integration,
+    features
   } = (0, _extractParams.extractParams)(entity, thresSt, scanSt);
   if (!topic) return null;
   const {
@@ -66,6 +67,7 @@ const LayerPrism = _ref => {
     }, /*#__PURE__*/_react.default.createElement(_layer_content.default, {
       topic: topic,
       feature: feature,
+      features: features,
       cLabel: cLabel,
       xLabel: xLabel,
       yLabel: yLabel,
@@ -89,6 +91,7 @@ const LayerPrism = _ref => {
   }, /*#__PURE__*/_react.default.createElement(_layer_content.default, {
     topic: topic,
     feature: feature,
+    features: features,
     cLabel: cLabel,
     xLabel: xLabel,
     yLabel: yLabel,

@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types, react/require-default-props */
+/* eslint-disable react/prop-types, react/require-default-props, max-len */
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -18,6 +18,7 @@ import MultiplicityPanel from './multiplicity';
 import CyclicVoltammetryPanel from './cyclic_voltamery_data';
 import GraphSelectionPanel from './graph_selection';
 import Cfg from '../../helpers/cfg';
+import Format from '../../helpers/format';
 
 const theme = createTheme({
   typography: {
@@ -82,7 +83,7 @@ class PanelViewer extends React.Component {
     const onExapndGraphSelection = () => this.onExapnd('graph');
 
     const { listCurves } = curveSt;
-    const hideGraphSelection = listCurves === false || listCurves === undefined;
+    const hideGraphSelection = listCurves === false || listCurves === undefined || Format.isLCMsLayout(layoutSt);
 
     return (
       <div className={classNames(classes.panels)}>

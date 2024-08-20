@@ -5,8 +5,9 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.drawMain = exports.drawLabel = exports.drawDisplay = exports.drawDestroy = exports.drawArrowOnCurve = void 0;
 const d3 = require('d3');
-const drawMain = (klass, w, h) => {
-  d3.select(klass).append('svg').attr('class', 'd3Svg').attr('preserveAspectRatio', 'xMinYMin meet').attr('viewBox', `0 0 ${w} ${h}`);
+const drawMain = function (klass, w, h) {
+  let d3svgClass = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'd3Svg';
+  d3.select(klass).append('svg').attr('class', d3svgClass).attr('preserveAspectRatio', 'xMinYMin meet').attr('viewBox', `0 0 ${w} ${h}`);
 };
 exports.drawMain = drawMain;
 const drawLabel = (klass, cLabel, xLabel, yLabel) => {

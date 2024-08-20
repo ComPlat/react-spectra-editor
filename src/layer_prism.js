@@ -25,7 +25,7 @@ const LayerPrism = ({
   canChangeDescription, onDescriptionChanged,
 }) => {
   const {
-    topic, feature, hasEdit, integration,
+    topic, feature, hasEdit, integration, features,
   } = extractParams(entity, thresSt, scanSt);
   if (!topic) return null;
 
@@ -46,6 +46,7 @@ const LayerPrism = ({
               <LayerContent
                 topic={topic}
                 feature={feature}
+                features={features}
                 cLabel={cLabel}
                 xLabel={xLabel}
                 yLabel={yLabel}
@@ -74,6 +75,7 @@ const LayerPrism = ({
             <LayerContent
               topic={topic}
               feature={feature}
+              features={features}
               cLabel={cLabel}
               xLabel={xLabel}
               yLabel={yLabel}

@@ -16,6 +16,7 @@ import {
 } from '../../helpers/chem';
 import { MuButton, commonStyle } from './common';
 import { extractPeaksEdit, extractAreaUnderCurve } from '../../helpers/extractPeaksEdit';
+import Format from '../../helpers/format';
 
 const styles = () => (
   Object.assign(
@@ -64,7 +65,7 @@ const BtnSubmit = ({
 }) => {
   const peaksEdit = extractPeaksEdit(feature, editPeakSt, thresSt, shiftSt, layoutSt);
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
-  const scan = Convert2Scan(feature, scanSt);
+  const scan = Format.isMsLayout(layoutSt) ? Convert2Scan(feature, scanSt) : 0;
   const thres = Convert2Thres(feature, thresSt);
   const aucValues = extractAreaUnderCurve(allIntegrationSt, integrationSt, layoutSt);
   const { dscMetaData } = metaSt;

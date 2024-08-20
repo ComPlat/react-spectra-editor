@@ -4,7 +4,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.convertTopic = exports.Topic2Seed = exports.ToThresEndPts = exports.ToShiftPeaks = exports.ToFrequency = exports.GetCyclicVoltaShiftOffset = exports.GetCyclicVoltaRatio = exports.GetCyclicVoltaPreviousShift = exports.GetCyclicVoltaPeakSeparate = exports.GetComparisons = exports.Feature2Peak = exports.Feature2MaxMinPeak = exports.ExtractJcamp = exports.Convert2Thres = exports.Convert2Scan = exports.Convert2Peak = exports.Convert2MaxMinPeak = exports.Convert2DValue = void 0;
+exports.convertTopic = exports.convertThresEndPts = exports.Topic2Seed = exports.ToThresEndPts = exports.ToShiftPeaks = exports.ToFrequency = exports.GetCyclicVoltaShiftOffset = exports.GetCyclicVoltaRatio = exports.GetCyclicVoltaPreviousShift = exports.GetCyclicVoltaPeakSeparate = exports.GetComparisons = exports.Feature2Peak = exports.Feature2MaxMinPeak = exports.ExtractJcamp = exports.Convert2Thres = exports.Convert2Scan = exports.Convert2Peak = exports.Convert2MaxMinPeak = exports.Convert2DValue = void 0;
 var _jcampconverter = _interopRequireDefault(require("jcampconverter"));
 var _reselect = require("reselect");
 var _shift = require("./shift");
@@ -295,6 +295,7 @@ const convertThresEndPts = (feature, threshold) => {
   }];
   return endPts;
 };
+exports.convertThresEndPts = convertThresEndPts;
 const ToThresEndPts = exports.ToThresEndPts = (0, _reselect.createSelector)(getFeature, getThreshold, convertThresEndPts);
 const getShiftPeak = state => {
   const {
@@ -382,6 +383,9 @@ const readLayout = jcamp => {
     }
     if (dataType.includes('DLS intensity')) {
       return _list_layout.LIST_LAYOUT.DLS_INTENSITY;
+    }
+    if (dataType.includes('LC/MS')) {
+      return _list_layout.LIST_LAYOUT.LC_MS;
     }
   }
   return false;
@@ -521,7 +525,8 @@ const buildPeakFeature = function (jcamp, layout, peakUp, s, thresRef) {
     upperThres,
     lowerThres,
     volammetryData: extractVoltammetryData(jcamp),
-    scanRate: +info.$CSSCANRATE || 0.1
+    scanRate: +info.$CSSCANRATE || 0.1,
+    csCategory: info.$CSCATEGORY
   }, s);
 };
 const maxArray = arr => {
@@ -804,6 +809,7 @@ const extrFeaturesMs = (jcamp, layout, peakUp) => {
   // }
   // // workaround for legacy design
   const thresRef = jcamp.info && jcamp.info.$CSTHRESHOLD * 100 || 5;
+  console.log('thresRef', thresRef);
   const base = jcamp.spectra[0];
   const features = jcamp.spectra.map(s => {
     const cpo = buildPeakFeature(jcamp, layout, peakUp, s, +thresRef.toFixed(4));
@@ -829,9 +835,9 @@ const ExtractJcamp = source => {
   });
   const layout = readLayout(jcamp);
   const peakUp = !_format.default.isIrLayout(layout);
-  const spectra = _format.default.isMsLayout(layout) ? extrSpectraMs(jcamp, layout) : extrSpectraNi(jcamp, layout);
+  const spectra = _format.default.isMsLayout(layout) || _format.default.isLCMsLayout(layout) ? extrSpectraMs(jcamp, layout) : extrSpectraNi(jcamp, layout);
   let features = {};
-  if (_format.default.isMsLayout(layout)) {
+  if (_format.default.isMsLayout(layout) || _format.default.isLCMsLayout(layout)) {
     features = extrFeaturesMs(jcamp, layout, peakUp);
   } else if (_format.default.isXRDLayout(layout)) {
     features = extrFeaturesXrd(jcamp, layout, peakUp);

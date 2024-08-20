@@ -8,8 +8,10 @@ var _effects = require("redux-saga/effects");
 var _action_type = require("../constants/action_type");
 var _list_ui = require("../constants/list_ui");
 var _list_layout = require("../constants/list_layout");
+var _list_graph = require("../constants/list_graph");
 const getUiSt = state => state.ui;
 const getCurveSt = state => state.curve;
+const getHplcMsSt = state => state.hplcMs;
 const calcPeaks = payload => {
   const {
     xExtent,
@@ -31,18 +33,39 @@ const calcPeaks = payload => {
 function* selectUiSweep(action) {
   const uiSt = yield (0, _effects.select)(getUiSt);
   const {
+    sweepType,
+    zoom
+  } = uiSt;
+  const {
     payload
   } = action;
   const curveSt = yield (0, _effects.select)(getCurveSt);
   const {
     curveIdx
   } = curveSt;
-  switch (uiSt.sweepType) {
+  const hplcMsSt = yield (0, _effects.select)(getHplcMsSt);
+  const {
+    uvvis
+  } = hplcMsSt;
+  switch (sweepType) {
     case _list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN:
-      yield (0, _effects.put)({
-        type: _action_type.UI.SWEEP.SELECT_ZOOMIN,
-        payload
-      });
+      if (uvvis.listWaveLength) {
+        const {
+          graphIndex
+        } = zoom;
+        yield (0, _effects.put)({
+          type: _action_type.UI.SWEEP.SELECT_ZOOMIN,
+          payload: {
+            graphIndex,
+            zoomValue: payload
+          }
+        });
+      } else {
+        yield (0, _effects.put)({
+          type: _action_type.UI.SWEEP.SELECT_ZOOMIN,
+          payload
+        });
+      }
       break;
     case _list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET:
       yield (0, _effects.put)({
@@ -97,7 +120,8 @@ function* scrollUiWheel(action) {
   const {
     xExtent,
     yExtent,
-    direction
+    direction,
+    brushClass
   } = payload;
   const {
     yL,
@@ -154,10 +178,17 @@ function* scrollUiWheel(action) {
       };
       break;
   }
-  yield (0, _effects.put)({
-    type: _action_type.UI.SWEEP.SELECT_ZOOMIN,
-    payload: nextExtent
-  });
+  if (brushClass === `.${_list_graph.LIST_BRUSH_SVG_GRAPH.RECT}`) {
+    yield (0, _effects.put)({
+      type: _action_type.UI.SWEEP.SELECT_ZOOMIN_SUBVIEW,
+      payload: nextExtent
+    });
+  } else {
+    yield (0, _effects.put)({
+      type: _action_type.UI.SWEEP.SELECT_ZOOMIN,
+      payload: nextExtent
+    });
+  }
 }
 const getUiSweepType = state => state.ui.sweepType;
 function* clickUiTarget(action) {
@@ -314,6 +345,11 @@ function* clickUiTarget(action) {
         index: voltammetryPeakIdx,
         jcampIdx: curveIdx
       }
+    });
+  } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.PEAK_GROUP_SELECT) {
+    yield (0, _effects.put)({
+      type: _action_type.UI.SUB_VIEWER.DISPLAY_VIEWER_AT,
+      payload
     });
   }
 }

@@ -2,6 +2,7 @@ import Format from './format';
 
 const btnCmdAnaViewer = (layoutSt) => (
   Format.isMsLayout(layoutSt)
+    || Format.isLCMsLayout(layoutSt)
     || Format.isRamanLayout(layoutSt)
     || Format.is19FLayout(layoutSt)
     || Format.isUvVisLayout(layoutSt)
@@ -20,11 +21,11 @@ const btnCmdAnaViewer = (layoutSt) => (
 
 const hideCmdAnaViewer = () => false;
 
-const btnCmdAddPeak = (layoutSt) => Format.isMsLayout(layoutSt);
+const btnCmdAddPeak = (layoutSt) => Format.isMsLayout(layoutSt) || Format.isLCMsLayout(layoutSt);
 
-const btnCmdRmPeak = (layoutSt) => Format.isMsLayout(layoutSt);
+const btnCmdRmPeak = (layoutSt) => Format.isMsLayout(layoutSt) || Format.isLCMsLayout(layoutSt);
 
-const btnCmdSetRef = (layoutSt) => !Format.isNmrLayout(layoutSt); // eslint-disable-line
+const btnCmdSetRef = (layoutSt) => !Format.isNmrLayout(layoutSt);
 
 const btnCmdIntg = (layoutSt) => !(Format.isNmrLayout(layoutSt)|| Format.isHplcUvVisLayout(layoutSt));  // eslint-disable-line
 
