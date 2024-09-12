@@ -5,9 +5,11 @@ import {
 } from '../constants/action_type';
 import { LIST_UI_SWEEP_TYPE } from '../constants/list_ui';
 import { LIST_LAYOUT } from '../constants/list_layout';
+import { LIST_BRUSH_SVG_GRAPH } from '../constants/list_graph';
 
 const getUiSt = (state) => state.ui;
 const getCurveSt = (state) => state.curve;
+const getHplcMsSt = (state) => state.hplcMs;
 
 const calcPeaks = (payload) => {
   const { xExtent, yExtent, dataPks } = payload;
@@ -20,17 +22,32 @@ const calcPeaks = (payload) => {
 
 function* selectUiSweep(action) {
   const uiSt = yield select(getUiSt);
+  const { sweepType, zoom } = uiSt;
   const { payload } = action;
 
   const curveSt = yield select(getCurveSt);
   const { curveIdx } = curveSt;
 
-  switch (uiSt.sweepType) {
+  const hplcMsSt = yield select(getHplcMsSt);
+  const { uvvis } = hplcMsSt;
+
+  switch (sweepType) {
     case LIST_UI_SWEEP_TYPE.ZOOMIN:
-      yield put({
-        type: UI.SWEEP.SELECT_ZOOMIN,
-        payload,
-      });
+      if (uvvis.listWaveLength) {
+        const { graphIndex } = zoom;
+        yield put({
+          type: UI.SWEEP.SELECT_ZOOMIN,
+          payload: {
+            graphIndex,
+            zoomValue: payload,
+          },
+        });
+      } else {
+        yield put({
+          type: UI.SWEEP.SELECT_ZOOMIN,
+          payload,
+        });
+      }
       break;
     case LIST_UI_SWEEP_TYPE.ZOOMRESET:
       yield put({
@@ -69,7 +86,9 @@ const getLayoutSt = (state) => state.layout;
 function* scrollUiWheel(action) {
   const layoutSt = yield select(getLayoutSt);
   const { payload } = action;
-  const { xExtent, yExtent, direction } = payload;
+  const {
+    xExtent, yExtent, direction, brushClass,
+  } = payload;
   const { yL, yU } = yExtent;
   const [yeL, yeU] = [yL + (yU - yL) * 0.1, yU - (yU - yL) * 0.1];
   const scale = direction ? 0.8 : 1.25;
@@ -102,10 +121,17 @@ function* scrollUiWheel(action) {
       nextExtent = { xExtent, yExtent: { yL: nytL, yU: nytU } };
       break;
   }
-  yield put({
-    type: UI.SWEEP.SELECT_ZOOMIN,
-    payload: nextExtent,
-  });
+  if (brushClass === `.${LIST_BRUSH_SVG_GRAPH.RECT}`) {
+    yield put({
+      type: UI.SWEEP.SELECT_ZOOMIN_SUBVIEW,
+      payload: nextExtent,
+    });
+  } else {
+    yield put({
+      type: UI.SWEEP.SELECT_ZOOMIN,
+      payload: nextExtent,
+    });
+  }
 }
 
 const getUiSweepType = (state) => state.ui.sweepType;
@@ -206,6 +232,11 @@ function* clickUiTarget(action) {
     yield put({
       type: CYCLIC_VOLTA_METRY.SET_REF,
       payload: { index: voltammetryPeakIdx, jcampIdx: curveIdx },
+    });
+  } else if (uiSweepType === LIST_UI_SWEEP_TYPE.PEAK_GROUP_SELECT) {
+    yield put({
+      type: UI.SUB_VIEWER.DISPLAY_VIEWER_AT,
+      payload,
     });
   }
 }

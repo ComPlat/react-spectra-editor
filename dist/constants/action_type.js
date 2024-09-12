@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.XRD = exports.UI = exports.THRESHOLD = exports.SUBMIT = exports.STATUS = exports.SIMULATION = exports.SHIFT = exports.SEC = exports.SCAN = exports.MULTIPLICITY = exports.META = exports.MANAGER = exports.LAYOUT = exports.JCAMP = exports.INTEGRATION = exports.FORECAST = exports.EDITPEAK = exports.CYCLIC_VOLTA_METRY = exports.CURVE = exports.AXES = void 0;
+exports.XRD = exports.UI = exports.THRESHOLD = exports.SUBMIT = exports.STATUS = exports.SIMULATION = exports.SHIFT = exports.SEC = exports.SCAN = exports.MULTIPLICITY = exports.META = exports.MANAGER = exports.LAYOUT = exports.JCAMP = exports.INTEGRATION = exports.HPLC_MS = exports.FORECAST = exports.EDITPEAK = exports.CYCLIC_VOLTA_METRY = exports.CURVE = exports.AXES = void 0;
 const THRESHOLD = exports.THRESHOLD = {
   UPDATE_VALUE: 'THRESHOLD_UPDATE_VALUE',
   RESET_VALUE: 'THRESHOLD_RESET_VALUE',
@@ -62,6 +62,9 @@ const UI = exports.UI = {
   },
   WHEEL: {
     SCROLL: 'UI_WHEEL_SCROLL'
+  },
+  SUB_VIEWER: {
+    DISPLAY_VIEWER_AT: 'DISPLAY_VIEWER_AT'
   }
 };
 const FORECAST = exports.FORECAST = {
@@ -146,4 +149,8 @@ const AXES = exports.AXES = {
 };
 const SEC = exports.SEC = {
   UPDATE_DETECTOR: 'UPDATE_DETECTOR'
+};
+const HPLC_MS = exports.HPLC_MS = {
+  UPDATE_UVVIS_WAVE_LENGTH: 'UPDATE_UVVIS_WAVE_LENGTH',
+  SELECT_TIC_CURVE: 'SELECT_TIC_CURVE'
 };

@@ -27,7 +27,8 @@ const setAllCurves = (state, action) => {
         feature,
         hasEdit,
         integration,
-        multiplicity
+        multiplicity,
+        features
       } = (0, _extractParams.extractParams)(entity, {
         isEdit: true
       });
@@ -46,7 +47,8 @@ const setAllCurves = (state, action) => {
         multiplicity,
         maxminPeak,
         color,
-        curveIdx: idx
+        curveIdx: idx,
+        features
       };
     });
     return Object.assign({}, state, {

@@ -34,15 +34,22 @@ const styles = () => (
 
 const CmdBar = ({
   classes, feature, hasEdit, forecast, operations, editorOnly, jcampIdx, hideThreshold,
+  hideMainEditTools,
 }) => (
   <div className={classes.card}>
-    <Viewer editorOnly={editorOnly} />
-    <Zoom />
-    <Peak jcampIdx={jcampIdx} feature={feature} />
-    <Pecker jcampIdx={jcampIdx} />
-    <Integration />
-    <Multiplicity />
-    <UndoRedo />
+    {
+      hideMainEditTools ? null : (
+        <>
+          <Viewer editorOnly={editorOnly} />
+          <Zoom />
+          <Peak jcampIdx={jcampIdx} feature={feature} />
+          <Pecker jcampIdx={jcampIdx} />
+          <Integration />
+          <Multiplicity />
+          <UndoRedo />
+        </>
+      )
+    }
     <Submit
       operations={operations}
       feature={feature}
@@ -80,6 +87,7 @@ CmdBar.propTypes = {
   editorOnly: PropTypes.bool.isRequired,
   jcampIdx: PropTypes.any,
   hideThreshold: PropTypes.bool,
+  hideMainEditTools: PropTypes.bool,
 };
 
 export default compose(

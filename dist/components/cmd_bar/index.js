@@ -37,18 +37,19 @@ const CmdBar = _ref => {
     operations,
     editorOnly,
     jcampIdx,
-    hideThreshold
+    hideThreshold,
+    hideMainEditTools
   } = _ref;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: classes.card
-  }, /*#__PURE__*/_react.default.createElement(_viewer.default, {
+  }, hideMainEditTools ? null : /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement(_viewer.default, {
     editorOnly: editorOnly
   }), /*#__PURE__*/_react.default.createElement(_zoom.default, null), /*#__PURE__*/_react.default.createElement(_peak.default, {
     jcampIdx: jcampIdx,
     feature: feature
   }), /*#__PURE__*/_react.default.createElement(_pecker.default, {
     jcampIdx: jcampIdx
-  }), /*#__PURE__*/_react.default.createElement(_integration.default, null), /*#__PURE__*/_react.default.createElement(_multiplicity.default, null), /*#__PURE__*/_react.default.createElement(_undo_redo.default, null), /*#__PURE__*/_react.default.createElement(_r04_submit.default, {
+  }), /*#__PURE__*/_react.default.createElement(_integration.default, null), /*#__PURE__*/_react.default.createElement(_multiplicity.default, null), /*#__PURE__*/_react.default.createElement(_undo_redo.default, null)), /*#__PURE__*/_react.default.createElement(_r04_submit.default, {
     operations: operations,
     feature: feature,
     forecast: forecast,
@@ -75,6 +76,7 @@ CmdBar.propTypes = {
   operations: _propTypes.default.array.isRequired,
   editorOnly: _propTypes.default.bool.isRequired,
   jcampIdx: _propTypes.default.any,
-  hideThreshold: _propTypes.default.bool
+  hideThreshold: _propTypes.default.bool,
+  hideMainEditTools: _propTypes.default.bool
 };
 var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _withStyles.default)(styles))(CmdBar);

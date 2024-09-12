@@ -156,7 +156,7 @@ const BtnPredict = _ref => {
   if (!(is13Cor1H || isIr)) return null;
   const oriPeaksEdit = (0, _extractPeaksEdit.extractPeaksEdit)(feature, editPeakSt, thresSt, shiftSt, layoutSt);
   const peaksEdit = _format.default.rmShiftFromPeaks(oriPeaksEdit, shiftSt);
-  const scan = (0, _chem.Convert2Scan)(feature, scanSt);
+  const scan = _format.default.isMsLayout(layoutSt) ? (0, _chem.Convert2Scan)(feature, scanSt) : 0;
   const thres = (0, _chem.Convert2Thres)(feature, thresSt);
   const simuCount = simulationSt.nmrSimPeaks.length;
   const uniqCount = [...new Set(simulationSt.nmrSimPeaks)].length;

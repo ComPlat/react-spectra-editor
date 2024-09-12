@@ -91,11 +91,12 @@ const Threshold = _ref => {
     thresValSt,
     isEditSt,
     curveSt,
+    hplcMsSt,
     updateThresholdValueAct,
     resetThresholdValueAct,
     toggleThresholdIsEditAct
   } = _ref;
-  const thresVal = thresValSt || feature.thresRef;
+  const thresVal = thresValSt || (feature ? feature.thresRef : hplcMsSt.threshold.value);
   return /*#__PURE__*/_react.default.createElement("span", {
     className: classes.groupRight
   }, setThreshold(classes, thresVal, updateThresholdValueAct, curveSt), /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
@@ -124,7 +125,8 @@ const mapStateToProps = (state, props) => (
   hideThresSt: _cfg.default.hideCmdThres(state.layout),
   isEditSt: state.threshold.list[state.curve.curveIdx].isEdit,
   thresValSt: parseFloat(state.threshold.list[state.curve.curveIdx].value) || 0,
-  curveSt: state.curve
+  curveSt: state.curve,
+  hplcMsSt: state.hplcMs
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   updateThresholdValueAct: _threshold.updateThresholdValue,
@@ -141,6 +143,7 @@ Threshold.propTypes = {
   curveSt: _propTypes.default.object.isRequired,
   updateThresholdValueAct: _propTypes.default.func.isRequired,
   resetThresholdValueAct: _propTypes.default.func.isRequired,
-  toggleThresholdIsEditAct: _propTypes.default.func.isRequired
+  toggleThresholdIsEditAct: _propTypes.default.func.isRequired,
+  hplcMsSt: _propTypes.default.bool.isRequired
 };
 var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(Threshold));

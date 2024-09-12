@@ -5,14 +5,14 @@ import { MouseMove } from './compass';
 const d3 = require('d3');
 
 const wheeled = (focus, event) => {
-  const { currentExtent, scrollUiWheelAct } = focus;
+  const { currentExtent, scrollUiWheelAct, brushClass } = focus;
   // WORKAROUND: firefox wheel compatibilty
   const wheelEvent = focus.isFirefox ? -event.deltaY : event.wheelDelta;  // eslint-disable-line
   const direction = wheelEvent > 0;
-  scrollUiWheelAct(Object.assign({}, currentExtent, { direction }));
+  scrollUiWheelAct(Object.assign({}, currentExtent, { direction, brushClass }));
 };
 
-const brushed = (focus, isUiAddIntgSt, event) => {
+const brushed = (focus, isUiAddIntgSt, event, brushedClass = '.d3Svg') => {
   const {
     selectUiSweepAct, data, dataPks, brush, w, h, scales,
   } = focus;
@@ -35,17 +35,17 @@ const brushed = (focus, isUiAddIntgSt, event) => {
   selectUiSweepAct({
     xExtent, yExtent, data, dataPks,
   });
-  d3.select('.d3Svg').selectAll('.brush').call(brush.move, null);
+  d3.select(brushedClass).selectAll('.brush').call(brush.move, null);
 };
 
-const MountBrush = (focus, isUiAddIntgSt, isUiNoBrushSt) => {
+const MountBrush = (focus, isUiAddIntgSt, isUiNoBrushSt, brushedClass = '.d3Svg') => {
   const {
     root, svg, brush, brushX, w, h,
   } = focus;
   svg.selectAll('.brush').remove();
   svg.selectAll('.brushX').remove();
 
-  const brushedCb = (event) => brushed(focus, isUiAddIntgSt, event);
+  const brushedCb = (event) => brushed(focus, isUiAddIntgSt, event, brushedClass);
   const wheeledCb = (event) => wheeled(focus, event);
 
   if (isUiNoBrushSt) {

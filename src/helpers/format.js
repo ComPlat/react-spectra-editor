@@ -18,6 +18,7 @@ const spectraDigit = (layout) => {
     case LIST_LAYOUT.CDS:
     case LIST_LAYOUT.SEC:
     case LIST_LAYOUT.GC:
+    case LIST_LAYOUT.LC_MS:
     case LIST_LAYOUT.MS:
       return 0;
     case LIST_LAYOUT.C13:
@@ -77,6 +78,7 @@ const spectraOps = {
   [LIST_LAYOUT.GC]: { head: 'GAS CHROMATOGRAPHY', tail: '.' },
   [LIST_LAYOUT.EMISSIONS]: { head: 'EMISSION', tail: '.' },
   [LIST_LAYOUT.DLS_INTENSITY]: { head: 'DLS', tail: '.' },
+  [LIST_LAYOUT.LC_MS]: { head: 'LIQUID MASS', tail: ' m/z' },
 };
 
 const rmRef = (peaks, shift, atIndex = 0) => {
@@ -373,6 +375,7 @@ const is19FLayout = (layoutSt) => (LIST_LAYOUT.F19 === layoutSt);
 const is13CLayout = (layoutSt) => (LIST_LAYOUT.C13 === layoutSt);
 const is1HLayout = (layoutSt) => (LIST_LAYOUT.H1 === layoutSt);
 const isMsLayout = (layoutSt) => (LIST_LAYOUT.MS === layoutSt);
+const isLCMsLayout = (layoutSt) => (LIST_LAYOUT.LC_MS === layoutSt);
 const isIrLayout = (layoutSt) => ([LIST_LAYOUT.IR, 'INFRARED'].indexOf(layoutSt) >= 0);
 const isRamanLayout = (layoutSt) => (LIST_LAYOUT.RAMAN === layoutSt);
 const isUvVisLayout = (layoutSt) => (LIST_LAYOUT.UVVIS === layoutSt);
@@ -549,6 +552,7 @@ const Format = {
   is15NLayout,
   is29SiLayout,
   isMsLayout,
+  isLCMsLayout,
   isIrLayout,
   isRamanLayout,
   isUvVisLayout,

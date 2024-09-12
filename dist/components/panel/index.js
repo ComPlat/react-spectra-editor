@@ -19,7 +19,8 @@ var _multiplicity = _interopRequireDefault(require("./multiplicity"));
 var _cyclic_voltamery_data = _interopRequireDefault(require("./cyclic_voltamery_data"));
 var _graph_selection = _interopRequireDefault(require("./graph_selection"));
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
-/* eslint-disable react/prop-types, react/require-default-props */
+var _format = _interopRequireDefault(require("../../helpers/format"));
+/* eslint-disable react/prop-types, react/require-default-props, max-len */
 
 const theme = (0, _styles.createTheme)({
   typography: {
@@ -96,7 +97,7 @@ class PanelViewer extends _react.default.Component {
     const {
       listCurves
     } = curveSt;
-    const hideGraphSelection = listCurves === false || listCurves === undefined;
+    const hideGraphSelection = listCurves === false || listCurves === undefined || _format.default.isLCMsLayout(layoutSt);
     return /*#__PURE__*/_react.default.createElement("div", {
       className: (0, _classnames.default)(classes.panels)
     }, /*#__PURE__*/_react.default.createElement(_styles.StyledEngineProvider, {

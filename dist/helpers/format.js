@@ -25,6 +25,7 @@ const spectraDigit = layout => {
     case _list_layout.LIST_LAYOUT.CDS:
     case _list_layout.LIST_LAYOUT.SEC:
     case _list_layout.LIST_LAYOUT.GC:
+    case _list_layout.LIST_LAYOUT.LC_MS:
     case _list_layout.LIST_LAYOUT.MS:
       return 0;
     case _list_layout.LIST_LAYOUT.C13:
@@ -147,6 +148,10 @@ const spectraOps = {
   [_list_layout.LIST_LAYOUT.DLS_INTENSITY]: {
     head: 'DLS',
     tail: '.'
+  },
+  [_list_layout.LIST_LAYOUT.LC_MS]: {
+    head: 'LIQUID MASS',
+    tail: ' m/z'
   }
 };
 const rmRef = function (peaks, shift) {
@@ -459,6 +464,7 @@ const is19FLayout = layoutSt => _list_layout.LIST_LAYOUT.F19 === layoutSt;
 const is13CLayout = layoutSt => _list_layout.LIST_LAYOUT.C13 === layoutSt;
 const is1HLayout = layoutSt => _list_layout.LIST_LAYOUT.H1 === layoutSt;
 const isMsLayout = layoutSt => _list_layout.LIST_LAYOUT.MS === layoutSt;
+const isLCMsLayout = layoutSt => _list_layout.LIST_LAYOUT.LC_MS === layoutSt;
 const isIrLayout = layoutSt => [_list_layout.LIST_LAYOUT.IR, 'INFRARED'].indexOf(layoutSt) >= 0;
 const isRamanLayout = layoutSt => _list_layout.LIST_LAYOUT.RAMAN === layoutSt;
 const isUvVisLayout = layoutSt => _list_layout.LIST_LAYOUT.UVVIS === layoutSt;
@@ -653,6 +659,7 @@ const Format = {
   is15NLayout,
   is29SiLayout,
   isMsLayout,
+  isLCMsLayout,
   isIrLayout,
   isRamanLayout,
   isUvVisLayout,

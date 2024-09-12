@@ -339,6 +339,9 @@ const readLayout = (jcamp) => {
     if (dataType.includes('DLS intensity')) {
       return LIST_LAYOUT.DLS_INTENSITY;
     }
+    if (dataType.includes('LC/MS')) {
+      return LIST_LAYOUT.LC_MS;
+    }
   }
   return false;
 };
@@ -477,6 +480,7 @@ const buildPeakFeature = (jcamp, layout, peakUp, s, thresRef, upperThres = false
         lowerThres,
         volammetryData: extractVoltammetryData(jcamp),
         scanRate: +info.$CSSCANRATE || 0.1,
+        csCategory: info.$CSCATEGORY,
       },
       s,
     )
@@ -757,6 +761,7 @@ const extrFeaturesMs = (jcamp, layout, peakUp) => {
   // }
   // // workaround for legacy design
   const thresRef = (jcamp.info && jcamp.info.$CSTHRESHOLD * 100) || 5;
+  console.log('thresRef', thresRef);
   const base = jcamp.spectra[0];
 
   const features = jcamp.spectra.map((s) => {
@@ -790,11 +795,11 @@ const ExtractJcamp = (source) => {
   const layout = readLayout(jcamp);
   const peakUp = !Format.isIrLayout(layout);
 
-  const spectra = Format.isMsLayout(layout)
+  const spectra = (Format.isMsLayout(layout) || Format.isLCMsLayout(layout))
     ? extrSpectraMs(jcamp, layout)
     : extrSpectraNi(jcamp, layout);
   let features = {};
-  if (Format.isMsLayout(layout)) {
+  if (Format.isMsLayout(layout) || Format.isLCMsLayout(layout)) {
     features = extrFeaturesMs(jcamp, layout, peakUp);
   } else if (Format.isXRDLayout(layout)) {
     features = extrFeaturesXrd(jcamp, layout, peakUp);
@@ -883,4 +888,5 @@ export {
   GetCyclicVoltaRatio, GetCyclicVoltaPeakSeparate,
   Feature2MaxMinPeak, convertTopic, Convert2MaxMinPeak,
   GetCyclicVoltaShiftOffset, GetCyclicVoltaPreviousShift,
+  convertThresEndPts,
 };

@@ -15,6 +15,7 @@ import { addOthers } from './actions/jcamp';
 import LayerPrism from './layer_prism';
 import Format from './helpers/format';
 import MultiJcampsViewer from './components/multi_jcamps_viewer';
+import HPLCViewer from './components/hplc_viewer';
 import { setAllCurves } from './actions/curve';
 
 const styles = () => ({
@@ -120,6 +121,17 @@ class LayerInit extends React.Component {
     const yyLabel = !yLabel && yLabel === '' ? `Y (${target.yUnit})` : yLabel;
 
     if (multiEntities) {
+      if (Format.isLCMsLayout(layout)) {
+        return (
+          <HPLCViewer
+            entityFileNames={entityFileNames}
+            userManualLink={userManualLink}
+            molSvg={molSvg}
+            theoryMass={theoryMass}
+            operations={operations}
+          />
+        );
+      }
       return (
         <MultiJcampsViewer
           multiEntities={multiEntities}

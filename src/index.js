@@ -22,6 +22,11 @@ import compareIr1Jcamp from './__tests__/fixtures/compare_ir_1_jcamp';
 import compareIr2Jcamp from './__tests__/fixtures/compare_ir_2_jcamp';
 import ramanJcamp from './__tests__/fixtures/raman_jcamp';
 import msJcamp from './__tests__/fixtures/ms_jcamp';
+import lcmsJcamp from './__tests__/fixtures/lc_ms_jcamp';
+import lcmsJcamp2 from './__tests__/fixtures/lc_ms_jcamp_2';
+import hplcMsTicPosJcamp from './__tests__/fixtures/lc_ms_jcamp_tic_pos';
+import hplcMsTicNegJcamp from './__tests__/fixtures/lc_ms_jcamp_tic_neg';
+import hplcMsUvvisJcamp from './__tests__/fixtures/lc_ms_jcamp_uvvis';
 import nmrResult from './__tests__/fixtures/nmr_result';
 import irResult from './__tests__/fixtures/ir_result';
 import Phenylalanin from './__tests__/fixtures/phenylalanin';
@@ -65,6 +70,11 @@ const compIr1Entity = FN.ExtractJcamp(compareIr1Jcamp);
 const compIr2Entity = FN.ExtractJcamp(compareIr2Jcamp);
 const ramanEntity = FN.ExtractJcamp(ramanJcamp);
 const msEntity = FN.ExtractJcamp(msJcamp);
+const lcmsEntity = FN.ExtractJcamp(lcmsJcamp);
+const lcmsEntity2 = FN.ExtractJcamp(lcmsJcamp2);
+const hplcMsTicPosEntity = FN.ExtractJcamp(hplcMsTicPosJcamp);
+const hplcMsTicNegEntity = FN.ExtractJcamp(hplcMsTicNegJcamp);
+const hplcMsUvvisEntity = FN.ExtractJcamp(hplcMsUvvisJcamp);
 const uvVisEntity = FN.ExtractJcamp(uvVisJcamp);
 const compUvVisEntity = FN.ExtractJcamp(compareUvVisJcamp);
 const hplcUVVisEntity = FN.ExtractJcamp(hplcUVVisJcamp);
@@ -187,8 +197,9 @@ class DemoWriteIr extends React.Component {
       case 'gc':
         return gcEntity1;
       case 'ms':
-      default:
         return msEntity;
+      default:
+        return lcmsEntity;
     }
   }
 
@@ -211,6 +222,8 @@ class DemoWriteIr extends React.Component {
         return [aifEntity1, aifEntity2];
       case 'gc':
         return [gcEntity1, gcEntity2, gcEntity3];
+      case 'lcms':
+        return [hplcMsTicPosEntity, hplcMsTicNegEntity, hplcMsUvvisEntity, lcmsEntity, lcmsEntity2];
       default:
         return false;
     }
@@ -238,6 +251,7 @@ class DemoWriteIr extends React.Component {
       case 'dsc':
       case 'xrd':
       case 'ms':
+      case 'lcms':
       case 'cyclic volta':
       case 'cds':
       case 'sec':
@@ -648,6 +662,13 @@ class DemoWriteIr extends React.Component {
             onClick={this.onClick('ms')}
           >
             MS
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('lcms')}
+          >
+            LC/MS
           </Button>
           <Button
             variant="contained"

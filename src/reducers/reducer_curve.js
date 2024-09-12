@@ -16,14 +16,14 @@ const setAllCurves = (state, action) => {
   if (payload) {
     const entities = payload.map((entity, idx) => {
       const {
-        topic, feature, hasEdit, integration, multiplicity,
+        topic, feature, hasEdit, integration, multiplicity, features,
       } = extractParams(entity, { isEdit: true });
       // const layout = entity.layout;
       const { layout } = entity;
       const maxminPeak = Convert2MaxMinPeak(layout, feature, 0);
       const color = Format.mutiEntitiesColors(idx);
       return {
-        layout, topic, feature, hasEdit, integration, multiplicity, maxminPeak, color, curveIdx: idx,
+        layout, topic, feature, hasEdit, integration, multiplicity, maxminPeak, color, curveIdx: idx, features,
       };
     });
 

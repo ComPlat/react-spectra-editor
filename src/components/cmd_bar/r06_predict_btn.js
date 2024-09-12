@@ -208,7 +208,7 @@ const BtnPredict = ({
 
   const oriPeaksEdit = extractPeaksEdit(feature, editPeakSt, thresSt, shiftSt, layoutSt);
   const peaksEdit = Format.rmShiftFromPeaks(oriPeaksEdit, shiftSt);
-  const scan = Convert2Scan(feature, scanSt);
+  const scan = Format.isMsLayout(layoutSt) ? Convert2Scan(feature, scanSt) : 0;
   const thres = Convert2Thres(feature, thresSt);
   const simuCount = simulationSt.nmrSimPeaks.length;
   const uniqCount = [...new Set(simulationSt.nmrSimPeaks)].length;

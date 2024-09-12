@@ -11,6 +11,7 @@ var _reactRedux = require("react-redux");
 var _redux = require("redux");
 var _index = _interopRequireDefault(require("./components/d3_line/index"));
 var _index2 = _interopRequireDefault(require("./components/d3_rect/index"));
+var _index3 = _interopRequireDefault(require("./components/d3_line_rect/index"));
 var _forecast_viewer = _interopRequireDefault(require("./components/forecast_viewer"));
 var _format = _interopRequireDefault(require("./helpers/format"));
 /* eslint-disable prefer-object-spread, default-param-last, react/function-component-definition */
@@ -19,6 +20,7 @@ const extractLayout = (forecast, layoutSt) => {
   const isEmpty = Object.keys(forecast).length === 0 && forecast.constructor === Object;
   const isNmr = _format.default.isNmrLayout(layoutSt);
   const isMs = _format.default.isMsLayout(layoutSt);
+  const isLCMs = _format.default.isLCMsLayout(layoutSt);
   const isIr = _format.default.isIrLayout(layoutSt);
   const isUvvis = _format.default.isUvVisLayout(layoutSt) || _format.default.isHplcUvVisLayout(layoutSt);
   const isXRD = _format.default.isXRDLayout(layoutSt);
@@ -29,7 +31,8 @@ const extractLayout = (forecast, layoutSt) => {
     isIr,
     isMs,
     isUvvis,
-    isXRD
+    isXRD,
+    isLCMs
   };
 };
 const Content = _ref => {
@@ -41,7 +44,8 @@ const Content = _ref => {
     yLabel,
     forecast,
     operations,
-    layoutSt
+    layoutSt,
+    features
   } = _ref;
   const {
     showForecast,
@@ -49,7 +53,8 @@ const Content = _ref => {
     isIr,
     isMs,
     isUvvis,
-    isXRD
+    isXRD,
+    isLCMs
   } = extractLayout(forecast, layoutSt);
   if (showForecast) {
     return /*#__PURE__*/_react.default.createElement(_forecast_viewer.default, {
@@ -76,6 +81,17 @@ const Content = _ref => {
       isHidden: false
     });
   }
+  if (isLCMs) {
+    return /*#__PURE__*/_react.default.createElement(_index3.default, {
+      topic: topic,
+      features: features,
+      cLabel: cLabel,
+      xLabel: xLabel,
+      yLabel: yLabel,
+      feature: feature,
+      isHidden: false
+    });
+  }
   return /*#__PURE__*/_react.default.createElement(_index.default, {
     topic: topic,
     cLabel: cLabel,
@@ -94,6 +110,7 @@ const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({}, dispat
 Content.propTypes = {
   topic: _propTypes.default.object.isRequired,
   feature: _propTypes.default.object.isRequired,
+  features: _propTypes.default.array.isRequired,
   cLabel: _propTypes.default.string.isRequired,
   xLabel: _propTypes.default.string.isRequired,
   yLabel: _propTypes.default.string.isRequired,
