@@ -686,7 +686,7 @@ class DemoWriteIr extends React.Component {
           canChangeDescription={true}
           onDescriptionChanged={this.onDescriptionChanged}
           molSvg={molSvg}
-          theoryMass={'123.0'}
+          exactMass={'120.0'}
           userManualLink={{cv: "https://www.chemotion.net/chemotionsaurus/docs/eln/chemspectra/cvanalysis"}}
           forecast={forecast}
           operations={operations}
