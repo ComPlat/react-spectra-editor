@@ -85,7 +85,7 @@ class PanelViewer extends _react.default.Component {
       curveSt,
       userManualLink,
       subLayoutsInfo,
-      theoryMass
+      exactMass
     } = this.props;
     const onExapndInfo = () => this.onExapnd('info');
     const onExapndPeak = () => this.onExapnd('peak');
@@ -115,7 +115,7 @@ class PanelViewer extends _react.default.Component {
       editorOnly: editorOnly,
       expand: expand === 'info',
       molSvg: molSvg,
-      theoryMass: theoryMass,
+      exactMass: exactMass,
       onExapnd: onExapndInfo,
       descriptions: descriptions,
       canChangeDescription: canChangeDescription,
@@ -159,7 +159,7 @@ PanelViewer.propTypes = {
   userManualLink: _propTypes.default.object,
   curveSt: _propTypes.default.object.isRequired,
   subLayoutsInfo: _propTypes.default.object,
-  theoryMass: _propTypes.default.string
+  exactMass: _propTypes.default.string
 };
 var _default = exports.default = (0, _reactRedux.connect)(
 // eslint-disable-line

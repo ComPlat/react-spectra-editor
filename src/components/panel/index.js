@@ -72,7 +72,7 @@ class PanelViewer extends React.Component {
     const {
       classes, feature, integration, editorOnly, molSvg, descriptions, layoutSt,
       canChangeDescription, jcampIdx, entityFileNames, curveSt, userManualLink,
-      subLayoutsInfo, theoryMass,
+      subLayoutsInfo, exactMass,
     } = this.props;
     const onExapndInfo = () => this.onExapnd('info');
     const onExapndPeak = () => this.onExapnd('peak');
@@ -97,7 +97,7 @@ class PanelViewer extends React.Component {
               editorOnly={editorOnly}
               expand={expand === 'info'}
               molSvg={molSvg}
-              theoryMass={theoryMass}
+              exactMass={exactMass}
               onExapnd={onExapndInfo}
               descriptions={descriptions}
               canChangeDescription={canChangeDescription}
@@ -140,7 +140,7 @@ PanelViewer.propTypes = {
   userManualLink: PropTypes.object,
   curveSt: PropTypes.object.isRequired,
   subLayoutsInfo: PropTypes.object,
-  theoryMass: PropTypes.string,
+  exactMass: PropTypes.string,
 };
 
 export default connect( // eslint-disable-line

@@ -56,7 +56,7 @@ const SpectraEditor = _ref => {
     molSvg,
     editorOnly,
     descriptions,
-    theoryMass,
+    exactMass,
     canChangeDescription,
     onDescriptionChanged,
     multiEntities,
@@ -83,7 +83,7 @@ const SpectraEditor = _ref => {
     molSvg: molSvg,
     multiMolSvgs: multiMolSvgs,
     editorOnly: editorOnly,
-    theoryMass: theoryMass,
+    exactMass: exactMass,
     canChangeDescription: canChangeDescription,
     onDescriptionChanged: onDescriptionChanged
   })));
@@ -106,7 +106,7 @@ SpectraEditor.propTypes = {
   canChangeDescription: _propTypes.default.bool,
   onDescriptionChanged: _propTypes.default.func,
   userManualLink: _propTypes.default.object,
-  theoryMass: _propTypes.default.string
+  exactMass: _propTypes.default.string
 };
 SpectraEditor.defaultProps = {
   others: {
@@ -122,7 +122,7 @@ SpectraEditor.defaultProps = {
   operations: [],
   descriptions: [],
   molSvg: '',
-  theoryMass: '',
+  exactMass: '',
   multiMolSvgs: [],
   editorOnly: false,
   canChangeDescription: false,
