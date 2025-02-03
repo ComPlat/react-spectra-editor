@@ -105,8 +105,9 @@ const aucValue = (integration) => {
     stackIntegration.forEach((inte) => {
       if (inte.absoluteArea) {
         const areaVal = inte.absoluteArea.toFixed(2);
+        const rt = inte.xL.toFixed(3);
         const percent = (areaVal * 100 / sumVal).toFixed(2);
-        const valStr = areaVal + " (" + percent + "%)"; // eslint-disable-line
+        const valStr = `${rt} min (${percent}%)`;
         values.push(valStr);
       }
     });
@@ -304,7 +305,7 @@ const InfoPanel = ({
           (Format.isHplcUvVisLayout(layoutSt)) ? (
             <div className={classNames(classes.rowRoot, classes.rowOddSim)}>
               <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>
-                Area under curve (AUC):
+                HPLC UV/VIS
               </span>
               <br />
               <span className={classNames(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt')}>
