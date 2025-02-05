@@ -12,6 +12,7 @@ var _list_layout = require("../constants/list_layout");
 const getLayoutSt = state => state.layout;
 const getCurveSt = state => state.curve;
 const getIntegrationSt = state => state.integration.present;
+const getMultiplicitySt = state => state.multiplicity.present;
 function getMaxMinPeak(curve) {
   return curve.maxminPeak;
 }
@@ -115,28 +116,48 @@ function* setInitIntegrations(action) {
   if (listCurves) {
     for (let index = 0; index < listCurves.length; index++) {
       const integationSt = yield (0, _effects.select)(getIntegrationSt);
+      const multiplicitySt = yield (0, _effects.select)(getMultiplicitySt);
       const curve = listCurves[index];
       const {
         integration,
+        multiplicity,
         simulation
       } = curve;
-      const {
-        integrations
-      } = integationSt;
-      const newArrIntegration = [...integrations];
-      if (index < newArrIntegration.length) {
-        newArrIntegration[index] = integration;
-      } else {
-        newArrIntegration.push(integration);
-      }
-      const payload = Object.assign({}, integationSt, {
-        integrations: newArrIntegration,
-        selectedIdx: index
-      }); // eslint-disable-line
-
       if (integration) {
+        const {
+          integrations
+        } = integationSt;
+        const newArrIntegration = [...integrations];
+        if (index < newArrIntegration.length) {
+          newArrIntegration[index] = integration;
+        } else {
+          newArrIntegration.push(integration);
+        }
+        const payload = Object.assign({}, integationSt, {
+          integrations: newArrIntegration,
+          selectedIdx: index
+        }); // eslint-disable-line
         yield (0, _effects.put)({
           type: _action_type.INTEGRATION.RESET_ALL_RDC,
+          payload
+        });
+      }
+      if (multiplicity) {
+        const {
+          multiplicities
+        } = multiplicitySt;
+        const newArrMultiplicities = [...multiplicities];
+        if (index < newArrMultiplicities.length) {
+          newArrMultiplicities[index] = multiplicity;
+        } else {
+          newArrMultiplicities.push(multiplicity);
+        }
+        const payload = Object.assign({}, multiplicitySt, {
+          multiplicities: newArrMultiplicities,
+          selectedIdx: index
+        }); // eslint-disable-line
+        yield (0, _effects.put)({
+          type: _action_type.MULTIPLICITY.RESET_ALL_RDC,
           payload
         });
       }

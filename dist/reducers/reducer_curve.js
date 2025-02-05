@@ -9,7 +9,7 @@ var _action_type = require("../constants/action_type");
 var _extractParams = require("../helpers/extractParams");
 var _chem = require("../helpers/chem");
 var _format = _interopRequireDefault(require("../helpers/format"));
-/* eslint-disable prefer-object-spread, default-param-last */
+/* eslint-disable prefer-object-spread, default-param-last, max-len */
 
 const initialState = {
   listCurves: [],
@@ -26,8 +26,11 @@ const setAllCurves = (state, action) => {
         topic,
         feature,
         hasEdit,
-        integration
-      } = (0, _extractParams.extractParams)(entity, 1);
+        integration,
+        multiplicity
+      } = (0, _extractParams.extractParams)(entity, {
+        isEdit: true
+      });
       // const layout = entity.layout;
       const {
         layout
@@ -40,6 +43,7 @@ const setAllCurves = (state, action) => {
         feature,
         hasEdit,
         integration,
+        multiplicity,
         maxminPeak,
         color,
         curveIdx: idx

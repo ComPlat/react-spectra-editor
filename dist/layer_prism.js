@@ -113,7 +113,7 @@ const mapStateToProps = (state, props) => (
 // eslint-disable-line
 {
   scanSt: state.scan,
-  thresSt: state.threshold,
+  thresSt: state.threshold.list[state.curve.curveIdx],
   uiSt: state.ui
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({}, dispatch);

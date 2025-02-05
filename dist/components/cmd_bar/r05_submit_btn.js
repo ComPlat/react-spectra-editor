@@ -93,7 +93,7 @@ const mapStateToProps = (state, props) => (
 // eslint-disable-line
 {
   editPeakSt: state.editPeak.present,
-  thresSt: state.threshold,
+  thresSt: state.threshold.list[state.curve.curveIdx],
   layoutSt: state.layout,
   shiftSt: state.shift,
   scanSt: state.scan,

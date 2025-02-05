@@ -73,7 +73,7 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
           feature={feature}
           operations={operations}
           editorOnly={true}
-          hideThreshold={true}
+          hideThreshold={!Format.isNmrLayout(layoutSt)}
         />
         <div className="react-spectrum-editor">
           <Grid container>

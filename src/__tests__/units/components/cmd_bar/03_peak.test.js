@@ -24,10 +24,15 @@ const store = mockStore({
     }
   },
   threshold: {
-    isEdit: true,
-    value: false,
-    upper: false,
-    lower: false,
+    selectedIdx: 0,
+    list: [
+      {
+        isEdit: true,
+        value: false,
+        upper: false,
+        lower: false,
+      }
+    ],
   },
   shift: { shifts: [] },
   cyclicvolta: {}
@@ -49,10 +54,15 @@ const nmrStore = mockStore({
     }
   },
   threshold: {
-    isEdit: true,
-    value: false,
-    upper: false,
-    lower: false,
+    selectedIdx: 0,
+    list: [
+      {
+        isEdit: true,
+        value: false,
+        upper: false,
+        lower: false,
+      }
+    ],
   },
   shift: { shifts: [] },
   cyclicvolta: {}
