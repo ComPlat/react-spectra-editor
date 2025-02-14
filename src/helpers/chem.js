@@ -456,6 +456,8 @@ const extractVoltammetryData = (jcamp) => {
 const buildPeakFeature = (jcamp, layout, peakUp, s, thresRef, upperThres = false, lowerThres = false) => {  // eslint-disable-line
   const { xType, info } = jcamp;
   const subTyp = xType ? ` - ${xType}` : '';
+  const xUnit = jcamp.info.XUNITS ? jcamp.info.XUNITS : '';
+  const yUnit = jcamp.info.YUNITS ? jcamp.info.YUNITS : '';
 
   return (
     Object.assign(
@@ -466,6 +468,8 @@ const buildPeakFeature = (jcamp, layout, peakUp, s, thresRef, upperThres = false
         scanCount: +info.$CSSCANCOUNT,
         scanAutoTarget: +info.$CSSCANAUTOTARGET,
         scanEditTarget: +info.$CSSCANEDITTARGET,
+        xUnit,
+        yUnit,
         shift: extractShift(s, jcamp),
         operation: {
           layout,
