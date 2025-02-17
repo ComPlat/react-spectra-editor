@@ -152,8 +152,8 @@ class ViewerMulti extends _react.default.Component {
         xUnit,
         yUnit
       } = selectedAxes;
-      xxLabel = xUnit === '' ? xLabel : xUnit;
-      yyLabel = yUnit === '' ? yLabel : yUnit;
+      xxLabel = xUnit === '' ? `X (${xLabel})` : `X (${xUnit})`;
+      yyLabel = yUnit === '' ? `Y (${yLabel})` : `Y (${yUnit})`;
     }
     const filterSeed = seed;
     const filterPeak = peak;

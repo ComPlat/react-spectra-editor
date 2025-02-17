@@ -504,6 +504,8 @@ const buildPeakFeature = function (jcamp, layout, peakUp, s, thresRef) {
     info
   } = jcamp;
   const subTyp = xType ? ` - ${xType}` : '';
+  const xUnit = jcamp.info.XUNITS ? jcamp.info.XUNITS : '';
+  const yUnit = jcamp.info.YUNITS ? jcamp.info.YUNITS : '';
   return Object.assign({
     typ: s.dataType + subTyp,
     peakUp,
@@ -511,6 +513,8 @@ const buildPeakFeature = function (jcamp, layout, peakUp, s, thresRef) {
     scanCount: +info.$CSSCANCOUNT,
     scanAutoTarget: +info.$CSSCANAUTOTARGET,
     scanEditTarget: +info.$CSSCANEDITTARGET,
+    xUnit,
+    yUnit,
     shift: extractShift(s, jcamp),
     operation: {
       layout,
