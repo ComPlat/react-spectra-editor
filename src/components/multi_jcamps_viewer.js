@@ -55,7 +55,7 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
     const {
       classes, curveSt, operations, entityFileNames,
       entities, userManualLink, molSvg, theoryMass, layoutSt,
-      integrationSt,
+      integrationSt, isComparison,
     } = this.props;
     if (!entities || entities.length === 0) return (<div />);
 
@@ -74,6 +74,7 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
           operations={operations}
           editorOnly={true}
           hideThreshold={true}
+          isComparison={isComparison}
         />
         <div className="react-spectrum-editor">
           <Grid container>
@@ -145,6 +146,7 @@ MultiJcampsViewer.propTypes = {
   layoutSt: PropTypes.string.isRequired,
   theoryMass: PropTypes.string,
   integrationSt: PropTypes.object.isRequired,
+  isComparison: PropTypes.bool.isRequired,
 };
 
 MultiJcampsViewer.defaultProps = {
@@ -155,6 +157,7 @@ MultiJcampsViewer.defaultProps = {
   xLabel: '',
   yLabel: '',
   entities: [],
+  isComparison: false,
 };
 
 export default compose(

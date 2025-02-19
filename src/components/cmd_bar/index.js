@@ -33,8 +33,16 @@ const styles = () => (
 );
 
 const CmdBar = ({
-  classes, feature, hasEdit, forecast, operations, editorOnly, jcampIdx, hideThreshold,
-}) => (
+  classes,
+  feature,
+  hasEdit,
+  forecast,
+  operations,
+  editorOnly,
+  jcampIdx,
+  hideThreshold,
+  isComparison,
+}) => (!isComparison ? (
   <div className={classes.card}>
     <Viewer editorOnly={editorOnly} />
     <Zoom />
@@ -51,14 +59,26 @@ const CmdBar = ({
       hideSwitch={false}
       disabled={false}
     />
-    {
-      hideThreshold ? null : (<Threshold feature={feature} hasEdit={hasEdit} />)
-    }
+    {hideThreshold ? null : <Threshold feature={feature} hasEdit={hasEdit} />}
     <Layout feature={feature} hasEdit={hasEdit} />
     <Wavelength />
     <ChangeAxes />
     <Detector />
   </div>
+) : (
+  <div className={classes.card}>
+    <Viewer editorOnly={editorOnly} />
+    <Zoom />
+    <Submit
+      operations={operations}
+      feature={feature}
+      forecast={forecast}
+      editorOnly={editorOnly}
+      hideSwitch={false}
+      disabled={false}
+    />
+  </div>
+)
 );
 
 const mapStateToProps = (state, _) => ( // eslint-disable-line
@@ -80,6 +100,7 @@ CmdBar.propTypes = {
   editorOnly: PropTypes.bool.isRequired,
   jcampIdx: PropTypes.any,
   hideThreshold: PropTypes.bool,
+  isComparison: PropTypes.bool.isRequired,
 };
 
 export default compose(

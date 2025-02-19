@@ -35,7 +35,7 @@ const SpectraEditor = ({
   entity, others, cLabel, xLabel, yLabel,
   operations, forecast, molSvg, editorOnly, descriptions, theoryMass,
   canChangeDescription, onDescriptionChanged,
-  multiEntities, multiMolSvgs, entityFileNames, userManualLink,
+  multiEntities, multiMolSvgs, entityFileNames, userManualLink, isComparison,
 }) => (
   <Provider store={store}>
     <StyledEngineProvider injectFirst>
@@ -57,6 +57,7 @@ const SpectraEditor = ({
         theoryMass={theoryMass}
         canChangeDescription={canChangeDescription}
         onDescriptionChanged={onDescriptionChanged}
+        isComparison={isComparison}
       />
     </StyledEngineProvider>
   </Provider>
@@ -83,6 +84,7 @@ SpectraEditor.propTypes = {
   onDescriptionChanged: PropTypes.func,
   userManualLink: PropTypes.object,
   theoryMass: PropTypes.string,
+  isComparison: PropTypes.bool,
 };
 
 SpectraEditor.defaultProps = {
@@ -101,6 +103,7 @@ SpectraEditor.defaultProps = {
   editorOnly: false,
   canChangeDescription: false,
   userManualLink: {},
+  isComparison: true,
 };
 
 export {

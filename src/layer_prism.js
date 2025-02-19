@@ -22,7 +22,7 @@ const LayerPrism = ({
   entity, cLabel, xLabel, yLabel, forecast, operations,
   descriptions, molSvg, editorOnly, theoryMass,
   thresSt, scanSt, uiSt,
-  canChangeDescription, onDescriptionChanged,
+  canChangeDescription, onDescriptionChanged, isComparison,
 }) => {
   const {
     topic, feature, hasEdit, integration,
@@ -67,6 +67,7 @@ const LayerPrism = ({
         forecast={forecast}
         operations={operations}
         editorOnly={editorOnly}
+        isComparison={isComparison}
       />
       <div className="react-spectrum-editor">
         <Grid container>
@@ -128,6 +129,7 @@ LayerPrism.propTypes = {
   uiSt: PropTypes.object.isRequired,
   canChangeDescription: PropTypes.bool.isRequired,
   onDescriptionChanged: PropTypes.func,
+  isComparison: PropTypes.bool.isRequired,
 };
 
 export default connect( // eslint-disable-line

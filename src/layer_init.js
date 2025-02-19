@@ -110,10 +110,9 @@ class LayerInit extends React.Component {
       entity, cLabel, xLabel, yLabel, forecast, operations,
       descriptions, molSvg, editorOnly, theoryMass,
       canChangeDescription, onDescriptionChanged,
-      multiEntities, entityFileNames, userManualLink,
+      multiEntities, entityFileNames, userManualLink, isComparison,
     } = this.props;
     const target = entity.spectra[0];
-
     const { layout } = entity;
 
     const xxLabel = !xLabel && xLabel === '' ? `X (${target.xUnit})` : xLabel;
@@ -128,6 +127,7 @@ class LayerInit extends React.Component {
           molSvg={molSvg}
           theoryMass={theoryMass}
           operations={operations}
+          isComparison={isComparison}
         />
       );
     } else if (Format.isCyclicVoltaLayout(layout)) {  // eslint-disable-line
@@ -139,6 +139,7 @@ class LayerInit extends React.Component {
           molSvg={molSvg}
           theoryMass={theoryMass}
           operations={operations}
+          isComparison={isComparison}
         />
       );
     }
@@ -157,6 +158,7 @@ class LayerInit extends React.Component {
         theoryMass={theoryMass}
         canChangeDescription={canChangeDescription}
         onDescriptionChanged={onDescriptionChanged}
+        isComparison={isComparison}
       />
     );
   }
@@ -208,6 +210,7 @@ LayerInit.propTypes = {
   userManualLink: PropTypes.object, // eslint-disable-line
   resetDetectorAct: PropTypes.func.isRequired,
   updateDSCMetaDataAct: PropTypes.func.isRequired,
+  isComparison: PropTypes.bool.isRequired,
 };
 
 export default connect( // eslint-disable-line
