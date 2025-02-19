@@ -141,7 +141,8 @@ class LayerInit extends _react.default.Component {
       onDescriptionChanged,
       multiEntities,
       entityFileNames,
-      userManualLink
+      userManualLink,
+      isComparison
     } = this.props;
     const target = entity.spectra[0];
     const {
@@ -156,7 +157,8 @@ class LayerInit extends _react.default.Component {
         userManualLink: userManualLink,
         molSvg: molSvg,
         theoryMass: theoryMass,
-        operations: operations
+        operations: operations,
+        isComparison: isComparison
       });
     } else if (_format.default.isCyclicVoltaLayout(layout)) {
       // eslint-disable-line
@@ -166,7 +168,8 @@ class LayerInit extends _react.default.Component {
         userManualLink: userManualLink,
         molSvg: molSvg,
         theoryMass: theoryMass,
-        operations: operations
+        operations: operations,
+        isComparison: isComparison
       });
     }
     return /*#__PURE__*/_react.default.createElement(_layer_prism.default, {
@@ -181,7 +184,8 @@ class LayerInit extends _react.default.Component {
       editorOnly: editorOnly,
       theoryMass: theoryMass,
       canChangeDescription: canChangeDescription,
-      onDescriptionChanged: onDescriptionChanged
+      onDescriptionChanged: onDescriptionChanged,
+      isComparison: isComparison
     });
   }
 }
@@ -230,7 +234,8 @@ LayerInit.propTypes = {
   userManualLink: _propTypes.default.object,
   // eslint-disable-line
   resetDetectorAct: _propTypes.default.func.isRequired,
-  updateDSCMetaDataAct: _propTypes.default.func.isRequired
+  updateDSCMetaDataAct: _propTypes.default.func.isRequired,
+  isComparison: _propTypes.default.bool.isRequired
 };
 var _default = exports.default = (0, _reactRedux.connect)(
 // eslint-disable-line

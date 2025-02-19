@@ -37,7 +37,8 @@ const LayerPrism = _ref => {
     scanSt,
     uiSt,
     canChangeDescription,
-    onDescriptionChanged
+    onDescriptionChanged,
+    isComparison
   } = _ref;
   const {
     topic,
@@ -78,7 +79,8 @@ const LayerPrism = _ref => {
     hasEdit: hasEdit,
     forecast: forecast,
     operations: operations,
-    editorOnly: editorOnly
+    editorOnly: editorOnly,
+    isComparison: isComparison
   }), /*#__PURE__*/_react.default.createElement("div", {
     className: "react-spectrum-editor"
   }, /*#__PURE__*/_react.default.createElement(_Grid.default, {
@@ -132,7 +134,8 @@ LayerPrism.propTypes = {
   scanSt: _propTypes.default.object.isRequired,
   uiSt: _propTypes.default.object.isRequired,
   canChangeDescription: _propTypes.default.bool.isRequired,
-  onDescriptionChanged: _propTypes.default.func
+  onDescriptionChanged: _propTypes.default.func,
+  isComparison: _propTypes.default.bool.isRequired
 };
 var _default = exports.default = (0, _reactRedux.connect)(
 // eslint-disable-line

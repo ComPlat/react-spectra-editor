@@ -62,7 +62,8 @@ const SpectraEditor = _ref => {
     multiEntities,
     multiMolSvgs,
     entityFileNames,
-    userManualLink
+    userManualLink,
+    isComparison
   } = _ref;
   return /*#__PURE__*/_react.default.createElement(_reactRedux.Provider, {
     store: store
@@ -85,7 +86,8 @@ const SpectraEditor = _ref => {
     editorOnly: editorOnly,
     theoryMass: theoryMass,
     canChangeDescription: canChangeDescription,
-    onDescriptionChanged: onDescriptionChanged
+    onDescriptionChanged: onDescriptionChanged,
+    isComparison: isComparison
   })));
 };
 exports.SpectraEditor = SpectraEditor;
@@ -106,7 +108,8 @@ SpectraEditor.propTypes = {
   canChangeDescription: _propTypes.default.bool,
   onDescriptionChanged: _propTypes.default.func,
   userManualLink: _propTypes.default.object,
-  theoryMass: _propTypes.default.string
+  theoryMass: _propTypes.default.string,
+  isComparison: _propTypes.default.bool
 };
 SpectraEditor.defaultProps = {
   others: {
@@ -126,5 +129,6 @@ SpectraEditor.defaultProps = {
   multiMolSvgs: [],
   editorOnly: false,
   canChangeDescription: false,
-  userManualLink: {}
+  userManualLink: {},
+  isComparison: true
 };

@@ -65,7 +65,8 @@ class MultiJcampsViewer extends _react.default.Component {
       molSvg,
       theoryMass,
       layoutSt,
-      integrationSt
+      integrationSt,
+      isComparison
     } = this.props;
     if (!entities || entities.length === 0) return /*#__PURE__*/_react.default.createElement("div", null);
     const separateCondition = _format.default.isGCLayout(layoutSt) ? 'yUnit' : 'xUnit';
@@ -88,7 +89,8 @@ class MultiJcampsViewer extends _react.default.Component {
       feature: feature,
       operations: operations,
       editorOnly: true,
-      hideThreshold: true
+      hideThreshold: true,
+      isComparison: isComparison
     }), /*#__PURE__*/_react.default.createElement("div", {
       className: "react-spectrum-editor"
     }, /*#__PURE__*/_react.default.createElement(_Grid.default, {
@@ -153,7 +155,8 @@ MultiJcampsViewer.propTypes = {
   entities: _propTypes.default.array,
   layoutSt: _propTypes.default.string.isRequired,
   theoryMass: _propTypes.default.string,
-  integrationSt: _propTypes.default.object.isRequired
+  integrationSt: _propTypes.default.object.isRequired,
+  isComparison: _propTypes.default.bool.isRequired
 };
 MultiJcampsViewer.defaultProps = {
   multiEntities: [],
@@ -162,6 +165,7 @@ MultiJcampsViewer.defaultProps = {
   cLabel: '',
   xLabel: '',
   yLabel: '',
-  entities: []
+  entities: [],
+  isComparison: false
 };
 var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(MultiJcampsViewer);

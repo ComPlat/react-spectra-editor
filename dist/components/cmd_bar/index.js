@@ -37,9 +37,10 @@ const CmdBar = _ref => {
     operations,
     editorOnly,
     jcampIdx,
-    hideThreshold
+    hideThreshold,
+    isComparison
   } = _ref;
-  return /*#__PURE__*/_react.default.createElement("div", {
+  return !isComparison ? /*#__PURE__*/_react.default.createElement("div", {
     className: classes.card
   }, /*#__PURE__*/_react.default.createElement(_viewer.default, {
     editorOnly: editorOnly
@@ -61,7 +62,18 @@ const CmdBar = _ref => {
   }), /*#__PURE__*/_react.default.createElement(_r01_layout.default, {
     feature: feature,
     hasEdit: hasEdit
-  }), /*#__PURE__*/_react.default.createElement(_r07_wavelength_btn.default, null), /*#__PURE__*/_react.default.createElement(_r08_change_axes.default, null), /*#__PURE__*/_react.default.createElement(_r09_detector.default, null));
+  }), /*#__PURE__*/_react.default.createElement(_r07_wavelength_btn.default, null), /*#__PURE__*/_react.default.createElement(_r08_change_axes.default, null), /*#__PURE__*/_react.default.createElement(_r09_detector.default, null)) : /*#__PURE__*/_react.default.createElement("div", {
+    className: classes.card
+  }, /*#__PURE__*/_react.default.createElement(_viewer.default, {
+    editorOnly: editorOnly
+  }), /*#__PURE__*/_react.default.createElement(_zoom.default, null), /*#__PURE__*/_react.default.createElement(_r04_submit.default, {
+    operations: operations,
+    feature: feature,
+    forecast: forecast,
+    editorOnly: editorOnly,
+    hideSwitch: false,
+    disabled: false
+  }));
 };
 const mapStateToProps = (state, _) => (
 // eslint-disable-line
@@ -75,6 +87,7 @@ CmdBar.propTypes = {
   operations: _propTypes.default.array.isRequired,
   editorOnly: _propTypes.default.bool.isRequired,
   jcampIdx: _propTypes.default.any,
-  hideThreshold: _propTypes.default.bool
+  hideThreshold: _propTypes.default.bool,
+  isComparison: _propTypes.default.bool.isRequired
 };
 var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _withStyles.default)(styles))(CmdBar);
