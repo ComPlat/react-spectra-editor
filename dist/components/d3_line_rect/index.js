@@ -402,21 +402,14 @@ class ViewerLineRect extends _react.default.Component {
     const {
       subViewerAt
     } = uiSt;
-    let selectFeature = null;
-    if (subViewerAt && subViewerAt.x) {
-      const {
-        features
-      } = (0, _extractParams.extractParams)(subEntities[entityIdx], 0, 1);
-      const arrPageValues = features.map(fe => fe.pageValue);
-      const closestPage = (0, _calc.findClosest)(arrPageValues, subViewerAt.x);
-      const filteredFeatures = features.filter(fe => {
-        const {
-          pageValue
-        } = fe;
-        return pageValue === closestPage;
-      });
-      [selectFeature] = filteredFeatures;
-    }
+    const {
+      features
+    } = (0, _extractParams.extractParams)(subEntities[entityIdx], 0, 1);
+    if (features.length === 0) return null;
+    const arrPageValues = features.map(fe => fe.pageValue);
+    const hasValidClick = subViewerAt && subViewerAt.x !== undefined;
+    const closestPage = hasValidClick ? (0, _calc.findClosest)(arrPageValues, subViewerAt.x) : arrPageValues[Math.floor(arrPageValues.length / 2)];
+    const [selectFeature] = features.filter(fe => fe.pageValue === closestPage);
     return selectFeature;
   }
   render() {
