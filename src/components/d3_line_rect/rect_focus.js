@@ -72,10 +72,13 @@ class RectFocus {
   }
 
   setDataParams(data, peaks, tTrEndPts, tSfPeaks) {
-    this.data = [...data];
+    this.data = data.map((d) => ({ ...d, x: d.x / 60 }));
     this.dataPks = [...peaks];
     this.tTrEndPts = tTrEndPts;
     this.tSfPeaks = tSfPeaks;
+
+    const xExtent = d3.extent(this.data, (d) => d.x);
+    this.scales.x.domain(xExtent);
   }
 
   updatePathCall(xt, yt) {
@@ -90,7 +93,8 @@ class RectFocus {
 
     if (!xExtent || !yExtent) {
       const xes = d3.extent(this.data, (d) => d.x).sort((a, b) => a - b);
-      xExtent = { xL: xes[0] - 10, xU: xes[1] + 10 };
+      const padding = (xes[1] - xes[0]) * 0.005;
+      xExtent = { xL: Math.max(0, xes[0] - padding), xU: xes[1] + padding };
       const btm = 0; // MS baseline is always 0.
       const top = d3.max(this.data, (d) => d.y);
       const height = top - btm;
