@@ -46,15 +46,16 @@ const updateHPLCData = (state, action) => {
       listWaveLength,
       selectedWaveLength: listWaveLength[0]
     });
-    const postiveCurves = payload[3];
+    const positiveCurves = payload[3];
     const {
       thresRef
-    } = postiveCurves.features[0];
+    } = positiveCurves.features[0];
     return Object.assign({}, state, {
       uvvis: newUvvis,
       threshold: {
         isEdit: true,
-        value: thresRef
+        value: thresRef,
+        originalValue: state.threshold.originalValue ?? thresRef
       }
     });
   }
@@ -117,12 +118,21 @@ const updateThresholdValue = (state, action) => {
     return Object.assign({}, state, {
       threshold: {
         isEdit: true,
-        value
+        value,
+        originalValue: state.threshold.originalValue ?? value
       }
     });
   }
   return state;
 };
+const resetThresholdValue = state => ({
+  ...state,
+  threshold: {
+    isEdit: true,
+    value: state.threshold.originalValue,
+    originalValue: state.threshold.originalValue
+  }
+});
 const hplcmsReducer = function () {
   let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
   let action = arguments.length > 1 ? arguments[1] : undefined;
@@ -135,6 +145,8 @@ const hplcmsReducer = function () {
       return updateTic(state, action);
     case _action_type.THRESHOLD.UPDATE_VALUE:
       return updateThresholdValue(state, action);
+    case _action_type.THRESHOLD.RESET_VALUE:
+      return resetThresholdValue(state);
     default:
       return state;
   }
