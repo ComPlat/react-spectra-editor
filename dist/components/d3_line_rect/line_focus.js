@@ -114,6 +114,10 @@ class LineFocus {
   }
   setDataParams(data, tTrEndPts, layout) {
     this.data = [...data];
+    this.data = data.map(d => ({
+      x: d.x / 60,
+      y: d.y
+    }));
     this.tTrEndPts = tTrEndPts;
     this.layout = layout;
   }
