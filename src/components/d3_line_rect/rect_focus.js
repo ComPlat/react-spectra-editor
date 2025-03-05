@@ -16,9 +16,10 @@ const d3 = require('d3');
 class RectFocus {
   constructor(props) {
     const {
-      W, H, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
+      W, H, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct, graphIndex, uiSt,
     } = props;
-
+    this.graphIndex = graphIndex;
+    this.uiSt = uiSt;
     this.rootKlass = `.${LIST_ROOT_SVG_GRAPH.RECT}`;
     this.brushClass = `.${LIST_BRUSH_SVG_GRAPH.RECT}`;
     this.margin = {
@@ -230,10 +231,11 @@ class RectFocus {
 
   update({
     filterSeed, filterPeak, tTrEndPts, tSfPeaks,
-    sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
+    sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt, uiSt,
   }) {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks);
+    this.uiSt = uiSt;
 
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);

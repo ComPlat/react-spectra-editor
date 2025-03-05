@@ -21,9 +21,10 @@ const d3 = require('d3');
 class MultiFocus {
   constructor(props) {
     const {
-      W, H, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct, entities,
+      W, H, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct, entities, graphIndex, uiSt,
     } = props;
-
+    this.graphIndex = graphIndex;
+    this.uiSt = uiSt;
     this.entities = entities;
     this.jcampIdx = 0;
     this.isShowAllCurves = false;
@@ -270,7 +271,7 @@ class MultiFocus {
     entities, curveSt,
     filterSeed, tTrEndPts,
     layoutSt,
-    sweepExtentSt, isUiNoBrushSt,
+    sweepExtentSt, isUiNoBrushSt, uiSt,
   }) {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, false);
@@ -279,6 +280,7 @@ class MultiFocus {
     const jcampIdx = curveIdx;
     this.isShowAllCurves = isShowAllCurve;
     this.entities = entities;
+    this.uiSt = uiSt;
 
     this.setDataParams(filterSeed, tTrEndPts, layoutSt, jcampIdx);
 
