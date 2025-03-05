@@ -169,22 +169,22 @@ class ViewerLineRect extends React.Component {
     super(props);
 
     const {
-      clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct, entities,
+      clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct, entities, uiSt,
     } = props;
 
     this.rootKlassLine = `.${LIST_ROOT_SVG_GRAPH.LINE}`;
     this.lineFocus = new LineFocus({
-      W, H, entities, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
+      W, H, entities, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct, graphIndex: 0, uiSt,
     });
 
     this.rootKlassMulti = `.${LIST_ROOT_SVG_GRAPH.MULTI}`;
     this.multiFocus = new MultiFocus({
-      W, H, entities, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
+      W, H, entities, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct, graphIndex: 1, uiSt,
     });
 
     this.rootKlassRect = `.${LIST_ROOT_SVG_GRAPH.RECT}`;
     this.rectFocus = new RectFocus({
-      W, H, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
+      W, H, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct, graphIndex: 2, uiSt,
     });
 
     this.normChange = this.normChange.bind(this);
@@ -282,6 +282,7 @@ class ViewerLineRect extends React.Component {
         tTrEndPts,
         isUiNoBrushSt: true,
         sweepExtentSt: sweepExtent[0],
+        uiSt,
       });
       drawLabel(this.rootKlassLine, null, 'Minutes', 'Intensity');
       drawDisplay(this.rootKlassLine, false);
@@ -298,6 +299,7 @@ class ViewerLineRect extends React.Component {
       sweepExtentSt: sweepExtent[1],
       isUiAddIntgSt,
       isUiNoBrushSt,
+      uiSt,
     });
     drawLabel(this.rootKlassMulti, cLabel, 'Minutes', 'Intensity');
     drawDisplay(this.rootKlassMulti, isHidden);
@@ -319,6 +321,7 @@ class ViewerLineRect extends React.Component {
         tTrEndPts: curTrEndPts,
         isUiNoBrushSt: true,
         sweepExtentSt: sweepExtent[2],
+        uiSt,
       });
       drawLabel(this.rootKlassRect, `${pageValue} min`, 'M/Z', 'Intensity');
       drawDisplay(this.rootKlassRect, false);

@@ -36,9 +36,20 @@ const updateSweepType = (state, action) => {
     });
   }
   const { zoom } = state;
-  const { sweepTypes } = zoom;
-  sweepTypes[graphIndex] = sweepType;
-  const newZoom = Object.assign({}, zoom, { sweepTypes, graphIndex });
+  let newSweepTypes = zoom.sweepTypes.slice();
+  newSweepTypes[graphIndex] = sweepType;
+
+  if (sweepType === LIST_UI_SWEEP_TYPE.ZOOMIN) {
+    newSweepTypes = newSweepTypes.map((val, idx) => (
+      idx === graphIndex
+        ? LIST_UI_SWEEP_TYPE.ZOOMIN
+        : LIST_UI_SWEEP_TYPE.ZOOMRESET
+    ));
+  }
+  const newZoom = Object.assign({}, zoom, {
+    sweepTypes: newSweepTypes,
+    graphIndex,
+  });
   return Object.assign({}, state, {
     zoom: newZoom,
     sweepType,

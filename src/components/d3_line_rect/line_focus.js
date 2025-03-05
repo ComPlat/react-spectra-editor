@@ -16,9 +16,10 @@ const d3 = require('d3');
 class LineFocus {
   constructor(props) {
     const {
-      W, H, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
+      W, H, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct, graphIndex, uiSt,
     } = props;
-
+    this.graphIndex = graphIndex;
+    this.uiSt = uiSt;
     this.jcampIdx = 0;
     this.rootKlass = `.${LIST_ROOT_SVG_GRAPH.LINE}`;
     this.margin = {
@@ -216,12 +217,12 @@ class LineFocus {
   update({
     filterSeed, tTrEndPts,
     layoutSt,
-    sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
+    sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt, uiSt,
   }) {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, false);
     this.setDataParams(filterSeed, tTrEndPts, layoutSt);
-
+    this.uiSt = uiSt;
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);
       this.getShouldUpdate();

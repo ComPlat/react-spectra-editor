@@ -1,6 +1,6 @@
 /* eslint-disable prefer-object-spread */
-
 import { MouseMove } from './compass';
+import { LIST_UI_SWEEP_TYPE } from '../constants/list_ui';
 
 const d3 = require('d3');
 
@@ -44,8 +44,23 @@ const MountBrush = (focus, isUiAddIntgSt, isUiNoBrushSt, brushedClass = '.d3Svg'
   } = focus;
   svg.selectAll('.brush').remove();
   svg.selectAll('.brushX').remove();
+  if (focus.uiSt
+    && focus.uiSt.zoom
+    && Array.isArray(focus.uiSt.zoom.sweepTypes)
+    && focus.uiSt.zoom.sweepTypes[focus.graphIndex] !== LIST_UI_SWEEP_TYPE.ZOOMIN) {
+    return;
+  }
 
-  const brushedCb = (event) => brushed(focus, isUiAddIntgSt, event, brushedClass);
+  const brushedCb = (event) => {
+    if (focus.graphIndex !== undefined
+      && focus.uiSt
+      && focus.uiSt.zoom
+      && Array.isArray(focus.uiSt.zoom.sweepTypes)
+      && focus.uiSt.zoom.sweepTypes[focus.graphIndex] !== LIST_UI_SWEEP_TYPE.ZOOMIN) {
+      return;
+    }
+    brushed(focus, isUiAddIntgSt, event, brushedClass);
+  };
   const wheeledCb = (event) => wheeled(focus, event);
 
   if (isUiNoBrushSt) {
