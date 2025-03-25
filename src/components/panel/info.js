@@ -351,6 +351,19 @@ const InfoPanel = ({
               : null
           }
       </div>
+      {
+          (Format.isLCMsLayout(layoutSt)) ? (
+            <div className={classNames(classes.rowRoot, classes.rowOddSim)}>
+              <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>
+                Area under curve (AUC):
+              </span>
+              <br />
+              <span className={classNames(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt')}>
+                {aucValue(integration)}
+              </span>
+            </div>
+          ) : null
+        }
     </Accordion>
   );
 };

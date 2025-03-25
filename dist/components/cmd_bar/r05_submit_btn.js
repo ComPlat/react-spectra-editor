@@ -16,6 +16,7 @@ var _styles = require("@mui/styles");
 var _chem = require("../../helpers/chem");
 var _common = require("./common");
 var _extractPeaksEdit = require("../../helpers/extractPeaksEdit");
+var _format = _interopRequireDefault(require("../../helpers/format"));
 /* eslint-disable prefer-object-spread, function-paren-newline,
 react/function-component-definition, function-call-argument-newline,
 react/require-default-props */
@@ -70,7 +71,7 @@ const BtnSubmit = _ref => {
   } = _ref;
   const peaksEdit = (0, _extractPeaksEdit.extractPeaksEdit)(feature, editPeakSt, thresSt, shiftSt, layoutSt);
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
-  const scan = (0, _chem.Convert2Scan)(feature, scanSt);
+  const scan = _format.default.isMsLayout(layoutSt) ? (0, _chem.Convert2Scan)(feature, scanSt) : 0;
   const thres = (0, _chem.Convert2Thres)(feature, thresSt);
   const aucValues = (0, _extractPeaksEdit.extractAreaUnderCurve)(allIntegrationSt, integrationSt, layoutSt);
   const {

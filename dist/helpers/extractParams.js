@@ -48,18 +48,88 @@ const extrShare = function (entity, thresSt) {
     multiplicity
   };
 };
-const extrMs = (entity, thresSt, scanSt) => {
-  const scanIdx = getScanIdx(entity, scanSt);
+const extrLcMs = entity => {
   const {
-    spectra,
-    feature,
-    hasEdit
-  } = extrShare(entity, thresSt, scanIdx);
-  const topic = spectra[scanIdx].data[0];
+    features,
+    layout
+  } = entity;
+  let arrX = [];
+  let arrY = [];
+  features.forEach(spectrum => {
+    const {
+      data,
+      csCategory,
+      pageValue
+    } = spectrum;
+    const isTic = csCategory === 'TIC SPECTRUM';
+    // const isUvvis = csCategory === 'UVVIS SPECTRUM';
+    const {
+      x,
+      y
+    } = data[0];
+    if (isTic) {
+      arrX = x;
+      arrY = y;
+    } else {
+      const maxY = Math.max(...y);
+      arrX = [...arrX, pageValue];
+      arrY = [...arrY, maxY];
+    }
+  });
+  const topic = {
+    x: arrX,
+    y: arrY
+  };
+  const maxYFeature = Math.max(...arrY);
+  const featureData = [{
+    x: arrX,
+    y: arrY
+  }];
+  const feature = {
+    maxY: maxYFeature,
+    operation: {
+      layout
+    },
+    data: featureData,
+    isPeaktable: false
+  };
   return {
     topic,
-    feature,
-    hasEdit
+    feature
+  };
+};
+const extrMs = (entity, thresSt, scanSt) => {
+  const {
+    layout
+  } = entity;
+  if (_format.default.isMsLayout(layout)) {
+    const scanIdx = getScanIdx(entity, scanSt);
+    const {
+      spectra,
+      feature,
+      hasEdit
+    } = extrShare(entity, thresSt, scanIdx);
+    const topic = spectra[scanIdx].data[0];
+    return {
+      topic,
+      feature,
+      hasEdit
+    };
+  }
+  const {
+    spectra,
+    features
+  } = entity;
+  const {
+    topic,
+    feature
+  } = extrLcMs(entity);
+  return {
+    entity,
+    spectra,
+    features,
+    topic,
+    feature
   };
 };
 const extrNi = (entity, thresSt) => {
@@ -80,7 +150,7 @@ const extrNi = (entity, thresSt) => {
     multiplicity
   };
 };
-const extractParams = (entity, thresSt, scanSt) => _format.default.isMsLayout(entity.layout) ? extrMs(entity, thresSt, scanSt) : extrNi(entity, thresSt);
+const extractParams = (entity, thresSt, scanSt) => _format.default.isMsLayout(entity.layout) || _format.default.isLCMsLayout(entity.layout) ? extrMs(entity, thresSt, scanSt) : extrNi(entity, thresSt);
 
 // eslint-disable-line
 exports.extractParams = extractParams;

@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types, react/require-default-props */
+/* eslint-disable react/prop-types, react/require-default-props, max-len */
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -18,6 +18,7 @@ import MultiplicityPanel from './multiplicity';
 import CyclicVoltammetryPanel from './cyclic_voltamery_data';
 import GraphSelectionPanel from './graph_selection';
 import Cfg from '../../helpers/cfg';
+import Format from '../../helpers/format';
 
 const theme = createTheme({
   typography: {
@@ -72,7 +73,7 @@ class PanelViewer extends React.Component {
     const {
       classes, feature, integration, editorOnly, molSvg, descriptions, layoutSt,
       canChangeDescription, jcampIdx, entityFileNames, curveSt, userManualLink,
-      subLayoutsInfo, theoryMass,
+      subLayoutsInfo, theoryMass, entities,
     } = this.props;
     const onExapndInfo = () => this.onExapnd('info');
     const onExapndPeak = () => this.onExapnd('peak');
@@ -80,9 +81,8 @@ class PanelViewer extends React.Component {
     const onExapndCompare = () => this.onExapnd('compare');
     const onExapndCyclicVolta = () => this.onExapnd('cyclicvolta');
     const onExapndGraphSelection = () => this.onExapnd('graph');
-
     const { listCurves } = curveSt;
-    const hideGraphSelection = listCurves === false || listCurves === undefined;
+    const hideGraphSelection = listCurves === false || listCurves === undefined || Format.isLCMsLayout(layoutSt);
 
     return (
       <div className={classNames(classes.panels)}>
@@ -92,6 +92,7 @@ class PanelViewer extends React.Component {
           >
             { hideGraphSelection ? null : <GraphSelectionPanel jcampIdx={jcampIdx} entityFileNames={entityFileNames} expand={expand === 'graph'} onExapnd={onExapndGraphSelection} subLayoutsInfo={subLayoutsInfo} />}
             <InfoPanel
+              entities={entities}
               feature={feature}
               integration={integration}
               editorOnly={editorOnly}
@@ -141,6 +142,7 @@ PanelViewer.propTypes = {
   curveSt: PropTypes.object.isRequired,
   subLayoutsInfo: PropTypes.object,
   theoryMass: PropTypes.string,
+  entities: PropTypes.array,
 };
 
 export default connect( // eslint-disable-line

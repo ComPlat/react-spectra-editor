@@ -19,6 +19,11 @@ var _compare_ir_1_jcamp = _interopRequireDefault(require("./__tests__/fixtures/c
 var _compare_ir_2_jcamp = _interopRequireDefault(require("./__tests__/fixtures/compare_ir_2_jcamp"));
 var _raman_jcamp = _interopRequireDefault(require("./__tests__/fixtures/raman_jcamp"));
 var _ms_jcamp = _interopRequireDefault(require("./__tests__/fixtures/ms_jcamp"));
+var _lc_ms_jcamp = _interopRequireDefault(require("./__tests__/fixtures/lc_ms_jcamp"));
+var _lc_ms_jcamp_ = _interopRequireDefault(require("./__tests__/fixtures/lc_ms_jcamp_2"));
+var _lc_ms_jcamp_tic_pos = _interopRequireDefault(require("./__tests__/fixtures/lc_ms_jcamp_tic_pos"));
+var _lc_ms_jcamp_tic_neg = _interopRequireDefault(require("./__tests__/fixtures/lc_ms_jcamp_tic_neg"));
+var _lc_ms_jcamp_uvvis = _interopRequireDefault(require("./__tests__/fixtures/lc_ms_jcamp_uvvis"));
 var _nmr_result = _interopRequireDefault(require("./__tests__/fixtures/nmr_result"));
 var _ir_result = _interopRequireDefault(require("./__tests__/fixtures/ir_result"));
 var _phenylalanin = _interopRequireDefault(require("./__tests__/fixtures/phenylalanin"));
@@ -63,6 +68,11 @@ const compIr1Entity = _app.FN.ExtractJcamp(_compare_ir_1_jcamp.default);
 const compIr2Entity = _app.FN.ExtractJcamp(_compare_ir_2_jcamp.default);
 const ramanEntity = _app.FN.ExtractJcamp(_raman_jcamp.default);
 const msEntity = _app.FN.ExtractJcamp(_ms_jcamp.default);
+const lcmsEntity = _app.FN.ExtractJcamp(_lc_ms_jcamp.default);
+const lcmsEntity2 = _app.FN.ExtractJcamp(_lc_ms_jcamp_.default);
+const hplcMsTicPosEntity = _app.FN.ExtractJcamp(_lc_ms_jcamp_tic_pos.default);
+const hplcMsTicNegEntity = _app.FN.ExtractJcamp(_lc_ms_jcamp_tic_neg.default);
+const hplcMsUvvisEntity = _app.FN.ExtractJcamp(_lc_ms_jcamp_uvvis.default);
 const uvVisEntity = _app.FN.ExtractJcamp(_uv_vis_jcamp.default);
 const compUvVisEntity = _app.FN.ExtractJcamp(_compare_uv_vis_jcamp.default);
 const hplcUVVisEntity = _app.FN.ExtractJcamp(_hplc_uvvis_jcamp.default);
@@ -185,8 +195,9 @@ class DemoWriteIr extends _react.default.Component {
       case 'gc':
         return gcEntity1;
       case 'ms':
-      default:
         return msEntity;
+      default:
+        return lcmsEntity;
     }
   }
   loadMultiEntities() {
@@ -210,6 +221,8 @@ class DemoWriteIr extends _react.default.Component {
         return [aifEntity1, aifEntity2];
       case 'gc':
         return [gcEntity1, gcEntity2, gcEntity3];
+      case 'lcms':
+        return [hplcMsTicPosEntity, hplcMsTicNegEntity, hplcMsUvvisEntity, lcmsEntity, lcmsEntity2];
       default:
         return false;
     }
@@ -238,6 +251,7 @@ class DemoWriteIr extends _react.default.Component {
       case 'dsc':
       case 'xrd':
       case 'ms':
+      case 'lcms':
       case 'cyclic volta':
       case 'cds':
       case 'sec':
@@ -749,6 +763,12 @@ class DemoWriteIr extends _react.default.Component {
       },
       onClick: this.onClick('ms')
     }, "MS"), /*#__PURE__*/_react.default.createElement(_material.Button, {
+      variant: "contained",
+      style: {
+        margin: '0 10px 0 10px'
+      },
+      onClick: this.onClick('lcms')
+    }, "LC/MS"), /*#__PURE__*/_react.default.createElement(_material.Button, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'

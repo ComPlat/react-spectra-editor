@@ -144,6 +144,10 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
   }, "MS")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
+    value: _list_layout.LIST_LAYOUT.LC_MS
+  }, /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
+  }, "LC/MS")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
     value: _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')

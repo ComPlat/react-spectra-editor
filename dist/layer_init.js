@@ -17,6 +17,7 @@ var _jcamp = require("./actions/jcamp");
 var _layer_prism = _interopRequireDefault(require("./layer_prism"));
 var _format = _interopRequireDefault(require("./helpers/format"));
 var _multi_jcamps_viewer = _interopRequireDefault(require("./components/multi_jcamps_viewer"));
+var _hplc_viewer = _interopRequireDefault(require("./components/hplc_viewer"));
 var _curve = require("./actions/curve");
 /* eslint-disable prefer-object-spread, default-param-last */
 
@@ -150,6 +151,15 @@ class LayerInit extends _react.default.Component {
     const xxLabel = !xLabel && xLabel === '' ? `X (${target.xUnit})` : xLabel;
     const yyLabel = !yLabel && yLabel === '' ? `Y (${target.yUnit})` : yLabel;
     if (multiEntities) {
+      if (_format.default.isLCMsLayout(layout)) {
+        return /*#__PURE__*/_react.default.createElement(_hplc_viewer.default, {
+          entityFileNames: entityFileNames,
+          userManualLink: userManualLink,
+          molSvg: molSvg,
+          theoryMass: theoryMass,
+          operations: operations
+        });
+      }
       return /*#__PURE__*/_react.default.createElement(_multi_jcamps_viewer.default, {
         multiEntities: multiEntities,
         entityFileNames: entityFileNames,
