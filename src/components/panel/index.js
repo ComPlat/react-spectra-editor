@@ -73,7 +73,8 @@ class PanelViewer extends React.Component {
     const {
       classes, feature, integration, editorOnly, molSvg, descriptions, layoutSt,
       canChangeDescription, jcampIdx, entityFileNames, curveSt, userManualLink,
-      subLayoutsInfo, exactMass, hideCyclicVolta,
+      subLayoutsInfo, exactMass, theoryMass, entities,
+      hideCyclicVolta,
     } = this.props;
     const onExapndInfo = () => this.onExapnd('info');
     const onExapndPeak = () => this.onExapnd('peak');
@@ -81,7 +82,6 @@ class PanelViewer extends React.Component {
     const onExapndCompare = () => this.onExapnd('compare');
     const onExapndCyclicVolta = () => this.onExapnd('cyclicvolta');
     const onExapndGraphSelection = () => this.onExapnd('graph');
-
     const { listCurves } = curveSt;
     const hideGraphSelection = listCurves === false || listCurves === undefined || Format.isLCMsLayout(layoutSt);
 
@@ -93,12 +93,14 @@ class PanelViewer extends React.Component {
           >
             { hideGraphSelection ? null : <GraphSelectionPanel jcampIdx={jcampIdx} entityFileNames={entityFileNames} expand={expand === 'graph'} onExapnd={onExapndGraphSelection} subLayoutsInfo={subLayoutsInfo} />}
             <InfoPanel
+              entities={entities}
               feature={feature}
               integration={integration}
               editorOnly={editorOnly}
               expand={expand === 'info'}
               molSvg={molSvg}
               exactMass={exactMass}
+              theoryMass={theoryMass}
               onExapnd={onExapndInfo}
               descriptions={descriptions}
               canChangeDescription={canChangeDescription}
@@ -151,6 +153,8 @@ PanelViewer.propTypes = {
   subLayoutsInfo: PropTypes.object,
   exactMass: PropTypes.string,
   hideCyclicVolta: PropTypes.bool,
+  theoryMass: PropTypes.string,
+  entities: PropTypes.array,
 };
 
 export default connect( // eslint-disable-line

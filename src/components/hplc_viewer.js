@@ -33,7 +33,7 @@ class HPLCViewer extends React.Component { // eslint-disable-line
   render() {
     const {
       classes, curveSt, operations, entityFileNames,
-      entities, userManualLink, molSvg, theoryMass,
+      entities, userManualLink, molSvg, theoryMass, integrationSt,
     } = this.props;
     if (!entities || entities.length === 0) return (<div />);
     const { curveIdx } = curveSt;
@@ -41,6 +41,8 @@ class HPLCViewer extends React.Component { // eslint-disable-line
     const { feature, topic } = entity;
     const ticEntities = entities.slice(0, 2);
     const dataEntities = entities.slice(2);
+    const { integrations } = integrationSt;
+    const currentIntegration = integrations[curveIdx];
 
     return (
       <div className={classes.root}>
@@ -61,10 +63,12 @@ class HPLCViewer extends React.Component { // eslint-disable-line
                 xLabel={feature.xUnit}
                 yLabel={feature.yUnit}
                 feature={feature}
+                jcampIdx={curveIdx}
               />
             </Grid>
             <Grid item xs={3} align="center">
               <PanelViewer
+                entities={entities}
                 jcampIdx={curveIdx}
                 entityFileNames={entityFileNames}
                 userManualLink={userManualLink}
@@ -72,6 +76,7 @@ class HPLCViewer extends React.Component { // eslint-disable-line
                 molSvg={molSvg}
                 theoryMass={theoryMass}
                 descriptions=""
+                integration={currentIntegration}
                 canChangeDescription={() => {}}
                 onDescriptionChanged={() => {}}
               />
@@ -88,6 +93,7 @@ const mapStateToProps = (state, _) => ( // eslint-disable-line
     curveSt: state.curve,
     entities: state.curve.listCurves,
     layoutSt: state.layout,
+    integrationSt: state.integration.present,
   }
 );
 
@@ -108,6 +114,7 @@ HPLCViewer.propTypes = {
   entities: PropTypes.array,
   layoutSt: PropTypes.string.isRequired,
   theoryMass: PropTypes.string,
+  integrationSt: PropTypes.object.isRequired,
 };
 
 HPLCViewer.defaultProps = {

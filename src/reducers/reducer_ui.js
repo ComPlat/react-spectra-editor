@@ -33,6 +33,14 @@ const updateSweepType = (state, action) => {
     return Object.assign({}, state, {
       sweepType: action.payload,
       jcampIdx: action.jcampIdx,
+      zoom: {
+        ...state.zoom,
+        sweepTypes: [
+          LIST_UI_SWEEP_TYPE.ZOOMRESET,
+          LIST_UI_SWEEP_TYPE.ZOOMRESET,
+          LIST_UI_SWEEP_TYPE.ZOOMRESET,
+        ],
+      },
     });
   }
   const { zoom } = state;
@@ -88,10 +96,17 @@ const resetZoom = (state, action) => {
   const selectedGraph = sweepExtent[graphIndex];
   const newSweepExtent = Object.assign({}, selectedGraph, { xExtent: false, yExtent: false });
   sweepExtent[graphIndex] = newSweepExtent;
-  const newZoom = Object.assign({}, zoom, { sweepExtent, graphIndex });
   return Object.assign({}, state, {
-    zoom: newZoom,
-    sweepType: LIST_UI_SWEEP_TYPE.ZOOMIN,
+    zoom: {
+      sweepExtent,
+      graphIndex,
+      sweepTypes: [
+        LIST_UI_SWEEP_TYPE.ZOOMRESET,
+        LIST_UI_SWEEP_TYPE.ZOOMRESET,
+        LIST_UI_SWEEP_TYPE.ZOOMRESET,
+      ],
+    },
+    sweepType: LIST_UI_SWEEP_TYPE.ZOOMRESET,
   });
 };
 

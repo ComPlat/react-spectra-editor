@@ -128,11 +128,14 @@ class RectFocus {
   }
 
   drawBar() {
+    if (!this.bars) {
+      return;
+    }
+
     const { xt, yt } = TfRescale(this);
     this.updatePathCall(xt, yt);
 
     const yRef = this.tTrEndPts[0].y;
-
     const bars = this.bars.selectAll('rect')
       .data(this.data);
 
@@ -169,15 +172,16 @@ class RectFocus {
   }
 
   drawThres() {
-    if (this.tTrEndPts.length > 0) {
+    if (this.thresLine && this.tTrEndPts.length > 0) {
       this.thresLine.attr('d', this.pathCall(this.tTrEndPts));
       this.thresLine.attr('visibility', 'visible');
-    } else {
+    } else if (this.thresLine) {
       this.thresLine.attr('visibility', 'hidden');
     }
   }
 
   drawGrid() {
+    if (!this.grid) return;
     this.grid.x.call(this.axisCall.x
       .tickSize(-this.h, 0, 0))
       .selectAll('line')

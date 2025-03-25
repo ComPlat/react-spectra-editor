@@ -181,6 +181,8 @@ class MultiFocus {
   }
 
   drawLine() {
+    if (!this.path) return;
+
     const { xt, yt } = TfRescale(this);
     this.updatePathCall(xt, yt);
     this.path.attr('d', this.pathCall(this.data));
@@ -193,6 +195,8 @@ class MultiFocus {
   drawOtherLines(layout) {
     d3.selectAll('.line-clip-compare').remove();
     if (!this.otherLineData) return null;
+    const { xt, yt } = TfRescale(this);
+    this.updatePathCall(xt, yt);
     this.otherLineData.forEach((entry, idx) => {
       const { data, color } = entry;
       const pathColor = color ? color : Format.mutiEntitiesColors(idx);
@@ -207,20 +211,23 @@ class MultiFocus {
 
   drawGrid() {
     const { sameXY } = this.shouldUpdate;
-    if (sameXY) return;
-
-    this.grid.x.call(this.axisCall.x
-      .tickSize(-this.h, 0, 0))
-      .selectAll('line')
-      .attr('stroke', '#ddd')
-      .attr('stroke-opacity', 0.6)
-      .attr('fill', 'none');
-    this.grid.y.call(this.axisCall.y
-      .tickSize(-this.w, 0, 0))
-      .selectAll('line')
-      .attr('stroke', '#ddd')
-      .attr('stroke-opacity', 0.6)
-      .attr('fill', 'none');
+    if (sameXY || !this.grid || !this.axisCall) return;
+    if (this.grid.x && this.axisCall.x) {
+      this.grid.x.call(this.axisCall.x
+        .tickSize(-this.h, 0, 0))
+        .selectAll('line')
+        .attr('stroke', '#ddd')
+        .attr('stroke-opacity', 0.6)
+        .attr('fill', 'none');
+    }
+    if (this.grid.y && this.axisCall.y) {
+      this.grid.y.call(this.axisCall.y
+        .tickSize(-this.w, 0, 0))
+        .selectAll('line')
+        .attr('stroke', '#ddd')
+        .attr('stroke-opacity', 0.6)
+        .attr('fill', 'none');
+    }
   }
 
   onClickTarget(event, data) {
