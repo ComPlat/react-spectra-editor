@@ -40,37 +40,26 @@ const brushed = (focus, isUiAddIntgSt, event, brushedClass = '.d3Svg') => {
 
 const MountBrush = (focus, isUiAddIntgSt, isUiNoBrushSt, brushedClass = '.d3Svg') => {
   const {
-    root, svg, brush, brushX, w, h,
+    root, svg, brush, brushX, w, h, uiSt, graphIndex,
   } = focus;
-  svg.selectAll('.brush').remove();
-  svg.selectAll('.brushX').remove();
-  if (focus.uiSt
-    && focus.uiSt.zoom
-    && Array.isArray(focus.uiSt.zoom.sweepTypes)
-    && focus.uiSt.zoom.sweepTypes[focus.graphIndex] !== LIST_UI_SWEEP_TYPE.ZOOMIN) {
-    return;
-  }
 
-  const brushedCb = (event) => {
-    if (focus.graphIndex !== undefined
-      && focus.uiSt
-      && focus.uiSt.zoom
-      && Array.isArray(focus.uiSt.zoom.sweepTypes)
-      && focus.uiSt.zoom.sweepTypes[focus.graphIndex] !== LIST_UI_SWEEP_TYPE.ZOOMIN) {
-      return;
-    }
-    brushed(focus, isUiAddIntgSt, event, brushedClass);
-  };
+  svg.selectAll('.brush, .brushX').remove();
+
+  const isZoomIn = uiSt?.zoom?.sweepTypes?.[graphIndex] === LIST_UI_SWEEP_TYPE.ZOOMIN;
+  const isIntegrationAdd = uiSt?.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD;
+
+  if (!(graphIndex === 0 && isIntegrationAdd) && !isZoomIn) return;
+
+  const brushedCb = (event) => brushed(focus, isUiAddIntgSt, event, brushedClass);
   const wheeledCb = (event) => wheeled(focus, event);
 
   if (isUiNoBrushSt) {
     const target = isUiAddIntgSt ? brushX : brush;
+    const klass = isUiAddIntgSt ? 'brushX' : 'brush';
     target.handleSize(10)
       .extent([[0, 0], [w, h]])
       .on('end', brushedCb);
 
-    // append brush components
-    const klass = isUiAddIntgSt ? 'brushX' : 'brush';
     root.append('g')
       .attr('class', klass)
       .on('mousemove', (event) => MouseMove(event, focus))

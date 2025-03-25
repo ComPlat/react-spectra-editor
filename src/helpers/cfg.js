@@ -27,7 +27,7 @@ const btnCmdRmPeak = (layoutSt) => Format.isMsLayout(layoutSt) || Format.isLCMsL
 
 const btnCmdSetRef = (layoutSt) => !Format.isNmrLayout(layoutSt);
 
-const btnCmdIntg = (layoutSt) => !(Format.isNmrLayout(layoutSt)|| Format.isHplcUvVisLayout(layoutSt));  // eslint-disable-line
+const btnCmdIntg = (layoutSt) => !(Format.isNmrLayout(layoutSt)|| Format.isHplcUvVisLayout(layoutSt) || Format.isLCMsLayout(layoutSt));  // eslint-disable-line
 
 const btnCmdMpy = (layoutSt) => !Format.isNmrLayout(layoutSt);
 

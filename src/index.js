@@ -198,8 +198,10 @@ class DemoWriteIr extends React.Component {
         return gcEntity1;
       case 'ms':
         return msEntity;
-      default:
+      case 'lcms':
         return lcmsEntity;
+      default:
+        return msEntity;
     }
   }
 

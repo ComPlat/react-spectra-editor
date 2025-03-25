@@ -119,11 +119,11 @@ class LayerInit extends React.Component {
 
     const xxLabel = !xLabel && xLabel === '' ? `X (${target.xUnit})` : xLabel;
     const yyLabel = !yLabel && yLabel === '' ? `Y (${target.yUnit})` : yLabel;
-
     if (multiEntities) {
       if (Format.isLCMsLayout(layout)) {
         return (
           <HPLCViewer
+            multiEntities={multiEntities}
             entityFileNames={entityFileNames}
             userManualLink={userManualLink}
             molSvg={molSvg}
@@ -134,7 +134,6 @@ class LayerInit extends React.Component {
       }
       return (
         <MultiJcampsViewer
-          multiEntities={multiEntities}
           entityFileNames={entityFileNames}
           userManualLink={userManualLink}
           molSvg={molSvg}

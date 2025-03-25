@@ -73,7 +73,7 @@ class PanelViewer extends React.Component {
     const {
       classes, feature, integration, editorOnly, molSvg, descriptions, layoutSt,
       canChangeDescription, jcampIdx, entityFileNames, curveSt, userManualLink,
-      subLayoutsInfo, theoryMass,
+      subLayoutsInfo, theoryMass, entities,
     } = this.props;
     const onExapndInfo = () => this.onExapnd('info');
     const onExapndPeak = () => this.onExapnd('peak');
@@ -81,7 +81,6 @@ class PanelViewer extends React.Component {
     const onExapndCompare = () => this.onExapnd('compare');
     const onExapndCyclicVolta = () => this.onExapnd('cyclicvolta');
     const onExapndGraphSelection = () => this.onExapnd('graph');
-
     const { listCurves } = curveSt;
     const hideGraphSelection = listCurves === false || listCurves === undefined || Format.isLCMsLayout(layoutSt);
 
@@ -93,6 +92,7 @@ class PanelViewer extends React.Component {
           >
             { hideGraphSelection ? null : <GraphSelectionPanel jcampIdx={jcampIdx} entityFileNames={entityFileNames} expand={expand === 'graph'} onExapnd={onExapndGraphSelection} subLayoutsInfo={subLayoutsInfo} />}
             <InfoPanel
+              entities={entities}
               feature={feature}
               integration={integration}
               editorOnly={editorOnly}
@@ -142,6 +142,7 @@ PanelViewer.propTypes = {
   curveSt: PropTypes.object.isRequired,
   subLayoutsInfo: PropTypes.object,
   theoryMass: PropTypes.string,
+  entities: PropTypes.array,
 };
 
 export default connect( // eslint-disable-line
