@@ -20,7 +20,7 @@ const styles = () => ({
 
 const LayerPrism = ({
   entity, cLabel, xLabel, yLabel, forecast, operations,
-  descriptions, molSvg, editorOnly, theoryMass,
+  descriptions, molSvg, editorOnly, exactMass,
   thresSt, scanSt, uiSt,
   canChangeDescription, onDescriptionChanged,
 }) => {
@@ -87,7 +87,7 @@ const LayerPrism = ({
               integration={integration}
               editorOnly={editorOnly}
               molSvg={molSvg}
-              theoryMass={theoryMass}
+              exactMass={exactMass}
               descriptions={descriptions}
               canChangeDescription={canChangeDescription}
               onDescriptionChanged={onDescriptionChanged}
@@ -119,7 +119,7 @@ LayerPrism.propTypes = {
   yLabel: PropTypes.string.isRequired,
   molSvg: PropTypes.string.isRequired,
   editorOnly: PropTypes.bool.isRequired,
-  theoryMass: PropTypes.string,
+  exactMass: PropTypes.string,
   forecast: PropTypes.object.isRequired,
   operations: PropTypes.array.isRequired,
   descriptions: PropTypes.array.isRequired,

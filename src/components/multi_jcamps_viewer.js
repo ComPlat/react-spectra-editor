@@ -54,7 +54,7 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
   render() {
     const {
       classes, curveSt, operations, entityFileNames,
-      entities, userManualLink, molSvg, theoryMass, layoutSt,
+      entities, userManualLink, molSvg, exactMass, layoutSt,
       integrationSt,
     } = this.props;
     if (!entities || entities.length === 0) return (<div />);
@@ -93,7 +93,7 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
                 userManualLink={userManualLink}
                 feature={feature}
                 molSvg={molSvg}
-                theoryMass={theoryMass}
+                exactMass={exactMass}
                 subLayoutsInfo={seperatedSubLayouts}
                 integration={currentIntegration}
                 descriptions=""
@@ -143,7 +143,7 @@ MultiJcampsViewer.propTypes = {
   userManualLink: PropTypes.object,
   entities: PropTypes.array,
   layoutSt: PropTypes.string.isRequired,
-  theoryMass: PropTypes.string,
+  exactMass: PropTypes.string,
   integrationSt: PropTypes.object.isRequired,
 };
 

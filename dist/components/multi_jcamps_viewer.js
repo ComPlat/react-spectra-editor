@@ -63,7 +63,7 @@ class MultiJcampsViewer extends _react.default.Component {
       entities,
       userManualLink,
       molSvg,
-      theoryMass,
+      exactMass,
       layoutSt,
       integrationSt
     } = this.props;
@@ -112,7 +112,7 @@ class MultiJcampsViewer extends _react.default.Component {
       userManualLink: userManualLink,
       feature: feature,
       molSvg: molSvg,
-      theoryMass: theoryMass,
+      exactMass: exactMass,
       subLayoutsInfo: seperatedSubLayouts,
       integration: currentIntegration,
       descriptions: "",
@@ -152,7 +152,7 @@ MultiJcampsViewer.propTypes = {
   userManualLink: _propTypes.default.object,
   entities: _propTypes.default.array,
   layoutSt: _propTypes.default.string.isRequired,
-  theoryMass: _propTypes.default.string,
+  exactMass: _propTypes.default.string,
   integrationSt: _propTypes.default.object.isRequired
 };
 MultiJcampsViewer.defaultProps = {

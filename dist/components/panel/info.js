@@ -231,7 +231,7 @@ const InfoPanel = _ref3 => {
     simulationSt,
     shiftSt,
     curveSt,
-    theoryMass,
+    exactMass,
     onExapnd,
     canChangeDescription,
     onDescriptionChanged,
@@ -313,13 +313,13 @@ const InfoPanel = _ref3 => {
     className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
   }, "Solv : "), /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
-  }, showSolvName)) : null, _format.default.isMsLayout(layoutSt) && theoryMass ? /*#__PURE__*/_react.default.createElement("div", {
+  }, showSolvName)) : null, _format.default.isMsLayout(layoutSt) && exactMass ? /*#__PURE__*/_react.default.createElement("div", {
     className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd)
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
-  }, "Theoretical mass: "), /*#__PURE__*/_react.default.createElement("span", {
+  }, "Exact mass: "), /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
-  }, `${parseFloat(theoryMass).toFixed(6)} g/mol`)) : null, /*#__PURE__*/_react.default.createElement(SECData, {
+  }, `${parseFloat(exactMass).toFixed(6)} g/mol`)) : null, /*#__PURE__*/_react.default.createElement(SECData, {
     classes: classes,
     layout: layoutSt,
     detector: selectedDetector,
@@ -383,7 +383,7 @@ InfoPanel.propTypes = {
   onExapnd: _propTypes.default.func.isRequired,
   canChangeDescription: _propTypes.default.bool.isRequired,
   onDescriptionChanged: _propTypes.default.func,
-  theoryMass: _propTypes.default.string,
+  exactMass: _propTypes.default.string,
   detectorSt: _propTypes.default.object.isRequired,
   metaSt: _propTypes.default.object.isRequired,
   updateDSCMetaDataAct: _propTypes.default.func.isRequired

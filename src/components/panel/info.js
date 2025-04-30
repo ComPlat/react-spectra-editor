@@ -196,7 +196,7 @@ DSCData.propTypes = {
 
 const InfoPanel = ({
   classes, expand, feature, integration, editorOnly, molSvg, descriptions,
-  layoutSt, simulationSt, shiftSt, curveSt, theoryMass,
+  layoutSt, simulationSt, shiftSt, curveSt, exactMass,
   onExapnd, canChangeDescription, onDescriptionChanged, detectorSt,
   metaSt, updateDSCMetaDataAct,
 }) => {
@@ -279,11 +279,11 @@ const InfoPanel = ({
             : null
         }
         {
-          Format.isMsLayout(layoutSt) && theoryMass
+          Format.isMsLayout(layoutSt) && exactMass
             ? (
               <div className={classNames(classes.rowRoot, classes.rowOdd)}>
-                <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Theoretical mass: </span>
-                <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{`${parseFloat(theoryMass).toFixed(6)} g/mol`}</span>
+                <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Exact mass: </span>
+                <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{`${parseFloat(exactMass).toFixed(6)} g/mol`}</span>
               </div>
             )
             : null
@@ -387,7 +387,7 @@ InfoPanel.propTypes = {
   onExapnd: PropTypes.func.isRequired,
   canChangeDescription: PropTypes.bool.isRequired,
   onDescriptionChanged: PropTypes.func,
-  theoryMass: PropTypes.string,
+  exactMass: PropTypes.string,
   detectorSt: PropTypes.object.isRequired,
   metaSt: PropTypes.object.isRequired,
   updateDSCMetaDataAct: PropTypes.func.isRequired,
