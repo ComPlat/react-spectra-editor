@@ -102,7 +102,7 @@ const LayerPrism = ({
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     scanSt: state.scan,
-    thresSt: state.threshold,
+    thresSt: state.threshold.list[state.curve.curveIdx],
     uiSt: state.ui,
   }
 );

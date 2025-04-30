@@ -1,11 +1,12 @@
 /* eslint-disable no-unused-vars, prefer-object-spread, no-mixed-operators,
-no-unneeded-ternary, arrow-body-style */
+no-unneeded-ternary, arrow-body-style, max-len */
 import {
   InitScale, InitAxisCall, InitTip,
 } from '../../helpers/init';
 import {
   MountPath, MountGrid, MountAxis, MountAxisLabelX, MountAxisLabelY,
   MountClip, MountMainFrame, MountTags, MountComparePath, MountRef,
+  MountThresLine,
 } from '../../helpers/mount';
 import { PksEdit, PeckersEdit } from '../../helpers/converter';
 import MountBrush from '../../helpers/brush';
@@ -49,6 +50,8 @@ class MultiFocus {
 
     this.axis = null;
     this.path = null;
+    this.thresLineUp = null;
+    this.thresLineDw = null;
     this.grid = null;
     this.tags = null;
     this.ref = null;
@@ -78,6 +81,7 @@ class MultiFocus {
     this.update = this.update.bind(this);
     this.setConfig = this.setConfig.bind(this);
     this.drawLine = this.drawLine.bind(this);
+    this.drawThres = this.drawThres.bind(this);
     this.drawOtherLines = this.drawOtherLines.bind(this);
     this.drawGrid = this.drawGrid.bind(this);
     this.drawPeaks = this.drawPeaks.bind(this);
@@ -141,15 +145,18 @@ class MultiFocus {
     this.root.call(this.tip);
   }
 
-  setDataParams(peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt, jcampIdx = 0) {
+  setDataParams(filterSeed, peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt, jcampIdx = 0) {
     this.data = [];
     this.otherLineData = [];
     let filterSubLayoutValue = null;
     this.entities.forEach((entry, idx) => {
       const { topic, feature, color } = entry;
       const offset = GetCyclicVoltaPreviousShift(cyclicvoltaSt, jcampIdx);
-      const currData = convertTopic(topic, layout, feature, offset);
+      let currData = convertTopic(topic, layout, feature, offset);
       if (idx === jcampIdx) {
+        if (!Format.isCyclicVoltaLayout(layout)) {
+          currData = filterSeed;
+        }
         this.data = [...currData];
         this.pathColor = color;
         filterSubLayoutValue = Format.isSECLayout(layout) ? feature.xUnit : feature.yUnit;
@@ -225,6 +232,23 @@ class MultiFocus {
     this.path.style('stroke', this.pathColor);
     if (this.layout === LIST_LAYOUT.AIF) {
       this.path.attr('marker-mid', 'url(#arrow-left)');
+    }
+  }
+
+  drawThres() {
+    if (this.tTrEndPts.length > 0) {
+      this.thresLineUp.attr('d', this.pathCall(this.tTrEndPts));
+      this.thresLineUp.attr('visibility', 'visible');
+      const [left, right] = this.tTrEndPts;
+      const dwMirrorEndPts = [
+        Object.assign({}, left, { y: -left.y }),
+        Object.assign({}, right, { y: -right.y }),
+      ];
+      this.thresLineDw.attr('d', this.pathCall(dwMirrorEndPts));
+      this.thresLineDw.attr('visibility', 'visible');
+    } else {
+      this.thresLineUp.attr('visibility', 'hidden');
+      this.thresLineDw.attr('visibility', 'hidden');
     }
   }
 
@@ -1002,11 +1026,12 @@ class MultiFocus {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, this.reverseXAxis(layoutSt));
     this.setTip();
-    this.setDataParams(filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
     MountCompass(this);
 
     this.axis = MountAxis(this);
     this.path = MountPath(this, this.pathColor);
+    [this.thresLineUp, this.thresLineDw] = MountThresLine(this, 'green');
     this.grid = MountGrid(this);
     this.tags = MountTags(this);
     this.ref = MountRef(this);
@@ -1016,6 +1041,7 @@ class MultiFocus {
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);
       this.drawLine();
+      this.drawThres();
       this.drawGrid();
       this.drawOtherLines(layoutSt);
       this.drawPeaks(editPeakSt);
@@ -1043,12 +1069,13 @@ class MultiFocus {
     this.isShowAllCurves = isShowAllCurve;
     this.entities = entities;
 
-    this.setDataParams(filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
 
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);
       this.getShouldUpdate(editPeakSt);
       this.drawLine();
+      this.drawThres();
       this.drawGrid();
       this.drawOtherLines(layoutSt);
       this.drawPeaks(editPeakSt);

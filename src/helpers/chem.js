@@ -139,7 +139,7 @@ const ToFrequency = createSelector(
 );
 
 const getThreshold = (state) => (
-  state.threshold ? state.threshold.value * 1.0 : false
+  state.threshold ? state.threshold.list[state.curve.curveIdx].value * 1.0 : false
 );
 
 const Convert2Peak = (feature, threshold, offset, upThreshold = false, lowThreshold = false) => {
