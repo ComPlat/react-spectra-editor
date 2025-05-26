@@ -20,7 +20,7 @@ import { resetAll } from '../../actions/manager';
 import {
   selectUiSweep, scrollUiWheel, clickUiTarget, setUiSweepType,
 } from '../../actions/ui';
-import { selectWavelength, changeTic } from '../../actions/hplcms';
+import { selectWavelength, changeTic, updateCurrentPageValue } from '../../actions/hplc_ms';
 import { selectCurve } from '../../actions/curve';
 import RectFocus from './rect_focus';
 import MultiFocus from './multi_focus';
@@ -35,6 +35,7 @@ import { LIST_ROOT_SVG_GRAPH, LIST_BRUSH_SVG_GRAPH } from '../../constants/list_
 import PeakGroup from '../cmd_bar/08_peak_group';
 import Threshold from '../cmd_bar/r03_threshold';
 import Integration from '../cmd_bar/04_integration';
+import Peak from '../cmd_bar/03_peak';
 
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.8 / 3); // ROI
@@ -132,7 +133,7 @@ const waveLengthSelect = (classes, hplcMsSt, updateWaveLengthAct) => {
   );
 };
 
-const ticSelect = (classes, hplcMsSt, updateTicAct) => {
+const ticSelect = (classes, hplcMsSt, handleTicChanged) => {
   const { tic } = hplcMsSt;
   const { isNegative } = tic;
   const listTIC = [{ name: 'PLUS', value: 0 }, { name: 'MINUS', value: 1 }];
@@ -143,6 +144,10 @@ const ticSelect = (classes, hplcMsSt, updateTicAct) => {
       </span>
     </MenuItem>
   ));
+
+  const onTicChange = (event) => {
+    handleTicChanged(event);
+  };
 
   return (
     <FormControl
@@ -157,7 +162,7 @@ const ticSelect = (classes, hplcMsSt, updateTicAct) => {
         labelId="select-decimal-label"
         label="Decimal"
         value={isNegative ? 1 : 0}
-        onChange={updateTicAct}
+        onChange={onTicChange}
         className={classNames(classes.selectInput, 'input-sv-bar-decimal')}
       >
         { options }
@@ -201,6 +206,7 @@ class ViewerLineRect extends React.Component {
       integationSt,
       isHidden,
       resetAllAct, uiSt,
+      editPeakSt,
     } = this.props;
     drawDestroy(this.rootKlassMulti);
     drawDestroy(this.rootKlassLine);
@@ -230,6 +236,7 @@ class ViewerLineRect extends React.Component {
       sweepExtentSt: sweepExtent[0],
       integationSt,
       isUiAddIntgSt,
+      editPeakSt,
     });
     drawLabel(this.rootKlassLine, null, 'Minutes', 'Intensity');
     drawDisplay(this.rootKlassLine, false);
@@ -268,6 +275,7 @@ class ViewerLineRect extends React.Component {
       tTrEndPts, layoutSt,
       isUiAddIntgSt, isUiNoBrushSt,
       isHidden, uiSt, hplcMsSt, integationSt,
+      editPeakSt,
     } = this.props;
     this.normChange(prevProps);
     const { zoom } = uiSt;
@@ -293,6 +301,8 @@ class ViewerLineRect extends React.Component {
           uiSt,
           layoutSt,
           integationSt,
+          hplcMsSt,
+          editPeakSt,
         });
       }
       drawLabel(this.rootKlassLine, null, 'Minutes', 'Intensity');
@@ -312,6 +322,7 @@ class ViewerLineRect extends React.Component {
         isUiAddIntgSt,
         isUiNoBrushSt,
         uiSt,
+        editPeakSt,
       });
     }
     drawLabel(this.rootKlassMulti, cLabel, 'Minutes', 'Intensity');
@@ -373,7 +384,9 @@ class ViewerLineRect extends React.Component {
   }
 
   extractSubView() {
-    const { uiSt, subEntities, hplcMsSt } = this.props;
+    const {
+      uiSt, subEntities, hplcMsSt, updateCurrentPageValueAct,
+    } = this.props;
     const { tic } = hplcMsSt;
     const { isNegative } = tic;
     const entityIdx = isNegative ? 2 : 1;
@@ -389,6 +402,11 @@ class ViewerLineRect extends React.Component {
     const closestPage = hasValidClick
       ? findClosest(arrPageValues, subViewerAt.x)
       : arrPageValues[Math.floor(arrPageValues.length / 2)];
+
+    if (closestPage !== hplcMsSt.tic.currentPageValue) {
+      updateCurrentPageValueAct(closestPage);
+    }
+
     const [selectFeature] = features.filter((fe) => fe.pageValue === closestPage);
     return selectFeature;
   }
@@ -411,6 +429,7 @@ class ViewerLineRect extends React.Component {
           waveLengthSelect(classes, hplcMsSt, selectWavelengthAct)
         }
         <Integration />
+        <Peak />
         <div className={LIST_ROOT_SVG_GRAPH.LINE} />
         <PeakGroup feature={feature} graphIndex={1} />
         {
@@ -440,6 +459,7 @@ const mapStateToProps = (state, props) => (
     uiSt: state.ui,
     layoutSt: state.layout,
     hplcMsSt: state.hplcMs,
+    editPeakSt: state.editPeak.present,
     integationSt: state.integration.present,
     sweepExtentSt: state.ui.sweepExtent,
   }
@@ -455,6 +475,7 @@ const mapDispatchToProps = (dispatch) => (
     updateTicAct: changeTic,
     selectCurveAct: selectCurve,
     zoomInAct: setUiSweepType,
+    updateCurrentPageValueAct: updateCurrentPageValue,
   }, dispatch)
 );
 
@@ -477,11 +498,13 @@ ViewerLineRect.propTypes = {
   selectUiSweepAct: PropTypes.func.isRequired,
   scrollUiWheelAct: PropTypes.func.isRequired,
   isHidden: PropTypes.bool.isRequired,
-  hplcMsSt: PropTypes.bool.isRequired,
+  hplcMsSt: PropTypes.object.isRequired,
   selectWavelengthAct: PropTypes.func.isRequired,
   updateTicAct: PropTypes.func.isRequired,
   selectCurveAct: PropTypes.func.isRequired,
   zoomInAct: PropTypes.func.isRequired,
+  editPeakSt: PropTypes.object.isRequired,
+  updateCurrentPageValueAct: PropTypes.func.isRequired,
 };
 
 // export default connect(mapStateToProps, mapDispatchToProps)(ViewerLineRect);

@@ -21,9 +21,9 @@ const btnCmdAnaViewer = (layoutSt) => (
 
 const hideCmdAnaViewer = () => false;
 
-const btnCmdAddPeak = (layoutSt) => Format.isMsLayout(layoutSt) || Format.isLCMsLayout(layoutSt);
+const btnCmdAddPeak = (layoutSt) => Format.isMsLayout(layoutSt);
 
-const btnCmdRmPeak = (layoutSt) => Format.isMsLayout(layoutSt) || Format.isLCMsLayout(layoutSt);
+const btnCmdRmPeak = (layoutSt) => Format.isMsLayout(layoutSt);
 
 const btnCmdSetRef = (layoutSt) => !Format.isNmrLayout(layoutSt);
 

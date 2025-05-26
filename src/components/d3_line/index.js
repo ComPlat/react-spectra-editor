@@ -39,7 +39,7 @@ class ViewerLine extends React.Component {
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt, integationSt, mtplySt,
       sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
       isHidden, wavelength, axesUnitsSt,
-      resetAllAct,
+      resetAllAct, uiSt,
     } = this.props;
     drawDestroy(this.rootKlass);
     resetAllAct(feature);
@@ -73,6 +73,7 @@ class ViewerLine extends React.Component {
       isUiAddIntgSt,
       isUiNoBrushSt,
       wavelength,
+      uiSt,
     });
     drawLabel(this.rootKlass, cLabel, xxLabel, yyLabel);
     drawDisplay(this.rootKlass, isHidden);
@@ -83,7 +84,7 @@ class ViewerLine extends React.Component {
       seed, peak, cLabel, xLabel, yLabel, freq, comparisons,
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt, integationSt, mtplySt,
       sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
-      isHidden, wavelength, axesUnitsSt,
+      isHidden, wavelength, axesUnitsSt, uiSt,
     } = this.props;
     this.normChange(prevProps);
 
@@ -115,6 +116,7 @@ class ViewerLine extends React.Component {
       isUiAddIntgSt,
       isUiNoBrushSt,
       wavelength,
+      uiSt,
     });
     drawLabel(this.rootKlass, cLabel, xxLabel, yyLabel);
     drawDisplay(this.rootKlass, isHidden);
@@ -156,6 +158,7 @@ const mapStateToProps = (state, props) => (
     isUiNoBrushSt: LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
     wavelength: state.wavelength,
     axesUnitsSt: state.axesUnits,
+    uiSt: state.ui,
   }
 );
 
@@ -179,6 +182,7 @@ ViewerLine.propTypes = {
     PropTypes.number,
   ]).isRequired,
   comparisons: PropTypes.array.isRequired,
+  uiSt: PropTypes.object.isRequired,
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,

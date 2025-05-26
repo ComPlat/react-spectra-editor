@@ -18,6 +18,8 @@ import { LIST_UI_SWEEP_TYPE } from '../../constants/list_ui';
 import TriBtn from './tri_btn';
 import { clearAllPeaks } from '../../actions/edit_peak';
 import { extractAutoPeaks } from '../../helpers/extractPeaksEdit';
+import { clearAllPeaksHplcMs } from '../../actions/hplc_ms';
+import { LIST_LAYOUT } from '../../constants/list_layout';
 
 const styles = () => (
   Object.assign(
@@ -34,15 +36,19 @@ const Peak = ({
   isHandleMaxAndMinPeaksSt,
   cyclicVotaSt, curveSt,
   clearAllPeaksAct, feature,
-  editPeakSt, thresSt, shiftSt, layoutSt,
+  editPeakSt, thresSt, shiftSt, layoutSt, clearAllPeaksHplcMsAct,
 }) => {
   let onSweepPeakAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.PEAK_ADD);
   let onSweepPeakDELETE = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.PEAK_DELETE);
   let onSweepAnchorShift = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT);
   const { curveIdx } = curveSt;
   const onClearAll = () => {
-    const dataPeaks = extractAutoPeaks(feature, thresSt, shiftSt, layoutSt);
-    clearAllPeaksAct({ curveIdx, dataPeaks });
+    if (layoutSt === LIST_LAYOUT.LC_MS) {
+      clearAllPeaksHplcMsAct();
+    } else {
+      const dataPeaks = extractAutoPeaks(feature, thresSt, shiftSt, layoutSt);
+      clearAllPeaksAct({ curveIdx, dataPeaks });
+    }
   };
   if (isHandleMaxAndMinPeaksSt) {
     const { spectraList } = cyclicVotaSt;
@@ -148,6 +154,7 @@ const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     setUiSweepTypeAct: setUiSweepType,
     clearAllPeaksAct: clearAllPeaks,
+    clearAllPeaksHplcMsAct: clearAllPeaksHplcMs,
   }, dispatch)
 );
 
@@ -169,6 +176,7 @@ Peak.propTypes = {
   thresSt: PropTypes.object.isRequired,
   layoutSt: PropTypes.string.isRequired,
   shiftSt: PropTypes.object.isRequired,
+  clearAllPeaksHplcMsAct: PropTypes.func.isRequired,
 };
 
 export default compose(

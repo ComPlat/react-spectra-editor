@@ -13,23 +13,38 @@ const initialState = {
 
 const setAllCurves = (state, action) => {
   const { payload } = action;
-  if (payload) {
-    const entities = payload.map((entity, idx) => {
-      const {
-        topic, feature, hasEdit, integration, multiplicity, features,
-      } = extractParams(entity, { isEdit: true });
-      // const layout = entity.layout;
-      const { layout } = entity;
-      const maxminPeak = Convert2MaxMinPeak(layout, feature, 0);
-      const color = Format.mutiEntitiesColors(idx);
-      return {
-        layout, topic, feature, hasEdit, integration, multiplicity, maxminPeak, color, curveIdx: idx, features,
-      };
-    });
+  if (!payload) return { ...state, curveIdx: 0, listCurves: [] };
 
-    return Object.assign({}, state, { curveIdx: 0, listCurves: entities });
-  }
-  return Object.assign({}, state, { curveIdx: 0, listCurves: payload });
+  const entities = payload.map((entity, idx) => {
+    const {
+      topic, feature, hasEdit, integration, multiplicity, features,
+    } = extractParams(entity, { isEdit: true });
+
+    const { layout } = entity;
+    const maxminPeak = Convert2MaxMinPeak(layout, feature, 0);
+    const color = Format.mutiEntitiesColors(idx);
+    return {
+      layout,
+      topic,
+      feature,
+      hasEdit,
+      integration,
+      multiplicity,
+      maxminPeak,
+      color,
+      curveIdx: idx,
+      features,
+    };
+  });
+
+  const maxIdx = entities.length - 1;
+  const safeCurveIdx = Math.min(state.curveIdx || 0, maxIdx);
+
+  return {
+    ...state,
+    curveIdx: safeCurveIdx,
+    listCurves: entities,
+  };
 };
 
 const curveReducer = (state = initialState, action) => {
