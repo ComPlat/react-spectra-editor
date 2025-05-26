@@ -88,7 +88,7 @@ const simContent = (nmrSimPeaks) => (
   nmrSimPeaks && nmrSimPeaks.sort((a, b) => a - b).join(', ')
 );
 
-const aucValue = (integration) => {
+const aucValue = (integration, hplcMsSt) => {
   if (!integration) {
     return '';
   }
@@ -111,7 +111,28 @@ const aucValue = (integration) => {
       }
     });
   }
-  return values.join(', ');
+
+  const spectraList = hplcMsSt?.uvvis?.spectraList || [];
+  const listWaveLength = hplcMsSt?.uvvis?.listWaveLength || [];
+
+  spectraList.forEach((spectrum, idx) => {
+    const wavelength = listWaveLength[idx];
+    const integrations = spectrum?.integrations || [];
+
+    if (integrations.length > 0) {
+      const sumArea = integrations.reduce((sum, integ) => sum + (integ.area || 0), 0);
+
+      const integrationStrings = integrations.map((integ) => {
+        const areaVal = integ.area?.toFixed(2) ?? '0.00';
+        const percent = sumArea > 0 ? ((integ.area * 100) / sumArea).toFixed(2) : '0.00';
+        return `${areaVal} (${percent}%)`;
+      });
+
+      values.push(`[${wavelength} nm]: ${integrationStrings.join(', ')}`);
+    }
+  });
+
+  return values.join('\n');
 };
 
 const SECData = ({
@@ -198,7 +219,7 @@ const InfoPanel = ({
   classes, expand, feature, integration, editorOnly, molSvg, descriptions,
   layoutSt, simulationSt, shiftSt, curveSt, theoryMass,
   onExapnd, canChangeDescription, onDescriptionChanged, detectorSt,
-  metaSt, updateDSCMetaDataAct,
+  metaSt, updateDSCMetaDataAct, hplcMsSt,
 }) => {
   if (!feature) return null;
   const {
@@ -352,18 +373,31 @@ const InfoPanel = ({
           }
       </div>
       {
-          (Format.isLCMsLayout(layoutSt)) ? (
-            <div className={classNames(classes.rowRoot, classes.rowOddSim)}>
-              <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>
-                Area under curve (AUC):
-              </span>
-              <br />
-              <span className={classNames(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt')}>
-                {aucValue(integration)}
-              </span>
+        Format.isLCMsLayout(layoutSt) ? (
+          <div className={classNames(classes.rowRoot, classes.rowOddSim)}>
+            <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>
+              Area under curve (AUC):
+            </span>
+            <br />
+            <div
+              className={classNames(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt')}
+              style={{
+                maxHeight: '80px',
+                overflowY: 'auto',
+                overflowX: 'hidden',
+                wordBreak: 'break-word',
+                marginBottom: '100px',
+              }}
+            >
+              {aucValue(integration, hplcMsSt)
+                .split('\n')
+                .map((line, idx) => (
+                  <div key={idx}>{line}</div>
+                ))}
             </div>
-          ) : null
-        }
+          </div>
+        ) : null
+      }
     </Accordion>
   );
 };
@@ -376,6 +410,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     curveSt: state.curve,
     detectorSt: state.detector,
     metaSt: state.meta,
+    hplcMsSt: state.hplcMs,
   }
 );
 
@@ -404,6 +439,7 @@ InfoPanel.propTypes = {
   detectorSt: PropTypes.object.isRequired,
   metaSt: PropTypes.object.isRequired,
   updateDSCMetaDataAct: PropTypes.func.isRequired,
+  hplcMsSt: PropTypes.object.isRequired,
 };
 
 export default connect( // eslint-disable-line

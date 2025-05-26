@@ -25,7 +25,6 @@ class LineFocus {
     } = props;
     this.graphIndex = graphIndex;
     this.uiSt = uiSt;
-    this.jcampIdx = 0;
     this.rootKlass = `.${LIST_ROOT_SVG_GRAPH.LINE}`;
     this.margin = {
       t: 5,
@@ -72,7 +71,7 @@ class LineFocus {
     this.isFirefox = typeof InstallTrigger !== 'undefined';
   }
 
-  getShouldUpdate(nextItSt) {
+  getShouldUpdate(hplcMsSt) {
     const {
       prevXt, prevYt, prevLySt, prevItSt,
       prevTePt, prevData,
@@ -81,7 +80,8 @@ class LineFocus {
     const sameXY = xt(1.1) === prevXt && prevYt === yt(1.1);
     const sameLySt = prevLySt === this.layout;
     const sameTePt = prevTePt === this.tTrEndPts.length;
-    const sameItSt = prevItSt === nextItSt;
+    const currentSpectrum = hplcMsSt?.uvvis?.currentSpectrum;
+    const sameItSt = prevItSt === currentSpectrum?.integrations?.length;
     const sameData = prevData === this.data.length;
     this.shouldUpdate = Object.assign(
       {},
@@ -93,13 +93,15 @@ class LineFocus {
     );
   }
 
-  resetShouldUpdate(prevItSt) {
+  resetShouldUpdate(hplcMsSt) {
     const { xt, yt } = TfRescale(this);
     const prevXt = xt(1.1);
     const prevYt = yt(1.1);
     const prevTePt = this.tTrEndPts.length;
     const prevData = this.data.length;
     const prevLySt = this.layout;
+    const currentSpectrum = hplcMsSt?.uvvis?.currentSpectrum;
+    const prevItSt = currentSpectrum?.integrations?.length;
     this.shouldUpdate = Object.assign(
       {},
       this.shouldUpdate,
@@ -115,11 +117,12 @@ class LineFocus {
     this.root.call(this.tip);
   }
 
-  setDataParams(data, tTrEndPts, layout) {
+  setDataParams(data, tTrEndPts, layout, editPeakSt) {
     this.data = [...data];
     this.data = data.map((d) => ({ x: d.x / 60, y: d.y }));
     this.tTrEndPts = tTrEndPts;
     this.layout = layout;
+    this.editPeakSt = editPeakSt;
   }
 
   updatePathCall(xt, yt) {
@@ -200,13 +203,16 @@ class LineFocus {
 
   drawAUC(stack) {
     const { xt, yt } = TfRescale(this);
-    const auc = this.tags.aucPath.selectAll('path').data(stack);
+    const auc = this.tags.aucPath
+      .selectAll('path')
+      .data(stack, (d) => itgIdTag(d));
+
     auc.exit()
       .attr('class', 'exit')
       .remove();
 
     const integCurve = (border) => {
-      const { xL, xU } = border;
+      const { xL, xU } = border.xExtent;
       const ps = this.data.filter((d) => d.x > xL && d.x < xU);
       if (!ps[0]) return null;
 
@@ -239,56 +245,50 @@ class LineFocus {
       .merge(auc)
       .attr('d', (d) => integCurve(d))
       .attr('id', (d) => `auc${itgIdTag(d)}`)
-      .on('mouseover', (event, d) => {
-        d3.select(`#auc${itgIdTag(d)}`)
-          .attr('stroke', 'red');
-        d3.select(`#auc${itgIdTag(d)}`)
-          .attr('stroke', 'red');
-        d3.select(`#auc${itgIdTag(d)}`)
-          .style('fill', 'red');
+      .on('mouseover', function () {
+        d3.select(this)
+          .attr('stroke', 'blue')
+          .style('fill', 'blue');
       })
-      .on('mouseout', (event, d) => {
-        d3.select(`#auc${itgIdTag(d)}`)
-          .attr('stroke', 'none');
-        d3.select(`#auc${itgIdTag(d)}`)
-          .style('fill', 'red');
-        d3.select(`#auc${itgIdTag(d)}`)
+      .on('mouseout', function () {
+        d3.select(this)
+          .attr('stroke', 'none')
+          .style('fill', 'red')
           .style('fill-opacity', 0.2);
       })
       .on('click', (event, d) => this.onClickTarget(event, d));
   }
 
-  drawInteg(integationSt) {
+  drawInteg(hplcMsSt) {
     const {
       sameXY, sameLySt, sameItSt, sameData,
     } = this.shouldUpdate;
     if (sameXY && sameLySt && sameItSt && sameData) return;
-    const { selectedIdx, integrations } = integationSt;
-    const selectedIntegration = integrations[selectedIdx];
-    const {
-      stack, refArea, refFactor, shift,
-    } = selectedIntegration;
+
     const isDisable = Cfg.btnCmdIntg(this.layout);
     const ignoreRef = Format.isLCMsLayout(this.layout);
-    const itgs = isDisable ? [] : stack;
 
-    const igbp = this.tags.igbPath.selectAll('path').data(itgs);
+    const currentSpectrum = hplcMsSt?.uvvis?.currentSpectrum;
+    const currentIntegrations = currentSpectrum?.integrations || [];
+    const currentRefArea = currentSpectrum?.refArea || 0;
+    const currentRefFactor = currentSpectrum?.refFactor || 1;
+    const igbp = this.tags.igbPath.selectAll('path').data(currentIntegrations, (d) => itgIdTag(d));
     igbp.exit()
       .attr('class', 'exit')
       .remove();
-    const igcp = this.tags.igcPath.selectAll('path').data(itgs);
+    const igcp = this.tags.igcPath.selectAll('path').data(currentIntegrations, (d) => itgIdTag(d));
     igcp.exit()
       .attr('class', 'exit')
       .remove();
 
-    const igtp = this.tags.igtPath.selectAll('text').data(itgs);
+    const igtp = this.tags.igtPath.selectAll('text').data(currentIntegrations, (d) => itgIdTag(d));
     igtp.exit()
       .attr('class', 'exit')
       .remove();
 
-    if (itgs.length === 0 || isDisable) {
+    if (currentIntegrations.length === 0 || isDisable) {
       // remove drawn area under curve
-      const auc = this.tags.aucPath.selectAll('path').data(stack);
+      const auc = this.tags.aucPath.selectAll('path').data(currentIntegrations);
       auc.exit()
         .attr('class', 'exit')
         .remove();
@@ -297,22 +297,23 @@ class LineFocus {
     }
 
     if (ignoreRef) {
-      this.drawAUC(stack);
+      this.drawAUC(currentIntegrations);
     } else {
       // rescale for zoom
       const { xt } = TfRescale(this);
 
       const dh = 50;
-      const integBar = (data) => (
-        d3.line()([
-          [xt(data.xL - shift), dh],
-          [xt(data.xL - shift), dh - 10],
-          [xt(data.xL - shift), dh - 5],
-          [xt(data.xU - shift), dh - 5],
-          [xt(data.xU - shift), dh - 10],
-          [xt(data.xU - shift), dh],
-        ])
-      );
+      const integBar = (data) => {
+        const points = [
+          [xt(data.xL), dh],
+          [xt(data.xL), dh - 10],
+          [xt(data.xL), dh - 5],
+          [xt(data.xU), dh - 5],
+          [xt(data.xU), dh - 10],
+          [xt(data.xU), dh],
+        ];
+        return d3.line()(points);
+      };
 
       igbp.enter()
         .append('path')
@@ -343,8 +344,7 @@ class LineFocus {
 
       const integCurve = (border) => {
         const { xL, xU } = border;
-        const [nXL, nXU] = [xL - shift, xU - shift];
-        const ps = this.data.filter((d) => d.x > nXL && d.x < nXU);
+        const ps = this.data.filter((d) => d.x > xL && d.x < xU);
         const kMax = this.data[this.data.length - 1].k;
         if (!ps[0]) return null;
         const kRef = ps[0].k;
@@ -394,8 +394,12 @@ class LineFocus {
         .style('text-anchor', 'middle')
         .merge(igtp)
         .attr('id', (d) => `igtp${itgIdTag(d)}`)
-        .text((d) => calcArea(d, refArea, refFactor, ignoreRef))
-        .attr('transform', (d) => `translate(${xt((d.xL + d.xU) / 2 - shift)}, ${dh - 12})`)
+        .text((d) => calcArea(d, currentRefArea, currentRefFactor, ignoreRef))
+        .attr('transform', (d) => {
+          const x = xt((d.xL + d.xU) / 2);
+          const y = dh - 12;
+          return `translate(${x}, ${y})`;
+        })
         .on('mouseover', (event, d) => {
           d3.select(`#igbp${itgIdTag(d)}`)
             .attr('stroke', 'blue');
@@ -416,19 +420,100 @@ class LineFocus {
     }
   }
 
+  mergedPeaks(hplcMsSt) {
+    const currentSpectrum = hplcMsSt?.uvvis?.currentSpectrum;
+    if (!currentSpectrum || !currentSpectrum.peaks) return [];
+    return currentSpectrum.peaks;
+  }
+
+  drawPeaks(hplcMsSt) {
+    const {
+      sameXY, sameEpSt, sameDtPk, sameSfPk,
+    } = this.shouldUpdate;
+
+    if (sameXY && sameEpSt && sameDtPk && sameSfPk) return;
+
+    const { xt, yt } = TfRescale(this);
+    const dPks = this.mergedPeaks(hplcMsSt);
+
+    const mpp = this.tags.pPath.selectAll('path').data(dPks);
+
+    mpp.exit().remove();
+
+    const linePath = [
+      { x: -0.5, y: 10 },
+      { x: -0.5, y: -20 },
+      { x: 0.5, y: -20 },
+      { x: 0.5, y: 10 },
+    ];
+
+    const lineSymbol = d3.line()
+      .x((d) => d.x)
+      .y((d) => d.y)(linePath);
+
+    mpp.enter()
+      .append('path')
+      .attr('d', lineSymbol)
+      .attr('class', 'enter-peak')
+      .attr('fill', 'red')
+      .attr('stroke', 'pink')
+      .attr('stroke-width', 3)
+      .attr('stroke-opacity', 0.0)
+      .merge(mpp)
+      .attr('id', (d) => `mpp${Math.round(1000 * d.x)}`)
+      .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(d.y)})`)
+      .on('mouseover', (event, d) => {
+        d3.select(`#mpp${Math.round(1000 * d.x)}`)
+          .attr('stroke-opacity', '1.0');
+        const tipParams = { d, layout: this.layout };
+        this.tip.show(tipParams, event.target);
+      })
+      .on('mouseout', (event, d) => {
+        d3.select(`#mpp${Math.round(1000 * d.x)}`)
+          .attr('stroke-opacity', '0.0');
+        const tipParams = { d, layout: this.layout };
+        this.tip.hide(tipParams, event.target);
+      })
+      .on('click', (event, d) => this.onClickTarget(event, d));
+
+    if (Format.isLCMsLayout(this.layout)) {
+      const bpTxt = this.tags.bpTxt.selectAll('text').data(dPks);
+
+      bpTxt.exit().remove();
+
+      bpTxt.enter()
+        .append('text')
+        .attr('class', 'peak-text')
+        .attr('font-family', 'Helvetica')
+        .style('font-size', '12px')
+        .attr('fill', '#228B22')
+        .style('text-anchor', 'middle')
+        .merge(bpTxt)
+        .attr('id', (d) => `txt${Math.round(1000 * d.x)}`)
+        .text((d) => d.x.toFixed(2))
+        .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(d.y) - 25})`)
+        .on('click', (event, d) => this.onClickTarget(event, d));
+    }
+  }
+
   create({
     filterSeed, tTrEndPts,
-    layoutSt, integationSt,
-    sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
+    layoutSt,
+    sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt, hplcMsSt, editPeakSt,
   }) {
     this.svg = d3.select('.d3Svg');
     MountMainFrame(this, 'focus');
     MountClip(this);
 
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
+    if (!this.root || this.root.empty()) {
+      console.error('Failed to initialize root element');
+      return;
+    }
+
     this.scales = InitScale(this, false);
     this.setTip();
-    this.setDataParams(filterSeed, tTrEndPts, layoutSt);
+    this.setDataParams(filterSeed, tTrEndPts, layoutSt, editPeakSt);
     MountCompass(this);
 
     this.axis = MountAxis(this);
@@ -441,11 +526,12 @@ class LineFocus {
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);
       this.drawLine();
+      this.drawPeaks(hplcMsSt);
       this.drawGrid();
-      this.drawInteg(integationSt);
+      this.drawInteg(hplcMsSt);
     }
     MountBrush(this, isUiAddIntgSt, isUiNoBrushSt);
-    this.resetShouldUpdate(integationSt);
+    this.resetShouldUpdate(hplcMsSt);
   }
 
   reverseXAxis(layoutSt) {
@@ -458,23 +544,25 @@ class LineFocus {
 
   update({
     filterSeed, tTrEndPts,
-    layoutSt, integationSt,
-    sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt, uiSt,
+    layoutSt,
+    sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt, uiSt, hplcMsSt, editPeakSt,
   }) {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, false);
-    this.setDataParams(filterSeed, tTrEndPts, layoutSt);
+    this.setDataParams(filterSeed, tTrEndPts, layoutSt, editPeakSt);
     this.uiSt = uiSt;
+
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);
-      this.getShouldUpdate(integationSt);
+      this.getShouldUpdate(hplcMsSt);
       this.drawLine();
       this.drawGrid();
-      this.drawInteg(integationSt);
+      this.drawPeaks(hplcMsSt);
+      this.drawInteg(hplcMsSt);
     }
 
     MountBrush(this, isUiAddIntgSt, isUiNoBrushSt);
-    this.resetShouldUpdate(integationSt);
+    this.resetShouldUpdate(hplcMsSt);
   }
 }
 

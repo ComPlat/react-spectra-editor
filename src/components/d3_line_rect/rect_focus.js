@@ -73,7 +73,7 @@ class RectFocus {
   }
 
   setDataParams(data, peaks, tTrEndPts, tSfPeaks) {
-    this.data = data.map((d) => ({ ...d, x: d.x / 60 }));
+    this.data = [...data];
     this.dataPks = [...peaks];
     this.tTrEndPts = tTrEndPts;
     this.tSfPeaks = tSfPeaks;

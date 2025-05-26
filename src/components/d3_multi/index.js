@@ -46,7 +46,7 @@ class ViewerMulti extends React.Component {
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt,
       sweepExtentSt, isUiNoBrushSt,
       isHidden, resetAllAct, cyclicvoltaSt,
-      integationSt, mtplySt, axesUnitsSt,
+      integationSt, mtplySt, axesUnitsSt, uiSt,
     } = this.props;
 
     drawDestroy(this.rootKlass);
@@ -84,6 +84,7 @@ class ViewerMulti extends React.Component {
       cyclicvoltaSt,
       integationSt,
       mtplySt,
+      uiSt,
     });
     drawLabel(this.rootKlass, cLabel, xxLabel, yyLabel);
     drawDisplay(this.rootKlass, isHidden);
@@ -98,6 +99,7 @@ class ViewerMulti extends React.Component {
       sweepExtentSt, isUiNoBrushSt,
       isHidden, cyclicvoltaSt,
       integationSt, mtplySt, axesUnitsSt,
+      uiSt,
     } = this.props;
     this.normChange(prevProps);
 
@@ -133,6 +135,7 @@ class ViewerMulti extends React.Component {
       cyclicvoltaSt,
       integationSt,
       mtplySt,
+      uiSt,
     });
     drawLabel(this.rootKlass, cLabel, xxLabel, yyLabel);
     drawDisplay(this.rootKlass, isHidden);
@@ -161,6 +164,7 @@ class ViewerMulti extends React.Component {
 const mapStateToProps = (state, props) => (
   {
     curveSt: state.curve,
+    uiSt: state.ui,
     seed: Topic2Seed(state, props),
     peak: Feature2Peak(state, props),
     tTrEndPts: ToThresEndPts(state, props),
@@ -191,6 +195,7 @@ const mapDispatchToProps = (dispatch) => (
 
 ViewerMulti.propTypes = {
   curveSt: PropTypes.object.isRequired,
+  uiSt: PropTypes.object.isRequired,
   entities: PropTypes.array.isRequired,
   seed: PropTypes.array.isRequired,
   peak: PropTypes.array.isRequired,

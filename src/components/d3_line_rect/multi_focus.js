@@ -240,7 +240,7 @@ class MultiFocus {
   create({
     curveSt,
     filterSeed, tTrEndPts,
-    editPeakSt, layoutSt,
+    layoutSt,
     sweepExtentSt, isUiNoBrushSt,
   }) {
     this.svg = d3.select(this.rootKlass).select(this.brushClass);
@@ -271,7 +271,7 @@ class MultiFocus {
       this.drawOtherLines(layoutSt);
     }
     MountBrush(this, false, isUiNoBrushSt, this.brushClass);
-    this.resetShouldUpdate(editPeakSt);
+    this.resetShouldUpdate();
   }
 
   update({

@@ -5,6 +5,9 @@ import Jcampconverter from 'jcampconverter';
 import { ToXY, IsSame } from './converter';
 import { LIST_LAYOUT } from '../constants/list_layout';
 import { calcMpyCenter } from './multiplicity_calc';
+import { store } from '../app';
+
+const getHplcMs = () => store.getState().hplcMs;
 
 const spectraDigit = (layout) => {
   switch (layout) {
@@ -89,6 +92,100 @@ const rmRef = (peaks, shift, atIndex = 0) => {
   return peaks.map(
     (p) => (IsSame(p.x, refValue) ? null : p),
   ).filter((r) => r != null);
+};
+
+const formatedLCMS = (hplcMsSt = getHplcMs(), isAscend, decimal) => {
+  let result = '';
+
+  const {
+    uvvis: { listWaveLength, spectraList },
+    ms,
+    tic,
+    isNegative,
+    threshold,
+  } = hplcMsSt;
+
+  result += 'HPLC UV/VIS:\n';
+
+  listWaveLength.forEach((wavelength, idx) => {
+    const spectrum = spectraList[idx];
+    if (!spectrum) {
+      return;
+    }
+
+    const peaks = spectrum.peaks || [];
+    const integrations = spectrum.integrations || [];
+
+    result += `Wavelength ${wavelength} nm:\n`;
+
+    if (peaks.length > 0) {
+      const sortedPeaks = [...peaks].sort((a, b) => b.y - a.y);
+      const maxIntensity = sortedPeaks[0].y || 1;
+
+      const peakLines = sortedPeaks.map((peak) => {
+        const rt = peak.x.toFixed(3);
+        const percent = ((peak.y / maxIntensity) * 100).toFixed(1);
+        return `    - ${rt} min (${percent}%)`;
+      });
+
+      result += `${peakLines.join('\n')}\n`;
+    }
+
+    if (integrations.length > 0 && integrations[0].stack?.length > 0) {
+      const { stack, refArea = 1 } = integrations[0];
+      const sortedIntegrations = [...stack].sort((a, b) => a.xL - b.xL);
+
+      result += '    Integrations:\n';
+
+      sortedIntegrations.forEach((integ) => {
+        const rt = integ.xL.toFixed(3);
+        const area = integ.area || integ.absoluteArea || 0;
+        const percent = ((area / refArea) * 100).toFixed(1);
+        result += `      - ${rt} min (${percent}%)\n`;
+      });
+    }
+  });
+
+  const polarity = tic.isNegative ? 'negative' : 'positive';
+
+  if (tic && ms[polarity]) {
+    let currentIndex = -1;
+    if (Array.isArray(tic[polarity]?.data?.x)) {
+      currentIndex = tic[polarity].data.x.findIndex(
+        (x) => Math.abs(x - tic.currentPageValue) < 1e-6,
+      );
+    }
+    if (currentIndex >= 0 && ms[polarity].peaks[currentIndex]) {
+      const peaks = ms[polarity].peaks[currentIndex];
+      const maxIntensity = Math.max(...peaks.map((p) => p.y)) || 1;
+      const thresholdValue = threshold?.value ?? 5;
+
+      const filtered = peaks.filter(
+        (peak) => (peak.y / maxIntensity) * 100 >= thresholdValue,
+      );
+
+      const sortedPeaks = [...filtered].sort((a, b) => {
+        if (isAscend) {
+          return parseFloat(a.x) - parseFloat(b.x);
+        }
+        return parseFloat(b.x) - parseFloat(a.x);
+      });
+
+      result += `\nMS (${isNegative ? '−' : '+'}ESI), m/z (≥${thresholdValue}%):\n`;
+
+      const lines = sortedPeaks.map((peak) => {
+        const mass = fixDigit(peak.x, decimal);
+        const percent = Math.round((peak.y / maxIntensity) * 100);
+        return `  - ${mass} (${percent}%)`;
+      });
+
+      result += lines.join('\n');
+    } else {
+      result += '\nMS: No data for current retention time.\n';
+    }
+  }
+
+  return result;
 };
 
 const formatedMS = (peaks, maxY, decimal = 2, isAscend = true) => {
@@ -305,7 +402,7 @@ const rmShiftFromPeaks = (peaks, shift, atIndex = 0) => {
 const peaksBody = ({
   peaks, layout, decimal, shift, isAscend,
   isIntensity = false, boundary = {},
-  integration, atIndex = 0, waveLength, temperature,
+  integration, atIndex = 0, waveLength, temperature, hplcMsSt,
 }) => {
   const result = rmShiftFromPeaks(peaks, shift, atIndex);
 
@@ -315,6 +412,9 @@ const peaksBody = ({
   const ordered = result.sort(sortFunc);
   const maxY = Math.max(...ordered.map((o) => o.y));
 
+  if (layout === LIST_LAYOUT.LC_MS) {
+    return formatedLCMS(hplcMsSt, isAscend, decimal);
+  }
   if (layout === LIST_LAYOUT.MS) {
     return formatedMS(ordered, maxY, decimal, isAscend);
   }
@@ -581,6 +681,7 @@ const Format = {
   formatedXRD,
   strNumberFixedLength,
   inlineNotation,
+  formatedLCMS,
 };
 
 export default Format;

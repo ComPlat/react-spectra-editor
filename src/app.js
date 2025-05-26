@@ -104,5 +104,5 @@ SpectraEditor.defaultProps = {
 };
 
 export {
-  SpectraEditor, FN,
+  SpectraEditor, FN, store,
 };

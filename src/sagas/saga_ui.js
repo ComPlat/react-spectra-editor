@@ -1,7 +1,7 @@
 import { put, takeEvery, select } from 'redux-saga/effects';
 
 import {
-  UI, EDITPEAK, SHIFT, INTEGRATION, MULTIPLICITY, CYCLIC_VOLTA_METRY,
+  UI, EDITPEAK, SHIFT, INTEGRATION, MULTIPLICITY, CYCLIC_VOLTA_METRY, HPLC_MS,
 } from '../constants/action_type';
 import { LIST_UI_SWEEP_TYPE } from '../constants/list_ui';
 import { LIST_LAYOUT } from '../constants/list_layout';
@@ -19,6 +19,8 @@ const calcPeaks = (payload) => {
   const peaks = dataPks.filter((p) => xL <= p.x && p.x <= xU && yL <= p.y && p.y <= yU);
   return peaks;
 };
+
+const getLayoutSt = (state) => state.layout;
 
 function* selectUiSweep(action) {
   const uiSt = yield select(getUiSt);
@@ -55,12 +57,24 @@ function* selectUiSweep(action) {
         payload,
       });
       break;
-    case LIST_UI_SWEEP_TYPE.INTEGRATION_ADD:
-      yield put({
-        type: UI.SWEEP.SELECT_INTEGRATION,
-        payload: { newData: payload, curveIdx },
-      });
+    case LIST_UI_SWEEP_TYPE.INTEGRATION_ADD: {
+      const layoutSt = yield select(getLayoutSt);
+      if (uvvis.selectedWaveLength && layoutSt === LIST_LAYOUT.LC_MS) {
+        yield put({
+          type: HPLC_MS.UPDATE_HPLCMS_INTEGRATIONS,
+          payload: {
+            spectrumId: uvvis.selectedWaveLength,
+            integration: payload,
+          },
+        });
+      } else {
+        yield put({
+          type: UI.SWEEP.SELECT_INTEGRATION,
+          payload: { newData: payload, curveIdx },
+        });
+      }
       break;
+    }
     case LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD:
       const peaks = calcPeaks(payload); // eslint-disable-line
       if (peaks.length === 0) { break; }
@@ -80,8 +94,6 @@ function* selectUiSweep(action) {
   }
   return null;
 }
-
-const getLayoutSt = (state) => state.layout;
 
 function* scrollUiWheel(action) {
   const layoutSt = yield select(getLayoutSt);
@@ -145,26 +157,60 @@ function* clickUiTarget(action) {
   const curveSt = yield select(getCurveSt);
   const { curveIdx } = curveSt;
 
+  const hplcMsSt = yield select(getHplcMsSt);
+  const { uvvis } = hplcMsSt;
+
   if (uiSweepType === LIST_UI_SWEEP_TYPE.PEAK_ADD && !onPeak) {
+    const spectrumId = hplcMsSt?.uvvis?.selectedWaveLength;
+    const currentPeaks = hplcMsSt?.uvvis?.currentSpectrum?.peaks || [];
+
+    const updatedPeaks = [...currentPeaks, payload];
+
     yield put({
-      type: EDITPEAK.ADD_POSITIVE,
-      payload: { dataToAdd: payload, curveIdx },
+      type: HPLC_MS.UPDATE_HPLCMS_PEAKS,
+      payload: {
+        spectrumId,
+        peaks: updatedPeaks,
+      },
     });
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.PEAK_DELETE && onPeak) {
-    yield put({
-      type: EDITPEAK.ADD_NEGATIVE,
-      payload: { dataToAdd: payload, curveIdx },
-    });
+    const layoutSt = yield select(getLayoutSt);
+    if (layoutSt === LIST_LAYOUT.LC_MS && uvvis.selectedWaveLength) {
+      yield put({
+        type: HPLC_MS.REMOVE_HPLCMS_PEAK,
+        payload: {
+          spectrumId: uvvis.selectedWaveLength,
+          peak: payload,
+        },
+      });
+    } else {
+      yield put({
+        type: EDITPEAK.ADD_NEGATIVE,
+        payload: { dataToAdd: payload, curveIdx },
+      });
+    }
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT && onPeak) {
     yield put({
       type: SHIFT.SET_PEAK,
       payload: { dataToSet: payload, curveIdx },
     });
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_RM && onPeak) {
-    yield put({
-      type: INTEGRATION.RM_ONE,
-      payload: { dataToRemove: payload, curveIdx },
-    });
+    const layoutSt = yield select(getLayoutSt);
+    if (uvvis.selectedWaveLength && layoutSt === LIST_LAYOUT.LC_MS) {
+      yield put({
+        type: HPLC_MS.UPDATE_HPLCMS_INTEGRATIONS,
+        payload: {
+          spectrumId: uvvis.selectedWaveLength,
+          integration: payload,
+          remove: true,
+        },
+      });
+    } else {
+      yield put({
+        type: INTEGRATION.RM_ONE,
+        payload: { dataToRemove: payload, curveIdx },
+      });
+    }
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_RM && onPeak) {
     yield put({
       type: INTEGRATION.RM_ONE,

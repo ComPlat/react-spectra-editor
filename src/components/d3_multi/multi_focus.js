@@ -27,9 +27,10 @@ const d3 = require('d3');
 class MultiFocus {
   constructor(props) {
     const {
-      W, H, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct, entities,
+      W, H, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct, entities, uiSt,
     } = props;
-
+    this.uiSt = uiSt;
+    this.graphIndex = uiSt?.zoom?.graphIndex;
     this.entities = entities;
     this.jcampIdx = 0;
     this.isShowAllCurves = false;
@@ -1013,8 +1014,10 @@ class MultiFocus {
     editPeakSt, layoutSt,
     sweepExtentSt, isUiNoBrushSt,
     cyclicvoltaSt,
-    integationSt, mtplySt,
+    integationSt, mtplySt, uiSt,
   }) {
+    this.uiSt = uiSt;
+    this.graphIndex = uiSt?.zoom?.graphIndex;
     this.svg = d3.select(this.rootKlass).select('.d3Svg');
     MountMainFrame(this, 'focus');
     MountClip(this);
@@ -1059,10 +1062,12 @@ class MultiFocus {
     filterSeed, filterPeak, tTrEndPts, tSfPeaks,
     editPeakSt, layoutSt,
     sweepExtentSt, isUiNoBrushSt, cyclicvoltaSt,
-    integationSt, mtplySt,
+    integationSt, mtplySt, uiSt,
   }) {
+    this.uiSt = uiSt;
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, this.reverseXAxis(layoutSt));
+    this.graphIndex = uiSt?.zoom?.graphIndex;
 
     const { curveIdx, isShowAllCurve } = curveSt;
     const jcampIdx = curveIdx;
@@ -1084,7 +1089,7 @@ class MultiFocus {
       this.drawInteg(integationSt);
       this.drawMtply(mtplySt);
     }
-    MountBrush(this, false, isUiNoBrushSt);
+    MountBrush(this, false, isUiNoBrushSt, this.uiSt, this.graphIndex);
     this.resetShouldUpdate(editPeakSt);
   }
 }

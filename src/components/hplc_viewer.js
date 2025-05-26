@@ -33,7 +33,7 @@ class HPLCViewer extends React.Component { // eslint-disable-line
   render() {
     const {
       classes, curveSt, operations, entityFileNames,
-      entities, userManualLink, molSvg, theoryMass, integrationSt,
+      entities, userManualLink, molSvg, theoryMass, integrationSt, hplcMsSt,
     } = this.props;
     if (!entities || entities.length === 0) return (<div />);
     const { curveIdx } = curveSt;
@@ -64,6 +64,7 @@ class HPLCViewer extends React.Component { // eslint-disable-line
                 yLabel={feature.yUnit}
                 feature={feature}
                 jcampIdx={curveIdx}
+                hplcMsSt={hplcMsSt}
               />
             </Grid>
             <Grid item xs={3} align="center">
@@ -94,6 +95,7 @@ const mapStateToProps = (state, _) => ( // eslint-disable-line
     entities: state.curve.listCurves,
     layoutSt: state.layout,
     integrationSt: state.integration.present,
+    hplcMsSt: state.hplcMs,
   }
 );
 
@@ -115,6 +117,7 @@ HPLCViewer.propTypes = {
   layoutSt: PropTypes.string.isRequired,
   theoryMass: PropTypes.string,
   integrationSt: PropTypes.object.isRequired,
+  hplcMsSt: PropTypes.object.isRequired,
 };
 
 HPLCViewer.defaultProps = {

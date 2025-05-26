@@ -143,6 +143,28 @@ const getThreshold = (state) => (
 );
 
 const Convert2Peak = (feature, threshold, offset, upThreshold = false, lowThreshold = false) => {
+  if (feature?.operation?.layout === 'LC/MS') {
+    const data = feature.data[0];
+    if (!data) return [];
+
+    const { x, y } = data;
+    const peaks = [];
+    const maxIntensity = Math.max(...y);
+
+    const thresholdValue = threshold || 0;
+    for (let i = 1; i < y.length - 1; i++) {
+      const intensity = (y[i] / maxIntensity) * 100;
+      if (intensity >= thresholdValue && y[i] > y[i - 1] && y[i] > y[i + 1]) {
+        peaks.push({
+          x: x[i],
+          y: y[i],
+        });
+      }
+    }
+
+    return peaks;
+  }
+
   const peak = [];
   if (!feature || !feature.data) return peak;
   const data = feature.data[0];
@@ -151,7 +173,13 @@ const Convert2Peak = (feature, threshold, offset, upThreshold = false, lowThresh
   } = feature;
   const { layout } = operation;
 
-  // if (!Format.isSECLayout(layout) && (upperThres || lowerThres)) {
+  if (Format.isLCMsLayout(layout) && feature.peaks) {
+    return feature.peaks.map((p) => ({
+      x: p.x - (offset || 0),
+      y: p.y,
+    }));
+  }
+
   if ((Format.isCyclicVoltaLayout(layout) || Format.isCDSLayout(layout))
   && (upperThres || lowerThres)) {
     let upperThresVal = upThreshold || upperThres;
@@ -354,6 +382,34 @@ const extrSpectraMs = (jcamp, layout) => {
   const scanCount = jcamp.info.$CSSCANCOUNT || 1;
   const spc = extrSpectraShare(jcamp.spectra.slice(0, scanCount), layout);
   let spectra = spc || [];
+  if (Format.isLCMsLayout(layout)) {
+    spectra = spectra.map((spectrum) => {
+      const { data } = spectrum;
+      if (!data || !data[0]) return spectrum;
+
+      const { x, y } = data[0];
+      const peaks = [];
+
+      for (let i = 1; i < y.length - 1; i++) {
+        if (y[i] > y[i - 1] && y[i] > y[i + 1]) {
+          peaks.push({
+            x: x[i],
+            y: y[i],
+          });
+        }
+      }
+
+      return {
+        ...spectrum,
+        peaks,
+        data: {
+          x: data[0].x,
+          y: data[0].y,
+        },
+      };
+    });
+  }
+
   if (jcamp.info.UNITS && jcamp.info.SYMBOL) {
     const units = jcamp.info.UNITS.split(',');
     const symbol = jcamp.info.SYMBOL.split(',');
@@ -456,35 +512,36 @@ const extractVoltammetryData = (jcamp) => {
   return peakStack;
 };
 
-const buildPeakFeature = (jcamp, layout, peakUp, s, thresRef, upperThres = false, lowerThres = false) => {  // eslint-disable-line
+const buildPeakFeature = (jcamp, layout, peakUp, s, thresRef, upperThres = false, lowerThres = false) => {
   const { xType, info } = jcamp;
   const subTyp = xType ? ` - ${xType}` : '';
 
-  return (
-    Object.assign(
-      {
-        typ: s.dataType + subTyp,
-        peakUp,
-        thresRef,
-        scanCount: +info.$CSSCANCOUNT,
-        scanAutoTarget: +info.$CSSCANAUTOTARGET,
-        scanEditTarget: +info.$CSSCANEDITTARGET,
-        shift: extractShift(s, jcamp),
-        operation: {
-          layout,
-          nucleus: xType || '',
-        },
-        observeFrequency: info['.OBSERVEFREQUENCY'],
-        solventName: info['.SOLVENTNAME'],
-        upperThres,
-        lowerThres,
-        volammetryData: extractVoltammetryData(jcamp),
-        scanRate: +info.$CSSCANRATE || 0.1,
-        csCategory: info.$CSCATEGORY,
-      },
-      s,
-    )
-  );
+  const baseFeature = {
+    typ: s.dataType + subTyp,
+    peakUp,
+    thresRef,
+    scanCount: +info.$CSSCANCOUNT,
+    scanAutoTarget: +info.$CSSCANAUTOTARGET,
+    scanEditTarget: +info.$CSSCANEDITTARGET,
+    shift: extractShift(s, jcamp),
+    operation: {
+      layout,
+      nucleus: xType || '',
+    },
+    observeFrequency: info['.OBSERVEFREQUENCY'],
+    solventName: info['.SOLVENTNAME'],
+    upperThres,
+    lowerThres,
+    volammetryData: extractVoltammetryData(jcamp),
+    scanRate: +info.$CSSCANRATE || 0.1,
+    csCategory: info.$CSCATEGORY,
+  };
+
+  if (layout === 'LC/MS' && s.peaks) {
+    baseFeature.peaks = s.peaks;
+  }
+
+  return Object.assign({}, baseFeature, s);
 };
 
 const maxArray = (arr) => {
@@ -761,7 +818,6 @@ const extrFeaturesMs = (jcamp, layout, peakUp) => {
   // }
   // // workaround for legacy design
   const thresRef = (jcamp.info && jcamp.info.$CSTHRESHOLD * 100) || 5;
-  console.log('thresRef', thresRef);
   const base = jcamp.spectra[0];
 
   const features = jcamp.spectra.map((s) => {

@@ -22,7 +22,7 @@ const d3 = require('d3');
 class LineFocus {
   constructor(props) {
     const {
-      W, H, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
+      W, H, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct, uiSt,
     } = props;
 
     this.jcampIdx = 0;
@@ -33,6 +33,8 @@ class LineFocus {
       l: 60,
       r: 5,
     };
+    this.uiSt = uiSt;
+    this.graphIndex = uiSt?.zoom?.graphIndex;
     this.w = W - this.margin.l - this.margin.r;
     this.h = H - this.margin.t - this.margin.b;
     this.clickUiTargetAct = clickUiTargetAct;
@@ -794,8 +796,10 @@ class LineFocus {
     filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, comparisons,
     editPeakSt, layoutSt, integationSt, mtplySt,
     sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
-    wavelength,
+    wavelength, uiSt,
   }) {
+    this.uiSt = uiSt;
+    this.graphIndex = uiSt?.zoom?.graphIndex;
     this.svg = d3.select('.d3Svg');
     MountMainFrame(this, 'focus');
     MountClip(this);
@@ -832,10 +836,12 @@ class LineFocus {
 
   update({
     filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, comparisons,
-    editPeakSt, layoutSt, integationSt, mtplySt,
+    editPeakSt, layoutSt, integationSt, mtplySt, uiSt,
     sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
     wavelength,
   }) {
+    this.uiSt = uiSt;
+    this.graphIndex = uiSt?.zoom?.graphIndex;
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, this.reverseXAxis(layoutSt));
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt, wavelength);
