@@ -46,7 +46,8 @@ class LayerInit extends React.Component {
   }
 
   normChange(prevProps) {
-    if (prevProps.entity !== this.props.entity) {
+    const { entity } = this.props;
+    if (prevProps.entity !== entity) {
       this.execReset();
     }
   }
