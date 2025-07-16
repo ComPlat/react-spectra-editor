@@ -9,6 +9,7 @@ import { withStyles } from '@mui/styles';
 import { updateOperation } from './actions/submit';
 import {
   resetInitCommon, resetInitNmr, resetInitMs, resetInitCommonWithIntergation, resetDetector,
+  resetMultiplicity,
 } from './actions/manager';
 import { updateMetaPeaks, updateDSCMetaData } from './actions/meta';
 import { addOthers } from './actions/jcamp';
@@ -45,13 +46,7 @@ class LayerInit extends React.Component {
   }
 
   normChange(prevProps) {
-    const prevFeatures = prevProps.entity.features;
-    const prevPeak = prevFeatures.editPeak || prevFeatures.autoPeak;
-    const { entity } = this.props;
-    const nextFeatures = entity.features;
-    const nextPeak = nextFeatures.editPeak || nextFeatures.autoPeak;
-
-    if (prevPeak !== nextPeak) {
+    if (prevProps.entity !== this.props.entity) {
       this.execReset();
     }
   }
@@ -60,7 +55,7 @@ class LayerInit extends React.Component {
     const {
       entity, updateMetaPeaksAct,
       resetInitCommonAct, resetInitMsAct, resetInitNmrAct, resetInitCommonWithIntergationAct,
-      resetDetectorAct, updateDSCMetaDataAct,
+      resetDetectorAct, updateDSCMetaDataAct, resetMultiplicityAct,
     } = this.props;
     resetInitCommonAct();
     resetDetectorAct();
@@ -71,8 +66,7 @@ class LayerInit extends React.Component {
       const editPeak = features.editPeak || features[0];
       const baseFeat = editPeak || autoPeak;
       resetInitMsAct(baseFeat);
-    }
-    if (Format.isNmrLayout(layout)) {
+    } else if (Format.isNmrLayout(layout)) {
       const { integration, multiplicity, simulation } = features;
       updateMetaPeaksAct(entity);
       resetInitNmrAct({
@@ -87,6 +81,8 @@ class LayerInit extends React.Component {
     } else if (Format.isDSCLayout(layout)) {
       const { dscMetaData } = features;
       updateDSCMetaDataAct(dscMetaData);
+    } else {
+      resetMultiplicityAct();
     }
   }
 
@@ -173,6 +169,7 @@ const mapDispatchToProps = (dispatch) => (
     resetInitMsAct: resetInitMs,
     resetInitCommonWithIntergationAct: resetInitCommonWithIntergation,
     resetDetectorAct: resetDetector,
+    resetMultiplicityAct: resetMultiplicity,
     updateOperationAct: updateOperation,
     updateMetaPeaksAct: updateMetaPeaks,
     addOthersAct: addOthers,
@@ -207,6 +204,7 @@ LayerInit.propTypes = {
   setAllCurvesAct: PropTypes.func.isRequired,
   userManualLink: PropTypes.object, // eslint-disable-line
   resetDetectorAct: PropTypes.func.isRequired,
+  resetMultiplicityAct: PropTypes.func.isRequired,
   updateDSCMetaDataAct: PropTypes.func.isRequired,
 };
 
