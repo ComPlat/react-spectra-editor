@@ -4,6 +4,9 @@ import { GetCyclicVoltaPeakSeparate } from '../helpers/chem';
 
 const initialState = {
   spectraList: [],
+  areaValue: 1.0,
+  areaUnit: 'cm^2',
+  useCurrentDensity: false,
 };
 
 const initSpectra = {
@@ -385,6 +388,21 @@ const cyclicVoltaReducer = (state = initialState, action) => {
       return selectRefFactor(state, action);
     case CYCLIC_VOLTA_METRY.RESETALL:
       return Object.assign({}, state, { spectraList: [] });
+    case CYCLIC_VOLTA_METRY.SET_AREA_VALUE: {
+      const { value } = action.payload;
+      if (value === '') {
+        return Object.assign({}, state, { areaValue: '' });
+      }
+      const areaValue = Number.isFinite(value) ? value : state.areaValue;
+      return Object.assign({}, state, { areaValue });
+    }
+    case CYCLIC_VOLTA_METRY.SET_AREA_UNIT: {
+      const { unit } = action.payload;
+      return Object.assign({}, state, { areaUnit: unit });
+    }
+    case CYCLIC_VOLTA_METRY.TOGGLE_DENSITY: {
+      return Object.assign({}, state, { useCurrentDensity: !state.useCurrentDensity });
+    }
     default:
       return state;
   }

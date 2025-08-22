@@ -21,6 +21,7 @@ import Wavelength from './r07_wavelength_btn';
 import Pecker from './07_pecker';
 import ChangeAxes from './r08_change_axes';
 import Detector from './r09_detector';
+import CvDensityControls from './r10_cv_density';
 
 const styles = () => (
   Object.assign(
@@ -56,6 +57,7 @@ const CmdBar = ({
     }
     <Layout feature={feature} hasEdit={hasEdit} />
     <Wavelength />
+    <CvDensityControls />
     <ChangeAxes />
     <Detector />
   </div>
