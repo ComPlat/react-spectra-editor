@@ -96,6 +96,7 @@ class MultiFocus {
     this.onClickPecker = this.onClickPecker.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
     this.cyclicvoltaSt = null;
+    this.yTransformFactor = 1.0;
   }
 
   getShouldUpdate(nextEpSt) {
@@ -145,14 +146,44 @@ class MultiFocus {
     this.root.call(this.tip);
   }
 
+  computeYTransformFactor(layout, cyclicvoltaSt, feature) {
+    let factor = 1.0;
+    if (layout === LIST_LAYOUT.CYCLIC_VOLTAMMETRY && cyclicvoltaSt && cyclicvoltaSt.useCurrentDensity) {
+      const rawArea = (cyclicvoltaSt.areaValue === '' ? 1.0 : cyclicvoltaSt.areaValue) || 1.0;
+      const areaUnit = cyclicvoltaSt.areaUnit || 'cm^2';
+      const safeArea = rawArea > 0 ? rawArea : 1.0;
+      const areaInCm2 = areaUnit === 'mm^2' ? (safeArea / 100.0) : safeArea;
+      factor = 1.0 / areaInCm2;
+      const baseY = feature && feature.yUnit ? String(feature.yUnit) : 'A';
+      if (/mA/i.test(baseY)) {
+        factor *= 1000.0;
+      }
+      if (areaUnit === 'mm^2') {
+        factor /= 100.0;
+      }
+    }
+    return factor;
+  }
+
+  transformYValue(y) {
+    return y * this.yTransformFactor;
+  }
+
   setDataParams(filterSeed, peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt, jcampIdx = 0) {
     this.data = [];
     this.otherLineData = [];
     let filterSubLayoutValue = null;
+
+    const currFeature = this.entities && this.entities[0] ? this.entities[0].feature : null;
+    this.yTransformFactor = this.computeYTransformFactor(layout, cyclicvoltaSt, currFeature);
+
     this.entities.forEach((entry, idx) => {
       const { topic, feature, color } = entry;
       const offset = GetCyclicVoltaPreviousShift(cyclicvoltaSt, jcampIdx);
       let currData = convertTopic(topic, layout, feature, offset);
+      if (this.yTransformFactor !== 1.0) {
+        currData = currData.map((p) => ({ x: p.x, y: this.transformYValue(p.y), k: p.k }));
+      }
       if (idx === jcampIdx) {
         if (!Format.isCyclicVoltaLayout(layout)) {
           currData = filterSeed;
@@ -237,14 +268,16 @@ class MultiFocus {
 
   drawThres() {
     if (this.tTrEndPts.length > 0) {
-      this.thresLineUp.attr('d', this.pathCall(this.tTrEndPts));
+      const upScaled = this.tTrEndPts.map((p) => ({ x: p.x, y: this.transformYValue(p.y) }));
+      this.thresLineUp.attr('d', this.pathCall(upScaled));
       this.thresLineUp.attr('visibility', 'visible');
       const [left, right] = this.tTrEndPts;
       const dwMirrorEndPts = [
         Object.assign({}, left, { y: -left.y }),
         Object.assign({}, right, { y: -right.y }),
       ];
-      this.thresLineDw.attr('d', this.pathCall(dwMirrorEndPts));
+      const dwScaled = dwMirrorEndPts.map((p) => ({ x: p.x, y: this.transformYValue(p.y) }));
+      this.thresLineDw.attr('d', this.pathCall(dwScaled));
       this.thresLineDw.attr('visibility', 'visible');
     } else {
       this.thresLineUp.attr('visibility', 'hidden');
@@ -458,7 +491,7 @@ class MultiFocus {
       .attr('stroke-opacity', 0.0)
       .merge(mpp)
       .attr('id', (d) => `mpp${Math.round(1000 * d.x)}`)
-      .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(d.y)})`)
+      .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(this.transformYValue(d.y))})`)
       .on('mouseover', (event, d) => {
         d3.select(`#mpp${Math.round(1000 * d.x)}`)
           .attr('stroke-opacity', '1.0');
@@ -494,7 +527,7 @@ class MultiFocus {
         .merge(bpTxt)
         .attr('id', (d) => `mpp${Math.round(1000 * d.x)}`)
         .text((d) => d.x.toFixed(2))
-        .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(d.y) - 25})`)
+        .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(this.transformYValue(d.y)) - 25})`)
         .on('click', (event, d) => this.onClickTarget(event, d));
     }
 
@@ -544,7 +577,7 @@ class MultiFocus {
       .attr('stroke-opacity', 0.0)
       .merge(mpp)
       .attr('id', (d) => `mpp${Math.round(1000 * d.x)}`)
-      .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(d.y)})`)
+      .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(this.transformYValue(d.y))})`)
       .on('mouseover', (event, d) => {
         d3.select(`#mpp${Math.round(1000 * d.x)}`)
           .attr('stroke-opacity', '1.0');
@@ -997,7 +1030,7 @@ class MultiFocus {
       .attr('fill', 'green')
       .attr('fill-opacity', 0.8)
       .merge(ccp)
-      .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(d.y)})`);
+      .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(this.transformYValue(d.y))})`);
   }
 
   reverseXAxis(layoutSt) {

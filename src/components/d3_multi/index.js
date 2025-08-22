@@ -67,6 +67,12 @@ class ViewerMulti extends React.Component {
       yyLabel = yUnit === '' ? yLabel : yUnit;
     }
 
+    if (cyclicvoltaSt && cyclicvoltaSt.useCurrentDensity) {
+      const areaUnit = cyclicvoltaSt.areaUnit || 'cm^2';
+      const currentUnit = feature && feature.yUnit ? String(feature.yUnit) : 'A';
+      yyLabel = `Current density in ${currentUnit}/${areaUnit}`;
+    }
+
     const filterSeed = seed;
     const filterPeak = peak;
 
@@ -97,7 +103,7 @@ class ViewerMulti extends React.Component {
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt,
       sweepExtentSt, isUiNoBrushSt,
       isHidden, cyclicvoltaSt,
-      integationSt, mtplySt, axesUnitsSt,
+      integationSt, mtplySt, axesUnitsSt, feature,
     } = this.props;
     this.normChange(prevProps);
 
@@ -114,6 +120,11 @@ class ViewerMulti extends React.Component {
       const { xUnit, yUnit } = selectedAxes;
       xxLabel = xUnit === '' ? xLabel : xUnit;
       yyLabel = yUnit === '' ? yLabel : yUnit;
+    }
+    if (cyclicvoltaSt && cyclicvoltaSt.useCurrentDensity) {
+      const areaUnit = cyclicvoltaSt.areaUnit || 'cm^2';
+      const currentUnit = feature && feature.yUnit ? String(feature.yUnit) : 'A';
+      yyLabel = `Current density in ${currentUnit}/${areaUnit}`;
     }
 
     const filterSeed = seed;
