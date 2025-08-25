@@ -150,15 +150,15 @@ class MultiFocus {
     let factor = 1.0;
     if (layout === LIST_LAYOUT.CYCLIC_VOLTAMMETRY && cyclicvoltaSt && cyclicvoltaSt.useCurrentDensity) {
       const rawArea = (cyclicvoltaSt.areaValue === '' ? 1.0 : cyclicvoltaSt.areaValue) || 1.0;
-      const areaUnit = cyclicvoltaSt.areaUnit || 'cm^2';
+      const areaUnit = cyclicvoltaSt.areaUnit || 'cm²';
       const safeArea = rawArea > 0 ? rawArea : 1.0;
-      const areaInCm2 = areaUnit === 'mm^2' ? (safeArea / 100.0) : safeArea;
+      const areaInCm2 = areaUnit === 'mm²' ? (safeArea / 100.0) : safeArea;
       factor = 1.0 / areaInCm2;
       const baseY = feature && feature.yUnit ? String(feature.yUnit) : 'A';
       if (/mA/i.test(baseY)) {
         factor *= 1000.0;
       }
-      if (areaUnit === 'mm^2') {
+      if (areaUnit === 'mm²') {
         factor /= 100.0;
       }
     }
