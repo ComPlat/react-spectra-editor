@@ -5,7 +5,7 @@ import { GetCyclicVoltaPeakSeparate } from '../helpers/chem';
 const initialState = {
   spectraList: [],
   areaValue: 1.0,
-  areaUnit: 'cm^2',
+  areaUnit: 'cm²',
   useCurrentDensity: false,
 };
 

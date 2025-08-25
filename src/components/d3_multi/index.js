@@ -68,7 +68,7 @@ class ViewerMulti extends React.Component {
     }
 
     if (cyclicvoltaSt && cyclicvoltaSt.useCurrentDensity) {
-      const areaUnit = cyclicvoltaSt.areaUnit || 'cm^2';
+      const areaUnit = cyclicvoltaSt.areaUnit || 'cm²';
       const currentUnit = feature && feature.yUnit ? String(feature.yUnit) : 'A';
       yyLabel = `Current density in ${currentUnit}/${areaUnit}`;
     }
@@ -122,7 +122,7 @@ class ViewerMulti extends React.Component {
       yyLabel = yUnit === '' ? yLabel : yUnit;
     }
     if (cyclicvoltaSt && cyclicvoltaSt.useCurrentDensity) {
-      const areaUnit = cyclicvoltaSt.areaUnit || 'cm^2';
+      const areaUnit = cyclicvoltaSt.areaUnit || 'cm²';
       const currentUnit = feature && feature.yUnit ? String(feature.yUnit) : 'A';
       yyLabel = `Current density in ${currentUnit}/${areaUnit}`;
     }

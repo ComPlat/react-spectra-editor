@@ -24,7 +24,7 @@ const styles = () => ({
   },
 });
 
-const units = ['cm^2', 'mm^2'];
+const units = ['cm²', 'mm²'];
 
 const CvDensityControls = ({
   classes, layoutSt, areaValue, areaUnit, useCurrentDensity,
@@ -58,8 +58,8 @@ const CvDensityControls = ({
       const from = areaUnit;
       const to = newUnit;
       let converted = num;
-      if (from === 'cm^2' && to === 'mm^2') converted = num * 100.0;
-      if (from === 'mm^2' && to === 'cm^2') converted = num / 100.0;
+      if (from === 'cm²' && to === 'mm²') converted = num * 100.0;
+      if (from === 'mm²' && to === 'cm²') converted = num / 100.0;
       setAreaValueAct(converted);
     }
     setAreaUnitAct(newUnit);
@@ -75,10 +75,10 @@ const CvDensityControls = ({
   return (
     <span className={classes.groupRight}>
       <FormControl className={classNames(classes.fieldArea)} variant="outlined" disabled={!useCurrentDensity}>
-        <InputLabel htmlFor="cv-area" className={classNames(classes.selectLabel, 'select-sv-bar-label')}>WE-area</InputLabel>
+        <InputLabel htmlFor="cv-area" className={classNames(classes.selectLabel, 'select-sv-bar-label')}>WE-ECSA</InputLabel>
         <OutlinedInput
           id="cv-area"
-          label="WE-area"
+          label="WE-ECSA"
           type="number"
           inputProps={{ step: '0.0001', min: '0' }}
           value={areaValue}
