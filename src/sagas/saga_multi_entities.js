@@ -37,6 +37,40 @@ function* setCyclicVoltametry(action) { // eslint-disable-line
       return;
     }
 
+    const cvSt = yield select((state) => state.cyclicvolta);
+    const { feature } = firstCurve;
+    if (feature) {
+      const { weAreaValue, weAreaUnit, currentMode } = feature;
+      if (typeof weAreaUnit === 'string' && weAreaUnit.length > 0) {
+        const unit = weAreaUnit.replace('^2', '²');
+        yield put(({ type: CYCLIC_VOLTA_METRY.SET_AREA_UNIT, payload: { unit } }));
+      }
+      else {
+        yield put(({ type: CYCLIC_VOLTA_METRY.SET_AREA_UNIT, payload: { unit: 'cm²' } }));
+      }
+      if (weAreaValue !== undefined && weAreaValue !== null) {
+        let numeric = null;
+        if (typeof weAreaValue === 'string') {
+          const parsed = parseFloat(weAreaValue);
+          if (!Number.isNaN(parsed)) numeric = parsed;
+        } else if (Number.isFinite(weAreaValue)) {
+          numeric = weAreaValue;
+        }
+        if (Number.isFinite(numeric)) {
+          yield put(({ type: CYCLIC_VOLTA_METRY.SET_AREA_VALUE, payload: { value: numeric } }));
+        }
+        else {
+          yield put(({ type: CYCLIC_VOLTA_METRY.SET_AREA_VALUE, payload: { value: 1.0 } }));
+        }
+      }
+      if (typeof currentMode === 'string' && currentMode.length > 0) {
+        const wantDensity = currentMode.toUpperCase() === 'DENSITY';
+        if (!!cvSt.useCurrentDensity !== wantDensity) {
+          yield put(({ type: CYCLIC_VOLTA_METRY.TOGGLE_DENSITY, payload: null }));
+        }
+      }
+    }
+
     for (let index = 0; index < listCurves.length; index++) {
       const curve = listCurves[index];
       const maxminPeak = getMaxMinPeak(curve);
