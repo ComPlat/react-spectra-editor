@@ -150,8 +150,7 @@ function* addUiPeakToStack(action) {
     payload
   });
 }
-const rmPeakFromStack = function (action, metaSt, mpySt) {
-  let curveIdx = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+const rmPeakFromStack = (action, metaSt, mpySt, curveIdx = 0) => {
   const {
     peak,
     xExtent

@@ -96,6 +96,7 @@ class MultiFocus {
     this.onClickPecker = this.onClickPecker.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
     this.cyclicvoltaSt = null;
+    this.yTransformFactor = 1.0;
   }
   getShouldUpdate(nextEpSt) {
     const {
@@ -158,11 +159,33 @@ class MultiFocus {
     this.tip = (0, _init.InitTip)();
     this.root.call(this.tip);
   }
-  setDataParams(filterSeed, peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt) {
-    let jcampIdx = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : 0;
+  computeYTransformFactor(layout, cyclicvoltaSt, feature) {
+    let factor = 1.0;
+    if (layout === _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY && cyclicvoltaSt && cyclicvoltaSt.useCurrentDensity) {
+      const rawArea = (cyclicvoltaSt.areaValue === '' ? 1.0 : cyclicvoltaSt.areaValue) || 1.0;
+      const areaUnit = cyclicvoltaSt.areaUnit || 'cm²';
+      const safeArea = rawArea > 0 ? rawArea : 1.0;
+      const areaInCm2 = areaUnit === 'mm²' ? safeArea / 100.0 : safeArea;
+      factor = 1.0 / areaInCm2;
+      const baseY = feature && feature.yUnit ? String(feature.yUnit) : 'A';
+      if (/mA/i.test(baseY)) {
+        factor *= 1000.0;
+      }
+      if (areaUnit === 'mm²') {
+        factor /= 100.0;
+      }
+    }
+    return factor;
+  }
+  transformYValue(y) {
+    return y * this.yTransformFactor;
+  }
+  setDataParams(filterSeed, peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt, jcampIdx = 0) {
     this.data = [];
     this.otherLineData = [];
     let filterSubLayoutValue = null;
+    const currFeature = this.entities && this.entities[0] ? this.entities[0].feature : null;
+    this.yTransformFactor = this.computeYTransformFactor(layout, cyclicvoltaSt, currFeature);
     this.entities.forEach((entry, idx) => {
       const {
         topic,
@@ -171,6 +194,13 @@ class MultiFocus {
       } = entry;
       const offset = (0, _chem.GetCyclicVoltaPreviousShift)(cyclicvoltaSt, jcampIdx);
       let currData = (0, _chem.convertTopic)(topic, layout, feature, offset);
+      if (this.yTransformFactor !== 1.0) {
+        currData = currData.map(p => ({
+          x: p.x,
+          y: this.transformYValue(p.y),
+          k: p.k
+        }));
+      }
       if (idx === jcampIdx) {
         if (!_format.default.isCyclicVoltaLayout(layout)) {
           currData = filterSeed;
@@ -266,7 +296,11 @@ class MultiFocus {
   }
   drawThres() {
     if (this.tTrEndPts.length > 0) {
-      this.thresLineUp.attr('d', this.pathCall(this.tTrEndPts));
+      const upScaled = this.tTrEndPts.map(p => ({
+        x: p.x,
+        y: this.transformYValue(p.y)
+      }));
+      this.thresLineUp.attr('d', this.pathCall(upScaled));
       this.thresLineUp.attr('visibility', 'visible');
       const [left, right] = this.tTrEndPts;
       const dwMirrorEndPts = [Object.assign({}, left, {
@@ -274,7 +308,11 @@ class MultiFocus {
       }), Object.assign({}, right, {
         y: -right.y
       })];
-      this.thresLineDw.attr('d', this.pathCall(dwMirrorEndPts));
+      const dwScaled = dwMirrorEndPts.map(p => ({
+        x: p.x,
+        y: this.transformYValue(p.y)
+      }));
+      this.thresLineDw.attr('d', this.pathCall(dwScaled));
       this.thresLineDw.attr('visibility', 'visible');
     } else {
       this.thresLineUp.attr('visibility', 'hidden');
@@ -469,7 +507,7 @@ class MultiFocus {
       return indexOfCVRefPeaks[index] === -1 ? lineSymbolRef : lineSymbol;
     }).attr('class', 'enter-peak').attr('fill', (_, index) => {
       return indexOfCVRefPeaks[index] === -1 ? 'blue' : 'red';
-    }).attr('stroke', 'pink').attr('stroke-width', 3).attr('stroke-opacity', 0.0).merge(mpp).attr('id', d => `mpp${Math.round(1000 * d.x)}`).attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y)})`).on('mouseover', (event, d) => {
+    }).attr('stroke', 'pink').attr('stroke-width', 3).attr('stroke-opacity', 0.0).merge(mpp).attr('id', d => `mpp${Math.round(1000 * d.x)}`).attr('transform', d => `translate(${xt(d.x)}, ${yt(this.transformYValue(d.y))})`).on('mouseover', (event, d) => {
       d3.select(`#mpp${Math.round(1000 * d.x)}`).attr('stroke-opacity', '1.0');
       d3.select(`#bpt${Math.round(1000 * d.x)}`).style('fill', 'blue');
       const tipParams = {
@@ -490,7 +528,7 @@ class MultiFocus {
     if (ignoreRef) {
       const bpTxt = this.tags.bpTxt.selectAll('text').data(dPks);
       bpTxt.exit().attr('class', 'exit').remove();
-      bpTxt.enter().append('text').attr('class', 'peak-text').attr('font-family', 'Helvetica').style('font-size', '12px').attr('fill', '#228B22').style('text-anchor', 'middle').merge(bpTxt).attr('id', d => `mpp${Math.round(1000 * d.x)}`).text(d => d.x.toFixed(2)).attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y) - 25})`).on('click', (event, d) => this.onClickTarget(event, d));
+      bpTxt.enter().append('text').attr('class', 'peak-text').attr('font-family', 'Helvetica').style('font-size', '12px').attr('fill', '#228B22').style('text-anchor', 'middle').merge(bpTxt).attr('id', d => `mpp${Math.round(1000 * d.x)}`).text(d => d.x.toFixed(2)).attr('transform', d => `translate(${xt(d.x)}, ${yt(this.transformYValue(d.y)) - 25})`).on('click', (event, d) => this.onClickTarget(event, d));
     }
     mpp.attr('fill', (_, index) => {
       return indexOfCVRefPeaks[index] === -1 ? 'blue' : 'red';
@@ -530,7 +568,7 @@ class MultiFocus {
       y: 10
     }];
     const lineSymbol = d3.line().x(d => d.x).y(d => d.y)(linePath);
-    mpp.enter().append('path').attr('d', lineSymbol).attr('class', 'enter-peak').attr('fill', '#228B22').attr('stroke', 'pink').attr('stroke-width', 3).attr('stroke-opacity', 0.0).merge(mpp).attr('id', d => `mpp${Math.round(1000 * d.x)}`).attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y)})`).on('mouseover', (event, d) => {
+    mpp.enter().append('path').attr('d', lineSymbol).attr('class', 'enter-peak').attr('fill', '#228B22').attr('stroke', 'pink').attr('stroke-width', 3).attr('stroke-opacity', 0.0).merge(mpp).attr('id', d => `mpp${Math.round(1000 * d.x)}`).attr('transform', d => `translate(${xt(d.x)}, ${yt(this.transformYValue(d.y))})`).on('mouseover', (event, d) => {
       d3.select(`#mpp${Math.round(1000 * d.x)}`).attr('stroke-opacity', '1.0');
       d3.select(`#bpt${Math.round(1000 * d.x)}`).style('fill', 'blue');
       const tipParams = {
@@ -806,26 +844,25 @@ class MultiFocus {
     }];
     const faktor = _format.default.isIrLayout(this.layout) ? -1 : 1;
     const lineSymbol = d3.line().x(d => d.x).y(d => faktor * d.y)(linePath);
-    ccp.enter().append('path').attr('d', lineSymbol).attr('class', 'enter-ref').attr('fill', 'green').attr('fill-opacity', 0.8).merge(ccp).attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y)})`);
+    ccp.enter().append('path').attr('d', lineSymbol).attr('class', 'enter-ref').attr('fill', 'green').attr('fill-opacity', 0.8).merge(ccp).attr('transform', d => `translate(${xt(d.x)}, ${yt(this.transformYValue(d.y))})`);
   }
   reverseXAxis(layoutSt) {
     return [_list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS, _list_layout.LIST_LAYOUT.TGA, _list_layout.LIST_LAYOUT.DSC, _list_layout.LIST_LAYOUT.XRD, _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY, _list_layout.LIST_LAYOUT.CDS, _list_layout.LIST_LAYOUT.SEC, _list_layout.LIST_LAYOUT.GC, _list_layout.LIST_LAYOUT.AIF].indexOf(layoutSt) < 0;
   }
-  create(_ref) {
-    let {
-      curveSt,
-      filterSeed,
-      filterPeak,
-      tTrEndPts,
-      tSfPeaks,
-      editPeakSt,
-      layoutSt,
-      sweepExtentSt,
-      isUiNoBrushSt,
-      cyclicvoltaSt,
-      integationSt,
-      mtplySt
-    } = _ref;
+  create({
+    curveSt,
+    filterSeed,
+    filterPeak,
+    tTrEndPts,
+    tSfPeaks,
+    editPeakSt,
+    layoutSt,
+    sweepExtentSt,
+    isUiNoBrushSt,
+    cyclicvoltaSt,
+    integationSt,
+    mtplySt
+  }) {
     this.svg = d3.select(this.rootKlass).select('.d3Svg');
     (0, _mount.MountMainFrame)(this, 'focus');
     (0, _mount.MountClip)(this);
@@ -863,22 +900,21 @@ class MultiFocus {
     (0, _brush.default)(this, false, isUiNoBrushSt);
     this.resetShouldUpdate(editPeakSt);
   }
-  update(_ref2) {
-    let {
-      entities,
-      curveSt,
-      filterSeed,
-      filterPeak,
-      tTrEndPts,
-      tSfPeaks,
-      editPeakSt,
-      layoutSt,
-      sweepExtentSt,
-      isUiNoBrushSt,
-      cyclicvoltaSt,
-      integationSt,
-      mtplySt
-    } = _ref2;
+  update({
+    entities,
+    curveSt,
+    filterSeed,
+    filterPeak,
+    tTrEndPts,
+    tSfPeaks,
+    editPeakSt,
+    layoutSt,
+    sweepExtentSt,
+    isUiNoBrushSt,
+    cyclicvoltaSt,
+    integationSt,
+    mtplySt
+  }) {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt));
     const {

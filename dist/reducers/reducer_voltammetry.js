@@ -9,7 +9,10 @@ var _chem = require("../helpers/chem");
 /* eslint-disable prefer-object-spread, default-param-last */
 
 const initialState = {
-  spectraList: []
+  spectraList: [],
+  areaValue: 1.0,
+  areaUnit: 'cm²',
+  useCurrentDensity: false
 };
 const initSpectra = {
   list: [],
@@ -112,8 +115,7 @@ const getE12 = data => {
   }
   return null;
 };
-const addPeak = function (state, action) {
-  let isMax = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+const addPeak = (state, action, isMax = true) => {
   const {
     payload
   } = action;
@@ -161,8 +163,7 @@ const addPeak = function (state, action) {
   }
   return state;
 };
-const removePeak = function (state, action) {
-  let isMax = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+const removePeak = (state, action, isMax = true) => {
   const {
     payload
   } = action;
@@ -533,9 +534,7 @@ const selectRefFactor = (state, action) => {
   }
   return state;
 };
-const cyclicVoltaReducer = function () {
-  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-  let action = arguments.length > 1 ? arguments[1] : undefined;
+const cyclicVoltaReducer = (state = initialState, action) => {
   switch (action.type) {
     case _action_type.CYCLIC_VOLTA_METRY.ADD_PAIR_PEAKS:
       return addPairPeak(state, action);
@@ -567,6 +566,36 @@ const cyclicVoltaReducer = function () {
       return Object.assign({}, state, {
         spectraList: []
       });
+    case _action_type.CYCLIC_VOLTA_METRY.SET_AREA_VALUE:
+      {
+        const {
+          value
+        } = action.payload;
+        if (value === '') {
+          return Object.assign({}, state, {
+            areaValue: ''
+          });
+        }
+        const areaValue = Number.isFinite(value) ? value : state.areaValue;
+        return Object.assign({}, state, {
+          areaValue
+        });
+      }
+    case _action_type.CYCLIC_VOLTA_METRY.SET_AREA_UNIT:
+      {
+        const {
+          unit
+        } = action.payload;
+        return Object.assign({}, state, {
+          areaUnit: unit
+        });
+      }
+    case _action_type.CYCLIC_VOLTA_METRY.TOGGLE_DENSITY:
+      {
+        return Object.assign({}, state, {
+          useCurrentDensity: !state.useCurrentDensity
+        });
+      }
     default:
       return state;
   }

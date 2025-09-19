@@ -16,6 +16,7 @@ var _list_ui = require("../../constants/list_ui");
 var _cyclic_voltammetry = require("../../actions/cyclic_voltammetry");
 var _multi_focus = _interopRequireDefault(require("./multi_focus"));
 var _draw = require("../common/draw");
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable no-mixed-operators, react/require-default-props,
 react/no-unused-prop-types */
 
@@ -89,6 +90,11 @@ class ViewerMulti extends _react.default.Component {
       xxLabel = xUnit === '' ? xLabel : xUnit;
       yyLabel = yUnit === '' ? yLabel : yUnit;
     }
+    if (cyclicvoltaSt && cyclicvoltaSt.useCurrentDensity) {
+      const areaUnit = cyclicvoltaSt.areaUnit || 'cm²';
+      const currentUnit = feature && feature.yUnit ? String(feature.yUnit) : 'A';
+      yyLabel = `Current density in ${currentUnit}/${areaUnit}`;
+    }
     const filterSeed = seed;
     const filterPeak = peak;
     (0, _draw.drawMain)(this.rootKlass, W, H);
@@ -129,7 +135,8 @@ class ViewerMulti extends _react.default.Component {
       cyclicvoltaSt,
       integationSt,
       mtplySt,
-      axesUnitsSt
+      axesUnitsSt,
+      feature
     } = this.props;
     this.normChange(prevProps);
     let xxLabel = xLabel;
@@ -154,6 +161,11 @@ class ViewerMulti extends _react.default.Component {
       } = selectedAxes;
       xxLabel = xUnit === '' ? xLabel : xUnit;
       yyLabel = yUnit === '' ? yLabel : yUnit;
+    }
+    if (cyclicvoltaSt && cyclicvoltaSt.useCurrentDensity) {
+      const areaUnit = cyclicvoltaSt.areaUnit || 'cm²';
+      const currentUnit = feature && feature.yUnit ? String(feature.yUnit) : 'A';
+      yyLabel = `Current density in ${currentUnit}/${areaUnit}`;
     }
     const filterSeed = seed;
     const filterPeak = peak;
@@ -191,7 +203,7 @@ class ViewerMulti extends _react.default.Component {
     }
   }
   render() {
-    return /*#__PURE__*/_react.default.createElement("div", {
+    return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
       className: "d3Line"
     });
   }

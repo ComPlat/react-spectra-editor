@@ -22,6 +22,7 @@ var _ui = require("../../actions/ui");
 var _list_ui = require("../../constants/list_ui");
 var _chem = require("../../helpers/chem");
 var _format = _interopRequireDefault(require("../../helpers/format"));
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable function-paren-newline, react/require-default-props,
 react/no-unused-prop-types, react/jsx-closing-tag-location, max-len, react/jsx-one-expression-per-line,
 react/jsx-indent, react/no-unescaped-entities, react/jsx-wrap-multilines, camelcase, no-shadow,
@@ -92,21 +93,20 @@ const styles = () => ({
     whiteSpace: 'nowrap'
   }
 });
-const CyclicVoltammetryPanel = _ref => {
-  let {
-    classes,
-    cyclicVotaSt,
-    feature,
-    addNewPairPeakAct,
-    setWorkWithMaxPeakAct,
-    selectPairPeakAct,
-    removePairPeakAct,
-    selectRefPeaksAct,
-    sweepTypeSt,
-    setUiSweepTypeAct,
-    jcampIdx,
-    userManualLink
-  } = _ref;
+const CyclicVoltammetryPanel = ({
+  classes,
+  cyclicVotaSt,
+  feature,
+  addNewPairPeakAct,
+  setWorkWithMaxPeakAct,
+  selectPairPeakAct,
+  removePairPeakAct,
+  selectRefPeaksAct,
+  sweepTypeSt,
+  setUiSweepTypeAct,
+  jcampIdx,
+  userManualLink
+}) => {
   const {
     spectraList
   } = cyclicVotaSt;
@@ -115,6 +115,26 @@ const CyclicVoltammetryPanel = _ref => {
   if (spectra !== undefined) {
     list = spectra.list;
   }
+  const formatCurrent = (y, feature, cyclicVotaSt) => {
+    const baseY = feature && feature.yUnit ? String(feature.yUnit) : 'A';
+    const isMilli = /mA/i.test(baseY);
+    console.log('isMilli', isMilli);
+    const useDensity = cyclicVotaSt && cyclicVotaSt.useCurrentDensity;
+    const rawArea = (cyclicVotaSt && cyclicVotaSt.areaValue === '' ? 1.0 : cyclicVotaSt?.areaValue) || 1.0;
+    const areaUnit = cyclicVotaSt && cyclicVotaSt.areaUnit ? cyclicVotaSt.areaUnit : 'cm²';
+    const safeArea = rawArea > 0 ? rawArea : 1.0;
+    let val = y;
+    let unit = isMilli ? 'mA' : 'A';
+    if (useDensity) {
+      val = y / safeArea;
+      unit = `${unit}/${areaUnit}`;
+    }
+    if (isMilli) {
+      val *= 1000.0;
+      console.log('val', val);
+    }
+    return `${parseFloat(val).toExponential(2)} ${unit}`;
+  };
   const selectCell = (idx, isMax) => {
     setWorkWithMaxPeakAct({
       isMax,
@@ -156,9 +176,9 @@ const CyclicVoltammetryPanel = _ref => {
   };
   const rows = list.map((o, idx) => ({
     idx,
-    max: o.max ? `E: ${_format.default.strNumberFixedLength(parseFloat(o.max.x), 3)} V,\nI: ${parseFloat(o.max.y * 1000).toExponential(2)} mA` : 'nd',
-    min: o.min ? `E: ${_format.default.strNumberFixedLength(parseFloat(o.min.x), 3)} V,\nI: ${parseFloat(o.min.y * 1000).toExponential(2)} mA` : 'nd',
-    pecker: o.pecker ? `${parseFloat(o.pecker.y * 1000).toExponential(2)} mA` : 'nd',
+    max: o.max ? `E: ${_format.default.strNumberFixedLength(parseFloat(o.max.x), 3)} V,\nI: ${formatCurrent(o.max.y, feature, cyclicVotaSt)}` : 'nd',
+    min: o.min ? `E: ${_format.default.strNumberFixedLength(parseFloat(o.min.x), 3)} V,\nI: ${formatCurrent(o.min.y, feature, cyclicVotaSt)}` : 'nd',
+    pecker: o.pecker ? `${formatCurrent(o.pecker.y, feature, cyclicVotaSt)}` : 'nd',
     delta: `${getDelta(o)} mV`,
     ratio: getRatio(feature, o),
     e12: typeof o.e12 === 'number' ? `${_format.default.strNumberFixedLength(o.e12, 3)} V` : 'nd',
@@ -171,113 +191,162 @@ const CyclicVoltammetryPanel = _ref => {
     }),
     onCheckRefChanged: e => changeCheckRefPeaks(idx, e)
   }));
-  return /*#__PURE__*/_react.default.createElement(_material.Accordion, {
-    "data-testid": "PanelVoltammetry"
-  }, /*#__PURE__*/_react.default.createElement(_material.AccordionSummary, {
-    expandIcon: /*#__PURE__*/_react.default.createElement(_ExpandMore.default, null),
-    className: (0, _classnames.default)(classes.panelSummary)
-  }, /*#__PURE__*/_react.default.createElement(_material.Typography, {
-    className: "txt-panel-header"
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title')
-  }, "Voltammetry data"))), /*#__PURE__*/_react.default.createElement(_material.Divider, null), /*#__PURE__*/_react.default.createElement(_material.Table, {
-    className: classes.table
-  }, /*#__PURE__*/_react.default.createElement(_material.TableHead, null, /*#__PURE__*/_react.default.createElement(_material.TableRow, null, /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "left",
-    className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, "Ref"), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "left",
-    className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, "Anodic"), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "left",
-    className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, "Cathodic"), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "left",
-    className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, "I ", /*#__PURE__*/_react.default.createElement("sub", null, "\u03BB0"), /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
-    title: /*#__PURE__*/_react.default.createElement("p", {
-      className: (0, _classnames.default)(classes.txtToolTip)
-    }, "Baseline correction value for I ratio ", /*#__PURE__*/_react.default.createElement("br", null), "(a.k.a y value of pecker)")
-  }, /*#__PURE__*/_react.default.createElement(_Info.default, {
-    className: (0, _classnames.default)(classes.infoIcon)
-  }))), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "left",
-    className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, "I ratio", /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
-    title: /*#__PURE__*/_react.default.createElement("div", {
-      className: (0, _classnames.default)(classes.txtToolTip)
-    }, /*#__PURE__*/_react.default.createElement("p", null, "Nicholson's method"), /*#__PURE__*/_react.default.createElement("i", null, "NICHOLSON, Rl S. Semiempirical Procedure for Measuring with Stationary Electrode Polarography Rates of Chemical Reactions Involving the Product of Electron Transfer. Analytical Chemistry, 1966, 38. Jg., Nr. 10, S. 1406-1406. https://doi.org/10.1021/ac60242a030"))
-  }, /*#__PURE__*/_react.default.createElement(_Info.default, {
-    className: (0, _classnames.default)(classes.infoIcon)
-  }))), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "left",
-    className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, "E", /*#__PURE__*/_react.default.createElement("sub", null, "1/2")), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "left",
-    className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, "\u0394E", /*#__PURE__*/_react.default.createElement("sub", null, "p"), /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
-    title: /*#__PURE__*/_react.default.createElement("span", {
-      className: (0, _classnames.default)(classes.txtToolTip)
-    }, "| Epa - Epc |")
-  }, /*#__PURE__*/_react.default.createElement(_Info.default, {
-    className: (0, _classnames.default)(classes.infoIcon)
-  }))), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "left",
-    className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, /*#__PURE__*/_react.default.createElement(_AddCircleOutline.default, {
-    onClick: () => addNewPairPeakAct(jcampIdx),
-    className: (0, _classnames.default)(classes.btnAddRow)
-  })))), /*#__PURE__*/_react.default.createElement(_material.TableBody, null, rows.map(row => /*#__PURE__*/_react.default.createElement(_material.TableRow, {
-    key: row.idx
-  }, /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "left",
-    className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, /*#__PURE__*/_react.default.createElement(_material.Checkbox, {
-    checked: row.isRef,
-    onChange: row.onCheckRefChanged
-  })), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "left",
-    className: (0, _classnames.default)(classes.tTxt, classes.square, spectra.isWorkMaxPeak && spectra.selectedIdx === row.idx ? classes.cellSelected : 'txt-sv-panel-txt'),
-    onClick: row.onClickMax
-  }, row.max.split('\n').map((s, index) => /*#__PURE__*/_react.default.createElement(_react.default.Fragment, {
-    key: index
-  }, s, /*#__PURE__*/_react.default.createElement("br", null)))), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "left",
-    className: (0, _classnames.default)(classes.tTxt, classes.square, !spectra.isWorkMaxPeak && spectra.selectedIdx === row.idx ? classes.cellSelected : 'txt-sv-panel-txt'),
-    onClick: row.onClickMin
-  }, row.min.split('\n').map((s, index) => /*#__PURE__*/_react.default.createElement(_react.default.Fragment, {
-    key: index
-  }, s, /*#__PURE__*/_react.default.createElement("br", null)))), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "left",
-    className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, row.pecker), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "left",
-    className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, row.ratio), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "left",
-    className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, row.e12), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "left",
-    className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, row.delta), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "left",
-    className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt')
-  }, /*#__PURE__*/_react.default.createElement(_RemoveCircle.default, {
-    className: (0, _classnames.default)(classes.btnRemove),
-    onClick: row.remove
-  })))))), /*#__PURE__*/_react.default.createElement("div", {
-    className: (0, _classnames.default)(classes.rowRoot, classes.rowEven)
-  }, /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
-    title: /*#__PURE__*/_react.default.createElement("span", {
-      className: (0, _classnames.default)(classes.txtToolTip)
-    }, "Click here to open the User manual document")
-  }, /*#__PURE__*/_react.default.createElement("span", null, /*#__PURE__*/_react.default.createElement("a", {
-    target: "_blank",
-    rel: "noopener noreferrer",
-    href: userManualLink
-  }, "How-To "), /*#__PURE__*/_react.default.createElement(_Help.default, {
-    className: (0, _classnames.default)(classes.infoIcon)
-  })))));
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Accordion, {
+    "data-testid": "PanelVoltammetry",
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.AccordionSummary, {
+      expandIcon: /*#__PURE__*/(0, _jsxRuntime.jsx)(_ExpandMore.default, {}),
+      className: (0, _classnames.default)(classes.panelSummary),
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Typography, {
+        className: "txt-panel-header",
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title'),
+          children: "Voltammetry data"
+        })
+      })
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Divider, {}), /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Table, {
+      className: classes.table,
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableHead, {
+        children: /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.TableRow, {
+          children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+            align: "left",
+            className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt'),
+            children: "Ref"
+          }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+            align: "left",
+            className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt'),
+            children: "Anodic"
+          }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+            align: "left",
+            className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt'),
+            children: "Cathodic"
+          }), /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.TableCell, {
+            align: "left",
+            className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt'),
+            children: ["I ", /*#__PURE__*/(0, _jsxRuntime.jsx)("sub", {
+              children: "\u03BB0"
+            }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tooltip, {
+              title: /*#__PURE__*/(0, _jsxRuntime.jsxs)("p", {
+                className: (0, _classnames.default)(classes.txtToolTip),
+                children: ["Baseline correction value for I ratio ", /*#__PURE__*/(0, _jsxRuntime.jsx)("br", {}), "(a.k.a y value of pecker)"]
+              }),
+              children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_Info.default, {
+                className: (0, _classnames.default)(classes.infoIcon)
+              })
+            })]
+          }), /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.TableCell, {
+            align: "left",
+            className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt'),
+            children: ["I ratio", /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tooltip, {
+              title: /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+                className: (0, _classnames.default)(classes.txtToolTip),
+                children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("p", {
+                  children: "Nicholson's method"
+                }), /*#__PURE__*/(0, _jsxRuntime.jsx)("i", {
+                  children: "NICHOLSON, Rl S. Semiempirical Procedure for Measuring with Stationary Electrode Polarography Rates of Chemical Reactions Involving the Product of Electron Transfer. Analytical Chemistry, 1966, 38. Jg., Nr. 10, S. 1406-1406. https://doi.org/10.1021/ac60242a030"
+                })]
+              }),
+              children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_Info.default, {
+                className: (0, _classnames.default)(classes.infoIcon)
+              })
+            })]
+          }), /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.TableCell, {
+            align: "left",
+            className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt'),
+            children: ["E", /*#__PURE__*/(0, _jsxRuntime.jsx)("sub", {
+              children: "1/2"
+            })]
+          }), /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.TableCell, {
+            align: "left",
+            className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt'),
+            children: ["\u0394E", /*#__PURE__*/(0, _jsxRuntime.jsx)("sub", {
+              children: "p"
+            }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tooltip, {
+              title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+                className: (0, _classnames.default)(classes.txtToolTip),
+                children: "| Epa - Epc |"
+              }),
+              children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_Info.default, {
+                className: (0, _classnames.default)(classes.infoIcon)
+              })
+            })]
+          }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+            align: "left",
+            className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt'),
+            children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_AddCircleOutline.default, {
+              onClick: () => addNewPairPeakAct(jcampIdx),
+              className: (0, _classnames.default)(classes.btnAddRow)
+            })
+          })]
+        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableBody, {
+        children: rows.map(row => /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.TableRow, {
+          children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+            align: "left",
+            className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt'),
+            children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Checkbox, {
+              checked: row.isRef,
+              onChange: row.onCheckRefChanged
+            })
+          }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+            align: "left",
+            className: (0, _classnames.default)(classes.tTxt, classes.square, spectra.isWorkMaxPeak && spectra.selectedIdx === row.idx ? classes.cellSelected : 'txt-sv-panel-txt'),
+            onClick: row.onClickMax,
+            children: row.max.split('\n').map((s, index) => /*#__PURE__*/(0, _jsxRuntime.jsxs)(_react.default.Fragment, {
+              children: [s, /*#__PURE__*/(0, _jsxRuntime.jsx)("br", {})]
+            }, index))
+          }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+            align: "left",
+            className: (0, _classnames.default)(classes.tTxt, classes.square, !spectra.isWorkMaxPeak && spectra.selectedIdx === row.idx ? classes.cellSelected : 'txt-sv-panel-txt'),
+            onClick: row.onClickMin,
+            children: row.min.split('\n').map((s, index) => /*#__PURE__*/(0, _jsxRuntime.jsxs)(_react.default.Fragment, {
+              children: [s, /*#__PURE__*/(0, _jsxRuntime.jsx)("br", {})]
+            }, index))
+          }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+            align: "left",
+            className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt'),
+            children: row.pecker
+          }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+            align: "left",
+            className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt'),
+            children: row.ratio
+          }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+            align: "left",
+            className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt'),
+            children: row.e12
+          }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+            align: "left",
+            className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt'),
+            children: row.delta
+          }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+            align: "left",
+            className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt'),
+            children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_RemoveCircle.default, {
+              className: (0, _classnames.default)(classes.btnRemove),
+              onClick: row.remove
+            })
+          })]
+        }, row.idx))
+      })]
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+      className: (0, _classnames.default)(classes.rowRoot, classes.rowEven),
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tooltip, {
+        title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtToolTip),
+          children: "Click here to open the User manual document"
+        }),
+        children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+          children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("a", {
+            target: "_blank",
+            rel: "noopener noreferrer",
+            href: userManualLink,
+            children: "How-To "
+          }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_Help.default, {
+            className: (0, _classnames.default)(classes.infoIcon)
+          })]
+        })
+      })
+    })]
+  });
 };
 const mapStateToProps = (state, props) => (
 // eslint-disable-line

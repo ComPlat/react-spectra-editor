@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.setWorkWithMaxPeak = exports.setCylicVoltaRefFactor = exports.setCylicVoltaRef = exports.selectRefPeaks = exports.selectPairPeak = exports.removeCylicVoltaPecker = exports.removeCylicVoltaPairPeak = exports.removeCylicVoltaMinPeak = exports.removeCylicVoltaMaxPeak = exports.addNewCylicVoltaPairPeak = exports.addCylicVoltaPecker = exports.addCylicVoltaMinPeak = exports.addCylicVoltaMaxPeak = void 0;
+exports.toggleCyclicVoltaDensity = exports.setWorkWithMaxPeak = exports.setCylicVoltaRefFactor = exports.setCylicVoltaRef = exports.setCyclicVoltaAreaValue = exports.setCyclicVoltaAreaUnit = exports.selectRefPeaks = exports.selectPairPeak = exports.removeCylicVoltaPecker = exports.removeCylicVoltaPairPeak = exports.removeCylicVoltaMinPeak = exports.removeCylicVoltaMaxPeak = exports.addNewCylicVoltaPairPeak = exports.addCylicVoltaPecker = exports.addCylicVoltaMinPeak = exports.addCylicVoltaMaxPeak = void 0;
 var _action_type = require("../constants/action_type");
 const addNewCylicVoltaPairPeak = payload => ({
   type: _action_type.CYCLIC_VOLTA_METRY.ADD_PAIR_PEAKS,
@@ -70,3 +70,22 @@ const setCylicVoltaRef = payload => ({
   payload
 });
 exports.setCylicVoltaRef = setCylicVoltaRef;
+const setCyclicVoltaAreaValue = value => ({
+  type: _action_type.CYCLIC_VOLTA_METRY.SET_AREA_VALUE,
+  payload: {
+    value
+  }
+});
+exports.setCyclicVoltaAreaValue = setCyclicVoltaAreaValue;
+const setCyclicVoltaAreaUnit = unit => ({
+  type: _action_type.CYCLIC_VOLTA_METRY.SET_AREA_UNIT,
+  payload: {
+    unit
+  }
+});
+exports.setCyclicVoltaAreaUnit = setCyclicVoltaAreaUnit;
+const toggleCyclicVoltaDensity = payload => ({
+  type: _action_type.CYCLIC_VOLTA_METRY.TOGGLE_DENSITY,
+  payload
+});
+exports.toggleCyclicVoltaDensity = toggleCyclicVoltaDensity;
