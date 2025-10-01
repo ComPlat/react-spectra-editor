@@ -92,8 +92,8 @@ class ViewerMulti extends _react.default.Component {
     }
     if (cyclicvoltaSt && cyclicvoltaSt.useCurrentDensity) {
       const areaUnit = cyclicvoltaSt.areaUnit || 'cm²';
-      const currentUnit = feature && feature.yUnit ? String(feature.yUnit) : 'A';
-      yyLabel = `Current density in ${currentUnit}/${areaUnit}`;
+      const baseUnit = /mA/i.test(String(yyLabel)) ? 'mA' : 'A';
+      yyLabel = `Current density in ${baseUnit}/${areaUnit}`;
     }
     const filterSeed = seed;
     const filterPeak = peak;
@@ -164,8 +164,8 @@ class ViewerMulti extends _react.default.Component {
     }
     if (cyclicvoltaSt && cyclicvoltaSt.useCurrentDensity) {
       const areaUnit = cyclicvoltaSt.areaUnit || 'cm²';
-      const currentUnit = feature && feature.yUnit ? String(feature.yUnit) : 'A';
-      yyLabel = `Current density in ${currentUnit}/${areaUnit}`;
+      const baseUnit = /mA/i.test(String(yyLabel)) ? 'mA' : 'A';
+      yyLabel = `Current density in ${baseUnit}/${areaUnit}`;
     }
     const filterSeed = seed;
     const filterPeak = peak;
