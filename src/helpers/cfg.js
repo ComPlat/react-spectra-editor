@@ -12,6 +12,7 @@ const btnCmdAnaViewer = (layoutSt) => (
     || Format.is31PLayout(layoutSt)
     || Format.is15NLayout(layoutSt)
     || Format.is29SiLayout(layoutSt)
+    || Format.isLSVLayout(layoutSt)
     || Format.isCyclicVoltaLayout(layoutSt)
     || Format.isCDSLayout(layoutSt)
     || Format.isSECLayout(layoutSt)
@@ -56,9 +57,11 @@ const hidePanelCompare = (layoutSt) => !(Format.isIrLayout(layoutSt) || Format.i
 
 const hideSolvent = (layoutSt) => !Format.isNmrLayout(layoutSt);
 
-const showTwoThreshold = (layoutSt) => Format.isCyclicVoltaLayout(layoutSt);
+const showTwoThreshold = (layoutSt) => (Format.isCyclicVoltaLayout(layoutSt)
+ || Format.isLSVLayout(layoutSt));
 
-const hidePanelCyclicVolta = (layoutSt) => !Format.isCyclicVoltaLayout(layoutSt);
+const hidePanelCyclicVolta = (layoutSt) => !(Format.isCyclicVoltaLayout(layoutSt)
+ || Format.isLSVLayout(layoutSt));
 
 const Config = {
   btnCmdAnaViewer,

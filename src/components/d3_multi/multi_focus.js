@@ -289,7 +289,7 @@ class MultiFocus {
     event.stopPropagation();
     event.preventDefault();
     const onPeak = true;
-    if (this.layout === LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
+    if (this.layout === LIST_LAYOUT.CYCLIC_VOLTAMMETRY || this.layout === LIST_LAYOUT.LSV) {
       const { spectraList } = this.cyclicvoltaSt;
       const spectra = spectraList[this.jcampIdx];
       const voltammetryPeakIdx = spectra.selectedIdx;
@@ -397,7 +397,7 @@ class MultiFocus {
       sameXY, sameEpSt, sameDtPk, sameSfPk,
     } = this.shouldUpdate;
 
-    if (!Format.isCyclicVoltaLayout(this.layout)
+    if (!(Format.isCyclicVoltaLayout(this.layout) || Format.isLSVLayout(this.layout))
     && sameXY && sameEpSt && sameDtPk && sameSfPk) return;
 
     // rescale for zoom
@@ -512,7 +512,7 @@ class MultiFocus {
       sameXY, sameEpSt, sameDtPk, sameSfPk,
     } = this.shouldUpdate;
 
-    if (!Format.isCyclicVoltaLayout(this.layout) && sameXY
+    if (!(Format.isCyclicVoltaLayout(this.layout) || Format.isLSVLayout(this.layout)) && sameXY
     && sameEpSt && sameDtPk && sameSfPk) return;
 
     // rescale for zoom
@@ -1003,7 +1003,7 @@ class MultiFocus {
   reverseXAxis(layoutSt) {
     return [LIST_LAYOUT.UVVIS, LIST_LAYOUT.HPLC_UVVIS,
       LIST_LAYOUT.TGA, LIST_LAYOUT.DSC,
-      LIST_LAYOUT.XRD, LIST_LAYOUT.CYCLIC_VOLTAMMETRY,
+      LIST_LAYOUT.XRD, LIST_LAYOUT.CYCLIC_VOLTAMMETRY, LIST_LAYOUT.LSV,
       LIST_LAYOUT.CDS, LIST_LAYOUT.SEC, LIST_LAYOUT.GC, LIST_LAYOUT.AIF].indexOf(layoutSt) < 0;
   }
 

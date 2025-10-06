@@ -28,6 +28,7 @@ const spectraDigit = (layout) => {
     case LIST_LAYOUT.N15:
     case LIST_LAYOUT.Si29:
     case LIST_LAYOUT.PLAIN:
+    case LIST_LAYOUT.LSV:
     case LIST_LAYOUT.CYCLIC_VOLTAMMETRY:
     default:
       return 2;
@@ -71,6 +72,7 @@ const spectraOps = {
   [LIST_LAYOUT.DSC]: { head: 'DIFFERENTIAL SCANNING CALORIMETRY', tail: ' SECONDS' },
   [LIST_LAYOUT.MS]: { head: 'MASS', tail: ' m/z' },
   [LIST_LAYOUT.XRD]: { head: 'XRD', tail: '.' },
+  [LIST_LAYOUT.LSV]: { head: 'LSV', tail: '.' },
   [LIST_LAYOUT.CYCLIC_VOLTAMMETRY]: { head: 'CV', tail: '.' },
   [LIST_LAYOUT.CDS]: { head: 'CIRCULAR DICHROISM SPECTROSCOPY', tail: '.' },
   [LIST_LAYOUT.SEC]: { head: 'SIZE EXCLUSION CHROMATOGRAPHY', tail: '.' },
@@ -335,6 +337,7 @@ const peaksBody = ({
     || layout === LIST_LAYOUT.TGA
     || layout === LIST_LAYOUT.DSC
     || layout === LIST_LAYOUT.CYCLIC_VOLTAMMETRY
+    || layout === LIST_LAYOUT.LSV
     || layout === LIST_LAYOUT.CDS
     || layout === LIST_LAYOUT.SEC
     || layout === LIST_LAYOUT.GC) {
@@ -380,6 +383,7 @@ const isHplcUvVisLayout = (layoutSt) => (LIST_LAYOUT.HPLC_UVVIS === layoutSt);
 const isTGALayout = (layoutSt) => (LIST_LAYOUT.TGA === layoutSt);
 const isDSCLayout = (layoutSt) => (LIST_LAYOUT.DSC === layoutSt);
 const isXRDLayout = (layoutSt) => (LIST_LAYOUT.XRD === layoutSt);
+const isLSVLayout = (layoutSt) => (LIST_LAYOUT.LSV === layoutSt);
 const isCyclicVoltaLayout = (layoutSt) => (LIST_LAYOUT.CYCLIC_VOLTAMMETRY === layoutSt);
 const isCDSLayout = (layoutSt) => (LIST_LAYOUT.CDS === layoutSt);
 const isSECLayout = (layoutSt) => (LIST_LAYOUT.SEC === layoutSt);
@@ -390,7 +394,11 @@ const isEmWaveLayout = (layoutSt) => (
 );
 const hasMultiCurves = (layoutSt) => (
   [
-    LIST_LAYOUT.CYCLIC_VOLTAMMETRY, LIST_LAYOUT.SEC, LIST_LAYOUT.GC, LIST_LAYOUT.AIF,
+    LIST_LAYOUT.CYCLIC_VOLTAMMETRY,
+    LIST_LAYOUT.LSV,
+    LIST_LAYOUT.SEC,
+    LIST_LAYOUT.GC,
+    LIST_LAYOUT.AIF,
   ].indexOf(layoutSt) >= 0
 );
 const isAIFLayout = (layoutSt) => (LIST_LAYOUT.AIF === layoutSt);
@@ -556,6 +564,7 @@ const Format = {
   isTGALayout,
   isDSCLayout,
   isXRDLayout,
+  isLSVLayout,
   isCyclicVoltaLayout,
   isCDSLayout,
   isSECLayout,

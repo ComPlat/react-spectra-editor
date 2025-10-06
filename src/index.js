@@ -36,6 +36,7 @@ import xrdJcamp2 from './__tests__/fixtures/xrd_jcamp_2';
 import cyclicVoltaJcamp1 from './__tests__/fixtures/cyclic_voltammetry_1';
 import cyclicVoltaJcamp2 from './__tests__/fixtures/cyclic_voltammetry_2';
 import cyclicVoltaJcamp3 from './__tests__/fixtures/cyclic_voltammetry_3';
+import lsvJcamp from './__tests__/fixtures/lsv_jcamp';
 import cdsJcamp from './__tests__/fixtures/cds_jcamp';
 import secJcamp1 from './__tests__/fixtures/sec_1_jcamp';
 import secJcamp2 from './__tests__/fixtures/sec_2_jcamp';
@@ -76,6 +77,7 @@ const xrdEntity2 = FN.ExtractJcamp(xrdJcamp2);
 const cyclicVoltaEntity1 = FN.ExtractJcamp(cyclicVoltaJcamp1);
 const cyclicVoltaEntity2 = FN.ExtractJcamp(cyclicVoltaJcamp2);
 const cyclicVoltaEntity3 = FN.ExtractJcamp(cyclicVoltaJcamp3);
+const lsvEntity = FN.ExtractJcamp(lsvJcamp);
 const cdsEntity = FN.ExtractJcamp(cdsJcamp);
 const secEntity1 = FN.ExtractJcamp(secJcamp1);
 const secEntity2 = FN.ExtractJcamp(secJcamp2);
@@ -172,6 +174,8 @@ class DemoWriteIr extends React.Component {
         return xrdEntity1;
       case 'cyclic volta':
         return cyclicVoltaEntity2;
+      case 'lsv':
+        return lsvEntity;
       case 'cds':
         return cdsEntity;
       case 'sec':
@@ -473,7 +477,7 @@ class DemoWriteIr extends React.Component {
       predictions,
     }
     
-    const molSvg = ['nmr 1h', 'ir', 'cyclic volta'].indexOf(typ) >= 0 ? Phenylalanin.path : '';
+    const molSvg = ['nmr 1h', 'ir', 'cyclic volta', 'lsv'].indexOf(typ) >= 0 ? Phenylalanin.path : '';
     const others = this.loadOthers();
 
     return (
@@ -589,6 +593,14 @@ class DemoWriteIr extends React.Component {
             onClick={this.onClick('cyclic volta')}
           >
             CV
+          </Button>
+          <Button
+            id='btn-lsv'
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('lsv')}
+          >
+            LSV
           </Button>
           <Button
             variant="contained"

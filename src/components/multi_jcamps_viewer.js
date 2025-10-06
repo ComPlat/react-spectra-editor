@@ -34,7 +34,7 @@ const styles = () => ({
 });
 
 const seperatingSubLayout = (entities, featureCondition, layoutSt) => {
-  if (layoutSt === LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
+  if (layoutSt === LIST_LAYOUT.CYCLIC_VOLTAMMETRY || layoutSt === LIST_LAYOUT.LSV) {
     return null;
   }
   const storedDict = {};

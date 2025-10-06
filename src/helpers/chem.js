@@ -34,7 +34,7 @@ const getShiftOffset = (state, _) => { // eslint-disable-line
     curve, layout, cyclicvolta,
   } = state;
   const { curveIdx } = curve;
-  if (layout === LIST_LAYOUT.CYCLIC_VOLTAMMETRY && cyclicvolta) {
+  if ((layout === LIST_LAYOUT.CYCLIC_VOLTAMMETRY || layout === LIST_LAYOUT.LSV) && cyclicvolta) {
     return GetCyclicVoltaShiftOffset(cyclicvolta, curveIdx);
   }
 
@@ -152,7 +152,7 @@ const Convert2Peak = (feature, threshold, offset, upThreshold = false, lowThresh
   const { layout } = operation;
 
   // if (!Format.isSECLayout(layout) && (upperThres || lowerThres)) {
-  if ((Format.isCyclicVoltaLayout(layout) || Format.isCDSLayout(layout))
+  if ((Format.isCyclicVoltaLayout(layout) || Format.isLSVLayout(layout) || Format.isCDSLayout(layout))
   && (upperThres || lowerThres)) {
     let upperThresVal = upThreshold || upperThres;
     if (!upperThresVal) {
@@ -204,7 +204,7 @@ const Convert2MaxMinPeak = (layout, feature, offset) => {  // eslint-disable-lin
   const peaks = {
     max: [], min: [], pecker: [], refIndex: -1,
   };
-  if (!Format.isCyclicVoltaLayout(layout) || !feature || !feature.data) return null;  // eslint-disable-line
+  if (!(Format.isCyclicVoltaLayout(layout) || Format.isLSVLayout(layout)) || !feature || !feature.data) return null;  // eslint-disable-line
   // const data = feature.data[0]; // eslint-disable-line
   const {
     volammetryData,
@@ -288,7 +288,6 @@ const ToShiftPeaks = createSelector(
 // - - - - - - - - - - - - - - - - - - - - - -
 const readLayout = (jcamp) => {
   const { xType, spectra } = jcamp;
-  if (xType && Format.isNmrLayout(xType)) return xType;
   const { dataType } = spectra[0];
   if (dataType) {
     if (dataType.includes('INFRARED SPECTRUM')) {
@@ -318,6 +317,9 @@ const readLayout = (jcamp) => {
     if (dataType.includes('CYCLIC VOLTAMMETRY')) {
       return LIST_LAYOUT.CYCLIC_VOLTAMMETRY;
     }
+    if (dataType.includes('LINEAR SWEEP VOLTAMMETRY')) {
+      return LIST_LAYOUT.LSV;
+    }
     if (dataType.includes('CIRCULAR DICHROISM SPECTROSCOPY')) {
       return LIST_LAYOUT.CDS;
     }
@@ -340,6 +342,7 @@ const readLayout = (jcamp) => {
       return LIST_LAYOUT.DLS_INTENSITY;
     }
   }
+  if (xType && Format.isNmrLayout(xType)) return xType;
   return false;
 };
 
@@ -802,7 +805,7 @@ const ExtractJcamp = (source) => {
     return {
       spectra, features, layout, temperature,
     };
-  } else if (Format.isCyclicVoltaLayout(layout) || Format.isSECLayout(layout)
+  } else if (Format.isCyclicVoltaLayout(layout) || Format.isLSVLayout(layout) || Format.isSECLayout(layout)
   || Format.isAIFLayout(layout) || Format.isCDSLayout(layout) || Format.isGCLayout(layout)) {
     features = extrFeaturesCylicVolta(jcamp, layout, peakUp);
   } else {
