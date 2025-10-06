@@ -9,9 +9,7 @@ var _list_layout = require("../constants/list_layout");
 /* eslint-disable prefer-object-spread, default-param-last */
 
 const initialState = _list_layout.LIST_LAYOUT.C13;
-const layoutReducer = function () {
-  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-  let action = arguments.length > 1 ? arguments[1] : undefined;
+const layoutReducer = (state = initialState, action) => {
   switch (action.type) {
     case _action_type.LAYOUT.UPDATE:
       return action.payload;

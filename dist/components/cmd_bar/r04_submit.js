@@ -17,6 +17,7 @@ var _r05_submit_btn = _interopRequireDefault(require("./r05_submit_btn"));
 var _r06_predict_btn = _interopRequireDefault(require("./r06_predict_btn"));
 var _common = require("./common");
 var _format = _interopRequireDefault(require("../../helpers/format"));
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, function-paren-newline,
 react/function-component-definition */
 
@@ -36,124 +37,145 @@ const styles = () => Object.assign({
 }, _common.commonStyle);
 const ascendSelect = (classes, hideSwitch, isAscendSt, toggleIsAscendAct) => {
   if (hideSwitch) return null;
-  return /*#__PURE__*/_react.default.createElement(_material.FormControl, {
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
     className: (0, _classnames.default)(classes.fieldOrder),
-    variant: "outlined"
-  }, /*#__PURE__*/_react.default.createElement(_material.InputLabel, {
-    id: "select-sort-peaks-label",
-    className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label')
-  }, "Write Peaks"), /*#__PURE__*/_react.default.createElement(_material.Select, {
-    labelId: "select-sort-peaks-label",
-    label: "Write Peaks",
-    value: isAscendSt,
-    onChange: toggleIsAscendAct,
-    className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-order')
-  }, /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: true,
-    key: "ascend"
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-ascend')
-  }, "Ascend")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: false,
-    key: "descend"
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-descend')
-  }, "Descend"))));
+    variant: "outlined",
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputLabel, {
+      id: "select-sort-peaks-label",
+      className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label'),
+      children: "Write Peaks"
+    }), /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Select, {
+      labelId: "select-sort-peaks-label",
+      label: "Write Peaks",
+      value: isAscendSt,
+      onChange: toggleIsAscendAct,
+      className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-order'),
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: true,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-ascend'),
+          children: "Ascend"
+        })
+      }, "ascend"), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: false,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-descend'),
+          children: "Descend"
+        })
+      }, "descend")]
+    })]
+  });
 };
 const intensitySelect = (classes, hideSwitch, isIntensitySt, toggleIsIntensityAct) => {
   if (hideSwitch) return null;
-  return /*#__PURE__*/_react.default.createElement(_material.FormControl, {
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
     className: (0, _classnames.default)(classes.fieldIntensity),
-    variant: "outlined"
-  }, /*#__PURE__*/_react.default.createElement(_material.InputLabel, {
-    id: "select-intensity-label",
-    className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label')
-  }, "Write Intensity"), /*#__PURE__*/_react.default.createElement(_material.Select, {
-    labelId: "select-intensity-label",
-    label: "Write Intensity",
-    value: isIntensitySt,
-    onChange: toggleIsIntensityAct,
-    className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-intensity')
-    // input={
-    //   (
-    //     <OutlinedInput
-    //       className={classNames(classes.selectInput, 'input-sv-bar-intensity')}
-    //       labelWidth={100}
-    //     />
-    //   )
-    // }
-  }, /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: true,
-    key: "ascend"
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-show')
-  }, "Show")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: false,
-    key: "descend"
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-hide')
-  }, "Hide"))));
+    variant: "outlined",
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputLabel, {
+      id: "select-intensity-label",
+      className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label'),
+      children: "Write Intensity"
+    }), /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Select, {
+      labelId: "select-intensity-label",
+      label: "Write Intensity",
+      value: isIntensitySt,
+      onChange: toggleIsIntensityAct,
+      className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-intensity')
+      // input={
+      //   (
+      //     <OutlinedInput
+      //       className={classNames(classes.selectInput, 'input-sv-bar-intensity')}
+      //       labelWidth={100}
+      //     />
+      //   )
+      // }
+      ,
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: true,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-show'),
+          children: "Show"
+        })
+      }, "ascend"), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: false,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-hide'),
+          children: "Hide"
+        })
+      }, "descend")]
+    })]
+  });
 };
 const decimalSelect = (classes, hideSwitch, decimalSt, updateDecimalAct) => {
   if (hideSwitch) return null;
   const decimals = [0, 1, 2, 3, 4];
-  const options = decimals.map(d => /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
+  const options = decimals.map(d => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
     value: d,
-    key: d
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-decimal')
-  }, d)));
-  return /*#__PURE__*/_react.default.createElement(_material.FormControl, {
+    children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+      className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-decimal'),
+      children: d
+    })
+  }, d));
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
     className: (0, _classnames.default)(classes.fieldDecimal),
-    variant: "outlined"
-  }, /*#__PURE__*/_react.default.createElement(_material.InputLabel, {
-    id: "select-decimal-label",
-    className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label')
-  }, "Decimal"), /*#__PURE__*/_react.default.createElement(_material.Select, {
-    labelId: "select-decimal-label",
-    label: "Decimal",
-    value: decimalSt,
-    onChange: updateDecimalAct,
-    className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-decimal')
-    // input={
-    //   (
-    //     <OutlinedInput
-    //       className={classNames(classes.selectInput, 'input-sv-bar-decimal')}
-    //       labelWidth={60}
-    //     />
-    //   )
-    // }
-  }, options));
+    variant: "outlined",
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputLabel, {
+      id: "select-decimal-label",
+      className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label'),
+      children: "Decimal"
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Select, {
+      labelId: "select-decimal-label",
+      label: "Decimal",
+      value: decimalSt,
+      onChange: updateDecimalAct,
+      className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-decimal')
+      // input={
+      //   (
+      //     <OutlinedInput
+      //       className={classNames(classes.selectInput, 'input-sv-bar-decimal')}
+      //       labelWidth={60}
+      //     />
+      //   )
+      // }
+      ,
+      children: options
+    })]
+  });
 };
 const operationSelect = (classes, operations, operation, onChangeSelect) => {
-  const options = operations.map(o => /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
+  const options = operations.map(o => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
     value: o.name,
-    key: o.name
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-operation')
-  }, o.name)));
+    children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+      className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-operation'),
+      children: o.name
+    })
+  }, o.name));
   const selectedValue = operation.name || operations[0].name;
-  return /*#__PURE__*/_react.default.createElement(_material.FormControl, {
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
     className: (0, _classnames.default)(classes.fieldOpertaion),
-    variant: "outlined"
-  }, /*#__PURE__*/_react.default.createElement(_material.InputLabel, {
-    id: "select-submit-label",
-    className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label')
-  }, "Submit"), /*#__PURE__*/_react.default.createElement(_material.Select, {
-    labelId: "select-submit-label",
-    label: "Submit",
-    value: selectedValue,
-    onChange: onChangeSelect,
-    className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-operation')
-    // input={
-    //   (
-    //     <OutlinedInput
-    //       className={classNames(classes.selectInput, 'input-sv-bar-operation')}
-    //       labelWidth={50}
-    //     />
-    //   )
-    // }
-  }, options));
+    variant: "outlined",
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputLabel, {
+      id: "select-submit-label",
+      className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label'),
+      children: "Submit"
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Select, {
+      labelId: "select-submit-label",
+      label: "Submit",
+      value: selectedValue,
+      onChange: onChangeSelect,
+      className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-operation')
+      // input={
+      //   (
+      //     <OutlinedInput
+      //       className={classNames(classes.selectInput, 'input-sv-bar-operation')}
+      //       labelWidth={50}
+      //     />
+      //   )
+      // }
+      ,
+      children: options
+    })]
+  });
 };
 const selectOperation = (name, operations, updateOperationAct) => {
   let operation = false;
@@ -164,39 +186,39 @@ const selectOperation = (name, operations, updateOperationAct) => {
   });
   updateOperationAct(operation);
 };
-const Submit = _ref => {
-  let {
-    operations,
-    classes,
-    feature,
-    forecast,
-    editorOnly,
-    hideSwitch,
-    disabled,
-    isAscendSt,
-    isIntensitySt,
-    operationSt,
-    decimalSt,
-    isEmWaveSt,
-    toggleIsAscendAct,
-    toggleIsIntensityAct,
-    updateOperationAct,
-    updateDecimalAct
-  } = _ref;
+const Submit = ({
+  operations,
+  classes,
+  feature,
+  forecast,
+  editorOnly,
+  hideSwitch,
+  disabled,
+  isAscendSt,
+  isIntensitySt,
+  operationSt,
+  decimalSt,
+  isEmWaveSt,
+  toggleIsAscendAct,
+  toggleIsIntensityAct,
+  updateOperationAct,
+  updateDecimalAct
+}) => {
   const onChangeSelect = e => selectOperation(e.target.value, operations, updateOperationAct);
   if (!operations || operations.length === 0) return null;
-  return /*#__PURE__*/_react.default.createElement("span", {
-    className: classes.groupRightMost
-  }, ascendSelect(classes, hideSwitch, isAscendSt, toggleIsAscendAct), intensitySelect(classes, hideSwitch || !isEmWaveSt, isIntensitySt, toggleIsIntensityAct), decimalSelect(classes, hideSwitch, decimalSt, updateDecimalAct), editorOnly ? null : /*#__PURE__*/_react.default.createElement(_r06_predict_btn.default, {
-    feature: feature,
-    forecast: forecast
-  }), operationSelect(classes, operations, operationSt, onChangeSelect), /*#__PURE__*/_react.default.createElement(_r05_submit_btn.default, {
-    feature: feature,
-    isAscend: isAscendSt,
-    isIntensity: isIntensitySt,
-    operation: operationSt,
-    disabled: disabled
-  }));
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+    className: classes.groupRightMost,
+    children: [ascendSelect(classes, hideSwitch, isAscendSt, toggleIsAscendAct), intensitySelect(classes, hideSwitch || !isEmWaveSt, isIntensitySt, toggleIsIntensityAct), decimalSelect(classes, hideSwitch, decimalSt, updateDecimalAct), editorOnly ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_r06_predict_btn.default, {
+      feature: feature,
+      forecast: forecast
+    }), operationSelect(classes, operations, operationSt, onChangeSelect), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r05_submit_btn.default, {
+      feature: feature,
+      isAscend: isAscendSt,
+      isIntensity: isIntensitySt,
+      operation: operationSt,
+      disabled: disabled
+    })]
+  });
 };
 const mapStateToProps = (state, props) => (
 // eslint-disable-line

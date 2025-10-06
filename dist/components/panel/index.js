@@ -19,6 +19,7 @@ var _multiplicity = _interopRequireDefault(require("./multiplicity"));
 var _cyclic_voltamery_data = _interopRequireDefault(require("./cyclic_voltamery_data"));
 var _graph_selection = _interopRequireDefault(require("./graph_selection"));
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable react/prop-types, react/require-default-props */
 
 const theme = (0, _styles.createTheme)({
@@ -97,45 +98,48 @@ class PanelViewer extends _react.default.Component {
       listCurves
     } = curveSt;
     const hideGraphSelection = listCurves === false || listCurves === undefined;
-    return /*#__PURE__*/_react.default.createElement("div", {
-      className: (0, _classnames.default)(classes.panels)
-    }, /*#__PURE__*/_react.default.createElement(_styles.StyledEngineProvider, {
-      injectFirst: true
-    }, /*#__PURE__*/_react.default.createElement(_styles.ThemeProvider, {
-      theme: theme
-    }, hideGraphSelection ? null : /*#__PURE__*/_react.default.createElement(_graph_selection.default, {
-      jcampIdx: jcampIdx,
-      entityFileNames: entityFileNames,
-      expand: expand === 'graph',
-      onExapnd: onExapndGraphSelection,
-      subLayoutsInfo: subLayoutsInfo
-    }), /*#__PURE__*/_react.default.createElement(_info.default, {
-      feature: feature,
-      integration: integration,
-      editorOnly: editorOnly,
-      expand: expand === 'info',
-      molSvg: molSvg,
-      exactMass: exactMass,
-      onExapnd: onExapndInfo,
-      descriptions: descriptions,
-      canChangeDescription: canChangeDescription,
-      onDescriptionChanged: this.handleDescriptionChanged
-    }), _cfg.default.hidePanelPeak(layoutSt) ? null : /*#__PURE__*/_react.default.createElement(_peaks.default, {
-      expand: expand === 'peak',
-      onExapnd: onExapndPeak
-    }), _cfg.default.hidePanelMpy(layoutSt) ? null : /*#__PURE__*/_react.default.createElement(_multiplicity.default, {
-      expand: expand === 'mpy',
-      onExapnd: onExapndMpy
-    }), _cfg.default.hidePanelCompare(layoutSt) || listCurves.length > 1 ? null : /*#__PURE__*/_react.default.createElement(_compare.default, {
-      expand: expand === 'compare',
-      onExapnd: onExapndCompare
-    }), _cfg.default.hidePanelCyclicVolta(layoutSt) ? null : /*#__PURE__*/_react.default.createElement(_cyclic_voltamery_data.default, {
-      jcampIdx: jcampIdx,
-      feature: feature,
-      expand: expand === 'cyclicvolta',
-      onExapnd: onExapndCyclicVolta,
-      userManualLink: userManualLink ? userManualLink.cv : undefined
-    }))));
+    return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+      className: (0, _classnames.default)(classes.panels),
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_styles.StyledEngineProvider, {
+        injectFirst: true,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsxs)(_styles.ThemeProvider, {
+          theme: theme,
+          children: [hideGraphSelection ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_graph_selection.default, {
+            jcampIdx: jcampIdx,
+            entityFileNames: entityFileNames,
+            expand: expand === 'graph',
+            onExapnd: onExapndGraphSelection,
+            subLayoutsInfo: subLayoutsInfo
+          }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_info.default, {
+            feature: feature,
+            integration: integration,
+            editorOnly: editorOnly,
+            expand: expand === 'info',
+            molSvg: molSvg,
+            exactMass: exactMass,
+            onExapnd: onExapndInfo,
+            descriptions: descriptions,
+            canChangeDescription: canChangeDescription,
+            onDescriptionChanged: this.handleDescriptionChanged
+          }), _cfg.default.hidePanelPeak(layoutSt) ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_peaks.default, {
+            expand: expand === 'peak',
+            onExapnd: onExapndPeak
+          }), _cfg.default.hidePanelMpy(layoutSt) ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_multiplicity.default, {
+            expand: expand === 'mpy',
+            onExapnd: onExapndMpy
+          }), _cfg.default.hidePanelCompare(layoutSt) || listCurves.length > 1 ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_compare.default, {
+            expand: expand === 'compare',
+            onExapnd: onExapndCompare
+          }), _cfg.default.hidePanelCyclicVolta(layoutSt) ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_cyclic_voltamery_data.default, {
+            jcampIdx: jcampIdx,
+            feature: feature,
+            expand: expand === 'cyclicvolta',
+            onExapnd: onExapndCyclicVolta,
+            userManualLink: userManualLink ? userManualLink.cv : undefined
+          })]
+        })
+      })
+    });
   }
 }
 const mapStateToProps = (state, _) => (

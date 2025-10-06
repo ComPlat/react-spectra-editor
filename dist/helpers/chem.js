@@ -21,9 +21,7 @@ const getTopic = (_, props) => props.topic;
 const getFeature = (_, props) => props.feature;
 const getLayout = (state, _) => state.layout; // eslint-disable-line
 
-const GetCyclicVoltaShiftOffset = function () {
-  let volammetryData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-  let curveIdx = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+const GetCyclicVoltaShiftOffset = (volammetryData = null, curveIdx = 0) => {
   if (!volammetryData) return 0.0;
   const {
     spectraList
@@ -54,7 +52,7 @@ const getShiftOffset = (state, _) => {
   const {
     curveIdx
   } = curve;
-  if (layout === _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY && cyclicvolta) {
+  if ((layout === _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY || layout === _list_layout.LIST_LAYOUT.LSV) && cyclicvolta) {
     return GetCyclicVoltaShiftOffset(cyclicvolta, curveIdx);
   }
   const {
@@ -165,9 +163,7 @@ const convertFrequency = (layout, feature) => {
 };
 const ToFrequency = exports.ToFrequency = (0, _reselect.createSelector)(getLayout, getFeature, convertFrequency);
 const getThreshold = state => state.threshold ? state.threshold.list[state.curve.curveIdx].value * 1.0 : false;
-const Convert2Peak = function (feature, threshold, offset) {
-  let upThreshold = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-  let lowThreshold = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+const Convert2Peak = (feature, threshold, offset, upThreshold = false, lowThreshold = false) => {
   const peak = [];
   if (!feature || !feature.data) return peak;
   const data = feature.data[0];
@@ -185,7 +181,7 @@ const Convert2Peak = function (feature, threshold, offset) {
   } = operation;
 
   // if (!Format.isSECLayout(layout) && (upperThres || lowerThres)) {
-  if ((_format.default.isCyclicVoltaLayout(layout) || _format.default.isCDSLayout(layout)) && (upperThres || lowerThres)) {
+  if ((_format.default.isCyclicVoltaLayout(layout) || _format.default.isLSVLayout(layout) || _format.default.isCDSLayout(layout)) && (upperThres || lowerThres)) {
     let upperThresVal = upThreshold || upperThres;
     if (!upperThresVal) {
       upperThresVal = 1.0;
@@ -237,7 +233,7 @@ const Convert2MaxMinPeak = (layout, feature, offset) => {
     pecker: [],
     refIndex: -1
   };
-  if (!_format.default.isCyclicVoltaLayout(layout) || !feature || !feature.data) return null; // eslint-disable-line
+  if (!(_format.default.isCyclicVoltaLayout(layout) || _format.default.isLSVLayout(layout)) || !feature || !feature.data) return null; // eslint-disable-line
   // const data = feature.data[0]; // eslint-disable-line
   const {
     volammetryData
@@ -330,7 +326,6 @@ const readLayout = jcamp => {
     xType,
     spectra
   } = jcamp;
-  if (xType && _format.default.isNmrLayout(xType)) return xType;
   const {
     dataType
   } = spectra[0];
@@ -362,6 +357,9 @@ const readLayout = jcamp => {
     if (dataType.includes('CYCLIC VOLTAMMETRY')) {
       return _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY;
     }
+    if (dataType.includes('LINEAR SWEEP VOLTAMMETRY')) {
+      return _list_layout.LIST_LAYOUT.LSV;
+    }
     if (dataType.includes('CIRCULAR DICHROISM SPECTROSCOPY')) {
       return _list_layout.LIST_LAYOUT.CDS;
     }
@@ -384,6 +382,7 @@ const readLayout = jcamp => {
       return _list_layout.LIST_LAYOUT.DLS_INTENSITY;
     }
   }
+  if (xType && _format.default.isNmrLayout(xType)) return xType;
   return false;
 };
 const extrSpectraShare = (spectra, layout) => spectra.map(s => Object.assign({
@@ -495,9 +494,7 @@ const extractVoltammetryData = jcamp => {
   });
   return peakStack;
 };
-const buildPeakFeature = function (jcamp, layout, peakUp, s, thresRef) {
-  let upperThres = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
-  let lowerThres = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : false;
+const buildPeakFeature = (jcamp, layout, peakUp, s, thresRef, upperThres = false, lowerThres = false) => {
   // eslint-disable-line
   const {
     xType,
@@ -842,7 +839,7 @@ const ExtractJcamp = source => {
       layout,
       temperature
     };
-  } else if (_format.default.isCyclicVoltaLayout(layout) || _format.default.isSECLayout(layout) || _format.default.isAIFLayout(layout) || _format.default.isCDSLayout(layout) || _format.default.isGCLayout(layout)) {
+  } else if (_format.default.isCyclicVoltaLayout(layout) || _format.default.isLSVLayout(layout) || _format.default.isSECLayout(layout) || _format.default.isAIFLayout(layout) || _format.default.isCDSLayout(layout) || _format.default.isGCLayout(layout)) {
     features = extrFeaturesCylicVolta(jcamp, layout, peakUp);
   } else {
     features = extrFeaturesNi(jcamp, layout, peakUp, spectra);
@@ -894,9 +891,7 @@ const Convert2Thres = (feature, thresSt) => {
   return value;
 };
 exports.Convert2Thres = Convert2Thres;
-const Convert2DValue = function (doubleTheta) {
-  let lambda = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.15406;
-  let isRadian = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+const Convert2DValue = (doubleTheta, lambda = 0.15406, isRadian = true) => {
   let theta = doubleTheta / 2;
   if (isRadian) {
     theta = theta / 180 * Math.PI;

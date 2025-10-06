@@ -164,9 +164,7 @@ const clearAll = (state, action) => {
     multiplicities: newMultiplicities
   });
 };
-const multiplicityReducer = function () {
-  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-  let action = arguments.length > 1 ? arguments[1] : undefined;
+const multiplicityReducer = (state = initialState, action) => {
   switch (action.type) {
     case _action_type.EDITPEAK.SHIFT:
       return setShift(state, action);
@@ -191,6 +189,8 @@ const multiplicityReducer = function () {
       return clearAll(state, action);
     case _action_type.MANAGER.RESETALL:
       return state;
+    case _action_type.MANAGER.RESET_MULTIPLICITY:
+      return initialState;
     default:
       return _undo_redo_config.undoRedoActions.indexOf(action.type) >= 0 ? Object.assign({}, state) : state;
   }
