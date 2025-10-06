@@ -14,6 +14,7 @@ var _styles = require("@mui/styles");
 var _material = require("@mui/material");
 var _comps = require("./comps");
 var _nmr_comps = require("./nmr_comps");
+var _jsxRuntime = require("react/jsx-runtime");
 const Styles = () => ({
   root: {
     overflowX: 'hidden',
@@ -58,37 +59,43 @@ const sectionTable = (classes, pds) => {
   const renderMsg = (0, _comps.notToRenderAnalysis)(pds);
   if (renderMsg) return renderMsg;
   const dict = pds.output.result[0];
-  if (!dict) return /*#__PURE__*/_react.default.createElement("div", null);
-  return /*#__PURE__*/_react.default.createElement(_material.Paper, {
-    className: classes.tableRoot
-  }, /*#__PURE__*/_react.default.createElement(_material.Table, {
-    className: classes.table,
-    size: "small"
-  }, (0, _nmr_comps.NmrTableHeader)(classes), /*#__PURE__*/_react.default.createElement(_material.TableBody, null, dict.shifts.sort((a, b) => a.atom - b.atom).map((row, idx) => (0, _nmr_comps.NmrTableBodyRow)(classes, row, idx)))));
+  if (!dict) return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {});
+  return /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Paper, {
+    className: classes.tableRoot,
+    children: /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Table, {
+      className: classes.table,
+      size: "small",
+      children: [(0, _nmr_comps.NmrTableHeader)(classes), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableBody, {
+        children: dict.shifts.sort((a, b) => a.atom - b.atom).map((row, idx) => (0, _nmr_comps.NmrTableBodyRow)(classes, row, idx))
+      })]
+    })
+  });
 };
-const NmrViewer = _ref => {
-  let {
-    // eslint-disable-line
-    classes,
-    molecule,
-    inputCb,
-    forecastSt
-  } = _ref;
-  return /*#__PURE__*/_react.default.createElement("div", {
-    className: (0, _classnames.default)(classes.root, 'card-forecast-viewer')
-  }, /*#__PURE__*/_react.default.createElement(_material.Grid, {
+const NmrViewer = ({
+  // eslint-disable-line
+  classes,
+  molecule,
+  inputCb,
+  forecastSt
+}) => /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+  className: (0, _classnames.default)(classes.root, 'card-forecast-viewer'),
+  children: [/*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Grid, {
     className: (0, _classnames.default)(classes.container),
-    container: true
-  }, /*#__PURE__*/_react.default.createElement(_material.Grid, {
-    item: true,
-    xs: 4
-  }, /*#__PURE__*/_react.default.createElement(_material.Paper, {
-    className: classes.svgRoot
-  }, (0, _comps.sectionSvg)(classes, forecastSt.predictions))), /*#__PURE__*/_react.default.createElement(_material.Grid, {
-    item: true,
-    xs: 8
-  }, sectionTable(classes, forecastSt.predictions))), (0, _comps.sectionInput)(classes, molecule, inputCb), (0, _nmr_comps.SectionReference)(classes));
-};
+    container: true,
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Grid, {
+      item: true,
+      xs: 4,
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Paper, {
+        className: classes.svgRoot,
+        children: (0, _comps.sectionSvg)(classes, forecastSt.predictions)
+      })
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Grid, {
+      item: true,
+      xs: 8,
+      children: sectionTable(classes, forecastSt.predictions)
+    })]
+  }), (0, _comps.sectionInput)(classes, molecule, inputCb), (0, _nmr_comps.SectionReference)(classes)]
+});
 const mapStateToProps = (state, props) => (
 // eslint-disable-line
 {

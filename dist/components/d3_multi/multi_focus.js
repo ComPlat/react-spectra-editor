@@ -158,8 +158,7 @@ class MultiFocus {
     this.tip = (0, _init.InitTip)();
     this.root.call(this.tip);
   }
-  setDataParams(filterSeed, peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt) {
-    let jcampIdx = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : 0;
+  setDataParams(filterSeed, peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt, jcampIdx = 0) {
     this.data = [];
     this.otherLineData = [];
     let filterSubLayoutValue = null;
@@ -310,7 +309,7 @@ class MultiFocus {
     event.stopPropagation();
     event.preventDefault();
     const onPeak = true;
-    if (this.layout === _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
+    if (this.layout === _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY || this.layout === _list_layout.LIST_LAYOUT.LSV) {
       const {
         spectraList
       } = this.cyclicvoltaSt;
@@ -404,7 +403,7 @@ class MultiFocus {
       sameDtPk,
       sameSfPk
     } = this.shouldUpdate;
-    if (!_format.default.isCyclicVoltaLayout(this.layout) && sameXY && sameEpSt && sameDtPk && sameSfPk) return;
+    if (!(_format.default.isCyclicVoltaLayout(this.layout) || _format.default.isLSVLayout(this.layout)) && sameXY && sameEpSt && sameDtPk && sameSfPk) return;
 
     // rescale for zoom
     const {
@@ -506,7 +505,7 @@ class MultiFocus {
       sameDtPk,
       sameSfPk
     } = this.shouldUpdate;
-    if (!_format.default.isCyclicVoltaLayout(this.layout) && sameXY && sameEpSt && sameDtPk && sameSfPk) return;
+    if (!(_format.default.isCyclicVoltaLayout(this.layout) || _format.default.isLSVLayout(this.layout)) && sameXY && sameEpSt && sameDtPk && sameSfPk) return;
 
     // rescale for zoom
     const {
@@ -809,23 +808,22 @@ class MultiFocus {
     ccp.enter().append('path').attr('d', lineSymbol).attr('class', 'enter-ref').attr('fill', 'green').attr('fill-opacity', 0.8).merge(ccp).attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y)})`);
   }
   reverseXAxis(layoutSt) {
-    return [_list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS, _list_layout.LIST_LAYOUT.TGA, _list_layout.LIST_LAYOUT.DSC, _list_layout.LIST_LAYOUT.XRD, _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY, _list_layout.LIST_LAYOUT.CDS, _list_layout.LIST_LAYOUT.SEC, _list_layout.LIST_LAYOUT.GC, _list_layout.LIST_LAYOUT.AIF].indexOf(layoutSt) < 0;
+    return [_list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS, _list_layout.LIST_LAYOUT.TGA, _list_layout.LIST_LAYOUT.DSC, _list_layout.LIST_LAYOUT.XRD, _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY, _list_layout.LIST_LAYOUT.LSV, _list_layout.LIST_LAYOUT.CDS, _list_layout.LIST_LAYOUT.SEC, _list_layout.LIST_LAYOUT.GC, _list_layout.LIST_LAYOUT.AIF].indexOf(layoutSt) < 0;
   }
-  create(_ref) {
-    let {
-      curveSt,
-      filterSeed,
-      filterPeak,
-      tTrEndPts,
-      tSfPeaks,
-      editPeakSt,
-      layoutSt,
-      sweepExtentSt,
-      isUiNoBrushSt,
-      cyclicvoltaSt,
-      integationSt,
-      mtplySt
-    } = _ref;
+  create({
+    curveSt,
+    filterSeed,
+    filterPeak,
+    tTrEndPts,
+    tSfPeaks,
+    editPeakSt,
+    layoutSt,
+    sweepExtentSt,
+    isUiNoBrushSt,
+    cyclicvoltaSt,
+    integationSt,
+    mtplySt
+  }) {
     this.svg = d3.select(this.rootKlass).select('.d3Svg');
     (0, _mount.MountMainFrame)(this, 'focus');
     (0, _mount.MountClip)(this);
@@ -863,22 +861,21 @@ class MultiFocus {
     (0, _brush.default)(this, false, isUiNoBrushSt);
     this.resetShouldUpdate(editPeakSt);
   }
-  update(_ref2) {
-    let {
-      entities,
-      curveSt,
-      filterSeed,
-      filterPeak,
-      tTrEndPts,
-      tSfPeaks,
-      editPeakSt,
-      layoutSt,
-      sweepExtentSt,
-      isUiNoBrushSt,
-      cyclicvoltaSt,
-      integationSt,
-      mtplySt
-    } = _ref2;
+  update({
+    entities,
+    curveSt,
+    filterSeed,
+    filterPeak,
+    tTrEndPts,
+    tSfPeaks,
+    editPeakSt,
+    layoutSt,
+    sweepExtentSt,
+    isUiNoBrushSt,
+    cyclicvoltaSt,
+    integationSt,
+    mtplySt
+  }) {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt));
     const {

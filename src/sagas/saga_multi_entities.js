@@ -33,7 +33,7 @@ function* setCyclicVoltametry(action) { // eslint-disable-line
 
     const firstCurve = listCurves[0];
     const { layout } = firstCurve;
-    if (layout !== LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
+    if (layout !== LIST_LAYOUT.CYCLIC_VOLTAMMETRY && layout !== LIST_LAYOUT.LSV) {
       return;
     }
 
@@ -77,7 +77,7 @@ function* setCyclicVoltametry(action) { // eslint-disable-line
 
 function* setCyclicVoltametryRef(action) { // eslint-disable-line
   const layoutSt = yield select(getLayoutSt);
-  if (layoutSt !== LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
+  if (layoutSt !== LIST_LAYOUT.CYCLIC_VOLTAMMETRY && layoutSt !== LIST_LAYOUT.LSV) {
     return;
   }
 

@@ -59,9 +59,7 @@ const setAllCurves = (state, action) => {
     listCurves: payload
   });
 };
-const curveReducer = function () {
-  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-  let action = arguments.length > 1 ? arguments[1] : undefined;
+const curveReducer = (state = initialState, action) => {
   switch (action.type) {
     case _action_type.CURVE.SELECT_WORKING_CURVE:
       return Object.assign({}, state, {

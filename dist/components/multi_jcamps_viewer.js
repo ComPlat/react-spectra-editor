@@ -18,6 +18,7 @@ var _curve = require("../actions/curve");
 var _cyclic_voltammetry = require("../actions/cyclic_voltammetry");
 var _list_layout = require("../constants/list_layout");
 var _format = _interopRequireDefault(require("../helpers/format"));
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable react/default-props-match-prop-types,
 react/require-default-props, react/no-unused-prop-types, react/jsx-boolean-value,
 prefer-object-spread */
@@ -35,7 +36,7 @@ const styles = () => ({
   }
 });
 const seperatingSubLayout = (entities, featureCondition, layoutSt) => {
-  if (layoutSt === _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
+  if (layoutSt === _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY || layoutSt === _list_layout.LIST_LAYOUT.LSV) {
     return null;
   }
   const storedDict = {};
@@ -67,7 +68,7 @@ class MultiJcampsViewer extends _react.default.Component {
       layoutSt,
       integrationSt
     } = this.props;
-    if (!entities || entities.length === 0) return /*#__PURE__*/_react.default.createElement("div", null);
+    if (!entities || entities.length === 0) return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {});
     const separateCondition = _format.default.isGCLayout(layoutSt) ? 'yUnit' : 'xUnit';
     const seperatedSubLayouts = seperatingSubLayout(entities, separateCondition, layoutSt);
     const {
@@ -82,43 +83,48 @@ class MultiJcampsViewer extends _react.default.Component {
       integrations
     } = integrationSt;
     const currentIntegration = integrations[curveIdx];
-    return /*#__PURE__*/_react.default.createElement("div", {
-      className: classes.root
-    }, /*#__PURE__*/_react.default.createElement(_index2.default, {
-      feature: feature,
-      operations: operations,
-      editorOnly: true,
-      hideThreshold: !_format.default.isNmrLayout(layoutSt)
-    }), /*#__PURE__*/_react.default.createElement("div", {
-      className: "react-spectrum-editor"
-    }, /*#__PURE__*/_react.default.createElement(_Grid.default, {
-      container: true
-    }, /*#__PURE__*/_react.default.createElement(_Grid.default, {
-      item: true,
-      xs: 9
-    }, /*#__PURE__*/_react.default.createElement(_index3.default, {
-      entities: entities,
-      topic: topic,
-      xLabel: feature.xUnit,
-      yLabel: feature.yUnit,
-      feature: feature
-    })), /*#__PURE__*/_react.default.createElement(_Grid.default, {
-      item: true,
-      xs: 3,
-      align: "center"
-    }, /*#__PURE__*/_react.default.createElement(_index.default, {
-      jcampIdx: curveIdx,
-      entityFileNames: entityFileNames,
-      userManualLink: userManualLink,
-      feature: feature,
-      molSvg: molSvg,
-      exactMass: exactMass,
-      subLayoutsInfo: seperatedSubLayouts,
-      integration: currentIntegration,
-      descriptions: "",
-      canChangeDescription: () => {},
-      onDescriptionChanged: () => {}
-    })))));
+    return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+      className: classes.root,
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_index2.default, {
+        feature: feature,
+        operations: operations,
+        editorOnly: true,
+        hideThreshold: !_format.default.isNmrLayout(layoutSt)
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+        className: "react-spectrum-editor",
+        children: /*#__PURE__*/(0, _jsxRuntime.jsxs)(_Grid.default, {
+          container: true,
+          children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
+            item: true,
+            xs: 9,
+            children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_index3.default, {
+              entities: entities,
+              topic: topic,
+              xLabel: feature.xUnit,
+              yLabel: feature.yUnit,
+              feature: feature
+            })
+          }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
+            item: true,
+            xs: 3,
+            align: "center",
+            children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_index.default, {
+              jcampIdx: curveIdx,
+              entityFileNames: entityFileNames,
+              userManualLink: userManualLink,
+              feature: feature,
+              molSvg: molSvg,
+              exactMass: exactMass,
+              subLayoutsInfo: seperatedSubLayouts,
+              integration: currentIntegration,
+              descriptions: "",
+              canChangeDescription: () => {},
+              onDescriptionChanged: () => {}
+            })
+          })]
+        })
+      })]
+    });
   }
 }
 const mapStateToProps = (state, _) => (

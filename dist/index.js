@@ -33,6 +33,7 @@ var _xrd_jcamp_2 = _interopRequireDefault(require("./__tests__/fixtures/xrd_jcam
 var _cyclic_voltammetry_ = _interopRequireDefault(require("./__tests__/fixtures/cyclic_voltammetry_1"));
 var _cyclic_voltammetry_2 = _interopRequireDefault(require("./__tests__/fixtures/cyclic_voltammetry_2"));
 var _cyclic_voltammetry_3 = _interopRequireDefault(require("./__tests__/fixtures/cyclic_voltammetry_3"));
+var _lsv_jcamp = _interopRequireDefault(require("./__tests__/fixtures/lsv_jcamp"));
 var _cds_jcamp = _interopRequireDefault(require("./__tests__/fixtures/cds_jcamp"));
 var _sec_1_jcamp = _interopRequireDefault(require("./__tests__/fixtures/sec_1_jcamp"));
 var _sec_2_jcamp = _interopRequireDefault(require("./__tests__/fixtures/sec_2_jcamp"));
@@ -48,6 +49,7 @@ var _dls_acf_jcamp = _interopRequireDefault(require("./__tests__/fixtures/dls_ac
 var _dls_intensity_jcamp = _interopRequireDefault(require("./__tests__/fixtures/dls_intensity_jcamp"));
 var _qDescValue = require("./__tests__/fixtures/qDescValue");
 require("./__tests__/style/svg.css");
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, default-param-last, no-nested-ternary */
 
 const nmr1HEntity = _app.FN.ExtractJcamp(_nmr1h_jcamp.default);
@@ -74,6 +76,7 @@ const xrdEntity2 = _app.FN.ExtractJcamp(_xrd_jcamp_2.default);
 const cyclicVoltaEntity1 = _app.FN.ExtractJcamp(_cyclic_voltammetry_.default);
 const cyclicVoltaEntity2 = _app.FN.ExtractJcamp(_cyclic_voltammetry_2.default);
 const cyclicVoltaEntity3 = _app.FN.ExtractJcamp(_cyclic_voltammetry_3.default);
+const lsvEntity = _app.FN.ExtractJcamp(_lsv_jcamp.default);
 const cdsEntity = _app.FN.ExtractJcamp(_cds_jcamp.default);
 const secEntity1 = _app.FN.ExtractJcamp(_sec_1_jcamp.default);
 const secEntity2 = _app.FN.ExtractJcamp(_sec_2_jcamp.default);
@@ -170,6 +173,8 @@ class DemoWriteIr extends _react.default.Component {
         return xrdEntity1;
       case 'cyclic volta':
         return cyclicVoltaEntity2;
+      case 'lsv':
+        return lsvEntity;
       case 'cds':
         return cdsEntity;
       case 'sec':
@@ -266,19 +271,18 @@ class DemoWriteIr extends _react.default.Component {
   rmDollarSign(target) {
     return target.replace(/\$/g, '');
   }
-  formatPks(_ref) {
-    let {
-      peaks,
-      layout,
-      shift,
-      isAscend,
-      decimal,
-      isIntensity,
-      integration,
-      waveLength,
-      cyclicvoltaSt,
-      curveSt
-    } = _ref;
+  formatPks({
+    peaks,
+    layout,
+    shift,
+    isAscend,
+    decimal,
+    isIntensity,
+    integration,
+    waveLength,
+    cyclicvoltaSt,
+    curveSt
+  }) {
     const entity = this.loadEntity();
     const {
       features
@@ -339,15 +343,14 @@ class DemoWriteIr extends _react.default.Component {
     }
     return desc;
   }
-  formatMpy(_ref2) {
-    let {
-      multiplicity,
-      integration,
-      shift,
-      isAscend,
-      decimal,
-      layout
-    } = _ref2;
+  formatMpy({
+    multiplicity,
+    integration,
+    shift,
+    isAscend,
+    decimal,
+    layout
+  }) {
     // obsv freq
     const entity = this.loadEntity();
     const {
@@ -409,15 +412,14 @@ class DemoWriteIr extends _react.default.Component {
     const solvent = label ? `${name.split('(')[0].trim()} [${value.toFixed(decimal)} ppm], ` : '';
     return `${layout} NMR (${freqStr}${solvent}ppm) δ = ${str}.`;
   }
-  writeMpy(_ref3) {
-    let {
-      layout,
-      shift,
-      isAscend,
-      decimal,
-      multiplicity,
-      integration
-    } = _ref3;
+  writeMpy({
+    layout,
+    shift,
+    isAscend,
+    decimal,
+    multiplicity,
+    integration
+  }) {
     if (!_app.FN.isNmrLayout(layout)) return;
     const desc = this.formatMpy({
       multiplicity,
@@ -431,19 +433,18 @@ class DemoWriteIr extends _react.default.Component {
       desc
     });
   }
-  writePeak(_ref4) {
-    let {
-      peaks,
-      layout,
-      shift,
-      isAscend,
-      decimal,
-      isIntensity,
-      integration,
-      waveLength,
-      cyclicvoltaSt,
-      curveSt
-    } = _ref4;
+  writePeak({
+    peaks,
+    layout,
+    shift,
+    isAscend,
+    decimal,
+    isIntensity,
+    integration,
+    waveLength,
+    cyclicvoltaSt,
+    curveSt
+  }) {
     const desc = this.formatPks({
       peaks,
       layout,
@@ -461,19 +462,18 @@ class DemoWriteIr extends _react.default.Component {
       desc
     });
   }
-  savePeaks(_ref5) {
-    let {
-      peaks,
-      layout,
-      shift,
-      isAscend,
-      decimal,
-      analysis,
-      isIntensity,
-      integration,
-      multiplicity,
-      waveLength
-    } = _ref5;
+  savePeaks({
+    peaks,
+    layout,
+    shift,
+    isAscend,
+    decimal,
+    analysis,
+    isIntensity,
+    integration,
+    multiplicity,
+    waveLength
+  }) {
     const entity = this.loadEntity();
     const {
       features
@@ -512,11 +512,10 @@ class DemoWriteIr extends _react.default.Component {
     }
     /*eslint-disable */
   }
-  predictOp(_ref6) {
-    let {
-      multiplicity,
-      curveSt
-    } = _ref6;
+  predictOp({
+    multiplicity,
+    curveSt
+  }) {
     const {
       curveIdx
     } = curveSt;
@@ -591,226 +590,269 @@ class DemoWriteIr extends _react.default.Component {
       molecule: molecule,
       predictions
     };
-    const molSvg = ['nmr 1h', 'ir', 'cyclic volta'].indexOf(typ) >= 0 ? _phenylalanin.default.path : '';
+    const molSvg = ['nmr 1h', 'ir', 'cyclic volta', 'lsv'].indexOf(typ) >= 0 ? _phenylalanin.default.path : '';
     const others = this.loadOthers();
-    return /*#__PURE__*/_react.default.createElement("div", {
+    return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
       style: {
         width: Math.round(window.innerWidth * 0.96)
-      }
-    }, /*#__PURE__*/_react.default.createElement("div", {
-      style: {
-        margin: '0 0 15px 55px'
-      }
-    }, /*#__PURE__*/_react.default.createElement(_material.Button, {
-      variant: "contained",
-      style: {
-        margin: '0 10px 0 10px'
       },
-      onClick: this.onClick('nmr 1h')
-    }, "NMR 1H"), /*#__PURE__*/_react.default.createElement(_material.Button, {
-      variant: "contained",
-      style: {
-        margin: '0 10px 0 10px'
-      },
-      onClick: this.onClick('nmr 13c')
-    }, "NMR 13C"), /*#__PURE__*/_react.default.createElement(_material.Button, {
-      variant: "contained",
-      style: {
-        margin: '0 10px 0 10px'
-      },
-      onClick: this.onClick('nmr 13c dept')
-    }, "NMR 13C DEPT"), /*#__PURE__*/_react.default.createElement(_material.Button, {
-      variant: "contained",
-      style: {
-        margin: '0 10px 0 10px'
-      },
-      onClick: this.onClick('nmr 19f')
-    }, "NMR 19F"), /*#__PURE__*/_react.default.createElement(_material.Button, {
-      variant: "contained",
-      style: {
-        margin: '0 10px 0 10px'
-      },
-      onClick: this.onClick('nmr 31p')
-    }, "NMR 31P"), /*#__PURE__*/_react.default.createElement(_material.Button, {
-      variant: "contained",
-      style: {
-        margin: '0 10px 0 10px'
-      },
-      onClick: this.onClick('nmr 15n')
-    }, "NMR 15N"), /*#__PURE__*/_react.default.createElement(_material.Button, {
-      variant: "contained",
-      style: {
-        margin: '0 10px 0 10px'
-      },
-      onClick: this.onClick('nmr 29si')
-    }, "NMR 29Si"), /*#__PURE__*/_react.default.createElement(_material.Button, {
-      variant: "contained",
-      style: {
-        margin: '0 10px 0 10px'
-      },
-      onClick: this.onClick('ir')
-    }, "IR"), /*#__PURE__*/_react.default.createElement(_material.Button, {
-      variant: "contained",
-      style: {
-        margin: '0 10px 0 10px'
-      },
-      onClick: this.onClick('raman')
-    }, "RAMAN"), /*#__PURE__*/_react.default.createElement(_material.Button, {
-      id: "btn-uv-vis",
-      variant: "contained",
-      style: {
-        margin: '0 10px 0 10px'
-      },
-      onClick: this.onClick('uv/vis')
-    }, "UV/VIS"), /*#__PURE__*/_react.default.createElement(_material.Button, {
-      id: "btn-hplc",
-      variant: "contained",
-      style: {
-        margin: '0 10px 0 10px'
-      },
-      onClick: this.onClick('hplc uv/vis')
-    }, "HPLC UV/VIS"), /*#__PURE__*/_react.default.createElement(_material.Button, {
-      id: "btn-tga",
-      variant: "contained",
-      style: {
-        margin: '0 10px 0 10px'
-      },
-      onClick: this.onClick('tga')
-    }, "TGA"), /*#__PURE__*/_react.default.createElement(_material.Button, {
-      id: "btn-dsc",
-      variant: "contained",
-      style: {
-        margin: '0 10px 0 10px'
-      },
-      onClick: this.onClick('dsc')
-    }, "DSC"), /*#__PURE__*/_react.default.createElement(_material.Button, {
-      id: "btn-xrd",
-      variant: "contained",
-      style: {
-        margin: '0 10px 0 10px'
-      },
-      onClick: this.onClick('xrd')
-    }, "XRD"), /*#__PURE__*/_react.default.createElement(_material.Button, {
-      id: "btn-cv",
-      variant: "contained",
-      style: {
-        margin: '0 10px 0 10px'
-      },
-      onClick: this.onClick('cyclic volta')
-    }, "CV"), /*#__PURE__*/_react.default.createElement(_material.Button, {
-      variant: "contained",
-      style: {
-        margin: '0 10px 0 10px'
-      },
-      onClick: this.onClick('cds')
-    }, "CDS"), /*#__PURE__*/_react.default.createElement(_material.Button, {
-      id: "btn-sec",
-      variant: "contained",
-      style: {
-        margin: '0 10px 0 10px'
-      },
-      onClick: this.onClick('sec')
-    }, "SEC"), /*#__PURE__*/_react.default.createElement(_material.Button, {
-      id: "btn-sec",
-      variant: "contained",
-      style: {
-        margin: '0 10px 0 10px'
-      },
-      onClick: this.onClick('gc')
-    }, "GC"), /*#__PURE__*/_react.default.createElement(_material.Button, {
-      id: "btn-sod",
-      variant: "contained",
-      style: {
-        margin: '0 10px 0 10px'
-      },
-      onClick: this.onClick('aif')
-    }, "SORPTION-DESORPTION"), /*#__PURE__*/_react.default.createElement(_material.Button, {
-      variant: "contained",
-      style: {
-        margin: '0 10px 0 10px'
-      },
-      onClick: this.onClick('emissions')
-    }, "EMISSIONS"), /*#__PURE__*/_react.default.createElement(_material.Button, {
-      variant: "contained",
-      style: {
-        margin: '0 10px 0 10px'
-      },
-      onClick: this.onClick('dls acf')
-    }, "DLS ACF"), /*#__PURE__*/_react.default.createElement(_material.Button, {
-      variant: "contained",
-      style: {
-        margin: '0 10px 0 10px'
-      },
-      onClick: this.onClick('dls intensity')
-    }, "DLS intensity"), /*#__PURE__*/_react.default.createElement(_material.Button, {
-      variant: "contained",
-      style: {
-        margin: '0 10px 0 10px'
-      },
-      onClick: this.onClick('ms')
-    }, "MS"), /*#__PURE__*/_react.default.createElement(_material.Button, {
-      variant: "contained",
-      style: {
-        margin: '0 10px 0 10px'
-      },
-      onClick: this.onClick('multi')
-    }, "Multi NMR"), /*#__PURE__*/_react.default.createElement(_material.Button, {
-      variant: "contained",
-      style: {
-        margin: '0 10px 0 10px'
-      },
-      onClick: this.onClick('multi ir')
-    }, "Multi IR"), /*#__PURE__*/_react.default.createElement(_material.Button, {
-      variant: "contained",
-      style: {
-        margin: '0 10px 0 10px'
-      },
-      onClick: this.onClick('multi hplc')
-    }, "Multi HPLC"), /*#__PURE__*/_react.default.createElement(_material.Button, {
-      variant: "contained",
-      style: {
-        margin: '0 10px 0 10px'
-      },
-      onClick: this.onClick('multi xrd')
-    }, "Multi XRD")), /*#__PURE__*/_react.default.createElement(_app.SpectraEditor, {
-      entity: entity,
-      multiEntities: multiEntities,
-      others: others,
-      editorOnly: false,
-      canChangeDescription: true,
-      onDescriptionChanged: this.onDescriptionChanged,
-      molSvg: molSvg,
-      theoryMass: '123.0',
-      userManualLink: {
-        cv: "https://www.chemotion.net/chemotionsaurus/docs/eln/chemspectra/cvanalysis"
-      },
-      forecast: forecast,
-      operations: operations
-    }), /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("span", null, "Description Changed"), /*#__PURE__*/_react.default.createElement(_reactQuill.default, {
-      className: 'card-sv-quill',
-      value: this.state.descChanged,
-      modules: {
-        toolbar: false
-      },
-      readOnly: true
-    })), /*#__PURE__*/_react.default.createElement(_material.Grid, {
-      container: true
-    }, /*#__PURE__*/_react.default.createElement(_material.Grid, {
-      item: true,
-      xs: 10
-    }, /*#__PURE__*/_react.default.createElement(_material.InputBase, {
-      style: {
-        margin: '0 0 0 63px'
-      },
-      placeholder: "Description",
-      multiline: true,
-      fullWidth: true,
-      rows: "2",
-      margin: "dense",
-      value: desc
-    }))));
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+        style: {
+          margin: '0 0 15px 55px'
+        },
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('nmr 1h'),
+          children: "NMR 1H"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('nmr 13c'),
+          children: "NMR 13C"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('nmr 13c dept'),
+          children: "NMR 13C DEPT"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('nmr 19f'),
+          children: "NMR 19F"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('nmr 31p'),
+          children: "NMR 31P"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('nmr 15n'),
+          children: "NMR 15N"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('nmr 29si'),
+          children: "NMR 29Si"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('ir'),
+          children: "IR"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('raman'),
+          children: "RAMAN"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          id: "btn-uv-vis",
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('uv/vis'),
+          children: "UV/VIS"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          id: "btn-hplc",
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('hplc uv/vis'),
+          children: "HPLC UV/VIS"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          id: "btn-tga",
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('tga'),
+          children: "TGA"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          id: "btn-dsc",
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('dsc'),
+          children: "DSC"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          id: "btn-xrd",
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('xrd'),
+          children: "XRD"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          id: "btn-cv",
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('cyclic volta'),
+          children: "CV"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          id: "btn-lsv",
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('lsv'),
+          children: "LSV"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('cds'),
+          children: "CDS"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          id: "btn-sec",
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('sec'),
+          children: "SEC"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          id: "btn-sec",
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('gc'),
+          children: "GC"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          id: "btn-sod",
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('aif'),
+          children: "SORPTION-DESORPTION"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('emissions'),
+          children: "EMISSIONS"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('dls acf'),
+          children: "DLS ACF"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('dls intensity'),
+          children: "DLS intensity"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('ms'),
+          children: "MS"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('multi'),
+          children: "Multi NMR"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('multi ir'),
+          children: "Multi IR"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('multi hplc'),
+          children: "Multi HPLC"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('multi xrd'),
+          children: "Multi XRD"
+        })]
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_app.SpectraEditor, {
+        entity: entity,
+        multiEntities: multiEntities,
+        others: others,
+        editorOnly: false,
+        canChangeDescription: true,
+        onDescriptionChanged: this.onDescriptionChanged,
+        molSvg: molSvg,
+        exactMass: '123.0',
+        userManualLink: {
+          cv: "https://www.chemotion.net/chemotionsaurus/docs/eln/chemspectra/cvanalysis"
+        },
+        forecast: forecast,
+        operations: operations
+      }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          children: "Description Changed"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_reactQuill.default, {
+          className: 'card-sv-quill',
+          value: this.state.descChanged,
+          modules: {
+            toolbar: false
+          },
+          readOnly: true
+        })]
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Grid, {
+        container: true,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Grid, {
+          item: true,
+          xs: 10,
+          children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputBase, {
+            style: {
+              margin: '0 0 0 63px'
+            },
+            placeholder: "Description",
+            multiline: true,
+            fullWidth: true,
+            rows: "2",
+            margin: "dense",
+            value: desc
+          })
+        })
+      })]
+    });
   }
 }
 
 // - - - DOM - - -
-_reactDom.default.render( /*#__PURE__*/_react.default.createElement(DemoWriteIr, null), document.getElementById('root'));
+_reactDom.default.render(/*#__PURE__*/(0, _jsxRuntime.jsx)(DemoWriteIr, {}), document.getElementById('root'));

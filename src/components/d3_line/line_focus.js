@@ -304,7 +304,7 @@ class LineFocus {
       sameXY, sameEpSt, sameDtPk, sameSfPk,
     } = this.shouldUpdate;
 
-    if (!Format.isCyclicVoltaLayout(this.layout)
+    if (!(Format.isCyclicVoltaLayout(this.layout) || Format.isLSVLayout(this.layout))
     && sameXY && sameEpSt && sameDtPk && sameSfPk) return;
 
     // rescale for zoom
@@ -785,7 +785,7 @@ class LineFocus {
   reverseXAxis(layoutSt) {
     return [LIST_LAYOUT.UVVIS, LIST_LAYOUT.HPLC_UVVIS,
       LIST_LAYOUT.TGA, LIST_LAYOUT.DSC,
-      LIST_LAYOUT.XRD, LIST_LAYOUT.CYCLIC_VOLTAMMETRY,
+      LIST_LAYOUT.XRD, LIST_LAYOUT.CYCLIC_VOLTAMMETRY, LIST_LAYOUT.LSV,
       LIST_LAYOUT.CDS, LIST_LAYOUT.DLS_ACF, LIST_LAYOUT.SEC, LIST_LAYOUT.GC,
       LIST_LAYOUT.EMISSIONS, LIST_LAYOUT.DLS_INTENSITY].indexOf(layoutSt) < 0;
   }

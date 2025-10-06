@@ -16,6 +16,7 @@ var _list_ui = require("../../constants/list_ui");
 var _cyclic_voltammetry = require("../../actions/cyclic_voltammetry");
 var _multi_focus = _interopRequireDefault(require("./multi_focus"));
 var _draw = require("../common/draw");
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable no-mixed-operators, react/require-default-props,
 react/no-unused-prop-types */
 
@@ -191,7 +192,7 @@ class ViewerMulti extends _react.default.Component {
     }
   }
   render() {
-    return /*#__PURE__*/_react.default.createElement("div", {
+    return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
       className: "d3Line"
     });
   }

@@ -30,9 +30,7 @@ const toggleIsAuto = state => Object.assign({}, state, {
   isAuto: !state.isAuto,
   target: false
 });
-const scanReducer = function () {
-  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-  let action = arguments.length > 1 ? arguments[1] : undefined;
+const scanReducer = (state = initialState, action) => {
   switch (action.type) {
     case _action_type.SCAN.SET_TARGET:
     case _action_type.SCAN.RESET_TARGET:
