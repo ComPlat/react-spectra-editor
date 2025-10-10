@@ -102,7 +102,7 @@ class MultiFocus {
   getShouldUpdate(nextEpSt) {
     const {
       prevXt, prevYt, prevEpSt, prevLySt,
-      prevTePt, prevDtPk, prevSfPk, prevData,
+      prevTePt, prevDtPk, prevSfPk, prevData, prevYFactor,
     } = this.shouldUpdate;
     const { xt, yt } = TfRescale(this);
     const sameXY = xt(1.1) === prevXt && prevYt === yt(1.1);
@@ -112,12 +112,13 @@ class MultiFocus {
     const sameDtPk = prevDtPk === this.dataPks.length;
     const sameSfPk = JSON.stringify(prevSfPk) === JSON.stringify(this.tSfPeaks);
     const sameData = prevData === this.data.length;
+    const sameYFactor = prevYFactor === this.yTransformFactor;
     this.shouldUpdate = Object.assign(
       {},
       this.shouldUpdate,
       {
         sameXY, sameEpSt, sameLySt, // eslint-disable-line
-        sameTePt, sameDtPk, sameSfPk, sameData, // eslint-disable-line
+        sameTePt, sameDtPk, sameSfPk, sameData, sameYFactor, // eslint-disable-line
       },
     );
   }
@@ -131,12 +132,13 @@ class MultiFocus {
     const prevSfPk = this.tSfPeaks;
     const prevData = this.data.length;
     const prevLySt = this.layout;
+    const prevYFactor = this.yTransformFactor;
     this.shouldUpdate = Object.assign(
       {},
       this.shouldUpdate,
       {
         prevXt, prevYt, prevEpSt, prevLySt, // eslint-disable-line
-        prevTePt, prevDtPk, prevSfPk, prevData, // eslint-disable-line
+        prevTePt, prevDtPk, prevSfPk, prevData, prevYFactor, // eslint-disable-line
       },
     );
   }
@@ -181,9 +183,6 @@ class MultiFocus {
       const { topic, feature, color } = entry;
       const offset = GetCyclicVoltaPreviousShift(cyclicvoltaSt, jcampIdx);
       let currData = convertTopic(topic, layout, feature, offset);
-      if (this.yTransformFactor !== 1.0) {
-        currData = currData.map((p) => ({ x: p.x, y: this.transformYValue(p.y), k: p.k }));
-      }
       if (idx === jcampIdx) {
         if (!Format.isCyclicVoltaLayout(layout)) {
           currData = filterSeed;
@@ -220,6 +219,12 @@ class MultiFocus {
       .y((d) => yt(d.y));
   }
 
+  setYAxisTickFormat() {
+    const f = this.yTransformFactor || 1;
+    const format = d3.format('.2n');
+    this.axisCall.y.tickFormat((v) => format(v * f));
+  }
+
   setConfig(sweepExtentSt) {
     // Domain Calculate
     let { xExtent, yExtent } = sweepExtentSt || { xExtent: false, yExtent: false };
@@ -252,6 +257,9 @@ class MultiFocus {
     // Axis Call
     this.axisCall.x.scale(xt);
     this.axisCall.y.scale(yt);
+    if (this.layout === LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
+      this.setYAxisTickFormat();
+    }
 
     this.currentExtent = { xExtent, yExtent };
   }
@@ -268,16 +276,14 @@ class MultiFocus {
 
   drawThres() {
     if (this.tTrEndPts.length > 0) {
-      const upScaled = this.tTrEndPts.map((p) => ({ x: p.x, y: this.transformYValue(p.y) }));
-      this.thresLineUp.attr('d', this.pathCall(upScaled));
+      this.thresLineUp.attr('d', this.pathCall(this.tTrEndPts));
       this.thresLineUp.attr('visibility', 'visible');
       const [left, right] = this.tTrEndPts;
       const dwMirrorEndPts = [
         Object.assign({}, left, { y: -left.y }),
         Object.assign({}, right, { y: -right.y }),
       ];
-      const dwScaled = dwMirrorEndPts.map((p) => ({ x: p.x, y: this.transformYValue(p.y) }));
-      this.thresLineDw.attr('d', this.pathCall(dwScaled));
+      this.thresLineDw.attr('d', this.pathCall(dwMirrorEndPts));
       this.thresLineDw.attr('visibility', 'visible');
     } else {
       this.thresLineUp.attr('visibility', 'hidden');
@@ -301,8 +307,8 @@ class MultiFocus {
   }
 
   drawGrid() {
-    const { sameXY } = this.shouldUpdate;
-    if (sameXY) return;
+    const { sameXY, sameYFactor } = this.shouldUpdate;
+    if (sameXY && sameYFactor) return;
 
     this.grid.x.call(this.axisCall.x
       .tickSize(-this.h, 0, 0))
@@ -491,7 +497,7 @@ class MultiFocus {
       .attr('stroke-opacity', 0.0)
       .merge(mpp)
       .attr('id', (d) => `mpp${Math.round(1000 * d.x)}`)
-      .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(this.transformYValue(d.y))})`)
+      .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(d.y)})`)
       .on('mouseover', (event, d) => {
         d3.select(`#mpp${Math.round(1000 * d.x)}`)
           .attr('stroke-opacity', '1.0');
@@ -527,7 +533,7 @@ class MultiFocus {
         .merge(bpTxt)
         .attr('id', (d) => `mpp${Math.round(1000 * d.x)}`)
         .text((d) => d.x.toFixed(2))
-        .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(this.transformYValue(d.y)) - 25})`)
+        .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(d.y) - 25})`)
         .on('click', (event, d) => this.onClickTarget(event, d));
     }
 
@@ -577,7 +583,7 @@ class MultiFocus {
       .attr('stroke-opacity', 0.0)
       .merge(mpp)
       .attr('id', (d) => `mpp${Math.round(1000 * d.x)}`)
-      .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(this.transformYValue(d.y))})`)
+      .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(d.y)})`)
       .on('mouseover', (event, d) => {
         d3.select(`#mpp${Math.round(1000 * d.x)}`)
           .attr('stroke-opacity', '1.0');
@@ -1030,7 +1036,7 @@ class MultiFocus {
       .attr('fill', 'green')
       .attr('fill-opacity', 0.8)
       .merge(ccp)
-      .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(this.transformYValue(d.y))})`);
+      .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(d.y)})`);
   }
 
   reverseXAxis(layoutSt) {
