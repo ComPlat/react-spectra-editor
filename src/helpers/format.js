@@ -448,7 +448,7 @@ const formatPeaksByPrediction = (
 
 const compareColors = (idx) => ['#ABB2B9', '#EDBB99', '#ABEBC6', '#D2B4DE', '#F9E79F'][idx % 5];
 
-const mutiEntitiesColors = (idx) => ['#d35400', '#2980b9', '#8e44ad', '#2c3e50', '#6D214F', '#182C61', '#BDC581'][idx % 7];
+const mutiEntitiesColors = (idx) => ['#2980b9', '#e4b423', '#8e44ad', '#2c3e50', '#6D214F', '#182C61', '#BDC581'][idx % 7];
 
 const strNumberFixedDecimal = (number, decimal = -1) => {
   if (decimal <= 0) {
