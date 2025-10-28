@@ -503,7 +503,7 @@ class MultiFocus {
           .attr('stroke-opacity', '1.0');
         d3.select(`#bpt${Math.round(1000 * d.x)}`)
           .style('fill', 'blue');
-        const tipParams = { d, layout: this.layout };
+        const tipParams = { d, layout: this.layout, yFactor: this.yTransformFactor };
         this.tip.show(tipParams, event.target);
       })
       .on('mouseout', (event, d) => {
@@ -511,7 +511,7 @@ class MultiFocus {
           .attr('stroke-opacity', '0.0');
         d3.select(`#bpt${Math.round(1000 * d.x)}`)
           .style('fill', 'red');
-        const tipParams = { d, layout: this.layout };
+        const tipParams = { d, layout: this.layout, yFactor: this.yTransformFactor };
         this.tip.hide(tipParams, event.target);
       })
       .on('click', (event, d) => this.onClickTarget(event, d));
@@ -589,7 +589,7 @@ class MultiFocus {
           .attr('stroke-opacity', '1.0');
         d3.select(`#bpt${Math.round(1000 * d.x)}`)
           .style('fill', 'blue');
-        const tipParams = { d, layout: this.layout };
+        const tipParams = { d, layout: this.layout, yFactor: this.yTransformFactor };
         this.tip.show(tipParams, event.target);
       })
       .on('mouseout', (event, d) => {
@@ -597,7 +597,7 @@ class MultiFocus {
           .attr('stroke-opacity', '0.0');
         d3.select(`#bpt${Math.round(1000 * d.x)}`)
           .style('fill', '#228B22');
-        const tipParams = { d, layout: this.layout };
+        const tipParams = { d, layout: this.layout, yFactor: this.yTransformFactor };
         this.tip.hide(tipParams, event.target);
       })
       .on('click', (event, d) => this.onClickPecker(event, d));
