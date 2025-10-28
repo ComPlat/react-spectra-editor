@@ -135,8 +135,7 @@ class ViewerMulti extends _react.default.Component {
       cyclicvoltaSt,
       integationSt,
       mtplySt,
-      axesUnitsSt,
-      feature
+      axesUnitsSt
     } = this.props;
     this.normChange(prevProps);
     let xxLabel = xLabel;

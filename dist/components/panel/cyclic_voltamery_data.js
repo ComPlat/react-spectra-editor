@@ -118,7 +118,6 @@ const CyclicVoltammetryPanel = ({
   const formatCurrent = (y, feature, cyclicVotaSt) => {
     const baseY = feature && feature.yUnit ? String(feature.yUnit) : 'A';
     const isMilli = /mA/i.test(baseY);
-    console.log('isMilli', isMilli);
     const useDensity = cyclicVotaSt && cyclicVotaSt.useCurrentDensity;
     const rawArea = (cyclicVotaSt && cyclicVotaSt.areaValue === '' ? 1.0 : cyclicVotaSt?.areaValue) || 1.0;
     const areaUnit = cyclicVotaSt && cyclicVotaSt.areaUnit ? cyclicVotaSt.areaUnit : 'cm²';
@@ -131,7 +130,6 @@ const CyclicVoltammetryPanel = ({
     }
     if (isMilli) {
       val *= 1000.0;
-      console.log('val', val);
     }
     return `${parseFloat(val).toExponential(2)} ${unit}`;
   };
