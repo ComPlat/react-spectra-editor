@@ -103,7 +103,7 @@ class ViewerMulti extends React.Component {
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt,
       sweepExtentSt, isUiNoBrushSt,
       isHidden, cyclicvoltaSt,
-      integationSt, mtplySt, axesUnitsSt, feature,
+      integationSt, mtplySt, axesUnitsSt,
     } = this.props;
     this.normChange(prevProps);
 
