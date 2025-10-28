@@ -44,8 +44,7 @@ function* setCyclicVoltametry(action) { // eslint-disable-line
       if (typeof weAreaUnit === 'string' && weAreaUnit.length > 0) {
         const unit = weAreaUnit.replace('^2', '²');
         yield put(({ type: CYCLIC_VOLTA_METRY.SET_AREA_UNIT, payload: { unit } }));
-      }
-      else {
+      } else {
         yield put(({ type: CYCLIC_VOLTA_METRY.SET_AREA_UNIT, payload: { unit: 'cm²' } }));
       }
       if (weAreaValue !== undefined && weAreaValue !== null) {
@@ -58,8 +57,7 @@ function* setCyclicVoltametry(action) { // eslint-disable-line
         }
         if (Number.isFinite(numeric)) {
           yield put(({ type: CYCLIC_VOLTA_METRY.SET_AREA_VALUE, payload: { value: numeric } }));
-        }
-        else {
+        } else {
           yield put(({ type: CYCLIC_VOLTA_METRY.SET_AREA_VALUE, payload: { value: 1.0 } }));
         }
       }
