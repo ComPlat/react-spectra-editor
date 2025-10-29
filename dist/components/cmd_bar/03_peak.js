@@ -20,31 +20,33 @@ var _list_ui = require("../../constants/list_ui");
 var _tri_btn = _interopRequireDefault(require("./tri_btn"));
 var _edit_peak = require("../../actions/edit_peak");
 var _extractPeaksEdit = require("../../helpers/extractPeaksEdit");
+var _hplc_ms = require("../../actions/hplc_ms");
+var _list_layout = require("../../constants/list_layout");
 /* eslint-disable prefer-object-spread, function-paren-newline, no-unused-vars,
 react/function-component-definition, react/require-default-props, max-len,
 react/no-unused-prop-types */
 
 const styles = () => Object.assign({}, _common.commonStyle);
-const Peak = _ref => {
-  let {
-    classes,
-    setUiSweepTypeAct,
-    isFocusAddPeakSt,
-    disableAddPeakSt,
-    isFocusRmPeakSt,
-    disableRmPeakSt,
-    isFocusSetRefSt,
-    disableSetRefSt,
-    isHandleMaxAndMinPeaksSt,
-    cyclicVotaSt,
-    curveSt,
-    clearAllPeaksAct,
-    feature,
-    editPeakSt,
-    thresSt,
-    shiftSt,
-    layoutSt
-  } = _ref;
+const Peak = ({
+  classes,
+  setUiSweepTypeAct,
+  isFocusAddPeakSt,
+  disableAddPeakSt,
+  isFocusRmPeakSt,
+  disableRmPeakSt,
+  isFocusSetRefSt,
+  disableSetRefSt,
+  isHandleMaxAndMinPeaksSt,
+  cyclicVotaSt,
+  curveSt,
+  clearAllPeaksAct,
+  feature,
+  editPeakSt,
+  thresSt,
+  shiftSt,
+  layoutSt,
+  clearAllPeaksHplcMsAct
+}) => {
   let onSweepPeakAdd = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.PEAK_ADD);
   let onSweepPeakDELETE = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.PEAK_DELETE);
   let onSweepAnchorShift = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT);
@@ -52,11 +54,15 @@ const Peak = _ref => {
     curveIdx
   } = curveSt;
   const onClearAll = () => {
-    const dataPeaks = (0, _extractPeaksEdit.extractAutoPeaks)(feature, thresSt, shiftSt, layoutSt);
-    clearAllPeaksAct({
-      curveIdx,
-      dataPeaks
-    });
+    if (layoutSt === _list_layout.LIST_LAYOUT.LC_MS) {
+      clearAllPeaksHplcMsAct();
+    } else {
+      const dataPeaks = (0, _extractPeaksEdit.extractAutoPeaks)(feature, thresSt, shiftSt, layoutSt);
+      clearAllPeaksAct({
+        curveIdx,
+        dataPeaks
+      });
+    }
   };
   if (isHandleMaxAndMinPeaksSt) {
     const {
@@ -141,7 +147,8 @@ const mapStateToProps = (state, props) => (
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   setUiSweepTypeAct: _ui.setUiSweepType,
-  clearAllPeaksAct: _edit_peak.clearAllPeaks
+  clearAllPeaksAct: _edit_peak.clearAllPeaks,
+  clearAllPeaksHplcMsAct: _hplc_ms.clearAllPeaksHplcMs
 }, dispatch);
 Peak.propTypes = {
   classes: _propTypes.default.object.isRequired,
@@ -160,6 +167,7 @@ Peak.propTypes = {
   editPeakSt: _propTypes.default.object.isRequired,
   thresSt: _propTypes.default.object.isRequired,
   layoutSt: _propTypes.default.string.isRequired,
-  shiftSt: _propTypes.default.object.isRequired
+  shiftSt: _propTypes.default.object.isRequired,
+  clearAllPeaksHplcMsAct: _propTypes.default.func.isRequired
 };
 var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _withStyles.default)(styles))(Peak);

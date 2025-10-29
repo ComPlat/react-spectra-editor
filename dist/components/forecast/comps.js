@@ -33,12 +33,9 @@ const titleStyle = {
 const txtStyle = {
   lineHeight: '20px'
 };
-const TxtLabel = function (classes, label) {
-  let extClsName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'txt-label';
-  return /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtLabel, extClsName)
-  }, label);
-};
+const TxtLabel = (classes, label, extClsName = 'txt-label') => /*#__PURE__*/_react.default.createElement("span", {
+  className: (0, _classnames.default)(classes.txtLabel, extClsName)
+}, label);
 exports.TxtLabel = TxtLabel;
 const StatusIcon = status => {
   switch (status) {
@@ -102,8 +99,7 @@ const StatusIcon = status => {
   }
 };
 exports.StatusIcon = StatusIcon;
-const ConfidenceLabel = function (classes, confidence) {
-  let extClsName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'txt-label';
+const ConfidenceLabel = (classes, confidence, extClsName = 'txt-label') => {
   if (!confidence) return /*#__PURE__*/_react.default.createElement("span", null, " - - ");
   const confidenceDp = parseFloat(Math.round(confidence * 100) / 100).toFixed(2);
   return /*#__PURE__*/_react.default.createElement("span", {

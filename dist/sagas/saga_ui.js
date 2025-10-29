@@ -30,6 +30,7 @@ const calcPeaks = payload => {
   const peaks = dataPks.filter(p => xL <= p.x && p.x <= xU && yL <= p.y && p.y <= yU);
   return peaks;
 };
+const getLayoutSt = state => state.layout;
 function* selectUiSweep(action) {
   const uiSt = yield (0, _effects.select)(getUiSt);
   const {
@@ -74,14 +75,27 @@ function* selectUiSweep(action) {
       });
       break;
     case _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD:
-      yield (0, _effects.put)({
-        type: _action_type.UI.SWEEP.SELECT_INTEGRATION,
-        payload: {
-          newData: payload,
-          curveIdx
+      {
+        const layoutSt = yield (0, _effects.select)(getLayoutSt);
+        if (uvvis.selectedWaveLength && layoutSt === _list_layout.LIST_LAYOUT.LC_MS) {
+          yield (0, _effects.put)({
+            type: _action_type.HPLC_MS.UPDATE_HPLCMS_INTEGRATIONS,
+            payload: {
+              spectrumId: uvvis.selectedWaveLength,
+              integration: payload
+            }
+          });
+        } else {
+          yield (0, _effects.put)({
+            type: _action_type.UI.SWEEP.SELECT_INTEGRATION,
+            payload: {
+              newData: payload,
+              curveIdx
+            }
+          });
         }
-      });
-      break;
+        break;
+      }
     case _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD:
       const peaks = calcPeaks(payload); // eslint-disable-line
       if (peaks.length === 0) {
@@ -111,7 +125,6 @@ function* selectUiSweep(action) {
   }
   return null;
 }
-const getLayoutSt = state => state.layout;
 function* scrollUiWheel(action) {
   const layoutSt = yield (0, _effects.select)(getLayoutSt);
   const {
@@ -203,22 +216,40 @@ function* clickUiTarget(action) {
   const {
     curveIdx
   } = curveSt;
+  const hplcMsSt = yield (0, _effects.select)(getHplcMsSt);
+  const {
+    uvvis
+  } = hplcMsSt;
   if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.PEAK_ADD && !onPeak) {
+    const spectrumId = hplcMsSt?.uvvis?.selectedWaveLength;
+    const currentPeaks = hplcMsSt?.uvvis?.currentSpectrum?.peaks || [];
+    const updatedPeaks = [...currentPeaks, payload];
     yield (0, _effects.put)({
-      type: _action_type.EDITPEAK.ADD_POSITIVE,
+      type: _action_type.HPLC_MS.UPDATE_HPLCMS_PEAKS,
       payload: {
-        dataToAdd: payload,
-        curveIdx
+        spectrumId,
+        peaks: updatedPeaks
       }
     });
   } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.PEAK_DELETE && onPeak) {
-    yield (0, _effects.put)({
-      type: _action_type.EDITPEAK.ADD_NEGATIVE,
-      payload: {
-        dataToAdd: payload,
-        curveIdx
-      }
-    });
+    const layoutSt = yield (0, _effects.select)(getLayoutSt);
+    if (layoutSt === _list_layout.LIST_LAYOUT.LC_MS && uvvis.selectedWaveLength) {
+      yield (0, _effects.put)({
+        type: _action_type.HPLC_MS.REMOVE_HPLCMS_PEAK,
+        payload: {
+          spectrumId: uvvis.selectedWaveLength,
+          peak: payload
+        }
+      });
+    } else {
+      yield (0, _effects.put)({
+        type: _action_type.EDITPEAK.ADD_NEGATIVE,
+        payload: {
+          dataToAdd: payload,
+          curveIdx
+        }
+      });
+    }
   } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT && onPeak) {
     yield (0, _effects.put)({
       type: _action_type.SHIFT.SET_PEAK,
@@ -228,13 +259,25 @@ function* clickUiTarget(action) {
       }
     });
   } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_RM && onPeak) {
-    yield (0, _effects.put)({
-      type: _action_type.INTEGRATION.RM_ONE,
-      payload: {
-        dataToRemove: payload,
-        curveIdx
-      }
-    });
+    const layoutSt = yield (0, _effects.select)(getLayoutSt);
+    if (uvvis.selectedWaveLength && layoutSt === _list_layout.LIST_LAYOUT.LC_MS) {
+      yield (0, _effects.put)({
+        type: _action_type.HPLC_MS.UPDATE_HPLCMS_INTEGRATIONS,
+        payload: {
+          spectrumId: uvvis.selectedWaveLength,
+          integration: payload,
+          remove: true
+        }
+      });
+    } else {
+      yield (0, _effects.put)({
+        type: _action_type.INTEGRATION.RM_ONE,
+        payload: {
+          dataToRemove: payload,
+          curveIdx
+        }
+      });
+    }
   } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_RM && onPeak) {
     yield (0, _effects.put)({
       type: _action_type.INTEGRATION.RM_ONE,

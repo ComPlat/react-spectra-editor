@@ -22,9 +22,17 @@ react/function-component-definition, function-call-argument-newline,
 react/require-default-props */
 
 const styles = () => Object.assign({}, _common.commonStyle);
-const onClickCb = (operation, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, analysis, decimalSt, integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData) => () => {
+const onClickCb = (operation, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, analysis, decimalSt, integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData, hplcMsSt) => () => {
+  let lcmsPeaks = null;
+  let lcmsIntegrals = null;
+  if (layoutSt === 'LC/MS') {
+    lcmsPeaks = (0, _extractPeaksEdit.formatLcmsPeaksForBackend)(hplcMsSt);
+    lcmsIntegrals = (0, _extractPeaksEdit.formatLcmsIntegralsForBackend)(hplcMsSt);
+  }
   operation({
     peaks: peaksEdit,
+    lcms_peaks: lcmsPeaks,
+    lcms_integrals: lcmsIntegrals,
     layout: layoutSt,
     shift: shiftSt,
     scan,
@@ -45,30 +53,30 @@ const onClickCb = (operation, peaksEdit, isAscend, isIntensity, scan, thres, lay
     dscMetaData
   });
 };
-const BtnSubmit = _ref => {
-  let {
-    classes,
-    operation,
-    feature,
-    isAscend,
-    isIntensity,
-    editPeakSt,
-    thresSt,
-    layoutSt,
-    shiftSt,
-    scanSt,
-    forecastSt,
-    decimalSt,
-    integrationSt,
-    multiplicitySt,
-    allIntegrationSt,
-    waveLengthSt,
-    cyclicvoltaSt,
-    curveSt,
-    axesUnitsSt,
-    detectorSt,
-    metaSt
-  } = _ref;
+const BtnSubmit = ({
+  classes,
+  operation,
+  feature,
+  isAscend,
+  isIntensity,
+  editPeakSt,
+  thresSt,
+  layoutSt,
+  shiftSt,
+  scanSt,
+  forecastSt,
+  decimalSt,
+  integrationSt,
+  multiplicitySt,
+  allIntegrationSt,
+  waveLengthSt,
+  cyclicvoltaSt,
+  curveSt,
+  axesUnitsSt,
+  detectorSt,
+  metaSt,
+  hplcMsSt
+}) => {
   const peaksEdit = (0, _extractPeaksEdit.extractPeaksEdit)(feature, editPeakSt, thresSt, shiftSt, layoutSt);
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
   const scan = _format.default.isMsLayout(layoutSt) ? (0, _chem.Convert2Scan)(feature, scanSt) : 0;
@@ -85,7 +93,7 @@ const BtnSubmit = _ref => {
   }, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
     className: (0, _classnames.default)('btn-sv-bar-submit'),
     color: "primary",
-    onClick: onClickCb(operation.value, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt, integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData)
+    onClick: onClickCb(operation.value, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt, integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData, hplcMsSt)
   }, /*#__PURE__*/_react.default.createElement(_PlayCircleOutline.default, {
     className: classes.icon
   })));
@@ -108,7 +116,8 @@ const mapStateToProps = (state, props) => (
   curveSt: state.curve,
   axesUnitsSt: state.axesUnits,
   detectorSt: state.detector,
-  metaSt: state.meta
+  metaSt: state.meta,
+  hplcMsSt: state.hplcMs
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({}, dispatch);
 BtnSubmit.propTypes = {
@@ -126,12 +135,13 @@ BtnSubmit.propTypes = {
   decimalSt: _propTypes.default.number.isRequired,
   integrationSt: _propTypes.default.object.isRequired,
   multiplicitySt: _propTypes.default.object.isRequired,
-  allIntegrationSt: _propTypes.default.object.isRequired,
+  allIntegrationSt: _propTypes.default.array.isRequired,
   waveLengthSt: _propTypes.default.object.isRequired,
   cyclicvoltaSt: _propTypes.default.object.isRequired,
   curveSt: _propTypes.default.object,
   axesUnitsSt: _propTypes.default.object.isRequired,
   detectorSt: _propTypes.default.object.isRequired,
-  metaSt: _propTypes.default.object.isRequired
+  metaSt: _propTypes.default.object.isRequired,
+  hplcMsSt: _propTypes.default.object.isRequired
 };
 var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(BtnSubmit);

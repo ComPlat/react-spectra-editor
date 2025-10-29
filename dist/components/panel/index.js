@@ -86,7 +86,8 @@ class PanelViewer extends _react.default.Component {
       curveSt,
       userManualLink,
       subLayoutsInfo,
-      theoryMass
+      theoryMass,
+      entities
     } = this.props;
     const onExapndInfo = () => this.onExapnd('info');
     const onExapndPeak = () => this.onExapnd('peak');
@@ -111,6 +112,7 @@ class PanelViewer extends _react.default.Component {
       onExapnd: onExapndGraphSelection,
       subLayoutsInfo: subLayoutsInfo
     }), /*#__PURE__*/_react.default.createElement(_info.default, {
+      entities: entities,
       feature: feature,
       integration: integration,
       editorOnly: editorOnly,
@@ -160,7 +162,8 @@ PanelViewer.propTypes = {
   userManualLink: _propTypes.default.object,
   curveSt: _propTypes.default.object.isRequired,
   subLayoutsInfo: _propTypes.default.object,
-  theoryMass: _propTypes.default.string
+  theoryMass: _propTypes.default.string,
+  entities: _propTypes.default.array
 };
 var _default = exports.default = (0, _reactRedux.connect)(
 // eslint-disable-line

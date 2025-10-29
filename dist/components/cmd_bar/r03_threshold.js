@@ -82,20 +82,19 @@ const restoreIcon = (classes, hasEdit, isEdit) => hasEdit && isEdit ? /*#__PURE_
   className: classes.icon
 });
 const restoreTp = (hasEdit, isEdit) => hasEdit && isEdit ? 'User Defined Threshold' : 'Auto Picked Threshold';
-const Threshold = _ref => {
-  let {
-    classes,
-    feature,
-    hasEdit,
-    hideThresSt,
-    thresValSt,
-    isEditSt,
-    curveSt,
-    hplcMsSt,
-    updateThresholdValueAct,
-    resetThresholdValueAct,
-    toggleThresholdIsEditAct
-  } = _ref;
+const Threshold = ({
+  classes,
+  feature,
+  hasEdit,
+  hideThresSt,
+  thresValSt,
+  isEditSt,
+  curveSt,
+  hplcMsSt,
+  updateThresholdValueAct,
+  resetThresholdValueAct,
+  toggleThresholdIsEditAct
+}) => {
   const thresVal = thresValSt || (feature ? feature.thresRef : hplcMsSt.threshold.value);
   return /*#__PURE__*/_react.default.createElement("span", {
     className: classes.groupRight

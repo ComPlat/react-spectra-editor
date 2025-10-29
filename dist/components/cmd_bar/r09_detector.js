@@ -67,18 +67,15 @@ const detectorSelect = (classes, detectorSt, curveSt, layoutSt, updateDetectorAc
     className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
   }, item.name)))));
 };
-const Detector = _ref => {
-  let {
-    classes,
-    detectorSt,
-    curveSt,
-    layoutSt,
-    updateDetectorAct
-  } = _ref;
-  return /*#__PURE__*/_react.default.createElement("span", {
-    className: classes.groupRight
-  }, detectorSelect(classes, detectorSt, curveSt, layoutSt, updateDetectorAct));
-};
+const Detector = ({
+  classes,
+  detectorSt,
+  curveSt,
+  layoutSt,
+  updateDetectorAct
+}) => /*#__PURE__*/_react.default.createElement("span", {
+  className: classes.groupRight
+}, detectorSelect(classes, detectorSt, curveSt, layoutSt, updateDetectorAct));
 const mapStateToProps = (state, _props) => (
 // eslint-disable-line
 {

@@ -20,50 +20,49 @@ const setAllCurves = (state, action) => {
   const {
     payload
   } = action;
-  if (payload) {
-    const entities = payload.map((entity, idx) => {
-      const {
-        topic,
-        feature,
-        hasEdit,
-        integration,
-        multiplicity,
-        features
-      } = (0, _extractParams.extractParams)(entity, {
-        isEdit: true
-      });
-      // const layout = entity.layout;
-      const {
-        layout
-      } = entity;
-      const maxminPeak = (0, _chem.Convert2MaxMinPeak)(layout, feature, 0);
-      const color = _format.default.mutiEntitiesColors(idx);
-      return {
-        layout,
-        topic,
-        feature,
-        hasEdit,
-        integration,
-        multiplicity,
-        maxminPeak,
-        color,
-        curveIdx: idx,
-        features
-      };
-    });
-    return Object.assign({}, state, {
-      curveIdx: 0,
-      listCurves: entities
-    });
-  }
-  return Object.assign({}, state, {
+  if (!payload) return {
+    ...state,
     curveIdx: 0,
-    listCurves: payload
+    listCurves: []
+  };
+  const entities = payload.map((entity, idx) => {
+    const {
+      topic,
+      feature,
+      hasEdit,
+      integration,
+      multiplicity,
+      features
+    } = (0, _extractParams.extractParams)(entity, {
+      isEdit: true
+    });
+    const {
+      layout
+    } = entity;
+    const maxminPeak = (0, _chem.Convert2MaxMinPeak)(layout, feature, 0);
+    const color = _format.default.mutiEntitiesColors(idx);
+    return {
+      layout,
+      topic,
+      feature,
+      hasEdit,
+      integration,
+      multiplicity,
+      maxminPeak,
+      color,
+      curveIdx: idx,
+      features
+    };
   });
+  const maxIdx = entities.length - 1;
+  const safeCurveIdx = Math.min(state.curveIdx || 0, maxIdx);
+  return {
+    ...state,
+    curveIdx: safeCurveIdx,
+    listCurves: entities
+  };
 };
-const curveReducer = function () {
-  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-  let action = arguments.length > 1 ? arguments[1] : undefined;
+const curveReducer = (state = initialState, action) => {
   switch (action.type) {
     case _action_type.CURVE.SELECT_WORKING_CURVE:
       return Object.assign({}, state, {

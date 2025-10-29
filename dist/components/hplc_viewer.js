@@ -14,6 +14,7 @@ var _material = require("@mui/material");
 var _index = _interopRequireDefault(require("./panel/index"));
 var _index2 = _interopRequireDefault(require("./cmd_bar/index"));
 var _index3 = _interopRequireDefault(require("./d3_line_rect/index"));
+var _extractEntityLCMS = require("../helpers/extractEntityLCMS");
 var _curve = require("../actions/curve");
 /* eslint-disable react/default-props-match-prop-types,
 react/require-default-props, react/no-unused-prop-types, react/jsx-boolean-value,
@@ -42,7 +43,9 @@ class HPLCViewer extends _react.default.Component {
       entities,
       userManualLink,
       molSvg,
-      theoryMass
+      theoryMass,
+      integrationSt,
+      hplcMsSt
     } = this.props;
     if (!entities || entities.length === 0) return /*#__PURE__*/_react.default.createElement("div", null);
     const {
@@ -53,8 +56,15 @@ class HPLCViewer extends _react.default.Component {
       feature,
       topic
     } = entity;
-    const ticEntities = entities.slice(0, 2);
-    const dataEntities = entities.slice(2);
+    const {
+      ticEntities,
+      uvvisEntities,
+      mzEntities
+    } = (0, _extractEntityLCMS.splitAndReindexEntities)(entities);
+    const {
+      integrations
+    } = integrationSt;
+    const currentIntegration = integrations[curveIdx];
     return /*#__PURE__*/_react.default.createElement("div", {
       className: classes.root
     }, /*#__PURE__*/_react.default.createElement(_index2.default, {
@@ -71,17 +81,21 @@ class HPLCViewer extends _react.default.Component {
       item: true,
       xs: 9
     }, /*#__PURE__*/_react.default.createElement(_index3.default, {
-      entities: ticEntities,
-      subEntities: dataEntities,
+      ticEntities: ticEntities,
+      uvvisEntities: uvvisEntities,
+      mzEntities: mzEntities,
       topic: topic,
       xLabel: feature.xUnit,
       yLabel: feature.yUnit,
-      feature: feature
+      feature: feature,
+      jcampIdx: curveIdx,
+      hplcMsSt: hplcMsSt
     })), /*#__PURE__*/_react.default.createElement(_material.Grid, {
       item: true,
       xs: 3,
       align: "center"
     }, /*#__PURE__*/_react.default.createElement(_index.default, {
+      entities: entities,
       jcampIdx: curveIdx,
       entityFileNames: entityFileNames,
       userManualLink: userManualLink,
@@ -89,6 +103,7 @@ class HPLCViewer extends _react.default.Component {
       molSvg: molSvg,
       theoryMass: theoryMass,
       descriptions: "",
+      integration: currentIntegration,
       canChangeDescription: () => {},
       onDescriptionChanged: () => {}
     })))));
@@ -99,7 +114,9 @@ const mapStateToProps = (state, _) => (
 {
   curveSt: state.curve,
   entities: state.curve.listCurves,
-  layoutSt: state.layout
+  layoutSt: state.layout,
+  integrationSt: state.integration.present,
+  hplcMsSt: state.hplcMs
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   setAllCurvesAct: _curve.setAllCurves
@@ -114,7 +131,9 @@ HPLCViewer.propTypes = {
   userManualLink: _propTypes.default.object,
   entities: _propTypes.default.array,
   layoutSt: _propTypes.default.string.isRequired,
-  theoryMass: _propTypes.default.string
+  theoryMass: _propTypes.default.string,
+  integrationSt: _propTypes.default.object.isRequired,
+  hplcMsSt: _propTypes.default.object.isRequired
 };
 HPLCViewer.defaultProps = {
   entityFileNames: [],

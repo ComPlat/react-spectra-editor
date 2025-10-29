@@ -61,7 +61,8 @@ class ViewerLine extends _react.default.Component {
       isHidden,
       wavelength,
       axesUnitsSt,
-      resetAllAct
+      resetAllAct,
+      uiSt
     } = this.props;
     (0, _draw.drawDestroy)(this.rootKlass);
     resetAllAct(feature);
@@ -95,7 +96,8 @@ class ViewerLine extends _react.default.Component {
       sweepExtentSt,
       isUiAddIntgSt,
       isUiNoBrushSt,
-      wavelength
+      wavelength,
+      uiSt
     });
     (0, _draw.drawLabel)(this.rootKlass, cLabel, xxLabel, yyLabel);
     (0, _draw.drawDisplay)(this.rootKlass, isHidden);
@@ -120,7 +122,8 @@ class ViewerLine extends _react.default.Component {
       isUiNoBrushSt,
       isHidden,
       wavelength,
-      axesUnitsSt
+      axesUnitsSt,
+      uiSt
     } = this.props;
     this.normChange(prevProps);
     let xxLabel = xLabel;
@@ -152,7 +155,8 @@ class ViewerLine extends _react.default.Component {
       sweepExtentSt,
       isUiAddIntgSt,
       isUiNoBrushSt,
-      wavelength
+      wavelength,
+      uiSt
     });
     (0, _draw.drawLabel)(this.rootKlass, cLabel, xxLabel, yyLabel);
     (0, _draw.drawDisplay)(this.rootKlass, isHidden);
@@ -191,7 +195,8 @@ const mapStateToProps = (state, props) => ({
   isUiAddIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
   isUiNoBrushSt: _list_ui.LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
   wavelength: state.wavelength,
-  axesUnitsSt: state.axesUnits
+  axesUnitsSt: state.axesUnits,
+  uiSt: state.ui
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   resetAllAct: _manager.resetAll,
@@ -207,6 +212,7 @@ ViewerLine.propTypes = {
   peak: _propTypes.default.array.isRequired,
   freq: _propTypes.default.oneOfType([_propTypes.default.bool, _propTypes.default.number]).isRequired,
   comparisons: _propTypes.default.array.isRequired,
+  uiSt: _propTypes.default.object.isRequired,
   cLabel: _propTypes.default.string.isRequired,
   xLabel: _propTypes.default.string.isRequired,
   yLabel: _propTypes.default.string.isRequired,

@@ -8,14 +8,13 @@ exports.default = void 0;
 var _format = _interopRequireDefault(require("./format"));
 const btnCmdAnaViewer = layoutSt => _format.default.isMsLayout(layoutSt) || _format.default.isLCMsLayout(layoutSt) || _format.default.isRamanLayout(layoutSt) || _format.default.is19FLayout(layoutSt) || _format.default.isUvVisLayout(layoutSt) || _format.default.isHplcUvVisLayout(layoutSt) || _format.default.isTGALayout(layoutSt) || _format.default.isDSCLayout(layoutSt) || _format.default.isXRDLayout(layoutSt) || _format.default.is31PLayout(layoutSt) || _format.default.is15NLayout(layoutSt) || _format.default.is29SiLayout(layoutSt) || _format.default.isCyclicVoltaLayout(layoutSt) || _format.default.isCDSLayout(layoutSt) || _format.default.isSECLayout(layoutSt) || _format.default.isGCLayout(layoutSt);
 const hideCmdAnaViewer = () => false;
-const btnCmdAddPeak = layoutSt => _format.default.isMsLayout(layoutSt) || _format.default.isLCMsLayout(layoutSt);
-const btnCmdRmPeak = layoutSt => _format.default.isMsLayout(layoutSt) || _format.default.isLCMsLayout(layoutSt);
+const btnCmdAddPeak = layoutSt => _format.default.isMsLayout(layoutSt);
+const btnCmdRmPeak = layoutSt => _format.default.isMsLayout(layoutSt);
 const btnCmdSetRef = layoutSt => !_format.default.isNmrLayout(layoutSt);
-const btnCmdIntg = layoutSt => !(_format.default.isNmrLayout(layoutSt) || _format.default.isHplcUvVisLayout(layoutSt)); // eslint-disable-line
+const btnCmdIntg = layoutSt => !(_format.default.isNmrLayout(layoutSt) || _format.default.isHplcUvVisLayout(layoutSt) || _format.default.isLCMsLayout(layoutSt)); // eslint-disable-line
 
 const btnCmdMpy = layoutSt => !_format.default.isNmrLayout(layoutSt);
-const btnCmdMpyPeak = function (layoutSt, mpySt) {
-  let curveIdx = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+const btnCmdMpyPeak = (layoutSt, mpySt, curveIdx = 0) => {
   const {
     multiplicities
   } = mpySt;

@@ -85,7 +85,7 @@ const styles = () => ({
 });
 const simTitle = () => 'Simulated signals from NMRshiftDB';
 const simContent = nmrSimPeaks => nmrSimPeaks && nmrSimPeaks.sort((a, b) => a - b).join(', ');
-const aucValue = integration => {
+const aucValue = (integration, hplcMsSt) => {
   if (!integration) {
     return '';
   }
@@ -108,15 +108,29 @@ const aucValue = integration => {
       }
     });
   }
-  return values.join(', ');
+  const spectraList = hplcMsSt?.uvvis?.spectraList || [];
+  const listWaveLength = hplcMsSt?.uvvis?.listWaveLength || [];
+  spectraList.forEach((spectrum, idx) => {
+    const wavelength = listWaveLength[idx];
+    const integrations = spectrum?.integrations || [];
+    if (integrations.length > 0) {
+      const sumArea = integrations.reduce((sum, integ) => sum + (integ.area || 0), 0);
+      const integrationStrings = integrations.map(integ => {
+        const areaVal = integ.area?.toFixed(2) ?? '0.00';
+        const percent = sumArea > 0 ? (integ.area * 100 / sumArea).toFixed(2) : '0.00';
+        return `${areaVal} (${percent}%)`;
+      });
+      values.push(`[${wavelength} nm]: ${integrationStrings.join(', ')}`);
+    }
+  });
+  return values.join('\n');
 };
-const SECData = _ref => {
-  let {
-    classes,
-    layout,
-    detector,
-    secData
-  } = _ref;
+const SECData = ({
+  classes,
+  layout,
+  detector,
+  secData
+}) => {
   if (_format.default.isSECLayout(layout) && secData) {
     const {
       d,
@@ -164,13 +178,12 @@ SECData.propTypes = {
   detector: _propTypes.default.object.isRequired,
   secData: _propTypes.default.object.isRequired
 };
-const DSCData = _ref2 => {
-  let {
-    classes,
-    layout,
-    dscMetaData,
-    updateAction
-  } = _ref2;
+const DSCData = ({
+  classes,
+  layout,
+  dscMetaData,
+  updateAction
+}) => {
   if (_format.default.isDSCLayout(layout) && dscMetaData !== undefined) {
     const {
       meltingPoint,
@@ -218,27 +231,27 @@ DSCData.propTypes = {
   dscMetaData: _propTypes.default.object.isRequired,
   updateAction: _propTypes.default.func.isRequired
 };
-const InfoPanel = _ref3 => {
-  let {
-    classes,
-    expand,
-    feature,
-    integration,
-    editorOnly,
-    molSvg,
-    descriptions,
-    layoutSt,
-    simulationSt,
-    shiftSt,
-    curveSt,
-    theoryMass,
-    onExapnd,
-    canChangeDescription,
-    onDescriptionChanged,
-    detectorSt,
-    metaSt,
-    updateDSCMetaDataAct
-  } = _ref3;
+const InfoPanel = ({
+  classes,
+  expand,
+  feature,
+  integration,
+  editorOnly,
+  molSvg,
+  descriptions,
+  layoutSt,
+  simulationSt,
+  shiftSt,
+  curveSt,
+  theoryMass,
+  onExapnd,
+  canChangeDescription,
+  onDescriptionChanged,
+  detectorSt,
+  metaSt,
+  updateDSCMetaDataAct,
+  hplcMsSt
+}) => {
   if (!feature) return null;
   const {
     title,
@@ -353,7 +366,22 @@ const InfoPanel = _ref3 => {
     className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
   }, simTitle(), ":"), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt')
-  }, simContent(simulationSt.nmrSimPeaks))) : null));
+  }, simContent(simulationSt.nmrSimPeaks))) : null), _format.default.isLCMsLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement("div", {
+    className: (0, _classnames.default)(classes.rowRoot, classes.rowOddSim)
+  }, /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
+  }, "Area under curve (AUC):"), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("div", {
+    className: (0, _classnames.default)(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt'),
+    style: {
+      maxHeight: '80px',
+      overflowY: 'auto',
+      overflowX: 'hidden',
+      wordBreak: 'break-word',
+      marginBottom: '100px'
+    }
+  }, aucValue(integration, hplcMsSt).split('\n').map((line, idx) => /*#__PURE__*/_react.default.createElement("div", {
+    key: idx
+  }, line)))) : null);
 };
 const mapStateToProps = (state, props) => (
 // eslint-disable-line
@@ -363,7 +391,8 @@ const mapStateToProps = (state, props) => (
   shiftSt: state.shift,
   curveSt: state.curve,
   detectorSt: state.detector,
-  metaSt: state.meta
+  metaSt: state.meta,
+  hplcMsSt: state.hplcMs
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   updateDSCMetaDataAct: _meta.updateDSCMetaData
@@ -386,7 +415,8 @@ InfoPanel.propTypes = {
   theoryMass: _propTypes.default.string,
   detectorSt: _propTypes.default.object.isRequired,
   metaSt: _propTypes.default.object.isRequired,
-  updateDSCMetaDataAct: _propTypes.default.func.isRequired
+  updateDSCMetaDataAct: _propTypes.default.func.isRequired,
+  hplcMsSt: _propTypes.default.object.isRequired
 };
 var _default = exports.default = (0, _reactRedux.connect)(
 // eslint-disable-line

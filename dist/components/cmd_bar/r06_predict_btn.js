@@ -135,22 +135,21 @@ const renderBtnUnknown = (classes, onClick) => /*#__PURE__*/_react.default.creat
 }, /*#__PURE__*/_react.default.createElement(_HelpOutlineOutlined.default, {
   className: classes.icon
 })));
-const BtnPredict = _ref => {
-  let {
-    classes,
-    feature,
-    forecast,
-    layoutSt,
-    simulationSt,
-    editPeakSt,
-    scanSt,
-    shiftSt,
-    thresSt,
-    integrationSt,
-    multiplicitySt,
-    setUiViewerTypeAct,
-    curveSt
-  } = _ref;
+const BtnPredict = ({
+  classes,
+  feature,
+  forecast,
+  layoutSt,
+  simulationSt,
+  editPeakSt,
+  scanSt,
+  shiftSt,
+  thresSt,
+  integrationSt,
+  multiplicitySt,
+  setUiViewerTypeAct,
+  curveSt
+}) => {
   const is13Cor1H = _format.default.is13CLayout(layoutSt) || _format.default.is1HLayout(layoutSt);
   const isIr = _format.default.isIrLayout(layoutSt);
   if (!(is13Cor1H || isIr)) return null;

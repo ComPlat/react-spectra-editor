@@ -62,7 +62,8 @@ class ViewerMulti extends _react.default.Component {
       cyclicvoltaSt,
       integationSt,
       mtplySt,
-      axesUnitsSt
+      axesUnitsSt,
+      uiSt
     } = this.props;
     (0, _draw.drawDestroy)(this.rootKlass);
     resetAllAct(feature);
@@ -104,7 +105,8 @@ class ViewerMulti extends _react.default.Component {
       isUiNoBrushSt,
       cyclicvoltaSt,
       integationSt,
-      mtplySt
+      mtplySt,
+      uiSt
     });
     (0, _draw.drawLabel)(this.rootKlass, cLabel, xxLabel, yyLabel);
     (0, _draw.drawDisplay)(this.rootKlass, isHidden);
@@ -129,7 +131,8 @@ class ViewerMulti extends _react.default.Component {
       cyclicvoltaSt,
       integationSt,
       mtplySt,
-      axesUnitsSt
+      axesUnitsSt,
+      uiSt
     } = this.props;
     this.normChange(prevProps);
     let xxLabel = xLabel;
@@ -170,7 +173,8 @@ class ViewerMulti extends _react.default.Component {
       isUiNoBrushSt,
       cyclicvoltaSt,
       integationSt,
-      mtplySt
+      mtplySt,
+      uiSt
     });
     (0, _draw.drawLabel)(this.rootKlass, cLabel, xxLabel, yyLabel);
     (0, _draw.drawDisplay)(this.rootKlass, isHidden);
@@ -198,6 +202,7 @@ class ViewerMulti extends _react.default.Component {
 }
 const mapStateToProps = (state, props) => ({
   curveSt: state.curve,
+  uiSt: state.ui,
   seed: (0, _chem.Topic2Seed)(state, props),
   peak: (0, _chem.Feature2Peak)(state, props),
   tTrEndPts: (0, _chem.ToThresEndPts)(state, props),
@@ -223,6 +228,7 @@ const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
 }, dispatch);
 ViewerMulti.propTypes = {
   curveSt: _propTypes.default.object.isRequired,
+  uiSt: _propTypes.default.object.isRequired,
   entities: _propTypes.default.array.isRequired,
   seed: _propTypes.default.array.isRequired,
   peak: _propTypes.default.array.isRequired,

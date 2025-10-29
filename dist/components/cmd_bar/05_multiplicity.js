@@ -23,20 +23,19 @@ react/function-component-definition, react/require-default-props, max-len,
 react/no-unused-prop-types */
 
 const styles = () => Object.assign({}, _common.commonStyle);
-const Multiplicity = _ref => {
-  let {
-    classes,
-    isFocusAddMpySt,
-    disableAddMpySt,
-    isFocusRmMpySt,
-    disableRmMpySt,
-    isFocusAddPeakSt,
-    isFocusRmPeakSt,
-    disableMpyPeakSt,
-    setUiSweepTypeAct,
-    clearMpyAllAct,
-    curveSt
-  } = _ref;
+const Multiplicity = ({
+  classes,
+  isFocusAddMpySt,
+  disableAddMpySt,
+  isFocusRmMpySt,
+  disableRmMpySt,
+  isFocusAddPeakSt,
+  isFocusRmPeakSt,
+  disableMpyPeakSt,
+  setUiSweepTypeAct,
+  clearMpyAllAct,
+  curveSt
+}) => {
   const onSweepMutAdd = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD);
   const onOneMutAdd = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_RM);
   const onPeakMutAdd = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_ADD);

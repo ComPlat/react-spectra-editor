@@ -46,18 +46,23 @@ const updateSweepType = (state, action) => {
   if (!sweepType) {
     return Object.assign({}, state, {
       sweepType: action.payload,
-      jcampIdx: action.jcampIdx
+      jcampIdx: action.jcampIdx,
+      zoom: {
+        ...state.zoom,
+        sweepTypes: [_list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET, _list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET, _list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET]
+      }
     });
   }
   const {
     zoom
   } = state;
-  const {
-    sweepTypes
-  } = zoom;
-  sweepTypes[graphIndex] = sweepType;
+  let newSweepTypes = zoom.sweepTypes.slice();
+  newSweepTypes[graphIndex] = sweepType;
+  if (sweepType === _list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN) {
+    newSweepTypes = newSweepTypes.map((val, idx) => idx === graphIndex ? _list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN : _list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET);
+  }
   const newZoom = Object.assign({}, zoom, {
-    sweepTypes,
+    sweepTypes: newSweepTypes,
     graphIndex
   });
   return Object.assign({}, state, {
@@ -122,18 +127,16 @@ const resetZoom = (state, action) => {
     yExtent: false
   });
   sweepExtent[graphIndex] = newSweepExtent;
-  const newZoom = Object.assign({}, zoom, {
-    sweepExtent,
-    graphIndex
-  });
   return Object.assign({}, state, {
-    zoom: newZoom,
-    sweepType: _list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN
+    zoom: {
+      sweepExtent,
+      graphIndex,
+      sweepTypes: [_list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET, _list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET, _list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET]
+    },
+    sweepType: _list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET
   });
 };
-const uiReducer = function () {
-  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-  let action = arguments.length > 1 ? arguments[1] : undefined;
+const uiReducer = (state = initialState, action) => {
   switch (action.type) {
     case _action_type.UI.VIEWER.SET_TYPE:
       return Object.assign({}, state, {

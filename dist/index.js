@@ -196,8 +196,10 @@ class DemoWriteIr extends _react.default.Component {
         return gcEntity1;
       case 'ms':
         return msEntity;
-      default:
+      case 'lcms':
         return lcmsEntity;
+      default:
+        return msEntity;
     }
   }
   loadMultiEntities() {
@@ -280,19 +282,18 @@ class DemoWriteIr extends _react.default.Component {
   rmDollarSign(target) {
     return target.replace(/\$/g, '');
   }
-  formatPks(_ref) {
-    let {
-      peaks,
-      layout,
-      shift,
-      isAscend,
-      decimal,
-      isIntensity,
-      integration,
-      waveLength,
-      cyclicvoltaSt,
-      curveSt
-    } = _ref;
+  formatPks({
+    peaks,
+    layout,
+    shift,
+    isAscend,
+    decimal,
+    isIntensity,
+    integration,
+    waveLength,
+    cyclicvoltaSt,
+    curveSt
+  }) {
     const entity = this.loadEntity();
     const {
       features
@@ -353,15 +354,14 @@ class DemoWriteIr extends _react.default.Component {
     }
     return desc;
   }
-  formatMpy(_ref2) {
-    let {
-      multiplicity,
-      integration,
-      shift,
-      isAscend,
-      decimal,
-      layout
-    } = _ref2;
+  formatMpy({
+    multiplicity,
+    integration,
+    shift,
+    isAscend,
+    decimal,
+    layout
+  }) {
     // obsv freq
     const entity = this.loadEntity();
     const {
@@ -423,15 +423,14 @@ class DemoWriteIr extends _react.default.Component {
     const solvent = label ? `${name.split('(')[0].trim()} [${value.toFixed(decimal)} ppm], ` : '';
     return `${layout} NMR (${freqStr}${solvent}ppm) δ = ${str}.`;
   }
-  writeMpy(_ref3) {
-    let {
-      layout,
-      shift,
-      isAscend,
-      decimal,
-      multiplicity,
-      integration
-    } = _ref3;
+  writeMpy({
+    layout,
+    shift,
+    isAscend,
+    decimal,
+    multiplicity,
+    integration
+  }) {
     if (!_app.FN.isNmrLayout(layout)) return;
     const desc = this.formatMpy({
       multiplicity,
@@ -445,19 +444,18 @@ class DemoWriteIr extends _react.default.Component {
       desc
     });
   }
-  writePeak(_ref4) {
-    let {
-      peaks,
-      layout,
-      shift,
-      isAscend,
-      decimal,
-      isIntensity,
-      integration,
-      waveLength,
-      cyclicvoltaSt,
-      curveSt
-    } = _ref4;
+  writePeak({
+    peaks,
+    layout,
+    shift,
+    isAscend,
+    decimal,
+    isIntensity,
+    integration,
+    waveLength,
+    cyclicvoltaSt,
+    curveSt
+  }) {
     const desc = this.formatPks({
       peaks,
       layout,
@@ -475,19 +473,18 @@ class DemoWriteIr extends _react.default.Component {
       desc
     });
   }
-  savePeaks(_ref5) {
-    let {
-      peaks,
-      layout,
-      shift,
-      isAscend,
-      decimal,
-      analysis,
-      isIntensity,
-      integration,
-      multiplicity,
-      waveLength
-    } = _ref5;
+  savePeaks({
+    peaks,
+    layout,
+    shift,
+    isAscend,
+    decimal,
+    analysis,
+    isIntensity,
+    integration,
+    multiplicity,
+    waveLength
+  }) {
     const entity = this.loadEntity();
     const {
       features
@@ -526,11 +523,10 @@ class DemoWriteIr extends _react.default.Component {
     }
     /*eslint-disable */
   }
-  predictOp(_ref6) {
-    let {
-      multiplicity,
-      curveSt
-    } = _ref6;
+  predictOp({
+    multiplicity,
+    curveSt
+  }) {
     const {
       curveIdx
     } = curveSt;
@@ -833,4 +829,4 @@ class DemoWriteIr extends _react.default.Component {
 }
 
 // - - - DOM - - -
-_reactDom.default.render( /*#__PURE__*/_react.default.createElement(DemoWriteIr, null), document.getElementById('root'));
+_reactDom.default.render(/*#__PURE__*/_react.default.createElement(DemoWriteIr, null), document.getElementById('root'));

@@ -20,8 +20,12 @@ class RectFocus {
       H,
       clickUiTargetAct,
       selectUiSweepAct,
-      scrollUiWheelAct
+      scrollUiWheelAct,
+      graphIndex,
+      uiSt
     } = props;
+    this.graphIndex = graphIndex;
+    this.uiSt = uiSt;
     this.rootKlass = `.${_list_graph.LIST_ROOT_SVG_GRAPH.RECT}`;
     this.brushClass = `.${_list_graph.LIST_BRUSH_SVG_GRAPH.RECT}`;
     this.margin = {
@@ -71,10 +75,7 @@ class RectFocus {
     this.root.call(this.tip);
   }
   setDataParams(data, peaks, tTrEndPts, tSfPeaks) {
-    this.data = data.map(d => ({
-      ...d,
-      x: d.x / 60
-    }));
+    this.data = [...data];
     this.dataPks = [...peaks];
     this.tTrEndPts = tTrEndPts;
     this.tSfPeaks = tSfPeaks;
@@ -133,6 +134,9 @@ class RectFocus {
     return y >= yRef ? 'steelblue' : '#aaa';
   }
   drawBar() {
+    if (!this.bars) {
+      return;
+    }
     const {
       xt,
       yt
@@ -161,14 +165,15 @@ class RectFocus {
     });
   }
   drawThres() {
-    if (this.tTrEndPts.length > 0) {
+    if (this.thresLine && this.tTrEndPts.length > 0) {
       this.thresLine.attr('d', this.pathCall(this.tTrEndPts));
       this.thresLine.attr('visibility', 'visible');
-    } else {
+    } else if (this.thresLine) {
       this.thresLine.attr('visibility', 'hidden');
     }
   }
   drawGrid() {
+    if (!this.grid) return;
     this.grid.x.call(this.axisCall.x.tickSize(-this.h, 0, 0)).selectAll('line').attr('stroke', '#ddd').attr('stroke-opacity', 0.6).attr('fill', 'none');
     this.grid.y.call(this.axisCall.y.tickSize(-this.w, 0, 0)).selectAll('line').attr('stroke', '#ddd').attr('stroke-opacity', 0.6).attr('fill', 'none');
   }
@@ -177,16 +182,15 @@ class RectFocus {
     this.dataPks = (0, _converter.PksEdit)(this.dataPks, editPeakSt);
     return this.dataPks;
   }
-  create(_ref) {
-    let {
-      filterSeed,
-      filterPeak,
-      tTrEndPts,
-      tSfPeaks,
-      sweepExtentSt,
-      isUiAddIntgSt,
-      isUiNoBrushSt
-    } = _ref;
+  create({
+    filterSeed,
+    filterPeak,
+    tTrEndPts,
+    tSfPeaks,
+    sweepExtentSt,
+    isUiAddIntgSt,
+    isUiNoBrushSt
+  }) {
     this.svg = d3.select(this.brushClass);
     (0, _mount.MountMainFrame)(this, 'focus');
     (0, _mount.MountClip)(this);
@@ -210,18 +214,19 @@ class RectFocus {
     }
     (0, _brush.default)(this, isUiAddIntgSt, isUiNoBrushSt, this.brushClass);
   }
-  update(_ref2) {
-    let {
-      filterSeed,
-      filterPeak,
-      tTrEndPts,
-      tSfPeaks,
-      sweepExtentSt,
-      isUiAddIntgSt,
-      isUiNoBrushSt
-    } = _ref2;
+  update({
+    filterSeed,
+    filterPeak,
+    tTrEndPts,
+    tSfPeaks,
+    sweepExtentSt,
+    isUiAddIntgSt,
+    isUiNoBrushSt,
+    uiSt
+  }) {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks);
+    this.uiSt = uiSt;
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);
       this.drawBar();

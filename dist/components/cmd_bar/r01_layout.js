@@ -181,24 +181,21 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
     className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
   }, "DLS INTENSITY"))));
 };
-const Layout = _ref => {
-  let {
-    classes,
-    feature,
-    hasEdit,
-    layoutSt,
-    setShiftRefAct,
-    updateLayoutAct,
-    curveSt,
-    shiftSt
-  } = _ref;
-  return /*#__PURE__*/_react.default.createElement("span", {
-    className: classes.groupRight
-  }, layoutSelect(classes, layoutSt, updateLayoutAct), shiftSelect(classes, layoutSt, setShiftRefAct, shiftSt, curveSt), /*#__PURE__*/_react.default.createElement(_r02_scan.default, {
-    feature: feature,
-    hasEdit: hasEdit
-  }));
-};
+const Layout = ({
+  classes,
+  feature,
+  hasEdit,
+  layoutSt,
+  setShiftRefAct,
+  updateLayoutAct,
+  curveSt,
+  shiftSt
+}) => /*#__PURE__*/_react.default.createElement("span", {
+  className: classes.groupRight
+}, layoutSelect(classes, layoutSt, updateLayoutAct), shiftSelect(classes, layoutSt, setShiftRefAct, shiftSt, curveSt), /*#__PURE__*/_react.default.createElement(_r02_scan.default, {
+  feature: feature,
+  hasEdit: hasEdit
+}));
 const mapStateToProps = (state, props) => (
 // eslint-disable-line
 {

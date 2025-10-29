@@ -16,12 +16,14 @@ var _TextField = _interopRequireDefault(require("@mui/material/TextField"));
 var _react2 = _interopRequireDefault(require("@mdi/react"));
 var _js = require("@mdi/js");
 var _integration = require("../../actions/integration");
+var _hplc_ms = require("../../actions/hplc_ms");
 var _ui = require("../../actions/ui");
 var _list_ui = require("../../constants/list_ui");
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 var _tri_btn = _interopRequireDefault(require("./tri_btn"));
 var _common = require("./common");
 var _format = _interopRequireDefault(require("../../helpers/format"));
+var _list_layout = require("../../constants/list_layout");
 /* eslint-disable prefer-object-spread, function-paren-newline,
 react/function-component-definition, react/require-default-props, max-len,
 react/no-unused-prop-types */
@@ -77,29 +79,36 @@ const setFactor = (classes, isDisable, integrationSt, setIntegrationFkrAct, curv
   });
 };
 const iconColor = criteria => criteria ? '#fff' : '#000';
-const Integration = _ref => {
-  let {
-    classes,
-    ignoreRef,
-    isDisableSt,
-    isFocusAddIntgSt,
-    isFocusRmIntgSt,
-    isFocusSetRefSt,
-    setUiSweepTypeAct,
-    setIntegrationFkrAct,
-    clearIntegrationAllAct,
-    curveSt,
-    integrationSt
-  } = _ref;
+const Integration = ({
+  classes,
+  ignoreRef,
+  isDisableSt,
+  isFocusAddIntgSt,
+  isFocusRmIntgSt,
+  isFocusSetRefSt,
+  setUiSweepTypeAct,
+  setIntegrationFkrAct,
+  clearIntegrationAllAct,
+  curveSt,
+  integrationSt,
+  clearIntegrationAllHplcMsAct,
+  layoutSt
+}) => {
   const onSweepIntegtAdd = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD);
   const onSweepIntegtRm = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_RM);
   const onSweepIntegtSR = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF);
   const {
     curveIdx
   } = curveSt;
-  const onClearAll = () => clearIntegrationAllAct({
-    curveIdx
-  });
+  const onClearAll = () => {
+    if (layoutSt === _list_layout.LIST_LAYOUT.LC_MS) {
+      clearIntegrationAllHplcMsAct();
+    } else {
+      clearIntegrationAllAct({
+        curveIdx
+      });
+    }
+  };
   return /*#__PURE__*/_react.default.createElement("span", {
     className: classes.group
   }, /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
@@ -168,12 +177,14 @@ const mapStateToProps = (state, props) => (
   isFocusSetRefSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF,
   ignoreRef: _format.default.isHplcUvVisLayout(state.layout),
   curveSt: state.curve,
-  integrationSt: state.integration.present
+  integrationSt: state.integration.present,
+  layoutSt: state.layout
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   setUiSweepTypeAct: _ui.setUiSweepType,
   setIntegrationFkrAct: _integration.setIntegrationFkr,
-  clearIntegrationAllAct: _integration.clearIntegrationAll
+  clearIntegrationAllAct: _integration.clearIntegrationAll,
+  clearIntegrationAllHplcMsAct: _hplc_ms.clearIntegrationAllHplcMs
 }, dispatch);
 Integration.propTypes = {
   classes: _propTypes.default.object.isRequired,
@@ -185,7 +196,9 @@ Integration.propTypes = {
   setUiSweepTypeAct: _propTypes.default.func.isRequired,
   setIntegrationFkrAct: _propTypes.default.func.isRequired,
   clearIntegrationAllAct: _propTypes.default.func.isRequired,
+  clearIntegrationAllHplcMsAct: _propTypes.default.func.isRequired,
   curveSt: _propTypes.default.object.isRequired,
-  integrationSt: _propTypes.default.object.isRequired
+  integrationSt: _propTypes.default.object.isRequired,
+  layoutSt: _propTypes.default.string.isRequired
 };
 var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _withStyles.default)(styles)(Integration));

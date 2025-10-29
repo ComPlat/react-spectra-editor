@@ -21,24 +21,23 @@ react/function-component-definition, react/require-default-props
 */
 
 const styles = () => ({});
-const LayerPrism = _ref => {
-  let {
-    entity,
-    cLabel,
-    xLabel,
-    yLabel,
-    forecast,
-    operations,
-    descriptions,
-    molSvg,
-    editorOnly,
-    theoryMass,
-    thresSt,
-    scanSt,
-    uiSt,
-    canChangeDescription,
-    onDescriptionChanged
-  } = _ref;
+const LayerPrism = ({
+  entity,
+  cLabel,
+  xLabel,
+  yLabel,
+  forecast,
+  operations,
+  descriptions,
+  molSvg,
+  editorOnly,
+  theoryMass,
+  thresSt,
+  scanSt,
+  uiSt,
+  canChangeDescription,
+  onDescriptionChanged
+}) => {
   const {
     topic,
     feature,

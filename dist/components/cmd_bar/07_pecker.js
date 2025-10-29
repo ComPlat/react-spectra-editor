@@ -77,19 +77,18 @@ const setRef = (classes, cyclicVotaSt, curveIdx, setCylicVoltaRefFactorAct) => {
     onKeyUp: onEnterPress
   });
 };
-const Pecker = _ref => {
-  let {
-    classes,
-    layoutSt,
-    isFocusAddPeckerSt,
-    isFocusRmPeckerSt,
-    setUiSweepTypeAct,
-    curveSt,
-    cyclicVotaSt,
-    setCylicVoltaRefFactorAct,
-    isFocusSetRefSt,
-    setCylicVoltaRefAct
-  } = _ref;
+const Pecker = ({
+  classes,
+  layoutSt,
+  isFocusAddPeckerSt,
+  isFocusRmPeckerSt,
+  setUiSweepTypeAct,
+  curveSt,
+  cyclicVotaSt,
+  setCylicVoltaRefFactorAct,
+  isFocusSetRefSt,
+  setCylicVoltaRefAct
+}) => {
   const {
     curveIdx
   } = curveSt;

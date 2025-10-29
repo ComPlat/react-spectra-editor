@@ -31,12 +31,11 @@ const Styles = () => ({
     color: 'white'
   }
 });
-const MpySelect = _ref => {
-  let {
-    classes,
-    target,
-    selectMpyTypeAct
-  } = _ref;
+const MpySelect = ({
+  classes,
+  target,
+  selectMpyTypeAct
+}) => {
   const {
     mpyType,
     xExtent

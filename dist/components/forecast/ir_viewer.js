@@ -69,29 +69,26 @@ const sectionTable = (classes, pds) => {
     size: "small"
   }, (0, _ir_comps.IrTableHeader)(classes), /*#__PURE__*/_react.default.createElement(_material.TableBody, null, fgs.sort((a, b) => b.confidence - a.confidence).map((fg, idx) => (0, _ir_comps.IrTableBodyRow)(classes, idx, fg)))));
 };
-const IrViewer = _ref => {
-  let {
-    // eslint-disable-line
-    classes,
-    molecule,
-    inputCb,
-    forecastSt
-  } = _ref;
-  return /*#__PURE__*/_react.default.createElement("div", {
-    className: (0, _classnames.default)(classes.root, 'card-forecast-viewer')
-  }, /*#__PURE__*/_react.default.createElement(_material.Grid, {
-    className: (0, _classnames.default)(classes.container),
-    container: true
-  }, /*#__PURE__*/_react.default.createElement(_material.Grid, {
-    item: true,
-    xs: 4
-  }, /*#__PURE__*/_react.default.createElement(_material.Paper, {
-    className: classes.svgRoot
-  }, (0, _comps.sectionSvg)(classes, forecastSt.predictions))), /*#__PURE__*/_react.default.createElement(_material.Grid, {
-    item: true,
-    xs: 8
-  }, sectionTable(classes, forecastSt.predictions))), (0, _comps.sectionInput)(classes, molecule, inputCb));
-};
+const IrViewer = ({
+  // eslint-disable-line
+  classes,
+  molecule,
+  inputCb,
+  forecastSt
+}) => /*#__PURE__*/_react.default.createElement("div", {
+  className: (0, _classnames.default)(classes.root, 'card-forecast-viewer')
+}, /*#__PURE__*/_react.default.createElement(_material.Grid, {
+  className: (0, _classnames.default)(classes.container),
+  container: true
+}, /*#__PURE__*/_react.default.createElement(_material.Grid, {
+  item: true,
+  xs: 4
+}, /*#__PURE__*/_react.default.createElement(_material.Paper, {
+  className: classes.svgRoot
+}, (0, _comps.sectionSvg)(classes, forecastSt.predictions))), /*#__PURE__*/_react.default.createElement(_material.Grid, {
+  item: true,
+  xs: 8
+}, sectionTable(classes, forecastSt.predictions))), (0, _comps.sectionInput)(classes, molecule, inputCb));
 const mapStateToProps = (state, props) => (
 // eslint-disable-line
 {

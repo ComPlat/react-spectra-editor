@@ -20,14 +20,13 @@ var _format = _interopRequireDefault(require("../../helpers/format"));
 /* eslint-disable prefer-object-spread, react/function-component-definition */
 
 const styles = () => Object.assign({}, _common.commonStyle);
-const PeakGroup = _ref => {
-  let {
-    classes,
-    feature,
-    isSelectingGroupSt,
-    setUiSweepTypeAct,
-    graphIndex
-  } = _ref;
+const PeakGroup = ({
+  classes,
+  feature,
+  isSelectingGroupSt,
+  setUiSweepTypeAct,
+  graphIndex
+}) => {
   const {
     operation
   } = feature;

@@ -21,38 +21,35 @@ react/function-component-definition, react/require-default-props, max-len,
 react/no-unused-prop-types */
 
 const styles = () => Object.assign({}, _common.commonStyle);
-const UndoRedo = _ref => {
-  let {
-    classes,
-    canUndo,
-    canRedo,
-    onUndoAct,
-    onRedoAct
-  } = _ref;
-  return /*#__PURE__*/_react.default.createElement("span", {
-    className: classes.group
-  }, /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
-    title: /*#__PURE__*/_react.default.createElement("span", {
-      className: "txt-sv-tp"
-    }, "Undo")
-  }, /*#__PURE__*/_react.default.createElement("span", null, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
-    className: (0, _classnames.default)('btn-sv-bar-undo'),
-    disabled: !canUndo,
-    onClick: onUndoAct
-  }, /*#__PURE__*/_react.default.createElement(_UndoOutlined.default, {
-    className: classes.icon
-  })))), /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
-    title: /*#__PURE__*/_react.default.createElement("span", {
-      className: "txt-sv-tp"
-    }, "Redo")
-  }, /*#__PURE__*/_react.default.createElement("span", null, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
-    className: (0, _classnames.default)('btn-sv-bar-redo'),
-    disabled: !canRedo,
-    onClick: onRedoAct
-  }, /*#__PURE__*/_react.default.createElement(_RedoOutlined.default, {
-    className: classes.icon
-  })))));
-};
+const UndoRedo = ({
+  classes,
+  canUndo,
+  canRedo,
+  onUndoAct,
+  onRedoAct
+}) => /*#__PURE__*/_react.default.createElement("span", {
+  className: classes.group
+}, /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+  title: /*#__PURE__*/_react.default.createElement("span", {
+    className: "txt-sv-tp"
+  }, "Undo")
+}, /*#__PURE__*/_react.default.createElement("span", null, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
+  className: (0, _classnames.default)('btn-sv-bar-undo'),
+  disabled: !canUndo,
+  onClick: onUndoAct
+}, /*#__PURE__*/_react.default.createElement(_UndoOutlined.default, {
+  className: classes.icon
+})))), /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
+  title: /*#__PURE__*/_react.default.createElement("span", {
+    className: "txt-sv-tp"
+  }, "Redo")
+}, /*#__PURE__*/_react.default.createElement("span", null, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
+  className: (0, _classnames.default)('btn-sv-bar-redo'),
+  disabled: !canRedo,
+  onClick: onRedoAct
+}, /*#__PURE__*/_react.default.createElement(_RedoOutlined.default, {
+  className: classes.icon
+})))));
 const canUndoFunc = state => state.editPeak.past.length > 0 || state.integration.past.length > 0 || state.multiplicity.past.length > 0;
 const canRedoFunc = state => state.editPeak.future.length > 0 || state.integration.future.length > 0 || state.multiplicity.future.length > 0;
 const mapStateToProps = (state, _) => (

@@ -13,6 +13,7 @@ var _list_layout = require("../../constants/list_layout");
 var _format = _interopRequireDefault(require("../../helpers/format"));
 var _list_graph = require("../../constants/list_graph");
 var _chem = require("../../helpers/chem");
+var _extractEntityLCMS = require("../../helpers/extractEntityLCMS");
 /* eslint-disable no-unused-vars, prefer-object-spread, no-mixed-operators,
 no-unneeded-ternary, arrow-body-style, max-len */
 
@@ -25,9 +26,13 @@ class MultiFocus {
       clickUiTargetAct,
       selectUiSweepAct,
       scrollUiWheelAct,
-      entities
+      ticEntities,
+      graphIndex,
+      uiSt
     } = props;
-    this.entities = entities;
+    this.graphIndex = graphIndex;
+    this.uiSt = uiSt;
+    this.ticEntities = ticEntities;
     this.jcampIdx = 0;
     this.isShowAllCurves = false;
     this.rootKlass = `.${_list_graph.LIST_ROOT_SVG_GRAPH.MULTI}`;
@@ -75,6 +80,7 @@ class MultiFocus {
     this.onClickTarget = this.onClickTarget.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
   }
+  colorForPolarity = polarity => polarity === 'negative' ? '#2980b9' : '#d35400';
   getShouldUpdate() {
     const {
       prevXt,
@@ -122,25 +128,27 @@ class MultiFocus {
     this.tip = (0, _init.InitTip)();
     this.root.call(this.tip);
   }
-  setDataParams(filterSeed, tTrEndPts, layout) {
-    let jcampIdx = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+  setDataParams(tTrEndPts, layout, jcampIdx = 0) {
     this.data = [];
     this.otherLineData = [];
-    this.entities.forEach((entry, idx) => {
+    this.ticEntities.forEach((entry, idx) => {
       const {
-        color,
         topic,
         feature
       } = entry;
-      let currData = filterSeed;
+      const cat = (0, _extractEntityLCMS.catToString)(feature?.csCategory ?? entry.features?.[0]?.csCategory);
+      const polarity = cat.includes('NEGATIVE') ? 'negative' : 'positive';
+      const fixedColor = this.colorForPolarity(polarity);
+      const currData = (0, _chem.convertTopic)(topic, layout, feature, 0);
       if (idx === jcampIdx) {
-        this.data = [...currData];
-        this.pathColor = color;
+        this.data = currData;
+        this.pathColor = fixedColor;
       } else {
-        currData = (0, _chem.convertTopic)(topic, layout, feature, 0);
         this.otherLineData.push({
           data: currData,
-          color
+          polarity,
+          color: fixedColor,
+          idx
         });
       }
     });
@@ -198,6 +206,7 @@ class MultiFocus {
     };
   }
   drawLine() {
+    if (!this.path) return;
     const {
       xt,
       yt
@@ -212,12 +221,16 @@ class MultiFocus {
   drawOtherLines(layout) {
     d3.selectAll('.line-clip-compare').remove();
     if (!this.otherLineData) return null;
+    const {
+      xt,
+      yt
+    } = (0, _compass.TfRescale)(this);
+    this.updatePathCall(xt, yt);
     this.otherLineData.forEach((entry, idx) => {
       const {
         data,
-        color
+        color: pathColor
       } = entry;
-      const pathColor = color ? color : _format.default.mutiEntitiesColors(idx);
       const path = (0, _mount.MountComparePath)(this, pathColor, idx, 0.4);
       path.attr('d', this.pathCall(data));
       if (this.layout === _list_layout.LIST_LAYOUT.AIF && this.isShowAllCurves === true) {
@@ -230,9 +243,13 @@ class MultiFocus {
     const {
       sameXY
     } = this.shouldUpdate;
-    if (sameXY) return;
-    this.grid.x.call(this.axisCall.x.tickSize(-this.h, 0, 0)).selectAll('line').attr('stroke', '#ddd').attr('stroke-opacity', 0.6).attr('fill', 'none');
-    this.grid.y.call(this.axisCall.y.tickSize(-this.w, 0, 0)).selectAll('line').attr('stroke', '#ddd').attr('stroke-opacity', 0.6).attr('fill', 'none');
+    if (sameXY || !this.grid || !this.axisCall) return;
+    if (this.grid.x && this.axisCall.x) {
+      this.grid.x.call(this.axisCall.x.tickSize(-this.h, 0, 0)).selectAll('line').attr('stroke', '#ddd').attr('stroke-opacity', 0.6).attr('fill', 'none');
+    }
+    if (this.grid.y && this.axisCall.y) {
+      this.grid.y.call(this.axisCall.y.tickSize(-this.w, 0, 0)).selectAll('line').attr('stroke', '#ddd').attr('stroke-opacity', 0.6).attr('fill', 'none');
+    }
   }
   onClickTarget(event, data) {
     event.stopPropagation();
@@ -240,16 +257,14 @@ class MultiFocus {
     const onPeak = true;
     this.clickUiTargetAct(data, onPeak, false, this.jcampIdx);
   }
-  create(_ref) {
-    let {
-      curveSt,
-      filterSeed,
-      tTrEndPts,
-      editPeakSt,
-      layoutSt,
-      sweepExtentSt,
-      isUiNoBrushSt
-    } = _ref;
+  create({
+    ticEntities,
+    curveSt,
+    tTrEndPts,
+    layoutSt,
+    sweepExtentSt,
+    isUiNoBrushSt
+  }) {
     this.svg = d3.select(this.rootKlass).select(this.brushClass);
     (0, _mount.MountMainFrame)(this, 'focus');
     (0, _mount.MountClip)(this);
@@ -259,10 +274,11 @@ class MultiFocus {
     } = curveSt;
     const jcampIdx = curveIdx;
     this.isShowAllCurves = isShowAllCurve;
+    this.ticEntities = ticEntities;
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = (0, _init.InitScale)(this, false);
     this.setTip();
-    this.setDataParams(filterSeed, tTrEndPts, layoutSt, jcampIdx);
+    this.setDataParams(tTrEndPts, layoutSt, jcampIdx);
     (0, _compass.MountCompass)(this);
     this.axis = (0, _mount.MountAxis)(this);
     this.path = (0, _mount.MountPath)(this, this.pathColor);
@@ -277,18 +293,17 @@ class MultiFocus {
       this.drawOtherLines(layoutSt);
     }
     (0, _brush.default)(this, false, isUiNoBrushSt, this.brushClass);
-    this.resetShouldUpdate(editPeakSt);
+    this.resetShouldUpdate();
   }
-  update(_ref2) {
-    let {
-      entities,
-      curveSt,
-      filterSeed,
-      tTrEndPts,
-      layoutSt,
-      sweepExtentSt,
-      isUiNoBrushSt
-    } = _ref2;
+  update({
+    curveSt,
+    tTrEndPts,
+    layoutSt,
+    ticEntities,
+    sweepExtentSt,
+    isUiNoBrushSt,
+    uiSt
+  }) {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = (0, _init.InitScale)(this, false);
     const {
@@ -297,8 +312,9 @@ class MultiFocus {
     } = curveSt;
     const jcampIdx = curveIdx;
     this.isShowAllCurves = isShowAllCurve;
-    this.entities = entities;
-    this.setDataParams(filterSeed, tTrEndPts, layoutSt, jcampIdx);
+    this.ticEntities = ticEntities;
+    this.uiSt = uiSt;
+    this.setDataParams(tTrEndPts, layoutSt, jcampIdx);
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);
       this.getShouldUpdate();

@@ -18,7 +18,7 @@ var _common = require("../cmd_bar/common");
 var _chem = require("../../helpers/chem");
 var _manager = require("../../actions/manager");
 var _ui = require("../../actions/ui");
-var _hplcms = require("../../actions/hplcms");
+var _hplc_ms = require("../../actions/hplc_ms");
 var _curve = require("../../actions/curve");
 var _rect_focus = _interopRequireDefault(require("./rect_focus"));
 var _multi_focus = _interopRequireDefault(require("./multi_focus"));
@@ -30,6 +30,8 @@ var _list_ui = require("../../constants/list_ui");
 var _list_graph = require("../../constants/list_graph");
 var _peak_group = _interopRequireDefault(require("../cmd_bar/08_peak_group"));
 var _r03_threshold = _interopRequireDefault(require("../cmd_bar/r03_threshold"));
+var _integration = _interopRequireDefault(require("../cmd_bar/04_integration"));
+var _peak = _interopRequireDefault(require("../cmd_bar/03_peak"));
 /* eslint-disable no-mixed-operators, prefer-object-spread, react/function-component-definition */
 
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
@@ -82,19 +84,17 @@ const zoomView = (classes, graphIndex, uiSt, zoomInAct) => {
   }))));
 };
 const waveLengthSelect = (classes, hplcMsSt, updateWaveLengthAct) => {
+  const uvvis = hplcMsSt && hplcMsSt.uvvis || {};
   const {
-    uvvis
-  } = hplcMsSt;
-  const {
-    listWaveLength,
+    listWaveLength = null,
     selectedWaveLength
   } = uvvis;
-  const options = listWaveLength.map(d => /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
+  const options = listWaveLength ? listWaveLength.map(d => /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
     value: d,
     key: d
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-decimal')
-  }, d)));
+  }, d))) : [];
   return /*#__PURE__*/_react.default.createElement(_material.FormControl, {
     className: (0, _classnames.default)(classes.fieldDecimal),
     variant: "outlined",
@@ -112,7 +112,7 @@ const waveLengthSelect = (classes, hplcMsSt, updateWaveLengthAct) => {
     className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-decimal')
   }, options));
 };
-const ticSelect = (classes, hplcMsSt, updateTicAct) => {
+const ticSelect = (classes, hplcMsSt, handleTicChanged) => {
   const {
     tic
   } = hplcMsSt;
@@ -132,11 +132,14 @@ const ticSelect = (classes, hplcMsSt, updateTicAct) => {
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-decimal')
   }, d.name)));
+  const onTicChange = event => {
+    handleTicChanged(event);
+  };
   return /*#__PURE__*/_react.default.createElement(_material.FormControl, {
     className: (0, _classnames.default)(classes.fieldDecimal),
     variant: "outlined",
     style: {
-      position: 'absolute'
+      width: '80px'
     }
   }, /*#__PURE__*/_react.default.createElement(_material.InputLabel, {
     id: "select-decimal-label",
@@ -145,7 +148,7 @@ const ticSelect = (classes, hplcMsSt, updateTicAct) => {
     labelId: "select-decimal-label",
     label: "Decimal",
     value: isNegative ? 1 : 0,
-    onChange: updateTicAct,
+    onChange: onTicChange,
     className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-decimal')
   }, options));
 };
@@ -156,25 +159,31 @@ class ViewerLineRect extends _react.default.Component {
       clickUiTargetAct,
       selectUiSweepAct,
       scrollUiWheelAct,
-      entities
+      ticEntities,
+      uvvisEntities,
+      uiSt
     } = props;
     this.rootKlassLine = `.${_list_graph.LIST_ROOT_SVG_GRAPH.LINE}`;
     this.lineFocus = new _line_focus.default({
       W,
       H,
-      entities,
+      uvvisEntities,
       clickUiTargetAct,
       selectUiSweepAct,
-      scrollUiWheelAct
+      scrollUiWheelAct,
+      graphIndex: 0,
+      uiSt
     });
     this.rootKlassMulti = `.${_list_graph.LIST_ROOT_SVG_GRAPH.MULTI}`;
     this.multiFocus = new _multi_focus.default({
       W,
       H,
-      entities,
+      ticEntities,
       clickUiTargetAct,
       selectUiSweepAct,
-      scrollUiWheelAct
+      scrollUiWheelAct,
+      graphIndex: 1,
+      uiSt
     });
     this.rootKlassRect = `.${_list_graph.LIST_ROOT_SVG_GRAPH.RECT}`;
     this.rectFocus = new _rect_focus.default({
@@ -182,7 +191,9 @@ class ViewerLineRect extends _react.default.Component {
       H,
       clickUiTargetAct,
       selectUiSweepAct,
-      scrollUiWheelAct
+      scrollUiWheelAct,
+      graphIndex: 2,
+      uiSt
     });
     this.normChange = this.normChange.bind(this);
     this.extractSubView = this.extractSubView.bind(this);
@@ -190,18 +201,20 @@ class ViewerLineRect extends _react.default.Component {
   }
   componentDidMount() {
     const {
-      entities,
       curveSt,
       seed,
       cLabel,
       feature,
+      ticEntities,
       tTrEndPts,
       layoutSt,
       isUiAddIntgSt,
       isUiNoBrushSt,
+      integationSt,
       isHidden,
       resetAllAct,
-      uiSt
+      uiSt,
+      editPeakSt
     } = this.props;
     (0, _draw.drawDestroy)(this.rootKlassMulti);
     (0, _draw.drawDestroy)(this.rootKlassLine);
@@ -214,6 +227,9 @@ class ViewerLineRect extends _react.default.Component {
       sweepExtent
     } = zoom;
     const uvvisViewFeature = this.extractUvvisView();
+    if (!uvvisViewFeature || !uvvisViewFeature.data || uvvisViewFeature.data.length === 0) {
+      return;
+    }
     const {
       data
     } = uvvisViewFeature;
@@ -235,16 +251,17 @@ class ViewerLineRect extends _react.default.Component {
       filterPeak: [],
       tTrEndPts,
       isUiNoBrushSt: true,
-      sweepExtentSt: sweepExtent[0]
+      sweepExtentSt: sweepExtent[0],
+      integationSt,
+      isUiAddIntgSt,
+      editPeakSt
     });
     (0, _draw.drawLabel)(this.rootKlassLine, null, 'Minutes', 'Intensity');
     (0, _draw.drawDisplay)(this.rootKlassLine, false);
-    const filterSeed = seed;
     (0, _draw.drawMain)(this.rootKlassMulti, W, H, _list_graph.LIST_BRUSH_SVG_GRAPH.MULTI);
     this.multiFocus.create({
-      entities,
+      ticEntities,
       curveSt,
-      filterSeed,
       tTrEndPts,
       layoutSt,
       sweepExtentSt: sweepExtent[1],
@@ -261,14 +278,13 @@ class ViewerLineRect extends _react.default.Component {
       isUiNoBrushSt: true,
       sweepExtentSt: sweepExtent[2]
     });
-    (0, _draw.drawLabel)(this.rootKlassRect, null, 'M/Z', 'Intensity');
+    (0, _draw.drawLabel)(this.rootKlassRect, null, 'm/z', 'Intensity');
     (0, _draw.drawDisplay)(this.rootKlassRect, false);
   }
   componentDidUpdate(prevProps) {
     const {
-      entities,
+      ticEntities,
       curveSt,
-      seed,
       cLabel,
       tTrEndPts,
       layoutSt,
@@ -276,7 +292,9 @@ class ViewerLineRect extends _react.default.Component {
       isUiNoBrushSt,
       isHidden,
       uiSt,
-      hplcMsSt
+      hplcMsSt,
+      integationSt,
+      editPeakSt
     } = this.props;
     this.normChange(prevProps);
     const {
@@ -302,28 +320,41 @@ class ViewerLineRect extends _react.default.Component {
         };
         return s;
       });
-      this.lineFocus.update({
-        filterSeed: uvvisSeed,
-        filterPeak: [],
-        tTrEndPts,
-        isUiNoBrushSt: true,
-        sweepExtentSt: sweepExtent[0]
-      });
+      if (this.lineFocus) {
+        this.lineFocus.update({
+          filterSeed: uvvisSeed,
+          filterPeak: [],
+          tTrEndPts,
+          isUiNoBrushSt: true,
+          isUiAddIntgSt,
+          sweepExtentSt: sweepExtent[0],
+          uiSt,
+          layoutSt,
+          integationSt,
+          hplcMsSt,
+          editPeakSt
+        });
+      }
       (0, _draw.drawLabel)(this.rootKlassLine, null, 'Minutes', 'Intensity');
       (0, _draw.drawDisplay)(this.rootKlassLine, false);
     }
-    const filterSeed = seed;
-    this.multiFocus.update({
-      entities,
-      curveSt,
-      filterSeed,
-      tTrEndPts,
-      layoutSt,
-      sweepExtentSt: sweepExtent[1],
-      isUiAddIntgSt,
-      isUiNoBrushSt
-    });
-    (0, _draw.drawLabel)(this.rootKlassMulti, cLabel, 'Minutes', 'Intensity');
+    if (this.multiFocus) {
+      this.multiFocus.update({
+        curveSt,
+        ticEntities,
+        tTrEndPts,
+        layoutSt,
+        sweepExtentSt: sweepExtent[1],
+        isUiAddIntgSt,
+        isUiNoBrushSt,
+        uiSt,
+        editPeakSt
+      });
+    }
+    const {
+      isNegative
+    } = hplcMsSt.tic;
+    (0, _draw.drawLabel)(this.rootKlassMulti, isNegative ? 'MINUS' : 'PLUS', 'Minutes', 'Intensity');
     (0, _draw.drawDisplay)(this.rootKlassMulti, isHidden);
     const subViewFeature = this.extractSubView();
     if (subViewFeature) {
@@ -347,14 +378,17 @@ class ViewerLineRect extends _react.default.Component {
         };
         return s;
       });
-      this.rectFocus.update({
-        filterSeed: subSeed,
-        filterPeak: [],
-        tTrEndPts: curTrEndPts,
-        isUiNoBrushSt: true,
-        sweepExtentSt: sweepExtent[2]
-      });
-      (0, _draw.drawLabel)(this.rootKlassRect, `${pageValue} min`, 'M/Z', 'Intensity');
+      if (this.rectFocus) {
+        this.rectFocus.update({
+          filterSeed: subSeed,
+          filterPeak: [],
+          tTrEndPts: curTrEndPts,
+          isUiNoBrushSt: true,
+          sweepExtentSt: sweepExtent[2],
+          uiSt
+        });
+      }
+      (0, _draw.drawLabel)(this.rootKlassRect, `${pageValue} min`, 'm/z', 'Intensity');
       (0, _draw.drawDisplay)(this.rootKlassRect, false);
     }
   }
@@ -372,25 +406,35 @@ class ViewerLineRect extends _react.default.Component {
   }
   extractUvvisView() {
     const {
-      subEntities,
+      uvvisEntities,
       hplcMsSt
     } = this.props;
+    if (!uvvisEntities || !uvvisEntities[0]) {
+      return null;
+    }
     const {
       features
-    } = (0, _extractParams.extractParams)(subEntities[0], 0, 1);
+    } = (0, _extractParams.extractParams)(uvvisEntities[0], 0, 1);
+    if (!features || features.length === 0) {
+      return null;
+    }
     const {
       uvvis
     } = hplcMsSt;
     const {
       wavelengthIdx
     } = uvvis;
+    if (wavelengthIdx < 0 || wavelengthIdx >= features.length) {
+      return null;
+    }
     return features[wavelengthIdx];
   }
   extractSubView() {
     const {
       uiSt,
-      subEntities,
-      hplcMsSt
+      mzEntities,
+      hplcMsSt,
+      updateCurrentPageValueAct
     } = this.props;
     const {
       tic
@@ -398,17 +442,23 @@ class ViewerLineRect extends _react.default.Component {
     const {
       isNegative
     } = tic;
-    const entityIdx = isNegative ? 2 : 1;
+    const entityIdx = isNegative ? 1 : 0;
+    if (!mzEntities || !mzEntities[entityIdx] || !mzEntities[entityIdx].layout) {
+      return null;
+    }
     const {
       subViewerAt
     } = uiSt;
     const {
       features
-    } = (0, _extractParams.extractParams)(subEntities[entityIdx], 0, 1);
-    if (features.length === 0) return null;
+    } = (0, _extractParams.extractParams)(mzEntities[entityIdx], 0, 1);
+    if (!features || features.length === 0) return null;
     const arrPageValues = features.map(fe => fe.pageValue);
     const hasValidClick = subViewerAt && subViewerAt.x !== undefined;
     const closestPage = hasValidClick ? (0, _calc.findClosest)(arrPageValues, subViewerAt.x) : arrPageValues[Math.floor(arrPageValues.length / 2)];
+    if (closestPage !== hplcMsSt.tic.currentPageValue) {
+      updateCurrentPageValueAct(closestPage);
+    }
     const [selectFeature] = features.filter(fe => fe.pageValue === closestPage);
     return selectFeature;
   }
@@ -427,7 +477,14 @@ class ViewerLineRect extends _react.default.Component {
       updateTicAct(event);
       selectCurveAct(event.target.value);
     };
-    return /*#__PURE__*/_react.default.createElement("div", null, zoomView(_classnames.default, 0, uiSt, zoomInAct), waveLengthSelect(classes, hplcMsSt, selectWavelengthAct), /*#__PURE__*/_react.default.createElement("div", {
+    const handleWaveLengthChange = event => {
+      [0, 1, 2].forEach(gi => zoomInAct({
+        graphIndex: gi,
+        sweepType: _list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET
+      }));
+      selectWavelengthAct(event);
+    };
+    return /*#__PURE__*/_react.default.createElement("div", null, zoomView(classes, 0, uiSt, zoomInAct), waveLengthSelect(classes, hplcMsSt, handleWaveLengthChange), /*#__PURE__*/_react.default.createElement(_integration.default, null), /*#__PURE__*/_react.default.createElement(_peak.default, null), /*#__PURE__*/_react.default.createElement("div", {
       className: _list_graph.LIST_ROOT_SVG_GRAPH.LINE
     }), /*#__PURE__*/_react.default.createElement(_peak_group.default, {
       feature: feature,
@@ -446,27 +503,34 @@ const mapStateToProps = (state, props) => ({
   isUiAddIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
   isUiNoBrushSt: _list_ui.LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
   uiSt: state.ui,
-  hplcMsSt: state.hplcMs
+  layoutSt: state.layout,
+  hplcMsSt: state.hplcMs,
+  editPeakSt: state.editPeak.present,
+  integationSt: state.integration.present,
+  sweepExtentSt: state.ui.sweepExtent
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   resetAllAct: _manager.resetAll,
   clickUiTargetAct: _ui.clickUiTarget,
   selectUiSweepAct: _ui.selectUiSweep,
   scrollUiWheelAct: _ui.scrollUiWheel,
-  selectWavelengthAct: _hplcms.selectWavelength,
-  updateTicAct: _hplcms.changeTic,
+  selectWavelengthAct: _hplc_ms.selectWavelength,
+  updateTicAct: _hplc_ms.changeTic,
   selectCurveAct: _curve.selectCurve,
-  zoomInAct: _ui.setUiSweepType
+  zoomInAct: _ui.setUiSweepType,
+  updateCurrentPageValueAct: _hplc_ms.updateCurrentPageValue
 }, dispatch);
 ViewerLineRect.propTypes = {
   classes: _propTypes.default.object.isRequired,
   uiSt: _propTypes.default.object.isRequired,
   curveSt: _propTypes.default.object.isRequired,
-  entities: _propTypes.default.array.isRequired,
-  subEntities: _propTypes.default.array.isRequired,
+  ticEntities: _propTypes.default.array.isRequired,
+  uvvisEntities: _propTypes.default.array.isRequired,
+  mzEntities: _propTypes.default.array.isRequired,
   seed: _propTypes.default.array.isRequired,
   cLabel: _propTypes.default.string.isRequired,
   layoutSt: _propTypes.default.string.isRequired,
+  integationSt: _propTypes.default.object.isRequired,
   feature: _propTypes.default.object.isRequired,
   tTrEndPts: _propTypes.default.array.isRequired,
   isUiAddIntgSt: _propTypes.default.bool.isRequired,
@@ -476,11 +540,13 @@ ViewerLineRect.propTypes = {
   selectUiSweepAct: _propTypes.default.func.isRequired,
   scrollUiWheelAct: _propTypes.default.func.isRequired,
   isHidden: _propTypes.default.bool.isRequired,
-  hplcMsSt: _propTypes.default.bool.isRequired,
+  hplcMsSt: _propTypes.default.object.isRequired,
   selectWavelengthAct: _propTypes.default.func.isRequired,
   updateTicAct: _propTypes.default.func.isRequired,
   selectCurveAct: _propTypes.default.func.isRequired,
-  zoomInAct: _propTypes.default.func.isRequired
+  zoomInAct: _propTypes.default.func.isRequired,
+  editPeakSt: _propTypes.default.object.isRequired,
+  updateCurrentPageValueAct: _propTypes.default.func.isRequired
 };
 
 // export default connect(mapStateToProps, mapDispatchToProps)(ViewerLineRect);

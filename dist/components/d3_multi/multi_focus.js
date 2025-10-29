@@ -30,8 +30,11 @@ class MultiFocus {
       clickUiTargetAct,
       selectUiSweepAct,
       scrollUiWheelAct,
-      entities
+      entities,
+      uiSt
     } = props;
+    this.uiSt = uiSt;
+    this.graphIndex = uiSt?.zoom?.graphIndex;
     this.entities = entities;
     this.jcampIdx = 0;
     this.isShowAllCurves = false;
@@ -158,8 +161,7 @@ class MultiFocus {
     this.tip = (0, _init.InitTip)();
     this.root.call(this.tip);
   }
-  setDataParams(filterSeed, peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt) {
-    let jcampIdx = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : 0;
+  setDataParams(filterSeed, peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt, jcampIdx = 0) {
     this.data = [];
     this.otherLineData = [];
     let filterSubLayoutValue = null;
@@ -811,21 +813,23 @@ class MultiFocus {
   reverseXAxis(layoutSt) {
     return [_list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS, _list_layout.LIST_LAYOUT.TGA, _list_layout.LIST_LAYOUT.DSC, _list_layout.LIST_LAYOUT.XRD, _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY, _list_layout.LIST_LAYOUT.CDS, _list_layout.LIST_LAYOUT.SEC, _list_layout.LIST_LAYOUT.GC, _list_layout.LIST_LAYOUT.AIF].indexOf(layoutSt) < 0;
   }
-  create(_ref) {
-    let {
-      curveSt,
-      filterSeed,
-      filterPeak,
-      tTrEndPts,
-      tSfPeaks,
-      editPeakSt,
-      layoutSt,
-      sweepExtentSt,
-      isUiNoBrushSt,
-      cyclicvoltaSt,
-      integationSt,
-      mtplySt
-    } = _ref;
+  create({
+    curveSt,
+    filterSeed,
+    filterPeak,
+    tTrEndPts,
+    tSfPeaks,
+    editPeakSt,
+    layoutSt,
+    sweepExtentSt,
+    isUiNoBrushSt,
+    cyclicvoltaSt,
+    integationSt,
+    mtplySt,
+    uiSt
+  }) {
+    this.uiSt = uiSt;
+    this.graphIndex = uiSt?.zoom?.graphIndex;
     this.svg = d3.select(this.rootKlass).select('.d3Svg');
     (0, _mount.MountMainFrame)(this, 'focus');
     (0, _mount.MountClip)(this);
@@ -863,24 +867,26 @@ class MultiFocus {
     (0, _brush.default)(this, false, isUiNoBrushSt);
     this.resetShouldUpdate(editPeakSt);
   }
-  update(_ref2) {
-    let {
-      entities,
-      curveSt,
-      filterSeed,
-      filterPeak,
-      tTrEndPts,
-      tSfPeaks,
-      editPeakSt,
-      layoutSt,
-      sweepExtentSt,
-      isUiNoBrushSt,
-      cyclicvoltaSt,
-      integationSt,
-      mtplySt
-    } = _ref2;
+  update({
+    entities,
+    curveSt,
+    filterSeed,
+    filterPeak,
+    tTrEndPts,
+    tSfPeaks,
+    editPeakSt,
+    layoutSt,
+    sweepExtentSt,
+    isUiNoBrushSt,
+    cyclicvoltaSt,
+    integationSt,
+    mtplySt,
+    uiSt
+  }) {
+    this.uiSt = uiSt;
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt));
+    this.graphIndex = uiSt?.zoom?.graphIndex;
     const {
       curveIdx,
       isShowAllCurve
@@ -902,7 +908,7 @@ class MultiFocus {
       this.drawInteg(integationSt);
       this.drawMtply(mtplySt);
     }
-    (0, _brush.default)(this, false, isUiNoBrushSt);
+    (0, _brush.default)(this, false, isUiNoBrushSt, this.uiSt, this.graphIndex);
     this.resetShouldUpdate(editPeakSt);
   }
 }

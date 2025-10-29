@@ -5,6 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 var _compass = require("./compass");
+var _list_ui = require("../constants/list_ui");
 /* eslint-disable prefer-object-spread */
 
 const d3 = require('d3');
@@ -22,8 +23,7 @@ const wheeled = (focus, event) => {
     brushClass
   }));
 };
-const brushed = function (focus, isUiAddIntgSt, event) {
-  let brushedClass = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '.d3Svg';
+const brushed = (focus, isUiAddIntgSt, event, brushedClass = '.d3Svg') => {
   const {
     selectUiSweepAct,
     data,
@@ -70,28 +70,32 @@ const brushed = function (focus, isUiAddIntgSt, event) {
     data,
     dataPks
   });
-  d3.select(brushedClass).selectAll('.brush').call(brush.move, null);
+  const svgSel = d3.select(brushedClass);
+  if (!svgSel.empty()) {
+    svgSel.selectAll('.brush').call(brush.move, null);
+  }
 };
-const MountBrush = function (focus, isUiAddIntgSt, isUiNoBrushSt) {
-  let brushedClass = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '.d3Svg';
+const MountBrush = (focus, isUiAddIntgSt, isUiNoBrushSt, brushedClass = '.d3Svg') => {
   const {
     root,
     svg,
     brush,
     brushX,
     w,
-    h
+    h,
+    uiSt,
+    graphIndex
   } = focus;
-  svg.selectAll('.brush').remove();
-  svg.selectAll('.brushX').remove();
+  svg.selectAll('.brush, .brushX').remove();
+  const isZoomIn = uiSt?.zoom?.sweepTypes?.[graphIndex] === _list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN;
+  const isIntegrationAdd = uiSt?.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD;
+  if (!(graphIndex === 0 && isIntegrationAdd) && !isZoomIn) return;
   const brushedCb = event => brushed(focus, isUiAddIntgSt, event, brushedClass);
   const wheeledCb = event => wheeled(focus, event);
   if (isUiNoBrushSt) {
     const target = isUiAddIntgSt ? brushX : brush;
-    target.handleSize(10).extent([[0, 0], [w, h]]).on('end', brushedCb);
-
-    // append brush components
     const klass = isUiAddIntgSt ? 'brushX' : 'brush';
+    target.handleSize(10).extent([[0, 0], [w, h]]).on('end', brushedCb);
     root.append('g').attr('class', klass).on('mousemove', event => (0, _compass.MouseMove)(event, focus)).call(target);
   }
   svg.on('wheel', wheeledCb);

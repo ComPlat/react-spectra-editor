@@ -15,8 +15,7 @@ var _styles = require("@mui/styles");
 var _material = require("@mui/material");
 var _curve = require("../../actions/curve");
 var _list_layout = require("../../constants/list_layout");
-function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
-function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
+function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function (e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 /* eslint-disable react/function-component-definition, function-paren-newline,
 react/require-default-props, react/no-unused-prop-types */
 
@@ -50,16 +49,15 @@ const styles = () => ({
     overflowWrap: 'anywhere'
   }
 });
-const GraphSelectionPanel = _ref => {
-  let {
-    classes,
-    curveSt,
-    entityFileNames,
-    subLayoutsInfo,
-    layoutSt,
-    selectCurveAct,
-    toggleShowAllCurveAct
-  } = _ref;
+const GraphSelectionPanel = ({
+  classes,
+  curveSt,
+  entityFileNames,
+  subLayoutsInfo,
+  layoutSt,
+  selectCurveAct,
+  toggleShowAllCurveAct
+}) => {
   let subLayoutValues = [];
   if (subLayoutsInfo) {
     subLayoutValues = Object.keys(subLayoutsInfo);
@@ -136,7 +134,7 @@ const GraphSelectionPanel = _ref => {
     className: "txt-panel-header"
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title')
-  }, "Graph selection"))), /*#__PURE__*/_react.default.createElement(_material.Divider, null), layoutSt === _list_layout.LIST_LAYOUT.AIF ? /*#__PURE__*/_react.default.createElement(_material.FormControlLabel, {
+  }, "Graph selections"))), /*#__PURE__*/_react.default.createElement(_material.Divider, null), layoutSt === _list_layout.LIST_LAYOUT.AIF ? /*#__PURE__*/_react.default.createElement(_material.FormControlLabel, {
     control: /*#__PURE__*/_react.default.createElement(_material.Switch, {
       checked: isShowAllCurve,
       onChange: onChangeSwitch

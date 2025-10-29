@@ -10,7 +10,7 @@ Object.defineProperty(exports, "FN", {
     return _fn.default;
   }
 });
-exports.SpectraEditor = void 0;
+exports.store = exports.SpectraEditor = void 0;
 var _react = _interopRequireDefault(require("react"));
 var _reactRedux = require("react-redux");
 var _redux = require("redux");
@@ -32,7 +32,7 @@ var _fn = _interopRequireDefault(require("./fn"));
 const sagaMiddleware = (0, _reduxSaga.default)();
 const middlewares = [sagaMiddleware]; // logger
 
-const store = (0, _redux.compose)((0, _redux.applyMiddleware)(...middlewares))(_redux.createStore)(_index.default);
+const store = exports.store = (0, _redux.compose)((0, _redux.applyMiddleware)(...middlewares))(_redux.createStore)(_index.default);
 sagaMiddleware.run(_index2.default);
 
 // - - - helper - - -
@@ -44,50 +44,47 @@ const ensureQuillDelta = descs => {
 };
 
 // - - - React - - -
-const SpectraEditor = _ref => {
-  let {
-    entity,
-    others,
-    cLabel,
-    xLabel,
-    yLabel,
-    operations,
-    forecast,
-    molSvg,
-    editorOnly,
-    descriptions,
-    theoryMass,
-    canChangeDescription,
-    onDescriptionChanged,
-    multiEntities,
-    multiMolSvgs,
-    entityFileNames,
-    userManualLink
-  } = _ref;
-  return /*#__PURE__*/_react.default.createElement(_reactRedux.Provider, {
-    store: store
-  }, /*#__PURE__*/_react.default.createElement(_material.StyledEngineProvider, {
-    injectFirst: true
-  }, /*#__PURE__*/_react.default.createElement(_layer_init.default, {
-    entity: entity,
-    multiEntities: multiEntities,
-    entityFileNames: entityFileNames,
-    userManualLink: userManualLink,
-    others: others,
-    cLabel: cLabel,
-    xLabel: xLabel,
-    yLabel: yLabel,
-    forecast: forecast,
-    operations: operations,
-    descriptions: ensureQuillDelta(descriptions),
-    molSvg: molSvg,
-    multiMolSvgs: multiMolSvgs,
-    editorOnly: editorOnly,
-    theoryMass: theoryMass,
-    canChangeDescription: canChangeDescription,
-    onDescriptionChanged: onDescriptionChanged
-  })));
-};
+const SpectraEditor = ({
+  entity,
+  others,
+  cLabel,
+  xLabel,
+  yLabel,
+  operations,
+  forecast,
+  molSvg,
+  editorOnly,
+  descriptions,
+  theoryMass,
+  canChangeDescription,
+  onDescriptionChanged,
+  multiEntities,
+  multiMolSvgs,
+  entityFileNames,
+  userManualLink
+}) => /*#__PURE__*/_react.default.createElement(_reactRedux.Provider, {
+  store: store
+}, /*#__PURE__*/_react.default.createElement(_material.StyledEngineProvider, {
+  injectFirst: true
+}, /*#__PURE__*/_react.default.createElement(_layer_init.default, {
+  entity: entity,
+  multiEntities: multiEntities,
+  entityFileNames: entityFileNames,
+  userManualLink: userManualLink,
+  others: others,
+  cLabel: cLabel,
+  xLabel: xLabel,
+  yLabel: yLabel,
+  forecast: forecast,
+  operations: operations,
+  descriptions: ensureQuillDelta(descriptions),
+  molSvg: molSvg,
+  multiMolSvgs: multiMolSvgs,
+  editorOnly: editorOnly,
+  theoryMass: theoryMass,
+  canChangeDescription: canChangeDescription,
+  onDescriptionChanged: onDescriptionChanged
+})));
 exports.SpectraEditor = SpectraEditor;
 SpectraEditor.propTypes = {
   entity: _propTypes.default.object.isRequired,

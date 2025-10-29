@@ -125,17 +125,16 @@ const peakList = (peaks, digits, cbAct, classes, isPos) => {
     className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
   }, row.rmBtn)))));
 };
-const PeakPanel = _ref => {
-  let {
-    editPeakSt,
-    layoutSt,
-    classes,
-    expand,
-    onExapnd,
-    rmFromPosListAct,
-    rmFromNegListAct,
-    curveSt
-  } = _ref;
+const PeakPanel = ({
+  editPeakSt,
+  layoutSt,
+  classes,
+  expand,
+  onExapnd,
+  rmFromPosListAct,
+  rmFromNegListAct,
+  curveSt
+}) => {
   const {
     curveIdx,
     listCurves

@@ -80,17 +80,16 @@ const scanSelect = (classes, feature, layoutSt, scanSt, onChange) => {
     className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-scan')
   }, content));
 };
-const Scan = _ref => {
-  let {
-    classes,
-    feature,
-    hasEdit,
-    layoutSt,
-    scanSt,
-    setScanTargetAct,
-    resetScanTargetAct,
-    toggleScanIsAutoAct
-  } = _ref;
+const Scan = ({
+  classes,
+  feature,
+  hasEdit,
+  layoutSt,
+  scanSt,
+  setScanTargetAct,
+  resetScanTargetAct,
+  toggleScanIsAutoAct
+}) => {
   const isMs = ['MS'].indexOf(layoutSt) >= 0;
   if (!isMs) return null;
   const onChange = e => setScanTargetAct(e.target.value);

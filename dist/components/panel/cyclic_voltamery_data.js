@@ -92,21 +92,20 @@ const styles = () => ({
     whiteSpace: 'nowrap'
   }
 });
-const CyclicVoltammetryPanel = _ref => {
-  let {
-    classes,
-    cyclicVotaSt,
-    feature,
-    addNewPairPeakAct,
-    setWorkWithMaxPeakAct,
-    selectPairPeakAct,
-    removePairPeakAct,
-    selectRefPeaksAct,
-    sweepTypeSt,
-    setUiSweepTypeAct,
-    jcampIdx,
-    userManualLink
-  } = _ref;
+const CyclicVoltammetryPanel = ({
+  classes,
+  cyclicVotaSt,
+  feature,
+  addNewPairPeakAct,
+  setWorkWithMaxPeakAct,
+  selectPairPeakAct,
+  removePairPeakAct,
+  selectRefPeaksAct,
+  sweepTypeSt,
+  setUiSweepTypeAct,
+  jcampIdx,
+  userManualLink
+}) => {
   const {
     spectraList
   } = cyclicVotaSt;

@@ -153,6 +153,7 @@ class LayerInit extends _react.default.Component {
     if (multiEntities) {
       if (_format.default.isLCMsLayout(layout)) {
         return /*#__PURE__*/_react.default.createElement(_hplc_viewer.default, {
+          multiEntities: multiEntities,
           entityFileNames: entityFileNames,
           userManualLink: userManualLink,
           molSvg: molSvg,
@@ -161,7 +162,6 @@ class LayerInit extends _react.default.Component {
         });
       }
       return /*#__PURE__*/_react.default.createElement(_multi_jcamps_viewer.default, {
-        multiEntities: multiEntities,
         entityFileNames: entityFileNames,
         userManualLink: userManualLink,
         molSvg: molSvg,

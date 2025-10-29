@@ -112,8 +112,7 @@ const getE12 = data => {
   }
   return null;
 };
-const addPeak = function (state, action) {
-  let isMax = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+const addPeak = (state, action, isMax = true) => {
   const {
     payload
   } = action;
@@ -161,8 +160,7 @@ const addPeak = function (state, action) {
   }
   return state;
 };
-const removePeak = function (state, action) {
-  let isMax = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+const removePeak = (state, action, isMax = true) => {
   const {
     payload
   } = action;
@@ -533,9 +531,7 @@ const selectRefFactor = (state, action) => {
   }
   return state;
 };
-const cyclicVoltaReducer = function () {
-  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-  let action = arguments.length > 1 ? arguments[1] : undefined;
+const cyclicVoltaReducer = (state = initialState, action) => {
   switch (action.type) {
     case _action_type.CYCLIC_VOLTA_METRY.ADD_PAIR_PEAKS:
       return addPairPeak(state, action);

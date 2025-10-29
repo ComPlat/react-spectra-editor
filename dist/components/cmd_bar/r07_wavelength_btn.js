@@ -38,7 +38,7 @@ const wavelengthSelect = (classes, waveLengthSt, layoutSt, updateWaveLengthAct) 
   }, /*#__PURE__*/_react.default.createElement(_material.InputLabel, {
     id: "select-wavelength-label",
     className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label')
-  }, "Wavelength"), /*#__PURE__*/_react.default.createElement(_material.Select, {
+  }, "Wavelength (nm)"), /*#__PURE__*/_react.default.createElement(_material.Select, {
     labelId: "select-wavelength-label",
     label: "Wavelength",
     value: waveLengthSt,
@@ -53,17 +53,14 @@ const wavelengthSelect = (classes, waveLengthSt, layoutSt, updateWaveLengthAct) 
     }, item.label, " (", item.value, " ", item.unit, ")"));
   })));
 };
-const Wavelength = _ref => {
-  let {
-    classes,
-    waveLengthSt,
-    layoutSt,
-    updateWaveLengthAct
-  } = _ref;
-  return /*#__PURE__*/_react.default.createElement("span", {
-    className: classes.groupRight
-  }, wavelengthSelect(classes, waveLengthSt, layoutSt, updateWaveLengthAct));
-};
+const Wavelength = ({
+  classes,
+  waveLengthSt,
+  layoutSt,
+  updateWaveLengthAct
+}) => /*#__PURE__*/_react.default.createElement("span", {
+  className: classes.groupRight
+}, wavelengthSelect(classes, waveLengthSt, layoutSt, updateWaveLengthAct));
 const mapStateToProps = (state, props) => (
 // eslint-disable-line
 {

@@ -66,29 +66,26 @@ const sectionTable = (classes, pds) => {
     size: "small"
   }, (0, _nmr_comps.NmrTableHeader)(classes), /*#__PURE__*/_react.default.createElement(_material.TableBody, null, dict.shifts.sort((a, b) => a.atom - b.atom).map((row, idx) => (0, _nmr_comps.NmrTableBodyRow)(classes, row, idx)))));
 };
-const NmrViewer = _ref => {
-  let {
-    // eslint-disable-line
-    classes,
-    molecule,
-    inputCb,
-    forecastSt
-  } = _ref;
-  return /*#__PURE__*/_react.default.createElement("div", {
-    className: (0, _classnames.default)(classes.root, 'card-forecast-viewer')
-  }, /*#__PURE__*/_react.default.createElement(_material.Grid, {
-    className: (0, _classnames.default)(classes.container),
-    container: true
-  }, /*#__PURE__*/_react.default.createElement(_material.Grid, {
-    item: true,
-    xs: 4
-  }, /*#__PURE__*/_react.default.createElement(_material.Paper, {
-    className: classes.svgRoot
-  }, (0, _comps.sectionSvg)(classes, forecastSt.predictions))), /*#__PURE__*/_react.default.createElement(_material.Grid, {
-    item: true,
-    xs: 8
-  }, sectionTable(classes, forecastSt.predictions))), (0, _comps.sectionInput)(classes, molecule, inputCb), (0, _nmr_comps.SectionReference)(classes));
-};
+const NmrViewer = ({
+  // eslint-disable-line
+  classes,
+  molecule,
+  inputCb,
+  forecastSt
+}) => /*#__PURE__*/_react.default.createElement("div", {
+  className: (0, _classnames.default)(classes.root, 'card-forecast-viewer')
+}, /*#__PURE__*/_react.default.createElement(_material.Grid, {
+  className: (0, _classnames.default)(classes.container),
+  container: true
+}, /*#__PURE__*/_react.default.createElement(_material.Grid, {
+  item: true,
+  xs: 4
+}, /*#__PURE__*/_react.default.createElement(_material.Paper, {
+  className: classes.svgRoot
+}, (0, _comps.sectionSvg)(classes, forecastSt.predictions))), /*#__PURE__*/_react.default.createElement(_material.Grid, {
+  item: true,
+  xs: 8
+}, sectionTable(classes, forecastSt.predictions))), (0, _comps.sectionInput)(classes, molecule, inputCb), (0, _nmr_comps.SectionReference)(classes));
 const mapStateToProps = (state, props) => (
 // eslint-disable-line
 {

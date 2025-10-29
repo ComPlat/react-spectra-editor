@@ -20,13 +20,12 @@ prefer-object-spread */
 
 // import SmaToSvg from '../common/chem';
 
-const baseSelectIrStatus = _ref => {
-  let {
-    sma,
-    status,
-    identity,
-    setIrStatusAct
-  } = _ref;
+const baseSelectIrStatus = ({
+  sma,
+  status,
+  identity,
+  setIrStatusAct
+}) => {
   const theStatus = ['accept', 'reject'].includes(status) ? status : '';
   return /*#__PURE__*/_react.default.createElement(_material.FormControl, null, /*#__PURE__*/_react.default.createElement(_material.Select, {
     value: theStatus,
@@ -99,8 +98,7 @@ const colorStyles = [{
 }, {
   backgroundColor: '#F5F5DC'
 }];
-const colorLabel = function (classes, idx) {
-  let extClsName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'txt-label';
+const colorLabel = (classes, idx, extClsName = 'txt-label') => {
   const style = Object.assign({}, colorStyles[idx % 8], {
     width: 20,
     borderRadius: 20,

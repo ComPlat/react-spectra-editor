@@ -21,9 +21,7 @@ const getTopic = (_, props) => props.topic;
 const getFeature = (_, props) => props.feature;
 const getLayout = (state, _) => state.layout; // eslint-disable-line
 
-const GetCyclicVoltaShiftOffset = function () {
-  let volammetryData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-  let curveIdx = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+const GetCyclicVoltaShiftOffset = (volammetryData = null, curveIdx = 0) => {
   if (!volammetryData) return 0.0;
   const {
     spectraList
@@ -165,9 +163,28 @@ const convertFrequency = (layout, feature) => {
 };
 const ToFrequency = exports.ToFrequency = (0, _reselect.createSelector)(getLayout, getFeature, convertFrequency);
 const getThreshold = state => state.threshold ? state.threshold.list[state.curve.curveIdx].value * 1.0 : false;
-const Convert2Peak = function (feature, threshold, offset) {
-  let upThreshold = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-  let lowThreshold = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+const Convert2Peak = (feature, threshold, offset, upThreshold = false, lowThreshold = false) => {
+  if (feature?.operation?.layout === 'LC/MS') {
+    const data = feature.data[0];
+    if (!data) return [];
+    const {
+      x,
+      y
+    } = data;
+    const peaks = [];
+    const maxIntensity = Math.max(...y);
+    const thresholdValue = threshold || 0;
+    for (let i = 1; i < y.length - 1; i++) {
+      const intensity = y[i] / maxIntensity * 100;
+      if (intensity >= thresholdValue && y[i] > y[i - 1] && y[i] > y[i + 1]) {
+        peaks.push({
+          x: x[i],
+          y: y[i]
+        });
+      }
+    }
+    return peaks;
+  }
   const peak = [];
   if (!feature || !feature.data) return peak;
   const data = feature.data[0];
@@ -183,8 +200,12 @@ const Convert2Peak = function (feature, threshold, offset) {
   const {
     layout
   } = operation;
-
-  // if (!Format.isSECLayout(layout) && (upperThres || lowerThres)) {
+  if (_format.default.isLCMsLayout(layout) && feature.peaks) {
+    return feature.peaks.map(p => ({
+      x: p.x - (offset || 0),
+      y: p.y
+    }));
+  }
   if ((_format.default.isCyclicVoltaLayout(layout) || _format.default.isCDSLayout(layout)) && (upperThres || lowerThres)) {
     let upperThresVal = upThreshold || upperThres;
     if (!upperThresVal) {
@@ -327,6 +348,9 @@ const ToShiftPeaks = exports.ToShiftPeaks = (0, _reselect.createSelector)(getShi
 // ExtractJcamp
 // - - - - - - - - - - - - - - - - - - - - - -
 const readLayout = jcamp => {
+  if (jcamp.dataType?.toUpperCase?.() === 'LC/MS') {
+    return _list_layout.LIST_LAYOUT.LC_MS;
+  }
   const {
     xType,
     spectra
@@ -394,12 +418,75 @@ const extrSpectraShare = (spectra, layout) => spectra.map(s => Object.assign({
   layout
 }, s)).filter(r => r != null);
 const extrSpectraMs = (jcamp, layout) => {
-  const scanCount = jcamp.info.$CSSCANCOUNT || 1;
-  const spc = extrSpectraShare(jcamp.spectra.slice(0, scanCount), layout);
-  let spectra = spc || [];
+  const isUvvisData = Array.isArray(jcamp.info?.$CSCATEGORY) && jcamp.info.$CSCATEGORY[0]?.includes('UVVIS');
+  const finalSpectra = [];
+  let hasAssignedGlobalIntegrals = false;
+  if (isUvvisData) {
+    for (let i = 0; i < jcamp.spectra.length; i++) {
+      const currentSpectrum = jcamp.spectra[i];
+      if (currentSpectrum.dataType === 'LC/MS') {
+        const mainSpectrum = {
+          ...currentSpectrum,
+          peaks: [],
+          integrations: []
+        };
+        if (jcamp.spectra[i + 1]?.dataType === 'UVVISPEAKTABLE') {
+          const peakData = jcamp.spectra[i + 1].data?.[0];
+          const peaks = [];
+          if (peakData && peakData.x && peakData.y) {
+            for (let j = 0; j < peakData.x.length; j++) {
+              peaks.push({
+                x: peakData.x[j],
+                y: peakData.y[j]
+              });
+            }
+          }
+          mainSpectrum.peaks = peaks;
+          let integralsStr = jcamp.spectra[i + 1]?.$OBSERVEDINTEGRALS;
+          if (!integralsStr && !hasAssignedGlobalIntegrals) {
+            integralsStr = jcamp.info?.$OBSERVEDINTEGRALS;
+          }
+          if (typeof integralsStr === 'string' && integralsStr.trim().length > 0) {
+            const matches = integralsStr.match(/\(([^)]+)\)/g) || [];
+            const integrals = [];
+            for (const m of matches) {
+              const parts = m.replace(/[()]/g, '').split(',').map(Number);
+              if (parts.length >= 3 && parts.slice(0, 3).every(Number.isFinite)) {
+                const [xL, xU, area, absoluteAreaMaybe] = parts;
+                integrals.push({
+                  xL,
+                  xU,
+                  area,
+                  absoluteArea: Number.isFinite(absoluteAreaMaybe) ? absoluteAreaMaybe : Math.abs(area)
+                });
+              }
+            }
+            mainSpectrum.integrations = integrals.map(it => ({
+              ...it,
+              xExtent: {
+                xL: it.xL,
+                xU: it.xU
+              }
+            }));
+            if (!jcamp.spectra[i + 1]?.$OBSERVEDINTEGRALS) {
+              hasAssignedGlobalIntegrals = true;
+            }
+          }
+          i++;
+        }
+        mainSpectrum.csCategory = 'UVVIS SPECTRUM';
+        finalSpectra.push(mainSpectrum);
+      }
+    }
+  } else {
+    finalSpectra.push(...jcamp.spectra.filter(s => s.data?.[0]?.x?.length > 0));
+  }
+  let spectra = extrSpectraShare(finalSpectra, layout) || [];
   if (jcamp.info.UNITS && jcamp.info.SYMBOL) {
-    const units = jcamp.info.UNITS.split(',');
-    const symbol = jcamp.info.SYMBOL.split(',');
+    const unitsString = Array.isArray(jcamp.info.UNITS) ? jcamp.info.UNITS[0] : jcamp.info.UNITS;
+    const symbolString = Array.isArray(jcamp.info.SYMBOL) ? jcamp.info.SYMBOL[0] : jcamp.info.SYMBOL;
+    const units = unitsString.split(',');
+    const symbol = symbolString.split(',');
     let xUnit = null;
     let yUnit = null;
     symbol.forEach((sym, idx) => {
@@ -499,16 +586,13 @@ const extractVoltammetryData = jcamp => {
   });
   return peakStack;
 };
-const buildPeakFeature = function (jcamp, layout, peakUp, s, thresRef) {
-  let upperThres = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
-  let lowerThres = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : false;
-  // eslint-disable-line
+const buildPeakFeature = (jcamp, layout, peakUp, s, thresRef, upperThres = false, lowerThres = false) => {
   const {
     xType,
     info
   } = jcamp;
   const subTyp = xType ? ` - ${xType}` : '';
-  return Object.assign({
+  const baseFeature = {
     typ: s.dataType + subTyp,
     peakUp,
     thresRef,
@@ -527,7 +611,11 @@ const buildPeakFeature = function (jcamp, layout, peakUp, s, thresRef) {
     volammetryData: extractVoltammetryData(jcamp),
     scanRate: +info.$CSSCANRATE || 0.1,
     csCategory: info.$CSCATEGORY
-  }, s);
+  };
+  if (layout === 'LC/MS' && s.peaks) {
+    baseFeature.peaks = s.peaks;
+  }
+  return Object.assign({}, baseFeature, s);
 };
 const maxArray = arr => {
   let len = arr.length;
@@ -788,33 +876,15 @@ const extrFeaturesCylicVolta = (jcamp, layout, peakUp) => {
   }).filter(r => r != null);
   return features;
 };
-const extrFeaturesMs = (jcamp, layout, peakUp) => {
-  // const nfs = {};
-  // const category = jcamp.info.$CSCATEGORY;
-  // const scanCount = parseInt(jcamp.info.$CSSCANCOUNT, 10) - 1;
-  // if (category) {
-  //   const idxEditPeak = category.indexOf('EDIT_PEAK');
-  //   if (idxEditPeak >= 0) {
-  //     const sEP = jcamp.spectra[idxEditPeak + scanCount];
-  //     const thresRef = calcThresRef(sEP, peakUp);
-  //     nfs.editPeak = buildPeakFeature(jcamp, layout, peakUp, sEP, thresRef);
-  //   }
-  //   const idxAutoPeak = category.indexOf('AUTO_PEAK');
-  //   if (idxAutoPeak >= 0) {
-  //     const sAP = jcamp.spectra[idxAutoPeak + scanCount];
-  //     const thresRef = calcThresRef(sAP, peakUp);
-  //     nfs.autoPeak = buildPeakFeature(jcamp, layout, peakUp, sAP, thresRef);
-  //   }
-  //   return nfs;
-  // }
-  // // workaround for legacy design
+const extrFeaturesMs = (jcamp, layout, peakUp, spectra) => {
   const thresRef = jcamp.info && jcamp.info.$CSTHRESHOLD * 100 || 5;
-  console.log('thresRef', thresRef);
-  const base = jcamp.spectra[0];
-  const features = jcamp.spectra.map(s => {
+  const features = spectra.map(s => {
+    if (!s.data || !s.data[0] || !s.data[0].x || !s.data[0].y) {
+      return null;
+    }
     const cpo = buildPeakFeature(jcamp, layout, peakUp, s, +thresRef.toFixed(4));
     const bnd = getBoundary(s);
-    return Object.assign({}, base, cpo, bnd);
+    return Object.assign({}, cpo, bnd);
   }).filter(r => r != null);
   return features;
 };
@@ -838,7 +908,7 @@ const ExtractJcamp = source => {
   const spectra = _format.default.isMsLayout(layout) || _format.default.isLCMsLayout(layout) ? extrSpectraMs(jcamp, layout) : extrSpectraNi(jcamp, layout);
   let features = {};
   if (_format.default.isMsLayout(layout) || _format.default.isLCMsLayout(layout)) {
-    features = extrFeaturesMs(jcamp, layout, peakUp);
+    features = extrFeaturesMs(jcamp, layout, peakUp, spectra);
   } else if (_format.default.isXRDLayout(layout)) {
     features = extrFeaturesXrd(jcamp, layout, peakUp);
     const temperature = extractTemperature(jcamp);
@@ -900,9 +970,7 @@ const Convert2Thres = (feature, thresSt) => {
   return value;
 };
 exports.Convert2Thres = Convert2Thres;
-const Convert2DValue = function (doubleTheta) {
-  let lambda = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.15406;
-  let isRadian = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+const Convert2DValue = (doubleTheta, lambda = 0.15406, isRadian = true) => {
   let theta = doubleTheta / 2;
   if (isRadian) {
     theta = theta / 180 * Math.PI;

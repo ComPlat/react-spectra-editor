@@ -20,12 +20,11 @@ var _list_ui = require("../../constants/list_ui");
 /* eslint-disable prefer-object-spread, react/function-component-definition */
 
 const styles = () => Object.assign({}, _common.commonStyle);
-const Zoom = _ref => {
-  let {
-    classes,
-    isfocusZoomSt,
-    setUiSweepTypeAct
-  } = _ref;
+const Zoom = ({
+  classes,
+  isfocusZoomSt,
+  setUiSweepTypeAct
+}) => {
   const onSweepZoomIn = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN);
   const onSweepZoomReset = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET);
   return /*#__PURE__*/_react.default.createElement("span", {
