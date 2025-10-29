@@ -35,7 +35,10 @@ const brushed = (focus, isUiAddIntgSt, event, brushedClass = '.d3Svg') => {
   selectUiSweepAct({
     xExtent, yExtent, data, dataPks,
   });
-  d3.select(brushedClass).selectAll('.brush').call(brush.move, null);
+  const svgSel = d3.select(brushedClass);
+  if (!svgSel.empty()) {
+    svgSel.selectAll('.brush').call(brush.move, null);
+  }
 };
 
 const MountBrush = (focus, isUiAddIntgSt, isUiNoBrushSt, brushedClass = '.d3Svg') => {

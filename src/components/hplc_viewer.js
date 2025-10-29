@@ -13,6 +13,7 @@ import {
 import PanelViewer from './panel/index';
 import CmdBar from './cmd_bar/index';
 import ViewerLineRect from './d3_line_rect/index';
+import { splitAndReindexEntities } from '../helpers/extractEntityLCMS';
 
 import { setAllCurves } from '../actions/curve';
 
@@ -39,8 +40,7 @@ class HPLCViewer extends React.Component { // eslint-disable-line
     const { curveIdx } = curveSt;
     const entity = entities[curveIdx];
     const { feature, topic } = entity;
-    const ticEntities = entities.slice(0, 2);
-    const dataEntities = entities.slice(2);
+    const { ticEntities, uvvisEntities, mzEntities } = splitAndReindexEntities(entities);
     const { integrations } = integrationSt;
     const currentIntegration = integrations[curveIdx];
 
@@ -57,8 +57,9 @@ class HPLCViewer extends React.Component { // eslint-disable-line
           <Grid container>
             <Grid item xs={9}>
               <ViewerLineRect
-                entities={ticEntities}
-                subEntities={dataEntities}
+                ticEntities={ticEntities}
+                uvvisEntities={uvvisEntities}
+                mzEntities={mzEntities}
                 topic={topic}
                 xLabel={feature.xUnit}
                 yLabel={feature.yUnit}

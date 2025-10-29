@@ -15,17 +15,18 @@ import { LIST_ROOT_SVG_GRAPH, LIST_BRUSH_SVG_GRAPH } from '../../constants/list_
 import {
   convertTopic,
 } from '../../helpers/chem';
+import { catToString } from '../../helpers/extractEntityLCMS';
 
 const d3 = require('d3');
 
 class MultiFocus {
   constructor(props) {
     const {
-      W, H, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct, entities, graphIndex, uiSt,
+      W, H, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct, ticEntities, graphIndex, uiSt,
     } = props;
     this.graphIndex = graphIndex;
     this.uiSt = uiSt;
-    this.entities = entities;
+    this.ticEntities = ticEntities;
     this.jcampIdx = 0;
     this.isShowAllCurves = false;
     this.rootKlass = `.${LIST_ROOT_SVG_GRAPH.MULTI}`;
@@ -76,6 +77,9 @@ class MultiFocus {
     this.isFirefox = typeof InstallTrigger !== 'undefined';
   }
 
+  colorForPolarity = (polarity) =>
+    polarity === 'negative' ? '#2980b9' : '#d35400';
+
   getShouldUpdate() {
     const {
       prevXt, prevYt, prevLySt,
@@ -118,18 +122,20 @@ class MultiFocus {
     this.root.call(this.tip);
   }
 
-  setDataParams(filterSeed, tTrEndPts, layout, jcampIdx = 0) {
+  setDataParams(tTrEndPts, layout, jcampIdx = 0) {
     this.data = [];
     this.otherLineData = [];
-    this.entities.forEach((entry, idx) => {
-      const { color, topic, feature } = entry;
-      let currData = filterSeed;
+    this.ticEntities.forEach((entry, idx) => {
+      const { topic, feature } = entry;
+      const cat = catToString(feature?.csCategory ?? entry.features?.[0]?.csCategory);
+      const polarity = cat.includes('NEGATIVE') ? 'negative' : 'positive';
+      const fixedColor = this.colorForPolarity(polarity);
+      const currData = convertTopic(topic, layout, feature, 0);
       if (idx === jcampIdx) {
-        this.data = [...currData];
-        this.pathColor = color;
+        this.data = currData;
+        this.pathColor = fixedColor;
       } else {
-        currData = convertTopic(topic, layout, feature, 0);
-        this.otherLineData.push({ data: currData, color });
+        this.otherLineData.push({ data: currData, polarity, color: fixedColor, idx });
       }
     });
 
@@ -198,8 +204,7 @@ class MultiFocus {
     const { xt, yt } = TfRescale(this);
     this.updatePathCall(xt, yt);
     this.otherLineData.forEach((entry, idx) => {
-      const { data, color } = entry;
-      const pathColor = color ? color : Format.mutiEntitiesColors(idx);
+      const { data, color: pathColor } = entry;
       const path = MountComparePath(this, pathColor, idx, 0.4);
       path.attr('d', this.pathCall(data));
       if (this.layout === LIST_LAYOUT.AIF && this.isShowAllCurves === true) {
@@ -238,8 +243,9 @@ class MultiFocus {
   }
 
   create({
+    ticEntities,
     curveSt,
-    filterSeed, tTrEndPts,
+    tTrEndPts,
     layoutSt,
     sweepExtentSt, isUiNoBrushSt,
   }) {
@@ -250,11 +256,11 @@ class MultiFocus {
     const { curveIdx, isShowAllCurve } = curveSt;
     const jcampIdx = curveIdx;
     this.isShowAllCurves = isShowAllCurve;
-
+    this.ticEntities = ticEntities;
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, false);
     this.setTip();
-    this.setDataParams(filterSeed, tTrEndPts, layoutSt, jcampIdx);
+    this.setDataParams(tTrEndPts, layoutSt, jcampIdx);
     MountCompass(this);
 
     this.axis = MountAxis(this);
@@ -275,9 +281,10 @@ class MultiFocus {
   }
 
   update({
-    entities, curveSt,
-    filterSeed, tTrEndPts,
+    curveSt,
+    tTrEndPts,
     layoutSt,
+    ticEntities,
     sweepExtentSt, isUiNoBrushSt, uiSt,
   }) {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
@@ -286,10 +293,10 @@ class MultiFocus {
     const { curveIdx, isShowAllCurve } = curveSt;
     const jcampIdx = curveIdx;
     this.isShowAllCurves = isShowAllCurve;
-    this.entities = entities;
+    this.ticEntities = ticEntities;
     this.uiSt = uiSt;
 
-    this.setDataParams(filterSeed, tTrEndPts, layoutSt, jcampIdx);
+    this.setDataParams(tTrEndPts, layoutSt, jcampIdx);
 
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);

@@ -175,17 +175,36 @@ class ViewerLineRect extends React.Component {
     super(props);
 
     const {
-      clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct, entities, uiSt,
+      clickUiTargetAct,
+      selectUiSweepAct,
+      scrollUiWheelAct,
+      ticEntities,
+      uvvisEntities,
+      uiSt,
     } = props;
 
     this.rootKlassLine = `.${LIST_ROOT_SVG_GRAPH.LINE}`;
     this.lineFocus = new LineFocus({
-      W, H, entities, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct, graphIndex: 0, uiSt,
+      W,
+      H,
+      uvvisEntities,
+      clickUiTargetAct,
+      selectUiSweepAct,
+      scrollUiWheelAct,
+      graphIndex: 0,
+      uiSt,
     });
 
     this.rootKlassMulti = `.${LIST_ROOT_SVG_GRAPH.MULTI}`;
     this.multiFocus = new MultiFocus({
-      W, H, entities, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct, graphIndex: 1, uiSt,
+      W,
+      H,
+      ticEntities,
+      clickUiTargetAct,
+      selectUiSweepAct,
+      scrollUiWheelAct,
+      graphIndex: 1,
+      uiSt,
     });
 
     this.rootKlassRect = `.${LIST_ROOT_SVG_GRAPH.RECT}`;
@@ -200,7 +219,7 @@ class ViewerLineRect extends React.Component {
 
   componentDidMount() {
     const {
-      entities, curveSt, seed, cLabel, feature,
+      curveSt, seed, cLabel, feature, ticEntities,
       tTrEndPts, layoutSt,
       isUiAddIntgSt, isUiNoBrushSt,
       integationSt,
@@ -241,13 +260,10 @@ class ViewerLineRect extends React.Component {
     drawLabel(this.rootKlassLine, null, 'Minutes', 'Intensity');
     drawDisplay(this.rootKlassLine, false);
 
-    const filterSeed = seed;
-
     drawMain(this.rootKlassMulti, W, H, LIST_BRUSH_SVG_GRAPH.MULTI);
     this.multiFocus.create({
-      entities,
+      ticEntities,
       curveSt,
-      filterSeed,
       tTrEndPts,
       layoutSt,
       sweepExtentSt: sweepExtent[1],
@@ -271,7 +287,7 @@ class ViewerLineRect extends React.Component {
 
   componentDidUpdate(prevProps) {
     const {
-      entities, curveSt, seed, cLabel,
+      ticEntities, curveSt, cLabel,
       tTrEndPts, layoutSt,
       isUiAddIntgSt, isUiNoBrushSt,
       isHidden, uiSt, hplcMsSt, integationSt,
@@ -309,13 +325,10 @@ class ViewerLineRect extends React.Component {
       drawDisplay(this.rootKlassLine, false);
     }
 
-    const filterSeed = seed;
-
     if (this.multiFocus) {
       this.multiFocus.update({
-        entities,
         curveSt,
-        filterSeed,
+        ticEntities,
         tTrEndPts,
         layoutSt,
         sweepExtentSt: sweepExtent[1],
@@ -325,7 +338,8 @@ class ViewerLineRect extends React.Component {
         editPeakSt,
       });
     }
-    drawLabel(this.rootKlassMulti, cLabel, 'Minutes', 'Intensity');
+    const { isNegative } = hplcMsSt.tic;
+    drawLabel(this.rootKlassMulti, isNegative ? 'MINUS' : 'PLUS', 'Minutes', 'Intensity');
     drawDisplay(this.rootKlassMulti, isHidden);
 
     const subViewFeature = this.extractSubView();
@@ -367,11 +381,11 @@ class ViewerLineRect extends React.Component {
   }
 
   extractUvvisView() {
-    const { subEntities, hplcMsSt } = this.props;
-    if (!subEntities || !subEntities[0]) {
+    const { uvvisEntities, hplcMsSt } = this.props;
+    if (!uvvisEntities || !uvvisEntities[0]) {
       return null;
     }
-    const { features } = extractParams(subEntities[0], 0, 1);
+    const { features } = extractParams(uvvisEntities[0], 0, 1);
     if (!features || features.length === 0) {
       return null;
     }
@@ -385,16 +399,16 @@ class ViewerLineRect extends React.Component {
 
   extractSubView() {
     const {
-      uiSt, subEntities, hplcMsSt, updateCurrentPageValueAct,
+      uiSt, mzEntities, hplcMsSt, updateCurrentPageValueAct,
     } = this.props;
     const { tic } = hplcMsSt;
     const { isNegative } = tic;
-    const entityIdx = isNegative ? 2 : 1;
-    if (!subEntities || !subEntities[entityIdx] || !subEntities[entityIdx].layout) {
+    const entityIdx = isNegative ? 1 : 0;
+    if (!mzEntities || !mzEntities[entityIdx] || !mzEntities[entityIdx].layout) {
       return null;
     }
     const { subViewerAt } = uiSt;
-    const { features } = extractParams(subEntities[entityIdx], 0, 1);
+    const { features } = extractParams(mzEntities[entityIdx], 0, 1);
     if (!features || features.length === 0) return null;
 
     const arrPageValues = features.map((fe) => fe.pageValue);
@@ -420,13 +434,19 @@ class ViewerLineRect extends React.Component {
       updateTicAct(event);
       selectCurveAct(event.target.value);
     };
+    const handleWaveLengthChange = (event) => {
+      [0, 1, 2].forEach((gi) =>
+        zoomInAct({ graphIndex: gi, sweepType: LIST_UI_SWEEP_TYPE.ZOOMRESET })
+      );
+      selectWavelengthAct(event);
+    };
     return (
       <div>
         {
           zoomView(classes, 0, uiSt, zoomInAct)
         }
         {
-          waveLengthSelect(classes, hplcMsSt, selectWavelengthAct)
+          waveLengthSelect(classes, hplcMsSt, handleWaveLengthChange)
         }
         <Integration />
         <Peak />
@@ -483,8 +503,9 @@ ViewerLineRect.propTypes = {
   classes: PropTypes.object.isRequired,
   uiSt: PropTypes.object.isRequired,
   curveSt: PropTypes.object.isRequired,
-  entities: PropTypes.array.isRequired,
-  subEntities: PropTypes.array.isRequired,
+  ticEntities: PropTypes.array.isRequired,
+  uvvisEntities: PropTypes.array.isRequired,
+  mzEntities: PropTypes.array.isRequired,
   seed: PropTypes.array.isRequired,
   cLabel: PropTypes.string.isRequired,
   layoutSt: PropTypes.string.isRequired,

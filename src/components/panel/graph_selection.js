@@ -128,7 +128,7 @@ const GraphSelectionPanel = ({
       >
         <Typography className="txt-panel-header">
           <span className={classNames(classes.txtBadge, 'txt-sv-panel-title')}>
-            Graph selection
+            Graph selections
           </span>
         </Typography>
       </AccordionSummary>

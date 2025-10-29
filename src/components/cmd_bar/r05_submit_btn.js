@@ -16,6 +16,7 @@ import {
 } from '../../helpers/chem';
 import { MuButton, commonStyle } from './common';
 import { extractPeaksEdit } from '../../helpers/extractPeaksEdit';
+import { extractPeaksEdit, formatLcmsPeaksForBackend, formatLcmsIntegralsForBackend } from '../../helpers/extractPeaksEdit';
 import Format from '../../helpers/format';
 
 const styles = () => (
@@ -174,7 +175,7 @@ const onClickCb = (
   layoutSt, shiftSt, analysis, decimalSt,
   integrationSt, multiplicitySt, waveLengthSt,
   cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData,
-  curveList, editPeakSt, thresList, scanSt, feature,
+  curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt,
 ) => (
   () => {
     const defaultCurves = feature ? [{ feature }] : [];
@@ -210,6 +211,10 @@ const onClickCb = (
     const payload = {
       spectra_list: spectraList,
     };
+    if (layoutSt === 'LC/MS') {
+      payload.lcms_peaks = formatLcmsPeaksForBackend(hplcMsSt);
+      payload.lcms_integrals = formatLcmsIntegralsForBackend(hplcMsSt);
+    }
     if (Number.isFinite(curveSt?.curveIdx)) {
       payload.curveSt = { curveIdx: curveSt.curveIdx };
     }
@@ -223,6 +228,7 @@ const BtnSubmit = ({
   decimalSt, integrationSt, multiplicitySt,
   waveLengthSt, cyclicvoltaSt, curveSt, curveList, axesUnitsSt, detectorSt,
   metaSt,
+  hplcMsSt,
 }) => {
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
   const { dscMetaData } = metaSt;
@@ -264,7 +270,7 @@ const BtnSubmit = ({
           layoutSt, shiftSt, forecastSt.predictions, decimalSt,
           integrationSt, multiplicitySt, waveLengthSt,
           cyclicvoltaPayload, curveSt, axesUnitsSt, detectorSt, dscMetaData,
-          curveList, editPeakSt, thresList, scanSt, feature,
+          curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt,
         )}
       >
         <PlayCircleOutlineIcon className={classes.icon} />
@@ -291,6 +297,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     axesUnitsSt: state.axesUnits,
     detectorSt: state.detector,
     metaSt: state.meta,
+    hplcMsSt: state.hplcMs,
   }
 );
 
@@ -326,6 +333,7 @@ BtnSubmit.propTypes = {
   axesUnitsSt: PropTypes.object.isRequired,
   detectorSt: PropTypes.object.isRequired,
   metaSt: PropTypes.object.isRequired,
+  hplcMsSt: PropTypes.object.isRequired,
 };
 
 export default compose(

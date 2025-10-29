@@ -2,6 +2,7 @@
 import { HPLC_MS, CURVE, THRESHOLD } from '../constants/action_type';
 import Format from '../helpers/format';
 import { getArea, getAbsoluteArea } from '../helpers/integration';
+import { catToString } from '../helpers/extractEntityLCMS';
 
 const initialState = {
   uvvis: {
@@ -45,67 +46,75 @@ const initialState = {
 
 const updateHPLCData = (state, action) => {
   const { payload } = action;
-
   if (!payload || payload.length === 0) return state;
 
-  const { layout } = payload[0];
-  if (!Format.isLCMsLayout(layout)) return state;
+  let ticPosData = { x: [], y: [] };
+  let ticNegData = { x: [], y: [] };
 
-  const ticPosData = payload[0].features[0].data[0];
-  const ticNegData = payload[1].features[0].data[0];
+  let uvvisCurve = null;
+  const mzPosFeatures = [];
+  const mzNegFeatures = [];
 
-  const uvvisCurve = payload[2];
-  const { features } = uvvisCurve;
+  payload.forEach((curve) => {
+    const cat = catToString(curve?.features?.[0]?.csCategory);
 
-  const listWaveLength = features.map((fe) => fe.pageValue);
-  const existingSpectraList = state.uvvis.spectraList;
-
-  const spectraList = features.map((feature, index) => {
-    const existingSpectrum = existingSpectraList[index];
-    return {
-      data: feature.data[0],
-      integrations: existingSpectrum?.integrations || [],
-      peaks: existingSpectrum?.peaks || [],
-    };
+    if (cat.includes('TIC')) {
+      if (cat.includes('NEGATIVE')) ticNegData = curve.features[0].data[0];
+      else                          ticPosData = curve.features[0].data[0];
+    } else if (cat.includes('UVVIS')) {
+      uvvisCurve = curve;
+    } else if (cat.includes('MZ')) {
+      if (cat.includes('NEGATIVE')) mzNegFeatures.push(...curve.features);
+      else                          mzPosFeatures.push(...curve.features);
+    }
   });
 
-  const previousSelected = state.uvvis.selectedWaveLength;
-  const validSelected = listWaveLength.includes(previousSelected);
-  const selectedWaveLength = validSelected ? previousSelected : listWaveLength[0];
-  const wavelengthIdx = validSelected ? listWaveLength.indexOf(previousSelected) : 0;
-  const currentSpectrum = spectraList[wavelengthIdx];
+  if (!uvvisCurve || !uvvisCurve.features) {
+    return state;
+  }
+  const features = uvvisCurve.features;
+
+  const getPageValue = (fe) => {
+    let raw = fe.pageSymbol || fe.page || fe.pageValue;
+    if (typeof raw === 'string') {
+      raw = raw.split('\n')[0].trim();
+      raw = raw.replace(/[^0-9.+-]/g, '');
+    }
+    return parseFloat(raw);
+  };
+
+  const filteredFeatures = features.filter(
+    (fe) => fe.data && fe.data[0] && fe.data[0].x && fe.data[0].x.length > 0 && fe.data[0].y && fe.data[0].y.length > 0,
+  );
+
+  const listWaveLength = filteredFeatures.map((fe) => getPageValue(fe));
+  const spectraList = filteredFeatures.map((fe) => ({
+    data: fe.data[0],
+    integrations: fe.integrations || [],
+    peaks: fe.peaks || [],
+    pageValue: getPageValue(fe),
+  }));
 
   const newUvvis = {
     ...state.uvvis,
     listWaveLength,
-    selectedWaveLength,
-    wavelengthIdx,
+    selectedWaveLength: listWaveLength[0],
+    wavelengthIdx: 0,
     spectraList,
-    currentSpectrum,
+    currentSpectrum: spectraList[0],
   };
 
-  const positiveCurves = payload[3];
-  const { features: posFeatures } = positiveCurves;
-
-  const positivePeaks = posFeatures.map((feature) => feature.data[0].y.map((y, i) => ({
-    x: feature.data[0].x[i],
-    y: y || 0,
-  })));
-
-  const negativeCurves = payload[4];
-  const { features: negFeatures } = negativeCurves;
-
-  const negativePeaks = negFeatures.map((feature) => feature.data[0].y.map((y, i) => ({
-    x: feature.data[0].x[i],
-    y: y || 0,
-  })));
+  const toPeaks = (fts) =>
+    fts.map((f) =>
+      f.data[0].y.map((y, i) => ({ x: f.data[0].x[i], y: y || 0 }))
+    );
 
   return {
     ...state,
     uvvis: newUvvis,
     ms: {
-      positive: { peaks: positivePeaks },
-      negative: { peaks: negativePeaks },
+      positive: { peaks: toPeaks(mzPosFeatures) },
+      negative: { peaks: toPeaks(mzNegFeatures) },
     },
     tic: {
       ...state.tic,

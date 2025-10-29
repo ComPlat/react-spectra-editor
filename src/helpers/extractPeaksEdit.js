@@ -18,12 +18,46 @@ const niOffset = (shiftSt, atIndex = 0) => {
 
 const msOffset = () => 0;
 
-const extractPeaksEdit = (feature, editPeakSt, thresSt, shiftSt, layoutSt, atIndex = 0) => {
-  const offset = (Format.isMsLayout(layoutSt) || Format.isLCMsLayout(layoutSt)) ? msOffset() : niOffset(shiftSt, atIndex);
-  const peaks = Convert2Peak(feature, thresSt.value, offset);
-  const peaksEdit = PksEdit(peaks, editPeakSt);
-  return peaksEdit;
-};
+function formatLcmsPeaksForBackend(hplcMsSt) {
+  const allPeaks = [];
+  if (hplcMsSt && hplcMsSt.uvvis && hplcMsSt.uvvis.spectraList) {
+    hplcMsSt.uvvis.spectraList.forEach((spectrum) => {
+      if (spectrum.peaks && spectrum.peaks.length > 0) {
+        const { pageValue } = spectrum;
+        spectrum.peaks.forEach((peak) => {
+          allPeaks.push({ ...peak, wavelength: pageValue });
+        });
+      }
+    });
+  }
+  return allPeaks;
+}
+
+function formatLcmsIntegralsForBackend(hplcMsSt) {
+  const allIntegrals = [];
+  if (hplcMsSt && hplcMsSt.uvvis && hplcMsSt.uvvis.spectraList) {
+    hplcMsSt.uvvis.spectraList.forEach((spectrum) => {
+      if (spectrum.integrations && spectrum.integrations.length > 0) {
+        const { pageValue } = spectrum;
+        spectrum.integrations.forEach((integral) => {
+          allIntegrals.push({
+            from: integral.xL,
+            to: integral.xU,
+            value: integral.area,
+            integral: integral.absoluteArea,
+            wavelength: pageValue,
+          });
+        });
+      }
+    });
+  }
+  return allIntegrals;
+}
+
+function extractPeaksEdit(hplcMsSt) {
+  if (!hplcMsSt || !hplcMsSt.uvvis || !hplcMsSt.uvvis.spectraList) return [];
+  return hplcMsSt.uvvis.spectraList.flatMap(spectrum => spectrum.peaks || []);
+}
 
 const extractAutoPeaks = (feature, thresSt, shiftSt, layoutSt, atIndex = 0) => {
   const offset = (Format.isMsLayout(layoutSt) || Format.isLCMsLayout(layoutSt)) ? msOffset() : niOffset(shiftSt, atIndex);
@@ -59,4 +93,4 @@ const extractAreaUnderCurve = (allIntegrationSt, presentIntegrationSt, layoutSt)
   return null;
 };
 
-export { extractPeaksEdit, extractAreaUnderCurve, extractAutoPeaks }; // eslint-disable-line
+export { extractPeaksEdit, extractAreaUnderCurve, extractAutoPeaks, formatLcmsPeaksForBackend, formatLcmsIntegralsForBackend }; // eslint-disable-line

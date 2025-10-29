@@ -1,4 +1,5 @@
 import Format from './format';
+import { catToString } from './extractEntityLCMS';
 
 const getScanIdx = (entity, scanSt) => {
   const { target, isAuto } = scanSt;
@@ -10,18 +11,15 @@ const getScanIdx = (entity, scanSt) => {
     : defaultFeat.scanEditTarget;
   const defaultCount = +spectra.length;
   let idx = +(target || defaultIdx || 0);
-  if (idx > defaultCount) { idx = defaultCount; }
+  if (idx > defaultCount) idx = defaultCount;
   return idx - 1;
 };
 
 const extrShare = (entity, thresSt, scanIdx = 0) => {
   const { spectra, features } = entity;
-  // const { autoPeak, editPeak } = features; // TBD
   const autoPeak = features.autoPeak || features[scanIdx] || features[0];
   const editPeak = features.editPeak || features[scanIdx] || features[0];
-  const hasEdit = editPeak && editPeak.data
-    ? editPeak.data[0].x.length > 0
-    : false;
+  const hasEdit = editPeak && editPeak.data ? editPeak.data[0].x.length > 0 : false;
 
   const feature = hasEdit && thresSt.isEdit ? editPeak : autoPeak;
   const { integration, multiplicity } = features;
@@ -34,27 +32,38 @@ const extrLcMs = (entity) => {
   const { features, layout } = entity;
   let arrX = [];
   let arrY = [];
-  features.forEach((spectrum) => {
-    const { data, csCategory, pageValue } = spectrum;
-    const isTic = csCategory === 'TIC SPECTRUM';
-    // const isUvvis = csCategory === 'UVVIS SPECTRUM';
-    const { x, y } = data[0];
-    if (isTic) {
+
+  const featuresArray = Array.isArray(features)
+    ? features
+    : (features && typeof features === 'object')
+        ? Object.values(features)
+        : [];
+
+  featuresArray.forEach((spectrum) => {
+    if (!spectrum?.data?.[0]) return;
+
+    const cat = catToString(spectrum.csCategory);
+    const { x, y }   = spectrum.data[0];
+    const pageValue  = spectrum.pageValue;
+
+    if (cat.includes('TIC')) {
       arrX = x;
       arrY = y;
     } else {
-      const maxY = Math.max(...y);
-      arrX = [...arrX, pageValue];
-      arrY = [...arrY, maxY];
+      arrX.push(pageValue);
+      arrY.push(Math.max(...y));
     }
   });
-  const topic = { x: arrX, y: arrY };
-  const maxYFeature = Math.max(...arrY);
-  const featureData = [{ x: arrX, y: arrY }];
-  const feature = {
-    maxY: maxYFeature, operation: { layout }, data: featureData, isPeaktable: false,
+
+  return {
+    topic:   { x: arrX, y: arrY },
+    feature: {
+      maxY:       arrY.length ? Math.max(...arrY) : 0,
+      operation:  { layout },
+      data:       [{ x: arrX, y: arrY }],
+      isPeaktable:false,
+    },
   };
-  return { topic, feature };
 };
 
 const extrMs = (entity, thresSt, scanSt) => {
