@@ -377,97 +377,106 @@ const readLayout = (jcamp) => {
   return false;
 };
 
-const extrSpectraShare = (spectra, layout) => (
-  spectra.map((s) => Object.assign({ layout }, s)).filter((r) => r != null)
-);
+const extrSpectraShare = (spectra, layout) =>
+  spectra.map((s) => Object.assign({ layout }, s)).filter((r) => r != null);
 
 const extrSpectraMs = (jcamp, layout) => {
-  const isUvvisData = Array.isArray(jcamp.info?.$CSCATEGORY) && jcamp.info.$CSCATEGORY[0]?.includes('UVVIS');
+  const isUvvisData =
+    Array.isArray(jcamp?.info?.$CSCATEGORY) &&
+    jcamp.info.$CSCATEGORY[0]?.includes?.('UVVIS');
+
   const finalSpectra = [];
-  let hasAssignedGlobalIntegrals = false;
 
-  if (isUvvisData) {
-    for (let i = 0; i < jcamp.spectra.length; i++) {
-      const currentSpectrum = jcamp.spectra[i];
+  const parseIntegralsString = (raw) => {
+    if (raw == null) return [];
+    let text = raw;
+    if (Array.isArray(text)) text = text.join(' ');
+    text = String(text).trim();
 
-      if (currentSpectrum.dataType === 'LC/MS') {
-        const mainSpectrum = { ...currentSpectrum, peaks: [], integrations: [] };
-
-        if (jcamp.spectra[i + 1]?.dataType === 'UVVISPEAKTABLE') {
-          const peakData = jcamp.spectra[i + 1].data?.[0];
-          const peaks = [];
-          if (peakData && peakData.x && peakData.y) {
-            for (let j = 0; j < peakData.x.length; j++) {
-              peaks.push({ x: peakData.x[j], y: peakData.y[j] });
-            }
-          }
-          mainSpectrum.peaks = peaks;
-
-          let integralsStr = jcamp.spectra[i + 1]?.$OBSERVEDINTEGRALS;
-          if (!integralsStr && !hasAssignedGlobalIntegrals) {
-            integralsStr = jcamp.info?.$OBSERVEDINTEGRALS;
-          }
-
-          if (typeof integralsStr === 'string' && integralsStr.trim().length > 0) {
-            const matches = integralsStr.match(/\(([^)]+)\)/g) || [];
-            const integrals = [];
-            for (const m of matches) {
-              const parts = m.replace(/[()]/g, '').split(',').map(Number);
-              if (parts.length >= 3 && parts.slice(0, 3).every(Number.isFinite)) {
-                const [xL, xU, area, absoluteAreaMaybe] = parts;
-                integrals.push({
-                  xL,
-                  xU,
-                  area,
-                  absoluteArea: Number.isFinite(absoluteAreaMaybe) ? absoluteAreaMaybe : Math.abs(area),
-                });
-              }
-            }
-            mainSpectrum.integrations = integrals.map((it) => ({
-              ...it,
-              xExtent: { xL: it.xL, xU: it.xU },
-            }));
-            if (!jcamp.spectra[i + 1]?.$OBSERVEDINTEGRALS) {
-              hasAssignedGlobalIntegrals = true;
-            }
-          }
-          i++;
-        }
-
-        mainSpectrum.csCategory = 'UVVIS SPECTRUM';
-        finalSpectra.push(mainSpectrum);
+    const groups = text.match(/\(([^)]+)\)/g) || [];
+    const out = [];
+    for (const g of groups) {
+      const nums = g
+        .replace(/[()]/g, '')
+        .split(/[,\s;]+/)
+        .map((s) => Number(s))
+        .filter(Number.isFinite);
+      if (nums.length >= 3) {
+        const [xL, xU, area, absMaybe] = nums;
+        out.push({
+          xL,
+          xU,
+          area,
+          absoluteArea: Number.isFinite(absMaybe) ? absMaybe : Math.abs(area),
+          xExtent: { xL, xU },
+        });
       }
     }
+    return out;
+  };
+
+  const pickIntegralsForPair = (raw, idx) => {
+    if (raw == null) return '';
+    if (Array.isArray(raw)) return raw[idx] ?? '';
+    if (typeof raw === 'string') return idx === 0 ? raw : '';
+    return '';
+  };
+
+  if (isUvvisData) {
+    const pairs = [];
+    for (let i = 0; i < (jcamp.spectra?.length || 0); i++) {
+      const s = jcamp.spectra[i];
+      if (s?.dataType === 'LC/MS' && jcamp.spectra[i + 1]?.dataType === 'UVVISPEAKTABLE') {
+        pairs.push([jcamp.spectra[i], jcamp.spectra[i + 1]]);
+        i++;
+      }
+    }
+
+    const container = jcamp?.info?.$OBSERVEDINTEGRALS ?? null;
+
+    pairs.forEach(([lcms, peakTable], pairIdx) => {
+      const mainSpectrum = { ...lcms, peaks: [], integrations: [], csCategory: 'UVVIS SPECTRUM' };
+
+      const peakData = peakTable?.data?.[0];
+      if (peakData?.x && peakData?.y) {
+        const len = Math.min(peakData.x.length, peakData.y.length);
+        const peaks = new Array(len);
+        for (let j = 0; j < len; j++) peaks[j] = { x: peakData.x[j], y: peakData.y[j] };
+        mainSpectrum.peaks = peaks;
+      }
+
+      const rawText = pickIntegralsForPair(container, pairIdx);
+      const integrals = parseIntegralsString(rawText);
+      if (integrals.length) mainSpectrum.integrations = integrals;
+
+      finalSpectra.push(mainSpectrum);
+    });
   } else {
-    finalSpectra.push(...jcamp.spectra.filter(s => s.data?.[0]?.x?.length > 0));
+    for (const s of jcamp.spectra || []) {
+      const hasPoints = s?.data?.[0]?.x?.length > 0;
+      if (!hasPoints) continue;
+      finalSpectra.push({ ...s });
+    }
   }
 
   let spectra = extrSpectraShare(finalSpectra, layout) || [];
-  if (jcamp.info.UNITS && jcamp.info.SYMBOL) {
-    const unitsString = Array.isArray(jcamp.info.UNITS) ? jcamp.info.UNITS[0] : jcamp.info.UNITS;
-    const symbolString = Array.isArray(jcamp.info.SYMBOL) ? jcamp.info.SYMBOL[0] : jcamp.info.SYMBOL;
 
-    const units = unitsString.split(',');
-    const symbol = symbolString.split(',');
-    let xUnit = null;
-    let yUnit = null;
-    symbol.forEach((sym, idx) => {
-      const currSymbol = sym.replace(' ', '').toLowerCase();
-      if (currSymbol === 'x') {
-        xUnit = units[idx].trim();
-      } else if (currSymbol === 'y') {
-        yUnit = units[idx].trim();
-      }
+  const info = jcamp?.info || {};
+  if (info.UNITS && info.SYMBOL) {
+    const unitsString = Array.isArray(info.UNITS) ? info.UNITS[0] : info.UNITS;
+    const symbolString = Array.isArray(info.SYMBOL) ? info.SYMBOL[0] : info.SYMBOL;
+    const units = String(unitsString).split(',');
+    const symbols = String(symbolString).split(',');
+    let xUnit = null, yUnit = null;
+    symbols.forEach((sym, idx) => {
+      const curr = String(sym).replace(' ', '').toLowerCase();
+      if (curr === 'x') xUnit = units[idx]?.trim?.() || null;
+      if (curr === 'y') yUnit = units[idx]?.trim?.() || null;
     });
-
     spectra = spectra.map((sp) => {
       const spectrum = sp;
-      if (xUnit) {
-        spectrum.xUnit = xUnit;
-      }
-      if (yUnit) {
-        spectrum.yUnit = yUnit;
-      }
+      if (xUnit) spectrum.xUnit = xUnit;
+      if (yUnit) spectrum.yUnit = yUnit;
       return spectrum;
     });
   }
@@ -573,8 +582,9 @@ const buildPeakFeature = (jcamp, layout, peakUp, s, thresRef, upperThres = false
     csCategory: info.$CSCATEGORY,
   };
 
-  if (layout === 'LC/MS' && s.peaks) {
-    baseFeature.peaks = s.peaks;
+  if (layout === 'LC/MS') {
+    if (s.peaks) baseFeature.peaks = s.peaks;
+    if (s.integrations) baseFeature.integrations = s.integrations;
   }
 
   return Object.assign({}, baseFeature, s);
