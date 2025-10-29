@@ -44,7 +44,7 @@ const wavelengthSelect = (classes, waveLengthSt, layoutSt, updateWaveLengthAct) 
       variant="outlined"
     >
       <InputLabel id="select-wavelength-label" className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
-        Wavelength
+        Wavelength (nm)
       </InputLabel>
       <Select
         labelId="select-wavelength-label"

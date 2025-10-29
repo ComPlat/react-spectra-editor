@@ -315,6 +315,9 @@ const ToShiftPeaks = createSelector(
 // ExtractJcamp
 // - - - - - - - - - - - - - - - - - - - - - -
 const readLayout = (jcamp) => {
+  if (jcamp.dataType?.toUpperCase?.() === 'LC/MS') {
+    return LIST_LAYOUT.LC_MS;
+  }
   const { xType, spectra } = jcamp;
   if (xType && Format.isNmrLayout(xType)) return xType;
   const { dataType } = spectra[0];
@@ -379,40 +382,73 @@ const extrSpectraShare = (spectra, layout) => (
 );
 
 const extrSpectraMs = (jcamp, layout) => {
-  const scanCount = jcamp.info.$CSSCANCOUNT || 1;
-  const spc = extrSpectraShare(jcamp.spectra.slice(0, scanCount), layout);
-  let spectra = spc || [];
-  if (Format.isLCMsLayout(layout)) {
-    spectra = spectra.map((spectrum) => {
-      const { data } = spectrum;
-      if (!data || !data[0]) return spectrum;
+  const isUvvisData = Array.isArray(jcamp.info?.$CSCATEGORY) && jcamp.info.$CSCATEGORY[0]?.includes('UVVIS');
+  const finalSpectra = [];
+  let hasAssignedGlobalIntegrals = false;
 
-      const { x, y } = data[0];
-      const peaks = [];
+  if (isUvvisData) {
+    for (let i = 0; i < jcamp.spectra.length; i++) {
+      const currentSpectrum = jcamp.spectra[i];
 
-      for (let i = 1; i < y.length - 1; i++) {
-        if (y[i] > y[i - 1] && y[i] > y[i + 1]) {
-          peaks.push({
-            x: x[i],
-            y: y[i],
-          });
+      if (currentSpectrum.dataType === 'LC/MS') {
+        const mainSpectrum = { ...currentSpectrum, peaks: [], integrations: [] };
+
+        if (jcamp.spectra[i + 1]?.dataType === 'UVVISPEAKTABLE') {
+          const peakData = jcamp.spectra[i + 1].data?.[0];
+          const peaks = [];
+          if (peakData && peakData.x && peakData.y) {
+            for (let j = 0; j < peakData.x.length; j++) {
+              peaks.push({ x: peakData.x[j], y: peakData.y[j] });
+            }
+          }
+          mainSpectrum.peaks = peaks;
+
+          let integralsStr = jcamp.spectra[i + 1]?.$OBSERVEDINTEGRALS;
+          if (!integralsStr && !hasAssignedGlobalIntegrals) {
+            integralsStr = jcamp.info?.$OBSERVEDINTEGRALS;
+          }
+
+          if (typeof integralsStr === 'string' && integralsStr.trim().length > 0) {
+            const matches = integralsStr.match(/\(([^)]+)\)/g) || [];
+            const integrals = [];
+            for (const m of matches) {
+              const parts = m.replace(/[()]/g, '').split(',').map(Number);
+              if (parts.length >= 3 && parts.slice(0, 3).every(Number.isFinite)) {
+                const [xL, xU, area, absoluteAreaMaybe] = parts;
+                integrals.push({
+                  xL,
+                  xU,
+                  area,
+                  absoluteArea: Number.isFinite(absoluteAreaMaybe) ? absoluteAreaMaybe : Math.abs(area),
+                });
+              }
+            }
+            mainSpectrum.integrations = integrals.map((it) => ({
+              ...it,
+              xExtent: { xL: it.xL, xU: it.xU },
+            }));
+            if (!jcamp.spectra[i + 1]?.$OBSERVEDINTEGRALS) {
+              hasAssignedGlobalIntegrals = true;
+            }
+          }
+          i++;
         }
-      }
 
-      return {
-        ...spectrum,
-        peaks,
-        data: {
-          x: data[0].x,
-          y: data[0].y,
-        },
-      };
-    });
+        mainSpectrum.csCategory = 'UVVIS SPECTRUM';
+        finalSpectra.push(mainSpectrum);
+      }
+    }
+  } else {
+    finalSpectra.push(...jcamp.spectra.filter(s => s.data?.[0]?.x?.length > 0));
   }
 
+  let spectra = extrSpectraShare(finalSpectra, layout) || [];
   if (jcamp.info.UNITS && jcamp.info.SYMBOL) {
-    const units = jcamp.info.UNITS.split(',');
-    const symbol = jcamp.info.SYMBOL.split(',');
+    const unitsString = Array.isArray(jcamp.info.UNITS) ? jcamp.info.UNITS[0] : jcamp.info.UNITS;
+    const symbolString = Array.isArray(jcamp.info.SYMBOL) ? jcamp.info.SYMBOL[0] : jcamp.info.SYMBOL;
+
+    const units = unitsString.split(',');
+    const symbol = symbolString.split(',');
     let xUnit = null;
     let yUnit = null;
     symbol.forEach((sym, idx) => {
@@ -797,35 +833,16 @@ const extrFeaturesCylicVolta = (jcamp, layout, peakUp) => {
   return features;
 };
 
-const extrFeaturesMs = (jcamp, layout, peakUp) => {
-  // const nfs = {};
-  // const category = jcamp.info.$CSCATEGORY;
-  // const scanCount = parseInt(jcamp.info.$CSSCANCOUNT, 10) - 1;
-  // if (category) {
-  //   const idxEditPeak = category.indexOf('EDIT_PEAK');
-  //   if (idxEditPeak >= 0) {
-  //     const sEP = jcamp.spectra[idxEditPeak + scanCount];
-  //     const thresRef = calcThresRef(sEP, peakUp);
-  //     nfs.editPeak = buildPeakFeature(jcamp, layout, peakUp, sEP, thresRef);
-  //   }
-  //   const idxAutoPeak = category.indexOf('AUTO_PEAK');
-  //   if (idxAutoPeak >= 0) {
-  //     const sAP = jcamp.spectra[idxAutoPeak + scanCount];
-  //     const thresRef = calcThresRef(sAP, peakUp);
-  //     nfs.autoPeak = buildPeakFeature(jcamp, layout, peakUp, sAP, thresRef);
-  //   }
-  //   return nfs;
-  // }
-  // // workaround for legacy design
+const extrFeaturesMs = (jcamp, layout, peakUp, spectra) => {
   const thresRef = (jcamp.info && jcamp.info.$CSTHRESHOLD * 100) || 5;
-  const base = jcamp.spectra[0];
-
-  const features = jcamp.spectra.map((s) => {
+  const features = spectra.map((s) => {
+    if (!s.data || !s.data[0] || !s.data[0].x || !s.data[0].y) {
+      return null;
+    }
     const cpo = buildPeakFeature(jcamp, layout, peakUp, s, +thresRef.toFixed(4));
     const bnd = getBoundary(s);
-    return Object.assign({}, base, cpo, bnd);
+    return Object.assign({}, cpo, bnd);
   }).filter((r) => r != null);
-
   return features;
 };
 
@@ -856,7 +873,7 @@ const ExtractJcamp = (source) => {
     : extrSpectraNi(jcamp, layout);
   let features = {};
   if (Format.isMsLayout(layout) || Format.isLCMsLayout(layout)) {
-    features = extrFeaturesMs(jcamp, layout, peakUp);
+    features = extrFeaturesMs(jcamp, layout, peakUp, spectra);
   } else if (Format.isXRDLayout(layout)) {
     features = extrFeaturesXrd(jcamp, layout, peakUp);
     const temperature = extractTemperature(jcamp);

@@ -59,6 +59,29 @@ const toPeakStr = (peaks) => {
   return str;
 };
 
+const extractUvvisLcmsPeaks = (hplcMsSt = getHplcMs()) => {
+  if (!hplcMsSt?.uvvis) {
+    return '{}';
+  }
+
+  const { listWaveLength = [], spectraList = [] } = hplcMsSt.uvvis;
+  const byWavelength = {};
+
+  spectraList.forEach((spectrum, idx) => {
+    const wl = listWaveLength[idx];
+    const wlKey = String(Math.round(wl));
+
+    (spectrum.peaks || []).forEach((p, n) => {
+
+
+      if (!byWavelength[wlKey]) byWavelength[wlKey] = [];
+      byWavelength[wlKey].push({ x: p.x, y: p.y });
+    });
+  });
+
+  return JSON.stringify(byWavelength);
+};
+
 const spectraOps = {
   [LIST_LAYOUT.PLAIN]: { head: '', tail: '.' },
   [LIST_LAYOUT.H1]: { head: '1H', tail: '.' },
@@ -475,7 +498,6 @@ const is19FLayout = (layoutSt) => (LIST_LAYOUT.F19 === layoutSt);
 const is13CLayout = (layoutSt) => (LIST_LAYOUT.C13 === layoutSt);
 const is1HLayout = (layoutSt) => (LIST_LAYOUT.H1 === layoutSt);
 const isMsLayout = (layoutSt) => (LIST_LAYOUT.MS === layoutSt);
-const isLCMsLayout = (layoutSt) => (LIST_LAYOUT.LC_MS === layoutSt);
 const isIrLayout = (layoutSt) => ([LIST_LAYOUT.IR, 'INFRARED'].indexOf(layoutSt) >= 0);
 const isRamanLayout = (layoutSt) => (LIST_LAYOUT.RAMAN === layoutSt);
 const isUvVisLayout = (layoutSt) => (LIST_LAYOUT.UVVIS === layoutSt);
@@ -487,6 +509,7 @@ const isCyclicVoltaLayout = (layoutSt) => (LIST_LAYOUT.CYCLIC_VOLTAMMETRY === la
 const isCDSLayout = (layoutSt) => (LIST_LAYOUT.CDS === layoutSt);
 const isSECLayout = (layoutSt) => (LIST_LAYOUT.SEC === layoutSt);
 const isGCLayout = (layoutSt) => (LIST_LAYOUT.GC === layoutSt);
+const isLCMsLayout = (layoutSt) => (LIST_LAYOUT.LC_MS === layoutSt);
 const isEmWaveLayout = (layoutSt) => (
   [LIST_LAYOUT.IR, LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS,
     LIST_LAYOUT.HPLC_UVVIS].indexOf(layoutSt) >= 0
@@ -637,6 +660,7 @@ const inlineNotation = (layout, data, sampleName = '') => {
 
 const Format = {
   toPeakStr,
+  extractUvvisLcmsPeaks,
   buildData,
   spectraDigit,
   spectraOps,
@@ -652,7 +676,6 @@ const Format = {
   is15NLayout,
   is29SiLayout,
   isMsLayout,
-  isLCMsLayout,
   isIrLayout,
   isRamanLayout,
   isUvVisLayout,
@@ -667,6 +690,7 @@ const Format = {
   isDLSIntensityLayout,
   isEmWaveLayout,
   isGCLayout,
+  isLCMsLayout,
   fixDigit,
   formatPeaksByPrediction,
   formatedMS,

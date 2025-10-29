@@ -15,7 +15,7 @@ import {
   Convert2Scan, Convert2Thres,
 } from '../../helpers/chem';
 import { MuButton, commonStyle } from './common';
-import { extractPeaksEdit, extractAreaUnderCurve } from '../../helpers/extractPeaksEdit';
+import { extractPeaksEdit, extractAreaUnderCurve, formatLcmsPeaksForBackend, formatLcmsIntegralsForBackend } from '../../helpers/extractPeaksEdit';
 import Format from '../../helpers/format';
 
 const styles = () => (
@@ -30,10 +30,20 @@ const onClickCb = (
   scan, thres, layoutSt, shiftSt, analysis, decimalSt,
   integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt,
   cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData,
+  hplcMsSt,
 ) => (
   () => {
+    let lcmsPeaks = null;
+    let lcmsIntegrals = null;
+    if (layoutSt === 'LC/MS') {
+      lcmsPeaks = formatLcmsPeaksForBackend(hplcMsSt);
+      lcmsIntegrals = formatLcmsIntegralsForBackend(hplcMsSt);
+    }
+
     operation({
       peaks: peaksEdit,
+      lcms_peaks: lcmsPeaks,
+      lcms_integrals: lcmsIntegrals,
       layout: layoutSt,
       shift: shiftSt,
       scan,
@@ -61,7 +71,7 @@ const BtnSubmit = ({
   editPeakSt, thresSt, layoutSt, shiftSt, scanSt, forecastSt,
   decimalSt, integrationSt, multiplicitySt, allIntegrationSt,
   waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt,
-  metaSt,
+  metaSt, hplcMsSt,
 }) => {
   const peaksEdit = extractPeaksEdit(feature, editPeakSt, thresSt, shiftSt, layoutSt);
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
@@ -86,6 +96,7 @@ const BtnSubmit = ({
           scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt,
           integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt,
           cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData,
+          hplcMsSt,
         )}
       >
         <PlayCircleOutlineIcon className={classes.icon} />
@@ -112,6 +123,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     axesUnitsSt: state.axesUnits,
     detectorSt: state.detector,
     metaSt: state.meta,
+    hplcMsSt: state.hplcMs,
   }
 );
 
@@ -140,13 +152,14 @@ BtnSubmit.propTypes = {
   decimalSt: PropTypes.number.isRequired,
   integrationSt: PropTypes.object.isRequired,
   multiplicitySt: PropTypes.object.isRequired,
-  allIntegrationSt: PropTypes.object.isRequired,
+  allIntegrationSt: PropTypes.array.isRequired,
   waveLengthSt: PropTypes.object.isRequired,
   cyclicvoltaSt: PropTypes.object.isRequired,
   curveSt: PropTypes.object,
   axesUnitsSt: PropTypes.object.isRequired,
   detectorSt: PropTypes.object.isRequired,
   metaSt: PropTypes.object.isRequired,
+  hplcMsSt: PropTypes.object.isRequired,
 };
 
 export default compose(
