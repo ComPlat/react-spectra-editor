@@ -484,11 +484,51 @@ const LIST_SHIFT_1H = [
   hTolueneD8Broad4, hTFADS, hTrifluoroethanolD31, hTrifluoroethanolD32,
 ];
 
-const LIST_SHIFT_19F = [];
+const LIST_SHIFT_19F = [
+  noReference,
+  hActicAcidD4Quin, hActicAcidD4S, hAcetoneD6Quin, hAcetonitrileD3Qquin,
+  hBenzeneS, hChloroformDS, hCyclohexaneD12S, hDeuteriumOxideS,
+  hDichloroethaneD4S, hDichloromethaneD2T, hDMFD7Quin1, hDMFD7Quin2,
+  hDMFD7Broad3, hDioxaneD8Broad, hDMSOD6Quin, hEthanolD6Broad1,
+  hEthanolD6S2, hEthanolD6S3, hMethanolD4Quin, hMethanolD4S,
+  hNitromethaneD3S, hPyridineD5Broad1, hPyridineD5Broad2, hPyridineD5Broad3,
+  hTHFD8S1, hTHFD8S2, hTMSS, hTolueneD8Quin, hTolueneD8Boad2, hTolueneD8S3,
+  hTolueneD8Broad4, hTFADS, hTrifluoroethanolD31, hTrifluoroethanolD32,
+];
 
-const LIST_SHIFT_31P = [];
-const LIST_SHIFT_15N = [];
-const LIST_SHIFT_29Si = [];
+const LIST_SHIFT_31P = [
+  noReference,
+  hActicAcidD4Quin, hActicAcidD4S, hAcetoneD6Quin, hAcetonitrileD3Qquin,
+  hBenzeneS, hChloroformDS, hCyclohexaneD12S, hDeuteriumOxideS,
+  hDichloroethaneD4S, hDichloromethaneD2T, hDMFD7Quin1, hDMFD7Quin2,
+  hDMFD7Broad3, hDioxaneD8Broad, hDMSOD6Quin, hEthanolD6Broad1,
+  hEthanolD6S2, hEthanolD6S3, hMethanolD4Quin, hMethanolD4S,
+  hNitromethaneD3S, hPyridineD5Broad1, hPyridineD5Broad2, hPyridineD5Broad3,
+  hTHFD8S1, hTHFD8S2, hTMSS, hTolueneD8Quin, hTolueneD8Boad2, hTolueneD8S3,
+  hTolueneD8Broad4, hTFADS, hTrifluoroethanolD31, hTrifluoroethanolD32,
+];
+const LIST_SHIFT_15N = [
+  noReference,
+  hActicAcidD4Quin, hActicAcidD4S, hAcetoneD6Quin, hAcetonitrileD3Qquin,
+  hBenzeneS, hChloroformDS, hCyclohexaneD12S, hDeuteriumOxideS,
+  hDichloroethaneD4S, hDichloromethaneD2T, hDMFD7Quin1, hDMFD7Quin2,
+  hDMFD7Broad3, hDioxaneD8Broad, hDMSOD6Quin, hEthanolD6Broad1,
+  hEthanolD6S2, hEthanolD6S3, hMethanolD4Quin, hMethanolD4S,
+  hNitromethaneD3S, hPyridineD5Broad1, hPyridineD5Broad2, hPyridineD5Broad3,
+  hTHFD8S1, hTHFD8S2, hTMSS, hTolueneD8Quin, hTolueneD8Boad2, hTolueneD8S3,
+  hTolueneD8Broad4, hTFADS, hTrifluoroethanolD31, hTrifluoroethanolD32,
+];
+const LIST_SHIFT_29Si = [
+  noReference,
+  hActicAcidD4Quin, hActicAcidD4S, hAcetoneD6Quin, hAcetonitrileD3Qquin,
+  hBenzeneS, hChloroformDS, hCyclohexaneD12S, hDeuteriumOxideS,
+  hDichloroethaneD4S, hDichloromethaneD2T, hDMFD7Quin1, hDMFD7Quin2,
+  hDMFD7Broad3, hDioxaneD8Broad, hDMSOD6Quin, hEthanolD6Broad1,
+  hEthanolD6S2, hEthanolD6S3, hMethanolD4Quin, hMethanolD4S,
+  hNitromethaneD3S, hPyridineD5Broad1, hPyridineD5Broad2, hPyridineD5Broad3,
+  hTHFD8S1, hTHFD8S2, hTMSS, hTolueneD8Quin, hTolueneD8Boad2, hTolueneD8S3,
+  hTolueneD8Broad4, hTFADS, hTrifluoroethanolD31, hTrifluoroethanolD32,
+];
 
 const getListShift = (layoutSt) => {
   switch (layoutSt) {
