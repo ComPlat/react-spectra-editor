@@ -1,6 +1,6 @@
 /* eslint-disable prefer-object-spread, function-paren-newline,
 react/function-component-definition */
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
@@ -37,44 +37,46 @@ const styles = () => (
 const shiftSelect = (
   classes, layoutSt, setShiftRefAct, shiftSt, curveSt,
 ) => {
-  if (Cfg.hideSolvent(layoutSt)) return null;
-  // const onChange = (e) => setShiftRefAct(e.target.value);
+  if (Cfg.hideSolvent(layoutSt)) {
+    return null;
+  }
+
   const { curveIdx } = curveSt;
   const { shifts } = shiftSt;
-  const selectedShift = shifts[curveIdx];
-  const shiftRef = selectedShift.ref;
+  const selectedShift = shifts[curveIdx] || {};
+  const listShift = getListShift(layoutSt) || [];
+
+  const shiftRefName = selectedShift?.ref?.name || '';
+  const isInList = listShift.some((r) => r.name === shiftRefName);
+  const selectValue = isInList ? shiftRefName : '';
 
   const onChange = (e) => {
-    const payload = { dataToSet: e.target.value, curveIdx };
-    setShiftRefAct(payload);
+    const name = e.target.value;
+    const refObj = listShift.find((r) => r.name === name);
+    if (refObj) {
+      setShiftRefAct({ dataToSet: refObj, curveIdx });
+    }
   };
 
-  const listShift = getListShift(layoutSt);
-
-  const content = listShift.map((ref) => (
-    <MenuItem value={ref} key={ref.name}>
-      <span className={classNames(classes.txtOpt, 'option-sv-bar-shift')}>
-        { `${ref.name}: ${Format.strNumberFixedDecimal(ref.value, 2)} ppm` }
-      </span>
-    </MenuItem>
-  ));
-
   return (
-    <FormControl
-      className={classNames(classes.fieldShift)}
-      variant="outlined"
-    >
+    <FormControl className={classNames(classes.fieldShift)} variant="outlined">
       <InputLabel id="select-solvent-label" className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
         Reference
       </InputLabel>
       <Select
-        value={shiftRef}
+        value={selectValue}
         labelId="select-solvent-label"
         label="Solvent"
         onChange={onChange}
         className={classNames(classes.selectInput, 'input-sv-bar-shift')}
       >
-        { content }
+        {listShift.map((ref) => (
+          <MenuItem value={ref.name} key={ref.name}>
+            <span className={classNames(classes.txtOpt, 'option-sv-bar-shift')}>
+              {`${ref.name}: ${Format.strNumberFixedDecimal(ref.value, 2)} ppm`}
+            </span>
+          </MenuItem>
+        ))}
       </Select>
     </FormControl>
   );
@@ -189,16 +191,82 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
   );
 };
 
+const PLACEHOLDER = '- - -';
+
+const norm = (s) => (s || '').toString().toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '');
+
+function solventKeyOf(feature) {
+  const r = feature?.metadata?.solventName ?? feature?.metadata?.solvent
+    ?? feature?.meta?.solventName ?? feature?.meta?.solvent
+    ?? feature?.solventName ?? feature?.solvent ?? null;
+  const a = feature?.metadata?.solvent_label ?? feature?.metadata?.solventLabel ?? null;
+  const raw = r && r !== PLACEHOLDER ? r : null;
+  const alt = a && a !== PLACEHOLDER ? a : null;
+  return norm(raw || alt || '');
+}
+
+function pickBestRef(list, key) {
+  if (!key || !list?.length) return null;
+  const scored = [];
+  list.forEach((r) => {
+    const nLabel = norm(r.label);
+    const nName = norm(r.name);
+    const nNsdb = norm(r.nsdb);
+    let s = 0;
+    if (nLabel && nLabel === key) s += 3;
+    if (nNsdb && nNsdb.includes(key)) s += 2;
+    if (nName && nName.includes(key)) s += 1;
+    if (s > 0) scored.push({ r, s });
+  });
+  if (!scored.length) return null;
+  let max = 0;
+  scored.forEach((x) => {
+    if (x.s > max) max = x.s;
+  });
+  let cand = scored.filter((x) => x.s === max).map((x) => x.r);
+  if (cand.length > 1) {
+    const vals = cand.map((c) => (typeof c.value === 'number' ? c.value : null))
+      .filter((v) => v != null).sort((a, b) => a - b);
+    if (vals.length) {
+      const m = vals[Math.floor(vals.length / 2)];
+      cand = cand.slice().sort((a, b) => Math.abs((a.value ?? m) - m)
+        - Math.abs((b.value ?? m) - m));
+    }
+    if (cand.length > 1) {
+      cand.sort((a, b) => (a.name?.length || 0) - (b.name?.length || 0));
+    }
+  }
+  return cand[0] || null;
+}
+
+function isRefUnset(shiftSt, curveIdx, list) {
+  const name = shiftSt?.shifts?.[curveIdx]?.ref?.name || '';
+  if (!name || name === PLACEHOLDER) return true;
+  return !(list || []).some((r) => r.name === name);
+}
+
 const Layout = ({
   classes, feature, hasEdit, layoutSt,
   setShiftRefAct, updateLayoutAct, curveSt, shiftSt,
-}) => (
-  <span className={classes.groupRight}>
-    { layoutSelect(classes, layoutSt, updateLayoutAct) }
-    { shiftSelect(classes, layoutSt, setShiftRefAct, shiftSt, curveSt) }
-    <Scan feature={feature} hasEdit={hasEdit} />
-  </span>
-);
+}) => {
+  const { curveIdx } = curveSt;
+  const list = getListShift(layoutSt) || [];
+  const unset = isRefUnset(shiftSt, curveIdx, list);
+  const key = solventKeyOf(feature);
+  const best = pickBestRef(list, key);
+
+  useEffect(() => {
+    if (unset && best) setShiftRefAct({ dataToSet: best, curveIdx });
+  }, [unset, best, curveIdx, setShiftRefAct]);
+
+  return (
+    <span className={classes.groupRight}>
+      { layoutSelect(classes, layoutSt, updateLayoutAct) }
+      { shiftSelect(classes, layoutSt, setShiftRefAct, shiftSt, curveSt) }
+      <Scan feature={feature} hasEdit={hasEdit} />
+    </span>
+  );
+};
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
