@@ -13,6 +13,7 @@ var _propTypes = _interopRequireDefault(require("prop-types"));
 var _styles = require("@mui/styles");
 var _material = require("@mui/material");
 var _multiplicity = require("../../actions/multiplicity");
+var _jsxRuntime = require("react/jsx-runtime");
 const styles = () => ({
   jDiv: {
     height: 28
@@ -36,16 +37,20 @@ const styles = () => ({
     height: 24
   }
 });
-const txtJ = () => /*#__PURE__*/_react.default.createElement(_material.InputAdornment, {
-  position: "start"
-}, /*#__PURE__*/_react.default.createElement("span", {
-  className: "txt-cmd-j"
-}, "J\xA0="));
-const txtHz = () => /*#__PURE__*/_react.default.createElement(_material.InputAdornment, {
-  position: "end"
-}, /*#__PURE__*/_react.default.createElement("span", {
-  className: "txt-cmd-hz"
-}, "Hz"));
+const txtJ = () => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputAdornment, {
+  position: "start",
+  children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+    className: "txt-cmd-j",
+    children: "J\xA0="
+  })
+});
+const txtHz = () => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputAdornment, {
+  position: "end",
+  children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+    className: "txt-cmd-hz",
+    children: "Hz"
+  })
+});
 class MpyCoupling extends _react.default.Component {
   constructor(props) {
     super(props);
@@ -97,25 +102,27 @@ class MpyCoupling extends _react.default.Component {
       tmpVal
     } = this.state;
     const value = focus && (tmpVal || tmpVal === '') ? tmpVal : row.jStr;
-    return /*#__PURE__*/_react.default.createElement("div", {
-      className: (0, _classnames.default)(classes.jDiv)
-    }, /*#__PURE__*/_react.default.createElement("span", {
-      className: (0, _classnames.default)(classes.moExtTxt, classes.jTxt, 'txt-sv-panel-head')
-    }, /*#__PURE__*/_react.default.createElement(_material.TextField, {
-      className: (0, _classnames.default)(classes.txtField, 'txt-cmd-field'),
-      placeholder: "-",
-      value: value,
-      margin: "none",
-      InputProps: {
-        startAdornment: txtJ(),
-        endAdornment: txtHz(),
-        className: (0, _classnames.default)(classes.txtInput, 'txt-sv-input-label')
-      },
-      onChange: this.onChange,
-      onFocus: this.onFocus,
-      onBlur: this.onBlur,
-      variant: "outlined"
-    })));
+    return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+      className: (0, _classnames.default)(classes.jDiv),
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        className: (0, _classnames.default)(classes.moExtTxt, classes.jTxt, 'txt-sv-panel-head'),
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TextField, {
+          className: (0, _classnames.default)(classes.txtField, 'txt-cmd-field'),
+          placeholder: "-",
+          value: value,
+          margin: "none",
+          InputProps: {
+            startAdornment: txtJ(),
+            endAdornment: txtHz(),
+            className: (0, _classnames.default)(classes.txtInput, 'txt-sv-input-label')
+          },
+          onChange: this.onChange,
+          onFocus: this.onFocus,
+          onBlur: this.onBlur,
+          variant: "outlined"
+        })
+      })
+    });
   }
 }
 const mapStateToProps = (state, props) => (

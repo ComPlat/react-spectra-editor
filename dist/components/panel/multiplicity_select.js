@@ -13,6 +13,7 @@ var _redux = require("redux");
 var _material = require("@mui/material");
 var _styles = require("@mui/styles");
 var _multiplicity = require("../../actions/multiplicity");
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable react/function-component-definition */
 
 const Styles = () => ({
@@ -31,12 +32,11 @@ const Styles = () => ({
     color: 'white'
   }
 });
-const MpySelect = _ref => {
-  let {
-    classes,
-    target,
-    selectMpyTypeAct
-  } = _ref;
+const MpySelect = ({
+  classes,
+  target,
+  selectMpyTypeAct
+}) => {
   const {
     mpyType,
     xExtent
@@ -57,21 +57,22 @@ const MpySelect = _ref => {
       });
     }
   };
-  return /*#__PURE__*/_react.default.createElement(_material.FormControl, {
+  return /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.FormControl, {
     className: (0, _classnames.default)(classes.formControl),
-    variant: "outlined"
-  }, /*#__PURE__*/_react.default.createElement(_material.TextField, {
-    className: (0, _classnames.default)(classes.txtField, 'txt-cmd-field'),
-    value: mpyType,
-    margin: "none",
     variant: "outlined",
-    InputProps: {
-      className: (0, _classnames.default)(classes.txtInput, 'txt-sv-input-label')
-    },
-    onChange: onChange,
-    onBlur: onBlur,
-    onKeyPress: onEnterPress
-  }));
+    children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TextField, {
+      className: (0, _classnames.default)(classes.txtField, 'txt-cmd-field'),
+      value: mpyType,
+      margin: "none",
+      variant: "outlined",
+      InputProps: {
+        className: (0, _classnames.default)(classes.txtInput, 'txt-sv-input-label')
+      },
+      onChange: onChange,
+      onBlur: onBlur,
+      onKeyPress: onEnterPress
+    })
+  });
 };
 const mapStateToProps = (state, props) => (
 // eslint-disable-line

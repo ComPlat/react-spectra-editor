@@ -18,43 +18,50 @@ var _ui = require("../../actions/ui");
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 var _common = require("./common");
 var _list_ui = require("../../constants/list_ui");
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, react/function-component-definition */
 
 const styles = () => Object.assign({}, _common.commonStyle);
-const Viewer = _ref => {
-  let {
-    classes,
-    isfocusSpectrumSt,
-    isfocusAnalysisSt,
-    hideCmdAnaViewerSt,
-    disableCmdAnaViewerSt,
-    setUiViewerTypeAct
-  } = _ref;
+const Viewer = ({
+  classes,
+  isfocusSpectrumSt,
+  isfocusAnalysisSt,
+  hideCmdAnaViewerSt,
+  disableCmdAnaViewerSt,
+  setUiViewerTypeAct
+}) => {
   const onViewSpectrum = () => setUiViewerTypeAct(_list_ui.LIST_UI_VIEWER_TYPE.SPECTRUM);
   const onViewAnalysis = () => setUiViewerTypeAct(_list_ui.LIST_UI_VIEWER_TYPE.ANALYSIS);
-  return /*#__PURE__*/_react.default.createElement("span", {
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
     className: classes.group,
-    "data-testid": "Viewer"
-  }, /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
-    title: /*#__PURE__*/_react.default.createElement("span", {
-      className: "txt-sv-tp"
-    }, "Spectrum Viewer")
-  }, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
-    className: (0, _classnames.default)((0, _common.focusStyle)(isfocusSpectrumSt, classes), 'btn-sv-bar-spctrum'),
-    onClick: onViewSpectrum
-  }, /*#__PURE__*/_react.default.createElement(_TimelineOutlined.default, {
-    className: classes.icon
-  }))), hideCmdAnaViewerSt ? null : /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
-    title: /*#__PURE__*/_react.default.createElement("span", {
-      className: "txt-sv-tp"
-    }, "Analysis Viewer")
-  }, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
-    className: (0, _classnames.default)((0, _common.focusStyle)(isfocusAnalysisSt, classes), 'btn-sv-bar-analysis'),
-    disabled: disableCmdAnaViewerSt,
-    onClick: onViewAnalysis
-  }, /*#__PURE__*/_react.default.createElement(_SpellcheckOutlined.default, {
-    className: classes.icon
-  }))));
+    "data-testid": "Viewer",
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
+      title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        className: "txt-sv-tp",
+        children: "Spectrum Viewer"
+      }),
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
+        className: (0, _classnames.default)((0, _common.focusStyle)(isfocusSpectrumSt, classes), 'btn-sv-bar-spctrum'),
+        onClick: onViewSpectrum,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_TimelineOutlined.default, {
+          className: classes.icon
+        })
+      })
+    }), hideCmdAnaViewerSt ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
+      title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        className: "txt-sv-tp",
+        children: "Analysis Viewer"
+      }),
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
+        className: (0, _classnames.default)((0, _common.focusStyle)(isfocusAnalysisSt, classes), 'btn-sv-bar-analysis'),
+        disabled: disableCmdAnaViewerSt,
+        onClick: onViewAnalysis,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_SpellcheckOutlined.default, {
+          className: classes.icon
+        })
+      })
+    })]
+  });
 };
 const mapStateToProps = (state, props) => (
 // eslint-disable-line

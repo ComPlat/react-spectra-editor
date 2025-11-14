@@ -217,9 +217,7 @@ const addNegative = (state, action) => {
     selectedIdx: curveIdx
   });
 };
-const shiftReducer = function () {
-  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-  let action = arguments.length > 1 ? arguments[1] : undefined;
+const shiftReducer = (state = initialState, action) => {
   switch (action.type) {
     case _action_type.SHIFT.SET_REF:
       return setRef(state, action);

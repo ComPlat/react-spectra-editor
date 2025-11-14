@@ -44,8 +44,7 @@ const getAbsoluteArea = (xL, xU, data) => {
   return area;
 };
 exports.getAbsoluteArea = getAbsoluteArea;
-const calcArea = function (d, refArea, refFactor) {
-  let ignoreRef = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+const calcArea = (d, refArea, refFactor, ignoreRef = false) => {
   if (ignoreRef) {
     const {
       absoluteArea

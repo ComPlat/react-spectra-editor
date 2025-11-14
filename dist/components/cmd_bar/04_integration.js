@@ -22,6 +22,7 @@ var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 var _tri_btn = _interopRequireDefault(require("./tri_btn"));
 var _common = require("./common");
 var _format = _interopRequireDefault(require("../../helpers/format"));
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, function-paren-newline,
 react/function-component-definition, react/require-default-props, max-len,
 react/no-unused-prop-types */
@@ -57,7 +58,7 @@ const setFactor = (classes, isDisable, integrationSt, setIntegrationFkrAct, curv
     const selectedIntegration = integrations[curveIdx];
     refFactor = selectedIntegration.refFactor || 1.00;
   }
-  return /*#__PURE__*/_react.default.createElement(_TextField.default, {
+  return /*#__PURE__*/(0, _jsxRuntime.jsx)(_TextField.default, {
     className: classes.field,
     disabled: isDisable,
     id: "intg-factor-name",
@@ -67,9 +68,10 @@ const setFactor = (classes, isDisable, integrationSt, setIntegrationFkrAct, curv
     InputProps: {
       className: (0, _classnames.default)(classes.txtInput, 'txtfield-sv-bar-input')
     },
-    label: /*#__PURE__*/_react.default.createElement("span", {
-      className: (0, _classnames.default)(classes.txtLabel, 'txtfield-sv-bar-label')
-    }, "Ref Area"),
+    label: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+      className: (0, _classnames.default)(classes.txtLabel, 'txtfield-sv-bar-label'),
+      children: "Ref Area"
+    }),
     onChange: onFactorChanged,
     onBlur: onFactorChanged,
     onKeyUp: onEnterPress,
@@ -77,20 +79,19 @@ const setFactor = (classes, isDisable, integrationSt, setIntegrationFkrAct, curv
   });
 };
 const iconColor = criteria => criteria ? '#fff' : '#000';
-const Integration = _ref => {
-  let {
-    classes,
-    ignoreRef,
-    isDisableSt,
-    isFocusAddIntgSt,
-    isFocusRmIntgSt,
-    isFocusSetRefSt,
-    setUiSweepTypeAct,
-    setIntegrationFkrAct,
-    clearIntegrationAllAct,
-    curveSt,
-    integrationSt
-  } = _ref;
+const Integration = ({
+  classes,
+  ignoreRef,
+  isDisableSt,
+  isFocusAddIntgSt,
+  isFocusRmIntgSt,
+  isFocusSetRefSt,
+  setUiSweepTypeAct,
+  setIntegrationFkrAct,
+  clearIntegrationAllAct,
+  curveSt,
+  integrationSt
+}) => {
   const onSweepIntegtAdd = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD);
   const onSweepIntegtRm = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_RM);
   const onSweepIntegtSR = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF);
@@ -100,64 +101,84 @@ const Integration = _ref => {
   const onClearAll = () => clearIntegrationAllAct({
     curveIdx
   });
-  return /*#__PURE__*/_react.default.createElement("span", {
-    className: classes.group
-  }, /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
-    title: /*#__PURE__*/_react.default.createElement("span", {
-      className: "txt-sv-tp"
-    }, "Add Integration")
-  }, /*#__PURE__*/_react.default.createElement("span", null, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
-    className: (0, _classnames.default)((0, _common.focusStyle)(isFocusAddIntgSt, classes), 'btn-add-inter'),
-    disabled: isDisableSt,
-    onClick: onSweepIntegtAdd
-  }, /*#__PURE__*/_react.default.createElement(_react2.default, {
-    path: _js.mdiMathIntegral,
-    size: iconSize,
-    color: iconColor(isFocusAddIntgSt || isDisableSt),
-    className: (0, _classnames.default)(classes.iconMdi, 'icon-sv-bar-addint')
-  }), /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txt, classes.txtIcon, 'txt-sv-bar-addint')
-  }, "+")))), /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
-    title: /*#__PURE__*/_react.default.createElement("span", {
-      className: "txt-sv-tp"
-    }, "Remove Integration")
-  }, /*#__PURE__*/_react.default.createElement("span", null, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
-    className: (0, _classnames.default)((0, _common.focusStyle)(isFocusRmIntgSt, classes), 'btn-remove-inter'),
-    disabled: isDisableSt,
-    onClick: onSweepIntegtRm
-  }, /*#__PURE__*/_react.default.createElement(_react2.default, {
-    path: _js.mdiMathIntegral,
-    size: iconSize,
-    color: iconColor(isFocusRmIntgSt || isDisableSt),
-    className: (0, _classnames.default)(classes.iconMdi, 'icon-sv-bar-rmint')
-  }), /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txt, classes.txtIcon, 'txt-sv-bar-rmint')
-  }, "-")))), /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
-    title: /*#__PURE__*/_react.default.createElement("span", {
-      className: "txt-sv-tp"
-    }, "Set Integration Reference")
-  }, /*#__PURE__*/_react.default.createElement("span", null, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
-    className: (0, _classnames.default)((0, _common.focusStyle)(isFocusSetRefSt, classes), 'btn-set-inter-ref'),
-    disabled: isDisableSt,
-    onClick: onSweepIntegtSR
-  }, /*#__PURE__*/_react.default.createElement(_react2.default, {
-    path: _js.mdiReflectVertical,
-    size: iconSize,
-    color: iconColor(isFocusSetRefSt || isDisableSt),
-    className: (0, _classnames.default)(classes.iconMdi, 'icon-sv-bar-refint')
-  })))), !ignoreRef ? setFactor(classes, isDisableSt, integrationSt, setIntegrationFkrAct, curveIdx) : null, /*#__PURE__*/_react.default.createElement(_tri_btn.default, {
-    content: {
-      tp: 'Clear All Integration'
-    },
-    cb: onClearAll
-  }, /*#__PURE__*/_react.default.createElement(_react2.default, {
-    path: _js.mdiMathIntegral,
-    size: iconSize,
-    color: iconColor(isDisableSt),
-    className: (0, _classnames.default)(classes.iconMdi, 'icon-sv-bar-rmallint')
-  }), /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txt, classes.txtIcon, 'txt-sv-bar-rmallint')
-  }, "x")));
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+    className: classes.group,
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
+      title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        className: "txt-sv-tp",
+        children: "Add Integration"
+      }),
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        children: /*#__PURE__*/(0, _jsxRuntime.jsxs)(_common.MuButton, {
+          className: (0, _classnames.default)((0, _common.focusStyle)(isFocusAddIntgSt, classes), 'btn-add-inter'),
+          disabled: isDisableSt,
+          onClick: onSweepIntegtAdd,
+          children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_react2.default, {
+            path: _js.mdiMathIntegral,
+            size: iconSize,
+            color: iconColor(isFocusAddIntgSt || isDisableSt),
+            className: (0, _classnames.default)(classes.iconMdi, 'icon-sv-bar-addint')
+          }), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+            className: (0, _classnames.default)(classes.txt, classes.txtIcon, 'txt-sv-bar-addint'),
+            children: "+"
+          })]
+        })
+      })
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
+      title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        className: "txt-sv-tp",
+        children: "Remove Integration"
+      }),
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        children: /*#__PURE__*/(0, _jsxRuntime.jsxs)(_common.MuButton, {
+          className: (0, _classnames.default)((0, _common.focusStyle)(isFocusRmIntgSt, classes), 'btn-remove-inter'),
+          disabled: isDisableSt,
+          onClick: onSweepIntegtRm,
+          children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_react2.default, {
+            path: _js.mdiMathIntegral,
+            size: iconSize,
+            color: iconColor(isFocusRmIntgSt || isDisableSt),
+            className: (0, _classnames.default)(classes.iconMdi, 'icon-sv-bar-rmint')
+          }), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+            className: (0, _classnames.default)(classes.txt, classes.txtIcon, 'txt-sv-bar-rmint'),
+            children: "-"
+          })]
+        })
+      })
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
+      title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        className: "txt-sv-tp",
+        children: "Set Integration Reference"
+      }),
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
+          className: (0, _classnames.default)((0, _common.focusStyle)(isFocusSetRefSt, classes), 'btn-set-inter-ref'),
+          disabled: isDisableSt,
+          onClick: onSweepIntegtSR,
+          children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_react2.default, {
+            path: _js.mdiReflectVertical,
+            size: iconSize,
+            color: iconColor(isFocusSetRefSt || isDisableSt),
+            className: (0, _classnames.default)(classes.iconMdi, 'icon-sv-bar-refint')
+          })
+        })
+      })
+    }), !ignoreRef ? setFactor(classes, isDisableSt, integrationSt, setIntegrationFkrAct, curveIdx) : null, /*#__PURE__*/(0, _jsxRuntime.jsxs)(_tri_btn.default, {
+      content: {
+        tp: 'Clear All Integration'
+      },
+      cb: onClearAll,
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_react2.default, {
+        path: _js.mdiMathIntegral,
+        size: iconSize,
+        color: iconColor(isDisableSt),
+        className: (0, _classnames.default)(classes.iconMdi, 'icon-sv-bar-rmallint')
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        className: (0, _classnames.default)(classes.txt, classes.txtIcon, 'txt-sv-bar-rmallint'),
+        children: "x"
+      })]
+    })]
+  });
 };
 const mapStateToProps = (state, props) => (
 // eslint-disable-line

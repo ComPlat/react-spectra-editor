@@ -17,6 +17,7 @@ var _styles = require("@mui/styles");
 var _chem = require("../../helpers/chem");
 var _edit_peak = require("../../actions/edit_peak");
 var _format = _interopRequireDefault(require("../../helpers/format"));
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable react/function-component-definition, no-unused-vars */
 
 const styles = theme => ({
@@ -79,7 +80,7 @@ const createData = (classes, idx, x, y, cb, digits) => ({
   idx: idx + 1,
   x: x.toFixed(digits),
   y,
-  rmBtn: /*#__PURE__*/_react.default.createElement(_HighlightOff.default, {
+  rmBtn: /*#__PURE__*/(0, _jsxRuntime.jsx)(_HighlightOff.default, {
     onClick: cb,
     className: classes.rmBtn
   })
@@ -91,51 +92,66 @@ const peakList = (peaks, digits, cbAct, classes, isPos) => {
   });
   const rowKlass = isPos ? classes.tRowHeadPos : classes.tRowHeadNeg;
   const headTxt = isPos ? 'P+' : 'P-';
-  return /*#__PURE__*/_react.default.createElement(_material.Table, {
-    className: classes.table
-  }, /*#__PURE__*/_react.default.createElement(_material.TableHead, null, /*#__PURE__*/_react.default.createElement(_material.TableRow, {
-    className: rowKlass
-  }, /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "right",
-    className: (0, _classnames.default)(classes.tTxtHead, 'txt-sv-panel-head')
-  }, /*#__PURE__*/_react.default.createElement("i", null, headTxt)), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "right",
-    className: (0, _classnames.default)(classes.tTxtHeadXY, 'txt-sv-panel-head')
-  }, "X"), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "right",
-    className: (0, _classnames.default)(classes.tTxtHeadXY, 'txt-sv-panel-head')
-  }, "Y"), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "right",
-    className: (0, _classnames.default)(classes.tTxtHead, 'txt-sv-panel-head')
-  }, "-"))), /*#__PURE__*/_react.default.createElement(_material.TableBody, null, rows.map(row => /*#__PURE__*/_react.default.createElement(_material.TableRow, {
-    key: row.idx,
-    className: classes.tRow,
-    hover: true
-  }, /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "right",
-    className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
-  }, row.idx), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "right",
-    className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
-  }, row.x), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "right",
-    className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
-  }, row.y.toExponential(2)), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "right",
-    className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
-  }, row.rmBtn)))));
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Table, {
+    className: classes.table,
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableHead, {
+      children: /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.TableRow, {
+        className: rowKlass,
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+          align: "right",
+          className: (0, _classnames.default)(classes.tTxtHead, 'txt-sv-panel-head'),
+          children: /*#__PURE__*/(0, _jsxRuntime.jsx)("i", {
+            children: headTxt
+          })
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+          align: "right",
+          className: (0, _classnames.default)(classes.tTxtHeadXY, 'txt-sv-panel-head'),
+          children: "X"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+          align: "right",
+          className: (0, _classnames.default)(classes.tTxtHeadXY, 'txt-sv-panel-head'),
+          children: "Y"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+          align: "right",
+          className: (0, _classnames.default)(classes.tTxtHead, 'txt-sv-panel-head'),
+          children: "-"
+        })]
+      })
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableBody, {
+      children: rows.map(row => /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.TableRow, {
+        className: classes.tRow,
+        hover: true,
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+          align: "right",
+          className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
+          children: row.idx
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+          align: "right",
+          className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
+          children: row.x
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+          align: "right",
+          className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
+          children: row.y.toExponential(2)
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+          align: "right",
+          className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
+          children: row.rmBtn
+        })]
+      }, row.idx))
+    })]
+  });
 };
-const PeakPanel = _ref => {
-  let {
-    editPeakSt,
-    layoutSt,
-    classes,
-    expand,
-    onExapnd,
-    rmFromPosListAct,
-    rmFromNegListAct,
-    curveSt
-  } = _ref;
+const PeakPanel = ({
+  editPeakSt,
+  layoutSt,
+  classes,
+  expand,
+  onExapnd,
+  rmFromPosListAct,
+  rmFromNegListAct,
+  curveSt
+}) => {
   const {
     curveIdx,
     listCurves
@@ -165,7 +181,7 @@ const PeakPanel = _ref => {
   const filteredArray = currentPeakOfCurve.filter(element => neg.includes(element));
   const peaksData = [].concat(filteredArray).concat(pos);
   const digits = _format.default.isEmWaveLayout(layoutSt) ? 0 : 4;
-  return /*#__PURE__*/_react.default.createElement(_material.Accordion, {
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Accordion, {
     "data-testid": "PeaksPanelInfo",
     expanded: expand,
     onChange: onExapnd,
@@ -173,16 +189,22 @@ const PeakPanel = _ref => {
     TransitionProps: {
       unmountOnExit: true
     } // increase Accordion performance
-  }, /*#__PURE__*/_react.default.createElement(_material.AccordionSummary, {
-    expandIcon: /*#__PURE__*/_react.default.createElement(_ExpandMore.default, null),
-    className: (0, _classnames.default)(classes.panelSummary)
-  }, /*#__PURE__*/_react.default.createElement(_material.Typography, {
-    className: "txt-panel-header"
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title')
-  }, "Peaks"))), /*#__PURE__*/_react.default.createElement(_material.Divider, null), /*#__PURE__*/_react.default.createElement("div", {
-    className: (0, _classnames.default)(classes.panelDetail)
-  }, peakList(peaksData, digits, rmFromPosListAct, classes, true)));
+    ,
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.AccordionSummary, {
+      expandIcon: /*#__PURE__*/(0, _jsxRuntime.jsx)(_ExpandMore.default, {}),
+      className: (0, _classnames.default)(classes.panelSummary),
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Typography, {
+        className: "txt-panel-header",
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title'),
+          children: "Peaks"
+        })
+      })
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Divider, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+      className: (0, _classnames.default)(classes.panelDetail),
+      children: peakList(peaksData, digits, rmFromPosListAct, classes, true)
+    })]
+  });
 };
 const mapStateToProps = (state, props) => (
 // eslint-disable-line

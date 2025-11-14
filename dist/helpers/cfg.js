@@ -15,8 +15,7 @@ const btnCmdSetRef = layoutSt => !_format.default.isNmrLayout(layoutSt); // esli
 const btnCmdIntg = layoutSt => !(_format.default.isNmrLayout(layoutSt) || _format.default.isHplcUvVisLayout(layoutSt)); // eslint-disable-line
 
 const btnCmdMpy = layoutSt => !_format.default.isNmrLayout(layoutSt);
-const btnCmdMpyPeak = function (layoutSt, mpySt) {
-  let curveIdx = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+const btnCmdMpyPeak = (layoutSt, mpySt, curveIdx = 0) => {
   const {
     multiplicities
   } = mpySt;

@@ -16,6 +16,7 @@ var _detector = require("../../actions/detector");
 var _format = _interopRequireDefault(require("../../helpers/format"));
 var _common = require("./common");
 var _list_detectors = require("../../constants/list_detectors");
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, react/jsx-one-expression-per-line,
 react/function-component-definition */
 
@@ -29,7 +30,7 @@ const styles = () => Object.assign({
 }, _common.commonStyle);
 const detectorSelect = (classes, detectorSt, curveSt, layoutSt, updateDetectorAct) => {
   if (!_format.default.isSECLayout(layoutSt)) {
-    return /*#__PURE__*/_react.default.createElement("i", null);
+    return /*#__PURE__*/(0, _jsxRuntime.jsx)("i", {});
   }
   const {
     curveIdx
@@ -46,39 +47,43 @@ const detectorSelect = (classes, detectorSt, curveSt, layoutSt, updateDetectorAc
     curveIdx,
     selectedDetector: e.target.value
   });
-  return /*#__PURE__*/_react.default.createElement(_material.FormControl, {
-    className: (0, _classnames.default)(classes.fieldLayout)
-  }, /*#__PURE__*/_react.default.createElement(_material.InputLabel, {
-    id: "select-detector-label",
-    className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label')
-  }, "Detector"), /*#__PURE__*/_react.default.createElement(_material.Select, {
-    labelId: "select-detector-label",
-    label: "Detector",
-    value: selectedDetector,
-    onChange: onChange,
-    className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-layout')
-  }, /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: ""
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  })), _list_detectors.LIST_DETECTORS.map(item => /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: item
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  }, item.name)))));
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
+    className: (0, _classnames.default)(classes.fieldLayout),
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputLabel, {
+      id: "select-detector-label",
+      className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label'),
+      children: "Detector"
+    }), /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Select, {
+      labelId: "select-detector-label",
+      label: "Detector",
+      value: selectedDetector,
+      onChange: onChange,
+      className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-layout'),
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: "",
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
+        })
+      }), _list_detectors.LIST_DETECTORS.map(item => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: item,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
+          children: item.name
+        })
+      }))]
+    })]
+  });
 };
-const Detector = _ref => {
-  let {
-    classes,
-    detectorSt,
-    curveSt,
-    layoutSt,
-    updateDetectorAct
-  } = _ref;
-  return /*#__PURE__*/_react.default.createElement("span", {
-    className: classes.groupRight
-  }, detectorSelect(classes, detectorSt, curveSt, layoutSt, updateDetectorAct));
-};
+const Detector = ({
+  classes,
+  detectorSt,
+  curveSt,
+  layoutSt,
+  updateDetectorAct
+}) => /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+  className: classes.groupRight,
+  children: detectorSelect(classes, detectorSt, curveSt, layoutSt, updateDetectorAct)
+});
 const mapStateToProps = (state, _props) => (
 // eslint-disable-line
 {

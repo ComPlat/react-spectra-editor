@@ -13,6 +13,7 @@ var _index = _interopRequireDefault(require("./components/d3_line/index"));
 var _index2 = _interopRequireDefault(require("./components/d3_rect/index"));
 var _forecast_viewer = _interopRequireDefault(require("./components/forecast_viewer"));
 var _format = _interopRequireDefault(require("./helpers/format"));
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, default-param-last, react/function-component-definition */
 
 const extractLayout = (forecast, layoutSt) => {
@@ -32,17 +33,16 @@ const extractLayout = (forecast, layoutSt) => {
     isXRD
   };
 };
-const Content = _ref => {
-  let {
-    topic,
-    feature,
-    cLabel,
-    xLabel,
-    yLabel,
-    forecast,
-    operations,
-    layoutSt
-  } = _ref;
+const Content = ({
+  topic,
+  feature,
+  cLabel,
+  xLabel,
+  yLabel,
+  forecast,
+  operations,
+  layoutSt
+}) => {
   const {
     showForecast,
     isNmr,
@@ -52,7 +52,7 @@ const Content = _ref => {
     isXRD
   } = extractLayout(forecast, layoutSt);
   if (showForecast) {
-    return /*#__PURE__*/_react.default.createElement(_forecast_viewer.default, {
+    return /*#__PURE__*/(0, _jsxRuntime.jsx)(_forecast_viewer.default, {
       topic: topic,
       cLabel: cLabel,
       xLabel: xLabel,
@@ -67,7 +67,7 @@ const Content = _ref => {
     });
   }
   if (isMs) {
-    return /*#__PURE__*/_react.default.createElement(_index2.default, {
+    return /*#__PURE__*/(0, _jsxRuntime.jsx)(_index2.default, {
       topic: topic,
       cLabel: cLabel,
       xLabel: xLabel,
@@ -76,7 +76,7 @@ const Content = _ref => {
       isHidden: false
     });
   }
-  return /*#__PURE__*/_react.default.createElement(_index.default, {
+  return /*#__PURE__*/(0, _jsxRuntime.jsx)(_index.default, {
     topic: topic,
     cLabel: cLabel,
     xLabel: xLabel,

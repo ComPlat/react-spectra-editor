@@ -16,6 +16,7 @@ var _wavelength = require("../../actions/wavelength");
 var _format = _interopRequireDefault(require("../../helpers/format"));
 var _common = require("./common");
 var _list_wavelength = require("../../constants/list_wavelength");
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, react/jsx-one-expression-per-line,
 react/function-component-definition */
 
@@ -29,41 +30,44 @@ const styles = () => Object.assign({
 }, _common.commonStyle);
 const wavelengthSelect = (classes, waveLengthSt, layoutSt, updateWaveLengthAct) => {
   if (!_format.default.isXRDLayout(layoutSt)) {
-    return /*#__PURE__*/_react.default.createElement("i", null);
+    return /*#__PURE__*/(0, _jsxRuntime.jsx)("i", {});
   }
   const onChange = e => updateWaveLengthAct(e.target.value);
-  return /*#__PURE__*/_react.default.createElement(_material.FormControl, {
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
     className: (0, _classnames.default)(classes.fieldLayout),
-    variant: "outlined"
-  }, /*#__PURE__*/_react.default.createElement(_material.InputLabel, {
-    id: "select-wavelength-label",
-    className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label')
-  }, "Wavelength"), /*#__PURE__*/_react.default.createElement(_material.Select, {
-    labelId: "select-wavelength-label",
-    label: "Wavelength",
-    value: waveLengthSt,
-    onChange: onChange,
-    className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-layout')
-  }, _list_wavelength.LIST_WAVE_LENGTH.map(item => {
-    // eslint-disable-line
-    return /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-      value: item
-    }, /*#__PURE__*/_react.default.createElement("span", {
-      className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-    }, item.label, " (", item.value, " ", item.unit, ")"));
-  })));
+    variant: "outlined",
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputLabel, {
+      id: "select-wavelength-label",
+      className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label'),
+      children: "Wavelength"
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Select, {
+      labelId: "select-wavelength-label",
+      label: "Wavelength",
+      value: waveLengthSt,
+      onChange: onChange,
+      className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-layout'),
+      children: _list_wavelength.LIST_WAVE_LENGTH.map(item => {
+        // eslint-disable-line
+        return /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+          value: item,
+          children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+            className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
+            children: [item.label, " (", item.value, " ", item.unit, ")"]
+          })
+        });
+      })
+    })]
+  });
 };
-const Wavelength = _ref => {
-  let {
-    classes,
-    waveLengthSt,
-    layoutSt,
-    updateWaveLengthAct
-  } = _ref;
-  return /*#__PURE__*/_react.default.createElement("span", {
-    className: classes.groupRight
-  }, wavelengthSelect(classes, waveLengthSt, layoutSt, updateWaveLengthAct));
-};
+const Wavelength = ({
+  classes,
+  waveLengthSt,
+  layoutSt,
+  updateWaveLengthAct
+}) => /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+  className: classes.groupRight,
+  children: wavelengthSelect(classes, waveLengthSt, layoutSt, updateWaveLengthAct)
+});
 const mapStateToProps = (state, props) => (
 // eslint-disable-line
 {

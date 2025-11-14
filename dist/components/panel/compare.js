@@ -5,7 +5,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-var _extends2 = _interopRequireDefault(require("@babel/runtime/helpers/extends"));
 var _react = _interopRequireDefault(require("react"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
 var _classnames = _interopRequireDefault(require("classnames"));
@@ -20,6 +19,7 @@ var _VisibilityOffOutlined = _interopRequireDefault(require("@mui/icons-material
 var _styles = require("@mui/styles");
 var _format = _interopRequireDefault(require("../../helpers/format"));
 var _jcamp = require("../../actions/jcamp");
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable function-paren-newline, react/jsx-props-no-spreading,
 react/function-component-definition */
 
@@ -112,19 +112,24 @@ const styles = theme => ({
   }
 });
 const msgDefault = 'Add spectra to compare.';
-const tpHint = classes => /*#__PURE__*/_react.default.createElement("span", {
-  className: (0, _classnames.default)(classes.tpCard)
-}, /*#__PURE__*/_react.default.createElement("p", {
-  className: (0, _classnames.default)(classes.tpLabel, 'txt-sv-tp')
-}, "- Accept *.dx, *.jdx, *.JCAMP,"), /*#__PURE__*/_react.default.createElement("p", {
-  className: (0, _classnames.default)(classes.tpLabel, 'txt-sv-tp')
-}, "- Max 5 spectra."));
-const content = (classes, desc) => /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
+const tpHint = classes => /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+  className: (0, _classnames.default)(classes.tpCard),
+  children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("p", {
+    className: (0, _classnames.default)(classes.tpLabel, 'txt-sv-tp'),
+    children: "- Accept *.dx, *.jdx, *.JCAMP,"
+  }), /*#__PURE__*/(0, _jsxRuntime.jsx)("p", {
+    className: (0, _classnames.default)(classes.tpLabel, 'txt-sv-tp'),
+    children: "- Max 5 spectra."
+  })]
+});
+const content = (classes, desc) => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tooltip, {
   title: tpHint(classes),
-  placement: "bottom"
-}, /*#__PURE__*/_react.default.createElement("span", {
-  className: (0, _classnames.default)(classes.tpLabel, 'txt-sv-tp')
-}, desc));
+  placement: "bottom",
+  children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+    className: (0, _classnames.default)(classes.tpLabel, 'txt-sv-tp'),
+    children: desc
+  })
+});
 const inputOthers = (classes, jcampSt) => {
   const {
     selectedIdx,
@@ -142,17 +147,19 @@ const inputOthers = (classes, jcampSt) => {
       jcamps: jcampFiles
     });
   };
-  return /*#__PURE__*/_react.default.createElement(_reactDropzone.default, {
+  return /*#__PURE__*/(0, _jsxRuntime.jsx)(_reactDropzone.default, {
     className: "dropbox",
-    onDrop: onDrop
-  }, _ref => {
-    let {
+    onDrop: onDrop,
+    children: ({
       getRootProps,
       getInputProps
-    } = _ref;
-    return /*#__PURE__*/_react.default.createElement("div", (0, _extends2.default)({}, getRootProps(), {
-      className: (0, _classnames.default)(classes.baseDD)
-    }), /*#__PURE__*/_react.default.createElement("input", getInputProps()), content(classes, desc));
+    }) => /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+      ...getRootProps(),
+      className: (0, _classnames.default)(classes.baseDD),
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("input", {
+        ...getInputProps()
+      }), content(classes, desc)]
+    })
   });
 };
 const compareList = (classes, jcampSt, rmOthersOneAct, toggleShowAct) => {
@@ -172,62 +179,71 @@ const compareList = (classes, jcampSt, rmOthersOneAct, toggleShowAct) => {
     isShow: o.show,
     toggleShowCb: () => toggleShowAct(idx)
   }));
-  return /*#__PURE__*/_react.default.createElement(_material.Table, {
-    className: classes.table
-  }, /*#__PURE__*/_react.default.createElement(_material.TableBody, null, rows.map(row => /*#__PURE__*/_react.default.createElement(_material.TableRow, {
-    key: row.idx,
-    className: classes.tRow,
-    hover: true
-  }, /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "right",
-    className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt'),
-    style: {
-      backgroundColor: row.color
-    }
-  }, row.idx + 1), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "right",
-    className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt', row.isShow ? null : classes.tTxtHide)
-  }, row.title), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "right",
-    className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
-  }, row.isShow ? /*#__PURE__*/_react.default.createElement(_VisibilityOutlined.default, {
-    onClick: row.toggleShowCb,
-    className: classes.showBtn
-  }) : /*#__PURE__*/_react.default.createElement(_VisibilityOffOutlined.default, {
-    onClick: row.toggleShowCb,
-    className: classes.hideBtn
-  }), /*#__PURE__*/_react.default.createElement(_HighlightOff.default, {
-    onClick: row.rmCb,
-    className: classes.rmBtn
-  }))))));
+  return /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Table, {
+    className: classes.table,
+    children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableBody, {
+      children: rows.map(row => /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.TableRow, {
+        className: classes.tRow,
+        hover: true,
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+          align: "right",
+          className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt'),
+          style: {
+            backgroundColor: row.color
+          },
+          children: row.idx + 1
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+          align: "right",
+          className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt', row.isShow ? null : classes.tTxtHide),
+          children: row.title
+        }), /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.TableCell, {
+          align: "right",
+          className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
+          children: [row.isShow ? /*#__PURE__*/(0, _jsxRuntime.jsx)(_VisibilityOutlined.default, {
+            onClick: row.toggleShowCb,
+            className: classes.showBtn
+          }) : /*#__PURE__*/(0, _jsxRuntime.jsx)(_VisibilityOffOutlined.default, {
+            onClick: row.toggleShowCb,
+            className: classes.hideBtn
+          }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_HighlightOff.default, {
+            onClick: row.rmCb,
+            className: classes.rmBtn
+          })]
+        })]
+      }, row.idx))
+    })
+  });
 };
-const ComparePanel = _ref2 => {
-  let {
-    classes,
-    expand,
-    onExapnd,
-    jcampSt,
-    rmOthersOneAct,
-    toggleShowAct
-  } = _ref2;
-  return /*#__PURE__*/_react.default.createElement(_material.Accordion, {
-    expanded: expand,
-    onChange: onExapnd,
-    className: (0, _classnames.default)(classes.panel),
-    TransitionProps: {
-      unmountOnExit: true
-    } // increase Accordion performance
-  }, /*#__PURE__*/_react.default.createElement(_material.AccordionSummary, {
-    expandIcon: /*#__PURE__*/_react.default.createElement(_ExpandMore.default, null),
-    className: (0, _classnames.default)(classes.panelSummary)
-  }, /*#__PURE__*/_react.default.createElement(_material.Typography, {
-    className: "txt-panel-header"
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title')
-  }, "Spectra Comparisons"))), /*#__PURE__*/_react.default.createElement(_material.Divider, null), inputOthers(classes, jcampSt), /*#__PURE__*/_react.default.createElement("div", {
-    className: (0, _classnames.default)(classes.panelDetail)
-  }, compareList(classes, jcampSt, rmOthersOneAct, toggleShowAct)));
-};
+const ComparePanel = ({
+  classes,
+  expand,
+  onExapnd,
+  jcampSt,
+  rmOthersOneAct,
+  toggleShowAct
+}) => /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Accordion, {
+  expanded: expand,
+  onChange: onExapnd,
+  className: (0, _classnames.default)(classes.panel),
+  TransitionProps: {
+    unmountOnExit: true
+  } // increase Accordion performance
+  ,
+  children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.AccordionSummary, {
+    expandIcon: /*#__PURE__*/(0, _jsxRuntime.jsx)(_ExpandMore.default, {}),
+    className: (0, _classnames.default)(classes.panelSummary),
+    children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Typography, {
+      className: "txt-panel-header",
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title'),
+        children: "Spectra Comparisons"
+      })
+    })
+  }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Divider, {}), inputOthers(classes, jcampSt), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+    className: (0, _classnames.default)(classes.panelDetail),
+    children: compareList(classes, jcampSt, rmOthersOneAct, toggleShowAct)
+  })]
+});
 const mapStateToProps = (state, props) => (
 // eslint-disable-line
 {

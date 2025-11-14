@@ -25,8 +25,7 @@ const getScanIdx = (entity, scanSt) => {
   }
   return idx - 1;
 };
-const extrShare = function (entity, thresSt) {
-  let scanIdx = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+const extrShare = (entity, thresSt, scanIdx = 0) => {
   const {
     spectra,
     features

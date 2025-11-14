@@ -16,6 +16,7 @@ var _styles = require("@mui/styles");
 var _chem = require("../../helpers/chem");
 var _common = require("./common");
 var _extractPeaksEdit = require("../../helpers/extractPeaksEdit");
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, function-paren-newline,
 react/function-component-definition, function-call-argument-newline,
 react/require-default-props */
@@ -44,30 +45,29 @@ const onClickCb = (operation, peaksEdit, isAscend, isIntensity, scan, thres, lay
     dscMetaData
   });
 };
-const BtnSubmit = _ref => {
-  let {
-    classes,
-    operation,
-    feature,
-    isAscend,
-    isIntensity,
-    editPeakSt,
-    thresSt,
-    layoutSt,
-    shiftSt,
-    scanSt,
-    forecastSt,
-    decimalSt,
-    integrationSt,
-    multiplicitySt,
-    allIntegrationSt,
-    waveLengthSt,
-    cyclicvoltaSt,
-    curveSt,
-    axesUnitsSt,
-    detectorSt,
-    metaSt
-  } = _ref;
+const BtnSubmit = ({
+  classes,
+  operation,
+  feature,
+  isAscend,
+  isIntensity,
+  editPeakSt,
+  thresSt,
+  layoutSt,
+  shiftSt,
+  scanSt,
+  forecastSt,
+  decimalSt,
+  integrationSt,
+  multiplicitySt,
+  allIntegrationSt,
+  waveLengthSt,
+  cyclicvoltaSt,
+  curveSt,
+  axesUnitsSt,
+  detectorSt,
+  metaSt
+}) => {
   const peaksEdit = (0, _extractPeaksEdit.extractPeaksEdit)(feature, editPeakSt, thresSt, shiftSt, layoutSt);
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
   const scan = (0, _chem.Convert2Scan)(feature, scanSt);
@@ -77,17 +77,20 @@ const BtnSubmit = _ref => {
     dscMetaData
   } = metaSt;
   if (!operation) return null;
-  return /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
-    title: /*#__PURE__*/_react.default.createElement("span", {
-      className: "txt-sv-tp"
-    }, "Submit")
-  }, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
-    className: (0, _classnames.default)('btn-sv-bar-submit'),
-    color: "primary",
-    onClick: onClickCb(operation.value, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt, integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData)
-  }, /*#__PURE__*/_react.default.createElement(_PlayCircleOutline.default, {
-    className: classes.icon
-  })));
+  return /*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
+    title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+      className: "txt-sv-tp",
+      children: "Submit"
+    }),
+    children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
+      className: (0, _classnames.default)('btn-sv-bar-submit'),
+      color: "primary",
+      onClick: onClickCb(operation.value, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt, integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData),
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_PlayCircleOutline.default, {
+        className: classes.icon
+      })
+    })
+  });
 };
 const mapStateToProps = (state, props) => (
 // eslint-disable-line

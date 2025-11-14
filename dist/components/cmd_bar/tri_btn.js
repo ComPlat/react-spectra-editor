@@ -14,6 +14,7 @@ var _styles = require("@mui/styles");
 var _Tooltip = _interopRequireDefault(require("@mui/material/Tooltip"));
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 var _common = require("./common");
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread */
 
 const styles = () => Object.assign({
@@ -58,16 +59,21 @@ class TriBtn extends _react.default.Component {
     const {
       tp
     } = content;
-    const title = /*#__PURE__*/_react.default.createElement("span", {
-      className: "txt-sv-tp"
-    }, tp);
-    return /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
-      title: title
-    }, /*#__PURE__*/_react.default.createElement("span", null, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
-      className: (0, _classnames.default)('btn-sv-bar-one'),
-      disabled: isClearAllDisabled === false ? false : _cfg.default.btnCmdMpy(layoutSt) && _cfg.default.btnCmdIntg(layoutSt),
-      onClick: this.onToggle
-    }, children)));
+    const title = /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+      className: "txt-sv-tp",
+      children: tp
+    });
+    return /*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
+      title: title,
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
+          className: (0, _classnames.default)('btn-sv-bar-one'),
+          disabled: isClearAllDisabled === false ? false : _cfg.default.btnCmdMpy(layoutSt) && _cfg.default.btnCmdIntg(layoutSt),
+          onClick: this.onToggle,
+          children: children
+        })
+      })
+    });
   }
   renderStageTwo() {
     const {
@@ -79,21 +85,27 @@ class TriBtn extends _react.default.Component {
       cb();
       this.onToggle(e);
     };
-    return /*#__PURE__*/_react.default.createElement("span", {
-      disabled: _cfg.default.btnCmdMpy(layoutSt) && _cfg.default.btnCmdIntg(layoutSt)
-    }, /*#__PURE__*/_react.default.createElement("span", {
-      className: (0, _classnames.default)(classes.txtLabel, 'txt-sv-bar-desc')
-    }, "Delete ALL?"), /*#__PURE__*/_react.default.createElement(_common.MuButton, {
-      className: (0, _classnames.default)('btn-sv-bar-yes'),
-      onClick: onExec
-    }, /*#__PURE__*/_react.default.createElement("span", {
-      className: (0, _classnames.default)(classes.txt, classes.btnYes, 'txt-sv-bar-yes')
-    }, "Y")), /*#__PURE__*/_react.default.createElement(_common.MuButton, {
-      className: (0, _classnames.default)('btn-sv-bar-no'),
-      onClick: this.onToggle
-    }, /*#__PURE__*/_react.default.createElement("span", {
-      className: (0, _classnames.default)(classes.txt, classes.btnNo, 'txt-sv-bar-no')
-    }, "N")));
+    return /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+      disabled: _cfg.default.btnCmdMpy(layoutSt) && _cfg.default.btnCmdIntg(layoutSt),
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        className: (0, _classnames.default)(classes.txtLabel, 'txt-sv-bar-desc'),
+        children: "Delete ALL?"
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
+        className: (0, _classnames.default)('btn-sv-bar-yes'),
+        onClick: onExec,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txt, classes.btnYes, 'txt-sv-bar-yes'),
+          children: "Y"
+        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
+        className: (0, _classnames.default)('btn-sv-bar-no'),
+        onClick: this.onToggle,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txt, classes.btnNo, 'txt-sv-bar-no'),
+          children: "N"
+        })
+      })]
+    });
   }
   render() {
     const {

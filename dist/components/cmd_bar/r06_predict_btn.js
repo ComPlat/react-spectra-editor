@@ -21,6 +21,7 @@ var _extractPeaksEdit = require("../../helpers/extractPeaksEdit");
 var _ui = require("../../actions/ui");
 var _list_ui = require("../../constants/list_ui");
 var _chem = require("../../helpers/chem");
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, function-paren-newline,
 max-len, react/function-component-definition,
 function-call-argument-newline, react/require-default-props */
@@ -100,57 +101,70 @@ const onClicUnknown = (feature, forecast, peaksEdit, layoutSt, scan, shiftSt, th
     curveSt
   });
 };
-const counterText = (classes, isIr, realCount, uniqCount, simuCount) => isIr ? null : /*#__PURE__*/_react.default.createElement("span", {
-  className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
-}, `${realCount}/${uniqCount}/${simuCount}`);
-const renderBtnPredict = (classes, isIr, realCount, uniqCount, simuCount, color, btnWidthCls, onClick) => /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
-  title: /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("span", {
-    className: "txt-sv-tp"
-  }, "Predict"), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("span", {
-    className: "txt-sv-tp"
-  }, "- Selected features must be eqal or less than simulated features."))
-}, /*#__PURE__*/_react.default.createElement(MuPredictButton, {
-  className: (0, _classnames.default)('btn-sv-bar-submit', btnWidthCls),
-  style: {
-    color
-  },
-  onClick: onClick
-}, counterText(classes, isIr, realCount, uniqCount, simuCount), /*#__PURE__*/_react.default.createElement(_GpsFixedOutlined.default, {
-  className: classes.icon
-})));
-const renderBtnUnknown = (classes, onClick) => /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
-  title: /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("span", {
-    className: "txt-sv-tp"
-  }, "Refresh Simulation"), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("span", {
-    className: "txt-sv-tp"
-  }, "- Simulation must be refreshed before making a prediction."), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("span", {
-    className: "txt-sv-tp"
-  }, "- If you continue to see this button after clicking it, the server is not ready. Please wait for a while."))
-}, /*#__PURE__*/_react.default.createElement(MuPredictButton, {
-  className: (0, _classnames.default)('btn-sv-bar-submit', classes.btnWidthUnknown),
-  style: {
-    color: 'orange'
-  },
-  onClick: onClick
-}, /*#__PURE__*/_react.default.createElement(_HelpOutlineOutlined.default, {
-  className: classes.icon
-})));
-const BtnPredict = _ref => {
-  let {
-    classes,
-    feature,
-    forecast,
-    layoutSt,
-    simulationSt,
-    editPeakSt,
-    scanSt,
-    shiftSt,
-    thresSt,
-    integrationSt,
-    multiplicitySt,
-    setUiViewerTypeAct,
-    curveSt
-  } = _ref;
+const counterText = (classes, isIr, realCount, uniqCount, simuCount) => isIr ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+  className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
+  children: `${realCount}/${uniqCount}/${simuCount}`
+});
+const renderBtnPredict = (classes, isIr, realCount, uniqCount, simuCount, color, btnWidthCls, onClick) => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tooltip, {
+  title: /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+      className: "txt-sv-tp",
+      children: "Predict"
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)("br", {}), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+      className: "txt-sv-tp",
+      children: "- Selected features must be eqal or less than simulated features."
+    })]
+  }),
+  children: /*#__PURE__*/(0, _jsxRuntime.jsxs)(MuPredictButton, {
+    className: (0, _classnames.default)('btn-sv-bar-submit', btnWidthCls),
+    style: {
+      color
+    },
+    onClick: onClick,
+    children: [counterText(classes, isIr, realCount, uniqCount, simuCount), /*#__PURE__*/(0, _jsxRuntime.jsx)(_GpsFixedOutlined.default, {
+      className: classes.icon
+    })]
+  })
+});
+const renderBtnUnknown = (classes, onClick) => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tooltip, {
+  title: /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+      className: "txt-sv-tp",
+      children: "Refresh Simulation"
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)("br", {}), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+      className: "txt-sv-tp",
+      children: "- Simulation must be refreshed before making a prediction."
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)("br", {}), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+      className: "txt-sv-tp",
+      children: "- If you continue to see this button after clicking it, the server is not ready. Please wait for a while."
+    })]
+  }),
+  children: /*#__PURE__*/(0, _jsxRuntime.jsx)(MuPredictButton, {
+    className: (0, _classnames.default)('btn-sv-bar-submit', classes.btnWidthUnknown),
+    style: {
+      color: 'orange'
+    },
+    onClick: onClick,
+    children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_HelpOutlineOutlined.default, {
+      className: classes.icon
+    })
+  })
+});
+const BtnPredict = ({
+  classes,
+  feature,
+  forecast,
+  layoutSt,
+  simulationSt,
+  editPeakSt,
+  scanSt,
+  shiftSt,
+  thresSt,
+  integrationSt,
+  multiplicitySt,
+  setUiViewerTypeAct,
+  curveSt
+}) => {
   const is13Cor1H = _format.default.is13CLayout(layoutSt) || _format.default.is1HLayout(layoutSt);
   const isIr = _format.default.isIrLayout(layoutSt);
   if (!(is13Cor1H || isIr)) return null;

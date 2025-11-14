@@ -17,9 +17,7 @@ const initialState = {
   },
   jcampIdx: 0
 };
-const uiReducer = function () {
-  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-  let action = arguments.length > 1 ? arguments[1] : undefined;
+const uiReducer = (state = initialState, action) => {
   switch (action.type) {
     case _action_type.UI.VIEWER.SET_TYPE:
       return Object.assign({}, state, {

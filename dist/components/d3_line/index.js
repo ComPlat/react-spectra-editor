@@ -16,6 +16,7 @@ var _line_focus = _interopRequireDefault(require("./line_focus"));
 var _draw = require("../common/draw");
 var _list_ui = require("../../constants/list_ui");
 var _cyclic_voltammetry = require("../../actions/cyclic_voltammetry");
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable no-mixed-operators */
 
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
@@ -171,7 +172,7 @@ class ViewerLine extends _react.default.Component {
     }
   }
   render() {
-    return /*#__PURE__*/_react.default.createElement("div", {
+    return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
       className: "d3Line"
     });
   }

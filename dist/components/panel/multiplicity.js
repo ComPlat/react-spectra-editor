@@ -19,6 +19,7 @@ var _multiplicity = require("../../actions/multiplicity");
 var _multiplicity_select = _interopRequireDefault(require("./multiplicity_select"));
 var _multiplicity_coupling = _interopRequireDefault(require("./multiplicity_coupling"));
 var _multiplicity_calc = require("../../helpers/multiplicity_calc");
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable function-paren-newline,
 function-call-argument-newline, react/function-component-definition */
 
@@ -138,31 +139,36 @@ const pkList = (classes, row, shift, digits, rmMpyPeakByPanelAct) => row.peaks.m
     peak: pk,
     xExtent
   });
-  const rmBtn = /*#__PURE__*/_react.default.createElement(_HighlightOff.default, {
+  const rmBtn = /*#__PURE__*/(0, _jsxRuntime.jsx)(_HighlightOff.default, {
     onClick: cb,
     className: classes.rmBtn
   });
-  return /*#__PURE__*/_react.default.createElement(_material.TableRow, {
-    key: pk.x,
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.TableRow, {
     className: classes.tRow,
-    hover: true
-  }, /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "right",
-    className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
-  }, `(${(pk.x - shift).toFixed(digits)}, ${pk.y.toExponential(2)})`), /*#__PURE__*/_react.default.createElement(_material.TableCell, {
-    align: "right",
-    className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
-  }, rmBtn));
+    hover: true,
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+      align: "right",
+      className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
+      children: `(${(pk.x - shift).toFixed(digits)}, ${pk.y.toExponential(2)})`
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+      align: "right",
+      className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
+      children: rmBtn
+    })]
+  }, pk.x);
 });
-const refreshBtn = (classes, onRefresh) => /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
+const refreshBtn = (classes, onRefresh) => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tooltip, {
   placement: "left",
-  title: /*#__PURE__*/_react.default.createElement("span", {
-    className: "txt-sv-tp"
-  }, "Calculate Multiplicity")
-}, /*#__PURE__*/_react.default.createElement(_material.Button, {
-  className: classes.btnRf,
-  onClick: onRefresh
-}, /*#__PURE__*/_react.default.createElement(_RefreshOutlined.default, null)));
+  title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+    className: "txt-sv-tp",
+    children: "Calculate Multiplicity"
+  }),
+  children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+    className: classes.btnRf,
+    onClick: onRefresh,
+    children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_RefreshOutlined.default, {})
+  })
+});
 const mpyList = (classes, digits, multiplicitySt, curveSt, clickMpyOneAct, rmMpyPeakByPanelAct, resetMpyOneAct) => {
   const {
     curveIdx
@@ -203,58 +209,74 @@ const mpyList = (classes, digits, multiplicitySt, curveSt, clickMpyOneAct, rmMpy
     };
     return createData(idx, xExtent, peaks, shift, smExtext, mpyType, js, onClick, onRefresh);
   });
-  return /*#__PURE__*/_react.default.createElement("div", null, rows.map(row => /*#__PURE__*/_react.default.createElement("div", {
-    className: classes.moCard,
-    key: row.idx
-  }, /*#__PURE__*/_react.default.createElement("div", {
-    className: classes.moCardHead
-  }, /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement(MUCheckbox, {
-    className: classes.moCBox,
-    checked: row.isCheck,
-    onChange: row.onClick
-  }), /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.moExtTxt, classes.moExtId, 'txt-sv-panel-head')
-  }, row.idx), /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.moExtTxt, 'txt-sv-panel-head')
-  }, `${row.center.toFixed(3)} (ppm)`), /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.moSelect, 'txt-sv-panel-head')
-  }, /*#__PURE__*/_react.default.createElement(_multiplicity_select.default, {
-    target: row
-  })), refreshBtn(classes, row.onRefresh)), /*#__PURE__*/_react.default.createElement(_multiplicity_coupling.default, {
-    row: row
-  })), /*#__PURE__*/_react.default.createElement(_material.Table, {
-    className: classes.table
-  }, /*#__PURE__*/_react.default.createElement(_material.TableBody, null, pkList(classes, row, shift, digits, rmMpyPeakByPanelAct))))));
+  return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+    children: rows.map(row => /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+      className: classes.moCard,
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+        className: classes.moCardHead,
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+          children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(MUCheckbox, {
+            className: classes.moCBox,
+            checked: row.isCheck,
+            onChange: row.onClick
+          }), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+            className: (0, _classnames.default)(classes.moExtTxt, classes.moExtId, 'txt-sv-panel-head'),
+            children: row.idx
+          }), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+            className: (0, _classnames.default)(classes.moExtTxt, 'txt-sv-panel-head'),
+            children: `${row.center.toFixed(3)} (ppm)`
+          }), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+            className: (0, _classnames.default)(classes.moSelect, 'txt-sv-panel-head'),
+            children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_multiplicity_select.default, {
+              target: row
+            })
+          }), refreshBtn(classes, row.onRefresh)]
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_multiplicity_coupling.default, {
+          row: row
+        })]
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Table, {
+        className: classes.table,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableBody, {
+          children: pkList(classes, row, shift, digits, rmMpyPeakByPanelAct)
+        })
+      })]
+    }, row.idx))
+  });
 };
-const MultiplicityPanel = _ref => {
-  let {
-    classes,
-    expand,
-    onExapnd,
-    multiplicitySt,
-    curveSt,
-    clickMpyOneAct,
-    rmMpyPeakByPanelAct,
-    resetMpyOneAct
-  } = _ref;
+const MultiplicityPanel = ({
+  classes,
+  expand,
+  onExapnd,
+  multiplicitySt,
+  curveSt,
+  clickMpyOneAct,
+  rmMpyPeakByPanelAct,
+  resetMpyOneAct
+}) => {
   const digits = 4;
-  return /*#__PURE__*/_react.default.createElement(_material.Accordion, {
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Accordion, {
     expanded: expand,
     onChange: onExapnd,
     className: (0, _classnames.default)(classes.panel),
     TransitionProps: {
       unmountOnExit: true
     } // increase Accordion performance
-  }, /*#__PURE__*/_react.default.createElement(_material.AccordionSummary, {
-    expandIcon: /*#__PURE__*/_react.default.createElement(_ExpandMore.default, null),
-    className: (0, _classnames.default)(classes.panelSummary)
-  }, /*#__PURE__*/_react.default.createElement(_material.Typography, {
-    className: "txt-panel-header"
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title')
-  }, "Multiplicity"))), /*#__PURE__*/_react.default.createElement(_material.Divider, null), /*#__PURE__*/_react.default.createElement("div", {
-    className: (0, _classnames.default)(classes.panelDetail)
-  }, mpyList(classes, digits, multiplicitySt, curveSt, clickMpyOneAct, rmMpyPeakByPanelAct, resetMpyOneAct)));
+    ,
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.AccordionSummary, {
+      expandIcon: /*#__PURE__*/(0, _jsxRuntime.jsx)(_ExpandMore.default, {}),
+      className: (0, _classnames.default)(classes.panelSummary),
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Typography, {
+        className: "txt-panel-header",
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title'),
+          children: "Multiplicity"
+        })
+      })
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Divider, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+      className: (0, _classnames.default)(classes.panelDetail),
+      children: mpyList(classes, digits, multiplicitySt, curveSt, clickMpyOneAct, rmMpyPeakByPanelAct, resetMpyOneAct)
+    })]
+  });
 };
 const mapStateToProps = (state, props) => (
 // eslint-disable-line
