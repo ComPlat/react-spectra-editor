@@ -98,6 +98,22 @@ class MultiFocus {
     this.cyclicvoltaSt = null;
   }
 
+  getGlobalXExtent() {
+    let allData = [...this.data];
+    if (this.otherLineData) {
+      this.otherLineData.forEach((lineData) => {
+        allData = [...allData, ...lineData.data];
+      });
+    }
+
+    const xes = d3.extent(allData, (d) => d.x).sort((a, b) => a - b);
+
+    return {
+      xL: xes[0],
+      xU: xes[1],
+    };
+  }
+
   getShouldUpdate(nextEpSt) {
     const {
       prevXt, prevYt, prevEpSt, prevLySt,
@@ -255,11 +271,25 @@ class MultiFocus {
   drawOtherLines(layout) {
     d3.selectAll('.line-clip-compare').remove();
     if (!this.otherLineData) return null;
+
+    const { yt } = TfRescale(this);
+    const globalXExtent = this.getGlobalXExtent();
+
+    const reverse = this.reverseXAxis(this.layout);
+    const xRange = reverse ? [this.w, 0] : [0, this.w];
+    const xtGlobal = d3.scaleLinear()
+      .domain([globalXExtent.xL, globalXExtent.xU])
+      .range(xRange);
+
+    const globalPathCall = d3.line()
+      .x((d) => xtGlobal(d.x))
+      .y((d) => yt(d.y));
+
     this.otherLineData.forEach((entry, idx) => {
       const { data, color } = entry;
       const pathColor = color ? color : Format.mutiEntitiesColors(idx);
       const path = MountComparePath(this, pathColor, idx, 0.4);
-      path.attr('d', this.pathCall(data));
+      path.attr('d', globalPathCall(data));
       if (this.layout === LIST_LAYOUT.AIF && this.isShowAllCurves === true) {
         path.attr('marker-mid', 'url(#arrow-left)');
       }
