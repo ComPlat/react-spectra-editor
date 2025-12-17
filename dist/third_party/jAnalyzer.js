@@ -22,7 +22,7 @@ var _default = exports.default = {
    * @param {object} signal
    * @private
    */
-  compilePattern: function (signal) {
+  compilePattern: function compilePattern(signal) {
     signal.multiplicity = 'm';
     // 1.1 symmetrize
     // It will add a set of peaks(signal.peaksComp) to the signal that will be used during

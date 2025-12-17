@@ -15,8 +15,8 @@ var _styles = require("@mui/styles");
 var _material = require("@mui/material");
 var _curve = require("../../actions/curve");
 var _list_layout = require("../../constants/list_layout");
-function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
-function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
+var _jsxRuntime = require("react/jsx-runtime");
+function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function _interopRequireWildcard(e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 /* eslint-disable react/function-component-definition, function-paren-newline,
 react/require-default-props, react/no-unused-prop-types */
 
@@ -50,16 +50,15 @@ const styles = () => ({
     overflowWrap: 'anywhere'
   }
 });
-const GraphSelectionPanel = _ref => {
-  let {
-    classes,
-    curveSt,
-    entityFileNames,
-    subLayoutsInfo,
-    layoutSt,
-    selectCurveAct,
-    toggleShowAllCurveAct
-  } = _ref;
+const GraphSelectionPanel = ({
+  classes,
+  curveSt,
+  entityFileNames,
+  subLayoutsInfo,
+  layoutSt,
+  selectCurveAct,
+  toggleShowAllCurveAct
+}) => {
   let subLayoutValues = [];
   if (subLayoutsInfo) {
     subLayoutValues = Object.keys(subLayoutsInfo);
@@ -69,7 +68,7 @@ const GraphSelectionPanel = _ref => {
     setSelectedSublayout(subLayoutValues[0]);
   }, subLayoutValues);
   if (!curveSt) {
-    return /*#__PURE__*/_react.default.createElement("span", null);
+    return /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {});
   }
   const {
     curveIdx,
@@ -77,7 +76,7 @@ const GraphSelectionPanel = _ref => {
     isShowAllCurve
   } = curveSt;
   if (!listCurves) {
-    return /*#__PURE__*/_react.default.createElement("span", null);
+    return /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {});
   }
   const onChange = idx => {
     selectCurveAct(idx);
@@ -127,82 +126,106 @@ const GraphSelectionPanel = _ref => {
       filename
     };
   });
-  return /*#__PURE__*/_react.default.createElement(_material.Accordion, {
-    "data-testid": "GraphSelectionPanel"
-  }, /*#__PURE__*/_react.default.createElement(_material.AccordionSummary, {
-    expandIcon: /*#__PURE__*/_react.default.createElement(_ExpandMore.default, null),
-    className: (0, _classnames.default)(classes.panelSummary)
-  }, /*#__PURE__*/_react.default.createElement(_material.Typography, {
-    className: "txt-panel-header"
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title')
-  }, "Graph selection"))), /*#__PURE__*/_react.default.createElement(_material.Divider, null), layoutSt === _list_layout.LIST_LAYOUT.AIF ? /*#__PURE__*/_react.default.createElement(_material.FormControlLabel, {
-    control: /*#__PURE__*/_react.default.createElement(_material.Switch, {
-      checked: isShowAllCurve,
-      onChange: onChangeSwitch
-    }),
-    label: "Show all curves"
-  }) : null, subLayoutValues && subLayoutValues.length > 1 ? /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement(_material.Tabs, {
-    value: selectedSubLayout,
-    onChange: onChangeTabSubLayout
-  }, subLayoutValues.map((subLayout, i) => {
-    let subLayoutName = '';
-    switch (subLayout.toUpperCase()) {
-      case 'G/MOL':
-        subLayoutName = 'MWD';
-        break;
-      case 'MILLILITERS':
-        subLayoutName = 'ELU';
-        break;
-      case 'INTENSITY':
-        subLayoutName = 'Chromatogram';
-        break;
-      case 'DEGREES CELSIUS':
-        subLayoutName = 'Temperature';
-        break;
-      default:
-        break;
-    }
-    return /*#__PURE__*/_react.default.createElement(_material.Tab, {
-      key: i,
-      value: subLayout,
-      label: subLayoutName
-    });
-  })), /*#__PURE__*/_react.default.createElement(_material.List, null, itemsSubLayout.map(item => /*#__PURE__*/_react.default.createElement(_material.ListItem, {
-    key: item.idx,
-    onClick: () => onChange(item.idx),
-    className: (0, _classnames.default)(item.idx === curveIdx ? classes.curveSelected : classes.curveDefault) // eslint-disable-line
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.curve)
-  }, /*#__PURE__*/_react.default.createElement("i", null, item.name), /*#__PURE__*/_react.default.createElement("span", {
-    style: {
-      float: 'right',
-      width: '95%'
-    }
-  }, /*#__PURE__*/_react.default.createElement("hr", {
-    className: (0, _classnames.default)(classes.line),
-    style: {
-      backgroundColor: item.color
-    }
-  }), item.filename !== '' ? /*#__PURE__*/_react.default.createElement("span", null, "File: ", item.filename) : null // eslint-disable-line
-  )))))) : /*#__PURE__*/_react.default.createElement(_material.List, null, items.map(item => /*#__PURE__*/_react.default.createElement(_material.ListItem, {
-    key: item.idx,
-    onClick: () => onChange(item.idx),
-    className: (0, _classnames.default)(item.idx === curveIdx ? classes.curveSelected : classes.curveDefault) // eslint-disable-line
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.curve)
-  }, /*#__PURE__*/_react.default.createElement("i", null, item.name), /*#__PURE__*/_react.default.createElement("span", {
-    style: {
-      float: 'right',
-      width: '95%'
-    }
-  }, /*#__PURE__*/_react.default.createElement("hr", {
-    className: (0, _classnames.default)(classes.line),
-    style: {
-      backgroundColor: item.color
-    }
-  }), item.filename !== '' ? /*#__PURE__*/_react.default.createElement("span", null, "File: ", item.filename) : null // eslint-disable-line
-  ))))));
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Accordion, {
+    "data-testid": "GraphSelectionPanel",
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.AccordionSummary, {
+      expandIcon: /*#__PURE__*/(0, _jsxRuntime.jsx)(_ExpandMore.default, {}),
+      className: (0, _classnames.default)(classes.panelSummary),
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Typography, {
+        className: "txt-panel-header",
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title'),
+          children: "Graph selection"
+        })
+      })
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Divider, {}), layoutSt === _list_layout.LIST_LAYOUT.AIF ? /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.FormControlLabel, {
+      control: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Switch, {
+        checked: isShowAllCurve,
+        onChange: onChangeSwitch
+      }),
+      label: "Show all curves"
+    }) : null, subLayoutValues && subLayoutValues.length > 1 ? /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tabs, {
+        value: selectedSubLayout,
+        onChange: onChangeTabSubLayout,
+        children: subLayoutValues.map((subLayout, i) => {
+          let subLayoutName = '';
+          switch (subLayout.toUpperCase()) {
+            case 'G/MOL':
+              subLayoutName = 'MWD';
+              break;
+            case 'MILLILITERS':
+              subLayoutName = 'ELU';
+              break;
+            case 'INTENSITY':
+              subLayoutName = 'Chromatogram';
+              break;
+            case 'DEGREES CELSIUS':
+              subLayoutName = 'Temperature';
+              break;
+            default:
+              break;
+          }
+          return /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tab, {
+            value: subLayout,
+            label: subLayoutName
+          }, i);
+        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.List, {
+        children: itemsSubLayout.map(item => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.ListItem, {
+          onClick: () => onChange(item.idx),
+          className: (0, _classnames.default)(item.idx === curveIdx ? classes.curveSelected : classes.curveDefault) // eslint-disable-line
+          ,
+          children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+            className: (0, _classnames.default)(classes.curve),
+            children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("i", {
+              children: item.name
+            }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+              style: {
+                float: 'right',
+                width: '95%'
+              },
+              children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("hr", {
+                className: (0, _classnames.default)(classes.line),
+                style: {
+                  backgroundColor: item.color
+                }
+              }), item.filename !== '' ? /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+                children: ["File: ", item.filename]
+              }) : null // eslint-disable-line
+              ]
+            })]
+          })
+        }, item.idx))
+      })]
+    }) : /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.List, {
+      children: items.map(item => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.ListItem, {
+        onClick: () => onChange(item.idx),
+        className: (0, _classnames.default)(item.idx === curveIdx ? classes.curveSelected : classes.curveDefault) // eslint-disable-line
+        ,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+          className: (0, _classnames.default)(classes.curve),
+          children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("i", {
+            children: item.name
+          }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+            style: {
+              float: 'right',
+              width: '95%'
+            },
+            children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("hr", {
+              className: (0, _classnames.default)(classes.line),
+              style: {
+                backgroundColor: item.color
+              }
+            }), item.filename !== '' ? /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+              children: ["File: ", item.filename]
+            }) : null // eslint-disable-line
+            ]
+          })]
+        })
+      }, item.idx))
+    })]
+  });
 };
 const mapStateToProps = (state, props) => (
 // eslint-disable-line

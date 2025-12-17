@@ -97,6 +97,19 @@ class MultiFocus {
     this.isFirefox = typeof InstallTrigger !== 'undefined';
     this.cyclicvoltaSt = null;
   }
+  getGlobalXExtent() {
+    let allData = [...this.data];
+    if (this.otherLineData) {
+      this.otherLineData.forEach(lineData => {
+        allData = [...allData, ...lineData.data];
+      });
+    }
+    const xes = d3.extent(allData, d => d.x).sort((a, b) => a - b);
+    return {
+      xL: xes[0],
+      xU: xes[1]
+    };
+  }
   getShouldUpdate(nextEpSt) {
     const {
       prevXt,
@@ -158,8 +171,7 @@ class MultiFocus {
     this.tip = (0, _init.InitTip)();
     this.root.call(this.tip);
   }
-  setDataParams(filterSeed, peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt) {
-    let jcampIdx = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : 0;
+  setDataParams(filterSeed, peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt, jcampIdx = 0) {
     this.data = [];
     this.otherLineData = [];
     let filterSubLayoutValue = null;
@@ -284,6 +296,14 @@ class MultiFocus {
   drawOtherLines(layout) {
     d3.selectAll('.line-clip-compare').remove();
     if (!this.otherLineData) return null;
+    const {
+      yt
+    } = (0, _compass.TfRescale)(this);
+    const globalXExtent = this.getGlobalXExtent();
+    const reverse = this.reverseXAxis(this.layout);
+    const xRange = reverse ? [this.w, 0] : [0, this.w];
+    const xtGlobal = d3.scaleLinear().domain([globalXExtent.xL, globalXExtent.xU]).range(xRange);
+    const globalPathCall = d3.line().x(d => xtGlobal(d.x)).y(d => yt(d.y));
     this.otherLineData.forEach((entry, idx) => {
       const {
         data,
@@ -291,7 +311,7 @@ class MultiFocus {
       } = entry;
       const pathColor = color ? color : _format.default.mutiEntitiesColors(idx);
       const path = (0, _mount.MountComparePath)(this, pathColor, idx, 0.4);
-      path.attr('d', this.pathCall(data));
+      path.attr('d', globalPathCall(data));
       if (this.layout === _list_layout.LIST_LAYOUT.AIF && this.isShowAllCurves === true) {
         path.attr('marker-mid', 'url(#arrow-left)');
       }
@@ -811,21 +831,20 @@ class MultiFocus {
   reverseXAxis(layoutSt) {
     return [_list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS, _list_layout.LIST_LAYOUT.TGA, _list_layout.LIST_LAYOUT.DSC, _list_layout.LIST_LAYOUT.XRD, _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY, _list_layout.LIST_LAYOUT.CDS, _list_layout.LIST_LAYOUT.SEC, _list_layout.LIST_LAYOUT.GC, _list_layout.LIST_LAYOUT.AIF].indexOf(layoutSt) < 0;
   }
-  create(_ref) {
-    let {
-      curveSt,
-      filterSeed,
-      filterPeak,
-      tTrEndPts,
-      tSfPeaks,
-      editPeakSt,
-      layoutSt,
-      sweepExtentSt,
-      isUiNoBrushSt,
-      cyclicvoltaSt,
-      integationSt,
-      mtplySt
-    } = _ref;
+  create({
+    curveSt,
+    filterSeed,
+    filterPeak,
+    tTrEndPts,
+    tSfPeaks,
+    editPeakSt,
+    layoutSt,
+    sweepExtentSt,
+    isUiNoBrushSt,
+    cyclicvoltaSt,
+    integationSt,
+    mtplySt
+  }) {
     this.svg = d3.select(this.rootKlass).select('.d3Svg');
     (0, _mount.MountMainFrame)(this, 'focus');
     (0, _mount.MountClip)(this);
@@ -863,22 +882,21 @@ class MultiFocus {
     (0, _brush.default)(this, false, isUiNoBrushSt);
     this.resetShouldUpdate(editPeakSt);
   }
-  update(_ref2) {
-    let {
-      entities,
-      curveSt,
-      filterSeed,
-      filterPeak,
-      tTrEndPts,
-      tSfPeaks,
-      editPeakSt,
-      layoutSt,
-      sweepExtentSt,
-      isUiNoBrushSt,
-      cyclicvoltaSt,
-      integationSt,
-      mtplySt
-    } = _ref2;
+  update({
+    entities,
+    curveSt,
+    filterSeed,
+    filterPeak,
+    tTrEndPts,
+    tSfPeaks,
+    editPeakSt,
+    layoutSt,
+    sweepExtentSt,
+    isUiNoBrushSt,
+    cyclicvoltaSt,
+    integationSt,
+    mtplySt
+  }) {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt));
     const {
