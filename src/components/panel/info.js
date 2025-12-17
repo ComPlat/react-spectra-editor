@@ -125,7 +125,6 @@ const normalizeQuillValue = (val) => {
 };
 
 const handleDescriptionChanged = (value, onDescriptionChanged) => {
-  console.log('INFO: value', value);
   onDescriptionChanged(normalizeQuillValue(value));
 };
 
