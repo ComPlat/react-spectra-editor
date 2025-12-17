@@ -18,6 +18,7 @@ var _curve = require("../actions/curve");
 var _cyclic_voltammetry = require("../actions/cyclic_voltammetry");
 var _list_layout = require("../constants/list_layout");
 var _format = _interopRequireDefault(require("../helpers/format"));
+var _cfg = _interopRequireDefault(require("../helpers/cfg"));
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable react/default-props-match-prop-types,
 react/require-default-props, react/no-unused-prop-types, react/jsx-boolean-value,
@@ -89,7 +90,7 @@ class MultiJcampsViewer extends _react.default.Component {
         feature: feature,
         operations: operations,
         editorOnly: true,
-        hideThreshold: !_format.default.isNmrLayout(layoutSt)
+        hideThreshold: _cfg.default.hideCmdThres(layoutSt)
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
         className: "react-spectrum-editor",
         children: /*#__PURE__*/(0, _jsxRuntime.jsxs)(_Grid.default, {
