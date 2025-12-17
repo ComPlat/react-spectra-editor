@@ -19,6 +19,7 @@ import {
 } from '../actions/cyclic_voltammetry';
 import { LIST_LAYOUT } from '../constants/list_layout';
 import Format from '../helpers/format';
+import Cfg from '../helpers/cfg';
 
 const styles = () => ({
   root: {
@@ -73,7 +74,7 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
           feature={feature}
           operations={operations}
           editorOnly={true}
-          hideThreshold={!Format.isNmrLayout(layoutSt)}
+          hideThreshold={Cfg.hideCmdThres(layoutSt)}
         />
         <div className="react-spectrum-editor">
           <Grid container>
