@@ -98,34 +98,38 @@ const Threshold = ({
     <span className={classes.groupRight}>
       { setThreshold(classes, thresVal, updateThresholdValueAct, curveSt) }
       <Tooltip title={<span className="txt-sv-tp">Restore Threshold</span>}>
-        <MuButton
-          className={
-            classNames(
-              'btn-sv-bar-thresref',
-            )
-          }
-          disabled={Cfg.btnCmdThres(thresVal)}
-          onClick={resetThresholdValueAct}
-        >
-          <RefreshOutlinedIcon className={classes.icon} />
-        </MuButton>
+        <span>
+          <MuButton
+            className={
+              classNames(
+                'btn-sv-bar-thresref',
+              )
+            }
+            disabled={Cfg.btnCmdThres(thresVal)}
+            onClick={resetThresholdValueAct}
+          >
+            <RefreshOutlinedIcon className={classes.icon} />
+          </MuButton>
+        </span>
       </Tooltip>
       {
         hideThresSt
           ? null
           : (
             <Tooltip title={<span className="txt-sv-tp">{restoreTp(hasEdit, isEditSt)}</span>}>
-              <MuButton
-                className={
-                  classNames(
-                    'btn-sv-bar-thresrst',
-                  )
-                }
-                disabled={Cfg.btnCmdThres(thresVal)}
-                onClick={toggleThresholdIsEditAct}
-              >
-                { restoreIcon(classes, hasEdit, isEditSt) }
-              </MuButton>
+              <span>
+                <MuButton
+                  className={
+                    classNames(
+                      'btn-sv-bar-thresrst',
+                    )
+                  }
+                  disabled={Cfg.btnCmdThres(thresVal)}
+                  onClick={toggleThresholdIsEditAct}
+                >
+                  { restoreIcon(classes, hasEdit, isEditSt) }
+                </MuButton>
+              </span>
             </Tooltip>
           )
       }
