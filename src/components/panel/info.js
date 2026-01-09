@@ -28,6 +28,22 @@ const styles = () => ({
   panelSummary: {
     backgroundColor: '#eee',
     height: 32,
+    minHeight: 32,
+    '& .MuiAccordionSummary-content': {
+      margin: 0,
+    },
+  },
+  subSectionHeader: {
+    backgroundColor: '#eee',
+    height: 32,
+    lineHeight: '32px',
+    paddingLeft: 10,
+    textAlign: 'left',
+    fontWeight: 'bold',
+    fontSize: '0.8rem',
+    fontFamily: 'Helvetica',
+    borderTop: '1px solid #dcdcdc',
+    color: 'rgba(0, 0, 0, 0.87)',
   },
   panelDetail: {
     backgroundColor: '#fff',
@@ -78,6 +94,20 @@ const styles = () => ({
     fontFamily: 'Helvetica',
     textAlign: 'left',
   },
+  quillContainer: {
+    margin: '10px 10px',
+    backgroundColor: '#fff',
+    '& .ql-container': {
+      border: 'none',
+    },
+    '& .ql-editor': {
+      minHeight: '60px',
+    },
+    '& .ql-editor.ql-blank::before': {
+      fontStyle: 'normal',
+      color: 'rgba(0, 0, 0, 0.54)',
+    },
+  },
 });
 
 const simTitle = () => (
@@ -87,6 +117,16 @@ const simTitle = () => (
 const simContent = (nmrSimPeaks) => (
   nmrSimPeaks && nmrSimPeaks.sort((a, b) => a - b).join(', ')
 );
+
+const normalizeQuillValue = (val) => {
+  if (!val) return '';
+  if (val === '<p><br></p>' || val === '<p></p>') return '';
+  return val;
+};
+
+const handleDescriptionChanged = (value, onDescriptionChanged) => {
+  onDescriptionChanged(normalizeQuillValue(value));
+};
 
 const aucValue = (integration) => {
   if (!integration) {
@@ -314,42 +354,41 @@ const InfoPanel = ({
           ) : null
         }
         <DSCData classes={classes} layout={layoutSt} dscMetaData={dscMetaData} updateAction={updateDSCMetaDataAct} />
-      </div>
-      {/* <ReactQuill
-        className={classNames(classes.quill, 'card-sv-quill')}
-        value={descriptions}
-        modules={{ toolbar: false }}
-        readOnly
-      /> */}
-      {
-        !Format.isCyclicVoltaLayout(layoutSt)
-          ? (
-            <ReactQuill
-              className={classNames(classes.quill, 'card-sv-quill')}
-              value={descriptions}
-              modules={{ toolbar: false }}
-              onChange={onDescriptionChanged}
-              readOnly={canChangeDescription !== undefined ? !canChangeDescription : true}
-            />
-          ) : null
-      }
-      <div>
         {
-            !editorOnly && Format.isNmrLayout(layoutSt)
-              ? (
+          !editorOnly && Format.isNmrLayout(layoutSt)
+            ? (
+              <>
+                <div className={classes.subSectionHeader}>
+                  { simTitle() }
+                </div>
                 <div className={classNames(classes.rowRoot, classes.rowOddSim)}>
-                  <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>
-                    { simTitle() }
-                    :
-                  </span>
-                  <br />
                   <span className={classNames(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt')}>
                     { simContent(simulationSt.nmrSimPeaks) }
                   </span>
                 </div>
-              )
-              : null
-          }
+              </>
+            )
+            : null
+        }
+        {
+          !Format.isCyclicVoltaLayout(layoutSt)
+            ? (
+              <>
+                <div className={classes.subSectionHeader}>
+                  Content
+                </div>
+                <div className={classes.quillContainer}>
+                  <ReactQuill
+                    value={normalizeQuillValue(descriptions)}
+                    placeholder={canChangeDescription ? 'Add text here...' : undefined}
+                    readOnly={!canChangeDescription}
+                    modules={{ toolbar: false }}
+                    onChange={(value) => handleDescriptionChanged(value, onDescriptionChanged)}
+                  />
+                </div>
+              </>
+            ) : null
+        }
       </div>
     </Accordion>
   );
@@ -379,7 +418,10 @@ InfoPanel.propTypes = {
   integration: PropTypes.object.isRequired,
   editorOnly: PropTypes.bool.isRequired,
   molSvg: PropTypes.string.isRequired,
-  descriptions: PropTypes.array.isRequired,
+  descriptions: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.array,
+  ]).isRequired,
   layoutSt: PropTypes.string.isRequired,
   simulationSt: PropTypes.array.isRequired,
   shiftSt: PropTypes.object.isRequired,
