@@ -20,6 +20,7 @@ var _list_shift = require("../../constants/list_shift");
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 var _common = require("./common");
 var _format = _interopRequireDefault(require("../../helpers/format"));
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, function-paren-newline,
 react/function-component-definition */
 
@@ -50,151 +51,214 @@ const shiftSelect = (classes, layoutSt, setShiftRefAct, shiftSt, curveSt) => {
     setShiftRefAct(payload);
   };
   const listShift = (0, _list_shift.getListShift)(layoutSt);
-  const content = listShift.map(ref => /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
+  const content = listShift.map(ref => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
     value: ref,
-    key: ref.name
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-shift')
-  }, `${ref.name}: ${_format.default.strNumberFixedDecimal(ref.value, 2)} ppm`)));
-  return /*#__PURE__*/_react.default.createElement(_material.FormControl, {
+    children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+      className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-shift'),
+      children: `${ref.name}: ${_format.default.strNumberFixedDecimal(ref.value, 2)} ppm`
+    })
+  }, ref.name));
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
     className: (0, _classnames.default)(classes.fieldShift),
-    variant: "outlined"
-  }, /*#__PURE__*/_react.default.createElement(_material.InputLabel, {
-    id: "select-solvent-label",
-    className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label')
-  }, "Reference"), /*#__PURE__*/_react.default.createElement(_material.Select, {
-    value: shiftRef,
-    labelId: "select-solvent-label",
-    label: "Solvent",
-    onChange: onChange,
-    className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-shift')
-  }, content));
+    variant: "outlined",
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputLabel, {
+      id: "select-solvent-label",
+      className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label'),
+      children: "Reference"
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Select, {
+      value: shiftRef,
+      labelId: "select-solvent-label",
+      label: "Solvent",
+      onChange: onChange,
+      className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-shift'),
+      children: content
+    })]
+  });
 };
 const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
   const onChange = e => updateLayoutAct(e.target.value);
-  return /*#__PURE__*/_react.default.createElement(_material.FormControl, {
-    className: (0, _classnames.default)(classes.fieldLayout)
-  }, /*#__PURE__*/_react.default.createElement(_material.InputLabel, {
-    id: "select-layout-label",
-    className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label')
-  }, "Layout"), /*#__PURE__*/_react.default.createElement(_material.Select, {
-    labelId: "select-layout-label",
-    label: "Layout",
-    value: layoutSt,
-    onChange: onChange,
-    className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-layout')
-  }, /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: _list_layout.LIST_LAYOUT.PLAIN
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  }, "plain")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: _list_layout.LIST_LAYOUT.IR
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  }, "IR")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: _list_layout.LIST_LAYOUT.RAMAN
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  }, "RAMAN")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: _list_layout.LIST_LAYOUT.UVVIS
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  }, "UV/VIS")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: _list_layout.LIST_LAYOUT.HPLC_UVVIS
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  }, "HPLC UV/VIS")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: _list_layout.LIST_LAYOUT.TGA
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  }, "TGA (THERMOGRAVIMETRIC ANALYSIS)")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: _list_layout.LIST_LAYOUT.DSC
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  }, "DSC (DIFFERENTIAL SCANNING CALORIMETRY)")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: _list_layout.LIST_LAYOUT.XRD
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  }, "XRD (X-RAY DIFFRACTION)")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: _list_layout.LIST_LAYOUT.H1
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  }, /*#__PURE__*/_react.default.createElement("sup", null, "1"), "H")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: _list_layout.LIST_LAYOUT.C13
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  }, /*#__PURE__*/_react.default.createElement("sup", null, "13"), "C")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: _list_layout.LIST_LAYOUT.F19
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  }, /*#__PURE__*/_react.default.createElement("sup", null, "19"), "F")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: _list_layout.LIST_LAYOUT.P31
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  }, /*#__PURE__*/_react.default.createElement("sup", null, "31"), "P")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: _list_layout.LIST_LAYOUT.N15
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  }, /*#__PURE__*/_react.default.createElement("sup", null, "15"), "N")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: _list_layout.LIST_LAYOUT.Si29
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  }, /*#__PURE__*/_react.default.createElement("sup", null, "29"), "Si")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: _list_layout.LIST_LAYOUT.MS
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  }, "MS")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  }, "CV (CYCLIC VOLTAMMETRY)")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: _list_layout.LIST_LAYOUT.CDS
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  }, "CDS (CIRCULAR DICHROISM SPECTROSCOPY)")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: _list_layout.LIST_LAYOUT.SEC
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  }, "SEC")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: _list_layout.LIST_LAYOUT.GC
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  }, "GC (GAS CHROMATOGRAPHY)")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: _list_layout.LIST_LAYOUT.AIF
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  }, "SORPTION-DESORPTION")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: _list_layout.LIST_LAYOUT.EMISSIONS
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  }, "EMISSIONS")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: _list_layout.LIST_LAYOUT.DLS_ACF
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  }, "DLS ACF")), /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-    value: _list_layout.LIST_LAYOUT.DLS_INTENSITY
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-  }, "DLS INTENSITY"))));
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
+    className: (0, _classnames.default)(classes.fieldLayout),
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputLabel, {
+      id: "select-layout-label",
+      className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label'),
+      children: "Layout"
+    }), /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Select, {
+      labelId: "select-layout-label",
+      label: "Layout",
+      value: layoutSt,
+      onChange: onChange,
+      className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-layout'),
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: _list_layout.LIST_LAYOUT.PLAIN,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
+          children: "plain"
+        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: _list_layout.LIST_LAYOUT.IR,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
+          children: "IR"
+        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: _list_layout.LIST_LAYOUT.RAMAN,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
+          children: "RAMAN"
+        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: _list_layout.LIST_LAYOUT.UVVIS,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
+          children: "UV/VIS"
+        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: _list_layout.LIST_LAYOUT.HPLC_UVVIS,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
+          children: "HPLC UV/VIS"
+        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: _list_layout.LIST_LAYOUT.TGA,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
+          children: "TGA (THERMOGRAVIMETRIC ANALYSIS)"
+        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: _list_layout.LIST_LAYOUT.DSC,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
+          children: "DSC (DIFFERENTIAL SCANNING CALORIMETRY)"
+        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: _list_layout.LIST_LAYOUT.XRD,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
+          children: "XRD (X-RAY DIFFRACTION)"
+        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: _list_layout.LIST_LAYOUT.H1,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
+          children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("sup", {
+            children: "1"
+          }), "H"]
+        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: _list_layout.LIST_LAYOUT.C13,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
+          children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("sup", {
+            children: "13"
+          }), "C"]
+        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: _list_layout.LIST_LAYOUT.F19,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
+          children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("sup", {
+            children: "19"
+          }), "F"]
+        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: _list_layout.LIST_LAYOUT.P31,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
+          children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("sup", {
+            children: "31"
+          }), "P"]
+        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: _list_layout.LIST_LAYOUT.N15,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
+          children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("sup", {
+            children: "15"
+          }), "N"]
+        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: _list_layout.LIST_LAYOUT.Si29,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
+          children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("sup", {
+            children: "29"
+          }), "Si"]
+        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: _list_layout.LIST_LAYOUT.MS,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
+          children: "MS"
+        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
+          children: "CV (CYCLIC VOLTAMMETRY)"
+        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: _list_layout.LIST_LAYOUT.CDS,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
+          children: "CDS (CIRCULAR DICHROISM SPECTROSCOPY)"
+        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: _list_layout.LIST_LAYOUT.SEC,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
+          children: "SEC"
+        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: _list_layout.LIST_LAYOUT.GC,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
+          children: "GC (GAS CHROMATOGRAPHY)"
+        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: _list_layout.LIST_LAYOUT.AIF,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
+          children: "SORPTION-DESORPTION"
+        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: _list_layout.LIST_LAYOUT.EMISSIONS,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
+          children: "EMISSIONS"
+        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: _list_layout.LIST_LAYOUT.DLS_ACF,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
+          children: "DLS ACF"
+        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: _list_layout.LIST_LAYOUT.DLS_INTENSITY,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
+          children: "DLS INTENSITY"
+        })
+      })]
+    })]
+  });
 };
-const Layout = _ref => {
-  let {
-    classes,
-    feature,
-    hasEdit,
-    layoutSt,
-    setShiftRefAct,
-    updateLayoutAct,
-    curveSt,
-    shiftSt
-  } = _ref;
-  return /*#__PURE__*/_react.default.createElement("span", {
-    className: classes.groupRight
-  }, layoutSelect(classes, layoutSt, updateLayoutAct), shiftSelect(classes, layoutSt, setShiftRefAct, shiftSt, curveSt), /*#__PURE__*/_react.default.createElement(_r02_scan.default, {
+const Layout = ({
+  classes,
+  feature,
+  hasEdit,
+  layoutSt,
+  setShiftRefAct,
+  updateLayoutAct,
+  curveSt,
+  shiftSt
+}) => /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+  className: classes.groupRight,
+  children: [layoutSelect(classes, layoutSt, updateLayoutAct), shiftSelect(classes, layoutSt, setShiftRefAct, shiftSt, curveSt), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r02_scan.default, {
     feature: feature,
     hasEdit: hasEdit
-  }));
-};
+  })]
+});
 const mapStateToProps = (state, props) => (
 // eslint-disable-line
 {

@@ -103,6 +103,30 @@ const CyclicVoltammetryPanel = ({
     list = spectra.list;
   }
 
+  const formatCurrent = (y, feature, cyclicVotaSt) => {
+    const baseY = feature && feature.yUnit ? String(feature.yUnit) : 'A';
+    const isMilli = /mA/i.test(baseY);
+    const useDensity = cyclicVotaSt && cyclicVotaSt.useCurrentDensity;
+
+    const rawArea = (cyclicVotaSt && cyclicVotaSt.areaValue === '' ? 1.0 : cyclicVotaSt?.areaValue) || 1.0;
+    const areaUnit = (cyclicVotaSt && cyclicVotaSt.areaUnit) ? cyclicVotaSt.areaUnit : 'cm²';
+    const safeArea = rawArea > 0 ? rawArea : 1.0;
+
+    let val = y;
+    let unit = isMilli ? 'mA' : 'A';
+
+    if (useDensity) {
+      val = y / safeArea;
+      unit = `${unit}/${areaUnit}`;
+    }
+
+    if (isMilli) {
+      val *= 1000.0;
+    }
+
+    return `${parseFloat(val).toExponential(2)} ${unit}`;
+  };
+
   const selectCell = (idx, isMax) => {
     setWorkWithMaxPeakAct({ isMax, jcampIdx });
     selectPairPeakAct({ index: idx, jcampIdx });
@@ -139,9 +163,9 @@ const CyclicVoltammetryPanel = ({
   const rows = list.map((o, idx) => (
     {
       idx,
-      max: o.max ? `E: ${Format.strNumberFixedLength(parseFloat(o.max.x), 3)} V,\nI: ${parseFloat((o.max.y) * 1000).toExponential(2)} mA` : 'nd',
-      min: o.min ? `E: ${Format.strNumberFixedLength(parseFloat(o.min.x), 3)} V,\nI: ${parseFloat((o.min.y) * 1000).toExponential(2)} mA` : 'nd',
-      pecker: o.pecker ? `${parseFloat((o.pecker.y) * 1000).toExponential(2)} mA` : 'nd',
+      max: o.max ? `E: ${Format.strNumberFixedLength(parseFloat(o.max.x), 3)} V,\nI: ${formatCurrent(o.max.y, feature, cyclicVotaSt)}` : 'nd',
+      min: o.min ? `E: ${Format.strNumberFixedLength(parseFloat(o.min.x), 3)} V,\nI: ${formatCurrent(o.min.y, feature, cyclicVotaSt)}` : 'nd',
+      pecker: o.pecker ? `${formatCurrent(o.pecker.y, feature, cyclicVotaSt)}` : 'nd',
       delta: `${getDelta(o)} mV`,
       ratio: getRatio(feature, o),
       e12: (typeof o.e12 === 'number') ? `${Format.strNumberFixedLength(o.e12, 3)} V` : 'nd',

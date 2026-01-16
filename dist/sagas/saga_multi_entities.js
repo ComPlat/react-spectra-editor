@@ -38,6 +38,66 @@ function* setCyclicVoltametry(action) {
     if (layout !== _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
       return;
     }
+    const cvSt = yield (0, _effects.select)(state => state.cyclicvolta);
+    const {
+      feature
+    } = firstCurve;
+    if (feature) {
+      const {
+        weAreaValue,
+        weAreaUnit,
+        currentMode
+      } = feature;
+      if (typeof weAreaUnit === 'string' && weAreaUnit.length > 0) {
+        const unit = weAreaUnit.replace('^2', '²');
+        yield (0, _effects.put)({
+          type: _action_type.CYCLIC_VOLTA_METRY.SET_AREA_UNIT,
+          payload: {
+            unit
+          }
+        });
+      } else {
+        yield (0, _effects.put)({
+          type: _action_type.CYCLIC_VOLTA_METRY.SET_AREA_UNIT,
+          payload: {
+            unit: 'cm²'
+          }
+        });
+      }
+      if (weAreaValue !== undefined && weAreaValue !== null) {
+        let numeric = null;
+        if (typeof weAreaValue === 'string') {
+          const parsed = parseFloat(weAreaValue);
+          if (!Number.isNaN(parsed)) numeric = parsed;
+        } else if (Number.isFinite(weAreaValue)) {
+          numeric = weAreaValue;
+        }
+        if (Number.isFinite(numeric)) {
+          yield (0, _effects.put)({
+            type: _action_type.CYCLIC_VOLTA_METRY.SET_AREA_VALUE,
+            payload: {
+              value: numeric
+            }
+          });
+        } else {
+          yield (0, _effects.put)({
+            type: _action_type.CYCLIC_VOLTA_METRY.SET_AREA_VALUE,
+            payload: {
+              value: 1.0
+            }
+          });
+        }
+      }
+      if (typeof currentMode === 'string' && currentMode.length > 0) {
+        const wantDensity = currentMode.toUpperCase() === 'DENSITY';
+        if (!!cvSt.useCurrentDensity !== wantDensity) {
+          yield (0, _effects.put)({
+            type: _action_type.CYCLIC_VOLTA_METRY.TOGGLE_DENSITY,
+            payload: null
+          });
+        }
+      }
+    }
     for (let index = 0; index < listCurves.length; index++) {
       const curve = listCurves[index];
       const maxminPeak = getMaxMinPeak(curve);

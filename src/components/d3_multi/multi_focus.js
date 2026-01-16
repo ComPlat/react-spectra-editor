@@ -96,6 +96,7 @@ class MultiFocus {
     this.onClickPecker = this.onClickPecker.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
     this.cyclicvoltaSt = null;
+    this.yTransformFactor = 1.0;
   }
 
   getGlobalXExtent() {
@@ -117,7 +118,7 @@ class MultiFocus {
   getShouldUpdate(nextEpSt) {
     const {
       prevXt, prevYt, prevEpSt, prevLySt,
-      prevTePt, prevDtPk, prevSfPk, prevData,
+      prevTePt, prevDtPk, prevSfPk, prevData, prevYFactor,
     } = this.shouldUpdate;
     const { xt, yt } = TfRescale(this);
     const sameXY = xt(1.1) === prevXt && prevYt === yt(1.1);
@@ -127,12 +128,13 @@ class MultiFocus {
     const sameDtPk = prevDtPk === this.dataPks.length;
     const sameSfPk = JSON.stringify(prevSfPk) === JSON.stringify(this.tSfPeaks);
     const sameData = prevData === this.data.length;
+    const sameYFactor = prevYFactor === this.yTransformFactor;
     this.shouldUpdate = Object.assign(
       {},
       this.shouldUpdate,
       {
         sameXY, sameEpSt, sameLySt, // eslint-disable-line
-        sameTePt, sameDtPk, sameSfPk, sameData, // eslint-disable-line
+        sameTePt, sameDtPk, sameSfPk, sameData, sameYFactor, // eslint-disable-line
       },
     );
   }
@@ -146,12 +148,13 @@ class MultiFocus {
     const prevSfPk = this.tSfPeaks;
     const prevData = this.data.length;
     const prevLySt = this.layout;
+    const prevYFactor = this.yTransformFactor;
     this.shouldUpdate = Object.assign(
       {},
       this.shouldUpdate,
       {
         prevXt, prevYt, prevEpSt, prevLySt, // eslint-disable-line
-        prevTePt, prevDtPk, prevSfPk, prevData, // eslint-disable-line
+        prevTePt, prevDtPk, prevSfPk, prevData, prevYFactor, // eslint-disable-line
       },
     );
   }
@@ -161,10 +164,37 @@ class MultiFocus {
     this.root.call(this.tip);
   }
 
+  computeYTransformFactor(layout, cyclicvoltaSt, feature) {
+    let factor = 1.0;
+    if (layout === LIST_LAYOUT.CYCLIC_VOLTAMMETRY && cyclicvoltaSt && cyclicvoltaSt.useCurrentDensity) {
+      const rawArea = (cyclicvoltaSt.areaValue === '' ? 1.0 : cyclicvoltaSt.areaValue) || 1.0;
+      const areaUnit = cyclicvoltaSt.areaUnit || 'cm²';
+      const safeArea = rawArea > 0 ? rawArea : 1.0;
+      const areaInCm2 = areaUnit === 'mm²' ? (safeArea / 100.0) : safeArea;
+      factor = 1.0 / areaInCm2;
+      const baseY = feature && feature.yUnit ? String(feature.yUnit) : 'A';
+      if (/mA/i.test(baseY)) {
+        factor *= 1000.0;
+      }
+      if (areaUnit === 'mm²') {
+        factor /= 100.0;
+      }
+    }
+    return factor;
+  }
+
+  transformYValue(y) {
+    return y * this.yTransformFactor;
+  }
+
   setDataParams(filterSeed, peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt, jcampIdx = 0) {
     this.data = [];
     this.otherLineData = [];
     let filterSubLayoutValue = null;
+
+    const currFeature = this.entities && this.entities[0] ? this.entities[0].feature : null;
+    this.yTransformFactor = this.computeYTransformFactor(layout, cyclicvoltaSt, currFeature);
+
     this.entities.forEach((entry, idx) => {
       const { topic, feature, color } = entry;
       const offset = GetCyclicVoltaPreviousShift(cyclicvoltaSt, jcampIdx);
@@ -205,6 +235,12 @@ class MultiFocus {
       .y((d) => yt(d.y));
   }
 
+  setYAxisTickFormat() {
+    const f = this.yTransformFactor || 1;
+    const format = d3.format('.2n');
+    this.axisCall.y.tickFormat((v) => format(v * f));
+  }
+
   setConfig(sweepExtentSt) {
     // Domain Calculate
     let { xExtent, yExtent } = sweepExtentSt || { xExtent: false, yExtent: false };
@@ -237,6 +273,9 @@ class MultiFocus {
     // Axis Call
     this.axisCall.x.scale(xt);
     this.axisCall.y.scale(yt);
+    if (this.layout === LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
+      this.setYAxisTickFormat();
+    }
 
     this.currentExtent = { xExtent, yExtent };
   }
@@ -298,8 +337,8 @@ class MultiFocus {
   }
 
   drawGrid() {
-    const { sameXY } = this.shouldUpdate;
-    if (sameXY) return;
+    const { sameXY, sameYFactor } = this.shouldUpdate;
+    if (sameXY && sameYFactor) return;
 
     this.grid.x.call(this.axisCall.x
       .tickSize(-this.h, 0, 0))
@@ -494,7 +533,7 @@ class MultiFocus {
           .attr('stroke-opacity', '1.0');
         d3.select(`#bpt${Math.round(1000 * d.x)}`)
           .style('fill', 'blue');
-        const tipParams = { d, layout: this.layout };
+        const tipParams = { d, layout: this.layout, yFactor: this.yTransformFactor };
         this.tip.show(tipParams, event.target);
       })
       .on('mouseout', (event, d) => {
@@ -502,7 +541,7 @@ class MultiFocus {
           .attr('stroke-opacity', '0.0');
         d3.select(`#bpt${Math.round(1000 * d.x)}`)
           .style('fill', 'red');
-        const tipParams = { d, layout: this.layout };
+        const tipParams = { d, layout: this.layout, yFactor: this.yTransformFactor };
         this.tip.hide(tipParams, event.target);
       })
       .on('click', (event, d) => this.onClickTarget(event, d));
@@ -580,7 +619,7 @@ class MultiFocus {
           .attr('stroke-opacity', '1.0');
         d3.select(`#bpt${Math.round(1000 * d.x)}`)
           .style('fill', 'blue');
-        const tipParams = { d, layout: this.layout };
+        const tipParams = { d, layout: this.layout, yFactor: this.yTransformFactor };
         this.tip.show(tipParams, event.target);
       })
       .on('mouseout', (event, d) => {
@@ -588,7 +627,7 @@ class MultiFocus {
           .attr('stroke-opacity', '0.0');
         d3.select(`#bpt${Math.round(1000 * d.x)}`)
           .style('fill', '#228B22');
-        const tipParams = { d, layout: this.layout };
+        const tipParams = { d, layout: this.layout, yFactor: this.yTransformFactor };
         this.tip.hide(tipParams, event.target);
       })
       .on('click', (event, d) => this.onClickPecker(event, d));
