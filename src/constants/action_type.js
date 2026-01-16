@@ -53,6 +53,9 @@ const UI = {
   VIEWER: {
     SET_TYPE: 'UI_VIEWER_SET_TYPE',
   },
+  COMPARE: {
+    SET_ALIGN_X: 'UI_COMPARE_SET_ALIGN_X',
+  },
   SWEEP: {
     SET_TYPE: 'UI_SWEEP_SET_TYPE',
     SELECT: 'UI_SWEEP_SELECT',

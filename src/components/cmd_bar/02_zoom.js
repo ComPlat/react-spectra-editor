@@ -13,6 +13,7 @@ import Tooltip from '@mui/material/Tooltip';
 import { setUiSweepType } from '../../actions/ui';
 import { MuButton, commonStyle, focusStyle } from './common';
 import { LIST_UI_SWEEP_TYPE } from '../../constants/list_ui';
+import AlignCompareX from './r10_align_compare_x';
 
 const styles = () => (
   Object.assign(
@@ -22,10 +23,10 @@ const styles = () => (
 );
 
 const Zoom = ({
-  classes, isfocusZoomSt, setUiSweepTypeAct,
+  classes, isfocusZoomSt, curveIdx, setUiSweepTypeAct,
 }) => {
-  const onSweepZoomIn = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.ZOOMIN);
-  const onSweepZoomReset = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.ZOOMRESET);
+  const onSweepZoomIn = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.ZOOMIN, curveIdx);
+  const onSweepZoomReset = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.ZOOMRESET, curveIdx);
 
   return (
     <span className={classes.group} data-testid="Zoom">
@@ -58,6 +59,7 @@ const Zoom = ({
           </MuButton>
         </span>
       </Tooltip>
+      <AlignCompareX compact />
     </span>
   );
 };
@@ -65,6 +67,7 @@ const Zoom = ({
 const mapStateToProps = (state, _) => ( // eslint-disable-line
   {
     isfocusZoomSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.ZOOMIN,
+    curveIdx: state.curve.curveIdx,
   }
 );
 
@@ -77,6 +80,7 @@ const mapDispatchToProps = (dispatch) => (
 Zoom.propTypes = {
   classes: PropTypes.object.isRequired,
   isfocusZoomSt: PropTypes.bool.isRequired,
+  curveIdx: PropTypes.number.isRequired,
   setUiSweepTypeAct: PropTypes.func.isRequired,
 };
 

@@ -30,6 +30,7 @@ function* selectUiSweep(action) {
       yield put({
         type: UI.SWEEP.SELECT_ZOOMIN,
         payload,
+        curveIdx,
       });
       break;
     case LIST_UI_SWEEP_TYPE.ZOOMRESET:
@@ -68,6 +69,8 @@ const getLayoutSt = (state) => state.layout;
 
 function* scrollUiWheel(action) {
   const layoutSt = yield select(getLayoutSt);
+  const curveSt = yield select(getCurveSt);
+  const { curveIdx } = curveSt;
   const { payload } = action;
   const { xExtent, yExtent, direction } = payload;
   const { yL, yU } = yExtent;
@@ -105,6 +108,7 @@ function* scrollUiWheel(action) {
   yield put({
     type: UI.SWEEP.SELECT_ZOOMIN,
     payload: nextExtent,
+    curveIdx,
   });
 }
 

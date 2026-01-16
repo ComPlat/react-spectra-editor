@@ -40,10 +40,18 @@ const clickUiTarget = (payload, onPeak, voltammetryPeakIdx = 0, jcampIdx = 0, on
   }
 );
 
+const setUiAlignCompareX = (payload) => (
+  {
+    type: UI.COMPARE.SET_ALIGN_X,
+    payload,
+  }
+);
+
 export {
   setUiViewerType,
   setUiSweepType,
   selectUiSweep,
   scrollUiWheel,
   clickUiTarget,
+  setUiAlignCompareX,
 };

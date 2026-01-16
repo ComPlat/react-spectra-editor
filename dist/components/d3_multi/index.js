@@ -16,6 +16,7 @@ var _list_ui = require("../../constants/list_ui");
 var _cyclic_voltammetry = require("../../actions/cyclic_voltammetry");
 var _multi_focus = _interopRequireDefault(require("./multi_focus"));
 var _draw = require("../common/draw");
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable no-mixed-operators, react/require-default-props,
 react/no-unused-prop-types */
 
@@ -60,6 +61,7 @@ class ViewerMulti extends _react.default.Component {
       isHidden,
       resetAllAct,
       cyclicvoltaSt,
+      alignCompareXSt,
       integationSt,
       mtplySt,
       axesUnitsSt
@@ -104,7 +106,8 @@ class ViewerMulti extends _react.default.Component {
       isUiNoBrushSt,
       cyclicvoltaSt,
       integationSt,
-      mtplySt
+      mtplySt,
+      alignCompareX: alignCompareXSt
     });
     (0, _draw.drawLabel)(this.rootKlass, cLabel, xxLabel, yyLabel);
     (0, _draw.drawDisplay)(this.rootKlass, isHidden);
@@ -127,6 +130,7 @@ class ViewerMulti extends _react.default.Component {
       isUiNoBrushSt,
       isHidden,
       cyclicvoltaSt,
+      alignCompareXSt,
       integationSt,
       mtplySt,
       axesUnitsSt
@@ -170,7 +174,8 @@ class ViewerMulti extends _react.default.Component {
       isUiNoBrushSt,
       cyclicvoltaSt,
       integationSt,
-      mtplySt
+      mtplySt,
+      alignCompareX: alignCompareXSt
     });
     (0, _draw.drawLabel)(this.rootKlass, cLabel, xxLabel, yyLabel);
     (0, _draw.drawDisplay)(this.rootKlass, isHidden);
@@ -191,27 +196,38 @@ class ViewerMulti extends _react.default.Component {
     }
   }
   render() {
-    return /*#__PURE__*/_react.default.createElement("div", {
+    return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
       className: "d3Line"
     });
   }
 }
-const mapStateToProps = (state, props) => ({
-  curveSt: state.curve,
-  seed: (0, _chem.Topic2Seed)(state, props),
-  peak: (0, _chem.Feature2Peak)(state, props),
-  tTrEndPts: (0, _chem.ToThresEndPts)(state, props),
-  tSfPeaks: (0, _chem.ToShiftPeaks)(state, props),
-  editPeakSt: state.editPeak.present,
-  layoutSt: state.layout,
-  sweepExtentSt: state.ui.sweepExtent,
-  isUiNoBrushSt: _list_ui.LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
-  cyclicvoltaSt: state.cyclicvolta,
-  maxminPeakSt: (0, _chem.Feature2MaxMinPeak)(state, props),
-  integationSt: state.integration.present,
-  mtplySt: state.multiplicity.present,
-  axesUnitsSt: state.axesUnits
-});
+const mapStateToProps = (state, props) => (() => {
+  const {
+    curveIdx
+  } = state.curve;
+  const sweepExtentByCurve = state.ui.sweepExtentByCurve || {};
+  const sweepExtentSt = sweepExtentByCurve[curveIdx] || {
+    xExtent: false,
+    yExtent: false
+  };
+  return {
+    curveSt: state.curve,
+    seed: (0, _chem.Topic2Seed)(state, props),
+    peak: (0, _chem.Feature2Peak)(state, props),
+    tTrEndPts: (0, _chem.ToThresEndPts)(state, props),
+    tSfPeaks: (0, _chem.ToShiftPeaks)(state, props),
+    editPeakSt: state.editPeak.present,
+    layoutSt: state.layout,
+    sweepExtentSt,
+    isUiNoBrushSt: _list_ui.LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
+    alignCompareXSt: state.ui.alignCompareX,
+    cyclicvoltaSt: state.cyclicvolta,
+    maxminPeakSt: (0, _chem.Feature2MaxMinPeak)(state, props),
+    integationSt: state.integration.present,
+    mtplySt: state.multiplicity.present,
+    axesUnitsSt: state.axesUnits
+  };
+})();
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   resetAllAct: _manager.resetAll,
   clickUiTargetAct: _ui.clickUiTarget,
@@ -248,6 +264,7 @@ ViewerMulti.propTypes = {
   addCylicVoltaMaxPeakAct: _propTypes.default.func.isRequired,
   addCylicVoltaMinPeakAct: _propTypes.default.func.isRequired,
   cLabel: _propTypes.default.string,
-  axesUnitsSt: _propTypes.default.object.isRequired
+  axesUnitsSt: _propTypes.default.object.isRequired,
+  alignCompareXSt: _propTypes.default.bool.isRequired
 };
 var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(ViewerMulti);

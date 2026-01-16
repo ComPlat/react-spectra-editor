@@ -18,6 +18,7 @@ var _RefreshOutlined = _interopRequireDefault(require("@mui/icons-material/Refre
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 var _threshold = require("../../actions/threshold");
 var _common = require("./common");
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, function-paren-newline,
 react/function-component-definition */
 
@@ -27,11 +28,13 @@ const styles = () => Object.assign({
   },
   txtIcon: {}
 }, _common.commonStyle);
-const txtPercent = () => /*#__PURE__*/_react.default.createElement(_material.InputAdornment, {
-  position: "end"
-}, /*#__PURE__*/_react.default.createElement("span", {
-  className: "txt-percent"
-}, "%"));
+const txtPercent = () => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputAdornment, {
+  position: "end",
+  children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+    className: "txt-percent",
+    children: "%"
+  })
+});
 const setThreshold = (classes, thresVal, updateThresholdValueAct, curveSt) => {
   const {
     curveIdx
@@ -52,71 +55,83 @@ const setThreshold = (classes, thresVal, updateThresholdValueAct, curveSt) => {
       });
     }
   };
-  return /*#__PURE__*/_react.default.createElement(_material.FormControl, {
-    variant: "outlined"
-  }, /*#__PURE__*/_react.default.createElement(_material.TextField, {
-    className: classes.field,
-    id: "outlined-name",
-    placeholder: "N.A.",
-    type: "number",
-    value: thresVal || 0.01,
-    margin: "none",
-    InputProps: {
-      endAdornment: txtPercent(),
-      className: (0, _classnames.default)(classes.txtInput, 'txtfield-sv-bar-input'),
-      inputProps: {
-        min: 0.01
-      }
-    },
-    onChange: onChange,
-    onBlur: onBlur,
-    onKeyPress: onEnterPress,
-    variant: "outlined"
-  }), /*#__PURE__*/_react.default.createElement(_material.InputLabel, {
-    className: (0, _classnames.default)(classes.txtLabelBottomInput)
-  }, "Threshold"));
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
+    variant: "outlined",
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TextField, {
+      className: classes.field,
+      id: "outlined-name",
+      placeholder: "N.A.",
+      type: "number",
+      value: thresVal || 0.01,
+      margin: "none",
+      InputProps: {
+        endAdornment: txtPercent(),
+        className: (0, _classnames.default)(classes.txtInput, 'txtfield-sv-bar-input'),
+        inputProps: {
+          min: 0.01
+        }
+      },
+      onChange: onChange,
+      onBlur: onBlur,
+      onKeyPress: onEnterPress,
+      variant: "outlined"
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputLabel, {
+      className: (0, _classnames.default)(classes.txtLabelBottomInput),
+      children: "Threshold"
+    })]
+  });
 };
-const restoreIcon = (classes, hasEdit, isEdit) => hasEdit && isEdit ? /*#__PURE__*/_react.default.createElement(_HowToRegOutlined.default, {
+const restoreIcon = (classes, hasEdit, isEdit) => hasEdit && isEdit ? /*#__PURE__*/(0, _jsxRuntime.jsx)(_HowToRegOutlined.default, {
   className: classes.icon
-}) : /*#__PURE__*/_react.default.createElement(_CloudDoneOutlined.default, {
+}) : /*#__PURE__*/(0, _jsxRuntime.jsx)(_CloudDoneOutlined.default, {
   className: classes.icon
 });
 const restoreTp = (hasEdit, isEdit) => hasEdit && isEdit ? 'User Defined Threshold' : 'Auto Picked Threshold';
-const Threshold = _ref => {
-  let {
-    classes,
-    feature,
-    hasEdit,
-    hideThresSt,
-    thresValSt,
-    isEditSt,
-    curveSt,
-    updateThresholdValueAct,
-    resetThresholdValueAct,
-    toggleThresholdIsEditAct
-  } = _ref;
+const Threshold = ({
+  classes,
+  feature,
+  hasEdit,
+  hideThresSt,
+  thresValSt,
+  isEditSt,
+  curveSt,
+  updateThresholdValueAct,
+  resetThresholdValueAct,
+  toggleThresholdIsEditAct
+}) => {
   const thresVal = thresValSt || feature.thresRef;
-  return /*#__PURE__*/_react.default.createElement("span", {
-    className: classes.groupRight
-  }, setThreshold(classes, thresVal, updateThresholdValueAct, curveSt), /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
-    title: /*#__PURE__*/_react.default.createElement("span", {
-      className: "txt-sv-tp"
-    }, "Restore Threshold")
-  }, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
-    className: (0, _classnames.default)('btn-sv-bar-thresref'),
-    disabled: _cfg.default.btnCmdThres(thresVal),
-    onClick: resetThresholdValueAct
-  }, /*#__PURE__*/_react.default.createElement(_RefreshOutlined.default, {
-    className: classes.icon
-  }))), hideThresSt ? null : /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
-    title: /*#__PURE__*/_react.default.createElement("span", {
-      className: "txt-sv-tp"
-    }, restoreTp(hasEdit, isEditSt))
-  }, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
-    className: (0, _classnames.default)('btn-sv-bar-thresrst'),
-    disabled: _cfg.default.btnCmdThres(thresVal),
-    onClick: toggleThresholdIsEditAct
-  }, restoreIcon(classes, hasEdit, isEditSt))));
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+    className: classes.groupRight,
+    children: [setThreshold(classes, thresVal, updateThresholdValueAct, curveSt), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tooltip, {
+      title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        className: "txt-sv-tp",
+        children: "Restore Threshold"
+      }),
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
+          className: (0, _classnames.default)('btn-sv-bar-thresref'),
+          disabled: _cfg.default.btnCmdThres(thresVal),
+          onClick: resetThresholdValueAct,
+          children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_RefreshOutlined.default, {
+            className: classes.icon
+          })
+        })
+      })
+    }), hideThresSt ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tooltip, {
+      title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        className: "txt-sv-tp",
+        children: restoreTp(hasEdit, isEditSt)
+      }),
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
+          className: (0, _classnames.default)('btn-sv-bar-thresrst'),
+          disabled: _cfg.default.btnCmdThres(thresVal),
+          onClick: toggleThresholdIsEditAct,
+          children: restoreIcon(classes, hasEdit, isEditSt)
+        })
+      })
+    })]
+  });
 };
 const mapStateToProps = (state, props) => (
 // eslint-disable-line

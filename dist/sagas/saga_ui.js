@@ -41,7 +41,8 @@ function* selectUiSweep(action) {
     case _list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN:
       yield (0, _effects.put)({
         type: _action_type.UI.SWEEP.SELECT_ZOOMIN,
-        payload
+        payload,
+        curveIdx
       });
       break;
     case _list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET:
@@ -91,6 +92,10 @@ function* selectUiSweep(action) {
 const getLayoutSt = state => state.layout;
 function* scrollUiWheel(action) {
   const layoutSt = yield (0, _effects.select)(getLayoutSt);
+  const curveSt = yield (0, _effects.select)(getCurveSt);
+  const {
+    curveIdx
+  } = curveSt;
   const {
     payload
   } = action;
@@ -156,7 +161,8 @@ function* scrollUiWheel(action) {
   }
   yield (0, _effects.put)({
     type: _action_type.UI.SWEEP.SELECT_ZOOMIN,
-    payload: nextExtent
+    payload: nextExtent,
+    curveIdx
   });
 }
 const getUiSweepType = state => state.ui.sweepType;

@@ -96,6 +96,7 @@ class MultiFocus {
     this.onClickPecker = this.onClickPecker.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
     this.cyclicvoltaSt = null;
+    this.alignCompareX = true;
   }
 
   getGlobalXExtent() {
@@ -272,18 +273,25 @@ class MultiFocus {
     d3.selectAll('.line-clip-compare').remove();
     if (!this.otherLineData) return null;
 
-    const { yt } = TfRescale(this);
-    const globalXExtent = this.getGlobalXExtent();
+    const { xt, yt } = TfRescale(this);
+    let globalPathCall;
 
-    const reverse = this.reverseXAxis(this.layout);
-    const xRange = reverse ? [this.w, 0] : [0, this.w];
-    const xtGlobal = d3.scaleLinear()
-      .domain([globalXExtent.xL, globalXExtent.xU])
-      .range(xRange);
+    if (this.alignCompareX) {
+      const globalXExtent = this.getGlobalXExtent();
+      const reverse = this.reverseXAxis(this.layout);
+      const xRange = reverse ? [this.w, 0] : [0, this.w];
+      const xtGlobal = d3.scaleLinear()
+        .domain([globalXExtent.xL, globalXExtent.xU])
+        .range(xRange);
 
-    const globalPathCall = d3.line()
-      .x((d) => xtGlobal(d.x))
-      .y((d) => yt(d.y));
+      globalPathCall = d3.line()
+        .x((d) => xtGlobal(d.x))
+        .y((d) => yt(d.y));
+    } else {
+      globalPathCall = d3.line()
+        .x((d) => xt(d.x))
+        .y((d) => yt(d.y));
+    }
 
     this.otherLineData.forEach((entry, idx) => {
       const { data, color } = entry;
@@ -1044,6 +1052,7 @@ class MultiFocus {
     sweepExtentSt, isUiNoBrushSt,
     cyclicvoltaSt,
     integationSt, mtplySt,
+    alignCompareX,
   }) {
     this.svg = d3.select(this.rootKlass).select('.d3Svg');
     MountMainFrame(this, 'focus');
@@ -1057,6 +1066,7 @@ class MultiFocus {
     this.scales = InitScale(this, this.reverseXAxis(layoutSt));
     this.setTip();
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
+    this.alignCompareX = alignCompareX;
     MountCompass(this);
 
     this.axis = MountAxis(this);
@@ -1090,6 +1100,7 @@ class MultiFocus {
     editPeakSt, layoutSt,
     sweepExtentSt, isUiNoBrushSt, cyclicvoltaSt,
     integationSt, mtplySt,
+    alignCompareX,
   }) {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, this.reverseXAxis(layoutSt));
@@ -1100,6 +1111,7 @@ class MultiFocus {
     this.entities = entities;
 
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
+    this.alignCompareX = alignCompareX;
 
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);
