@@ -235,7 +235,11 @@ const ComparePanel = ({
   <Accordion
     expanded={expand}
     onChange={onExapnd}
-    className={classNames(classes.panel)}
+    disableGutters
+    sx={{
+      '&.MuiAccordion-root.Mui-expanded': { margin: 0 },
+      '&:before': { display: 'none' },
+    }}
     TransitionProps={{ unmountOnExit: true }} // increase Accordion performance
   >
     <AccordionSummary

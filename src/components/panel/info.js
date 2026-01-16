@@ -28,10 +28,6 @@ const styles = () => ({
   panelSummary: {
     backgroundColor: '#eee',
     height: 32,
-    minHeight: 32,
-    '& .MuiAccordionSummary-content': {
-      margin: 0,
-    },
   },
   subSectionHeader: {
     backgroundColor: '#eee',
@@ -279,7 +275,11 @@ const InfoPanel = ({
       data-testid="PanelInfo"
       expanded={expand}
       onChange={onExapnd}
-      className={classNames(classes.panel)}
+      disableGutters
+      sx={{
+        '&.MuiAccordion-root.Mui-expanded': { margin: 0 },
+        '&:before': { display: 'none' },
+      }}
       TransitionProps={{ unmountOnExit: true }} // increase Accordion performance
     >
       <AccordionSummary
@@ -379,8 +379,9 @@ const InfoPanel = ({
                 </div>
                 <div className={classes.quillContainer}>
                   <ReactQuill
+                    className={classNames(classes.quill, 'card-sv-quill')}
                     value={normalizeQuillValue(descriptions)}
-                    placeholder={canChangeDescription ? 'Add text here...' : undefined}
+                    placeholder={canChangeDescription ? 'Peaks will be written here...' : undefined}
                     readOnly={!canChangeDescription}
                     modules={{ toolbar: false }}
                     onChange={(value) => handleDescriptionChanged(value, onDescriptionChanged)}

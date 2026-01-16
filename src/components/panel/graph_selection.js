@@ -114,7 +114,14 @@ const GraphSelectionPanel = ({
   });
 
   return (
-    <Accordion data-testid="GraphSelectionPanel">
+    <Accordion
+      data-testid="GraphSelectionPanel"
+      disableGutters
+      sx={{
+        '&.MuiAccordion-root.Mui-expanded': { margin: 0 },
+        '&:before': { display: 'none' },
+      }}
+    >
       <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
         className={classNames(classes.panelSummary)}

@@ -156,6 +156,11 @@ const CyclicVoltammetryPanel = ({
   return (
     <Accordion
       data-testid="PanelVoltammetry"
+      disableGutters
+      sx={{
+        '&.MuiAccordion-root.Mui-expanded': { margin: 0 },
+        '&:before': { display: 'none' },
+      }}
     >
       <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
