@@ -17,6 +17,7 @@ var _HowToRegOutlined = _interopRequireDefault(require("@mui/icons-material/HowT
 var _RefreshOutlined = _interopRequireDefault(require("@mui/icons-material/RefreshOutlined"));
 var _scan = require("../../actions/scan");
 var _common = require("./common");
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, function-paren-newline,
 react/function-component-definition */
 
@@ -25,32 +26,38 @@ const styles = () => Object.assign({
     width: 90
   }
 }, _common.commonStyle);
-const restoreIcon = (classes, hasEdit, isEdit) => hasEdit && isEdit ? /*#__PURE__*/_react.default.createElement(_HowToRegOutlined.default, {
+const restoreIcon = (classes, hasEdit, isEdit) => hasEdit && isEdit ? /*#__PURE__*/(0, _jsxRuntime.jsx)(_HowToRegOutlined.default, {
   className: classes.icon
-}) : /*#__PURE__*/_react.default.createElement(_CloudDoneOutlined.default, {
+}) : /*#__PURE__*/(0, _jsxRuntime.jsx)(_CloudDoneOutlined.default, {
   className: classes.icon
 });
 const restoreTp = (hasEdit, isEdit) => hasEdit && isEdit ? 'User Defined Scan' : 'Auto Picked Scan';
-const btnRestore = (classes, hasEdit, isEdit, toggleEditAct) => /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
-  title: /*#__PURE__*/_react.default.createElement("span", {
-    className: "txt-sv-tp"
-  }, restoreTp(hasEdit, isEdit))
-}, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
-  className: (0, _classnames.default)('btn-sv-bar-scanrst'),
-  disabled: !hasEdit,
-  onClick: toggleEditAct
-}, restoreIcon(classes, hasEdit, isEdit)));
-const btnRrfresh = (classes, disabled, refreshAct) => /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
-  title: /*#__PURE__*/_react.default.createElement("span", {
-    className: "txt-sv-tp"
-  }, "Refresh Scan")
-}, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
-  className: (0, _classnames.default)('btn-sv-bar-scanrfs'),
-  disabled: disabled,
-  onClick: refreshAct
-}, /*#__PURE__*/_react.default.createElement(_RefreshOutlined.default, {
-  className: classes.icon
-})));
+const btnRestore = (classes, hasEdit, isEdit, toggleEditAct) => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tooltip, {
+  title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+    className: "txt-sv-tp",
+    children: restoreTp(hasEdit, isEdit)
+  }),
+  children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
+    className: (0, _classnames.default)('btn-sv-bar-scanrst'),
+    disabled: !hasEdit,
+    onClick: toggleEditAct,
+    children: restoreIcon(classes, hasEdit, isEdit)
+  })
+});
+const btnRrfresh = (classes, disabled, refreshAct) => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tooltip, {
+  title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+    className: "txt-sv-tp",
+    children: "Refresh Scan"
+  }),
+  children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
+    className: (0, _classnames.default)('btn-sv-bar-scanrfs'),
+    disabled: disabled,
+    onClick: refreshAct,
+    children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_RefreshOutlined.default, {
+      className: classes.icon
+    })
+  })
+});
 const scanSelect = (classes, feature, layoutSt, scanSt, onChange) => {
   const {
     target,
@@ -58,43 +65,48 @@ const scanSelect = (classes, feature, layoutSt, scanSt, onChange) => {
   } = scanSt;
   if (!count) return null;
   const range = [...Array(count + 1).keys()].slice(1);
-  const content = range.map(num => /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
+  const content = range.map(num => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
     value: num,
-    key: num
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-scan')
-  }, `scan ${num}`)));
+    children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+      className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-scan'),
+      children: `scan ${num}`
+    })
+  }, num));
   const defaultValue = scanSt.isAuto || !feature.scanEditTarget ? feature.scanAutoTarget : feature.scanEditTarget;
   const selValue = target || defaultValue || 1;
-  return /*#__PURE__*/_react.default.createElement(_material.FormControl, {
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
     className: (0, _classnames.default)(classes.fieldScan),
-    variant: "outlined"
-  }, /*#__PURE__*/_react.default.createElement(_material.InputLabel, {
-    id: "select-scan-label",
-    className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label')
-  }, "Current Scan"), /*#__PURE__*/_react.default.createElement(_material.Select, {
-    labelId: "select-scan-label",
-    label: "Current Scan",
-    value: selValue,
-    onChange: onChange,
-    className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-scan')
-  }, content));
+    variant: "outlined",
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputLabel, {
+      id: "select-scan-label",
+      className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label'),
+      children: "Current Scan"
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Select, {
+      labelId: "select-scan-label",
+      label: "Current Scan",
+      value: selValue,
+      onChange: onChange,
+      className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-scan'),
+      children: content
+    })]
+  });
 };
-const Scan = _ref => {
-  let {
-    classes,
-    feature,
-    hasEdit,
-    layoutSt,
-    scanSt,
-    setScanTargetAct,
-    resetScanTargetAct,
-    toggleScanIsAutoAct
-  } = _ref;
+const Scan = ({
+  classes,
+  feature,
+  hasEdit,
+  layoutSt,
+  scanSt,
+  setScanTargetAct,
+  resetScanTargetAct,
+  toggleScanIsAutoAct
+}) => {
   const isMs = ['MS'].indexOf(layoutSt) >= 0;
   if (!isMs) return null;
   const onChange = e => setScanTargetAct(e.target.value);
-  return /*#__PURE__*/_react.default.createElement("span", null, scanSelect(classes, feature, layoutSt, scanSt, onChange), btnRrfresh(classes, false, resetScanTargetAct), btnRestore(classes, hasEdit, !scanSt.isAuto, toggleScanIsAutoAct));
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+    children: [scanSelect(classes, feature, layoutSt, scanSt, onChange), btnRrfresh(classes, false, resetScanTargetAct), btnRestore(classes, hasEdit, !scanSt.isAuto, toggleScanIsAutoAct)]
+  });
 };
 const mapStateToProps = (state, props) => (
 // eslint-disable-line

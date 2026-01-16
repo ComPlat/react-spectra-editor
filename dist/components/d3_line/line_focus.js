@@ -598,23 +598,22 @@ class LineFocus {
   reverseXAxis(layoutSt) {
     return [_list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS, _list_layout.LIST_LAYOUT.TGA, _list_layout.LIST_LAYOUT.DSC, _list_layout.LIST_LAYOUT.XRD, _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY, _list_layout.LIST_LAYOUT.CDS, _list_layout.LIST_LAYOUT.DLS_ACF, _list_layout.LIST_LAYOUT.SEC, _list_layout.LIST_LAYOUT.GC, _list_layout.LIST_LAYOUT.EMISSIONS, _list_layout.LIST_LAYOUT.DLS_INTENSITY].indexOf(layoutSt) < 0;
   }
-  create(_ref) {
-    let {
-      filterSeed,
-      filterPeak,
-      tTrEndPts,
-      tSfPeaks,
-      freq,
-      comparisons,
-      editPeakSt,
-      layoutSt,
-      integationSt,
-      mtplySt,
-      sweepExtentSt,
-      isUiAddIntgSt,
-      isUiNoBrushSt,
-      wavelength
-    } = _ref;
+  create({
+    filterSeed,
+    filterPeak,
+    tTrEndPts,
+    tSfPeaks,
+    freq,
+    comparisons,
+    editPeakSt,
+    layoutSt,
+    integationSt,
+    mtplySt,
+    sweepExtentSt,
+    isUiAddIntgSt,
+    isUiNoBrushSt,
+    wavelength
+  }) {
     this.svg = d3.select('.d3Svg');
     (0, _mount.MountMainFrame)(this, 'focus');
     (0, _mount.MountClip)(this);
@@ -645,23 +644,22 @@ class LineFocus {
     (0, _brush.default)(this, isUiAddIntgSt, isUiNoBrushSt);
     this.resetShouldUpdate(editPeakSt, integationSt, mtplySt);
   }
-  update(_ref2) {
-    let {
-      filterSeed,
-      filterPeak,
-      tTrEndPts,
-      tSfPeaks,
-      freq,
-      comparisons,
-      editPeakSt,
-      layoutSt,
-      integationSt,
-      mtplySt,
-      sweepExtentSt,
-      isUiAddIntgSt,
-      isUiNoBrushSt,
-      wavelength
-    } = _ref2;
+  update({
+    filterSeed,
+    filterPeak,
+    tTrEndPts,
+    tSfPeaks,
+    freq,
+    comparisons,
+    editPeakSt,
+    layoutSt,
+    integationSt,
+    mtplySt,
+    sweepExtentSt,
+    isUiAddIntgSt,
+    isUiNoBrushSt,
+    wavelength
+  }) {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt));
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt, wavelength);

@@ -21,9 +21,7 @@ const getTopic = (_, props) => props.topic;
 const getFeature = (_, props) => props.feature;
 const getLayout = (state, _) => state.layout; // eslint-disable-line
 
-const GetCyclicVoltaShiftOffset = function () {
-  let volammetryData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-  let curveIdx = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+const GetCyclicVoltaShiftOffset = (volammetryData = null, curveIdx = 0) => {
   if (!volammetryData) return 0.0;
   const {
     spectraList
@@ -165,9 +163,7 @@ const convertFrequency = (layout, feature) => {
 };
 const ToFrequency = exports.ToFrequency = (0, _reselect.createSelector)(getLayout, getFeature, convertFrequency);
 const getThreshold = state => state.threshold ? state.threshold.list[state.curve.curveIdx].value * 1.0 : false;
-const Convert2Peak = function (feature, threshold, offset) {
-  let upThreshold = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-  let lowThreshold = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+const Convert2Peak = (feature, threshold, offset, upThreshold = false, lowThreshold = false) => {
   const peak = [];
   if (!feature || !feature.data) return peak;
   const data = feature.data[0];
@@ -495,9 +491,7 @@ const extractVoltammetryData = jcamp => {
   });
   return peakStack;
 };
-const buildPeakFeature = function (jcamp, layout, peakUp, s, thresRef) {
-  let upperThres = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
-  let lowerThres = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : false;
+const buildPeakFeature = (jcamp, layout, peakUp, s, thresRef, upperThres = false, lowerThres = false) => {
   // eslint-disable-line
   const {
     xType,
@@ -894,9 +888,7 @@ const Convert2Thres = (feature, thresSt) => {
   return value;
 };
 exports.Convert2Thres = Convert2Thres;
-const Convert2DValue = function (doubleTheta) {
-  let lambda = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.15406;
-  let isRadian = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+const Convert2DValue = (doubleTheta, lambda = 0.15406, isRadian = true) => {
   let theta = doubleTheta / 2;
   if (isRadian) {
     theta = theta / 180 * Math.PI;

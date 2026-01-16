@@ -140,23 +140,28 @@ class ViewerLine extends React.Component {
 }
 
 const mapStateToProps = (state, props) => (
-  {
-    seed: Topic2Seed(state, props),
-    peak: Feature2Peak(state, props),
-    freq: ToFrequency(state, props),
-    comparisons: GetComparisons(state, props),
-    tTrEndPts: ToThresEndPts(state, props),
-    tSfPeaks: ToShiftPeaks(state, props),
-    editPeakSt: state.editPeak.present,
-    layoutSt: state.layout,
-    integationSt: state.integration.present,
-    mtplySt: state.multiplicity.present,
-    sweepExtentSt: state.ui.sweepExtent,
-    isUiAddIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
-    isUiNoBrushSt: LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
-    wavelength: state.wavelength,
-    axesUnitsSt: state.axesUnits,
-  }
+  (() => {
+    const { curveIdx } = state.curve;
+    const sweepExtentByCurve = state.ui.sweepExtentByCurve || {};
+    const sweepExtentSt = sweepExtentByCurve[curveIdx] || { xExtent: false, yExtent: false };
+    return {
+      seed: Topic2Seed(state, props),
+      peak: Feature2Peak(state, props),
+      freq: ToFrequency(state, props),
+      comparisons: GetComparisons(state, props),
+      tTrEndPts: ToThresEndPts(state, props),
+      tSfPeaks: ToShiftPeaks(state, props),
+      editPeakSt: state.editPeak.present,
+      layoutSt: state.layout,
+      integationSt: state.integration.present,
+      mtplySt: state.multiplicity.present,
+      sweepExtentSt,
+      isUiAddIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
+      isUiNoBrushSt: LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
+      wavelength: state.wavelength,
+      axesUnitsSt: state.axesUnits,
+    };
+  })()
 );
 
 const mapDispatchToProps = (dispatch) => (

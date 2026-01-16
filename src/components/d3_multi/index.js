@@ -45,7 +45,7 @@ class ViewerMulti extends React.Component {
       seed, peak, cLabel, xLabel, yLabel, feature,
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt,
       sweepExtentSt, isUiNoBrushSt,
-      isHidden, resetAllAct, cyclicvoltaSt,
+      isHidden, resetAllAct, cyclicvoltaSt, alignCompareXSt,
       integationSt, mtplySt, axesUnitsSt,
     } = this.props;
 
@@ -84,6 +84,7 @@ class ViewerMulti extends React.Component {
       cyclicvoltaSt,
       integationSt,
       mtplySt,
+      alignCompareX: alignCompareXSt,
     });
     drawLabel(this.rootKlass, cLabel, xxLabel, yyLabel);
     drawDisplay(this.rootKlass, isHidden);
@@ -96,7 +97,7 @@ class ViewerMulti extends React.Component {
       seed, peak, cLabel, xLabel, yLabel,
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt,
       sweepExtentSt, isUiNoBrushSt,
-      isHidden, cyclicvoltaSt,
+      isHidden, cyclicvoltaSt, alignCompareXSt,
       integationSt, mtplySt, axesUnitsSt,
     } = this.props;
     this.normChange(prevProps);
@@ -133,6 +134,7 @@ class ViewerMulti extends React.Component {
       cyclicvoltaSt,
       integationSt,
       mtplySt,
+      alignCompareX: alignCompareXSt,
     });
     drawLabel(this.rootKlass, cLabel, xxLabel, yyLabel);
     drawDisplay(this.rootKlass, isHidden);
@@ -159,22 +161,28 @@ class ViewerMulti extends React.Component {
 }
 
 const mapStateToProps = (state, props) => (
-  {
-    curveSt: state.curve,
-    seed: Topic2Seed(state, props),
-    peak: Feature2Peak(state, props),
-    tTrEndPts: ToThresEndPts(state, props),
-    tSfPeaks: ToShiftPeaks(state, props),
-    editPeakSt: state.editPeak.present,
-    layoutSt: state.layout,
-    sweepExtentSt: state.ui.sweepExtent,
-    isUiNoBrushSt: LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
-    cyclicvoltaSt: state.cyclicvolta,
-    maxminPeakSt: Feature2MaxMinPeak(state, props),
-    integationSt: state.integration.present,
-    mtplySt: state.multiplicity.present,
-    axesUnitsSt: state.axesUnits,
-  }
+  (() => {
+    const { curveIdx } = state.curve;
+    const sweepExtentByCurve = state.ui.sweepExtentByCurve || {};
+    const sweepExtentSt = sweepExtentByCurve[curveIdx] || { xExtent: false, yExtent: false };
+    return {
+      curveSt: state.curve,
+      seed: Topic2Seed(state, props),
+      peak: Feature2Peak(state, props),
+      tTrEndPts: ToThresEndPts(state, props),
+      tSfPeaks: ToShiftPeaks(state, props),
+      editPeakSt: state.editPeak.present,
+      layoutSt: state.layout,
+      sweepExtentSt,
+      isUiNoBrushSt: LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
+      alignCompareXSt: state.ui.alignCompareX,
+      cyclicvoltaSt: state.cyclicvolta,
+      maxminPeakSt: Feature2MaxMinPeak(state, props),
+      integationSt: state.integration.present,
+      mtplySt: state.multiplicity.present,
+      axesUnitsSt: state.axesUnits,
+    };
+  })()
 );
 
 const mapDispatchToProps = (dispatch) => (
@@ -217,6 +225,7 @@ ViewerMulti.propTypes = {
   addCylicVoltaMinPeakAct: PropTypes.func.isRequired,
   cLabel: PropTypes.string,
   axesUnitsSt: PropTypes.object.isRequired,
+  alignCompareXSt: PropTypes.bool.isRequired,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ViewerMulti);

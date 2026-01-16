@@ -16,6 +16,7 @@ var _line_focus = _interopRequireDefault(require("./line_focus"));
 var _draw = require("../common/draw");
 var _list_ui = require("../../constants/list_ui");
 var _cyclic_voltammetry = require("../../actions/cyclic_voltammetry");
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable no-mixed-operators */
 
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
@@ -171,28 +172,38 @@ class ViewerLine extends _react.default.Component {
     }
   }
   render() {
-    return /*#__PURE__*/_react.default.createElement("div", {
+    return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
       className: "d3Line"
     });
   }
 }
-const mapStateToProps = (state, props) => ({
-  seed: (0, _chem.Topic2Seed)(state, props),
-  peak: (0, _chem.Feature2Peak)(state, props),
-  freq: (0, _chem.ToFrequency)(state, props),
-  comparisons: (0, _chem.GetComparisons)(state, props),
-  tTrEndPts: (0, _chem.ToThresEndPts)(state, props),
-  tSfPeaks: (0, _chem.ToShiftPeaks)(state, props),
-  editPeakSt: state.editPeak.present,
-  layoutSt: state.layout,
-  integationSt: state.integration.present,
-  mtplySt: state.multiplicity.present,
-  sweepExtentSt: state.ui.sweepExtent,
-  isUiAddIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
-  isUiNoBrushSt: _list_ui.LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
-  wavelength: state.wavelength,
-  axesUnitsSt: state.axesUnits
-});
+const mapStateToProps = (state, props) => (() => {
+  const {
+    curveIdx
+  } = state.curve;
+  const sweepExtentByCurve = state.ui.sweepExtentByCurve || {};
+  const sweepExtentSt = sweepExtentByCurve[curveIdx] || {
+    xExtent: false,
+    yExtent: false
+  };
+  return {
+    seed: (0, _chem.Topic2Seed)(state, props),
+    peak: (0, _chem.Feature2Peak)(state, props),
+    freq: (0, _chem.ToFrequency)(state, props),
+    comparisons: (0, _chem.GetComparisons)(state, props),
+    tTrEndPts: (0, _chem.ToThresEndPts)(state, props),
+    tSfPeaks: (0, _chem.ToShiftPeaks)(state, props),
+    editPeakSt: state.editPeak.present,
+    layoutSt: state.layout,
+    integationSt: state.integration.present,
+    mtplySt: state.multiplicity.present,
+    sweepExtentSt,
+    isUiAddIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
+    isUiNoBrushSt: _list_ui.LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
+    wavelength: state.wavelength,
+    axesUnitsSt: state.axesUnits
+  };
+})();
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   resetAllAct: _manager.resetAll,
   clickUiTargetAct: _ui.clickUiTarget,

@@ -16,6 +16,7 @@ var _common = require("./common");
 var _list_layout = require("../../constants/list_layout");
 var _list_axes = require("../../constants/list_axes");
 var _axes = require("../../actions/axes");
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, react/jsx-one-expression-per-line,
 react/function-component-definition,
 max-len, no-unused-vars, no-multiple-empty-lines */
@@ -52,27 +53,31 @@ const axisX = (classes, layoutSt, axesUnitsSt, updateXAxisAct, curveSt) => {
   const {
     xUnit
   } = selectedAxes;
-  return /*#__PURE__*/_react.default.createElement(_material.FormControl, {
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
     className: (0, _classnames.default)(classes.fieldLayout),
-    variant: "outlined"
-  }, /*#__PURE__*/_react.default.createElement(_material.Select, {
-    labelId: "select-x-axis-label",
-    label: "x-Axis",
-    value: xUnit,
-    onChange: onChange,
-    className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-layout')
-  }, options.map(item => {
-    // eslint-disable-line
-    return /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-      value: item,
-      key: item
-    }, /*#__PURE__*/_react.default.createElement("span", {
-      className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-    }, item === '' ? 'Default' : item));
-  })), /*#__PURE__*/_react.default.createElement(_material.InputLabel, {
-    id: "select-x-axis-label",
-    className: (0, _classnames.default)(classes.txtLabelTopInput)
-  }, "x-Axis"));
+    variant: "outlined",
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Select, {
+      labelId: "select-x-axis-label",
+      label: "x-Axis",
+      value: xUnit,
+      onChange: onChange,
+      className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-layout'),
+      children: options.map(item => {
+        // eslint-disable-line
+        return /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+          value: item,
+          children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+            className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
+            children: item === '' ? 'Default' : item
+          })
+        }, item);
+      })
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputLabel, {
+      id: "select-x-axis-label",
+      className: (0, _classnames.default)(classes.txtLabelTopInput),
+      children: "x-Axis"
+    })]
+  });
 };
 const axisY = (classes, layoutSt, axesUnitsSt, updateYAxisAct, curveSt) => {
   const optionsAxisX = _list_axes.LIST_AXES.y;
@@ -97,48 +102,52 @@ const axisY = (classes, layoutSt, axesUnitsSt, updateYAxisAct, curveSt) => {
   const {
     yUnit
   } = selectedAxes;
-  return /*#__PURE__*/_react.default.createElement(_material.FormControl, {
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
     className: (0, _classnames.default)(classes.fieldLayout),
-    variant: "outlined"
-  }, /*#__PURE__*/_react.default.createElement(_material.Select, {
-    labelId: "select-y-axis-label",
-    label: "y-Axis",
-    value: yUnit,
-    onChange: onChange,
-    className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-layout')
-  }, options.map(item => {
-    // eslint-disable-line
-    return /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
-      value: item,
-      key: item
-    }, /*#__PURE__*/_react.default.createElement("span", {
-      className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
-    }, item === '' ? 'Default' : item));
-  })), /*#__PURE__*/_react.default.createElement(_material.InputLabel, {
-    id: "select-y-axis-label",
-    className: (0, _classnames.default)(classes.txtLabelTopInput)
-  }, "y-Axis"));
+    variant: "outlined",
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Select, {
+      labelId: "select-y-axis-label",
+      label: "y-Axis",
+      value: yUnit,
+      onChange: onChange,
+      className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-layout'),
+      children: options.map(item => {
+        // eslint-disable-line
+        return /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+          value: item,
+          children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+            className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
+            children: item === '' ? 'Default' : item
+          })
+        }, item);
+      })
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputLabel, {
+      id: "select-y-axis-label",
+      className: (0, _classnames.default)(classes.txtLabelTopInput),
+      children: "y-Axis"
+    })]
+  });
 };
 const showSelect = (classes, layoutSt, curveSt, axesUnitsSt, updateXAxisAct, updateYAxisAct) => {
   if (!listLayoutToShow.includes(layoutSt)) {
-    return /*#__PURE__*/_react.default.createElement("i", null);
+    return /*#__PURE__*/(0, _jsxRuntime.jsx)("i", {});
   }
-  return /*#__PURE__*/_react.default.createElement("span", null, axisX(classes, layoutSt, axesUnitsSt, updateXAxisAct, curveSt), axisY(classes, layoutSt, axesUnitsSt, updateYAxisAct, curveSt));
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+    children: [axisX(classes, layoutSt, axesUnitsSt, updateXAxisAct, curveSt), axisY(classes, layoutSt, axesUnitsSt, updateYAxisAct, curveSt)]
+  });
 };
-const ChangeAxes = _ref => {
-  let {
-    classes,
-    layoutSt,
-    curveSt,
-    axesUnitsSt,
-    updateXAxisAct,
-    updateYAxisAct
-  } = _ref;
-  return /*#__PURE__*/_react.default.createElement("span", {
-    className: classes.groupRight,
-    "data-testid": "ChangeAxes"
-  }, showSelect(classes, layoutSt, curveSt, axesUnitsSt, updateXAxisAct, updateYAxisAct));
-};
+const ChangeAxes = ({
+  classes,
+  layoutSt,
+  curveSt,
+  axesUnitsSt,
+  updateXAxisAct,
+  updateYAxisAct
+}) => /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+  className: classes.groupRight,
+  "data-testid": "ChangeAxes",
+  children: showSelect(classes, layoutSt, curveSt, axesUnitsSt, updateXAxisAct, updateYAxisAct)
+});
 const mapStateToProps = (state, props) => (
 // eslint-disable-line
 {
