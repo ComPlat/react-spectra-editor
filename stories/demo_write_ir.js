@@ -106,6 +106,7 @@ class DemoWriteIr extends React.Component {
           entity={entity}
           forecast={forecast}
           operations={operations}
+          descriptions={desc}
         />
         <Grid container>
           <Grid item xs={6}>

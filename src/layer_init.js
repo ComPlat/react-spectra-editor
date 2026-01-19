@@ -125,6 +125,9 @@ class LayerInit extends React.Component {
           molSvg={molSvg}
           exactMass={exactMass}
           operations={operations}
+          descriptions={descriptions}
+          canChangeDescription={canChangeDescription}
+          onDescriptionChanged={onDescriptionChanged}
         />
       );
     } else if (Format.isCyclicVoltaLayout(layout)) {  // eslint-disable-line
@@ -136,6 +139,9 @@ class LayerInit extends React.Component {
           molSvg={molSvg}
           exactMass={exactMass}
           operations={operations}
+          descriptions={descriptions}
+          canChangeDescription={canChangeDescription}
+          onDescriptionChanged={onDescriptionChanged}
         />
       );
     }

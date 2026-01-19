@@ -55,7 +55,7 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
     const {
       classes, curveSt, operations, entityFileNames,
       entities, userManualLink, molSvg, exactMass, layoutSt,
-      integrationSt,
+      integrationSt, descriptions, canChangeDescription, onDescriptionChanged,
     } = this.props;
     if (!entities || entities.length === 0) return (<div />);
 
@@ -96,9 +96,9 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
                 exactMass={exactMass}
                 subLayoutsInfo={seperatedSubLayouts}
                 integration={currentIntegration}
-                descriptions=""
-                canChangeDescription={() => {}}
-                onDescriptionChanged={() => {}}
+                descriptions={descriptions}
+                canChangeDescription={canChangeDescription}
+                onDescriptionChanged={onDescriptionChanged}
               />
             </Grid>
           </Grid>
@@ -145,6 +145,9 @@ MultiJcampsViewer.propTypes = {
   layoutSt: PropTypes.string.isRequired,
   exactMass: PropTypes.string,
   integrationSt: PropTypes.object.isRequired,
+  descriptions: PropTypes.array.isRequired,
+  canChangeDescription: PropTypes.bool.isRequired,
+  onDescriptionChanged: PropTypes.func,
 };
 
 MultiJcampsViewer.defaultProps = {
@@ -155,6 +158,8 @@ MultiJcampsViewer.defaultProps = {
   xLabel: '',
   yLabel: '',
   entities: [],
+  descriptions: [],
+  canChangeDescription: false,
 };
 
 export default compose(
