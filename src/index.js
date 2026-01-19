@@ -683,6 +683,7 @@ class DemoWriteIr extends React.Component {
           multiEntities={multiEntities}
           others={others}
           editorOnly={false}
+          descriptions={desc}
           canChangeDescription={true}
           onDescriptionChanged={this.onDescriptionChanged}
           molSvg={molSvg}
