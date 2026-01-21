@@ -306,7 +306,8 @@ class DemoWriteIr extends React.Component {
           xyData: feature.data[0],
         },
       };
-      const inlineData = FN.inlineNotation(layout, data);
+      const sampleName = feature?.sampleName || feature?.title || '';
+      const inlineData = FN.inlineNotation(layout, data, sampleName);
       const { formattedString } = inlineData;
       desc = formattedString;
     }

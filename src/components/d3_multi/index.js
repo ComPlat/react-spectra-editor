@@ -9,6 +9,7 @@ import {
   Topic2Seed, Feature2Peak, ToThresEndPts, ToShiftPeaks,
   Feature2MaxMinPeak,
 } from '../../helpers/chem';
+import Format from '../../helpers/format';
 import { resetAll } from '../../actions/manager';
 import { selectUiSweep, scrollUiWheel, clickUiTarget } from '../../actions/ui';
 import { LIST_NON_BRUSH_TYPES } from '../../constants/list_ui';
@@ -19,6 +20,8 @@ import MultiFocus from './multi_focus';
 import {
   drawMain, drawLabel, drawDisplay, drawDestroy, drawArrowOnCurve,
 } from '../common/draw';
+
+const d3 = require('d3');
 
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.85); // ROI
@@ -88,6 +91,7 @@ class ViewerMulti extends React.Component {
     drawLabel(this.rootKlass, cLabel, xxLabel, yyLabel);
     drawDisplay(this.rootKlass, isHidden);
     drawArrowOnCurve(this.rootKlass, isHidden);
+    this.applyCvSizing(layoutSt);
   }
 
   componentDidUpdate(prevProps) {
@@ -137,10 +141,20 @@ class ViewerMulti extends React.Component {
     drawLabel(this.rootKlass, cLabel, xxLabel, yyLabel);
     drawDisplay(this.rootKlass, isHidden);
     drawArrowOnCurve(this.rootKlass, isHidden);
+    this.applyCvSizing(layoutSt);
   }
 
   componentWillUnmount() {
     drawDestroy(this.rootKlass);
+  }
+
+  applyCvSizing(layoutSt) {
+    const svgSel = d3.select(this.rootKlass).selectAll('svg');
+    if (Format.isCyclicVoltaLayout(layoutSt)) {
+      svgSel.style('height', '100%');
+    } else {
+      svgSel.style('height', null);
+    }
   }
 
   normChange(prevProps) {
@@ -152,8 +166,10 @@ class ViewerMulti extends React.Component {
   }
 
   render() {
+    const { layoutSt } = this.props;
+    const isCyclicVolta = Format.isCyclicVoltaLayout(layoutSt);
     return (
-      <div className="d3Line" />
+      <div className="d3Line" style={isCyclicVolta ? { height: '100%' } : undefined} />
     );
   }
 }

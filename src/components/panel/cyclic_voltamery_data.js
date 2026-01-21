@@ -8,14 +8,13 @@ import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import InfoIcon from '@mui/icons-material/Info';
 import HelpIcon from '@mui/icons-material/Help';
 import { withStyles } from '@mui/styles';
 import {
-  Accordion, AccordionSummary, Table, TableHead, TableBody, TableCell, TableRow,
+  Table, TableHead, TableBody, TableCell, TableRow,
   Tooltip, Divider, Typography, Checkbox,
 } from '@mui/material';
 import {
@@ -28,22 +27,45 @@ import Format from '../../helpers/format';
 
 const styles = () => ({
   panel: {
-    backgroundColor: '#eee',
-    display: 'table-row',
+    backgroundColor: '#f7f7f7',
+    border: '1px solid #e6e6e6',
+    borderRadius: 8,
+    overflow: 'hidden',
   },
-  panelSummary: {
+  panelHeader: {
     backgroundColor: '#eee',
-    height: 32,
+    padding: '10px 12px',
+    display: 'flex',
+    alignItems: 'center',
   },
-  panelDetail: {
-    backgroundColor: '#fff',
-    maxHeight: 'calc(90vh - 220px)', // ROI
-    overflow: 'auto',
+  howToWrap: {
+    marginLeft: 'auto',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 4,
   },
   table: {
     width: '100%',
     overflowWrap: 'anywhere',
     fontSize: '14px !important',
+  },
+  tableWrap: {
+    padding: '8px 12px 12px',
+    height: 180,
+    overflowY: 'auto',
+    overflowX: 'hidden',
+  },
+  tableHeadRow: {
+    backgroundColor: '#f5f5f5',
+  },
+  tableHeadCell: {
+    fontWeight: 600,
+    color: '#333',
+  },
+  tableBodyRow: {
+    '&:nth-of-type(even)': {
+      backgroundColor: '#fafafa',
+    },
   },
   td: {
     wordWrap: 'break-all',
@@ -61,7 +83,9 @@ const styles = () => ({
     color: 'green',
   },
   tTxt: {
-    padding: 5,
+    padding: '10px 12px',
+    lineHeight: 1.4,
+    verticalAlign: 'top',
   },
   infoIcon: {
     width: '15px',
@@ -72,22 +96,22 @@ const styles = () => ({
     fontSize: '14px !important',
   },
   rowRoot: {
-    border: '1px solid #eee',
-    height: 36,
-    lineHeight: '36px',
-    overflow: 'hidden',
-    paddingLeft: 24,
+    border: '1px solid #e6e6e6',
+    borderRadius: 6,
+    minHeight: 40,
+    lineHeight: 1.4,
+    padding: '10px 16px',
     textAlign: 'left',
   },
   rowOdd: {
     backgroundColor: '#fff',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
+    textOverflow: 'clip',
+    whiteSpace: 'normal',
   },
   rowEven: {
     backgroundColor: '#fafafa',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
+    textOverflow: 'clip',
+    whiteSpace: 'normal',
   },
 });
 
@@ -154,49 +178,54 @@ const CyclicVoltammetryPanel = ({
   ));
 
   return (
-    <Accordion
-      data-testid="PanelVoltammetry"
-      disableGutters
-      sx={{
-        '&.MuiAccordion-root.Mui-expanded': { margin: 0 },
-        '&:before': { display: 'none' },
-      }}
-    >
-      <AccordionSummary
-        expandIcon={<ExpandMoreIcon />}
-        className={classNames(classes.panelSummary)}
-      >
+    <div className={classes.panel} data-testid="PanelVoltammetry">
+      <div className={classes.panelHeader}>
         <Typography className="txt-panel-header">
-        <span className={classNames(classes.txtBadge, 'txt-sv-panel-title')}>
-          Voltammetry data
-        </span>
+          <span className={classNames(classes.txtBadge, 'txt-sv-panel-title')}>
+            Voltammetry data
+          </span>
         </Typography>
-      </AccordionSummary>
+        <Tooltip
+          title={
+            (
+              <span className={classNames(classes.txtToolTip)}>
+                Click here to open the User manual document
+              </span>
+            )
+          }
+        >
+          <span className={classes.howToWrap}>
+            <a target="_blank" rel="noopener noreferrer" href={userManualLink}>How-To</a>
+            <HelpIcon className={classNames(classes.infoIcon)} />
+          </span>
+        </Tooltip>
+      </div>
       <Divider />
-      <Table className={classes.table}>
-        <TableHead>
-          <TableRow>
+      <div className={classes.tableWrap}>
+        <Table className={classes.table}>
+          <TableHead>
+            <TableRow className={classes.tableHeadRow}>
             <TableCell
               align="left"
-              className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
+              className={classNames(classes.tTxt, classes.tableHeadCell, classes.square, 'txt-sv-panel-txt')}
             >
               Ref
             </TableCell>
             <TableCell
               align="left"
-              className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
+              className={classNames(classes.tTxt, classes.tableHeadCell, classes.square, 'txt-sv-panel-txt')}
             >
               Anodic
             </TableCell>
             <TableCell
               align="left"
-              className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
+              className={classNames(classes.tTxt, classes.tableHeadCell, classes.square, 'txt-sv-panel-txt')}
             >
               Cathodic
             </TableCell>
             <TableCell
               align="left"
-              className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
+              className={classNames(classes.tTxt, classes.tableHeadCell, classes.square, 'txt-sv-panel-txt')}
             >
               I <sub>λ0</sub>
               <Tooltip
@@ -212,7 +241,7 @@ const CyclicVoltammetryPanel = ({
             </TableCell>
             <TableCell
               align="left"
-              className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
+              className={classNames(classes.tTxt, classes.tableHeadCell, classes.square, 'txt-sv-panel-txt')}
             >
               I ratio
               <Tooltip
@@ -229,13 +258,13 @@ https://doi.org/10.1021/ac60242a030</i>
             </TableCell>
             <TableCell
               align="left"
-              className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
+              className={classNames(classes.tTxt, classes.tableHeadCell, classes.square, 'txt-sv-panel-txt')}
             >
               E<sub>1/2</sub>
             </TableCell>
             <TableCell
               align="left"
-              className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
+              className={classNames(classes.tTxt, classes.tableHeadCell, classes.square, 'txt-sv-panel-txt')}
             >
               ΔE<sub>p</sub>
               <Tooltip
@@ -252,7 +281,7 @@ https://doi.org/10.1021/ac60242a030</i>
             </TableCell>
             <TableCell
               align="left"
-              className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
+              className={classNames(classes.tTxt, classes.tableHeadCell, classes.square, 'txt-sv-panel-txt')}
             >
               <AddCircleOutlineIcon onClick={() => addNewPairPeakAct(jcampIdx)} className={classNames(classes.btnAddRow)} />
             </TableCell>
@@ -261,7 +290,7 @@ https://doi.org/10.1021/ac60242a030</i>
         <TableBody>
           {
             rows.map((row) => (
-              <TableRow key={row.idx}>
+              <TableRow key={row.idx} className={classes.tableBodyRow} hover>
                 <TableCell
                   align="left"
                   className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
@@ -337,31 +366,15 @@ https://doi.org/10.1021/ac60242a030</i>
             ))
           }
         </TableBody>
-      </Table>
-
-      <div className={classNames(classes.rowRoot, classes.rowEven)}>
-        <Tooltip
-          title={
-            (
-              <span className={classNames(classes.txtToolTip)}>
-                Click here to open the User manual document
-              </span>
-            )
-          }
-        >
-          <span>
-            <a target="_blank" rel="noopener noreferrer" href={userManualLink}>How-To </a>
-            <HelpIcon className={classNames(classes.infoIcon)} />
-          </span>
-        </Tooltip>
+        </Table>
       </div>
-    </Accordion>
+
+    </div>
   );
 };
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
-    layoutSt: state.layout,
     cyclicVotaSt: state.cyclicvolta,
     sweepTypeSt: state.ui.sweepType,
   }
@@ -380,11 +393,7 @@ const mapDispatchToProps = (dispatch) => (
 
 CyclicVoltammetryPanel.propTypes = {
   classes: PropTypes.object.isRequired,
-  expand: PropTypes.bool.isRequired,
   feature: PropTypes.object.isRequired,
-  molSvg: PropTypes.string.isRequired,
-  layoutSt: PropTypes.string.isRequired,
-  onExapnd: PropTypes.func.isRequired,
   cyclicVotaSt: PropTypes.object.isRequired,
   addNewPairPeakAct: PropTypes.func.isRequired,
   setWorkWithMaxPeakAct: PropTypes.func.isRequired,

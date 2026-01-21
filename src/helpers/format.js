@@ -509,15 +509,27 @@ const inlineNotation = (layout, data, sampleName = '') => {
           ];
         } else {
           const delta = (max && min) ? strNumberFixedLength(Math.abs(max.x - min.x) * 1000, 3) : '0';
-          nonRefString += `\nE1/2 = ([${sampleName}] , ΔEp) = ${e12Str} V (${delta} mV)`;
-          const currentNoneOps = [
-            { insert: '\nE' },
-            { insert: '1/2', attributes: { script: 'sub' } },
-            { insert: ` = ([${sampleName}] , ΔE` },
-            { insert: 'p', attributes: { script: 'sub' } },
-            { insert: `) = ${e12Str} V (${delta} mV)` },
-          ];
-          nonRefOps.push(...currentNoneOps);
+          if (sampleName) {
+            nonRefString += `\nE1/2 = ([${sampleName}] , ΔEp) = ${e12Str} V (${delta} mV)`;
+            const currentNoneOps = [
+              { insert: '\nE' },
+              { insert: '1/2', attributes: { script: 'sub' } },
+              { insert: ` = ([${sampleName}] , ΔE` },
+              { insert: 'p', attributes: { script: 'sub' } },
+              { insert: `) = ${e12Str} V (${delta} mV)` },
+            ];
+            nonRefOps.push(...currentNoneOps);
+          } else {
+            nonRefString += `\nE1/2 = (ΔEp) = ${e12Str} V (${delta} mV)`;
+            const currentNoneOps = [
+              { insert: '\nE' },
+              { insert: '1/2', attributes: { script: 'sub' } },
+              { insert: ' = (ΔE' },
+              { insert: 'p', attributes: { script: 'sub' } },
+              { insert: `) = ${e12Str} V (${delta} mV)` },
+            ];
+            nonRefOps.push(...currentNoneOps);
+          }
         }
       });
 

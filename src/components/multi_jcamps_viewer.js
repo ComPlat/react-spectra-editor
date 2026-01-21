@@ -3,6 +3,7 @@ react/require-default-props, react/no-unused-prop-types, react/jsx-boolean-value
 prefer-object-spread */
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
 
@@ -10,6 +11,7 @@ import Grid from '@mui/material/Grid';
 import { withStyles } from '@mui/styles';
 
 import PanelViewer from './panel/index';
+import CyclicVoltammetryPanel from './panel/cyclic_voltamery_data';
 import CmdBar from './cmd_bar/index';
 import ViewerMulti from './d3_multi/index';
 
@@ -30,6 +32,28 @@ const styles = () => ({
   },
   tabLabel: {
     fontSize: '14px',
+  },
+  cvEditor: {
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: 0,
+  },
+  cvTopRow: {
+    flex: '1 1 auto',
+    minHeight: 0,
+    overflow: 'hidden',
+  },
+  cvViewerCol: {
+    height: '100%',
+    minHeight: 0,
+  },
+  cvPanelRow: {
+    flex: '0 0 auto',
+  },
+  cvPanelBelow: {
+    marginTop: 16,
+    width: '100%',
   },
 });
 
@@ -67,6 +91,8 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
     const { integrations } = integrationSt;
     const currentIntegration = integrations[curveIdx];
 
+    const isCyclicVolta = Format.isCyclicVoltaLayout(layoutSt);
+
     return (
       <div className={classes.root}>
         <CmdBar
@@ -75,9 +101,11 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
           editorOnly={true}
           hideThreshold={!Format.isNmrLayout(layoutSt)}
         />
-        <div className="react-spectrum-editor">
-          <Grid container>
-            <Grid item xs={9}>
+        <div
+          className={classNames('react-spectrum-editor', isCyclicVolta && classes.cvEditor)}
+        >
+          <Grid container className={isCyclicVolta ? classes.cvTopRow : undefined}>
+            <Grid item xs={9} className={isCyclicVolta ? classes.cvViewerCol : undefined}>
               <ViewerMulti
                 entities={entities}
                 topic={topic}
@@ -99,9 +127,19 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
                 descriptions={descriptions}
                 canChangeDescription={canChangeDescription}
                 onDescriptionChanged={onDescriptionChanged}
+                hideCyclicVolta={isCyclicVolta}
               />
             </Grid>
           </Grid>
+          {isCyclicVolta ? (
+            <div className={classNames(classes.cvPanelBelow, classes.cvPanelRow)}>
+              <CyclicVoltammetryPanel
+                jcampIdx={curveIdx}
+                feature={feature}
+                userManualLink={userManualLink ? userManualLink.cv : undefined}
+              />
+            </div>
+          ) : null}
         </div>
       </div>
     );

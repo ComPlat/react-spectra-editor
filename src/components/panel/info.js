@@ -370,26 +370,19 @@ const InfoPanel = ({
             )
             : null
         }
-        {
-          !Format.isCyclicVoltaLayout(layoutSt)
-            ? (
-              <>
-                <div className={classes.subSectionHeader}>
-                  Content
-                </div>
-                <div className={classes.quillContainer}>
-                  <ReactQuill
-                    className={classNames(classes.quill, 'card-sv-quill')}
-                    value={normalizeQuillValue(descriptions)}
-                    placeholder={canChangeDescription ? 'Peaks will be written here...' : undefined}
-                    readOnly
-                    modules={{ toolbar: false }}
-                    onChange={(value) => handleDescriptionChanged(value, onDescriptionChanged)}
-                  />
-                </div>
-              </>
-            ) : null
-        }
+        <div className={classes.subSectionHeader}>
+          Content
+        </div>
+        <div className={classes.quillContainer}>
+          <ReactQuill
+            className={classNames(classes.quill, 'card-sv-quill')}
+            value={normalizeQuillValue(descriptions)}
+            placeholder={canChangeDescription ? 'Peaks will be written here...' : undefined}
+            readOnly
+            modules={{ toolbar: false }}
+            onChange={(value) => handleDescriptionChanged(value, onDescriptionChanged)}
+          />
+        </div>
       </div>
     </Accordion>
   );
