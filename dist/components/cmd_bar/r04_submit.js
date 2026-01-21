@@ -1,0 +1,256 @@
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _react = _interopRequireDefault(require("react"));
+var _propTypes = _interopRequireDefault(require("prop-types"));
+var _classnames = _interopRequireDefault(require("classnames"));
+var _reactRedux = require("react-redux");
+var _redux = require("redux");
+var _material = require("@mui/material");
+var _styles = require("@mui/styles");
+var _submit = require("../../actions/submit");
+var _r05_submit_btn = _interopRequireDefault(require("./r05_submit_btn"));
+var _r06_predict_btn = _interopRequireDefault(require("./r06_predict_btn"));
+var _common = require("./common");
+var _format = _interopRequireDefault(require("../../helpers/format"));
+var _jsxRuntime = require("react/jsx-runtime");
+/* eslint-disable prefer-object-spread, function-paren-newline,
+react/function-component-definition */
+
+const styles = () => Object.assign({
+  fieldOrder: {
+    width: 90
+  },
+  fieldIntensity: {
+    width: 90
+  },
+  fieldDecimal: {
+    width: 80
+  },
+  fieldOpertaion: {
+    width: 120
+  }
+}, _common.commonStyle);
+const ascendSelect = (classes, hideSwitch, isAscendSt, toggleIsAscendAct) => {
+  if (hideSwitch) return null;
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
+    className: (0, _classnames.default)(classes.fieldOrder),
+    variant: "outlined",
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputLabel, {
+      id: "select-sort-peaks-label",
+      className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label'),
+      children: "Write Peaks"
+    }), /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Select, {
+      labelId: "select-sort-peaks-label",
+      label: "Write Peaks",
+      value: isAscendSt,
+      onChange: toggleIsAscendAct,
+      className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-order'),
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: true,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-ascend'),
+          children: "Ascend"
+        })
+      }, "ascend"), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: false,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-descend'),
+          children: "Descend"
+        })
+      }, "descend")]
+    })]
+  });
+};
+const intensitySelect = (classes, hideSwitch, isIntensitySt, toggleIsIntensityAct) => {
+  if (hideSwitch) return null;
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
+    className: (0, _classnames.default)(classes.fieldIntensity),
+    variant: "outlined",
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputLabel, {
+      id: "select-intensity-label",
+      className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label'),
+      children: "Write Intensity"
+    }), /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Select, {
+      labelId: "select-intensity-label",
+      label: "Write Intensity",
+      value: isIntensitySt,
+      onChange: toggleIsIntensityAct,
+      className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-intensity')
+      // input={
+      //   (
+      //     <OutlinedInput
+      //       className={classNames(classes.selectInput, 'input-sv-bar-intensity')}
+      //       labelWidth={100}
+      //     />
+      //   )
+      // }
+      ,
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: true,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-show'),
+          children: "Show"
+        })
+      }, "ascend"), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: false,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-hide'),
+          children: "Hide"
+        })
+      }, "descend")]
+    })]
+  });
+};
+const decimalSelect = (classes, hideSwitch, decimalSt, updateDecimalAct) => {
+  if (hideSwitch) return null;
+  const decimals = [0, 1, 2, 3, 4];
+  const options = decimals.map(d => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+    value: d,
+    children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+      className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-decimal'),
+      children: d
+    })
+  }, d));
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
+    className: (0, _classnames.default)(classes.fieldDecimal),
+    variant: "outlined",
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputLabel, {
+      id: "select-decimal-label",
+      className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label'),
+      children: "Decimal"
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Select, {
+      labelId: "select-decimal-label",
+      label: "Decimal",
+      value: decimalSt,
+      onChange: updateDecimalAct,
+      className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-decimal')
+      // input={
+      //   (
+      //     <OutlinedInput
+      //       className={classNames(classes.selectInput, 'input-sv-bar-decimal')}
+      //       labelWidth={60}
+      //     />
+      //   )
+      // }
+      ,
+      children: options
+    })]
+  });
+};
+const operationSelect = (classes, operations, operation, onChangeSelect) => {
+  const options = operations.map(o => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+    value: o.name,
+    children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+      className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-operation'),
+      children: o.name
+    })
+  }, o.name));
+  const selectedValue = operation.name || operations[0].name;
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
+    className: (0, _classnames.default)(classes.fieldOpertaion),
+    variant: "outlined",
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputLabel, {
+      id: "select-submit-label",
+      className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label'),
+      children: "Submit"
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Select, {
+      labelId: "select-submit-label",
+      label: "Submit",
+      value: selectedValue,
+      onChange: onChangeSelect,
+      className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-operation')
+      // input={
+      //   (
+      //     <OutlinedInput
+      //       className={classNames(classes.selectInput, 'input-sv-bar-operation')}
+      //       labelWidth={50}
+      //     />
+      //   )
+      // }
+      ,
+      children: options
+    })]
+  });
+};
+const selectOperation = (name, operations, updateOperationAct) => {
+  let operation = false;
+  operations.forEach(o => {
+    if (o.name === name) {
+      operation = o;
+    }
+  });
+  updateOperationAct(operation);
+};
+const Submit = ({
+  operations,
+  classes,
+  feature,
+  forecast,
+  editorOnly,
+  hideSwitch,
+  disabled,
+  isAscendSt,
+  isIntensitySt,
+  operationSt,
+  decimalSt,
+  isEmWaveSt,
+  toggleIsAscendAct,
+  toggleIsIntensityAct,
+  updateOperationAct,
+  updateDecimalAct
+}) => {
+  const onChangeSelect = e => selectOperation(e.target.value, operations, updateOperationAct);
+  if (!operations || operations.length === 0) return null;
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+    className: classes.groupRightMost,
+    children: [ascendSelect(classes, hideSwitch, isAscendSt, toggleIsAscendAct), intensitySelect(classes, hideSwitch || !isEmWaveSt, isIntensitySt, toggleIsIntensityAct), decimalSelect(classes, hideSwitch, decimalSt, updateDecimalAct), editorOnly ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_r06_predict_btn.default, {
+      feature: feature,
+      forecast: forecast
+    }), operationSelect(classes, operations, operationSt, onChangeSelect), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r05_submit_btn.default, {
+      feature: feature,
+      isAscend: isAscendSt,
+      isIntensity: isIntensitySt,
+      operation: operationSt,
+      disabled: disabled
+    })]
+  });
+};
+const mapStateToProps = (state, props) => (
+// eslint-disable-line
+{
+  isEmWaveSt: _format.default.isEmWaveLayout(state.layout),
+  isAscendSt: state.submit.isAscend,
+  isIntensitySt: state.submit.isIntensity,
+  decimalSt: state.submit.decimal,
+  operationSt: state.submit.operation
+});
+const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
+  toggleIsAscendAct: _submit.toggleIsAscend,
+  toggleIsIntensityAct: _submit.toggleIsIntensity,
+  updateOperationAct: _submit.updateOperation,
+  updateDecimalAct: _submit.updateDecimal
+}, dispatch);
+Submit.propTypes = {
+  classes: _propTypes.default.object.isRequired,
+  feature: _propTypes.default.object.isRequired,
+  forecast: _propTypes.default.object.isRequired,
+  editorOnly: _propTypes.default.bool.isRequired,
+  operations: _propTypes.default.array.isRequired,
+  operationSt: _propTypes.default.object.isRequired,
+  hideSwitch: _propTypes.default.bool.isRequired,
+  disabled: _propTypes.default.bool.isRequired,
+  isAscendSt: _propTypes.default.bool.isRequired,
+  isIntensitySt: _propTypes.default.bool.isRequired,
+  isEmWaveSt: _propTypes.default.bool.isRequired,
+  decimalSt: _propTypes.default.number.isRequired,
+  toggleIsAscendAct: _propTypes.default.func.isRequired,
+  toggleIsIntensityAct: _propTypes.default.func.isRequired,
+  updateOperationAct: _propTypes.default.func.isRequired,
+  updateDecimalAct: _propTypes.default.func.isRequired
+};
+var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(Submit);
