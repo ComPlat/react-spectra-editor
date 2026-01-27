@@ -98,8 +98,22 @@ class LayerInit extends React.Component {
   }
 
   updateMultiEntities() {
-    const { multiEntities, setAllCurvesAct } = this.props;
-    setAllCurvesAct(multiEntities);
+    const { multiEntities, setAllCurvesAct, entity } = this.props;
+    const isMultiSpectra = Array.isArray(multiEntities) && multiEntities.length > 1;
+    if (isMultiSpectra) {
+      setAllCurvesAct(multiEntities);
+      return;
+    }
+
+    if (Format.isCyclicVoltaLayout(entity.layout)) {
+      const payload = (Array.isArray(multiEntities) && multiEntities.length > 0)
+        ? multiEntities
+        : [entity];
+      setAllCurvesAct(payload);
+      return;
+    }
+
+    setAllCurvesAct(false);
   }
 
   render() {
@@ -116,7 +130,8 @@ class LayerInit extends React.Component {
     const xxLabel = !xLabel && xLabel === '' ? `X (${target.xUnit})` : xLabel;
     const yyLabel = !yLabel && yLabel === '' ? `Y (${target.yUnit})` : yLabel;
 
-    if (multiEntities) {
+    const isMultiSpectra = Array.isArray(multiEntities) && multiEntities.length > 1;
+    if (isMultiSpectra) {
       return (
         <MultiJcampsViewer
           multiEntities={multiEntities}
