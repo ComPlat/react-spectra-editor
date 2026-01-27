@@ -8,40 +8,40 @@ const noReference = {
 };
 
 const cActicAcidD4Sept = {
-  name: 'Acetic acid-d4 (sept)',
+  name: 'Acetic acid-d₄ (sept)',
   value: 20.0,
   label: 'Acetic acid-d4',
 };
 
 const cActicAcidD4S = {
-  name: 'Acetic acid-d4 (s)',
+  name: 'Acetic acid-d₄ (s)',
   value: 178.990,
   label: 'Acetic acid-d4',
 };
 
 const cAcetoneD6Sep = {
-  name: 'Acetone-d6 (sep)',
+  name: 'Acetone-d₆ (sep)',
   value: 29.640,
   label: 'Acetone-d6',
   nsdb: 'Acetone-D6 ((CD3)2CO)',
 };
 
 const cAcetoneD6Broad = {
-  name: 'Acetone-d6 (broad)',
+  name: 'Acetone-d₆ (broad)',
   value: 206.260,
   label: 'Acetone-d6',
   nsdb: 'Acetone-D6 ((CD3)2CO)',
 };
 
 const cAcetonitrileD3Sep = {
-  name: 'Acetonitrile-d3 (sep)',
+  name: 'Acetonitrile-d₃ (sep)',
   value: 1.32,
   label: 'Acetonitrile-d3',
   nsdb: 'Acetonitrile-D3(CD3CN)',
 };
 
 const cAcetonitrileD3S = {
-  name: 'Acetonitrile-d3 (s)',
+  name: 'Acetonitrile-d₃ (s)',
   value: 118.26,
   label: 'Acetonitrile-d3',
   nsdb: 'Acetonitrile-D3(CD3CN)',
@@ -62,97 +62,97 @@ const cChloroformDT = {
 };
 
 const cCyclohexaneD12Quin = {
-  name: 'Cyclohexane-d12 (quin)',
+  name: 'Cyclohexane-d₁₂ (quin)',
   value: 26.430,
   label: 'C$6D$1$2',
 };
 
 const cDichloromethaneD2Quin = {
-  name: 'Dichloromethane-d2 (quin)',
+  name: 'Dichloromethane-d₂ (quin)',
   value: 53.84,
   label: 'CD$2Cl$2',
 };
 
 const cDmfD7Sep1 = {
-  name: 'DMF-d7 (sep)-1',
+  name: 'DMF-d₇ (sep)-1',
   value: 29.76,
   label: 'DMF-d7',
 };
 
 const cDmfD7Sep2 = {
-  name: 'DMF-d7 (sep)-2',
+  name: 'DMF-d₇ (sep)-2',
   value: 34.89,
   label: 'DMF-d7',
 };
 
 const cDmfD7T3 = {
-  name: 'DMF-d7 (t)-3',
+  name: 'DMF-d₇ (t)-3',
   value: 163.15,
   label: 'DMF-d7',
 };
 
 const cDioxaneD8Quin = {
-  name: 'Dioxane-d8 (quin)',
+  name: 'Dioxane-d₈ (quin)',
   value: 66.660,
   label: 'Dioxane-d8',
 };
 
 const cDmsoD6 = {
-  name: 'DMSO-d6',
+  name: 'DMSO-d₆',
   value: 39.52,
   label: 'DMSO-d6',
   nsdb: 'Dimethylsulphoxide-D6 (DMSO-D6, C2D6SO)',
 };
 
 const cEthanolD6Sep = {
-  name: 'Ethanol-d6 (sep)',
+  name: 'Ethanol-d₆ (sep)',
   value: 17.3,
   label: 'Ethanol-d6',
 };
 
 const cEthanolD6Quin = {
-  name: 'Ethanol-d6 (quin)',
+  name: 'Ethanol-d₆ (quin)',
   value: 56.96,
   label: 'Ethanol-d6',
 };
 
 const cMethanolD4Sep = {
-  name: 'Methanol-d4 (sep)',
+  name: 'Methanol-d₄ (sep)',
   value: 49.00,
   label: 'Methanol-d4',
   nsdb: 'Methanol-D4 (CD3OD)',
 };
 
 const cPyridineD5T1 = {
-  name: 'Pyridine-d5 (t)-1',
+  name: 'Pyridine-d₅ (t)-1',
   value: 123.87,
   label: 'Pyridine-d5',
   nsdb: 'Pyridin-D5 (C5D5N)',
 };
 
 const cPyridineD5T2 = {
-  name: 'Pyridine-d5 (t)-2',
+  name: 'Pyridine-d₅ (t)-2',
   value: 135.91,
   label: 'Pyridine-d5',
   nsdb: 'Pyridin-D5 (C5D5N)',
 };
 
 const cPyridineD5T3 = {
-  name: 'Pyridine-d5 (t)-3',
+  name: 'Pyridine-d₅ (t)-3',
   value: 150.35,
   label: 'Pyridine-d5',
   nsdb: 'Pyridin-D5 (C5D5N)',
 };
 
 const cThfD8Quin1 = {
-  name: 'THF-d8 (quin)-1',
+  name: 'THF-d₈ (quin)-1',
   value: 25.37,
   label: 'THF-d8 ',
   nsdb: 'Tetrahydrofuran-D8 (THF-D8, C4D4O)',
 };
 
 const cThfD8Quin2 = {
-  name: 'THF-d8 (quin)-2',
+  name: 'THF-d₈ (quin)-2',
   value: 67.57,
   label: 'THF-d8 ',
   nsdb: 'Tetrahydrofuran-D8 (THF-D8, C4D4O)',
@@ -165,31 +165,31 @@ const cTmsS = {
 };
 
 const cTolueneD8Sep1 = {
-  name: 'Toluene-d8 (sep)-1',
+  name: 'Toluene-d₈ (sep)-1',
   value: 20.4,
   label: 'Toluene-d8',
 };
 
 const cTolueneD8T2 = {
-  name: 'Toluene-d8 (t)-2',
+  name: 'Toluene-d₈ (t)-2',
   value: 125.49,
   label: 'Toluene-d8',
 };
 
 const cTolueneD8T3 = {
-  name: 'Toluene-d8 (t)-3',
+  name: 'Toluene-d₈ (t)-3',
   value: 128.33,
   label: 'Toluene-d8',
 };
 
 const cTolueneD8T4 = {
-  name: 'Toluene-d8 (t)-4',
+  name: 'Toluene-d₈ (t)-4',
   value: 129.24,
   label: 'Toluene-d8',
 };
 
 const cTolueneD8T5 = {
-  name: 'Toluene-d8 (s)-5',
+  name: 'Toluene-d₈ (s)-5',
   value: 137.86,
   label: 'Toluene-d8',
 };
@@ -207,37 +207,37 @@ const cTfaDQ2 = {
 };
 
 const cTrifluoroethanolD3Quin = {
-  name: 'Trifluoroethanol-d3 (quin)',
+  name: 'Trifluoroethanol-d₃ (quin)',
   value: 61.80,
   label: 'Trifluoroethanol-d3',
 };
 
 const cTrifluoroethanolD3Broad = {
-  name: 'Trifluoroethanol-d3 (broad)',
+  name: 'Trifluoroethanol-d₃ (broad)',
   value: 126.28,
   label: 'Trifluoroethanol-d3',
 };
 
 const cC6D5Cl1 = {
-  name: 'C6D5Cl (s)',
+  name: 'C₆D₅Cl (s)',
   value: 134.19,
   label: 'C6D5Cl',
 };
 
 const cC6D5Cl2 = {
-  name: 'C6D5Cl (t)-1',
+  name: 'C₆D₅Cl (t)-1',
   value: 129.26,
   label: 'C6D5Cl',
 };
 
 const cC6D5Cl3 = {
-  name: 'C6D5Cl (t)-2',
+  name: 'C₆D₅Cl (t)-2',
   value: 128.25,
   label: 'C6D5Cl',
 };
 
 const cC6D5Cl4 = {
-  name: 'C6D5Cl (t)-3',
+  name: 'C₆D₅Cl (t)-3',
   value: 125.96,
   label: 'C6D5Cl',
 };
@@ -255,26 +255,26 @@ const LIST_SHIFT_13C = [
 ];
 
 const hActicAcidD4Quin = {
-  name: 'Acetic acid-d4 (quin)',
+  name: 'Acetic acid-d₄ (quin)',
   value: 2.04,
   label: 'Acetic acid-d4',
 };
 
 const hActicAcidD4S = {
-  name: 'Acetic acid-d4 (s)',
+  name: 'Acetic acid-d₄ (s)',
   value: 11.65,
   label: 'Acetic acid-d4',
 };
 
 const hAcetoneD6Quin = {
-  name: 'Acetone-d6 (quin)',
+  name: 'Acetone-d₆ (quin)',
   value: 2.05,
   label: 'Acetone-d6',
   nsdb: 'Acetone-D6 ((CD3)2CO)',
 };
 
 const hAcetonitrileD3Qquin = {
-  name: 'Acetonitrile-d3 (quin)',
+  name: 'Acetonitrile-d₃ (quin)',
   value: 1.94,
   label: 'Acetonitrile-d3',
   nsdb: 'Acetonitrile-D3(CD3CN)',
@@ -295,130 +295,130 @@ const hChloroformDS = {
 };
 
 const hCyclohexaneD12S = {
-  name: 'Cyclohexane-d12 (s)',
+  name: 'Cyclohexane-d₁₂ (s)',
   value: 1.38,
   label: 'C$6D$1$2',
 };
 
 const hDeuteriumOxideS = {
-  name: 'D2O (s)',
+  name: 'D₂O (s)',
   value: 4.79,
   label: 'D$2O',
   nsdb: 'Deuteriumoxide (D2O)',
 };
 
 const hDichloroethaneD4S = {
-  name: 'Dichloroethane-d4 (s)',
+  name: 'Dichloroethane-d₄ (s)',
   value: 3.72,
   label: 'Dichloroethane-d4',
 };
 
 const hDichloromethaneD2T = {
-  name: 'Dichloromethane-d2 (t)',
+  name: 'Dichloromethane-d₂ (t)',
   value: 5.32,
   label: 'CD2Cl2',
   nsdb: 'Methylenchloride-D2 (CD2Cl2)',
 };
 
 const hDMFD7Quin1 = {
-  name: 'DMF-d7 (quin)-1',
+  name: 'DMF-d₇ (quin)-1',
   value: 2.75,
   label: 'DMF-d7',
 };
 
 const hDMFD7Quin2 = {
-  name: 'DMF-d7 (quin)-2',
+  name: 'DMF-d₇ (quin)-2',
   value: 2.92,
   label: 'DMF-d7',
 };
 
 const hDMFD7Broad3 = {
-  name: 'DMF-d7 (broad)-3',
+  name: 'DMF-d₇ (broad)-3',
   value: 8.03,
   label: 'DMF-d7',
 };
 
 const hDioxaneD8Broad = {
-  name: 'Dioxane-d8 (broad)',
+  name: 'Dioxane-d₈ (broad)',
   value: 3.53,
   label: 'Dioxane-d8',
 };
 
 const hDMSOD6Quin = {
-  name: 'DMSO-d6 (quin)',
+  name: 'DMSO-d₆ (quin)',
   value: 2.50,
   label: 'DMSO-d6',
   nsdb: 'Dimethylsulphoxide-D6 (DMSO-D6, C2D6SO)',
 };
 
 const hEthanolD6Broad1 = {
-  name: 'Ethanol-d6 (broad)-1',
+  name: 'Ethanol-d₆ (broad)-1',
   value: 1.11,
   label: 'Ethanol-d6',
 };
 
 const hEthanolD6S2 = {
-  name: 'Ethanol-d6 (s)-2',
+  name: 'Ethanol-d₆ (s)-2',
   value: 3.56,
   label: 'Ethanol-d6',
 };
 
 const hEthanolD6S3 = {
-  name: 'Ethanol-d6 (s)-3',
+  name: 'Ethanol-d₆ (s)-3',
   value: 5.29,
   label: 'Ethanol-d6',
 };
 
 const hMethanolD4Quin = {
-  name: 'Methanol-d4 (quin)',
+  name: 'Methanol-d₄ (quin)',
   value: 3.31,
   label: 'Methanol-d4',
   nsdb: 'Methanol-D4 (CD3OD)',
 };
 
 const hMethanolD4S = {
-  name: 'Methanol-d4 (s)',
+  name: 'Methanol-d₄ (s)',
   value: 4.87,
   label: 'Methanol-d4',
   nsdb: 'Methanol-D4 (CD3OD)',
 };
 
 const hNitromethaneD3S = {
-  name: 'Nitromethane-d3 (s)',
+  name: 'Nitromethane-d₃ (s)',
   value: 4.33,
   label: 'Nitromethane-d3',
 };
 
 const hPyridineD5Broad1 = {
-  name: 'Pyridine-d5 (broad)-1',
+  name: 'Pyridine-d₅ (broad)-1',
   value: 7.22,
   label: 'Pyridine-d5',
   nsdb: 'Pyridin-D5 (C5D5N)',
 };
 
 const hPyridineD5Broad2 = {
-  name: 'Pyridine-d5 (broad)-2',
+  name: 'Pyridine-d₅ (broad)-2',
   value: 7.58,
   label: 'Pyridine-d5',
   nsdb: 'Pyridin-D5 (C5D5N)',
 };
 
 const hPyridineD5Broad3 = {
-  name: 'Pyridine-d5 (broad)-3',
+  name: 'Pyridine-d₅ (broad)-3',
   value: 8.74,
   label: 'Pyridine-d5',
   nsdb: 'Pyridin-D5 (C5D5N)',
 };
 
 const hTHFD8S1 = {
-  name: 'THF-d8 (s)-1',
+  name: 'THF-d₈ (s)-1',
   value: 1.73,
   label: 'THF-d8',
   nsdb: 'Tetrahydrofuran-D8 (THF-D8, C4D4O)',
 };
 
 const hTHFD8S2 = {
-  name: 'THF-d8 (s)-2',
+  name: 'THF-d₈ (s)-2',
   value: 3.58,
   label: 'THF-d8',
   nsdb: 'Tetrahydrofuran-D8 (THF-D8, C4D4O)',
@@ -431,25 +431,25 @@ const hTMSS = {
 };
 
 const hTolueneD8Quin = {
-  name: 'Toluene-d8 (quin)-1',
+  name: 'Toluene-d₈ (quin)-1',
   value: 2.09,
   label: 'Toluene-d8',
 };
 
 const hTolueneD8Boad2 = {
-  name: 'Toluene-d8 (boad)-2',
+  name: 'Toluene-d₈ (boad)-2',
   value: 6.98,
   label: 'Toluene-d8',
 };
 
 const hTolueneD8S3 = {
-  name: 'Toluene-d8 (s)-3',
+  name: 'Toluene-d₈ (s)-3',
   value: 7.00,
   label: 'Toluene-d8',
 };
 
 const hTolueneD8Broad4 = {
-  name: 'Toluene-d8 (broad)-4',
+  name: 'Toluene-d₈ (broad)-4',
   value: 7.09,
   label: 'Toluene-d8',
 };
@@ -461,13 +461,13 @@ const hTFADS = {
 };
 
 const hTrifluoroethanolD31 = {
-  name: 'Trifluoroethanol-d3-1',
+  name: 'Trifluoroethanol-d₃-1',
   value: 3.88,
   label: 'Trifluoroethanol-d3',
 };
 
 const hTrifluoroethanolD32 = {
-  name: 'Trifluoroethanol-d3-2',
+  name: 'Trifluoroethanol-d₃-2',
   value: 5.02,
   label: 'Trifluoroethanol-d3',
 };
