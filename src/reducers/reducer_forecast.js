@@ -6,7 +6,16 @@ const initialState = {
     outline: {},
     output: { result: [] },
   },
+  predictionsByCurve: {},
 };
+
+const toCurveIdx = (input) => (Number.isInteger(input) ? input : 0);
+
+const getPredictionsByCurve = (state) => (state.predictionsByCurve || {});
+
+const getPredictionsForCurve = (state, curveIdx) => (
+  getPredictionsByCurve(state)[curveIdx] || state.predictions
+);
 
 const updateIrResl = (stResl, plPred) => {
   const { sma, identity, value } = plPred;
@@ -24,21 +33,30 @@ const updateIrResl = (stResl, plPred) => {
 };
 
 const updateIrStatus = (state, action) => {
-  const { predictions } = action.payload;
-  const { outline, output } = state.predictions;
+  const { predictions, curveIdx } = action.payload;
+  const targetIdx = toCurveIdx(curveIdx);
+  const targetPredictions = getPredictionsForCurve(state, targetIdx);
+  const { outline, output } = targetPredictions;
   const stResl = output.result[0];
   const nextResl = updateIrResl(stResl, predictions);
+  const nextPredictions = {
+    outline,
+    output: {
+      result: [nextResl],
+    },
+  };
+  const predictionsByCurve = Object.assign(
+    {},
+    getPredictionsByCurve(state),
+    { [targetIdx]: nextPredictions },
+  );
 
   return Object.assign(
     {},
     state,
     {
-      predictions: {
-        outline,
-        output: {
-          result: [nextResl],
-        },
-      },
+      predictions: nextPredictions,
+      predictionsByCurve,
     },
   );
 };
@@ -64,41 +82,67 @@ const updateNmrResl = (stResl, plPred) => {
 };
 
 const updateNmrStatus = (state, action) => {
-  const { predictions } = action.payload;
-  const { outline, output } = state.predictions;
+  const { predictions, curveIdx } = action.payload;
+  const targetIdx = toCurveIdx(curveIdx);
+  const targetPredictions = getPredictionsForCurve(state, targetIdx);
+  const { outline, output } = targetPredictions;
   const stResl = output.result[0];
   const nextResl = updateNmrResl(stResl, predictions);
+  const nextPredictions = {
+    outline,
+    output: {
+      result: [nextResl],
+    },
+  };
+  const predictionsByCurve = Object.assign(
+    {},
+    getPredictionsByCurve(state),
+    { [targetIdx]: nextPredictions },
+  );
 
-  const newSt = Object.assign(
+  return Object.assign(
     {},
     state,
     {
-      predictions: {
-        outline,
-        output: {
-          result: [nextResl],
-        },
-      },
+      predictions: nextPredictions,
+      predictionsByCurve,
     },
   );
-  return newSt;
 };
 
 const forecastReducer = (state = initialState, action) => {
   switch (action.type) {
     case FORECAST.INIT_STATUS:
       if (!action.payload) return state;
-      return Object.assign(
-        {},
-        action.payload,
-      );
+      {
+        const { curveIdx, ...payloadRest } = action.payload;
+        const nextPredictions = payloadRest.predictions || state.predictions;
+        const nextState = Object.assign(
+          {},
+          state,
+          payloadRest,
+        );
+        if (!Number.isInteger(curveIdx)) {
+          return nextState;
+        }
+        const predictionsByCurve = Object.assign(
+          {},
+          getPredictionsByCurve(state),
+          nextPredictions ? { [curveIdx]: nextPredictions } : {},
+        );
+        return Object.assign({}, nextState, { predictionsByCurve });
+      }
     case FORECAST.SET_IR_STATUS:
       return updateIrStatus(state, action);
     case FORECAST.SET_NMR_STATUS:
       return updateNmrStatus(state, action);
     case FORECAST.CLEAR_STATUS:
-    case MANAGER.RESETALL:
       return initialState;
+    case MANAGER.RESETALL:
+      if (action.payload && action.payload.resetForecast) {
+        return initialState;
+      }
+      return state;
     default:
       return state;
   }

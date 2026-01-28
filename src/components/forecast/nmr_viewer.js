@@ -81,27 +81,42 @@ const sectionTable = (classes, pds) => {
 };
 
 const NmrViewer = ({  // eslint-disable-line
-  classes, molecule, inputCb, forecastSt,
-}) => (
-  <div className={classNames(classes.root, 'card-forecast-viewer')}>
-    <Grid className={classNames(classes.container)} container>
-      <Grid item xs={4}>
-        <Paper className={classes.svgRoot}>
-          { sectionSvg(classes, forecastSt.predictions) }
-        </Paper>
+  classes, molecule, inputCb, forecastSt, curveSt,
+}) => {
+  const { curveIdx } = curveSt;
+  const predictionsByCurve = forecastSt.predictionsByCurve || {};
+  const hasCurvePredictions = Object.prototype.hasOwnProperty.call(predictionsByCurve, curveIdx);
+  const hasAnyCurvePredictions = Object.keys(predictionsByCurve).length > 0;
+  const emptyPredictions = { outline: {}, output: { result: [] } };
+  let activePredictions = forecastSt.predictions;
+  if (hasCurvePredictions) {
+    activePredictions = predictionsByCurve[curveIdx];
+  } else if (hasAnyCurvePredictions) {
+    activePredictions = emptyPredictions;
+  }
+
+  return (
+    <div className={classNames(classes.root, 'card-forecast-viewer')}>
+      <Grid className={classNames(classes.container)} container>
+        <Grid item xs={4}>
+          <Paper className={classes.svgRoot}>
+            { sectionSvg(classes, activePredictions) }
+          </Paper>
+        </Grid>
+        <Grid item xs={8}>
+          { sectionTable(classes, activePredictions) }
+        </Grid>
       </Grid>
-      <Grid item xs={8}>
-        { sectionTable(classes, forecastSt.predictions) }
-      </Grid>
-    </Grid>
-    { sectionInput(classes, molecule, inputCb) }
-    { SectionReference(classes) }
-  </div>
-);
+      { sectionInput(classes, molecule, inputCb) }
+      { SectionReference(classes) }
+    </div>
+  );
+};
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     forecastSt: state.forecast,
+    curveSt: state.curve,
   }
 );
 
@@ -118,6 +133,7 @@ NmrViewer.propTypes = {
     PropTypes.bool,
   ]),
   forecastSt: PropTypes.object.isRequired,
+  curveSt: PropTypes.object.isRequired,
 };
 
 NmrViewer.defaultProps = {

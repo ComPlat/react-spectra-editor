@@ -12,12 +12,14 @@ import { withStyles } from '@mui/styles';
 import PanelViewer from './panel/index';
 import CmdBar from './cmd_bar/index';
 import ViewerMulti from './d3_multi/index';
+import ForecastViewer from './forecast_viewer';
 
 import { setAllCurves } from '../actions/curve';
 import {
   addNewCylicVoltaPairPeak, addCylicVoltaMaxPeak, addCylicVoltaMinPeak, addCylicVoltaPecker,
 } from '../actions/cyclic_voltammetry';
 import { LIST_LAYOUT } from '../constants/list_layout';
+import { LIST_UI_VIEWER_TYPE } from '../constants/list_ui';
 import Format from '../helpers/format';
 
 const styles = () => ({
@@ -56,6 +58,7 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
       classes, curveSt, operations, entityFileNames,
       entities, userManualLink, molSvg, exactMass, layoutSt,
       integrationSt, descriptions, canChangeDescription, onDescriptionChanged,
+      forecast, uiSt, cLabel,
     } = this.props;
     if (!entities || entities.length === 0) return (<div />);
 
@@ -66,25 +69,50 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
     const { feature, topic } = entity;
     const { integrations } = integrationSt;
     const currentIntegration = integrations[curveIdx];
+    const isNmr = Format.isNmrLayout(layoutSt);
+    const isIr = Format.isIrLayout(layoutSt);
+    const isUvvis = Format.isUvVisLayout(layoutSt) || Format.isHplcUvVisLayout(layoutSt);
+    const isXRD = Format.isXRDLayout(layoutSt);
+    const hasForecast = forecast && Object.keys(forecast).length > 0;
+    const showForecast = hasForecast && (isNmr || isIr || isUvvis || isXRD)
+      && uiSt.viewer === LIST_UI_VIEWER_TYPE.ANALYSIS;
+    const xLabel = feature.xUnit ? `X (${feature.xUnit})` : '';
+    const yLabel = feature.yUnit ? `Y (${feature.yUnit})` : '';
 
     return (
       <div className={classes.root}>
         <CmdBar
           feature={feature}
           operations={operations}
+          forecast={forecast}
           editorOnly={true}
           hideThreshold={!Format.isNmrLayout(layoutSt)}
         />
         <div className="react-spectrum-editor">
           <Grid container>
             <Grid item xs={9}>
-              <ViewerMulti
-                entities={entities}
-                topic={topic}
-                xLabel={feature.xUnit}
-                yLabel={feature.yUnit}
-                feature={feature}
-              />
+              {showForecast ? (
+                <ForecastViewer
+                  topic={topic}
+                  cLabel={cLabel}
+                  xLabel={xLabel}
+                  yLabel={yLabel}
+                  feature={feature}
+                  forecast={forecast}
+                  isNmr={isNmr}
+                  isIr={isIr}
+                  isUvvis={isUvvis}
+                  isXRD={isXRD}
+                />
+              ) : (
+                <ViewerMulti
+                  entities={entities}
+                  topic={topic}
+                  xLabel={feature.xUnit}
+                  yLabel={feature.yUnit}
+                  feature={feature}
+                />
+              )}
             </Grid>
             <Grid item xs={3} align="center">
               <PanelViewer
@@ -115,6 +143,7 @@ const mapStateToProps = (state, _) => ( // eslint-disable-line
     entities: state.curve.listCurves,
     layoutSt: state.layout,
     integrationSt: state.integration.present,
+    uiSt: state.ui,
   }
 );
 
@@ -148,18 +177,20 @@ MultiJcampsViewer.propTypes = {
   descriptions: PropTypes.array.isRequired,
   canChangeDescription: PropTypes.bool.isRequired,
   onDescriptionChanged: PropTypes.func,
+  forecast: PropTypes.object.isRequired,
+  uiSt: PropTypes.object.isRequired,
+  cLabel: PropTypes.string,
 };
 
 MultiJcampsViewer.defaultProps = {
   multiEntities: [],
   entityFileNames: [],
   molSvg: '',
-  cLabel: '',
-  xLabel: '',
-  yLabel: '',
   entities: [],
   descriptions: [],
   canChangeDescription: false,
+  forecast: {},
+  cLabel: '',
 };
 
 export default compose(
