@@ -9,6 +9,7 @@ describe('Test redux reducer for forecast', () => {
 
   interface ForecastState {
     predictions: ForecastPrediction
+    predictionsByCurve: Record<number, ForecastPrediction>
   }
 
   interface ForcastAction {
@@ -21,8 +22,8 @@ describe('Test redux reducer for forecast', () => {
   let initState: ForecastState
 
   beforeEach(() => {
-    forecastState = { predictions: { outline: {}, output: { result: [] }, } }
-    initState = { predictions: { outline: {}, output: { result: [] }, } }
+    forecastState = { predictions: { outline: {}, output: { result: [] }, }, predictionsByCurve: {} }
+    initState = { predictions: { outline: {}, output: { result: [] }, }, predictionsByCurve: {} }
     action = { type: "", payload: null }
   })
 
@@ -41,16 +42,25 @@ describe('Test redux reducer for forecast', () => {
     })
 
     it('Init with payload', () => {
-      const payload: ForecastPrediction = { outline: {}, output: {} }
+      const payload: any = {
+        predictions: { outline: {}, output: {} },
+        curveIdx: 1,
+      }
       action.payload = payload
       const newState = forecastReducer(forecastState, action)
-      expect(newState).toEqual(payload)
+      expect(newState).toEqual({
+        ...forecastState,
+        predictions: payload.predictions,
+        predictionsByCurve: {
+          1: payload.predictions,
+        },
+      })
     })
   })
 
   describe('Clear and reset', () => {
     beforeEach(() => {
-      forecastState = { predictions: { outline: null, output: null }}
+      forecastState = { predictions: { outline: null, output: null }, predictionsByCurve: {} }
     })
 
     it('Clear status', () => {
@@ -63,7 +73,7 @@ describe('Test redux reducer for forecast', () => {
     it('Reset status', () => {
       action.type = MANAGER.RESETALL
       const newState = forecastReducer(forecastState, action)
-      expect(newState).toEqual(initState)
+      expect(newState).toEqual(forecastState)
     })
   })
 

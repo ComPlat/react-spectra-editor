@@ -68,6 +68,19 @@ const BtnSubmit = ({
   const thres = Convert2Thres(feature, thresSt);
   const aucValues = extractAreaUnderCurve(allIntegrationSt, integrationSt, layoutSt);
   const { dscMetaData } = metaSt;
+  const predictionsByCurve = forecastSt.predictionsByCurve || {};
+  const hasCurvePredictions = Object.prototype.hasOwnProperty.call(
+    predictionsByCurve,
+    curveSt.curveIdx,
+  );
+  const hasAnyCurvePredictions = Object.keys(predictionsByCurve).length > 0;
+  const emptyPredictions = { outline: {}, output: { result: [] } };
+  let activePredictions = forecastSt.predictions;
+  if (hasCurvePredictions) {
+    activePredictions = predictionsByCurve[curveSt.curveIdx];
+  } else if (hasAnyCurvePredictions) {
+    activePredictions = emptyPredictions;
+  }
 
   if (!operation) return null;
 
@@ -82,7 +95,7 @@ const BtnSubmit = ({
         color="primary"
         onClick={onClickCb(
           operation.value, peaksEdit, isAscend, isIntensity,
-          scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt,
+          scan, thres, layoutSt, shiftSt, activePredictions, decimalSt,
           integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt,
           cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData,
         )}

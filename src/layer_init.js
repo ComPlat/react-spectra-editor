@@ -30,6 +30,7 @@ class LayerInit extends React.Component {
     this.initReducer = this.initReducer.bind(this);
     this.updateOthers = this.updateOthers.bind(this);
     this.updateMultiEntities = this.updateMultiEntities.bind(this);
+    this.hasSameMultiEntities = this.hasSameMultiEntities.bind(this);
   }
 
   componentDidMount() {
@@ -42,7 +43,12 @@ class LayerInit extends React.Component {
   componentDidUpdate(prevProps) {
     this.normChange(prevProps);
     this.updateOthers();
-    this.updateMultiEntities();
+    const { entity, multiEntities } = this.props;
+    const multiEntitiesChanged = !this.hasSameMultiEntities(prevProps.multiEntities, multiEntities);
+    const entityChanged = prevProps.entity !== entity;
+    if (multiEntitiesChanged || entityChanged) {
+      this.updateMultiEntities();
+    }
   }
 
   normChange(prevProps) {
@@ -97,9 +103,36 @@ class LayerInit extends React.Component {
     addOthersAct(others);
   }
 
+  hasSameMultiEntities(prevMultiEntities, nextMultiEntities) {
+    if (prevMultiEntities === nextMultiEntities) return true;
+    const prevArray = Array.isArray(prevMultiEntities) ? prevMultiEntities : null;
+    const nextArray = Array.isArray(nextMultiEntities) ? nextMultiEntities : null;
+    if (!prevArray && !nextArray) return true;
+    if (!prevArray || !nextArray) return false;
+    if (prevArray.length !== nextArray.length) return false;
+    for (let idx = 0; idx < prevArray.length; idx += 1) {
+      if (prevArray[idx] !== nextArray[idx]) return false;
+    }
+    return true;
+  }
+
   updateMultiEntities() {
-    const { multiEntities, setAllCurvesAct } = this.props;
-    setAllCurvesAct(multiEntities);
+    const { multiEntities, setAllCurvesAct, entity } = this.props;
+    const isMultiSpectra = Array.isArray(multiEntities) && multiEntities.length > 1;
+    if (isMultiSpectra) {
+      setAllCurvesAct(multiEntities);
+      return;
+    }
+
+    if (Format.isCyclicVoltaLayout(entity.layout)) {
+      const payload = (Array.isArray(multiEntities) && multiEntities.length > 0)
+        ? multiEntities
+        : [entity];
+      setAllCurvesAct(payload);
+      return;
+    }
+
+    setAllCurvesAct(false);
   }
 
   render() {
@@ -116,7 +149,8 @@ class LayerInit extends React.Component {
     const xxLabel = !xLabel && xLabel === '' ? `X (${target.xUnit})` : xLabel;
     const yyLabel = !yLabel && yLabel === '' ? `Y (${target.yUnit})` : yLabel;
 
-    if (multiEntities) {
+    const isMultiSpectra = Array.isArray(multiEntities) && multiEntities.length > 1;
+    if (isMultiSpectra) {
       return (
         <MultiJcampsViewer
           multiEntities={multiEntities}
@@ -125,6 +159,8 @@ class LayerInit extends React.Component {
           molSvg={molSvg}
           exactMass={exactMass}
           operations={operations}
+          forecast={forecast}
+          cLabel={cLabel}
           descriptions={descriptions}
           canChangeDescription={canChangeDescription}
           onDescriptionChanged={onDescriptionChanged}
@@ -139,6 +175,8 @@ class LayerInit extends React.Component {
           molSvg={molSvg}
           exactMass={exactMass}
           operations={operations}
+          forecast={forecast}
+          cLabel={cLabel}
           descriptions={descriptions}
           canChangeDescription={canChangeDescription}
           onDescriptionChanged={onDescriptionChanged}

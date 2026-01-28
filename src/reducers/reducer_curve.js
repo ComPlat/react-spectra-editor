@@ -18,12 +18,22 @@ const setAllCurves = (state, action) => {
       const {
         topic, feature, hasEdit, integration, multiplicity,
       } = extractParams(entity, { isEdit: true });
+      const simulation = entity && entity.features ? entity.features.simulation : undefined;
       // const layout = entity.layout;
       const { layout } = entity;
       const maxminPeak = Convert2MaxMinPeak(layout, feature, 0);
       const color = Format.mutiEntitiesColors(idx);
       return {
-        layout, topic, feature, hasEdit, integration, multiplicity, maxminPeak, color, curveIdx: idx,
+        layout,
+        topic,
+        feature,
+        hasEdit,
+        integration,
+        multiplicity,
+        simulation,
+        maxminPeak,
+        color,
+        curveIdx: idx,
       };
     });
 

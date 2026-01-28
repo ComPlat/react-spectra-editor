@@ -23,6 +23,7 @@ import compareIr2Jcamp from './__tests__/fixtures/compare_ir_2_jcamp';
 import ramanJcamp from './__tests__/fixtures/raman_jcamp';
 import msJcamp from './__tests__/fixtures/ms_jcamp';
 import nmrResult from './__tests__/fixtures/nmr_result';
+import nmrResultAlt from './__tests__/fixtures/nmr_result_alt';
 import irResult from './__tests__/fixtures/ir_result';
 import Phenylalanin from './__tests__/fixtures/phenylalanin';
 import compareUvVisJcamp from './__tests__/fixtures/compare_uv_vis_jcamp';
@@ -253,7 +254,7 @@ class DemoWriteIr extends React.Component {
 
   loadOthers() {
     const { showOthers, typ } = this.state;
-    const isIr = typ === 'ir';
+    const isIr = typ === 'ir' || typ === 'multi ir';
     const isXRD = typ === 'xrd';
     const others = showOthers ? (
       isIr ? [compIr1Entity, compIr2Entity] : (
@@ -418,7 +419,7 @@ class DemoWriteIr extends React.Component {
   predictOp({
     multiplicity, curveSt,
    }) {
-    const { curveIdx } = curveSt;
+    const { curveIdx = 0 } = curveSt || {};
     const { multiplicities } = multiplicity;
     const selectedMultiplicity = multiplicities[curveIdx];
     const { stack, shift } = selectedMultiplicity;
@@ -428,13 +429,16 @@ class DemoWriteIr extends React.Component {
     })
     // console.log(targets)
     const { molecule, typ } = this.state;
-    const predictions = { running: true };
+    const predictions = { running: true, curveIdx };
 
     this.setState({ predictions });
     // simulate fetching...
-    const result = typ === 'ir' ? irResult : nmrResult;
+    const selectNmrResult = (idx) => (idx % 2 === 0 ? nmrResult : nmrResultAlt);
+    const result = (typ === 'ir' || typ === 'multi ir')
+      ? irResult
+      : selectNmrResult(curveIdx);
     setTimeout(() => {
-      this.setState({ predictions: result });
+      this.setState({ predictions: { ...result, curveIdx } });
     }, 2000);
   }
 

@@ -6,6 +6,7 @@ import {
 } from '../constants/action_type';
 
 import { LIST_LAYOUT } from '../constants/list_layout';
+import Format from '../helpers/format';
 
 const getLayoutSt = (state) => state.layout;
 const getCurveSt = (state) => state.curve;
@@ -139,9 +140,34 @@ function* setInitIntegrations(action) { // eslint-disable-line
   }
 }
 
+function* setSimulationForCurve(action) { // eslint-disable-line
+  const layoutSt = yield select(getLayoutSt);
+  if (!Format.isNmrLayout(layoutSt)) return;
+
+  const curveSt = yield select(getCurveSt);
+  const { listCurves, curveIdx } = curveSt;
+  if (!Array.isArray(listCurves) || listCurves.length === 0) return;
+
+  const targetIdx = Number.isInteger(action.payload) ? action.payload : curveIdx;
+  const targetCurve = listCurves[targetIdx];
+  if (!targetCurve || !targetCurve.simulation) {
+    yield put({
+      type: SIMULATION.RESET_ALL_RDC,
+      payload: { nmrSimPeaks: [] },
+    });
+    return;
+  }
+
+  yield put({
+    type: SIMULATION.RESET_ALL_RDC,
+    payload: targetCurve.simulation,
+  });
+}
+
 const multiEntitiesSagas = [
   takeEvery(CURVE.SET_ALL_CURVES, setCyclicVoltametry),
   takeEvery(CURVE.SET_ALL_CURVES, setInitIntegrations),
+  takeEvery(CURVE.SELECT_WORKING_CURVE, setSimulationForCurve),
   takeEvery(CYCLIC_VOLTA_METRY.SET_FACTOR, setCyclicVoltametryRef),
 ];
 

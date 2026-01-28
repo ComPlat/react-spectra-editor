@@ -212,7 +212,7 @@ const selectOperation = (name, operations, updateOperationAct) => {
 
 const Submit = ({
   operations, classes, feature, forecast, editorOnly, hideSwitch, disabled,
-  isAscendSt, isIntensitySt, operationSt, decimalSt, isEmWaveSt,
+  isAscendSt, isIntensitySt, operationSt, decimalSt, isEmWaveSt, layoutSt,
   toggleIsAscendAct, toggleIsIntensityAct,
   updateOperationAct, updateDecimalAct,
 }) => {
@@ -221,6 +221,11 @@ const Submit = ({
   );
 
   if (!operations || operations.length === 0) return null;
+
+  const allowPredictInEditorOnly = Format.is1HLayout(layoutSt)
+    || Format.is13CLayout(layoutSt)
+    || Format.isIrLayout(layoutSt);
+  const shouldShowPredict = !editorOnly || allowPredictInEditorOnly;
 
   return (
     <span className={classes.groupRightMost}>
@@ -240,14 +245,14 @@ const Submit = ({
         )
       }
       {
-        editorOnly
-          ? null
-          : (
+        shouldShowPredict
+          ? (
             <BtnPredict
               feature={feature}
               forecast={forecast}
             />
           )
+          : null
       }
       {
         operationSelect(
@@ -267,6 +272,7 @@ const Submit = ({
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
+    layoutSt: state.layout,
     isEmWaveSt: Format.isEmWaveLayout(state.layout),
     isAscendSt: state.submit.isAscend,
     isIntensitySt: state.submit.isIntensity,
@@ -293,6 +299,7 @@ Submit.propTypes = {
   operationSt: PropTypes.object.isRequired,
   hideSwitch: PropTypes.bool.isRequired,
   disabled: PropTypes.bool.isRequired,
+  layoutSt: PropTypes.string.isRequired,
   isAscendSt: PropTypes.bool.isRequired,
   isIntensitySt: PropTypes.bool.isRequired,
   isEmWaveSt: PropTypes.bool.isRequired,
