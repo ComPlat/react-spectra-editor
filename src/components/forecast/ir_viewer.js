@@ -60,7 +60,7 @@ const sectionTable = (classes, pds) => {
   const renderMsg = notToRenderAnalysis(pds);
   if (renderMsg) return renderMsg;
 
-  if (!pds.output.result || !pds.output.result[0]) return null;
+  if (!pds || !pds.output || !pds.output.result || !pds.output.result[0]) return null;
 
   const { fgs } = pds.output.result[0];
   if (!fgs) return null;
@@ -88,7 +88,7 @@ const IrViewer = ({ // eslint-disable-line
   const hasCurvePredictions = Object.prototype.hasOwnProperty.call(predictionsByCurve, curveIdx);
   const hasAnyCurvePredictions = Object.keys(predictionsByCurve).length > 0;
   const emptyPredictions = { outline: {}, output: { result: [] } };
-  let activePredictions = forecastSt.predictions;
+  let activePredictions = forecastSt.predictions || emptyPredictions;
   if (hasCurvePredictions) {
     activePredictions = predictionsByCurve[curveIdx];
   } else if (hasAnyCurvePredictions) {

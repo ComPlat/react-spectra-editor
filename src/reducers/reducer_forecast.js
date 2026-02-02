@@ -121,6 +121,7 @@ const forecastReducer = (state = initialState, action) => {
           {},
           state,
           payloadRest,
+          { predictions: nextPredictions },
         );
         if (!Number.isInteger(curveIdx)) {
           return nextState;
