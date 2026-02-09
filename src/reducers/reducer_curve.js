@@ -1,6 +1,8 @@
 /* eslint-disable prefer-object-spread, default-param-last, max-len */
 import { CURVE } from '../constants/action_type';
 import { extractParams } from '../helpers/extractParams';
+import { getLcMsInfo, isLcMsGroup } from '../helpers/extractEntityLCMS';
+import { LIST_LAYOUT } from '../constants/list_layout';
 
 import { Convert2MaxMinPeak } from '../helpers/chem';
 import Format from '../helpers/format';
@@ -15,16 +17,30 @@ const setAllCurves = (state, action) => {
   const { payload } = action;
   if (!payload) return { ...state, curveIdx: 0, listCurves: [] };
 
+  const isLcmsGroup = isLcMsGroup(payload);
   const entities = payload.map((entity, idx) => {
+    const lcmsInfo = getLcMsInfo(entity);
+    const layout = (isLcmsGroup && lcmsInfo.kind !== 'unknown')
+      ? LIST_LAYOUT.LC_MS
+      : entity.layout;
+    const extracted = extractParams(entity, { isEdit: true }, null, {
+      forceLcms: isLcmsGroup && lcmsInfo.kind !== 'unknown',
+    });
     const {
-      topic, feature, hasEdit, integration, multiplicity, features,
-    } = extractParams(entity, { isEdit: true });
+      topic, feature, hasEdit, integration, multiplicity, features, entity: entityFromExtract, spectra,
+    } = extracted;
 
-    const { layout } = entity;
+    let finalFeatures = features;
+    if (!finalFeatures || (Array.isArray(finalFeatures) && finalFeatures.length === 0)) {
+      finalFeatures = entityFromExtract?.features || entity.features || [];
+    }
+
     const maxminPeak = Convert2MaxMinPeak(layout, feature, 0);
     const color = Format.mutiEntitiesColors(idx);
     return {
       layout,
+      lcmsKind: lcmsInfo.kind,
+      lcmsPolarity: lcmsInfo.polarity,
       topic,
       feature,
       hasEdit,
@@ -33,7 +49,9 @@ const setAllCurves = (state, action) => {
       maxminPeak,
       color,
       curveIdx: idx,
-      features,
+      features: finalFeatures,
+      entity: entityFromExtract || entity,
+      spectra: spectra || entity.spectra,
     };
   });
 

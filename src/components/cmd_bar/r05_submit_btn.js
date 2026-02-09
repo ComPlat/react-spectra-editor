@@ -15,7 +15,9 @@ import {
   Convert2Scan, Convert2Thres,
 } from '../../helpers/chem';
 import { MuButton, commonStyle } from './common';
-import { extractPeaksEdit, extractAreaUnderCurve, formatLcmsPeaksForBackend, formatLcmsIntegralsForBackend } from '../../helpers/extractPeaksEdit';
+import {
+  extractPeaksEdit, extractAreaUnderCurve, formatLcmsPeaksForBackend, formatLcmsIntegralsForBackend,
+} from '../../helpers/extractPeaksEdit';
 import Format from '../../helpers/format';
 
 const styles = () => (

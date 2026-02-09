@@ -46,6 +46,8 @@ const MountBrush = (focus, isUiAddIntgSt, isUiNoBrushSt, brushedClass = '.d3Svg'
     root, svg, brush, brushX, w, h, uiSt, graphIndex,
   } = focus;
 
+  if (!root || !svg || typeof svg.selectAll !== 'function') return;
+
   svg.selectAll('.brush, .brushX').remove();
 
   const isZoomIn = uiSt?.zoom?.sweepTypes?.[graphIndex] === LIST_UI_SWEEP_TYPE.ZOOMIN;

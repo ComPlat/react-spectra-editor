@@ -8,7 +8,7 @@ import {
 
 import ReactQuill from 'react-quill';
 
-import { SpectraEditor, FN } from './app';
+import { SpectraEditor, FN, store } from './app';
 import nmr1HJcamp from './__tests__/fixtures/nmr1h_jcamp';
 import nmr1H2Jcamp from './__tests__/fixtures/nmr1h_2_jcamp';
 import nmr13CDeptJcamp from './__tests__/fixtures/nmr13c_dept_jcamp';
@@ -27,6 +27,9 @@ import lcmsJcamp2 from './__tests__/fixtures/lc_ms_jcamp_2';
 import hplcMsTicPosJcamp from './__tests__/fixtures/lc_ms_jcamp_tic_pos';
 import hplcMsTicNegJcamp from './__tests__/fixtures/lc_ms_jcamp_tic_neg';
 import hplcMsUvvisJcamp from './__tests__/fixtures/lc_ms_jcamp_uvvis';
+import lcMsTicChemstationJcamp from './__tests__/fixtures/lc_ms_jcamp_tic_chemstation';
+import lcMsMzChemstationJcamp from './__tests__/fixtures/lc_ms_jcamp_mz_chemstation';
+import lcMsUvvisChemstationJcamp from './__tests__/fixtures/lc_ms_jcamp_uvvis_chemstation';
 import nmrResult from './__tests__/fixtures/nmr_result';
 import irResult from './__tests__/fixtures/ir_result';
 import Phenylalanin from './__tests__/fixtures/phenylalanin';
@@ -75,6 +78,9 @@ const lcmsEntity2 = FN.ExtractJcamp(lcmsJcamp2);
 const hplcMsTicPosEntity = FN.ExtractJcamp(hplcMsTicPosJcamp);
 const hplcMsTicNegEntity = FN.ExtractJcamp(hplcMsTicNegJcamp);
 const hplcMsUvvisEntity = FN.ExtractJcamp(hplcMsUvvisJcamp);
+const hplcMsTicChemstationEntity = FN.ExtractJcamp(lcMsTicChemstationJcamp);
+const hplcMsMzChemstationEntity = FN.ExtractJcamp(lcMsMzChemstationJcamp);
+const hplcMsUvvisChemstationEntity = FN.ExtractJcamp(lcMsUvvisChemstationJcamp);
 const uvVisEntity = FN.ExtractJcamp(uvVisJcamp);
 const compUvVisEntity = FN.ExtractJcamp(compareUvVisJcamp);
 const hplcUVVisEntity = FN.ExtractJcamp(hplcUVVisJcamp);
@@ -200,6 +206,8 @@ class DemoWriteIr extends React.Component {
         return msEntity;
       case 'lcms':
         return lcmsEntity;
+      case 'lcms chemstation':
+        return hplcMsUvvisChemstationEntity;
       default:
         return msEntity;
     }
@@ -226,6 +234,10 @@ class DemoWriteIr extends React.Component {
         return [gcEntity1, gcEntity2, gcEntity3];
       case 'lcms':
         return [hplcMsTicPosEntity, hplcMsTicNegEntity, hplcMsUvvisEntity, lcmsEntity, lcmsEntity2];
+      case 'lcms chemstation':
+        return [
+          hplcMsTicChemstationEntity, hplcMsMzChemstationEntity, hplcMsUvvisChemstationEntity,
+        ];
       default:
         return false;
     }
@@ -254,6 +266,7 @@ class DemoWriteIr extends React.Component {
       case 'xrd':
       case 'ms':
       case 'lcms':
+      case 'lcms chemstation':
       case 'cyclic volta':
       case 'cds':
       case 'sec':
@@ -305,6 +318,7 @@ class DemoWriteIr extends React.Component {
       integration,
       waveLength,
       temperature,
+      hplcMsSt: store.getState().hplcMs,
     });
     const wrapper = FN.peaksWrapper(layout, shift);
     let desc = this.rmDollarSign(wrapper.head) + body + wrapper.tail;
@@ -399,8 +413,8 @@ class DemoWriteIr extends React.Component {
   }
 
   savePeaks({
-    peaks, layout, shift, isAscend, decimal, analysis, isIntensity,
-    integration, multiplicity, waveLength,
+    peaks, layout, shift, isAscend, decimal, isIntensity,
+    waveLength,
   }) {
     const entity = this.loadEntity();
     const { features } = entity;
@@ -410,12 +424,18 @@ class DemoWriteIr extends React.Component {
       : (features.editPeak || features.autoPeak);
     const boundary = { maxY, minY };
     const body = FN.peaksBody({
-      peaks, layout, decimal, shift, isAscend, isIntensity, boundary, waveLength, temperature,
+      peaks,
+      layout,
+      decimal,
+      shift,
+      isAscend,
+      isIntensity,
+      boundary,
+      waveLength,
+      temperature,
+      hplcMsSt: store.getState().hplcMs,
     });
     /*eslint-disable */
-    console.log(analysis);
-    console.log(integration);
-    console.log(multiplicity);
     if (shift.ref.label) {
       const label = this.rmDollarSign(shift.ref.label);
       alert(
@@ -670,7 +690,14 @@ class DemoWriteIr extends React.Component {
             style={{ margin: '0 10px 0 10px' }}
             onClick={this.onClick('lcms')}
           >
-            LC/MS
+            LC/MS OpenLab
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('lcms chemstation')}
+          >
+            LC/MS Chemstation
           </Button>
           <Button
             variant="contained"

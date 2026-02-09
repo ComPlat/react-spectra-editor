@@ -1,8 +1,7 @@
 /* eslint-disable prefer-object-spread, default-param-last */
 import { HPLC_MS, CURVE, THRESHOLD } from '../constants/action_type';
-import Format from '../helpers/format';
 import { getArea, getAbsoluteArea } from '../helpers/integration';
-import { catToString } from '../helpers/extractEntityLCMS';
+import { getLcMsInfo } from '../helpers/extractEntityLCMS';
 
 const initialState = {
   uvvis: {
@@ -13,27 +12,26 @@ const initialState = {
     currentSpectrum: null,
   },
   ms: {
-    positive: {
-      peaks: [],
-    },
-    negative: {
-      peaks: [],
-    },
+    positive: { peaks: [] },
+    negative: { peaks: [] },
+    neutral: { peaks: [] },
   },
   tic: {
     currentPageValue: null,
-    isNegative: false,
+    polarity: 'positive',
+    available: {
+      positive: false,
+      negative: false,
+      neutral: false,
+    },
     positive: {
-      data: {
-        x: [],
-        y: [],
-      },
+      data: { x: [], y: [] },
     },
     negative: {
-      data: {
-        x: [],
-        y: [],
-      },
+      data: { x: [], y: [] },
+    },
+    neutral: {
+      data: { x: [], y: [] },
     },
   },
   threshold: {
@@ -48,44 +46,93 @@ const updateHPLCData = (state, action) => {
   const { payload } = action;
   if (!payload || payload.length === 0) return state;
 
+  const normalizeFeatures = (curve) => {
+    if (Array.isArray(curve?.features)) return curve.features;
+    if (Array.isArray(curve?.spectra)) return curve.spectra;
+    if (curve?.feature) return [curve.feature];
+    if (curve?.entity?.features) {
+      if (Array.isArray(curve.entity.features)) return curve.entity.features;
+      if (typeof curve.entity.features === 'object') {
+        return Object.values(curve.entity.features).filter((f) => f?.data?.[0]);
+      }
+    }
+    if (curve?.features && typeof curve.features === 'object') {
+      return Object.values(curve.features).filter((f) => f?.data?.[0]);
+    }
+    return [];
+  };
+
   let ticPosData = { x: [], y: [] };
   let ticNegData = { x: [], y: [] };
+  let ticNeutralData = { x: [], y: [] };
 
   let uvvisCurve = null;
   const mzPosFeatures = [];
   const mzNegFeatures = [];
+  const mzNeutralFeatures = [];
 
   payload.forEach((curve) => {
-    const cat = catToString(curve?.features?.[0]?.csCategory);
-
-    if (cat.includes('TIC')) {
-      if (cat.includes('NEGATIVE')) ticNegData = curve.features[0].data[0];
-      else                          ticPosData = curve.features[0].data[0];
-    } else if (cat.includes('UVVIS')) {
-      uvvisCurve = curve;
-    } else if (cat.includes('MZ')) {
-      if (cat.includes('NEGATIVE')) mzNegFeatures.push(...curve.features);
-      else                          mzPosFeatures.push(...curve.features);
+    const { kind, polarity } = getLcMsInfo(curve);
+    const featuresArr = normalizeFeatures(curve);
+    if (kind === 'tic') {
+      const [feature] = featuresArr;
+      const featureData = feature?.data?.[0];
+      if (!featureData || !featureData.x || featureData.x.length === 0) {
+        return;
+      }
+      if (polarity === 'negative') {
+        ticNegData = featureData;
+      } else if (polarity === 'positive') {
+        ticPosData = featureData;
+      } else {
+        ticNeutralData = featureData;
+      }
+    } else if (kind === 'uvvis') {
+      uvvisCurve = {
+        ...curve,
+        features: featuresArr,
+      };
+    } else if (kind === 'mz') {
+      if (featuresArr.length === 0) return;
+      if (polarity === 'negative') {
+        mzNegFeatures.push(...featuresArr);
+      } else if (polarity === 'positive') {
+        mzPosFeatures.push(...featuresArr);
+      } else {
+        mzNeutralFeatures.push(...featuresArr);
+      }
     }
   });
 
   if (!uvvisCurve || !uvvisCurve.features) {
     return state;
   }
-  const features = uvvisCurve.features;
+  const { features } = uvvisCurve;
 
   const getPageValue = (fe) => {
     let raw = fe.pageSymbol || fe.page || fe.pageValue;
     if (typeof raw === 'string') {
       raw = raw.split('\n')[0].trim();
-      raw = raw.replace(/[^0-9.+-]/g, '');
+      const match = raw.match(/[=:]\s*([0-9.+-]+)/);
+      if (match) {
+        const [, value] = match;
+        raw = value;
+      } else {
+        raw = raw.replace(/[^0-9.+-]/g, '');
+      }
     }
-    return parseFloat(raw);
+    const value = parseFloat(raw);
+    return Number.isFinite(value) ? value : 0;
   };
 
-  const filteredFeatures = features.filter(
-    (fe) => fe.data && fe.data[0] && fe.data[0].x && fe.data[0].x.length > 0 && fe.data[0].y && fe.data[0].y.length > 0,
-  );
+  const filteredFeatures = features.filter((fe) => (
+    fe.data
+    && fe.data[0]
+    && fe.data[0].x
+    && fe.data[0].x.length > 0
+    && fe.data[0].y
+    && fe.data[0].y.length > 0
+  ));
 
   const listWaveLength = filteredFeatures.map((fe) => getPageValue(fe));
   const spectraList = filteredFeatures.map((fe) => ({
@@ -104,10 +151,25 @@ const updateHPLCData = (state, action) => {
     currentSpectrum: spectraList[0],
   };
 
-  const toPeaks = (fts) =>
-    fts.map((f) =>
-      f.data[0].y.map((y, i) => ({ x: f.data[0].x[i], y: y || 0 }))
-    );
+  const toPeaks = (fts) => fts.map((f) => {
+    const data = f?.data?.[0] || {};
+    const xValues = Array.isArray(data.x) ? data.x : [];
+    const yValues = Array.isArray(data.y) ? data.y : [];
+    const length = Math.min(xValues.length, yValues.length);
+    return xValues.slice(0, length).map((x, i) => ({
+      x,
+      y: yValues[i] || 0,
+    }));
+  });
+
+  const available = {
+    positive: ticPosData?.x?.length > 0,
+    negative: ticNegData?.x?.length > 0,
+    neutral: ticNeutralData?.x?.length > 0,
+  };
+  const preferredOrder = ['positive', 'negative', 'neutral'];
+  const fallbackPolarity = preferredOrder.find((pol) => available[pol]) || 'positive';
+  const selectedPolarity = available[state.tic.polarity] ? state.tic.polarity : fallbackPolarity;
 
   return {
     ...state,
@@ -115,11 +177,15 @@ const updateHPLCData = (state, action) => {
     ms: {
       positive: { peaks: toPeaks(mzPosFeatures) },
       negative: { peaks: toPeaks(mzNegFeatures) },
+      neutral: { peaks: toPeaks(mzNeutralFeatures) },
     },
     tic: {
       ...state.tic,
+      polarity: selectedPolarity,
+      available,
       positive: { data: ticPosData },
       negative: { data: ticNegData },
+      neutral: { data: ticNeutralData },
     },
   };
 };
@@ -181,12 +247,12 @@ const updateWaveLength = (state, action) => {
 };
 
 const updateTic = (state, action) => {
-  const { isNegative } = action.payload;
+  const { polarity } = action.payload;
   return {
     ...state,
     tic: {
       ...state.tic,
-      isNegative,
+      polarity,
     },
   };
 };
@@ -247,8 +313,42 @@ const updateHplcMsIntegrations = (state, action) => {
   }
 
   const { integrations = [] } = selectedSpectrum;
-  const { xExtent, data } = integration;
 
+  const getRange = (intg) => {
+    const xL = intg?.xExtent?.xL ?? intg?.xL;
+    const xU = intg?.xExtent?.xU ?? intg?.xU;
+    return { xL, xU };
+  };
+
+  if (remove) {
+    const { xL: rmXL, xU: rmXU } = getRange(integration);
+    if (rmXL == null || rmXU == null) return state;
+    const newIntegrations = integrations.filter((intg) => {
+      const { xL, xU } = getRange(intg);
+      if (xL == null || xU == null) return true;
+      return !(Math.abs(xL - rmXL) < 1e-6 && Math.abs(xU - rmXU) < 1e-6);
+    });
+
+    const newSpectrum = {
+      ...selectedSpectrum,
+      integrations: newIntegrations,
+    };
+
+    const newSpectraList = [...spectraList];
+    newSpectraList[curveIdx] = newSpectrum;
+
+    return {
+      ...state,
+      uvvis: {
+        ...uvvis,
+        spectraList: newSpectraList,
+        currentSpectrum:
+          spectrumId === uvvis.selectedWaveLength ? newSpectrum : uvvis.currentSpectrum,
+      },
+    };
+  }
+
+  const { xExtent, data } = integration;
   if (!xExtent || !data || !xExtent.xL || !xExtent.xU || xExtent.xU === xExtent.xL) {
     return state;
   }
@@ -268,9 +368,7 @@ const updateHplcMsIntegrations = (state, action) => {
     data,
   };
 
-  const newIntegrations = remove
-    ? integrations.filter((int) => !(int.xL === newIntegration.xL && int.xU === newIntegration.xU))
-    : [...integrations, newIntegration];
+  const newIntegrations = [...integrations, newIntegration];
 
   const newSpectrum = {
     ...selectedSpectrum,

@@ -1,13 +1,9 @@
 /* eslint-disable prefer-destructuring */
 /* eslint-disable no-mixed-operators, prefer-object-spread,
 function-paren-newline, no-unused-vars, default-param-last */
-import Jcampconverter from 'jcampconverter';
 import { ToXY, IsSame } from './converter';
 import { LIST_LAYOUT } from '../constants/list_layout';
 import { calcMpyCenter } from './multiplicity_calc';
-import { store } from '../app';
-
-const getHplcMs = () => store.getState().hplcMs;
 
 const spectraDigit = (layout) => {
   switch (layout) {
@@ -59,7 +55,7 @@ const toPeakStr = (peaks) => {
   return str;
 };
 
-const extractUvvisLcmsPeaks = (hplcMsSt = getHplcMs()) => {
+const extractUvvisLcmsPeaks = (hplcMsSt) => {
   if (!hplcMsSt?.uvvis) {
     return '{}';
   }
@@ -72,8 +68,6 @@ const extractUvvisLcmsPeaks = (hplcMsSt = getHplcMs()) => {
     const wlKey = String(Math.round(wl));
 
     (spectrum.peaks || []).forEach((p, n) => {
-
-
       if (!byWavelength[wlKey]) byWavelength[wlKey] = [];
       byWavelength[wlKey].push({ x: p.x, y: p.y });
     });
@@ -117,16 +111,17 @@ const rmRef = (peaks, shift, atIndex = 0) => {
   ).filter((r) => r != null);
 };
 
-const formatedLCMS = (hplcMsSt = getHplcMs(), isAscend, decimal) => {
+const formatedLCMS = (hplcMsSt, isAscend, decimal) => {
+  if (!hplcMsSt?.uvvis) {
+    return '';
+  }
+
   let result = '';
 
-  const {
-    uvvis: { listWaveLength, spectraList },
-    ms,
-    tic,
-    isNegative,
-    threshold,
-  } = hplcMsSt;
+  const { listWaveLength = [], spectraList = [] } = hplcMsSt.uvvis || {};
+  const ms = hplcMsSt.ms || {};
+  const tic = hplcMsSt.tic;
+  const threshold = hplcMsSt.threshold;
 
   result += 'HPLC UV/VIS:\n';
 
@@ -169,17 +164,29 @@ const formatedLCMS = (hplcMsSt = getHplcMs(), isAscend, decimal) => {
     }
   });
 
-  const polarity = tic.isNegative ? 'negative' : 'positive';
+  const polarity = tic?.polarity || (tic?.isNegative ? 'negative' : 'positive');
+  let polarityKey = 'neutral';
+  if (polarity === 'negative') {
+    polarityKey = 'negative';
+  } else if (polarity === 'positive') {
+    polarityKey = 'positive';
+  }
+  let polarityLabel = '';
+  if (polarity === 'negative') {
+    polarityLabel = '−';
+  } else if (polarity === 'positive') {
+    polarityLabel = '+';
+  }
 
-  if (tic && ms[polarity]) {
+  if (tic && ms[polarityKey]) {
     let currentIndex = -1;
-    if (Array.isArray(tic[polarity]?.data?.x)) {
-      currentIndex = tic[polarity].data.x.findIndex(
+    if (Array.isArray(tic[polarityKey]?.data?.x)) {
+      currentIndex = tic[polarityKey].data.x.findIndex(
         (x) => Math.abs(x - tic.currentPageValue) < 1e-6,
       );
     }
-    if (currentIndex >= 0 && ms[polarity].peaks[currentIndex]) {
-      const peaks = ms[polarity].peaks[currentIndex];
+    if (currentIndex >= 0 && ms[polarityKey].peaks[currentIndex]) {
+      const peaks = ms[polarityKey].peaks[currentIndex];
       const maxIntensity = Math.max(...peaks.map((p) => p.y)) || 1;
       const thresholdValue = threshold?.value ?? 5;
 
@@ -194,7 +201,8 @@ const formatedLCMS = (hplcMsSt = getHplcMs(), isAscend, decimal) => {
         return parseFloat(b.x) - parseFloat(a.x);
       });
 
-      result += `\nMS (${isNegative ? '−' : '+'}ESI), m/z (≥${thresholdValue}%):\n`;
+      const label = polarityLabel ? `${polarityLabel}ESI` : 'ESI';
+      result += `\nMS (${label}), m/z (≥${thresholdValue}%):\n`;
 
       const lines = sortedPeaks.map((peak) => {
         const mass = fixDigit(peak.x, decimal);

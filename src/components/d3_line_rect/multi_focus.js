@@ -15,7 +15,7 @@ import { LIST_ROOT_SVG_GRAPH, LIST_BRUSH_SVG_GRAPH } from '../../constants/list_
 import {
   convertTopic,
 } from '../../helpers/chem';
-import { catToString } from '../../helpers/extractEntityLCMS';
+import { getLcMsInfo } from '../../helpers/extractEntityLCMS';
 
 const d3 = require('d3');
 
@@ -77,8 +77,11 @@ class MultiFocus {
     this.isFirefox = typeof InstallTrigger !== 'undefined';
   }
 
-  colorForPolarity = (polarity) =>
-    polarity === 'negative' ? '#2980b9' : '#d35400';
+  colorForPolarity = (polarity) => {
+    if (polarity === 'negative') return '#2980b9';
+    if (polarity === 'neutral') return '#2980b9';
+    return '#d35400';
+  };
 
   getShouldUpdate() {
     const {
@@ -127,15 +130,17 @@ class MultiFocus {
     this.otherLineData = [];
     this.ticEntities.forEach((entry, idx) => {
       const { topic, feature } = entry;
-      const cat = catToString(feature?.csCategory ?? entry.features?.[0]?.csCategory);
-      const polarity = cat.includes('NEGATIVE') ? 'negative' : 'positive';
+      const { polarity = 'neutral' } = getLcMsInfo(entry);
       const fixedColor = this.colorForPolarity(polarity);
+      if (!feature || !topic) return;
       const currData = convertTopic(topic, layout, feature, 0);
       if (idx === jcampIdx) {
         this.data = currData;
         this.pathColor = fixedColor;
       } else {
-        this.otherLineData.push({ data: currData, polarity, color: fixedColor, idx });
+        this.otherLineData.push({
+          data: currData, polarity, color: fixedColor, idx,
+        });
       }
     });
 
@@ -287,6 +292,7 @@ class MultiFocus {
     ticEntities,
     sweepExtentSt, isUiNoBrushSt, uiSt,
   }) {
+    this.svg = d3.select(this.rootKlass).select(this.brushClass);
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, false);
 
