@@ -53,30 +53,31 @@ const onClickCb = (operation, peaksEdit, isAscend, isIntensity, scan, thres, lay
     dscMetaData
   });
 };
-const BtnSubmit = ({
-  classes,
-  operation,
-  feature,
-  isAscend,
-  isIntensity,
-  editPeakSt,
-  thresSt,
-  layoutSt,
-  shiftSt,
-  scanSt,
-  forecastSt,
-  decimalSt,
-  integrationSt,
-  multiplicitySt,
-  allIntegrationSt,
-  waveLengthSt,
-  cyclicvoltaSt,
-  curveSt,
-  axesUnitsSt,
-  detectorSt,
-  metaSt,
-  hplcMsSt
-}) => {
+const BtnSubmit = _ref => {
+  let {
+    classes,
+    operation,
+    feature,
+    isAscend,
+    isIntensity,
+    editPeakSt,
+    thresSt,
+    layoutSt,
+    shiftSt,
+    scanSt,
+    forecastSt,
+    decimalSt,
+    integrationSt,
+    multiplicitySt,
+    allIntegrationSt,
+    waveLengthSt,
+    cyclicvoltaSt,
+    curveSt,
+    axesUnitsSt,
+    detectorSt,
+    metaSt,
+    hplcMsSt
+  } = _ref;
   const peaksEdit = (0, _extractPeaksEdit.extractPeaksEdit)(feature, editPeakSt, thresSt, shiftSt, layoutSt);
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
   const scan = _format.default.isMsLayout(layoutSt) ? (0, _chem.Convert2Scan)(feature, scanSt) : 0;

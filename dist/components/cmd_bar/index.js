@@ -28,39 +28,42 @@ var _r09_detector = _interopRequireDefault(require("./r09_detector"));
 react/function-component-definition, react/require-default-props */
 
 const styles = () => Object.assign({}, {}, _common.commonStyle);
-const CmdBar = ({
-  classes,
-  feature,
-  hasEdit,
-  forecast,
-  operations,
-  editorOnly,
-  jcampIdx,
-  hideThreshold,
-  hideMainEditTools
-}) => /*#__PURE__*/_react.default.createElement("div", {
-  className: classes.card
-}, hideMainEditTools ? null : /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement(_viewer.default, {
-  editorOnly: editorOnly
-}), /*#__PURE__*/_react.default.createElement(_zoom.default, null), /*#__PURE__*/_react.default.createElement(_peak.default, {
-  jcampIdx: jcampIdx,
-  feature: feature
-}), /*#__PURE__*/_react.default.createElement(_pecker.default, {
-  jcampIdx: jcampIdx
-}), /*#__PURE__*/_react.default.createElement(_integration.default, null), /*#__PURE__*/_react.default.createElement(_multiplicity.default, null), /*#__PURE__*/_react.default.createElement(_undo_redo.default, null)), /*#__PURE__*/_react.default.createElement(_r04_submit.default, {
-  operations: operations,
-  feature: feature,
-  forecast: forecast,
-  editorOnly: editorOnly,
-  hideSwitch: false,
-  disabled: false
-}), hideThreshold ? null : /*#__PURE__*/_react.default.createElement(_r03_threshold.default, {
-  feature: feature,
-  hasEdit: hasEdit
-}), /*#__PURE__*/_react.default.createElement(_r01_layout.default, {
-  feature: feature,
-  hasEdit: hasEdit
-}), /*#__PURE__*/_react.default.createElement(_r07_wavelength_btn.default, null), /*#__PURE__*/_react.default.createElement(_r08_change_axes.default, null), /*#__PURE__*/_react.default.createElement(_r09_detector.default, null));
+const CmdBar = _ref => {
+  let {
+    classes,
+    feature,
+    hasEdit,
+    forecast,
+    operations,
+    editorOnly,
+    jcampIdx,
+    hideThreshold,
+    hideMainEditTools
+  } = _ref;
+  return /*#__PURE__*/_react.default.createElement("div", {
+    className: classes.card
+  }, hideMainEditTools ? null : /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement(_viewer.default, {
+    editorOnly: editorOnly
+  }), /*#__PURE__*/_react.default.createElement(_zoom.default, null), /*#__PURE__*/_react.default.createElement(_peak.default, {
+    jcampIdx: jcampIdx,
+    feature: feature
+  }), /*#__PURE__*/_react.default.createElement(_pecker.default, {
+    jcampIdx: jcampIdx
+  }), /*#__PURE__*/_react.default.createElement(_integration.default, null), /*#__PURE__*/_react.default.createElement(_multiplicity.default, null), /*#__PURE__*/_react.default.createElement(_undo_redo.default, null)), /*#__PURE__*/_react.default.createElement(_r04_submit.default, {
+    operations: operations,
+    feature: feature,
+    forecast: forecast,
+    editorOnly: editorOnly,
+    hideSwitch: false,
+    disabled: false
+  }), hideThreshold ? null : /*#__PURE__*/_react.default.createElement(_r03_threshold.default, {
+    feature: feature,
+    hasEdit: hasEdit
+  }), /*#__PURE__*/_react.default.createElement(_r01_layout.default, {
+    feature: feature,
+    hasEdit: hasEdit
+  }), /*#__PURE__*/_react.default.createElement(_r07_wavelength_btn.default, null), /*#__PURE__*/_react.default.createElement(_r08_change_axes.default, null), /*#__PURE__*/_react.default.createElement(_r09_detector.default, null));
+};
 const mapStateToProps = (state, _) => (
 // eslint-disable-line
 {});

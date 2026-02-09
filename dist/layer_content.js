@@ -35,17 +35,18 @@ const extractLayout = (forecast, layoutSt) => {
     isLCMs
   };
 };
-const Content = ({
-  topic,
-  feature,
-  cLabel,
-  xLabel,
-  yLabel,
-  forecast,
-  operations,
-  layoutSt,
-  features
-}) => {
+const Content = _ref => {
+  let {
+    topic,
+    feature,
+    cLabel,
+    xLabel,
+    yLabel,
+    forecast,
+    operations,
+    layoutSt,
+    features
+  } = _ref;
   const {
     showForecast,
     isNmr,

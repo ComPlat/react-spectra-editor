@@ -79,21 +79,22 @@ const setFactor = (classes, isDisable, integrationSt, setIntegrationFkrAct, curv
   });
 };
 const iconColor = criteria => criteria ? '#fff' : '#000';
-const Integration = ({
-  classes,
-  ignoreRef,
-  isDisableSt,
-  isFocusAddIntgSt,
-  isFocusRmIntgSt,
-  isFocusSetRefSt,
-  setUiSweepTypeAct,
-  setIntegrationFkrAct,
-  clearIntegrationAllAct,
-  curveSt,
-  integrationSt,
-  clearIntegrationAllHplcMsAct,
-  layoutSt
-}) => {
+const Integration = _ref => {
+  let {
+    classes,
+    ignoreRef,
+    isDisableSt,
+    isFocusAddIntgSt,
+    isFocusRmIntgSt,
+    isFocusSetRefSt,
+    setUiSweepTypeAct,
+    setIntegrationFkrAct,
+    clearIntegrationAllAct,
+    curveSt,
+    integrationSt,
+    clearIntegrationAllHplcMsAct,
+    layoutSt
+  } = _ref;
   const onSweepIntegtAdd = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD);
   const onSweepIntegtRm = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_RM);
   const onSweepIntegtSR = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF);

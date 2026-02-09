@@ -164,24 +164,25 @@ const selectOperation = (name, operations, updateOperationAct) => {
   });
   updateOperationAct(operation);
 };
-const Submit = ({
-  operations,
-  classes,
-  feature,
-  forecast,
-  editorOnly,
-  hideSwitch,
-  disabled,
-  isAscendSt,
-  isIntensitySt,
-  operationSt,
-  decimalSt,
-  isEmWaveSt,
-  toggleIsAscendAct,
-  toggleIsIntensityAct,
-  updateOperationAct,
-  updateDecimalAct
-}) => {
+const Submit = _ref => {
+  let {
+    operations,
+    classes,
+    feature,
+    forecast,
+    editorOnly,
+    hideSwitch,
+    disabled,
+    isAscendSt,
+    isIntensitySt,
+    operationSt,
+    decimalSt,
+    isEmWaveSt,
+    toggleIsAscendAct,
+    toggleIsIntensityAct,
+    updateOperationAct,
+    updateDecimalAct
+  } = _ref;
   const onChangeSelect = e => selectOperation(e.target.value, operations, updateOperationAct);
   if (!operations || operations.length === 0) return null;
   return /*#__PURE__*/_react.default.createElement("span", {

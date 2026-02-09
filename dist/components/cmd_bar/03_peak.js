@@ -27,26 +27,27 @@ react/function-component-definition, react/require-default-props, max-len,
 react/no-unused-prop-types */
 
 const styles = () => Object.assign({}, _common.commonStyle);
-const Peak = ({
-  classes,
-  setUiSweepTypeAct,
-  isFocusAddPeakSt,
-  disableAddPeakSt,
-  isFocusRmPeakSt,
-  disableRmPeakSt,
-  isFocusSetRefSt,
-  disableSetRefSt,
-  isHandleMaxAndMinPeaksSt,
-  cyclicVotaSt,
-  curveSt,
-  clearAllPeaksAct,
-  feature,
-  editPeakSt,
-  thresSt,
-  shiftSt,
-  layoutSt,
-  clearAllPeaksHplcMsAct
-}) => {
+const Peak = _ref => {
+  let {
+    classes,
+    setUiSweepTypeAct,
+    isFocusAddPeakSt,
+    disableAddPeakSt,
+    isFocusRmPeakSt,
+    disableRmPeakSt,
+    isFocusSetRefSt,
+    disableSetRefSt,
+    isHandleMaxAndMinPeaksSt,
+    cyclicVotaSt,
+    curveSt,
+    clearAllPeaksAct,
+    feature,
+    editPeakSt,
+    thresSt,
+    shiftSt,
+    layoutSt,
+    clearAllPeaksHplcMsAct
+  } = _ref;
   let onSweepPeakAdd = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.PEAK_ADD);
   let onSweepPeakDELETE = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.PEAK_DELETE);
   let onSweepAnchorShift = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT);

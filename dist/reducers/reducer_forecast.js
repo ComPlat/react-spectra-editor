@@ -101,7 +101,9 @@ const updateNmrStatus = (state, action) => {
   });
   return newSt;
 };
-const forecastReducer = (state = initialState, action) => {
+const forecastReducer = function () {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+  let action = arguments.length > 1 ? arguments[1] : undefined;
   switch (action.type) {
     case _action_type.FORECAST.INIT_STATUS:
       if (!action.payload) return state;

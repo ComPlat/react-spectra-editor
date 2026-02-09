@@ -32,6 +32,7 @@ var _peak_group = _interopRequireDefault(require("../cmd_bar/08_peak_group"));
 var _r03_threshold = _interopRequireDefault(require("../cmd_bar/r03_threshold"));
 var _integration = _interopRequireDefault(require("../cmd_bar/04_integration"));
 var _peak = _interopRequireDefault(require("../cmd_bar/03_peak"));
+var _extractEntityLCMS = require("../../helpers/extractEntityLCMS");
 /* eslint-disable no-mixed-operators, prefer-object-spread, react/function-component-definition */
 
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
@@ -99,7 +100,7 @@ const waveLengthSelect = (classes, hplcMsSt, updateWaveLengthAct) => {
     className: (0, _classnames.default)(classes.fieldDecimal),
     variant: "outlined",
     style: {
-      width: '80px'
+      width: '140px'
     }
   }, /*#__PURE__*/_react.default.createElement(_material.InputLabel, {
     id: "select-decimal-label",
@@ -117,16 +118,25 @@ const ticSelect = (classes, hplcMsSt, handleTicChanged) => {
     tic
   } = hplcMsSt;
   const {
-    isNegative
+    polarity,
+    available
   } = tic;
   const listTIC = [{
     name: 'PLUS',
-    value: 0
+    value: 'positive',
+    enabled: available?.positive
   }, {
     name: 'MINUS',
-    value: 1
+    value: 'negative',
+    enabled: available?.negative
+  }, {
+    name: 'NEUTRAL',
+    value: 'neutral',
+    enabled: available?.neutral
   }];
-  const options = listTIC.map(d => /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
+  const filtered = listTIC.filter(d => d.enabled);
+  const listOptions = filtered.length > 0 ? filtered : listTIC;
+  const options = listOptions.map(d => /*#__PURE__*/_react.default.createElement(_material.MenuItem, {
     value: d.value,
     key: d.value
   }, /*#__PURE__*/_react.default.createElement("span", {
@@ -139,7 +149,7 @@ const ticSelect = (classes, hplcMsSt, handleTicChanged) => {
     className: (0, _classnames.default)(classes.fieldDecimal),
     variant: "outlined",
     style: {
-      width: '80px'
+      width: '110px'
     }
   }, /*#__PURE__*/_react.default.createElement(_material.InputLabel, {
     id: "select-decimal-label",
@@ -147,7 +157,7 @@ const ticSelect = (classes, hplcMsSt, handleTicChanged) => {
   }, "TIC"), /*#__PURE__*/_react.default.createElement(_material.Select, {
     labelId: "select-decimal-label",
     label: "Decimal",
-    value: isNegative ? 1 : 0,
+    value: polarity,
     onChange: onTicChange,
     className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-decimal')
   }, options));
@@ -202,8 +212,6 @@ class ViewerLineRect extends _react.default.Component {
   componentDidMount() {
     const {
       curveSt,
-      seed,
-      cLabel,
       feature,
       ticEntities,
       tTrEndPts,
@@ -268,7 +276,7 @@ class ViewerLineRect extends _react.default.Component {
       isUiAddIntgSt,
       isUiNoBrushSt
     });
-    (0, _draw.drawLabel)(this.rootKlassMulti, cLabel, 'Minutes', 'Intensity');
+    (0, _draw.drawLabel)(this.rootKlassMulti, null, 'Minutes', 'Intensity');
     (0, _draw.drawDisplay)(this.rootKlassMulti, isHidden);
     (0, _draw.drawMain)(this.rootKlassRect, W, H, _list_graph.LIST_BRUSH_SVG_GRAPH.RECT);
     this.rectFocus.create({
@@ -285,7 +293,6 @@ class ViewerLineRect extends _react.default.Component {
     const {
       ticEntities,
       curveSt,
-      cLabel,
       tTrEndPts,
       layoutSt,
       isUiAddIntgSt,
@@ -352,9 +359,15 @@ class ViewerLineRect extends _react.default.Component {
       });
     }
     const {
-      isNegative
+      polarity
     } = hplcMsSt.tic;
-    (0, _draw.drawLabel)(this.rootKlassMulti, isNegative ? 'MINUS' : 'PLUS', 'Minutes', 'Intensity');
+    let ticLabel = 'NEUTRAL';
+    if (polarity === 'negative') {
+      ticLabel = 'MINUS';
+    } else if (polarity === 'positive') {
+      ticLabel = 'PLUS';
+    }
+    (0, _draw.drawLabel)(this.rootKlassMulti, ticLabel, 'Minutes', 'Intensity');
     (0, _draw.drawDisplay)(this.rootKlassMulti, isHidden);
     const subViewFeature = this.extractSubView();
     if (subViewFeature) {
@@ -415,7 +428,13 @@ class ViewerLineRect extends _react.default.Component {
     const {
       features
     } = (0, _extractParams.extractParams)(uvvisEntities[0], 0, 1);
-    if (!features || features.length === 0) {
+    let featuresArr = [];
+    if (Array.isArray(features)) {
+      featuresArr = features;
+    } else if (features && typeof features === 'object') {
+      featuresArr = Object.values(features);
+    }
+    if (featuresArr.length === 0) {
       return null;
     }
     const {
@@ -424,10 +443,10 @@ class ViewerLineRect extends _react.default.Component {
     const {
       wavelengthIdx
     } = uvvis;
-    if (wavelengthIdx < 0 || wavelengthIdx >= features.length) {
+    if (wavelengthIdx < 0 || wavelengthIdx >= featuresArr.length) {
       return null;
     }
-    return features[wavelengthIdx];
+    return featuresArr[wavelengthIdx];
   }
   extractSubView() {
     const {
@@ -437,13 +456,10 @@ class ViewerLineRect extends _react.default.Component {
       updateCurrentPageValueAct
     } = this.props;
     const {
-      tic
-    } = hplcMsSt;
-    const {
-      isNegative
-    } = tic;
-    const entityIdx = isNegative ? 1 : 0;
-    if (!mzEntities || !mzEntities[entityIdx] || !mzEntities[entityIdx].layout) {
+      polarity
+    } = hplcMsSt.tic;
+    const pickEntity = mzEntities?.find(ent => (0, _extractEntityLCMS.getLcMsInfo)(ent).polarity === polarity) || mzEntities?.[0];
+    if (!pickEntity || !pickEntity.layout) {
       return null;
     }
     const {
@@ -451,16 +467,23 @@ class ViewerLineRect extends _react.default.Component {
     } = uiSt;
     const {
       features
-    } = (0, _extractParams.extractParams)(mzEntities[entityIdx], 0, 1);
-    if (!features || features.length === 0) return null;
-    const arrPageValues = features.map(fe => fe.pageValue);
+    } = (0, _extractParams.extractParams)(pickEntity, 0, 1);
+    let featuresArr = [];
+    if (Array.isArray(features)) {
+      featuresArr = features;
+    } else if (features && typeof features === 'object') {
+      featuresArr = Object.values(features);
+    }
+    if (featuresArr.length === 0) return null;
+    const pageValues = featuresArr.map(fe => Number(fe?.pageValue)).filter(val => Number.isFinite(val));
+    if (pageValues.length === 0) return featuresArr[0];
     const hasValidClick = subViewerAt && subViewerAt.x !== undefined;
-    const closestPage = hasValidClick ? (0, _calc.findClosest)(arrPageValues, subViewerAt.x) : arrPageValues[Math.floor(arrPageValues.length / 2)];
+    const closestPage = hasValidClick ? (0, _calc.findClosest)(pageValues, subViewerAt.x) : pageValues[Math.floor(pageValues.length / 2)];
     if (closestPage !== hplcMsSt.tic.currentPageValue) {
       updateCurrentPageValueAct(closestPage);
     }
-    const [selectFeature] = features.filter(fe => fe.pageValue === closestPage);
-    return selectFeature;
+    const selectFeature = featuresArr.find(fe => Number(fe?.pageValue) === closestPage);
+    return selectFeature || featuresArr[0];
   }
   render() {
     const {
@@ -471,17 +494,26 @@ class ViewerLineRect extends _react.default.Component {
       selectCurveAct,
       feature,
       zoomInAct,
-      uiSt
+      uiSt,
+      ticEntities
     } = this.props;
     const handleTicChanged = event => {
-      updateTicAct(event);
-      selectCurveAct(event.target.value);
+      const selectedPolarity = event.target.value;
+      updateTicAct({
+        polarity: selectedPolarity
+      });
+      const targetEntity = ticEntities?.find(ent => (0, _extractEntityLCMS.getLcMsInfo)(ent).polarity === selectedPolarity);
+      if (targetEntity?.curveIdx !== undefined) {
+        selectCurveAct(targetEntity.curveIdx);
+      }
     };
     const handleWaveLengthChange = event => {
-      [0, 1, 2].forEach(gi => zoomInAct({
-        graphIndex: gi,
-        sweepType: _list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET
-      }));
+      [0, 1, 2].forEach(gi => {
+        zoomInAct({
+          graphIndex: gi,
+          sweepType: _list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET
+        });
+      });
       selectWavelengthAct(event);
     };
     return /*#__PURE__*/_react.default.createElement("div", null, zoomView(classes, 0, uiSt, zoomInAct), waveLengthSelect(classes, hplcMsSt, handleWaveLengthChange), /*#__PURE__*/_react.default.createElement(_integration.default, null), /*#__PURE__*/_react.default.createElement(_peak.default, null), /*#__PURE__*/_react.default.createElement("div", {
@@ -498,7 +530,6 @@ class ViewerLineRect extends _react.default.Component {
 }
 const mapStateToProps = (state, props) => ({
   curveSt: state.curve,
-  seed: (0, _chem.Topic2Seed)(state, props),
   tTrEndPts: (0, _chem.ToThresEndPts)(state, props),
   isUiAddIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
   isUiNoBrushSt: _list_ui.LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
@@ -527,8 +558,6 @@ ViewerLineRect.propTypes = {
   ticEntities: _propTypes.default.array.isRequired,
   uvvisEntities: _propTypes.default.array.isRequired,
   mzEntities: _propTypes.default.array.isRequired,
-  seed: _propTypes.default.array.isRequired,
-  cLabel: _propTypes.default.string.isRequired,
   layoutSt: _propTypes.default.string.isRequired,
   integationSt: _propTypes.default.object.isRequired,
   feature: _propTypes.default.object.isRequired,

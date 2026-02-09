@@ -44,47 +44,50 @@ const ensureQuillDelta = descs => {
 };
 
 // - - - React - - -
-const SpectraEditor = ({
-  entity,
-  others,
-  cLabel,
-  xLabel,
-  yLabel,
-  operations,
-  forecast,
-  molSvg,
-  editorOnly,
-  descriptions,
-  theoryMass,
-  canChangeDescription,
-  onDescriptionChanged,
-  multiEntities,
-  multiMolSvgs,
-  entityFileNames,
-  userManualLink
-}) => /*#__PURE__*/_react.default.createElement(_reactRedux.Provider, {
-  store: store
-}, /*#__PURE__*/_react.default.createElement(_material.StyledEngineProvider, {
-  injectFirst: true
-}, /*#__PURE__*/_react.default.createElement(_layer_init.default, {
-  entity: entity,
-  multiEntities: multiEntities,
-  entityFileNames: entityFileNames,
-  userManualLink: userManualLink,
-  others: others,
-  cLabel: cLabel,
-  xLabel: xLabel,
-  yLabel: yLabel,
-  forecast: forecast,
-  operations: operations,
-  descriptions: ensureQuillDelta(descriptions),
-  molSvg: molSvg,
-  multiMolSvgs: multiMolSvgs,
-  editorOnly: editorOnly,
-  theoryMass: theoryMass,
-  canChangeDescription: canChangeDescription,
-  onDescriptionChanged: onDescriptionChanged
-})));
+const SpectraEditor = _ref => {
+  let {
+    entity,
+    others,
+    cLabel,
+    xLabel,
+    yLabel,
+    operations,
+    forecast,
+    molSvg,
+    editorOnly,
+    descriptions,
+    theoryMass,
+    canChangeDescription,
+    onDescriptionChanged,
+    multiEntities,
+    multiMolSvgs,
+    entityFileNames,
+    userManualLink
+  } = _ref;
+  return /*#__PURE__*/_react.default.createElement(_reactRedux.Provider, {
+    store: store
+  }, /*#__PURE__*/_react.default.createElement(_material.StyledEngineProvider, {
+    injectFirst: true
+  }, /*#__PURE__*/_react.default.createElement(_layer_init.default, {
+    entity: entity,
+    multiEntities: multiEntities,
+    entityFileNames: entityFileNames,
+    userManualLink: userManualLink,
+    others: others,
+    cLabel: cLabel,
+    xLabel: xLabel,
+    yLabel: yLabel,
+    forecast: forecast,
+    operations: operations,
+    descriptions: ensureQuillDelta(descriptions),
+    molSvg: molSvg,
+    multiMolSvgs: multiMolSvgs,
+    editorOnly: editorOnly,
+    theoryMass: theoryMass,
+    canChangeDescription: canChangeDescription,
+    onDescriptionChanged: onDescriptionChanged
+  })));
+};
 exports.SpectraEditor = SpectraEditor;
 SpectraEditor.propTypes = {
   entity: _propTypes.default.object.isRequired,
@@ -111,7 +114,7 @@ SpectraEditor.defaultProps = {
     addOthersCb: false
   },
   multiEntities: false,
-  entityFileNames: false,
+  entityFileNames: [],
   cLabel: '',
   xLabel: '',
   yLabel: '',

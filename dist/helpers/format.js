@@ -1,20 +1,16 @@
 "use strict";
 
-var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-var _jcampconverter = _interopRequireDefault(require("jcampconverter"));
 var _converter = require("./converter");
 var _list_layout = require("../constants/list_layout");
 var _multiplicity_calc = require("./multiplicity_calc");
-var _app = require("../app");
 /* eslint-disable prefer-destructuring */
 /* eslint-disable no-mixed-operators, prefer-object-spread,
 function-paren-newline, no-unused-vars, default-param-last */
 
-const getHplcMs = () => _app.store.getState().hplcMs;
 const spectraDigit = layout => {
   switch (layout) {
     case _list_layout.LIST_LAYOUT.IR:
@@ -66,7 +62,7 @@ const toPeakStr = peaks => {
   const str = arr.join('#');
   return str;
 };
-const extractUvvisLcmsPeaks = (hplcMsSt = getHplcMs()) => {
+const extractUvvisLcmsPeaks = hplcMsSt => {
   if (!hplcMsSt?.uvvis) {
     return '{}';
   }
@@ -178,7 +174,8 @@ const spectraOps = {
     tail: ' m/z'
   }
 };
-const rmRef = (peaks, shift, atIndex = 0) => {
+const rmRef = function (peaks, shift) {
+  let atIndex = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
   if (!shift) return peaks;
   const {
     shifts
@@ -187,18 +184,18 @@ const rmRef = (peaks, shift, atIndex = 0) => {
   const refValue = selectedShift.ref.value || selectedShift.peak.x;
   return peaks.map(p => (0, _converter.IsSame)(p.x, refValue) ? null : p).filter(r => r != null);
 };
-const formatedLCMS = (hplcMsSt = getHplcMs(), isAscend, decimal) => {
+const formatedLCMS = (hplcMsSt, isAscend, decimal) => {
+  if (!hplcMsSt?.uvvis) {
+    return '';
+  }
   let result = '';
   const {
-    uvvis: {
-      listWaveLength,
-      spectraList
-    },
-    ms,
-    tic,
-    isNegative,
-    threshold
-  } = hplcMsSt;
+    listWaveLength = [],
+    spectraList = []
+  } = hplcMsSt.uvvis || {};
+  const ms = hplcMsSt.ms || {};
+  const tic = hplcMsSt.tic;
+  const threshold = hplcMsSt.threshold;
   result += 'HPLC UV/VIS:\n';
   listWaveLength.forEach((wavelength, idx) => {
     const spectrum = spectraList[idx];
@@ -233,14 +230,26 @@ const formatedLCMS = (hplcMsSt = getHplcMs(), isAscend, decimal) => {
       });
     }
   });
-  const polarity = tic.isNegative ? 'negative' : 'positive';
-  if (tic && ms[polarity]) {
+  const polarity = tic?.polarity || (tic?.isNegative ? 'negative' : 'positive');
+  let polarityKey = 'neutral';
+  if (polarity === 'negative') {
+    polarityKey = 'negative';
+  } else if (polarity === 'positive') {
+    polarityKey = 'positive';
+  }
+  let polarityLabel = '';
+  if (polarity === 'negative') {
+    polarityLabel = '−';
+  } else if (polarity === 'positive') {
+    polarityLabel = '+';
+  }
+  if (tic && ms[polarityKey]) {
     let currentIndex = -1;
-    if (Array.isArray(tic[polarity]?.data?.x)) {
-      currentIndex = tic[polarity].data.x.findIndex(x => Math.abs(x - tic.currentPageValue) < 1e-6);
+    if (Array.isArray(tic[polarityKey]?.data?.x)) {
+      currentIndex = tic[polarityKey].data.x.findIndex(x => Math.abs(x - tic.currentPageValue) < 1e-6);
     }
-    if (currentIndex >= 0 && ms[polarity].peaks[currentIndex]) {
-      const peaks = ms[polarity].peaks[currentIndex];
+    if (currentIndex >= 0 && ms[polarityKey].peaks[currentIndex]) {
+      const peaks = ms[polarityKey].peaks[currentIndex];
       const maxIntensity = Math.max(...peaks.map(p => p.y)) || 1;
       const thresholdValue = threshold?.value ?? 5;
       const filtered = peaks.filter(peak => peak.y / maxIntensity * 100 >= thresholdValue);
@@ -250,7 +259,8 @@ const formatedLCMS = (hplcMsSt = getHplcMs(), isAscend, decimal) => {
         }
         return parseFloat(b.x) - parseFloat(a.x);
       });
-      result += `\nMS (${isNegative ? '−' : '+'}ESI), m/z (≥${thresholdValue}%):\n`;
+      const label = polarityLabel ? `${polarityLabel}ESI` : 'ESI';
+      result += `\nMS (${label}), m/z (≥${thresholdValue}%):\n`;
       const lines = sortedPeaks.map(peak => {
         const mass = fixDigit(peak.x, decimal);
         const percent = Math.round(peak.y / maxIntensity * 100);
@@ -263,7 +273,9 @@ const formatedLCMS = (hplcMsSt = getHplcMs(), isAscend, decimal) => {
   }
   return result;
 };
-const formatedMS = (peaks, maxY, decimal = 2, isAscend = true) => {
+const formatedMS = function (peaks, maxY) {
+  let decimal = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 2;
+  let isAscend = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
   const ascendFunc = (a, b) => parseFloat(a) - parseFloat(b);
   const descendFunc = (a, b) => parseFloat(b) - parseFloat(a);
   const sortFunc = isAscend ? ascendFunc : descendFunc;
@@ -295,7 +307,12 @@ const emLevel = (boundary, val, lowerIsStronger) => {
   if (ratio > 30) return 's';
   return 'vs';
 };
-const formatedEm = (peaks, maxY, decimal = 2, isAscend = true, isIntensity = false, boundary = {}, lowerIsStronger = false) => {
+const formatedEm = function (peaks, maxY) {
+  let decimal = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 2;
+  let isAscend = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
+  let isIntensity = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+  let boundary = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : {};
+  let lowerIsStronger = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : false;
   const ascendFunc = (a, b) => parseFloat(a) - parseFloat(b);
   const descendFunc = (a, b) => parseFloat(b) - parseFloat(a);
   const sortFunc = isAscend ? ascendFunc : descendFunc;
@@ -318,7 +335,12 @@ const formatedEm = (peaks, maxY, decimal = 2, isAscend = true, isIntensity = fal
   }
   return ordered.map(o => `${o.x}`).join(', ');
 };
-const formatedUvVis = (peaks, maxY, decimal = 2, isAscend = true, isIntensity = false, boundary = {}, lowerIsStronger = false) => {
+const formatedUvVis = function (peaks, maxY) {
+  let decimal = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 2;
+  let isAscend = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
+  let isIntensity = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+  let boundary = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : {};
+  let lowerIsStronger = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : false;
   const ascendFunc = (a, b) => parseFloat(a) - parseFloat(b);
   const descendFunc = (a, b) => parseFloat(b) - parseFloat(a);
   const sortFunc = isAscend ? ascendFunc : descendFunc;
@@ -341,7 +363,12 @@ const formatedUvVis = (peaks, maxY, decimal = 2, isAscend = true, isIntensity = 
   //   .join(', ');
   return ordered.map(o => `${o.x}`).join(', ');
 };
-const formatedEmissions = (peaks, maxY, decimal = 2, isAscend = true, isIntensity = false, boundary = {}, lowerIsStronger = false) => {
+const formatedEmissions = function (peaks, maxY) {
+  let decimal = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 2;
+  let isAscend = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
+  let isIntensity = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+  let boundary = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : {};
+  let lowerIsStronger = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : false;
   const ascendFunc = (a, b) => parseFloat(a) - parseFloat(b);
   const descendFunc = (a, b) => parseFloat(b) - parseFloat(a);
   const sortFunc = isAscend ? ascendFunc : descendFunc;
@@ -361,7 +388,12 @@ const formatedEmissions = (peaks, maxY, decimal = 2, isAscend = true, isIntensit
   }));
   return ordered.map(o => `${o.x} nm (${fixDigit(o.y, 2)} a.u.)`).join(', ');
 };
-const formatedDLSIntensity = (peaks, maxY, decimal = 2, isAscend = true, isIntensity = false, boundary = {}, lowerIsStronger = false) => {
+const formatedDLSIntensity = function (peaks, maxY) {
+  let decimal = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 2;
+  let isAscend = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
+  let isIntensity = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+  let boundary = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : {};
+  let lowerIsStronger = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : false;
   const ascendFunc = (a, b) => parseFloat(a) - parseFloat(b);
   const descendFunc = (a, b) => parseFloat(b) - parseFloat(a);
   const sortFunc = isAscend ? ascendFunc : descendFunc;
@@ -381,7 +413,9 @@ const formatedDLSIntensity = (peaks, maxY, decimal = 2, isAscend = true, isInten
   }));
   return ordered.map(o => `${o.x} nm (${o.y} %)`).join(', ');
 };
-const formatedHplcUvVis = (peaks, decimal = 2, integration) => {
+const formatedHplcUvVis = function (peaks) {
+  let decimal = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
+  let integration = arguments.length > 2 ? arguments[2] : undefined;
   let stack = [];
   if (integration) {
     stack = integration.stack;
@@ -414,7 +448,10 @@ const formatedHplcUvVis = (peaks, decimal = 2, integration) => {
   });
   return arrResult.join(', ');
 };
-const formatedXRD = (peaks, isAscend = true, waveLength, temperature) => {
+const formatedXRD = function (peaks) {
+  let isAscend = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+  let waveLength = arguments.length > 2 ? arguments[2] : undefined;
+  let temperature = arguments.length > 3 ? arguments[3] : undefined;
   const ascendFunc = (a, b) => parseFloat(a) - parseFloat(b);
   const descendFunc = (a, b) => parseFloat(b) - parseFloat(a);
   const sortFunc = isAscend ? ascendFunc : descendFunc;
@@ -436,7 +473,8 @@ const formatedXRD = (peaks, isAscend = true, waveLength, temperature) => {
   }));
   return `(${XRDSource}, ${XRDWavelength}, ${temperature} °C), 2θ [°] (d [nm]): ${ordered.map(o => `${o.x} (${fixDigit(o.y, 2)})`).join(', ')}`;
 };
-const rmShiftFromPeaks = (peaks, shift, atIndex = 0) => {
+const rmShiftFromPeaks = function (peaks, shift) {
+  let atIndex = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
   const peaksXY = (0, _converter.ToXY)(peaks);
   const {
     shifts
@@ -459,20 +497,21 @@ const rmShiftFromPeaks = (peaks, shift, atIndex = 0) => {
   }).filter(r => r != null);
   return result;
 };
-const peaksBody = ({
-  peaks,
-  layout,
-  decimal,
-  shift,
-  isAscend,
-  isIntensity = false,
-  boundary = {},
-  integration,
-  atIndex = 0,
-  waveLength,
-  temperature,
-  hplcMsSt
-}) => {
+const peaksBody = _ref => {
+  let {
+    peaks,
+    layout,
+    decimal,
+    shift,
+    isAscend,
+    isIntensity = false,
+    boundary = {},
+    integration,
+    atIndex = 0,
+    waveLength,
+    temperature,
+    hplcMsSt
+  } = _ref;
   const result = rmShiftFromPeaks(peaks, shift, atIndex);
   const ascendFunc = (a, b) => parseFloat(a.x) - parseFloat(b.x);
   const descendFunc = (a, b) => parseFloat(b.x) - parseFloat(a.x);
@@ -508,7 +547,8 @@ const peaksBody = ({
   }
   return ordered.map(o => fixDigit(o.x, decimal)).join(', ');
 };
-const peaksWrapper = (layout, shift, atIndex = 0) => {
+const peaksWrapper = function (layout, shift) {
+  let atIndex = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
   let solvTxt = '';
   const {
     shifts
@@ -573,7 +613,8 @@ const getNmrTyp = layout => {
       return '';
   }
 };
-const formatPeaksByPrediction = (peaks, layout, isAscend, decimal, predictions = []) => {
+const formatPeaksByPrediction = function (peaks, layout, isAscend, decimal) {
+  let predictions = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : [];
   const pDict = {};
   peaks.forEach(p => {
     pDict[p.x.toFixed(decimal)] = 0;
@@ -603,13 +644,15 @@ const formatPeaksByPrediction = (peaks, layout, isAscend, decimal, predictions =
 };
 const compareColors = idx => ['#ABB2B9', '#EDBB99', '#ABEBC6', '#D2B4DE', '#F9E79F'][idx % 5];
 const mutiEntitiesColors = idx => ['#d35400', '#2980b9', '#8e44ad', '#2c3e50', '#6D214F', '#182C61', '#BDC581'][idx % 7];
-const strNumberFixedDecimal = (number, decimal = -1) => {
+const strNumberFixedDecimal = function (number) {
+  let decimal = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : -1;
   if (decimal <= 0) {
     return `${number}`;
   }
   return number.toFixed(Math.max(decimal, (number.toString().split('.')[1] || []).length));
 };
-const strNumberFixedLength = (number, maxLength = -1) => {
+const strNumberFixedLength = function (number) {
+  let maxLength = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : -1;
   if (maxLength <= 0) {
     return `${number}`;
   }
@@ -626,7 +669,8 @@ const strNumberFixedLength = (number, maxLength = -1) => {
 
   return number.toFixed(lengthToFix);
 };
-const inlineNotation = (layout, data, sampleName = '') => {
+const inlineNotation = function (layout, data) {
+  let sampleName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
   let formattedString = '';
   let quillData = [];
   const {

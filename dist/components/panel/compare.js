@@ -145,12 +145,15 @@ const inputOthers = (classes, jcampSt) => {
   return /*#__PURE__*/_react.default.createElement(_reactDropzone.default, {
     className: "dropbox",
     onDrop: onDrop
-  }, ({
-    getRootProps,
-    getInputProps
-  }) => /*#__PURE__*/_react.default.createElement("div", (0, _extends2.default)({}, getRootProps(), {
-    className: (0, _classnames.default)(classes.baseDD)
-  }), /*#__PURE__*/_react.default.createElement("input", getInputProps()), content(classes, desc)));
+  }, _ref => {
+    let {
+      getRootProps,
+      getInputProps
+    } = _ref;
+    return /*#__PURE__*/_react.default.createElement("div", (0, _extends2.default)({}, getRootProps(), {
+      className: (0, _classnames.default)(classes.baseDD)
+    }), /*#__PURE__*/_react.default.createElement("input", getInputProps()), content(classes, desc));
+  });
 };
 const compareList = (classes, jcampSt, rmOthersOneAct, toggleShowAct) => {
   const {
@@ -198,30 +201,33 @@ const compareList = (classes, jcampSt, rmOthersOneAct, toggleShowAct) => {
     className: classes.rmBtn
   }))))));
 };
-const ComparePanel = ({
-  classes,
-  expand,
-  onExapnd,
-  jcampSt,
-  rmOthersOneAct,
-  toggleShowAct
-}) => /*#__PURE__*/_react.default.createElement(_material.Accordion, {
-  expanded: expand,
-  onChange: onExapnd,
-  className: (0, _classnames.default)(classes.panel),
-  TransitionProps: {
-    unmountOnExit: true
-  } // increase Accordion performance
-}, /*#__PURE__*/_react.default.createElement(_material.AccordionSummary, {
-  expandIcon: /*#__PURE__*/_react.default.createElement(_ExpandMore.default, null),
-  className: (0, _classnames.default)(classes.panelSummary)
-}, /*#__PURE__*/_react.default.createElement(_material.Typography, {
-  className: "txt-panel-header"
-}, /*#__PURE__*/_react.default.createElement("span", {
-  className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title')
-}, "Spectra Comparisons"))), /*#__PURE__*/_react.default.createElement(_material.Divider, null), inputOthers(classes, jcampSt), /*#__PURE__*/_react.default.createElement("div", {
-  className: (0, _classnames.default)(classes.panelDetail)
-}, compareList(classes, jcampSt, rmOthersOneAct, toggleShowAct)));
+const ComparePanel = _ref2 => {
+  let {
+    classes,
+    expand,
+    onExapnd,
+    jcampSt,
+    rmOthersOneAct,
+    toggleShowAct
+  } = _ref2;
+  return /*#__PURE__*/_react.default.createElement(_material.Accordion, {
+    expanded: expand,
+    onChange: onExapnd,
+    className: (0, _classnames.default)(classes.panel),
+    TransitionProps: {
+      unmountOnExit: true
+    } // increase Accordion performance
+  }, /*#__PURE__*/_react.default.createElement(_material.AccordionSummary, {
+    expandIcon: /*#__PURE__*/_react.default.createElement(_ExpandMore.default, null),
+    className: (0, _classnames.default)(classes.panelSummary)
+  }, /*#__PURE__*/_react.default.createElement(_material.Typography, {
+    className: "txt-panel-header"
+  }, /*#__PURE__*/_react.default.createElement("span", {
+    className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title')
+  }, "Spectra Comparisons"))), /*#__PURE__*/_react.default.createElement(_material.Divider, null), inputOthers(classes, jcampSt), /*#__PURE__*/_react.default.createElement("div", {
+    className: (0, _classnames.default)(classes.panelDetail)
+  }, compareList(classes, jcampSt, rmOthersOneAct, toggleShowAct)));
+};
 const mapStateToProps = (state, props) => (
 // eslint-disable-line
 {

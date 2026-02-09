@@ -49,7 +49,8 @@ const MountPath = (target, color) => {
   return path;
 };
 exports.MountPath = MountPath;
-const MountComparePath = (target, color, id, alpha = 1) => {
+const MountComparePath = function (target, color, id) {
+  let alpha = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
   const path = target.root.append('g').attr('class', 'line-clip-compare').attr('id', id).attr('clip-path', 'url(#clip)').append('path').attr('class', 'line').style('fill', 'none').style('stroke', color).style('stroke-opacity', alpha).style('stroke-width', 1).style('stroke-dasharray', '30, 3').on('click', event => (0, _compass.ClickCompass)(event, target));
   return path;
 };

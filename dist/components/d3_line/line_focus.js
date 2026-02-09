@@ -601,23 +601,24 @@ class LineFocus {
   reverseXAxis(layoutSt) {
     return [_list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS, _list_layout.LIST_LAYOUT.TGA, _list_layout.LIST_LAYOUT.DSC, _list_layout.LIST_LAYOUT.XRD, _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY, _list_layout.LIST_LAYOUT.CDS, _list_layout.LIST_LAYOUT.DLS_ACF, _list_layout.LIST_LAYOUT.SEC, _list_layout.LIST_LAYOUT.GC, _list_layout.LIST_LAYOUT.EMISSIONS, _list_layout.LIST_LAYOUT.DLS_INTENSITY].indexOf(layoutSt) < 0;
   }
-  create({
-    filterSeed,
-    filterPeak,
-    tTrEndPts,
-    tSfPeaks,
-    freq,
-    comparisons,
-    editPeakSt,
-    layoutSt,
-    integationSt,
-    mtplySt,
-    sweepExtentSt,
-    isUiAddIntgSt,
-    isUiNoBrushSt,
-    wavelength,
-    uiSt
-  }) {
+  create(_ref) {
+    let {
+      filterSeed,
+      filterPeak,
+      tTrEndPts,
+      tSfPeaks,
+      freq,
+      comparisons,
+      editPeakSt,
+      layoutSt,
+      integationSt,
+      mtplySt,
+      sweepExtentSt,
+      isUiAddIntgSt,
+      isUiNoBrushSt,
+      wavelength,
+      uiSt
+    } = _ref;
     this.uiSt = uiSt;
     this.graphIndex = uiSt?.zoom?.graphIndex;
     this.svg = d3.select('.d3Svg');
@@ -650,23 +651,24 @@ class LineFocus {
     (0, _brush.default)(this, isUiAddIntgSt, isUiNoBrushSt);
     this.resetShouldUpdate(editPeakSt, integationSt, mtplySt);
   }
-  update({
-    filterSeed,
-    filterPeak,
-    tTrEndPts,
-    tSfPeaks,
-    freq,
-    comparisons,
-    editPeakSt,
-    layoutSt,
-    integationSt,
-    mtplySt,
-    uiSt,
-    sweepExtentSt,
-    isUiAddIntgSt,
-    isUiNoBrushSt,
-    wavelength
-  }) {
+  update(_ref2) {
+    let {
+      filterSeed,
+      filterPeak,
+      tTrEndPts,
+      tSfPeaks,
+      freq,
+      comparisons,
+      editPeakSt,
+      layoutSt,
+      integationSt,
+      mtplySt,
+      uiSt,
+      sweepExtentSt,
+      isUiAddIntgSt,
+      isUiNoBrushSt,
+      wavelength
+    } = _ref2;
     this.uiSt = uiSt;
     this.graphIndex = uiSt?.zoom?.graphIndex;
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');

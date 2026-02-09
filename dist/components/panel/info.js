@@ -125,12 +125,13 @@ const aucValue = (integration, hplcMsSt) => {
   });
   return values.join('\n');
 };
-const SECData = ({
-  classes,
-  layout,
-  detector,
-  secData
-}) => {
+const SECData = _ref => {
+  let {
+    classes,
+    layout,
+    detector,
+    secData
+  } = _ref;
   if (_format.default.isSECLayout(layout) && secData) {
     const {
       d,
@@ -178,12 +179,13 @@ SECData.propTypes = {
   detector: _propTypes.default.object.isRequired,
   secData: _propTypes.default.object.isRequired
 };
-const DSCData = ({
-  classes,
-  layout,
-  dscMetaData,
-  updateAction
-}) => {
+const DSCData = _ref2 => {
+  let {
+    classes,
+    layout,
+    dscMetaData,
+    updateAction
+  } = _ref2;
   if (_format.default.isDSCLayout(layout) && dscMetaData !== undefined) {
     const {
       meltingPoint,
@@ -231,27 +233,28 @@ DSCData.propTypes = {
   dscMetaData: _propTypes.default.object.isRequired,
   updateAction: _propTypes.default.func.isRequired
 };
-const InfoPanel = ({
-  classes,
-  expand,
-  feature,
-  integration,
-  editorOnly,
-  molSvg,
-  descriptions,
-  layoutSt,
-  simulationSt,
-  shiftSt,
-  curveSt,
-  theoryMass,
-  onExapnd,
-  canChangeDescription,
-  onDescriptionChanged,
-  detectorSt,
-  metaSt,
-  updateDSCMetaDataAct,
-  hplcMsSt
-}) => {
+const InfoPanel = _ref3 => {
+  let {
+    classes,
+    expand,
+    feature,
+    integration,
+    editorOnly,
+    molSvg,
+    descriptions,
+    layoutSt,
+    simulationSt,
+    shiftSt,
+    curveSt,
+    theoryMass,
+    onExapnd,
+    canChangeDescription,
+    onDescriptionChanged,
+    detectorSt,
+    metaSt,
+    updateDSCMetaDataAct,
+    hplcMsSt
+  } = _ref3;
   if (!feature) return null;
   const {
     title,

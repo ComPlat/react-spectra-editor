@@ -80,7 +80,11 @@ class MultiFocus {
     this.onClickTarget = this.onClickTarget.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
   }
-  colorForPolarity = polarity => polarity === 'negative' ? '#2980b9' : '#d35400';
+  colorForPolarity = polarity => {
+    if (polarity === 'negative') return '#2980b9';
+    if (polarity === 'neutral') return '#2980b9';
+    return '#d35400';
+  };
   getShouldUpdate() {
     const {
       prevXt,
@@ -128,7 +132,8 @@ class MultiFocus {
     this.tip = (0, _init.InitTip)();
     this.root.call(this.tip);
   }
-  setDataParams(tTrEndPts, layout, jcampIdx = 0) {
+  setDataParams(tTrEndPts, layout) {
+    let jcampIdx = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
     this.data = [];
     this.otherLineData = [];
     this.ticEntities.forEach((entry, idx) => {
@@ -136,9 +141,11 @@ class MultiFocus {
         topic,
         feature
       } = entry;
-      const cat = (0, _extractEntityLCMS.catToString)(feature?.csCategory ?? entry.features?.[0]?.csCategory);
-      const polarity = cat.includes('NEGATIVE') ? 'negative' : 'positive';
+      const {
+        polarity = 'neutral'
+      } = (0, _extractEntityLCMS.getLcMsInfo)(entry);
       const fixedColor = this.colorForPolarity(polarity);
+      if (!feature || !topic) return;
       const currData = (0, _chem.convertTopic)(topic, layout, feature, 0);
       if (idx === jcampIdx) {
         this.data = currData;
@@ -257,14 +264,15 @@ class MultiFocus {
     const onPeak = true;
     this.clickUiTargetAct(data, onPeak, false, this.jcampIdx);
   }
-  create({
-    ticEntities,
-    curveSt,
-    tTrEndPts,
-    layoutSt,
-    sweepExtentSt,
-    isUiNoBrushSt
-  }) {
+  create(_ref) {
+    let {
+      ticEntities,
+      curveSt,
+      tTrEndPts,
+      layoutSt,
+      sweepExtentSt,
+      isUiNoBrushSt
+    } = _ref;
     this.svg = d3.select(this.rootKlass).select(this.brushClass);
     (0, _mount.MountMainFrame)(this, 'focus');
     (0, _mount.MountClip)(this);
@@ -295,15 +303,17 @@ class MultiFocus {
     (0, _brush.default)(this, false, isUiNoBrushSt, this.brushClass);
     this.resetShouldUpdate();
   }
-  update({
-    curveSt,
-    tTrEndPts,
-    layoutSt,
-    ticEntities,
-    sweepExtentSt,
-    isUiNoBrushSt,
-    uiSt
-  }) {
+  update(_ref2) {
+    let {
+      curveSt,
+      tTrEndPts,
+      layoutSt,
+      ticEntities,
+      sweepExtentSt,
+      isUiNoBrushSt,
+      uiSt
+    } = _ref2;
+    this.svg = d3.select(this.rootKlass).select(this.brushClass);
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = (0, _init.InitScale)(this, false);
     const {

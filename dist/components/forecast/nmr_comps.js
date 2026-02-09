@@ -17,14 +17,15 @@ var _comps = require("./comps");
 var _forecast = require("../../actions/forecast");
 /* eslint-disable react/function-component-definition, react/destructuring-assignment */
 
-const baseSelectNmrStatus = ({
-  // eslint-disable-line
-  idx,
-  atom,
-  status,
-  identity,
-  setNmrStatusAct
-}) => {
+const baseSelectNmrStatus = _ref => {
+  let {
+    // eslint-disable-line
+    idx,
+    atom,
+    status,
+    identity,
+    setNmrStatusAct
+  } = _ref;
   const theStatus = ['accept', 'reject'].includes(status) ? status : '';
   return /*#__PURE__*/_react.default.createElement(_material.FormControl, null, /*#__PURE__*/_react.default.createElement(_material.Select, {
     value: theStatus,

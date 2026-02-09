@@ -20,7 +20,9 @@ const initialState = {
 const updateOperation = action => ({
   operation: action.payload || initialState.operation
 });
-const submitReducer = (state = initialState, action) => {
+const submitReducer = function () {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+  let action = arguments.length > 1 ? arguments[1] : undefined;
   switch (action.type) {
     case _action_type.SUBMIT.TOGGLE_IS_ASCEND:
       return Object.assign({}, state, {
@@ -45,7 +47,8 @@ const submitReducer = (state = initialState, action) => {
       }
     case _action_type.MANAGER.RESETALL:
       {
-        const decimal = _format.default.spectraDigit(action.payload.operation.layout);
+        const layout = action.payload?.operation?.layout;
+        const decimal = layout ? _format.default.spectraDigit(layout) : state.decimal;
         return Object.assign({}, state, {
           decimal,
           isIntensity: true,

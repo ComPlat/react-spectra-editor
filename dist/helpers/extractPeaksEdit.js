@@ -8,14 +8,14 @@ exports.extractAutoPeaks = exports.extractAreaUnderCurve = void 0;
 exports.extractPeaksEdit = extractPeaksEdit;
 exports.formatLcmsIntegralsForBackend = formatLcmsIntegralsForBackend;
 exports.formatLcmsPeaksForBackend = formatLcmsPeaksForBackend;
-var _converter = require("./converter");
 var _chem = require("./chem");
 var _shift = require("./shift");
 var _format = _interopRequireDefault(require("./format"));
 var _integration = require("./integration");
 /* eslint-disable max-len */
 
-const niOffset = (shiftSt, atIndex = 0) => {
+const niOffset = function (shiftSt) {
+  let atIndex = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
   const {
     shifts
   } = shiftSt;
@@ -76,7 +76,8 @@ function extractPeaksEdit(hplcMsSt) {
   if (!hplcMsSt || !hplcMsSt.uvvis || !hplcMsSt.uvvis.spectraList) return [];
   return hplcMsSt.uvvis.spectraList.flatMap(spectrum => spectrum.peaks || []);
 }
-const extractAutoPeaks = (feature, thresSt, shiftSt, layoutSt, atIndex = 0) => {
+const extractAutoPeaks = function (feature, thresSt, shiftSt, layoutSt) {
+  let atIndex = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 0;
   const offset = _format.default.isMsLayout(layoutSt) || _format.default.isLCMsLayout(layoutSt) ? msOffset() : niOffset(shiftSt, atIndex);
   const peaks = (0, _chem.Convert2Peak)(feature, thresSt.value, offset);
   return peaks;

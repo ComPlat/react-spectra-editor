@@ -208,7 +208,9 @@ const clearAll = (state, action) => {
     selectedIdx: curveIdx
   });
 };
-const integrationReducer = (state = initialState, action) => {
+const integrationReducer = function () {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+  let action = arguments.length > 1 ? arguments[1] : undefined;
   switch (action.type) {
     case _action_type.UI.SWEEP.SELECT_INTEGRATION:
       return addToStack(state, action);

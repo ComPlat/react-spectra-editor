@@ -226,16 +226,17 @@ const mpyList = (classes, digits, multiplicitySt, curveSt, clickMpyOneAct, rmMpy
     className: classes.table
   }, /*#__PURE__*/_react.default.createElement(_material.TableBody, null, pkList(classes, row, shift, digits, rmMpyPeakByPanelAct))))));
 };
-const MultiplicityPanel = ({
-  classes,
-  expand,
-  onExapnd,
-  multiplicitySt,
-  curveSt,
-  clickMpyOneAct,
-  rmMpyPeakByPanelAct,
-  resetMpyOneAct
-}) => {
+const MultiplicityPanel = _ref => {
+  let {
+    classes,
+    expand,
+    onExapnd,
+    multiplicitySt,
+    curveSt,
+    clickMpyOneAct,
+    rmMpyPeakByPanelAct,
+    resetMpyOneAct
+  } = _ref;
   const digits = 4;
   return /*#__PURE__*/_react.default.createElement(_material.Accordion, {
     expanded: expand,

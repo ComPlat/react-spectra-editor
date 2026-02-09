@@ -13,7 +13,8 @@ const initialState = {
     yUnit: ''
   }]
 };
-const updateAxis = (state, payload, isYAxis = false) => {
+const updateAxis = function (state, payload) {
+  let isYAxis = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
   const {
     value,
     curveIndex
@@ -43,7 +44,9 @@ const updateAxis = (state, payload, isYAxis = false) => {
     axes
   });
 };
-const axesReducer = (state = initialState, action) => {
+const axesReducer = function () {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+  let action = arguments.length > 1 ? arguments[1] : undefined;
   switch (action.type) {
     case _action_type.AXES.UPDATE_X_AXIS:
       return updateAxis(state, action.payload);

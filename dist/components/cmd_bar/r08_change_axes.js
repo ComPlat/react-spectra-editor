@@ -125,17 +125,20 @@ const showSelect = (classes, layoutSt, curveSt, axesUnitsSt, updateXAxisAct, upd
   }
   return /*#__PURE__*/_react.default.createElement("span", null, axisX(classes, layoutSt, axesUnitsSt, updateXAxisAct, curveSt), axisY(classes, layoutSt, axesUnitsSt, updateYAxisAct, curveSt));
 };
-const ChangeAxes = ({
-  classes,
-  layoutSt,
-  curveSt,
-  axesUnitsSt,
-  updateXAxisAct,
-  updateYAxisAct
-}) => /*#__PURE__*/_react.default.createElement("span", {
-  className: classes.groupRight,
-  "data-testid": "ChangeAxes"
-}, showSelect(classes, layoutSt, curveSt, axesUnitsSt, updateXAxisAct, updateYAxisAct));
+const ChangeAxes = _ref => {
+  let {
+    classes,
+    layoutSt,
+    curveSt,
+    axesUnitsSt,
+    updateXAxisAct,
+    updateYAxisAct
+  } = _ref;
+  return /*#__PURE__*/_react.default.createElement("span", {
+    className: classes.groupRight,
+    "data-testid": "ChangeAxes"
+  }, showSelect(classes, layoutSt, curveSt, axesUnitsSt, updateXAxisAct, updateYAxisAct));
+};
 const mapStateToProps = (state, props) => (
 // eslint-disable-line
 {

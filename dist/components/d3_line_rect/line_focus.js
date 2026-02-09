@@ -388,16 +388,17 @@ class LineFocus {
       bpTxt.enter().append('text').attr('class', 'peak-text').attr('font-family', 'Helvetica').style('font-size', '12px').attr('fill', '#228B22').style('text-anchor', 'middle').merge(bpTxt).attr('id', d => `txt${Math.round(1000 * d.x)}`).text(d => d.x.toFixed(2)).attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y) - 25})`).on('click', (event, d) => this.onClickTarget(event, d));
     }
   }
-  create({
-    filterSeed,
-    tTrEndPts,
-    layoutSt,
-    sweepExtentSt,
-    isUiAddIntgSt,
-    isUiNoBrushSt,
-    hplcMsSt,
-    editPeakSt
-  }) {
+  create(_ref) {
+    let {
+      filterSeed,
+      tTrEndPts,
+      layoutSt,
+      sweepExtentSt,
+      isUiAddIntgSt,
+      isUiNoBrushSt,
+      hplcMsSt,
+      editPeakSt
+    } = _ref;
     this.svg = d3.select('.d3Svg');
     (0, _mount.MountMainFrame)(this, 'focus');
     (0, _mount.MountClip)(this);
@@ -429,17 +430,18 @@ class LineFocus {
   reverseXAxis(layoutSt) {
     return [_list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS, _list_layout.LIST_LAYOUT.TGA, _list_layout.LIST_LAYOUT.DSC, _list_layout.LIST_LAYOUT.XRD, _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY, _list_layout.LIST_LAYOUT.CDS, _list_layout.LIST_LAYOUT.DLS_ACF, _list_layout.LIST_LAYOUT.SEC, _list_layout.LIST_LAYOUT.GC, _list_layout.LIST_LAYOUT.EMISSIONS, _list_layout.LIST_LAYOUT.DLS_INTENSITY].indexOf(layoutSt) < 0;
   }
-  update({
-    filterSeed,
-    tTrEndPts,
-    layoutSt,
-    sweepExtentSt,
-    isUiAddIntgSt,
-    isUiNoBrushSt,
-    uiSt,
-    hplcMsSt,
-    editPeakSt
-  }) {
+  update(_ref2) {
+    let {
+      filterSeed,
+      tTrEndPts,
+      layoutSt,
+      sweepExtentSt,
+      isUiAddIntgSt,
+      isUiNoBrushSt,
+      uiSt,
+      hplcMsSt,
+      editPeakSt
+    } = _ref2;
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = (0, _init.InitScale)(this, false);
     this.setDataParams(filterSeed, tTrEndPts, layoutSt, editPeakSt);

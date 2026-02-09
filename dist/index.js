@@ -24,6 +24,9 @@ var _lc_ms_jcamp_ = _interopRequireDefault(require("./__tests__/fixtures/lc_ms_j
 var _lc_ms_jcamp_tic_pos = _interopRequireDefault(require("./__tests__/fixtures/lc_ms_jcamp_tic_pos"));
 var _lc_ms_jcamp_tic_neg = _interopRequireDefault(require("./__tests__/fixtures/lc_ms_jcamp_tic_neg"));
 var _lc_ms_jcamp_uvvis = _interopRequireDefault(require("./__tests__/fixtures/lc_ms_jcamp_uvvis"));
+var _lc_ms_jcamp_tic_chemstation = _interopRequireDefault(require("./__tests__/fixtures/lc_ms_jcamp_tic_chemstation"));
+var _lc_ms_jcamp_mz_chemstation = _interopRequireDefault(require("./__tests__/fixtures/lc_ms_jcamp_mz_chemstation"));
+var _lc_ms_jcamp_uvvis_chemstation = _interopRequireDefault(require("./__tests__/fixtures/lc_ms_jcamp_uvvis_chemstation"));
 var _nmr_result = _interopRequireDefault(require("./__tests__/fixtures/nmr_result"));
 var _ir_result = _interopRequireDefault(require("./__tests__/fixtures/ir_result"));
 var _phenylalanin = _interopRequireDefault(require("./__tests__/fixtures/phenylalanin"));
@@ -73,6 +76,9 @@ const lcmsEntity2 = _app.FN.ExtractJcamp(_lc_ms_jcamp_.default);
 const hplcMsTicPosEntity = _app.FN.ExtractJcamp(_lc_ms_jcamp_tic_pos.default);
 const hplcMsTicNegEntity = _app.FN.ExtractJcamp(_lc_ms_jcamp_tic_neg.default);
 const hplcMsUvvisEntity = _app.FN.ExtractJcamp(_lc_ms_jcamp_uvvis.default);
+const hplcMsTicChemstationEntity = _app.FN.ExtractJcamp(_lc_ms_jcamp_tic_chemstation.default);
+const hplcMsMzChemstationEntity = _app.FN.ExtractJcamp(_lc_ms_jcamp_mz_chemstation.default);
+const hplcMsUvvisChemstationEntity = _app.FN.ExtractJcamp(_lc_ms_jcamp_uvvis_chemstation.default);
 const uvVisEntity = _app.FN.ExtractJcamp(_uv_vis_jcamp.default);
 const compUvVisEntity = _app.FN.ExtractJcamp(_compare_uv_vis_jcamp.default);
 const hplcUVVisEntity = _app.FN.ExtractJcamp(_hplc_uvvis_jcamp.default);
@@ -198,6 +204,8 @@ class DemoWriteIr extends _react.default.Component {
         return msEntity;
       case 'lcms':
         return lcmsEntity;
+      case 'lcms chemstation':
+        return hplcMsUvvisChemstationEntity;
       default:
         return msEntity;
     }
@@ -225,6 +233,8 @@ class DemoWriteIr extends _react.default.Component {
         return [gcEntity1, gcEntity2, gcEntity3];
       case 'lcms':
         return [hplcMsTicPosEntity, hplcMsTicNegEntity, hplcMsUvvisEntity, lcmsEntity, lcmsEntity2];
+      case 'lcms chemstation':
+        return [hplcMsTicChemstationEntity, hplcMsMzChemstationEntity, hplcMsUvvisChemstationEntity];
       default:
         return false;
     }
@@ -254,6 +264,7 @@ class DemoWriteIr extends _react.default.Component {
       case 'xrd':
       case 'ms':
       case 'lcms':
+      case 'lcms chemstation':
       case 'cyclic volta':
       case 'cds':
       case 'sec':
@@ -282,18 +293,19 @@ class DemoWriteIr extends _react.default.Component {
   rmDollarSign(target) {
     return target.replace(/\$/g, '');
   }
-  formatPks({
-    peaks,
-    layout,
-    shift,
-    isAscend,
-    decimal,
-    isIntensity,
-    integration,
-    waveLength,
-    cyclicvoltaSt,
-    curveSt
-  }) {
+  formatPks(_ref) {
+    let {
+      peaks,
+      layout,
+      shift,
+      isAscend,
+      decimal,
+      isIntensity,
+      integration,
+      waveLength,
+      cyclicvoltaSt,
+      curveSt
+    } = _ref;
     const entity = this.loadEntity();
     const {
       features
@@ -319,7 +331,8 @@ class DemoWriteIr extends _react.default.Component {
       boundary,
       integration,
       waveLength,
-      temperature
+      temperature,
+      hplcMsSt: _app.store.getState().hplcMs
     });
     const wrapper = _app.FN.peaksWrapper(layout, shift);
     let desc = this.rmDollarSign(wrapper.head) + body + wrapper.tail;
@@ -354,14 +367,15 @@ class DemoWriteIr extends _react.default.Component {
     }
     return desc;
   }
-  formatMpy({
-    multiplicity,
-    integration,
-    shift,
-    isAscend,
-    decimal,
-    layout
-  }) {
+  formatMpy(_ref2) {
+    let {
+      multiplicity,
+      integration,
+      shift,
+      isAscend,
+      decimal,
+      layout
+    } = _ref2;
     // obsv freq
     const entity = this.loadEntity();
     const {
@@ -423,14 +437,15 @@ class DemoWriteIr extends _react.default.Component {
     const solvent = label ? `${name.split('(')[0].trim()} [${value.toFixed(decimal)} ppm], ` : '';
     return `${layout} NMR (${freqStr}${solvent}ppm) δ = ${str}.`;
   }
-  writeMpy({
-    layout,
-    shift,
-    isAscend,
-    decimal,
-    multiplicity,
-    integration
-  }) {
+  writeMpy(_ref3) {
+    let {
+      layout,
+      shift,
+      isAscend,
+      decimal,
+      multiplicity,
+      integration
+    } = _ref3;
     if (!_app.FN.isNmrLayout(layout)) return;
     const desc = this.formatMpy({
       multiplicity,
@@ -444,18 +459,19 @@ class DemoWriteIr extends _react.default.Component {
       desc
     });
   }
-  writePeak({
-    peaks,
-    layout,
-    shift,
-    isAscend,
-    decimal,
-    isIntensity,
-    integration,
-    waveLength,
-    cyclicvoltaSt,
-    curveSt
-  }) {
+  writePeak(_ref4) {
+    let {
+      peaks,
+      layout,
+      shift,
+      isAscend,
+      decimal,
+      isIntensity,
+      integration,
+      waveLength,
+      cyclicvoltaSt,
+      curveSt
+    } = _ref4;
     const desc = this.formatPks({
       peaks,
       layout,
@@ -473,18 +489,16 @@ class DemoWriteIr extends _react.default.Component {
       desc
     });
   }
-  savePeaks({
-    peaks,
-    layout,
-    shift,
-    isAscend,
-    decimal,
-    analysis,
-    isIntensity,
-    integration,
-    multiplicity,
-    waveLength
-  }) {
+  savePeaks(_ref5) {
+    let {
+      peaks,
+      layout,
+      shift,
+      isAscend,
+      decimal,
+      isIntensity,
+      waveLength
+    } = _ref5;
     const entity = this.loadEntity();
     const {
       features
@@ -509,12 +523,10 @@ class DemoWriteIr extends _react.default.Component {
       isIntensity,
       boundary,
       waveLength,
-      temperature
+      temperature,
+      hplcMsSt: _app.store.getState().hplcMs
     });
     /*eslint-disable */
-    console.log(analysis);
-    console.log(integration);
-    console.log(multiplicity);
     if (shift.ref.label) {
       const label = this.rmDollarSign(shift.ref.label);
       alert(`Peaks: ${body}` + '\n' + '- - - - - - - - - - -' + '\n' + `Shift solvent = ${label}, ${shift.ref.value}ppm` + '\n');
@@ -523,10 +535,11 @@ class DemoWriteIr extends _react.default.Component {
     }
     /*eslint-disable */
   }
-  predictOp({
-    multiplicity,
-    curveSt
-  }) {
+  predictOp(_ref6) {
+    let {
+      multiplicity,
+      curveSt
+    } = _ref6;
     const {
       curveIdx
     } = curveSt;
@@ -764,7 +777,13 @@ class DemoWriteIr extends _react.default.Component {
         margin: '0 10px 0 10px'
       },
       onClick: this.onClick('lcms')
-    }, "LC/MS"), /*#__PURE__*/_react.default.createElement(_material.Button, {
+    }, "LC/MS OpenLab"), /*#__PURE__*/_react.default.createElement(_material.Button, {
+      variant: "contained",
+      style: {
+        margin: '0 10px 0 10px'
+      },
+      onClick: this.onClick('lcms chemstation')
+    }, "LC/MS Chemstation"), /*#__PURE__*/_react.default.createElement(_material.Button, {
       variant: "contained",
       style: {
         margin: '0 10px 0 10px'
@@ -829,4 +848,4 @@ class DemoWriteIr extends _react.default.Component {
 }
 
 // - - - DOM - - -
-_reactDom.default.render(/*#__PURE__*/_react.default.createElement(DemoWriteIr, null), document.getElementById('root'));
+_reactDom.default.render( /*#__PURE__*/_react.default.createElement(DemoWriteIr, null), document.getElementById('root'));

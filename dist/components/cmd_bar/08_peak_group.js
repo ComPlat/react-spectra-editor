@@ -20,20 +20,24 @@ var _format = _interopRequireDefault(require("../../helpers/format"));
 /* eslint-disable prefer-object-spread, react/function-component-definition */
 
 const styles = () => Object.assign({}, _common.commonStyle);
-const PeakGroup = ({
-  classes,
-  feature,
-  isSelectingGroupSt,
-  setUiSweepTypeAct,
-  graphIndex
-}) => {
+const PeakGroup = _ref => {
+  let {
+    classes,
+    feature,
+    isSelectingGroupSt,
+    setUiSweepTypeAct,
+    graphIndex
+  } = _ref;
+  if (!feature || !feature.operation) {
+    return null;
+  }
   const {
     operation
   } = feature;
   const {
     layout
-  } = operation;
-  if (!_format.default.isLCMsLayout(layout)) {
+  } = operation || {};
+  if (!layout || !_format.default.isLCMsLayout(layout)) {
     return null;
   }
   const onSelectPeakGroup = () => {

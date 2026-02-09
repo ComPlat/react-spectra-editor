@@ -52,15 +52,17 @@ class HPLCViewer extends _react.default.Component {
       curveIdx
     } = curveSt;
     const entity = entities[curveIdx];
+    if (!entity) return /*#__PURE__*/_react.default.createElement("div", null);
     const {
       feature,
       topic
-    } = entity;
+    } = entity || {};
     const {
       ticEntities,
       uvvisEntities,
       mzEntities
     } = (0, _extractEntityLCMS.splitAndReindexEntities)(entities);
+    const displayFeature = feature || entities[0]?.feature || entities[0]?.features?.[0] || {};
     const {
       integrations
     } = integrationSt;
@@ -68,7 +70,7 @@ class HPLCViewer extends _react.default.Component {
     return /*#__PURE__*/_react.default.createElement("div", {
       className: classes.root
     }, /*#__PURE__*/_react.default.createElement(_index2.default, {
-      feature: feature,
+      feature: displayFeature,
       operations: operations,
       editorOnly: true,
       hideThreshold: true,
@@ -85,9 +87,9 @@ class HPLCViewer extends _react.default.Component {
       uvvisEntities: uvvisEntities,
       mzEntities: mzEntities,
       topic: topic,
-      xLabel: feature.xUnit,
-      yLabel: feature.yUnit,
-      feature: feature,
+      xLabel: displayFeature?.xUnit || '',
+      yLabel: displayFeature?.yUnit || '',
+      feature: displayFeature,
       jcampIdx: curveIdx,
       hplcMsSt: hplcMsSt
     })), /*#__PURE__*/_react.default.createElement(_material.Grid, {
@@ -99,7 +101,7 @@ class HPLCViewer extends _react.default.Component {
       jcampIdx: curveIdx,
       entityFileNames: entityFileNames,
       userManualLink: userManualLink,
-      feature: feature,
+      feature: displayFeature,
       molSvg: molSvg,
       theoryMass: theoryMass,
       descriptions: "",
@@ -127,7 +129,7 @@ HPLCViewer.propTypes = {
   molSvg: _propTypes.default.string.isRequired,
   setAllCurvesAct: _propTypes.default.func.isRequired,
   curveSt: _propTypes.default.object.isRequired,
-  operations: _propTypes.default.func.isRequired,
+  operations: _propTypes.default.array.isRequired,
   userManualLink: _propTypes.default.object,
   entities: _propTypes.default.array,
   layoutSt: _propTypes.default.string.isRequired,

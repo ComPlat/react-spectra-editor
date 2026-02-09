@@ -164,7 +164,9 @@ const clearAll = (state, action) => {
     multiplicities: newMultiplicities
   });
 };
-const multiplicityReducer = (state = initialState, action) => {
+const multiplicityReducer = function () {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+  let action = arguments.length > 1 ? arguments[1] : undefined;
   switch (action.type) {
     case _action_type.EDITPEAK.SHIFT:
       return setShift(state, action);

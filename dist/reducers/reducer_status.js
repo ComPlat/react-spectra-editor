@@ -10,7 +10,9 @@ var _action_type = require("../constants/action_type");
 const initialState = {
   btnSubmit: false
 };
-const statusReducer = (state = initialState, action) => {
+const statusReducer = function () {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+  let action = arguments.length > 1 ? arguments[1] : undefined;
   switch (action.type) {
     case _action_type.STATUS.TOGGLEBTNSUBMIT:
       return Object.assign({}, state, {

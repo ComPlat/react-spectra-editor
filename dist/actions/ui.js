@@ -10,11 +10,14 @@ const setUiViewerType = payload => ({
   payload
 });
 exports.setUiViewerType = setUiViewerType;
-const setUiSweepType = (payload, jcampIdx = 0) => ({
-  type: _action_type.UI.SWEEP.SET_TYPE,
-  payload,
-  jcampIdx
-});
+const setUiSweepType = function (payload) {
+  let jcampIdx = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+  return {
+    type: _action_type.UI.SWEEP.SET_TYPE,
+    payload,
+    jcampIdx
+  };
+};
 exports.setUiSweepType = setUiSweepType;
 const selectUiSweep = payload => ({
   type: _action_type.UI.SWEEP.SELECT,
@@ -26,12 +29,17 @@ const scrollUiWheel = payload => ({
   payload
 });
 exports.scrollUiWheel = scrollUiWheel;
-const clickUiTarget = (payload, onPeak, voltammetryPeakIdx = 0, jcampIdx = 0, onPecker = false) => ({
-  type: _action_type.UI.CLICK_TARGET,
-  payload,
-  onPeak,
-  voltammetryPeakIdx,
-  jcampIdx,
-  onPecker
-});
+const clickUiTarget = function (payload, onPeak) {
+  let voltammetryPeakIdx = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+  let jcampIdx = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+  let onPecker = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+  return {
+    type: _action_type.UI.CLICK_TARGET,
+    payload,
+    onPeak,
+    voltammetryPeakIdx,
+    jcampIdx,
+    onPecker
+  };
+};
 exports.clickUiTarget = clickUiTarget;

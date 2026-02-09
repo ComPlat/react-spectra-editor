@@ -16,6 +16,7 @@ var _meta = require("./actions/meta");
 var _jcamp = require("./actions/jcamp");
 var _layer_prism = _interopRequireDefault(require("./layer_prism"));
 var _format = _interopRequireDefault(require("./helpers/format"));
+var _extractEntityLCMS = require("./helpers/extractEntityLCMS");
 var _multi_jcamps_viewer = _interopRequireDefault(require("./components/multi_jcamps_viewer"));
 var _hplc_viewer = _interopRequireDefault(require("./components/hplc_viewer"));
 var _curve = require("./actions/curve");
@@ -144,14 +145,15 @@ class LayerInit extends _react.default.Component {
       entityFileNames,
       userManualLink
     } = this.props;
-    const target = entity.spectra[0];
     const {
       layout
     } = entity;
-    const xxLabel = !xLabel && xLabel === '' ? `X (${target.xUnit})` : xLabel;
-    const yyLabel = !yLabel && yLabel === '' ? `Y (${target.yUnit})` : yLabel;
-    if (multiEntities) {
-      if (_format.default.isLCMsLayout(layout)) {
+    const isLcms = _format.default.isLCMsLayout(layout) || multiEntities && Array.isArray(multiEntities) && (0, _extractEntityLCMS.isLcMsGroup)(multiEntities);
+    const target = isLcms ? null : entity.spectra && Array.isArray(entity.spectra) && entity.spectra[0] || null;
+    const xxLabel = !xLabel && xLabel === '' && target && target.xUnit ? `X (${target.xUnit})` : xLabel;
+    const yyLabel = !yLabel && yLabel === '' && target && target.yUnit ? `Y (${target.yUnit})` : yLabel;
+    if (multiEntities && Array.isArray(multiEntities)) {
+      if (_format.default.isLCMsLayout(layout) || (0, _extractEntityLCMS.isLcMsGroup)(multiEntities)) {
         return /*#__PURE__*/_react.default.createElement(_hplc_viewer.default, {
           multiEntities: multiEntities,
           entityFileNames: entityFileNames,

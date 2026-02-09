@@ -202,7 +202,9 @@ const clearAllPeaks = (state, action) => {
     peaks: newPeaks
   });
 };
-const editPeakReducer = (state = initialState, action) => {
+const editPeakReducer = function () {
+  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+  let action = arguments.length > 1 ? arguments[1] : undefined;
   switch (action.type) {
     case _action_type.EDITPEAK.ADD_POSITIVE:
       return addToPos(state, action);

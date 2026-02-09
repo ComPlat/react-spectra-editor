@@ -53,14 +53,17 @@ const wavelengthSelect = (classes, waveLengthSt, layoutSt, updateWaveLengthAct) 
     }, item.label, " (", item.value, " ", item.unit, ")"));
   })));
 };
-const Wavelength = ({
-  classes,
-  waveLengthSt,
-  layoutSt,
-  updateWaveLengthAct
-}) => /*#__PURE__*/_react.default.createElement("span", {
-  className: classes.groupRight
-}, wavelengthSelect(classes, waveLengthSt, layoutSt, updateWaveLengthAct));
+const Wavelength = _ref => {
+  let {
+    classes,
+    waveLengthSt,
+    layoutSt,
+    updateWaveLengthAct
+  } = _ref;
+  return /*#__PURE__*/_react.default.createElement("span", {
+    className: classes.groupRight
+  }, wavelengthSelect(classes, waveLengthSt, layoutSt, updateWaveLengthAct));
+};
 const mapStateToProps = (state, props) => (
 // eslint-disable-line
 {

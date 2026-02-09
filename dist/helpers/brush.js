@@ -23,7 +23,8 @@ const wheeled = (focus, event) => {
     brushClass
   }));
 };
-const brushed = (focus, isUiAddIntgSt, event, brushedClass = '.d3Svg') => {
+const brushed = function (focus, isUiAddIntgSt, event) {
+  let brushedClass = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '.d3Svg';
   const {
     selectUiSweepAct,
     data,
@@ -75,7 +76,8 @@ const brushed = (focus, isUiAddIntgSt, event, brushedClass = '.d3Svg') => {
     svgSel.selectAll('.brush').call(brush.move, null);
   }
 };
-const MountBrush = (focus, isUiAddIntgSt, isUiNoBrushSt, brushedClass = '.d3Svg') => {
+const MountBrush = function (focus, isUiAddIntgSt, isUiNoBrushSt) {
+  let brushedClass = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '.d3Svg';
   const {
     root,
     svg,
@@ -86,6 +88,7 @@ const MountBrush = (focus, isUiAddIntgSt, isUiNoBrushSt, brushedClass = '.d3Svg'
     uiSt,
     graphIndex
   } = focus;
+  if (!root || !svg || typeof svg.selectAll !== 'function') return;
   svg.selectAll('.brush, .brushX').remove();
   const isZoomIn = uiSt?.zoom?.sweepTypes?.[graphIndex] === _list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN;
   const isIntegrationAdd = uiSt?.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD;

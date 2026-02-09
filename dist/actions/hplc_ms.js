@@ -11,11 +11,15 @@ const selectWavelength = payload => ({
 });
 exports.selectWavelength = selectWavelength;
 const changeTic = payload => {
-  const isNegative = payload.target.value === 1;
+  const rawValue = payload?.target?.value ?? payload?.polarity ?? 'positive';
+  let polarity = rawValue;
+  if (rawValue === 0 || rawValue === '0') polarity = 'positive';
+  if (rawValue === 1 || rawValue === '1') polarity = 'negative';
+  if (rawValue === 2 || rawValue === '2') polarity = 'neutral';
   const action = {
     type: _action_type.HPLC_MS.SELECT_TIC_CURVE,
     payload: {
-      isNegative
+      polarity
     }
   };
   return action;

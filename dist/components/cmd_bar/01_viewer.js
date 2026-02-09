@@ -21,14 +21,15 @@ var _list_ui = require("../../constants/list_ui");
 /* eslint-disable prefer-object-spread, react/function-component-definition */
 
 const styles = () => Object.assign({}, _common.commonStyle);
-const Viewer = ({
-  classes,
-  isfocusSpectrumSt,
-  isfocusAnalysisSt,
-  hideCmdAnaViewerSt,
-  disableCmdAnaViewerSt,
-  setUiViewerTypeAct
-}) => {
+const Viewer = _ref => {
+  let {
+    classes,
+    isfocusSpectrumSt,
+    isfocusAnalysisSt,
+    hideCmdAnaViewerSt,
+    disableCmdAnaViewerSt,
+    setUiViewerTypeAct
+  } = _ref;
   const onViewSpectrum = () => setUiViewerTypeAct(_list_ui.LIST_UI_VIEWER_TYPE.SPECTRUM);
   const onViewAnalysis = () => setUiViewerTypeAct(_list_ui.LIST_UI_VIEWER_TYPE.ANALYSIS);
   return /*#__PURE__*/_react.default.createElement("span", {
