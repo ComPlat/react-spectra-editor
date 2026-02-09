@@ -88,7 +88,7 @@ SpectraEditor.propTypes = {
 SpectraEditor.defaultProps = {
   others: { others: [], addOthersCb: false },
   multiEntities: false,
-  entityFileNames: false,
+  entityFileNames: [],
   cLabel: '',
   xLabel: '',
   yLabel: '',

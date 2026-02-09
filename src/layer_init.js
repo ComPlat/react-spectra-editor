@@ -15,6 +15,7 @@ import { updateMetaPeaks, updateDSCMetaData } from './actions/meta';
 import { addOthers } from './actions/jcamp';
 import LayerPrism from './layer_prism';
 import Format from './helpers/format';
+import { isLcMsGroup } from './helpers/extractEntityLCMS';
 import MultiJcampsViewer from './components/multi_jcamps_viewer';
 import HPLCViewer from './components/hplc_viewer';
 import { setAllCurves } from './actions/curve';
@@ -124,16 +125,20 @@ class LayerInit extends React.Component {
       canChangeDescription, onDescriptionChanged,
       multiEntities, entityFileNames, userManualLink,
     } = this.props;
-    const target = entity.spectra[0];
-
     const { layout } = entity;
 
-    const xxLabel = !xLabel && xLabel === '' ? `X (${target.xUnit})` : xLabel;
-    const yyLabel = !yLabel && yLabel === '' ? `Y (${target.yUnit})` : yLabel;
+    const isLcms = Format.isLCMsLayout(layout)
+      || (Array.isArray(multiEntities) && isLcMsGroup(multiEntities));
+    const target = isLcms
+      ? null
+      : (entity.spectra && Array.isArray(entity.spectra) && entity.spectra[0]) || null;
+
+    const xxLabel = (!xLabel && xLabel === '' && target && target.xUnit) ? `X (${target.xUnit})` : xLabel;
+    const yyLabel = (!yLabel && yLabel === '' && target && target.yUnit) ? `Y (${target.yUnit})` : yLabel;
 
     const hasMultiEntities = Array.isArray(multiEntities) && multiEntities.length > 0;
     const isMultiSpectra = Array.isArray(multiEntities) && multiEntities.length > 1;
-    if (Format.isLCMsLayout(layout) && hasMultiEntities) {
+    if (hasMultiEntities && (Format.isLCMsLayout(layout) || isLcMsGroup(multiEntities))) {
       return (
         <HPLCViewer
           entityFileNames={entityFileNames}

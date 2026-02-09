@@ -15,7 +15,6 @@ import {
   Convert2Scan, Convert2Thres,
 } from '../../helpers/chem';
 import { MuButton, commonStyle } from './common';
-import { extractPeaksEdit } from '../../helpers/extractPeaksEdit';
 import { extractPeaksEdit, formatLcmsPeaksForBackend, formatLcmsIntegralsForBackend } from '../../helpers/extractPeaksEdit';
 import Format from '../../helpers/format';
 

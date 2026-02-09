@@ -1,5 +1,5 @@
 import Format from './format';
-import { catToString } from './extractEntityLCMS';
+import { getLcMsInfo } from './extractEntityLCMS';
 
 const getScanIdx = (entity, scanSt) => {
   const { target, isAuto } = scanSt;
@@ -32,43 +32,46 @@ const extrLcMs = (entity) => {
   const { features, layout } = entity;
   let arrX = [];
   let arrY = [];
+  const entityInfo = getLcMsInfo(entity);
 
-  const featuresArray = Array.isArray(features)
-    ? features
-    : (features && typeof features === 'object')
-        ? Object.values(features)
-        : [];
+  let featuresArray = [];
+  if (Array.isArray(features)) {
+    featuresArray = features;
+  } else if (features && typeof features === 'object') {
+    featuresArray = Object.values(features);
+  }
 
-  featuresArray.forEach((spectrum) => {
-    if (!spectrum?.data?.[0]) return;
-
-    const cat = catToString(spectrum.csCategory);
-    const { x, y }   = spectrum.data[0];
-    const pageValue  = spectrum.pageValue;
-
-    if (cat.includes('TIC')) {
+  if (entityInfo.kind === 'tic') {
+    const ticFeature = featuresArray.find((spectrum) => spectrum?.data?.[0]?.x?.length > 0);
+    if (ticFeature?.data?.[0]) {
+      const { x, y } = ticFeature.data[0];
       arrX = x;
       arrY = y;
-    } else {
+    }
+  } else {
+    featuresArray.forEach((spectrum) => {
+      if (!spectrum?.data?.[0]) return;
+      const { y } = spectrum.data[0];
+      const { pageValue } = spectrum;
       arrX.push(pageValue);
       arrY.push(Math.max(...y));
-    }
-  });
+    });
+  }
 
   return {
-    topic:   { x: arrX, y: arrY },
+    topic: { x: arrX, y: arrY },
     feature: {
-      maxY:       arrY.length ? Math.max(...arrY) : 0,
-      operation:  { layout },
-      data:       [{ x: arrX, y: arrY }],
-      isPeaktable:false,
+      maxY: arrY.length ? Math.max(...arrY) : 0,
+      operation: { layout },
+      data: [{ x: arrX, y: arrY }],
+      isPeaktable: false,
     },
   };
 };
 
-const extrMs = (entity, thresSt, scanSt) => {
+const extrMs = (entity, thresSt, scanSt, forceLcms = false) => {
   const { layout } = entity;
-  if (Format.isMsLayout(layout)) {
+  if (Format.isMsLayout(layout) && !forceLcms) {
     const scanIdx = getScanIdx(entity, scanSt);
     const { spectra, feature, hasEdit } = extrShare(entity, thresSt, scanIdx);
     const topic = spectra[scanIdx].data[0];
@@ -92,10 +95,12 @@ const extrNi = (entity, thresSt) => {
   };
 };
 
-const extractParams = (entity, thresSt, scanSt) => (
-  (Format.isMsLayout(entity.layout) || Format.isLCMsLayout(entity.layout))
-    ? extrMs(entity, thresSt, scanSt)
-    : extrNi(entity, thresSt)
-);
+const extractParams = (entity, thresSt, scanSt, options = {}) => {
+  const { forceLcms = false } = options;
+  const useLcms = forceLcms || Format.isLCMsLayout(entity.layout);
+  return (Format.isMsLayout(entity.layout) || useLcms)
+    ? extrMs(entity, thresSt, scanSt, useLcms)
+    : extrNi(entity, thresSt);
+};
 
 export { extractParams }; // eslint-disable-line

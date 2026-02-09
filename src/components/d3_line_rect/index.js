@@ -14,7 +14,7 @@ import FindReplaceOutlinedIcon from '@mui/icons-material/FindReplaceOutlined';
 import { MuButton, commonStyle, focusStyle } from '../cmd_bar/common';
 
 import {
-  Topic2Seed, ToThresEndPts, convertThresEndPts,
+  ToThresEndPts, convertThresEndPts,
 } from '../../helpers/chem';
 import { resetAll } from '../../actions/manager';
 import {
@@ -36,6 +36,7 @@ import PeakGroup from '../cmd_bar/08_peak_group';
 import Threshold from '../cmd_bar/r03_threshold';
 import Integration from '../cmd_bar/04_integration';
 import Peak from '../cmd_bar/03_peak';
+import { getLcMsInfo } from '../../helpers/extractEntityLCMS';
 
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.8 / 3); // ROI
@@ -115,7 +116,7 @@ const waveLengthSelect = (classes, hplcMsSt, updateWaveLengthAct) => {
     <FormControl
       className={classNames(classes.fieldDecimal)}
       variant="outlined"
-      style={{ width: '80px' }}
+      style={{ width: '140px' }}
     >
       <InputLabel id="select-decimal-label" className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
         Wavelength
@@ -135,9 +136,15 @@ const waveLengthSelect = (classes, hplcMsSt, updateWaveLengthAct) => {
 
 const ticSelect = (classes, hplcMsSt, handleTicChanged) => {
   const { tic } = hplcMsSt;
-  const { isNegative } = tic;
-  const listTIC = [{ name: 'PLUS', value: 0 }, { name: 'MINUS', value: 1 }];
-  const options = listTIC.map((d) => (
+  const { polarity, available } = tic;
+  const listTIC = [
+    { name: 'PLUS', value: 'positive', enabled: available?.positive },
+    { name: 'MINUS', value: 'negative', enabled: available?.negative },
+    { name: 'NEUTRAL', value: 'neutral', enabled: available?.neutral },
+  ];
+  const filtered = listTIC.filter((d) => d.enabled);
+  const listOptions = filtered.length > 0 ? filtered : listTIC;
+  const options = listOptions.map((d) => (
     <MenuItem value={d.value} key={d.value}>
       <span className={classNames(classes.txtOpt, 'option-sv-bar-decimal')}>
         {d.name}
@@ -153,7 +160,7 @@ const ticSelect = (classes, hplcMsSt, handleTicChanged) => {
     <FormControl
       className={classNames(classes.fieldDecimal)}
       variant="outlined"
-      style={{ width: '80px' }}
+      style={{ width: '110px' }}
     >
       <InputLabel id="select-decimal-label" className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
         TIC
@@ -161,7 +168,7 @@ const ticSelect = (classes, hplcMsSt, handleTicChanged) => {
       <Select
         labelId="select-decimal-label"
         label="Decimal"
-        value={isNegative ? 1 : 0}
+        value={polarity}
         onChange={onTicChange}
         className={classNames(classes.selectInput, 'input-sv-bar-decimal')}
       >
@@ -219,7 +226,7 @@ class ViewerLineRect extends React.Component {
 
   componentDidMount() {
     const {
-      curveSt, seed, cLabel, feature, ticEntities,
+      curveSt, feature, ticEntities,
       tTrEndPts, layoutSt,
       isUiAddIntgSt, isUiNoBrushSt,
       integationSt,
@@ -270,7 +277,7 @@ class ViewerLineRect extends React.Component {
       isUiAddIntgSt,
       isUiNoBrushSt,
     });
-    drawLabel(this.rootKlassMulti, cLabel, 'Minutes', 'Intensity');
+    drawLabel(this.rootKlassMulti, null, 'Minutes', 'Intensity');
     drawDisplay(this.rootKlassMulti, isHidden);
 
     drawMain(this.rootKlassRect, W, H, LIST_BRUSH_SVG_GRAPH.RECT);
@@ -287,7 +294,7 @@ class ViewerLineRect extends React.Component {
 
   componentDidUpdate(prevProps) {
     const {
-      ticEntities, curveSt, cLabel,
+      ticEntities, curveSt,
       tTrEndPts, layoutSt,
       isUiAddIntgSt, isUiNoBrushSt,
       isHidden, uiSt, hplcMsSt, integationSt,
@@ -338,8 +345,14 @@ class ViewerLineRect extends React.Component {
         editPeakSt,
       });
     }
-    const { isNegative } = hplcMsSt.tic;
-    drawLabel(this.rootKlassMulti, isNegative ? 'MINUS' : 'PLUS', 'Minutes', 'Intensity');
+    const { polarity } = hplcMsSt.tic;
+    let ticLabel = 'NEUTRAL';
+    if (polarity === 'negative') {
+      ticLabel = 'MINUS';
+    } else if (polarity === 'positive') {
+      ticLabel = 'PLUS';
+    }
+    drawLabel(this.rootKlassMulti, ticLabel, 'Minutes', 'Intensity');
     drawDisplay(this.rootKlassMulti, isHidden);
 
     const subViewFeature = this.extractSubView();
@@ -386,58 +399,81 @@ class ViewerLineRect extends React.Component {
       return null;
     }
     const { features } = extractParams(uvvisEntities[0], 0, 1);
-    if (!features || features.length === 0) {
+    let featuresArr = [];
+    if (Array.isArray(features)) {
+      featuresArr = features;
+    } else if (features && typeof features === 'object') {
+      featuresArr = Object.values(features);
+    }
+    if (featuresArr.length === 0) {
       return null;
     }
     const { uvvis } = hplcMsSt;
     const { wavelengthIdx } = uvvis;
-    if (wavelengthIdx < 0 || wavelengthIdx >= features.length) {
+    if (wavelengthIdx < 0 || wavelengthIdx >= featuresArr.length) {
       return null;
     }
-    return features[wavelengthIdx];
+    return featuresArr[wavelengthIdx];
   }
 
   extractSubView() {
     const {
       uiSt, mzEntities, hplcMsSt, updateCurrentPageValueAct,
     } = this.props;
-    const { tic } = hplcMsSt;
-    const { isNegative } = tic;
-    const entityIdx = isNegative ? 1 : 0;
-    if (!mzEntities || !mzEntities[entityIdx] || !mzEntities[entityIdx].layout) {
+    const { polarity } = hplcMsSt.tic;
+    const pickEntity = mzEntities?.find((ent) => (
+      getLcMsInfo(ent).polarity === polarity
+    )) || mzEntities?.[0];
+    if (!pickEntity || !pickEntity.layout) {
       return null;
     }
     const { subViewerAt } = uiSt;
-    const { features } = extractParams(mzEntities[entityIdx], 0, 1);
-    if (!features || features.length === 0) return null;
+    const { features } = extractParams(pickEntity, 0, 1);
+    let featuresArr = [];
+    if (Array.isArray(features)) {
+      featuresArr = features;
+    } else if (features && typeof features === 'object') {
+      featuresArr = Object.values(features);
+    }
+    if (featuresArr.length === 0) return null;
 
-    const arrPageValues = features.map((fe) => fe.pageValue);
+    const pageValues = featuresArr
+      .map((fe) => Number(fe?.pageValue))
+      .filter((val) => Number.isFinite(val));
+    if (pageValues.length === 0) return featuresArr[0];
+
     const hasValidClick = subViewerAt && subViewerAt.x !== undefined;
     const closestPage = hasValidClick
-      ? findClosest(arrPageValues, subViewerAt.x)
-      : arrPageValues[Math.floor(arrPageValues.length / 2)];
+      ? findClosest(pageValues, subViewerAt.x)
+      : pageValues[Math.floor(pageValues.length / 2)];
 
     if (closestPage !== hplcMsSt.tic.currentPageValue) {
       updateCurrentPageValueAct(closestPage);
     }
 
-    const [selectFeature] = features.filter((fe) => fe.pageValue === closestPage);
-    return selectFeature;
+    const selectFeature = featuresArr.find((fe) => Number(fe?.pageValue) === closestPage);
+    return selectFeature || featuresArr[0];
   }
 
   render() {
     const {
       classes, hplcMsSt, selectWavelengthAct, updateTicAct, selectCurveAct,
-      feature, zoomInAct, uiSt,
+      feature, zoomInAct, uiSt, ticEntities,
     } = this.props;
     const handleTicChanged = (event) => {
-      updateTicAct(event);
-      selectCurveAct(event.target.value);
+      const selectedPolarity = event.target.value;
+      updateTicAct({ polarity: selectedPolarity });
+      const targetEntity = ticEntities?.find((ent) => (
+        getLcMsInfo(ent).polarity === selectedPolarity
+      ));
+      if (targetEntity?.curveIdx !== undefined) {
+        selectCurveAct(targetEntity.curveIdx);
+      }
     };
     const handleWaveLengthChange = (event) => {
-      [0, 1, 2].forEach((gi) =>
-        zoomInAct({ graphIndex: gi, sweepType: LIST_UI_SWEEP_TYPE.ZOOMRESET })
-      );
+      [0, 1, 2].forEach((gi) => {
+        zoomInAct({ graphIndex: gi, sweepType: LIST_UI_SWEEP_TYPE.ZOOMRESET });
+      });
       selectWavelengthAct(event);
     };
     return (
@@ -472,7 +508,6 @@ class ViewerLineRect extends React.Component {
 const mapStateToProps = (state, props) => (
   {
     curveSt: state.curve,
-    seed: Topic2Seed(state, props),
     tTrEndPts: ToThresEndPts(state, props),
     isUiAddIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
     isUiNoBrushSt: LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
@@ -506,8 +541,6 @@ ViewerLineRect.propTypes = {
   ticEntities: PropTypes.array.isRequired,
   uvvisEntities: PropTypes.array.isRequired,
   mzEntities: PropTypes.array.isRequired,
-  seed: PropTypes.array.isRequired,
-  cLabel: PropTypes.string.isRequired,
   layoutSt: PropTypes.string.isRequired,
   integationSt: PropTypes.object.isRequired,
   feature: PropTypes.object.isRequired,

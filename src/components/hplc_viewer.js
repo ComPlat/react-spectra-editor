@@ -39,15 +39,17 @@ class HPLCViewer extends React.Component { // eslint-disable-line
     if (!entities || entities.length === 0) return (<div />);
     const { curveIdx } = curveSt;
     const entity = entities[curveIdx];
-    const { feature, topic } = entity;
+    if (!entity) return (<div />);
+    const { feature, topic } = entity || {};
     const { ticEntities, uvvisEntities, mzEntities } = splitAndReindexEntities(entities);
+    const displayFeature = feature || (entities[0]?.feature) || (entities[0]?.features?.[0]) || {};
     const { integrations } = integrationSt;
     const currentIntegration = integrations[curveIdx];
 
     return (
       <div className={classes.root}>
         <CmdBar
-          feature={feature}
+          feature={displayFeature}
           operations={operations}
           editorOnly={true}
           hideThreshold={true}
@@ -61,9 +63,9 @@ class HPLCViewer extends React.Component { // eslint-disable-line
                 uvvisEntities={uvvisEntities}
                 mzEntities={mzEntities}
                 topic={topic}
-                xLabel={feature.xUnit}
-                yLabel={feature.yUnit}
-                feature={feature}
+                xLabel={displayFeature?.xUnit || ''}
+                yLabel={displayFeature?.yUnit || ''}
+                feature={displayFeature}
                 jcampIdx={curveIdx}
                 hplcMsSt={hplcMsSt}
               />
@@ -74,7 +76,7 @@ class HPLCViewer extends React.Component { // eslint-disable-line
                 jcampIdx={curveIdx}
                 entityFileNames={entityFileNames}
                 userManualLink={userManualLink}
-                feature={feature}
+                feature={displayFeature}
                 molSvg={molSvg}
                 theoryMass={theoryMass}
                 descriptions=""
@@ -112,7 +114,7 @@ HPLCViewer.propTypes = {
   molSvg: PropTypes.string.isRequired,
   setAllCurvesAct: PropTypes.func.isRequired,
   curveSt: PropTypes.object.isRequired,
-  operations: PropTypes.func.isRequired,
+  operations: PropTypes.array.isRequired,
   userManualLink: PropTypes.object,
   entities: PropTypes.array,
   layoutSt: PropTypes.string.isRequired,

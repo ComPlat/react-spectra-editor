@@ -25,9 +25,12 @@ const PeakGroup = ({
   classes, feature, isSelectingGroupSt, setUiSweepTypeAct,
   graphIndex,
 }) => {
+  if (!feature || !feature.operation) {
+    return null;
+  }
   const { operation } = feature;
-  const { layout } = operation;
-  if (!Format.isLCMsLayout(layout)) {
+  const { layout } = operation || {};
+  if (!layout || !Format.isLCMsLayout(layout)) {
     return null;
   }
   const onSelectPeakGroup = () => {

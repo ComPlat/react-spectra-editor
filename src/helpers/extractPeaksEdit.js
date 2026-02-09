@@ -1,5 +1,4 @@
 /* eslint-disable max-len */
-import { PksEdit } from './converter';
 import { Convert2Peak } from './chem';
 import { FromManualToOffset } from './shift';
 import Format from './format';
@@ -56,7 +55,7 @@ function formatLcmsIntegralsForBackend(hplcMsSt) {
 
 function extractPeaksEdit(hplcMsSt) {
   if (!hplcMsSt || !hplcMsSt.uvvis || !hplcMsSt.uvvis.spectraList) return [];
-  return hplcMsSt.uvvis.spectraList.flatMap(spectrum => spectrum.peaks || []);
+  return hplcMsSt.uvvis.spectraList.flatMap((spectrum) => spectrum.peaks || []);
 }
 
 const extractAutoPeaks = (feature, thresSt, shiftSt, layoutSt, atIndex = 0) => {
