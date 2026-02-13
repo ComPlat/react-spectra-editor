@@ -120,8 +120,9 @@ const normalizeQuillValue = (val) => {
   return val;
 };
 
-const handleDescriptionChanged = (value, onDescriptionChanged) => {
-  onDescriptionChanged(normalizeQuillValue(value));
+const handleDescriptionChanged = (content, delta, source, editor, onDescriptionChanged) => {
+  if (!onDescriptionChanged) return;
+  onDescriptionChanged(normalizeQuillValue(content), delta, source, editor);
 };
 
 const aucValue = (integration) => {
@@ -382,9 +383,9 @@ const InfoPanel = ({
                     className={classNames(classes.quill, 'card-sv-quill')}
                     value={normalizeQuillValue(descriptions)}
                     placeholder={canChangeDescription ? 'Peaks will be written here...' : undefined}
-                    readOnly
+                    readOnly={!canChangeDescription}
                     modules={{ toolbar: false }}
-                    onChange={(value) => handleDescriptionChanged(value, onDescriptionChanged)}
+                    onChange={(content, delta, source, editor) => handleDescriptionChanged(content, delta, source, editor, onDescriptionChanged)}
                   />
                 </div>
               </>
