@@ -382,7 +382,7 @@ const InfoPanel = ({
                     className={classNames(classes.quill, 'card-sv-quill')}
                     value={normalizeQuillValue(descriptions)}
                     placeholder={canChangeDescription ? 'Peaks will be written here...' : undefined}
-                    readOnly
+                    readOnly={!canChangeDescription}
                     modules={{ toolbar: false }}
                     onChange={(value) => handleDescriptionChanged(value, onDescriptionChanged)}
                   />
