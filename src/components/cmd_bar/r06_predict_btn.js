@@ -199,7 +199,7 @@ const renderBtnUnknown = (
 const BtnPredict = ({
   classes, feature, forecast,
   layoutSt, simulationSt, editPeakSt, scanSt, shiftSt, thresSt,
-  integrationSt, multiplicitySt,
+  integrationSt, multiplicitySt, forecastSt,
   setUiViewerTypeAct, curveSt,
 }) => {
   const is13Cor1H = Format.is13CLayout(layoutSt) || Format.is1HLayout(layoutSt);
@@ -212,11 +212,21 @@ const BtnPredict = ({
   const thres = Convert2Thres(feature, thresSt);
   const simuCount = simulationSt.nmrSimPeaks.length;
   const uniqCount = [...new Set(simulationSt.nmrSimPeaks)].length;
+  const { curveIdx } = curveSt;
+  const predictionsByCurve = (forecastSt && forecastSt.predictionsByCurve) || {};
+  const hasCurvePredictions = Object.prototype.hasOwnProperty.call(predictionsByCurve, curveIdx);
+  const hasAnyCurvePredictions = Object.keys(predictionsByCurve).length > 0;
+  const emptyPredictions = { outline: {}, output: { result: [] } };
+  let analysisPredictions = (forecastSt && forecastSt.predictions) || forecast.predictions;
+  if (hasCurvePredictions) {
+    analysisPredictions = predictionsByCurve[curveIdx];
+  } else if (hasAnyCurvePredictions) {
+    analysisPredictions = emptyPredictions;
+  }
   let realCount = 0;
   if (Format.is13CLayout(layoutSt)) {
     realCount = carbonFeatures(peaksEdit, multiplicitySt).length;
   } else {
-    const { curveIdx } = curveSt;
     const { multiplicities } = multiplicitySt;
     const selectedMultiplicity = multiplicities[curveIdx];
     const { stack } = selectedMultiplicity;
@@ -226,7 +236,7 @@ const BtnPredict = ({
   if (is13Cor1H && simuCount === 0) {
     const onClickUnknownCb = onClicUnknown(
       feature, forecast, peaksEdit, layoutSt, scan, shiftSt, thres,
-      forecast.predictions, integrationSt, multiplicitySt, curveSt,
+      analysisPredictions, integrationSt, multiplicitySt, curveSt,
     );
     return renderBtnUnknown(classes, onClickUnknownCb);
   }
@@ -238,7 +248,7 @@ const BtnPredict = ({
     ? (
       onClickReady(
         forecast, peaksEdit, layoutSt, scan, shiftSt, thres,
-        forecast.predictions, integrationSt, multiplicitySt, setUiViewerTypeAct, curveSt,
+        analysisPredictions, integrationSt, multiplicitySt, setUiViewerTypeAct, curveSt,
       )
     )
     : onClickFail(layoutSt, simuCount, realCount);
@@ -263,6 +273,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     integrationSt: state.integration.present,
     multiplicitySt: state.multiplicity.present,
     curveSt: state.curve,
+    forecastSt: state.forecast,
   }
 );
 
@@ -284,6 +295,7 @@ BtnPredict.propTypes = {
   thresSt: PropTypes.object.isRequired,
   integrationSt: PropTypes.object.isRequired,
   multiplicitySt: PropTypes.object.isRequired,
+  forecastSt: PropTypes.object.isRequired,
   setUiViewerTypeAct: PropTypes.func.isRequired,
   curveSt: PropTypes.object,
 };

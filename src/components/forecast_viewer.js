@@ -48,8 +48,18 @@ class ForecastViewer extends React.Component {
   }
 
   initForecastReducer() {
-    const { forecast, initForecastStatusAct, setUiViewerTypeAct } = this.props;
-    initForecastStatusAct(forecast);
+    const {
+      forecast, initForecastStatusAct, setUiViewerTypeAct,
+    } = this.props;
+    const predictionCurveIdx = (
+      forecast
+      && forecast.predictions
+      && Number.isInteger(forecast.predictions.curveIdx)
+    ) ? forecast.predictions.curveIdx : null;
+    const payload = predictionCurveIdx === null
+      ? forecast
+      : { ...forecast, curveIdx: predictionCurveIdx };
+    initForecastStatusAct(payload);
     if (forecast && forecast.predictions) {
       const { running, refreshed } = forecast.predictions;
       if (running || refreshed) setUiViewerTypeAct(LIST_UI_VIEWER_TYPE.ANALYSIS);
@@ -69,7 +79,8 @@ class ForecastViewer extends React.Component {
 
     const { curveIdx } = curveSt;
     const { jcamps } = jcampSt;
-    const comparisons = jcamps[curveIdx].others;
+    const currentJcamp = jcamps && jcamps[curveIdx];
+    const comparisons = currentJcamp && currentJcamp.others ? currentJcamp.others : [];
 
     return (
       <div className={classes.root}>

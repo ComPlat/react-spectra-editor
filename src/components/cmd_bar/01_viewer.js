@@ -12,6 +12,7 @@ import Tooltip from '@mui/material/Tooltip';
 
 import { setUiViewerType } from '../../actions/ui';
 import Cfg from '../../helpers/cfg';
+import Format from '../../helpers/format';
 import { MuButton, commonStyle, focusStyle } from './common';
 import { LIST_UI_VIEWER_TYPE } from '../../constants/list_ui';
 
@@ -73,7 +74,14 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     isfocusSpectrumSt: state.ui.viewer === LIST_UI_VIEWER_TYPE.SPECTRUM,
     isfocusAnalysisSt: state.ui.viewer === LIST_UI_VIEWER_TYPE.ANALYSIS,
-    hideCmdAnaViewerSt: Cfg.hideCmdAnaViewer(state.layout) || props.editorOnly,
+    hideCmdAnaViewerSt: Cfg.hideCmdAnaViewer(state.layout)
+      || (
+        props.editorOnly
+        && !(
+          Format.isNmrLayout(state.layout)
+          || Format.isIrLayout(state.layout)
+        )
+      ),
     disableCmdAnaViewerSt: Cfg.btnCmdAnaViewer(state.layout),
   }
 );

@@ -180,6 +180,7 @@ const SectionUnknown = () => (
 );
 
 const notToRenderAnalysis = (pds) => {
+  if (!pds) return <div />;
   if (pds.running) return <SectionRunning />;
   if (!pds.outline || !pds.outline.code) return <div />;
 
@@ -193,8 +194,8 @@ const sectionSvg = (classes, predictions) => {
   const renderMsg = notToRenderAnalysis(predictions);
   if (renderMsg) return null;
 
-  if (!predictions.output) return null;
-  const targetSvg = predictions.output.result[0].svgs[0];
+  if (!predictions || !predictions.output || !predictions.output.result || !predictions.output.result[0]) return null;
+  const targetSvg = predictions.output.result[0].svgs && predictions.output.result[0].svgs[0];
   if (!targetSvg) return <SectionLoading />;
   return (
     <SvgFileZoomPan

@@ -60,7 +60,7 @@ const sectionTable = (classes, pds) => {
   const renderMsg = notToRenderAnalysis(pds);
   if (renderMsg) return renderMsg;
 
-  if (!pds.output.result || !pds.output.result[0]) return null;
+  if (!pds || !pds.output || !pds.output.result || !pds.output.result[0]) return null;
 
   const { fgs } = pds.output.result[0];
   if (!fgs) return null;
@@ -81,26 +81,41 @@ const sectionTable = (classes, pds) => {
 };
 
 const IrViewer = ({ // eslint-disable-line
-  classes, molecule, inputCb, forecastSt,
-}) => (
-  <div className={classNames(classes.root, 'card-forecast-viewer')}>
-    <Grid className={classNames(classes.container)} container>
-      <Grid item xs={4}>
-        <Paper className={classes.svgRoot}>
-          { sectionSvg(classes, forecastSt.predictions) }
-        </Paper>
+  classes, molecule, inputCb, forecastSt, curveSt,
+}) => {
+  const { curveIdx } = curveSt;
+  const predictionsByCurve = forecastSt.predictionsByCurve || {};
+  const hasCurvePredictions = Object.prototype.hasOwnProperty.call(predictionsByCurve, curveIdx);
+  const hasAnyCurvePredictions = Object.keys(predictionsByCurve).length > 0;
+  const emptyPredictions = { outline: {}, output: { result: [] } };
+  let activePredictions = forecastSt.predictions || emptyPredictions;
+  if (hasCurvePredictions) {
+    activePredictions = predictionsByCurve[curveIdx];
+  } else if (hasAnyCurvePredictions) {
+    activePredictions = emptyPredictions;
+  }
+
+  return (
+    <div className={classNames(classes.root, 'card-forecast-viewer')}>
+      <Grid className={classNames(classes.container)} container>
+        <Grid item xs={4}>
+          <Paper className={classes.svgRoot}>
+            { sectionSvg(classes, activePredictions) }
+          </Paper>
+        </Grid>
+        <Grid item xs={8}>
+          { sectionTable(classes, activePredictions) }
+        </Grid>
       </Grid>
-      <Grid item xs={8}>
-        { sectionTable(classes, forecastSt.predictions) }
-      </Grid>
-    </Grid>
-    { sectionInput(classes, molecule, inputCb) }
-  </div>
-);
+      { sectionInput(classes, molecule, inputCb) }
+    </div>
+  );
+};
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     forecastSt: state.forecast,
+    curveSt: state.curve,
   }
 );
 
@@ -117,6 +132,7 @@ IrViewer.propTypes = {
     PropTypes.bool,
   ]),
   forecastSt: PropTypes.object.isRequired,
+  curveSt: PropTypes.object.isRequired,
 };
 
 IrViewer.defaultProps = {

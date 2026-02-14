@@ -42,7 +42,9 @@ class ViewerLine extends React.Component {
       resetAllAct,
     } = this.props;
     drawDestroy(this.rootKlass);
-    resetAllAct(feature);
+    if (!isHidden) {
+      resetAllAct(feature);
+    }
 
     let xxLabel = xLabel;
     let yyLabel = yLabel;
