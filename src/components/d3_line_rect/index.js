@@ -41,6 +41,19 @@ import { getLcMsInfo } from '../../helpers/extractEntityLCMS';
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.8 / 3); // ROI
 
+const parsePageValue = (feature) => {
+  const raw = feature?.pageSymbol ?? feature?.pageValue ?? feature?.page;
+  if (raw == null) return null;
+  if (typeof raw === 'number') {
+    return Number.isFinite(raw) ? raw : null;
+  }
+  const text = String(raw).split('\n')[0].trim();
+  const match = text.match(/[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?/);
+  if (!match) return null;
+  const value = Number(match[0]);
+  return Number.isFinite(value) ? value : null;
+};
+
 const styles = () => (
   Object.assign(
     {},
@@ -226,7 +239,7 @@ class ViewerLineRect extends React.Component {
 
   componentDidMount() {
     const {
-      curveSt, feature, ticEntities,
+      curveSt, feature, ticEntities, hplcMsSt,
       tTrEndPts, layoutSt,
       isUiAddIntgSt, isUiNoBrushSt,
       integationSt,
@@ -271,6 +284,7 @@ class ViewerLineRect extends React.Component {
     this.multiFocus.create({
       ticEntities,
       curveSt,
+      hplcMsSt,
       tTrEndPts,
       layoutSt,
       sweepExtentSt: sweepExtent[1],
@@ -336,6 +350,7 @@ class ViewerLineRect extends React.Component {
       this.multiFocus.update({
         curveSt,
         ticEntities,
+        hplcMsSt,
         tTrEndPts,
         layoutSt,
         sweepExtentSt: sweepExtent[1],
@@ -359,7 +374,11 @@ class ViewerLineRect extends React.Component {
     if (subViewFeature) {
       const { threshold } = hplcMsSt;
       const curTrEndPts = convertThresEndPts(subViewFeature, threshold.value);
-      const { data, pageValue } = subViewFeature;
+      const { data } = subViewFeature;
+      const pageValue = parsePageValue(subViewFeature);
+      const labelValue = Number.isFinite(pageValue)
+        ? pageValue
+        : (subViewFeature?.pageValue ?? subViewFeature?.page ?? null);
       const currentData = data[0];
       const { x, y } = currentData;
       const subSeed = x.map((d, index) => {
@@ -376,7 +395,12 @@ class ViewerLineRect extends React.Component {
           uiSt,
         });
       }
-      drawLabel(this.rootKlassRect, `${pageValue} min`, 'm/z', 'Intensity');
+      drawLabel(
+        this.rootKlassRect,
+        labelValue != null ? `${labelValue} min` : null,
+        'm/z',
+        'Intensity',
+      );
       drawDisplay(this.rootKlassRect, false);
     }
   }
@@ -438,7 +462,7 @@ class ViewerLineRect extends React.Component {
     if (featuresArr.length === 0) return null;
 
     const pageValues = featuresArr
-      .map((fe) => Number(fe?.pageValue))
+      .map((fe) => parsePageValue(fe))
       .filter((val) => Number.isFinite(val));
     if (pageValues.length === 0) return featuresArr[0];
 
@@ -451,7 +475,10 @@ class ViewerLineRect extends React.Component {
       updateCurrentPageValueAct(closestPage);
     }
 
-    const selectFeature = featuresArr.find((fe) => Number(fe?.pageValue) === closestPage);
+    const selectFeature = featuresArr.find((fe) => {
+      const value = parsePageValue(fe);
+      return Number.isFinite(value) && Math.abs(value - closestPage) < 1e-9;
+    });
     return selectFeature || featuresArr[0];
   }
 

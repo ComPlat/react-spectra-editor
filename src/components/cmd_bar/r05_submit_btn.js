@@ -218,7 +218,7 @@ const onClickCb = (
       if (ticPolarity === 'positive') {
         payload.lcms_tic = 'POSITIVE';
       } else if (ticPolarity === 'negative') {
-        payload.lcms_tic = 'NEGATIV';
+        payload.lcms_tic = 'NEGATIVE';
       } else if (ticPolarity === 'neutral') {
         payload.lcms_tic = 'NEUTRAL';
       } else if (ticPolarity) {

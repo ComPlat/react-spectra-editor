@@ -19,6 +19,16 @@ import { getLcMsInfo } from '../../helpers/extractEntityLCMS';
 
 const d3 = require('d3');
 
+const pickTicIndex = (ticEntities, curveIdx, polarity) => {
+  if (!Array.isArray(ticEntities) || ticEntities.length === 0) return 0;
+  if (Number.isInteger(curveIdx) && curveIdx >= 0 && curveIdx < ticEntities.length) {
+    return curveIdx;
+  }
+  if (!polarity) return 0;
+  const idx = ticEntities.findIndex((ent) => getLcMsInfo(ent).polarity === polarity);
+  return idx >= 0 ? idx : 0;
+};
+
 class MultiFocus {
   constructor(props) {
     const {
@@ -128,7 +138,8 @@ class MultiFocus {
   setDataParams(tTrEndPts, layout, jcampIdx = 0) {
     this.data = [];
     this.otherLineData = [];
-    this.ticEntities.forEach((entry, idx) => {
+    const ticEntities = Array.isArray(this.ticEntities) ? this.ticEntities : [];
+    ticEntities.forEach((entry, idx) => {
       const { topic, feature } = entry;
       const { polarity = 'neutral' } = getLcMsInfo(entry);
       const fixedColor = this.colorForPolarity(polarity);
@@ -250,6 +261,7 @@ class MultiFocus {
   create({
     ticEntities,
     curveSt,
+    hplcMsSt,
     tTrEndPts,
     layoutSt,
     sweepExtentSt, isUiNoBrushSt,
@@ -259,9 +271,10 @@ class MultiFocus {
     MountClip(this);
 
     const { curveIdx, isShowAllCurve } = curveSt;
-    const jcampIdx = curveIdx;
+    const selectedPolarity = hplcMsSt?.tic?.polarity;
+    const jcampIdx = pickTicIndex(ticEntities, curveIdx, selectedPolarity);
     this.isShowAllCurves = isShowAllCurve;
-    this.ticEntities = ticEntities;
+    this.ticEntities = Array.isArray(ticEntities) ? ticEntities : [];
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, false);
     this.setTip();
@@ -290,6 +303,7 @@ class MultiFocus {
     tTrEndPts,
     layoutSt,
     ticEntities,
+    hplcMsSt,
     sweepExtentSt, isUiNoBrushSt, uiSt,
   }) {
     this.svg = d3.select(this.rootKlass).select(this.brushClass);
@@ -297,9 +311,10 @@ class MultiFocus {
     this.scales = InitScale(this, false);
 
     const { curveIdx, isShowAllCurve } = curveSt;
-    const jcampIdx = curveIdx;
+    const selectedPolarity = hplcMsSt?.tic?.polarity;
+    const jcampIdx = pickTicIndex(ticEntities, curveIdx, selectedPolarity);
     this.isShowAllCurves = isShowAllCurve;
-    this.ticEntities = ticEntities;
+    this.ticEntities = Array.isArray(ticEntities) ? ticEntities : [];
     this.uiSt = uiSt;
 
     this.setDataParams(tTrEndPts, layoutSt, jcampIdx);

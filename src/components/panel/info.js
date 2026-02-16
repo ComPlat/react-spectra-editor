@@ -156,11 +156,8 @@ const handleDescriptionChanged = (content, delta, source, editor, onDescriptionC
 };
 
 const aucValue = (integration, hplcMsSt) => {
-  if (!integration) {
-    return '';
-  }
   const values = [];
-  const stackIntegration = integration.stack;
+  const stackIntegration = integration?.stack;
   if (Array.isArray(stackIntegration)) {
     let sumVal = 0.0;
     stackIntegration.forEach((inte) => {
