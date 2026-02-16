@@ -35,6 +35,7 @@ class HPLCViewer extends React.Component { // eslint-disable-line
     const {
       classes, curveSt, operations, entityFileNames,
       entities, userManualLink, molSvg, theoryMass, integrationSt, hplcMsSt,
+      descriptions, canChangeDescription, onDescriptionChanged, editorOnly,
     } = this.props;
     if (!entities || entities.length === 0) return (<div />);
     const { curveIdx } = curveSt;
@@ -79,10 +80,11 @@ class HPLCViewer extends React.Component { // eslint-disable-line
                 feature={displayFeature}
                 molSvg={molSvg}
                 theoryMass={theoryMass}
-                descriptions=""
+                descriptions={descriptions}
                 integration={currentIntegration}
-                canChangeDescription={() => {}}
-                onDescriptionChanged={() => {}}
+                canChangeDescription={canChangeDescription}
+                onDescriptionChanged={onDescriptionChanged}
+                editorOnly={editorOnly}
               />
             </Grid>
           </Grid>
@@ -121,6 +123,10 @@ HPLCViewer.propTypes = {
   theoryMass: PropTypes.string,
   integrationSt: PropTypes.object.isRequired,
   hplcMsSt: PropTypes.object.isRequired,
+  descriptions: PropTypes.array.isRequired,
+  canChangeDescription: PropTypes.bool.isRequired,
+  onDescriptionChanged: PropTypes.func,
+  editorOnly: PropTypes.bool.isRequired,
 };
 
 HPLCViewer.defaultProps = {
@@ -130,6 +136,7 @@ HPLCViewer.defaultProps = {
   xLabel: '',
   yLabel: '',
   entities: [],
+  onDescriptionChanged: () => {},
 };
 
 export default compose(

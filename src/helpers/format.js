@@ -143,25 +143,32 @@ const formatedLCMS = (hplcMsSt, isAscend, decimal) => {
       const peakLines = sortedPeaks.map((peak) => {
         const rt = peak.x.toFixed(3);
         const percent = ((peak.y / maxIntensity) * 100).toFixed(1);
-        return `    - ${rt} min (${percent}%)`;
+        return `${rt} min (${percent}%)`;
       });
 
-      result += `${peakLines.join('\n')}\n`;
+      result += `Peaks: ${peakLines.join(', ')}\n`;
     }
 
-    if (integrations.length > 0 && integrations[0].stack?.length > 0) {
-      const { stack, refArea = 1 } = integrations[0];
-      const sortedIntegrations = [...stack].sort((a, b) => a.xL - b.xL);
+    const stack = integrations?.[0]?.stack;
+    const hasStack = Array.isArray(stack) && stack.length > 0;
+    const hasList = !hasStack && Array.isArray(integrations) && integrations.length > 0;
+    if (hasStack || hasList) {
+      const entries = hasStack ? stack : integrations;
+      const refAreaCandidate = hasStack
+        ? integrations?.[0]?.refArea
+        : integrations?.[0]?.refArea ?? integrations?.[0]?.area;
+      const refArea = refAreaCandidate && refAreaCandidate > 0 ? refAreaCandidate : 1;
+      const sortedIntegrations = [...entries].sort((a, b) => a.xL - b.xL);
 
-      result += '    Integrations:\n';
-
-      sortedIntegrations.forEach((integ) => {
+      const integrationLines = sortedIntegrations.map((integ) => {
         const rt = integ.xL.toFixed(3);
         const area = integ.area || integ.absoluteArea || 0;
         const percent = ((area / refArea) * 100).toFixed(1);
-        result += `      - ${rt} min (${percent}%)\n`;
+        return `${rt} min (${percent}%)`;
       });
+      result += `Integrations: ${integrationLines.join(', ')}\n`;
     }
+    result += '\n';
   });
 
   const polarity = tic?.polarity || (tic?.isNegative ? 'negative' : 'positive');
@@ -207,10 +214,10 @@ const formatedLCMS = (hplcMsSt, isAscend, decimal) => {
       const lines = sortedPeaks.map((peak) => {
         const mass = fixDigit(peak.x, decimal);
         const percent = Math.round((peak.y / maxIntensity) * 100);
-        return `  - ${mass} (${percent}%)`;
+        return `${mass} (${percent}%)`;
       });
 
-      result += lines.join('\n');
+      result += `  ${lines.join(', ')}`;
     } else {
       result += '\nMS: No data for current retention time.\n';
     }

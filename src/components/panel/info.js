@@ -184,11 +184,15 @@ const aucValue = (integration, hplcMsSt) => {
     const integrations = spectrum?.integrations || [];
 
     if (integrations.length > 0) {
-      const sumArea = integrations.reduce((sum, integ) => sum + (integ.area || 0), 0);
+      const sumArea = integrations.reduce(
+        (sum, integ) => sum + (integ.absoluteArea ?? integ.area ?? 0),
+        0,
+      );
 
       const integrationStrings = integrations.map((integ) => {
-        const areaVal = integ.area?.toFixed(2) ?? '0.00';
-        const percent = sumArea > 0 ? ((integ.area * 100) / sumArea).toFixed(2) : '0.00';
+        const rawArea = integ.absoluteArea ?? integ.area ?? 0;
+        const areaVal = rawArea.toFixed(2);
+        const percent = sumArea > 0 ? ((rawArea * 100) / sumArea).toFixed(2) : '0.00';
         return `${areaVal} (${percent}%)`;
       });
 
@@ -283,7 +287,7 @@ const InfoPanel = ({
   classes, expand, feature, integration, editorOnly, molSvg, descriptions,
   layoutSt, simulationSt, shiftSt, curveSt, exactMass,
   onExapnd, canChangeDescription, onDescriptionChanged, detectorSt,
-  metaSt, updateDSCMetaDataAct, hplcMsSt,
+  metaSt, updateDSCMetaDataAct, hplcMsSt, entities,
 }) => {
   if (!feature) return null;
   const {
@@ -292,6 +296,13 @@ const InfoPanel = ({
   const { dscMetaData } = metaSt;
   const { curveIdx } = curveSt;
   const { curves } = detectorSt;
+  const currentEntity = Array.isArray(entities) ? entities[curveIdx] : null;
+  const entityTitle = currentEntity?.entity?.title
+    || currentEntity?.title
+    || currentEntity?.spectra?.[0]?.title
+    || currentEntity?.entity?.spectra?.[0]?.title
+    || '';
+  const displayTitle = title || entityTitle;
 
   const getSelectedDetectorForCurve = (_detectorSt, targetCurveIdx) => {
     const targetCurve = curves.find((curve) => curve.curveIdx === targetCurveIdx);
@@ -345,7 +356,7 @@ const InfoPanel = ({
       <div className={classNames(classes.panelDetail)}>
         <div className={classNames(classes.rowRoot, classes.rowOdd)}>
           <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Title : </span>
-          <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{ title }</span>
+          <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{ displayTitle }</span>
         </div>
         {
           Format.isNmrLayout(layoutSt)
@@ -511,6 +522,7 @@ InfoPanel.propTypes = {
   metaSt: PropTypes.object.isRequired,
   updateDSCMetaDataAct: PropTypes.func.isRequired,
   hplcMsSt: PropTypes.object.isRequired,
+  entities: PropTypes.array,
 };
 
 export default connect( // eslint-disable-line

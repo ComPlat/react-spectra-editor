@@ -135,7 +135,6 @@ class LayerInit extends React.Component {
 
     const xxLabel = (!xLabel && xLabel === '' && target && target.xUnit) ? `X (${target.xUnit})` : xLabel;
     const yyLabel = (!yLabel && yLabel === '' && target && target.yUnit) ? `Y (${target.yUnit})` : yLabel;
-
     const hasMultiEntities = Array.isArray(multiEntities) && multiEntities.length > 0;
     const isMultiSpectra = Array.isArray(multiEntities) && multiEntities.length > 1;
     if (hasMultiEntities && (Format.isLCMsLayout(layout) || isLcMsGroup(multiEntities))) {
@@ -146,6 +145,10 @@ class LayerInit extends React.Component {
           molSvg={molSvg}
           theoryMass={theoryMass}
           operations={operations}
+          descriptions={descriptions}
+          canChangeDescription={canChangeDescription}
+          onDescriptionChanged={onDescriptionChanged}
+          editorOnly={editorOnly}
         />
       );
     }

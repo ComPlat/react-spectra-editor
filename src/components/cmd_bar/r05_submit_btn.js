@@ -213,6 +213,7 @@ const onClickCb = (
     if (layoutSt === 'LC/MS') {
       payload.lcms_peaks = formatLcmsPeaksForBackend(hplcMsSt);
       payload.lcms_integrals = formatLcmsIntegralsForBackend(hplcMsSt);
+      payload.lcms_peaks_text = Format.formatedLCMS(hplcMsSt, isAscend, decimalSt);
       payload.lcms_uvvis_wavelength = hplcMsSt?.uvvis?.selectedWaveLength ?? null;
       const ticPolarity = hplcMsSt?.tic?.polarity;
       if (ticPolarity === 'positive') {
