@@ -48,9 +48,12 @@ const styles = () => ({
   cvViewerCol: {
     height: '100%',
     minHeight: 0,
+    display: 'flex',
+    flexDirection: 'column',
   },
-  cvPanelRow: {
-    flex: '0 0 auto',
+  cvViewerWrap: {
+    flex: '1 1 auto',
+    minHeight: 0,
   },
   cvPanelBelow: {
     marginTop: 16,
@@ -105,13 +108,24 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
         <div className={classNames('react-spectrum-editor', isCyclicVolta && classes.cvEditor)}>
           <Grid container className={isCyclicVolta ? classes.cvTopRow : undefined}>
             <Grid item xs={9} className={isCyclicVolta ? classes.cvViewerCol : undefined}>
-              <ViewerMulti
-                entities={entities}
-                topic={topic}
-                xLabel={feature.xUnit}
-                yLabel={feature.yUnit}
-                feature={feature}
-              />
+              <div className={isCyclicVolta ? classes.cvViewerWrap : undefined}>
+                <ViewerMulti
+                  entities={entities}
+                  topic={topic}
+                  xLabel={feature.xUnit}
+                  yLabel={feature.yUnit}
+                  feature={feature}
+                />
+              </div>
+              {isCyclicVolta ? (
+                <div className={classes.cvPanelBelow}>
+                  <CyclicVoltammetryPanel
+                    jcampIdx={curveIdx}
+                    feature={feature}
+                    userManualLink={userManualLink ? userManualLink.cv : undefined}
+                  />
+                </div>
+              ) : null}
             </Grid>
             <Grid item xs={3} align="center">
               <PanelViewer
@@ -130,15 +144,6 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
               />
             </Grid>
           </Grid>
-          {isCyclicVolta ? (
-            <div className={classNames(classes.cvPanelBelow, classes.cvPanelRow)}>
-              <CyclicVoltammetryPanel
-                jcampIdx={curveIdx}
-                feature={feature}
-                userManualLink={userManualLink ? userManualLink.cv : undefined}
-              />
-            </div>
-          ) : null}
         </div>
       </div>
     );

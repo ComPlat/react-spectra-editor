@@ -27,7 +27,10 @@ import { LIST_UI_SWEEP_TYPE } from '../../constants/list_ui';
 import { GetCyclicVoltaRatio, GetCyclicVoltaPeakSeparate } from '../../helpers/chem';
 import Format from '../../helpers/format';
 
-const EXPANDED_HEIGHT = 320;
+const MAX_VISIBLE_ROWS = 6;
+const ROW_HEIGHT_PX = 28;
+const HEADER_HEIGHT_PX = 24;
+const EXPANDED_HEIGHT = HEADER_HEIGHT_PX + (MAX_VISIBLE_ROWS * ROW_HEIGHT_PX);
 
 const styles = () => ({
   panel: {
@@ -38,7 +41,7 @@ const styles = () => ({
   },
   panelHeader: {
     backgroundColor: '#eee',
-    padding: '10px 12px',
+    padding: '4px 8px',
     display: 'flex',
     alignItems: 'center',
   },
@@ -54,15 +57,15 @@ const styles = () => ({
     gap: 4,
   },
   toggleBtn: {
-    padding: 4,
+    padding: 0,
   },
   table: {
     width: '100%',
     overflowWrap: 'anywhere',
-    fontSize: '14px !important',
+    fontSize: '11px !important',
   },
   tableWrap: {
-    padding: '8px 12px 12px',
+    padding: '3px 6px 5px',
     height: 'auto',
     maxHeight: EXPANDED_HEIGHT,
     overflowY: 'auto',
@@ -71,7 +74,7 @@ const styles = () => ({
   },
   tableWrapCollapsed: {
     maxHeight: 0,
-    padding: '0 12px',
+    padding: '0 5px',
     overflow: 'hidden',
   },
   tableHeadRow: {
@@ -80,6 +83,7 @@ const styles = () => ({
   tableHeadCell: {
     fontWeight: 600,
     color: '#333',
+    fontSize: '11px !important',
   },
   tableBodyRow: {
     '&:nth-of-type(even)': {
@@ -93,7 +97,7 @@ const styles = () => ({
   cellSelected: {
     backgroundColor: '#2196f3',
     color: '#fff',
-    fontSize: '14px !important',
+    fontSize: '13px !important',
   },
   btnRemove: {
     color: 'red',
@@ -102,9 +106,10 @@ const styles = () => ({
     color: 'green',
   },
   tTxt: {
-    padding: '10px 12px',
-    lineHeight: 1.4,
+    padding: '5px 2px',
+    lineHeight: 1.2,
     verticalAlign: 'top',
+    fontSize: '11px !important',
   },
   infoIcon: {
     width: '15px',
@@ -340,7 +345,7 @@ https://doi.org/10.1021/ac60242a030</i>
                   align="left"
                   className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
                 >
-                  <Checkbox checked={row.isRef} onChange={row.onCheckRefChanged} />
+                  <Checkbox size="small" checked={row.isRef} onChange={row.onCheckRefChanged} sx={{ padding: 0 }} />
                 </TableCell>
                 <TableCell
                   align="left"
