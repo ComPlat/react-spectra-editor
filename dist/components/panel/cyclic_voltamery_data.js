@@ -30,7 +30,10 @@ react/no-unused-prop-types, react/jsx-closing-tag-location, max-len, react/jsx-o
 react/jsx-indent, react/no-unescaped-entities, react/jsx-wrap-multilines, camelcase, no-shadow,
 arrow-body-style, react/function-component-definition */
 
-const EXPANDED_HEIGHT = 320;
+const MAX_VISIBLE_ROWS = 6;
+const ROW_HEIGHT_PX = 28;
+const HEADER_HEIGHT_PX = 24;
+const EXPANDED_HEIGHT = HEADER_HEIGHT_PX + MAX_VISIBLE_ROWS * ROW_HEIGHT_PX;
 const styles = () => ({
   panel: {
     backgroundColor: '#f7f7f7',
@@ -40,7 +43,7 @@ const styles = () => ({
   },
   panelHeader: {
     backgroundColor: '#eee',
-    padding: '10px 12px',
+    padding: '4px 8px',
     display: 'flex',
     alignItems: 'center'
   },
@@ -56,15 +59,15 @@ const styles = () => ({
     gap: 4
   },
   toggleBtn: {
-    padding: 4
+    padding: 0
   },
   table: {
     width: '100%',
     overflowWrap: 'anywhere',
-    fontSize: '14px !important'
+    fontSize: '11px !important'
   },
   tableWrap: {
-    padding: '8px 12px 12px',
+    padding: '3px 6px 5px',
     height: 'auto',
     maxHeight: EXPANDED_HEIGHT,
     overflowY: 'auto',
@@ -73,7 +76,7 @@ const styles = () => ({
   },
   tableWrapCollapsed: {
     maxHeight: 0,
-    padding: '0 12px',
+    padding: '0 5px',
     overflow: 'hidden'
   },
   tableHeadRow: {
@@ -81,7 +84,8 @@ const styles = () => ({
   },
   tableHeadCell: {
     fontWeight: 600,
-    color: '#333'
+    color: '#333',
+    fontSize: '11px !important'
   },
   tableBodyRow: {
     '&:nth-of-type(even)': {
@@ -95,7 +99,7 @@ const styles = () => ({
   cellSelected: {
     backgroundColor: '#2196f3',
     color: '#fff',
-    fontSize: '14px !important'
+    fontSize: '13px !important'
   },
   btnRemove: {
     color: 'red'
@@ -104,9 +108,10 @@ const styles = () => ({
     color: 'green'
   },
   tTxt: {
-    padding: '10px 12px',
-    lineHeight: 1.4,
-    verticalAlign: 'top'
+    padding: '5px 2px',
+    lineHeight: 1.2,
+    verticalAlign: 'top',
+    fontSize: '11px !important'
   },
   infoIcon: {
     width: '15px',
@@ -350,8 +355,12 @@ const CyclicVoltammetryPanel = ({
               align: "left",
               className: (0, _classnames.default)(classes.tTxt, classes.square, 'txt-sv-panel-txt'),
               children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Checkbox, {
+                size: "small",
                 checked: row.isRef,
-                onChange: row.onCheckRefChanged
+                onChange: row.onCheckRefChanged,
+                sx: {
+                  padding: 0
+                }
               })
             }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
               align: "left",

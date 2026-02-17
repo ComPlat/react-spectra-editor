@@ -50,10 +50,13 @@ const styles = () => ({
   },
   cvViewerCol: {
     height: '100%',
-    minHeight: 0
+    minHeight: 0,
+    display: 'flex',
+    flexDirection: 'column'
   },
-  cvPanelRow: {
-    flex: '0 0 auto'
+  cvViewerWrap: {
+    flex: '1 1 auto',
+    minHeight: 0
   },
   cvPanelBelow: {
     marginTop: 16,
@@ -119,22 +122,32 @@ class MultiJcampsViewer extends _react.default.Component {
         operations: operations,
         editorOnly: true,
         hideThreshold: !_format.default.isNmrLayout(layoutSt)
-      }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
         className: (0, _classnames.default)('react-spectrum-editor', isCyclicVolta && classes.cvEditor),
-        children: [/*#__PURE__*/(0, _jsxRuntime.jsxs)(_Grid.default, {
+        children: /*#__PURE__*/(0, _jsxRuntime.jsxs)(_Grid.default, {
           container: true,
           className: isCyclicVolta ? classes.cvTopRow : undefined,
-          children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
+          children: [/*#__PURE__*/(0, _jsxRuntime.jsxs)(_Grid.default, {
             item: true,
             xs: 9,
             className: isCyclicVolta ? classes.cvViewerCol : undefined,
-            children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_index3.default, {
-              entities: entities,
-              topic: topic,
-              xLabel: feature.xUnit,
-              yLabel: feature.yUnit,
-              feature: feature
-            })
+            children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+              className: isCyclicVolta ? classes.cvViewerWrap : undefined,
+              children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_index3.default, {
+                entities: entities,
+                topic: topic,
+                xLabel: feature.xUnit,
+                yLabel: feature.yUnit,
+                feature: feature
+              })
+            }), isCyclicVolta ? /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+              className: classes.cvPanelBelow,
+              children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_cyclic_voltamery_data.default, {
+                jcampIdx: curveIdx,
+                feature: feature,
+                userManualLink: userManualLink ? userManualLink.cv : undefined
+              })
+            }) : null]
           }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
             item: true,
             xs: 3,
@@ -154,14 +167,7 @@ class MultiJcampsViewer extends _react.default.Component {
               hideCyclicVolta: isCyclicVolta
             })
           })]
-        }), isCyclicVolta ? /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-          className: (0, _classnames.default)(classes.cvPanelBelow, classes.cvPanelRow),
-          children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_cyclic_voltamery_data.default, {
-            jcampIdx: curveIdx,
-            feature: feature,
-            userManualLink: userManualLink ? userManualLink.cv : undefined
-          })
-        }) : null]
+        })
       })]
     });
   }
