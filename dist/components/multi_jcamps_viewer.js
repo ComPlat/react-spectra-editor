@@ -59,7 +59,8 @@ const styles = () => ({
     minHeight: 0
   },
   cvPanelBelow: {
-    marginTop: 16,
+    marginTop: 'auto',
+    paddingTop: 8,
     width: '100%'
   }
 });

@@ -26,6 +26,15 @@ const styles = () => ({
   },
   fieldUnit: {
     width: 75
+  },
+  toggleGroup: {
+    height: 26
+  },
+  toggleBtn: {
+    fontSize: 10,
+    minHeight: 26,
+    padding: '0 6px',
+    textTransform: 'none'
   }
 });
 const units = ['cm²', 'mm²'];
@@ -80,7 +89,7 @@ const CvDensityControls = ({
     }
   };
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
-    className: classes.groupRight,
+    className: classes.group,
     children: [/*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
       className: (0, _classnames.default)(classes.fieldArea),
       variant: "outlined",
@@ -131,14 +140,14 @@ const CvDensityControls = ({
       size: "small",
       value: useCurrentDensity ? 'density' : 'current',
       onChange: handleToggle,
-      className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-layout'),
+      className: (0, _classnames.default)(classes.selectInput, classes.toggleGroup, 'input-sv-bar-layout'),
       children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.ToggleButton, {
         value: "current",
-        className: (0, _classnames.default)(classes.txtOpt),
+        className: (0, _classnames.default)(classes.txtOpt, classes.toggleBtn),
         children: "Current"
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.ToggleButton, {
         value: "density",
-        className: (0, _classnames.default)(classes.txtOpt),
+        className: (0, _classnames.default)(classes.txtOpt, classes.toggleBtn),
         children: "Current / Area"
       })]
     })]
