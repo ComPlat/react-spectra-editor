@@ -45,22 +45,23 @@ const tpStyle = () => {
   const style = stBorder + stBorderRadius + stBackground + stColor + stPadding + stOpacity + stPadding + stZindex + stFontFamily;
   return style;
 };
-const tpDiv = (d, digits) => `
+const tpDiv = (d, digits, yFactor = 1) => `
   <div
     class="peak-tp"
     style="${tpStyle()}"
   >
     <span> x: ${_format.default.fixDigit(d.x, digits)}</span>
     <br/>
-    <span> y: ${d3.format('.2~e')(d.y)}</span>
+    <span> y: ${d3.format('.2~e')(d.y * (yFactor || 1))}</span>
   <div>
   `;
 const InitTip = () => {
   d3.select('.peak-tp').remove();
   const tip = (0, _d3Tip.default)().attr('class', 'd3-tip').html(({
     d,
-    layout
-  }) => tpDiv(d, _format.default.spectraDigit(layout)));
+    layout,
+    yFactor
+  }) => tpDiv(d, _format.default.spectraDigit(layout), yFactor || 1));
   return tip;
 };
 exports.InitTip = InitTip;

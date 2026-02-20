@@ -500,7 +500,7 @@ class DemoWriteIr extends _react.default.Component {
     console.log(analysis);
     console.log(integration);
     console.log(multiplicity);
-    if (shift.ref.label) {
+    if (shift?.ref?.label) {
       const label = this.rmDollarSign(shift.ref.label);
       alert(`Peaks: ${body}` + '\n' + '- - - - - - - - - - -' + '\n' + `Shift solvent = ${label}, ${shift.ref.value}ppm` + '\n');
     } else {

@@ -24,6 +24,7 @@ var _r07_wavelength_btn = _interopRequireDefault(require("./r07_wavelength_btn")
 var _pecker = _interopRequireDefault(require("./07_pecker"));
 var _r08_change_axes = _interopRequireDefault(require("./r08_change_axes"));
 var _r09_detector = _interopRequireDefault(require("./r09_detector"));
+var _r10_cv_density = _interopRequireDefault(require("./r10_cv_density"));
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, function-paren-newline,
 react/function-component-definition, react/require-default-props */
@@ -60,7 +61,7 @@ const CmdBar = ({
   }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r01_layout.default, {
     feature: feature,
     hasEdit: hasEdit
-  }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r07_wavelength_btn.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r08_change_axes.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r09_detector.default, {})]
+  }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r07_wavelength_btn.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r10_cv_density.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r08_change_axes.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r09_detector.default, {})]
 });
 const mapStateToProps = (state, _) => (
 // eslint-disable-line

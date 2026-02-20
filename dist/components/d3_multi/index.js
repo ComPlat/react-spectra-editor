@@ -97,6 +97,11 @@ class ViewerMulti extends _react.default.Component {
       xxLabel = xUnit === '' ? xLabel : xUnit;
       yyLabel = yUnit === '' ? yLabel : yUnit;
     }
+    if (cyclicvoltaSt && cyclicvoltaSt.useCurrentDensity) {
+      const areaUnit = cyclicvoltaSt.areaUnit || 'cm²';
+      const baseUnit = /mA/i.test(String(yyLabel)) ? 'mA' : 'A';
+      yyLabel = `Current density in ${baseUnit}/${areaUnit}`;
+    }
     const filterSeed = seed;
     const filterPeak = peak;
     if (_format.default.isCyclicVoltaLayout(layoutSt)) {
@@ -236,6 +241,11 @@ class ViewerMulti extends _react.default.Component {
       } = selectedAxes;
       xxLabel = xUnit === '' ? xLabel : xUnit;
       yyLabel = yUnit === '' ? yLabel : yUnit;
+    }
+    if (cyclicvoltaSt && cyclicvoltaSt.useCurrentDensity) {
+      const areaUnit = cyclicvoltaSt.areaUnit || 'cm²';
+      const baseUnit = /mA/i.test(String(yyLabel)) ? 'mA' : 'A';
+      yyLabel = `Current density in ${baseUnit}/${areaUnit}`;
     }
     const filterSeed = seed;
     const filterPeak = peak;
