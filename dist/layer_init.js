@@ -11,6 +11,7 @@ var _reactRedux = require("react-redux");
 var _redux = require("redux");
 var _styles = require("@mui/styles");
 var _submit = require("./actions/submit");
+var _layout = require("./actions/layout");
 var _manager = require("./actions/manager");
 var _meta = require("./actions/meta");
 var _jcamp = require("./actions/jcamp");
@@ -62,7 +63,8 @@ class LayerInit extends _react.default.Component {
       resetInitCommonWithIntergationAct,
       resetDetectorAct,
       updateDSCMetaDataAct,
-      resetMultiplicityAct
+      resetMultiplicityAct,
+      updateLayoutAct
     } = this.props;
     resetInitCommonAct();
     resetDetectorAct();
@@ -70,6 +72,7 @@ class LayerInit extends _react.default.Component {
       layout,
       features
     } = entity;
+    updateLayoutAct(layout);
     if (_format.default.isMsLayout(layout)) {
       // const { autoPeak, editPeak } = features; // TBD
       const autoPeak = features.autoPeak || features[0];
@@ -229,6 +232,7 @@ const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   resetDetectorAct: _manager.resetDetector,
   resetMultiplicityAct: _manager.resetMultiplicity,
   updateOperationAct: _submit.updateOperation,
+  updateLayoutAct: _layout.updateLayout,
   updateMetaPeaksAct: _meta.updateMetaPeaks,
   addOthersAct: _jcamp.addOthers,
   setAllCurvesAct: _curve.setAllCurves,
@@ -255,6 +259,7 @@ LayerInit.propTypes = {
   resetInitMsAct: _propTypes.default.func.isRequired,
   resetInitCommonWithIntergationAct: _propTypes.default.func.isRequired,
   updateOperationAct: _propTypes.default.func.isRequired,
+  updateLayoutAct: _propTypes.default.func.isRequired,
   updateMetaPeaksAct: _propTypes.default.func.isRequired,
   addOthersAct: _propTypes.default.func.isRequired,
   canChangeDescription: _propTypes.default.bool.isRequired,
