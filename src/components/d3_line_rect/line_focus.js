@@ -293,12 +293,12 @@ class LineFocus {
       .merge(auc)
       .attr('d', (d) => integCurve(d))
       .attr('id', (d) => `auc${itgIdTag(d)}`)
-      .on('mouseover', function () {
+      .on('mouseover', function handleAucMouseover() {
         d3.select(this)
           .attr('stroke', 'blue')
           .style('fill', 'blue');
       })
-      .on('mouseout', function () {
+      .on('mouseout', function handleAucMouseout() {
         d3.select(this)
           .attr('stroke', 'none')
           .style('fill', 'red')
@@ -554,10 +554,7 @@ class LineFocus {
     MountClip(this);
 
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
-    if (!this.root || this.root.empty()) {
-      console.error('Failed to initialize root element');
-      return;
-    }
+    if (!this.root || this.root.empty()) return;
 
     this.scales = InitScale(this, false);
     this.setTip();
