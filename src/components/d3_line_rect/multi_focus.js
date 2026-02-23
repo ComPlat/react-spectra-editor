@@ -346,7 +346,7 @@ class MultiFocus {
     const marker = this.root.selectAll('.tic-page-marker')
       .data(hasValue ? [currentPageValue] : []);
     marker.exit().remove();
-    
+
     if (!hasValue) return;
     const { xt } = TfRescale(this);
     marker.enter()
