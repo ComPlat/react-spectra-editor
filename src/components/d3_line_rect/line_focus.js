@@ -74,7 +74,7 @@ class LineFocus {
   getShouldUpdate(hplcMsSt) {
     const {
       prevXt, prevYt, prevLySt, prevItSt,
-      prevTePt, prevData,
+      prevTePt, prevData, prevDataSig, prevIntegrationSig, prevSpectrumKey,
     } = this.shouldUpdate;
     const { xt, yt } = TfRescale(this);
     const sameXY = xt(1.1) === prevXt && prevYt === yt(1.1);
@@ -83,12 +83,24 @@ class LineFocus {
     const currentSpectrum = hplcMsSt?.uvvis?.currentSpectrum;
     const sameItSt = prevItSt === currentSpectrum?.integrations?.length;
     const sameData = prevData === this.data.length;
+    const firstPt = this.data[0];
+    const lastPt = this.data[this.data.length - 1];
+    const dataSig = `${this.data.length}-${firstPt?.y ?? ''}-${lastPt?.y ?? ''}`;
+    const sameDataSig = prevDataSig === dataSig;
+    const spectrumKey = currentSpectrum?.pageValue ?? hplcMsSt?.uvvis?.selectedWaveLength ?? '';
+    const sameSpectrumKey = prevSpectrumKey === spectrumKey;
+    const integrations = currentSpectrum?.integrations || [];
+    const firstIntegration = integrations[0];
+    const lastIntegration = integrations[integrations.length - 1];
+    const integrationSig = `${integrations.length}-${firstIntegration?.xL ?? ''}-${firstIntegration?.xU ?? ''}-${lastIntegration?.xL ?? ''}-${lastIntegration?.xU ?? ''}-${currentSpectrum?.refArea ?? ''}-${currentSpectrum?.refFactor ?? ''}`;
+    const sameIntegrationSig = prevIntegrationSig === integrationSig;
     this.shouldUpdate = Object.assign(
       {},
       this.shouldUpdate,
       {
         sameXY, sameLySt, // eslint-disable-line
-        sameTePt, sameData, sameItSt, // eslint-disable-line
+        sameTePt, sameData, sameItSt, sameDataSig, sameIntegrationSig, sameSpectrumKey, // eslint-disable-line
+        dataSig, integrationSig, spectrumKey, // eslint-disable-line
       },
     );
   }
@@ -102,12 +114,20 @@ class LineFocus {
     const prevLySt = this.layout;
     const currentSpectrum = hplcMsSt?.uvvis?.currentSpectrum;
     const prevItSt = currentSpectrum?.integrations?.length;
+    const firstPt = this.data[0];
+    const lastPt = this.data[this.data.length - 1];
+    const prevDataSig = `${this.data.length}-${firstPt?.y ?? ''}-${lastPt?.y ?? ''}`;
+    const spectrumKey = currentSpectrum?.pageValue ?? hplcMsSt?.uvvis?.selectedWaveLength ?? '';
+    const integrations = currentSpectrum?.integrations || [];
+    const firstIntegration = integrations[0];
+    const lastIntegration = integrations[integrations.length - 1];
+    const prevIntegrationSig = `${integrations.length}-${firstIntegration?.xL ?? ''}-${firstIntegration?.xU ?? ''}-${lastIntegration?.xL ?? ''}-${lastIntegration?.xU ?? ''}-${currentSpectrum?.refArea ?? ''}-${currentSpectrum?.refFactor ?? ''}`;
     this.shouldUpdate = Object.assign(
       {},
       this.shouldUpdate,
       {
         prevXt, prevYt, prevLySt, // eslint-disable-line
-        prevTePt, prevData, prevItSt, // eslint-disable-line
+        prevTePt, prevData, prevItSt, prevDataSig, prevIntegrationSig, prevSpectrumKey: spectrumKey, // eslint-disable-line
       },
     );
   }
@@ -121,8 +141,11 @@ class LineFocus {
     this.data = [...data];
     this.data = data.map((d) => ({ x: d.x / 60, y: d.y }));
     this.tTrEndPts = tTrEndPts;
-    this.layout = layout;
+    if (layout) {
+      this.layout = layout;
+    }
     this.editPeakSt = editPeakSt;
+    this.xOnlyBrush = this.layout === LIST_LAYOUT.LC_MS;
   }
 
   updatePathCall(xt, yt) {
@@ -135,9 +158,11 @@ class LineFocus {
     // Domain Calculate
     let { xExtent, yExtent } = sweepExtentSt || { xExtent: false, yExtent: false };
 
-    if (!xExtent || !yExtent) {
+    if (!xExtent) {
       const xes = d3.extent(this.data, (d) => d.x).sort((a, b) => a - b);
       xExtent = { xL: xes[0], xU: xes[1] };
+    }
+    if (!yExtent) {
       const btm = d3.min(this.data, (d) => d.y);
       const top = d3.max(this.data, (d) => d.y);
       const height = top - btm;
@@ -163,8 +188,8 @@ class LineFocus {
   drawLine() {
     if (!this.path) return;
 
-    const { sameXY } = this.shouldUpdate;
-    if (sameXY) return;
+    const { sameXY, sameDataSig } = this.shouldUpdate;
+    if (sameXY && sameDataSig) return;
 
     const { xt, yt } = TfRescale(this);
     this.updatePathCall(xt, yt);
@@ -261,9 +286,9 @@ class LineFocus {
 
   drawInteg(hplcMsSt) {
     const {
-      sameXY, sameLySt, sameItSt, sameData,
+      sameXY, sameLySt, sameItSt, sameData, sameIntegrationSig, sameSpectrumKey,
     } = this.shouldUpdate;
-    if (sameXY && sameLySt && sameItSt && sameData) return;
+    if (sameXY && sameLySt && sameItSt && sameData && sameIntegrationSig && sameSpectrumKey) return;
 
     const isDisable = Cfg.btnCmdIntg(this.layout);
     const ignoreRef = Format.isLCMsLayout(this.layout);

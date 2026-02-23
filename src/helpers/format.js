@@ -117,6 +117,8 @@ const formatedLCMS = (hplcMsSt, isAscend, decimal) => {
   }
 
   let result = '';
+  const parsedDecimal = Number.isFinite(decimal) ? decimal : Number.parseInt(decimal, 10);
+  const resolvedDecimal = Number.isFinite(parsedDecimal) ? parsedDecimal : 3;
 
   const { listWaveLength = [], spectraList = [] } = hplcMsSt.uvvis || {};
   const ms = hplcMsSt.ms || {};
@@ -141,7 +143,7 @@ const formatedLCMS = (hplcMsSt, isAscend, decimal) => {
       const maxIntensity = sortedPeaks[0].y || 1;
 
       const peakLines = sortedPeaks.map((peak) => {
-        const rt = peak.x.toFixed(3);
+        const rt = peak.x.toFixed(resolvedDecimal);
         const percent = ((peak.y / maxIntensity) * 100).toFixed(1);
         return `${rt} min (${percent}%)`;
       });
@@ -161,7 +163,7 @@ const formatedLCMS = (hplcMsSt, isAscend, decimal) => {
       const sortedIntegrations = [...entries].sort((a, b) => a.xL - b.xL);
 
       const integrationLines = sortedIntegrations.map((integ) => {
-        const rt = integ.xL.toFixed(3);
+        const rt = integ.xL.toFixed(resolvedDecimal);
         const area = integ.area || integ.absoluteArea || 0;
         const percent = ((area / refArea) * 100).toFixed(1);
         return `${rt} min (${percent}%)`;
@@ -212,7 +214,7 @@ const formatedLCMS = (hplcMsSt, isAscend, decimal) => {
       result += `\nMS (${label}), m/z (≥${thresholdValue}%):\n`;
 
       const lines = sortedPeaks.map((peak) => {
-        const mass = fixDigit(peak.x, decimal);
+        const mass = fixDigit(peak.x, resolvedDecimal);
         const percent = Math.round((peak.y / maxIntensity) * 100);
         return `${mass} (${percent}%)`;
       });

@@ -32,6 +32,7 @@ function* selectUiSweep(action) {
 
   const hplcMsSt = yield select(getHplcMsSt);
   const { uvvis } = hplcMsSt;
+  const layoutSt = yield select(getLayoutSt);
 
   switch (sweepType) {
     case LIST_UI_SWEEP_TYPE.ZOOMIN:
@@ -58,7 +59,6 @@ function* selectUiSweep(action) {
       });
       break;
     case LIST_UI_SWEEP_TYPE.INTEGRATION_ADD: {
-      const layoutSt = yield select(getLayoutSt);
       if (uvvis.selectedWaveLength && layoutSt === LIST_LAYOUT.LC_MS) {
         yield put({
           type: HPLC_MS.UPDATE_HPLCMS_INTEGRATIONS,
@@ -75,10 +75,10 @@ function* selectUiSweep(action) {
       }
       break;
     }
-    case LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD:
+    case LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD: {
       const peaks = calcPeaks(payload); // eslint-disable-line
       if (peaks.length === 0) { break; }
-      const newPayload = Object.assign({}, payload, { peaks }); // eslint-disable-line
+      const newPayload = { ...payload, peaks }; // eslint-disable-line
 
       yield put({
         type: UI.SWEEP.SELECT_INTEGRATION,
@@ -89,6 +89,7 @@ function* selectUiSweep(action) {
         payload: { newData: newPayload, curveIdx },
       });
       break;
+    }
     default:
       break;
   }

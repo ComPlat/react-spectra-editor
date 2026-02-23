@@ -12,9 +12,9 @@ const wheeled = (focus, event) => {
   scrollUiWheelAct(Object.assign({}, currentExtent, { direction, brushClass }));
 };
 
-const brushed = (focus, isUiAddIntgSt, event, brushedClass = '.d3Svg') => {
+const brushed = (focus, xOnly, event, brushedClass = '.d3Svg') => {
   const {
-    selectUiSweepAct, data, dataPks, brush, w, h, scales,
+    selectUiSweepAct, data, dataPks, brush, brushX, w, h, scales,
   } = focus;
   const selection = event.selection && event.selection.reverse();
   if (!selection) return;
@@ -22,7 +22,7 @@ const brushed = (focus, isUiAddIntgSt, event, brushedClass = '.d3Svg') => {
   let yes = [h, 0].map(scales.y.invert).sort((a, b) => a - b);
   let xExtent = { xL: xes[0], xU: xes[1] };
   let yExtent = { yL: yes[0], yU: yes[1] };
-  if (isUiAddIntgSt) {
+  if (xOnly) {
     xes = selection.map(scales.x.invert).sort((a, b) => a - b);
     xExtent = { xL: xes[0], xU: xes[1] };
   } else {
@@ -37,7 +37,11 @@ const brushed = (focus, isUiAddIntgSt, event, brushedClass = '.d3Svg') => {
   });
   const svgSel = d3.select(brushedClass);
   if (!svgSel.empty()) {
-    svgSel.selectAll('.brush').call(brush.move, null);
+    if (xOnly && brushX) {
+      svgSel.selectAll('.brushX').call(brushX.move, null);
+    } else {
+      svgSel.selectAll('.brush').call(brush.move, null);
+    }
   }
 };
 
@@ -55,12 +59,14 @@ const MountBrush = (focus, isUiAddIntgSt, isUiNoBrushSt, brushedClass = '.d3Svg'
 
   if (!(graphIndex === 0 && isIntegrationAdd) && !isZoomIn) return;
 
-  const brushedCb = (event) => brushed(focus, isUiAddIntgSt, event, brushedClass);
+  const isXAxisOnly = focus?.xOnlyBrush === true;
+  const xOnly = isUiAddIntgSt || isXAxisOnly;
+  const brushedCb = (event) => brushed(focus, xOnly, event, brushedClass);
   const wheeledCb = (event) => wheeled(focus, event);
 
   if (isUiNoBrushSt) {
-    const target = isUiAddIntgSt ? brushX : brush;
-    const klass = isUiAddIntgSt ? 'brushX' : 'brush';
+    const target = xOnly ? brushX : brush;
+    const klass = xOnly ? 'brushX' : 'brush';
     target.handleSize(10)
       .extent([[0, 0], [w, h]])
       .on('end', brushedCb);

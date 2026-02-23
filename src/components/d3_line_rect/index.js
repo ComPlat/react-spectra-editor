@@ -132,7 +132,7 @@ const waveLengthSelect = (classes, hplcMsSt, updateWaveLengthAct) => {
       style={{ width: '140px' }}
     >
       <InputLabel id="select-decimal-label" className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
-        Wavelength
+        Wavelength (nm)
       </InputLabel>
       <Select
         labelId="select-decimal-label"
@@ -271,6 +271,7 @@ class ViewerLineRect extends React.Component {
       filterSeed: uvvisSeed,
       filterPeak: [],
       tTrEndPts,
+      layoutSt,
       isUiNoBrushSt: true,
       sweepExtentSt: sweepExtent[0],
       integationSt,
@@ -299,6 +300,7 @@ class ViewerLineRect extends React.Component {
       filterSeed: [],
       filterPeak: [],
       tTrEndPts,
+      layoutSt,
       isUiNoBrushSt: true,
       sweepExtentSt: sweepExtent[2],
     });
@@ -390,6 +392,7 @@ class ViewerLineRect extends React.Component {
           filterSeed: subSeed,
           filterPeak: [],
           tTrEndPts: curTrEndPts,
+          layoutSt,
           isUiNoBrushSt: true,
           sweepExtentSt: sweepExtent[2],
           uiSt,
@@ -498,9 +501,6 @@ class ViewerLineRect extends React.Component {
       }
     };
     const handleWaveLengthChange = (event) => {
-      [0, 1, 2].forEach((gi) => {
-        zoomInAct({ graphIndex: gi, sweepType: LIST_UI_SWEEP_TYPE.ZOOMRESET });
-      });
       selectWavelengthAct(event);
     };
     return (
@@ -514,13 +514,15 @@ class ViewerLineRect extends React.Component {
         <Integration />
         <Peak />
         <div className={LIST_ROOT_SVG_GRAPH.LINE} />
-        <PeakGroup feature={feature} graphIndex={1} />
         {
           zoomView(classes, 1, uiSt, zoomInAct)
         }
         {
           ticSelect(classes, hplcMsSt, handleTicChanged)
         }
+        <span style={{ display: 'inline-flex' }}>
+          <PeakGroup feature={feature} graphIndex={1} />
+        </span>
         <div className={LIST_ROOT_SVG_GRAPH.MULTI} />
         {
           zoomView(classes, 2, uiSt, zoomInAct)

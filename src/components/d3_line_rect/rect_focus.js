@@ -34,6 +34,7 @@ class RectFocus {
     this.selectUiSweepAct = selectUiSweepAct;
     this.scrollUiWheelAct = scrollUiWheelAct;
     this.brush = d3.brush();
+    this.brushX = d3.brushX();
 
     this.axis = null;
     this.thresLine = null;
@@ -72,11 +73,15 @@ class RectFocus {
     this.root.call(this.tip);
   }
 
-  setDataParams(data, peaks, tTrEndPts, tSfPeaks) {
+  setDataParams(data, peaks, tTrEndPts, tSfPeaks, layout = null) {
     this.data = [...data];
     this.dataPks = [...peaks];
     this.tTrEndPts = tTrEndPts;
     this.tSfPeaks = tSfPeaks;
+    if (layout) {
+      this.layout = layout;
+    }
+    this.xOnlyBrush = this.layout === LIST_LAYOUT.LC_MS;
 
     const xExtent = d3.extent(this.data, (d) => d.x);
     this.scales.x.domain(xExtent);
@@ -203,7 +208,7 @@ class RectFocus {
   }
 
   create({
-    filterSeed, filterPeak, tTrEndPts, tSfPeaks,
+    filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt,
     sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
   }) {
     this.svg = d3.select(this.brushClass);
@@ -212,7 +217,7 @@ class RectFocus {
 
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.setTip();
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt);
     MountCompass(this);
 
     this.axis = MountAxis(this);
@@ -234,11 +239,11 @@ class RectFocus {
   }
 
   update({
-    filterSeed, filterPeak, tTrEndPts, tSfPeaks,
+    filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt,
     sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt, uiSt,
   }) {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt);
     this.uiSt = uiSt;
 
     if (this.data && this.data.length > 0) {

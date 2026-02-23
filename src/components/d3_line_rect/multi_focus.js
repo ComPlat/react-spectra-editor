@@ -93,6 +93,85 @@ class MultiFocus {
     return '#d35400';
   };
 
+  getTicLegendEntries = (ticEntities, hplcMsSt) => {
+    const available = hplcMsSt?.tic?.available;
+    const selected = hplcMsSt?.tic?.polarity;
+    const baseEntries = [
+      { key: 'positive', label: 'PLUS' },
+      { key: 'negative', label: 'MINUS' },
+      { key: 'neutral', label: 'NEUTRAL' },
+    ];
+
+    let entries = [];
+    if (available && typeof available === 'object') {
+      const filtered = baseEntries.filter((entry) => available[entry.key]);
+      if (filtered.length > 0) entries = filtered;
+    }
+
+    if (entries.length === 0 && Array.isArray(ticEntities)) {
+      const found = new Set();
+      ticEntities.forEach((entry) => {
+        const { polarity } = getLcMsInfo(entry);
+        if (polarity) found.add(polarity);
+      });
+      if (found.size > 0) {
+        entries = baseEntries.filter((entry) => found.has(entry.key));
+      }
+    }
+
+    if (entries.length === 0) entries = baseEntries;
+
+    return entries.map((entry) => ({
+      ...entry,
+      color: this.colorForPolarity(entry.key),
+      selected: entry.key === selected,
+    }));
+  };
+
+  drawTicLegend = (ticEntities, hplcMsSt) => {
+    if (!this.root) return;
+    this.root.selectAll('.tic-legend').remove();
+
+    const entries = this.getTicLegendEntries(ticEntities, hplcMsSt);
+    if (entries.length === 0) return;
+
+    const lineLength = 14;
+    const lineGap = 6;
+    const legendX = this.w - 8 - lineLength;
+    const legendY = 10;
+    const rowHeight = 14;
+
+    const legend = this.root.append('g')
+      .attr('class', 'tic-legend');
+
+    entries.forEach((entry, idx) => {
+      const row = legend.append('g')
+        .attr('transform', `translate(${legendX}, ${legendY + idx * rowHeight})`);
+      const opacity = entry.selected ? 1 : 0.35;
+
+      row.append('line')
+        .attr('x1', 0)
+        .attr('x2', lineLength)
+        .attr('y1', 0)
+        .attr('y2', 0)
+        .attr('stroke', entry.color)
+        .attr('stroke-width', entry.selected ? 2 : 1)
+        .attr('stroke-opacity', opacity)
+        .attr('stroke-linecap', 'round');
+
+      row.append('text')
+        .attr('x', -lineGap)
+        .attr('y', 0)
+        .attr('dy', '0.32em')
+        .attr('text-anchor', 'end')
+        .attr('font-family', 'Helvetica')
+        .style('font-size', '11px')
+        .style('fill', entry.color)
+        .style('opacity', opacity)
+        .text(entry.label);
+    });
+  };
+
   getShouldUpdate() {
     const {
       prevXt, prevYt, prevLySt,
@@ -156,8 +235,11 @@ class MultiFocus {
     });
 
     this.tTrEndPts = tTrEndPts;
-    this.layout = layout;
+    if (layout) {
+      this.layout = layout;
+    }
     this.jcampIdx = jcampIdx;
+    this.xOnlyBrush = this.layout === LIST_LAYOUT.LC_MS;
   }
 
   updatePathCall(xt, yt) {
@@ -170,16 +252,21 @@ class MultiFocus {
     // Domain Calculate
     let { xExtent, yExtent } = sweepExtentSt || { xExtent: false, yExtent: false };
 
+    let allData = null;
     if (!xExtent || !yExtent) {
-      let allData = [...this.data];
+      allData = [...this.data];
       if (this.otherLineData) {
         this.otherLineData.forEach((lineData) => {
           allData = [...allData, ...lineData.data];
         });
       }
+    }
 
+    if (!xExtent) {
       const xes = d3.extent(allData, (d) => d.x).sort((a, b) => a - b);
       xExtent = { xL: xes[0], xU: xes[1] };
+    }
+    if (!yExtent) {
       const btm = d3.min(allData, (d) => d.y);
       const top = d3.max(allData, (d) => d.y);
       const height = top - btm;
@@ -293,6 +380,7 @@ class MultiFocus {
       this.drawLine();
       this.drawGrid();
       this.drawOtherLines(layoutSt);
+      this.drawTicLegend(ticEntities, hplcMsSt);
     }
     MountBrush(this, false, isUiNoBrushSt, this.brushClass);
     this.resetShouldUpdate();
@@ -325,6 +413,7 @@ class MultiFocus {
       this.drawLine();
       this.drawGrid();
       this.drawOtherLines(layoutSt);
+      this.drawTicLegend(ticEntities, hplcMsSt);
     }
     MountBrush(this, false, isUiNoBrushSt, this.brushClass);
     this.resetShouldUpdate();
