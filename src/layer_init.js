@@ -7,6 +7,7 @@ import { bindActionCreators } from 'redux';
 import { withStyles } from '@mui/styles';
 
 import { updateOperation } from './actions/submit';
+import { updateLayout } from './actions/layout';
 import {
   resetInitCommon, resetInitNmr, resetInitMs, resetInitCommonWithIntergation, resetDetector,
   resetMultiplicity,
@@ -58,11 +59,12 @@ class LayerInit extends React.Component {
     const {
       entity, updateMetaPeaksAct,
       resetInitCommonAct, resetInitMsAct, resetInitNmrAct, resetInitCommonWithIntergationAct,
-      resetDetectorAct, updateDSCMetaDataAct, resetMultiplicityAct,
+      resetDetectorAct, updateDSCMetaDataAct, resetMultiplicityAct, updateLayoutAct,
     } = this.props;
     resetInitCommonAct();
     resetDetectorAct();
     const { layout, features } = entity;
+    updateLayoutAct(layout);
     if (Format.isMsLayout(layout)) {
       // const { autoPeak, editPeak } = features; // TBD
       const autoPeak = features.autoPeak || features[0];
@@ -213,6 +215,7 @@ const mapDispatchToProps = (dispatch) => (
     resetDetectorAct: resetDetector,
     resetMultiplicityAct: resetMultiplicity,
     updateOperationAct: updateOperation,
+    updateLayoutAct: updateLayout,
     updateMetaPeaksAct: updateMetaPeaks,
     addOthersAct: addOthers,
     setAllCurvesAct: setAllCurves,
@@ -239,6 +242,7 @@ LayerInit.propTypes = {
   resetInitMsAct: PropTypes.func.isRequired,
   resetInitCommonWithIntergationAct: PropTypes.func.isRequired,
   updateOperationAct: PropTypes.func.isRequired,
+  updateLayoutAct: PropTypes.func.isRequired,
   updateMetaPeaksAct: PropTypes.func.isRequired,
   addOthersAct: PropTypes.func.isRequired,
   canChangeDescription: PropTypes.bool.isRequired,
