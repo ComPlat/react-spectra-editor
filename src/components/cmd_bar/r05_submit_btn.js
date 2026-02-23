@@ -16,6 +16,7 @@ import {
 } from '../../helpers/chem';
 import { MuButton, commonStyle } from './common';
 import { extractPeaksEdit, extractAreaUnderCurve } from '../../helpers/extractPeaksEdit';
+import Format from '../../helpers/format';
 
 const styles = () => (
   Object.assign(
@@ -24,6 +25,38 @@ const styles = () => (
   )
 );
 
+const getAxesSelection = (axesUnitsSt, curveSt) => {
+  const axes = axesUnitsSt?.axes;
+  if (!Array.isArray(axes) || axes.length === 0) return { xUnit: '', yUnit: '' };
+  const idx = Number.isFinite(curveSt?.curveIdx) ? curveSt.curveIdx : 0;
+  return axes[idx] || axes[0] || { xUnit: '', yUnit: '' };
+};
+
+const resolveAxisLabels = (xLabel, yLabel, axesUnitsSt, curveSt) => {
+  const { xUnit, yUnit } = getAxesSelection(axesUnitsSt, curveSt);
+  return {
+    xLabel: xUnit === '' ? xLabel : xUnit,
+    yLabel: yUnit === '' ? yLabel : yUnit,
+  };
+};
+
+const computeCvYScaleFactor = (feature, cyclicvoltaSt) => {
+  if (!cyclicvoltaSt?.useCurrentDensity) return 1.0;
+  const rawArea = (cyclicvoltaSt.areaValue === '' ? 1.0 : cyclicvoltaSt.areaValue) || 1.0;
+  const areaUnit = cyclicvoltaSt.areaUnit || 'cm²';
+  const safeArea = rawArea > 0 ? rawArea : 1.0;
+  const areaInCm2 = areaUnit === 'mm²' ? (safeArea / 100.0) : safeArea;
+  let factor = 1.0 / areaInCm2;
+  const baseY = feature && feature.yUnit ? String(feature.yUnit) : 'A';
+  if (/mA/i.test(baseY)) {
+    factor *= 1000.0;
+  }
+  if (areaUnit === 'mm²') {
+    factor /= 100.0;
+  }
+  return factor;
+};
+
 const onClickCb = (
   operation, peaksEdit, isAscend, isIntensity,
   scan, thres, layoutSt, shiftSt, analysis, decimalSt,
@@ -31,7 +64,7 @@ const onClickCb = (
   cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData,
 ) => (
   () => {
-    operation({
+    const payload = {
       peaks: peaksEdit,
       layout: layoutSt,
       shift: shiftSt,
@@ -51,7 +84,11 @@ const onClickCb = (
       axesUnitsSt,
       detectorSt,
       dscMetaData,
-    });
+    };
+    if (Format.isCyclicVoltaLayout(layoutSt)) {
+      console.log('[CV submit] payload', payload);
+    }
+    operation(payload);
   }
 );
 
@@ -68,6 +105,26 @@ const BtnSubmit = ({
   const thres = Convert2Thres(feature, thresSt);
   const aucValues = extractAreaUnderCurve(allIntegrationSt, integrationSt, layoutSt);
   const { dscMetaData } = metaSt;
+  const isCvLayout = Format.isCyclicVoltaLayout(layoutSt);
+  const { xLabel, yLabel } = resolveAxisLabels(
+    feature?.xUnit,
+    feature?.yUnit,
+    axesUnitsSt,
+    curveSt,
+  );
+  const axisDisplay = {
+    xLabel,
+    yLabel,
+  };
+  const cvDisplay = isCvLayout ? {
+    mode: cyclicvoltaSt?.useCurrentDensity ? 'density' : 'current',
+    yScaleFactor: computeCvYScaleFactor(feature, cyclicvoltaSt),
+  } : null;
+  const cyclicvoltaPayload = {
+    ...cyclicvoltaSt,
+    axisDisplay,
+    cvDisplay,
+  };
 
   if (!operation) return null;
 
@@ -84,7 +141,7 @@ const BtnSubmit = ({
           operation.value, peaksEdit, isAscend, isIntensity,
           scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt,
           integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt,
-          cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData,
+          cyclicvoltaPayload, curveSt, axesUnitsSt, detectorSt, dscMetaData,
         )}
       >
         <PlayCircleOutlineIcon className={classes.icon} />

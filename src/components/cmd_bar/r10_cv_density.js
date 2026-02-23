@@ -22,9 +22,16 @@ const styles = () => ({
   fieldUnit: {
     width: 75,
   },
+  toggleGroup: {
+    height: 30,
+    marginLeft: 8,
+  },
   toggleBtn: {
     fontSize: 10,
     padding: '0 6px',
+    height: 30,
+    minHeight: 30,
+    lineHeight: '30px',
     textTransform: 'none',
   },
 });

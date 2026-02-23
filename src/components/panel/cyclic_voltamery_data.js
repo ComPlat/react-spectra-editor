@@ -51,6 +51,22 @@ const styles = () => ({
     alignItems: 'center',
     gap: 8,
   },
+  panelInfo: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 8,
+    marginLeft: 10,
+  },
+  modeText: {
+    fontSize: '11px',
+    color: '#333',
+    fontWeight: 500,
+  },
+  modeWarning: {
+    fontSize: '11px',
+    color: '#d32f2f',
+    fontWeight: 600,
+  },
   howToWrap: {
     display: 'inline-flex',
     alignItems: 'center',
@@ -226,6 +242,9 @@ const CyclicVoltammetryPanel = ({
     }
   ));
 
+  const isDensityMode = cyclicVotaSt?.useCurrentDensity;
+  const modeLabel = isDensityMode ? 'Current density' : 'Current';
+
   return (
     <div className={classes.panel} data-testid="PanelVoltammetry">
       <div
@@ -246,6 +265,12 @@ const CyclicVoltammetryPanel = ({
             Voltammetry data
           </span>
         </Typography>
+        <span className={classes.panelInfo}>
+          <span className={classes.modeText}>{`Mode: ${modeLabel}`}</span>
+          <span className={classes.modeWarning}>
+            WE-ECSA must be set when switching to Current Density.
+          </span>
+        </span>
         <div className={classes.panelActions}>
           <Tooltip
             title={

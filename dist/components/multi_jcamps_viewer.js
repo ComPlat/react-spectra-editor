@@ -60,7 +60,7 @@ const styles = () => ({
   },
   cvPanelBelow: {
     marginTop: 'auto',
-    paddingTop: 8,
+    paddingTop: 0,
     width: '100%'
   }
 });
