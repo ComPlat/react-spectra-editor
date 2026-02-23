@@ -219,6 +219,29 @@ class LineFocus {
     }
   }
 
+  drawPageMarker(hplcMsSt) {
+    if (!this.root || !Format.isLCMsLayout(this.layout)) return;
+    const currentPageValue = hplcMsSt?.tic?.currentPageValue;
+    const hasValue = Number.isFinite(currentPageValue);
+    const marker = this.root.selectAll('.uvvis-page-marker')
+      .data(hasValue ? [currentPageValue] : []);
+    marker.exit().remove();
+
+    if (!hasValue) return;
+    const { xt } = TfRescale(this);
+    marker.enter()
+      .append('line')
+      .attr('class', 'uvvis-page-marker')
+      .attr('stroke', 'red')
+      .attr('stroke-width', 1)
+      .attr('stroke-opacity', 0.8)
+      .merge(marker)
+      .attr('x1', xt(currentPageValue))
+      .attr('x2', xt(currentPageValue))
+      .attr('y1', 0)
+      .attr('y2', this.h);
+  }
+
   onClickTarget(event, data) {
     event.stopPropagation();
     event.preventDefault();
@@ -553,6 +576,7 @@ class LineFocus {
       this.drawLine();
       this.drawPeaks(hplcMsSt);
       this.drawGrid();
+      this.drawPageMarker(hplcMsSt);
       this.drawInteg(hplcMsSt);
     }
     MountBrush(this, isUiAddIntgSt, isUiNoBrushSt);
@@ -582,6 +606,7 @@ class LineFocus {
       this.getShouldUpdate(hplcMsSt);
       this.drawLine();
       this.drawGrid();
+      this.drawPageMarker(hplcMsSt);
       this.drawPeaks(hplcMsSt);
       this.drawInteg(hplcMsSt);
     }

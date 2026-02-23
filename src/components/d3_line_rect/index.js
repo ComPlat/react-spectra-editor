@@ -277,6 +277,7 @@ class ViewerLineRect extends React.Component {
       integationSt,
       isUiAddIntgSt,
       editPeakSt,
+      hplcMsSt,
     });
     drawLabel(this.rootKlassLine, null, 'Minutes', 'Intensity');
     drawDisplay(this.rootKlassLine, false);
