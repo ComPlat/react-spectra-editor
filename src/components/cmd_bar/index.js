@@ -22,6 +22,7 @@ import Pecker from './07_pecker';
 import ChangeAxes from './r08_change_axes';
 import Detector from './r09_detector';
 import CvDensityControls from './r10_cv_density';
+import Format from '../../helpers/format';
 
 const styles = () => (
   Object.assign(
@@ -34,37 +35,42 @@ const styles = () => (
 );
 
 const CmdBar = ({
-  classes, feature, hasEdit, forecast, operations, editorOnly, jcampIdx, hideThreshold,
-}) => (
-  <div className={classes.card}>
-    <Viewer editorOnly={editorOnly} />
-    <Zoom />
-    <Peak jcampIdx={jcampIdx} feature={feature} />
-    <Pecker jcampIdx={jcampIdx} />
-    <Integration />
-    <Multiplicity />
-    <UndoRedo />
-    <Submit
-      operations={operations}
-      feature={feature}
-      forecast={forecast}
-      editorOnly={editorOnly}
-      hideSwitch={false}
-      disabled={false}
-    />
-    {
-      hideThreshold ? null : (<Threshold feature={feature} hasEdit={hasEdit} />)
-    }
-    <Layout feature={feature} hasEdit={hasEdit} />
-    <Wavelength />
-    <CvDensityControls />
-    <ChangeAxes />
-    <Detector />
-  </div>
-);
+  classes, feature, hasEdit, forecast, operations, editorOnly, jcampIdx, hideThreshold, layoutSt,
+}) => {
+  const isCvLayout = Format.isCyclicVoltaLayout(layoutSt);
+
+  return (
+    <div className={classes.card}>
+      <Viewer editorOnly={editorOnly} />
+      <Zoom />
+      <Peak jcampIdx={jcampIdx} feature={feature} />
+      <Pecker jcampIdx={jcampIdx} />
+      {isCvLayout ? null : <Integration />}
+      {isCvLayout ? null : <Multiplicity />}
+      <UndoRedo />
+      <Submit
+        operations={operations}
+        feature={feature}
+        forecast={forecast}
+        editorOnly={editorOnly}
+        hideSwitch={false}
+        disabled={false}
+      />
+      {
+        hideThreshold ? null : (<Threshold feature={feature} hasEdit={hasEdit} />)
+      }
+      <Layout feature={feature} hasEdit={hasEdit} />
+      <Wavelength />
+      <CvDensityControls />
+      <ChangeAxes />
+      <Detector />
+    </div>
+  );
+};
 
 const mapStateToProps = (state, _) => ( // eslint-disable-line
   {
+    layoutSt: state.layout,
   }
 );
 
@@ -80,6 +86,7 @@ CmdBar.propTypes = {
   hasEdit: PropTypes.bool.isRequired,
   operations: PropTypes.array.isRequired,
   editorOnly: PropTypes.bool.isRequired,
+  layoutSt: PropTypes.string.isRequired,
   jcampIdx: PropTypes.any,
   hideThreshold: PropTypes.bool,
 };
