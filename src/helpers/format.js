@@ -98,7 +98,7 @@ const spectraOps = {
   [LIST_LAYOUT.GC]: { head: 'GAS CHROMATOGRAPHY', tail: '.' },
   [LIST_LAYOUT.EMISSIONS]: { head: 'EMISSION', tail: '.' },
   [LIST_LAYOUT.DLS_INTENSITY]: { head: 'DLS', tail: '.' },
-  [LIST_LAYOUT.LC_MS]: { head: 'LIQUID MASS', tail: ' m/z' },
+  [LIST_LAYOUT.LC_MS]: { head: 'HPLC UV/VIS', tail: '' },
 };
 
 const rmRef = (peaks, shift, atIndex = 0) => {
@@ -116,7 +116,8 @@ const formatedLCMS = (hplcMsSt, isAscend, decimal) => {
     return '';
   }
 
-  let result = '';
+  let result = '\n';
+  const sections = [];
   const parsedDecimal = Number.isFinite(decimal) ? decimal : Number.parseInt(decimal, 10);
   const resolvedDecimal = Number.isFinite(parsedDecimal) ? parsedDecimal : 3;
 
@@ -124,8 +125,6 @@ const formatedLCMS = (hplcMsSt, isAscend, decimal) => {
   const ms = hplcMsSt.ms || {};
   const tic = hplcMsSt.tic;
   const threshold = hplcMsSt.threshold;
-
-  result += 'HPLC UV/VIS:\n';
 
   listWaveLength.forEach((wavelength, idx) => {
     const spectrum = spectraList[idx];
@@ -136,7 +135,7 @@ const formatedLCMS = (hplcMsSt, isAscend, decimal) => {
     const peaks = spectrum.peaks || [];
     const integrations = spectrum.integrations || [];
 
-    result += `Wavelength ${wavelength} nm:\n`;
+    const lines = [`Wavelength ${wavelength} nm:`];
 
     if (peaks.length > 0) {
       const sortedPeaks = [...peaks].sort((a, b) => b.y - a.y);
@@ -148,7 +147,7 @@ const formatedLCMS = (hplcMsSt, isAscend, decimal) => {
         return `${rt} min (${percent}%)`;
       });
 
-      result += `Peaks: ${peakLines.join(', ')}\n`;
+      lines.push(`Peaks: ${peakLines.join(', ')}`);
     }
 
     const stack = integrations?.[0]?.stack;
@@ -168,10 +167,13 @@ const formatedLCMS = (hplcMsSt, isAscend, decimal) => {
         const percent = ((area / refArea) * 100).toFixed(1);
         return `${rt} min (${percent}%)`;
       });
-      result += `Integrations: ${integrationLines.join(', ')}\n`;
+      lines.push(`Integrations: ${integrationLines.join(', ')}`);
     }
-    result += '\n';
+    sections.push(lines.join('\n'));
   });
+  if (sections.length > 0) {
+    result = `\n${sections.join('\n\n')}`;
+  }
 
   const polarity = tic?.polarity || (tic?.isNegative ? 'negative' : 'positive');
   let polarityKey = 'neutral';
@@ -211,7 +213,10 @@ const formatedLCMS = (hplcMsSt, isAscend, decimal) => {
       });
 
       const label = polarityLabel ? `${polarityLabel}ESI` : 'ESI';
-      result += `\nMS (${label}), m/z (≥${thresholdValue}%):\n`;
+      if (result) {
+        result += '\n\n';
+      }
+      result += `MS (${label}), m/z (≥${thresholdValue}%):\n`;
 
       const lines = sortedPeaks.map((peak) => {
         const mass = fixDigit(peak.x, resolvedDecimal);
@@ -221,7 +226,10 @@ const formatedLCMS = (hplcMsSt, isAscend, decimal) => {
 
       result += `  ${lines.join(', ')}`;
     } else {
-      result += '\nMS: No data for current retention time.\n';
+      if (result) {
+        result += '\n\n';
+      }
+      result += 'MS: No data for current retention time.\n';
     }
   }
 

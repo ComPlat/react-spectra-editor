@@ -73,7 +73,7 @@ class PanelViewer extends React.Component {
     const {
       classes, feature, integration, editorOnly, molSvg, descriptions, layoutSt,
       canChangeDescription, jcampIdx, entityFileNames, curveSt, userManualLink,
-      subLayoutsInfo, exactMass, theoryMass, entities,
+      subLayoutsInfo, exactMass, entities,
       hideCyclicVolta,
     } = this.props;
     const onExapndInfo = () => this.onExapnd('info');
@@ -100,7 +100,6 @@ class PanelViewer extends React.Component {
               expand={expand === 'info'}
               molSvg={molSvg}
               exactMass={exactMass}
-              theoryMass={theoryMass}
               onExapnd={onExapndInfo}
               descriptions={descriptions}
               canChangeDescription={canChangeDescription}
@@ -153,7 +152,6 @@ PanelViewer.propTypes = {
   subLayoutsInfo: PropTypes.object,
   exactMass: PropTypes.string,
   hideCyclicVolta: PropTypes.bool,
-  theoryMass: PropTypes.string,
   entities: PropTypes.array,
 };
 
