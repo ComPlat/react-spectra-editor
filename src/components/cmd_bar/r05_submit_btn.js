@@ -215,18 +215,6 @@ const onClickCb = (
       payload.lcms_integrals = formatLcmsIntegralsForBackend(hplcMsSt);
       payload.lcms_peaks_text = Format.formatedLCMS(hplcMsSt, isAscend, decimalSt);
       payload.lcms_uvvis_wavelength = hplcMsSt?.uvvis?.selectedWaveLength ?? null;
-      const ticPolarity = hplcMsSt?.tic?.polarity;
-      if (ticPolarity === 'positive') {
-        payload.lcms_tic = 'POSITIVE';
-      } else if (ticPolarity === 'negative') {
-        payload.lcms_tic = 'NEGATIVE';
-      } else if (ticPolarity === 'neutral') {
-        payload.lcms_tic = 'NEUTRAL';
-      } else if (ticPolarity) {
-        payload.lcms_tic = String(ticPolarity).toUpperCase();
-      } else {
-        payload.lcms_tic = null;
-      }
       payload.lcms_mz_page = hplcMsSt?.tic?.currentPageValue ?? null;
     }
     if (Number.isFinite(curveSt?.curveIdx)) {
