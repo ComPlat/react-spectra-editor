@@ -83,6 +83,7 @@ class MultiFocus {
     this.drawLine = this.drawLine.bind(this);
     this.drawOtherLines = this.drawOtherLines.bind(this);
     this.drawGrid = this.drawGrid.bind(this);
+    this.drawPageMarker = this.drawPageMarker.bind(this);
     this.onClickTarget = this.onClickTarget.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
   }
@@ -338,6 +339,29 @@ class MultiFocus {
     }
   }
 
+  drawPageMarker(hplcMsSt) {
+    if (!this.root) return;
+    const currentPageValue = hplcMsSt?.tic?.currentPageValue;
+    const hasValue = Number.isFinite(currentPageValue);
+    const marker = this.root.selectAll('.tic-page-marker')
+      .data(hasValue ? [currentPageValue] : []);
+    marker.exit().remove();
+    
+    if (!hasValue) return;
+    const { xt } = TfRescale(this);
+    marker.enter()
+      .append('line')
+      .attr('class', 'tic-page-marker')
+      .attr('stroke', 'red')
+      .attr('stroke-width', 1)
+      .attr('stroke-opacity', 0.8)
+      .merge(marker)
+      .attr('x1', xt(currentPageValue))
+      .attr('x2', xt(currentPageValue))
+      .attr('y1', 0)
+      .attr('y2', this.h);
+  }
+
   onClickTarget(event, data) {
     event.stopPropagation();
     event.preventDefault();
@@ -379,6 +403,7 @@ class MultiFocus {
       this.setConfig(sweepExtentSt);
       this.drawLine();
       this.drawGrid();
+      this.drawPageMarker(hplcMsSt);
       this.drawOtherLines(layoutSt);
       this.drawTicLegend(ticEntities, hplcMsSt);
     }
@@ -412,6 +437,7 @@ class MultiFocus {
       this.getShouldUpdate();
       this.drawLine();
       this.drawGrid();
+      this.drawPageMarker(hplcMsSt);
       this.drawOtherLines(layoutSt);
       this.drawTicLegend(ticEntities, hplcMsSt);
     }
