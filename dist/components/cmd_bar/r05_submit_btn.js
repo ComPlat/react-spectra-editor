@@ -16,14 +16,53 @@ var _styles = require("@mui/styles");
 var _chem = require("../../helpers/chem");
 var _common = require("./common");
 var _extractPeaksEdit = require("../../helpers/extractPeaksEdit");
+var _format = _interopRequireDefault(require("../../helpers/format"));
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, function-paren-newline,
 react/function-component-definition, function-call-argument-newline,
 react/require-default-props */
 
 const styles = () => Object.assign({}, _common.commonStyle);
+const getAxesSelection = (axesUnitsSt, curveSt) => {
+  const axes = axesUnitsSt?.axes;
+  if (!Array.isArray(axes) || axes.length === 0) return {
+    xUnit: '',
+    yUnit: ''
+  };
+  const idx = Number.isFinite(curveSt?.curveIdx) ? curveSt.curveIdx : 0;
+  return axes[idx] || axes[0] || {
+    xUnit: '',
+    yUnit: ''
+  };
+};
+const resolveAxisLabels = (xLabel, yLabel, axesUnitsSt, curveSt) => {
+  const {
+    xUnit,
+    yUnit
+  } = getAxesSelection(axesUnitsSt, curveSt);
+  return {
+    xLabel: xUnit === '' ? xLabel : xUnit,
+    yLabel: yUnit === '' ? yLabel : yUnit
+  };
+};
+const computeCvYScaleFactor = (feature, cyclicvoltaSt) => {
+  if (!cyclicvoltaSt?.useCurrentDensity) return 1.0;
+  const rawArea = (cyclicvoltaSt.areaValue === '' ? 1.0 : cyclicvoltaSt.areaValue) || 1.0;
+  const areaUnit = cyclicvoltaSt.areaUnit || 'cm²';
+  const safeArea = rawArea > 0 ? rawArea : 1.0;
+  const areaInCm2 = areaUnit === 'mm²' ? safeArea / 100.0 : safeArea;
+  let factor = 1.0 / areaInCm2;
+  const baseY = feature && feature.yUnit ? String(feature.yUnit) : 'A';
+  if (/mA/i.test(baseY)) {
+    factor *= 1000.0;
+  }
+  if (areaUnit === 'mm²') {
+    factor /= 100.0;
+  }
+  return factor;
+};
 const onClickCb = (operation, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, analysis, decimalSt, integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData) => () => {
-  operation({
+  const payload = {
     peaks: peaksEdit,
     layout: layoutSt,
     shift: shiftSt,
@@ -43,7 +82,11 @@ const onClickCb = (operation, peaksEdit, isAscend, isIntensity, scan, thres, lay
     axesUnitsSt,
     detectorSt,
     dscMetaData
-  });
+  };
+  if (_format.default.isCyclicVoltaLayout(layoutSt)) {
+    console.log('[CV submit] payload', payload);
+  }
+  operation(payload);
 };
 const BtnSubmit = ({
   classes,
@@ -76,6 +119,24 @@ const BtnSubmit = ({
   const {
     dscMetaData
   } = metaSt;
+  const isCvLayout = _format.default.isCyclicVoltaLayout(layoutSt);
+  const {
+    xLabel,
+    yLabel
+  } = resolveAxisLabels(feature?.xUnit, feature?.yUnit, axesUnitsSt, curveSt);
+  const axisDisplay = {
+    xLabel,
+    yLabel
+  };
+  const cvDisplay = isCvLayout ? {
+    mode: cyclicvoltaSt?.useCurrentDensity ? 'density' : 'current',
+    yScaleFactor: computeCvYScaleFactor(feature, cyclicvoltaSt)
+  } : null;
+  const cyclicvoltaPayload = {
+    ...cyclicvoltaSt,
+    axisDisplay,
+    cvDisplay
+  };
   if (!operation) return null;
   return /*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
     title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
@@ -85,7 +146,7 @@ const BtnSubmit = ({
     children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
       className: (0, _classnames.default)('btn-sv-bar-submit'),
       color: "primary",
-      onClick: onClickCb(operation.value, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt, integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData),
+      onClick: onClickCb(operation.value, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt, integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt, cyclicvoltaPayload, curveSt, axesUnitsSt, detectorSt, dscMetaData),
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_PlayCircleOutline.default, {
         className: classes.icon
       })

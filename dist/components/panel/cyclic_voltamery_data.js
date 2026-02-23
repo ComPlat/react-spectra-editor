@@ -53,6 +53,22 @@ const styles = () => ({
     alignItems: 'center',
     gap: 8
   },
+  panelInfo: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 8,
+    marginLeft: 10
+  },
+  modeText: {
+    fontSize: '11px',
+    color: '#333',
+    fontWeight: 500
+  },
+  modeWarning: {
+    fontSize: '11px',
+    color: '#d32f2f',
+    fontWeight: 600
+  },
   howToWrap: {
     display: 'inline-flex',
     alignItems: 'center',
@@ -237,6 +253,8 @@ const CyclicVoltammetryPanel = ({
     }),
     onCheckRefChanged: e => changeCheckRefPeaks(idx, e)
   }));
+  const isDensityMode = cyclicVotaSt?.useCurrentDensity;
+  const modeLabel = isDensityMode ? 'Current density' : 'Current';
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
     className: classes.panel,
     "data-testid": "PanelVoltammetry",
@@ -258,6 +276,15 @@ const CyclicVoltammetryPanel = ({
           className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title'),
           children: "Voltammetry data"
         })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+        className: classes.panelInfo,
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: classes.modeText,
+          children: `Mode: ${modeLabel}`
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: classes.modeWarning,
+          children: "WE-ECSA must be set when switching to Current Density."
+        })]
       }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
         className: classes.panelActions,
         children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tooltip, {

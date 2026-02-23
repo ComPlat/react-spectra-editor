@@ -24,6 +24,54 @@ react/no-unused-prop-types */
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.85); // ROI
 
+const getBaseCurrentUnit = label => /mA/i.test(String(label)) ? 'mA' : 'A';
+const buildCvYAxisLabel = (label, cyclicvoltaSt) => {
+  const baseUnit = getBaseCurrentUnit(label);
+  if (cyclicvoltaSt && cyclicvoltaSt.useCurrentDensity) {
+    const areaUnit = cyclicvoltaSt.areaUnit || 'cm²';
+    return `Current density (${baseUnit}/${areaUnit})`;
+  }
+  return `Current (${baseUnit})`;
+};
+const resolveAxisLabels = ({
+  xLabel,
+  yLabel,
+  axesUnitsSt,
+  curveSt,
+  layoutSt,
+  cyclicvoltaSt
+}) => {
+  let xxLabel = xLabel;
+  let yyLabel = yLabel;
+  if (axesUnitsSt) {
+    const {
+      curveIdx
+    } = curveSt;
+    const {
+      axes
+    } = axesUnitsSt;
+    let selectedAxes = axes[curveIdx];
+    if (!selectedAxes) {
+      selectedAxes = {
+        xUnit: '',
+        yUnit: ''
+      };
+    }
+    const {
+      xUnit,
+      yUnit
+    } = selectedAxes;
+    xxLabel = xUnit === '' ? xLabel : xUnit;
+    yyLabel = yUnit === '' ? yLabel : yUnit;
+  }
+  if (_format.default.isCyclicVoltaLayout(layoutSt)) {
+    yyLabel = buildCvYAxisLabel(yyLabel, cyclicvoltaSt);
+  }
+  return {
+    xxLabel,
+    yyLabel
+  };
+};
 class ViewerMulti extends _react.default.Component {
   constructor(props) {
     super(props);
@@ -74,34 +122,17 @@ class ViewerMulti extends _react.default.Component {
       axesUnitsSt
     } = this.props;
     this.normChange(prevProps);
-    let xxLabel = xLabel;
-    let yyLabel = yLabel;
-    if (axesUnitsSt) {
-      const {
-        curveIdx
-      } = curveSt;
-      const {
-        axes
-      } = axesUnitsSt;
-      let selectedAxes = axes[curveIdx];
-      if (!selectedAxes) {
-        selectedAxes = {
-          xUnit: '',
-          yUnit: ''
-        };
-      }
-      const {
-        xUnit,
-        yUnit
-      } = selectedAxes;
-      xxLabel = xUnit === '' ? xLabel : xUnit;
-      yyLabel = yUnit === '' ? yLabel : yUnit;
-    }
-    if (cyclicvoltaSt && cyclicvoltaSt.useCurrentDensity) {
-      const areaUnit = cyclicvoltaSt.areaUnit || 'cm²';
-      const baseUnit = /mA/i.test(String(yyLabel)) ? 'mA' : 'A';
-      yyLabel = `Current density in ${baseUnit}/${areaUnit}`;
-    }
+    const {
+      xxLabel,
+      yyLabel
+    } = resolveAxisLabels({
+      xLabel,
+      yLabel,
+      axesUnitsSt,
+      curveSt,
+      layoutSt,
+      cyclicvoltaSt
+    });
     const filterSeed = seed;
     const filterPeak = peak;
     if (_format.default.isCyclicVoltaLayout(layoutSt)) {
@@ -219,34 +250,17 @@ class ViewerMulti extends _react.default.Component {
     if (shouldReset) {
       resetAllAct(feature);
     }
-    let xxLabel = xLabel;
-    let yyLabel = yLabel;
-    if (axesUnitsSt) {
-      const {
-        curveIdx
-      } = curveSt;
-      const {
-        axes
-      } = axesUnitsSt;
-      let selectedAxes = axes[curveIdx];
-      if (!selectedAxes) {
-        selectedAxes = {
-          xUnit: '',
-          yUnit: ''
-        };
-      }
-      const {
-        xUnit,
-        yUnit
-      } = selectedAxes;
-      xxLabel = xUnit === '' ? xLabel : xUnit;
-      yyLabel = yUnit === '' ? yLabel : yUnit;
-    }
-    if (cyclicvoltaSt && cyclicvoltaSt.useCurrentDensity) {
-      const areaUnit = cyclicvoltaSt.areaUnit || 'cm²';
-      const baseUnit = /mA/i.test(String(yyLabel)) ? 'mA' : 'A';
-      yyLabel = `Current density in ${baseUnit}/${areaUnit}`;
-    }
+    const {
+      xxLabel,
+      yyLabel
+    } = resolveAxisLabels({
+      xLabel,
+      yLabel,
+      axesUnitsSt,
+      curveSt,
+      layoutSt,
+      cyclicvoltaSt
+    });
     const filterSeed = seed;
     const filterPeak = peak;
     this.focus = new _multi_focus.default({

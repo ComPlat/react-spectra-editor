@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-var _react = _interopRequireDefault(require("react"));
+var _react = _interopRequireWildcard(require("react"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
 var _reactRedux = require("react-redux");
 var _classnames = _interopRequireDefault(require("classnames"));
@@ -17,6 +17,7 @@ var _list_layout = require("../../constants/list_layout");
 var _list_axes = require("../../constants/list_axes");
 var _axes = require("../../actions/axes");
 var _jsxRuntime = require("react/jsx-runtime");
+function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function _interopRequireWildcard(e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 /* eslint-disable prefer-object-spread, react/jsx-one-expression-per-line,
 react/function-component-definition,
 max-len, no-unused-vars, no-multiple-empty-lines */
@@ -99,18 +100,18 @@ const axisY = (classes, layoutSt, axesUnitsSt, updateYAxisAct, curveSt) => {
       yUnit: ''
     };
   }
-  const {
-    yUnit
-  } = selectedAxes;
+  const yUnit = '';
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
     className: (0, _classnames.default)(classes.fieldLayout),
     variant: "outlined",
+    disabled: true,
     children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Select, {
       labelId: "select-y-axis-label",
       label: "y-Axis",
       value: yUnit,
       onChange: onChange,
       className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-layout'),
+      disabled: true,
       children: options.map(item => {
         // eslint-disable-line
         return /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
@@ -143,11 +144,29 @@ const ChangeAxes = ({
   axesUnitsSt,
   updateXAxisAct,
   updateYAxisAct
-}) => /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
-  className: classes.groupRight,
-  "data-testid": "ChangeAxes",
-  children: showSelect(classes, layoutSt, curveSt, axesUnitsSt, updateXAxisAct, updateYAxisAct)
-});
+}) => {
+  const {
+    curveIdx
+  } = curveSt;
+  const axes = axesUnitsSt?.axes || [];
+  (0, _react.useEffect)(() => {
+    if (layoutSt !== _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY) return;
+    const selectedAxes = axes[curveIdx] || {
+      yUnit: ''
+    };
+    if (selectedAxes.yUnit !== '') {
+      updateYAxisAct({
+        value: '',
+        curveIndex: curveIdx
+      });
+    }
+  }, [layoutSt, axes, curveIdx, updateYAxisAct]);
+  return /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+    className: classes.groupRight,
+    "data-testid": "ChangeAxes",
+    children: showSelect(classes, layoutSt, curveSt, axesUnitsSt, updateXAxisAct, updateYAxisAct)
+  });
+};
 const mapStateToProps = (state, props) => (
 // eslint-disable-line
 {
