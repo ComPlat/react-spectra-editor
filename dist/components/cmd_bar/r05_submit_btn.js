@@ -23,27 +23,36 @@ react/function-component-definition, function-call-argument-newline,
 react/require-default-props */
 
 const styles = () => Object.assign({}, _common.commonStyle);
-const getAxesSelection = (axesUnitsSt, curveSt) => {
+const getAxesSelection = (axesUnitsSt, curveIdx) => {
   const axes = axesUnitsSt?.axes;
   if (!Array.isArray(axes) || axes.length === 0) return {
     xUnit: '',
     yUnit: ''
   };
-  const idx = Number.isFinite(curveSt?.curveIdx) ? curveSt.curveIdx : 0;
+  const idx = Number.isFinite(curveIdx) ? curveIdx : 0;
   return axes[idx] || axes[0] || {
     xUnit: '',
     yUnit: ''
   };
 };
-const resolveAxisLabels = (xLabel, yLabel, axesUnitsSt, curveSt) => {
+const resolveAxisLabels = (xLabel, yLabel, axesUnitsSt, curveIdx) => {
   const {
     xUnit,
     yUnit
-  } = getAxesSelection(axesUnitsSt, curveSt);
+  } = getAxesSelection(axesUnitsSt, curveIdx);
   return {
     xLabel: xUnit === '' ? xLabel : xUnit,
     yLabel: yUnit === '' ? yLabel : yUnit
   };
+};
+const getBaseCurrentUnit = label => /mA/i.test(String(label)) ? 'mA' : 'A';
+const buildCvAxisYLabel = (yLabel, cyclicvoltaSt) => {
+  const baseUnit = getBaseCurrentUnit(yLabel);
+  const areaUnit = cyclicvoltaSt?.areaUnit || 'cm²';
+  if (cyclicvoltaSt?.useCurrentDensity) {
+    return `Current density in ${baseUnit}/${areaUnit}`;
+  }
+  return `Current in ${baseUnit}`;
 };
 const computeCvYScaleFactor = (feature, cyclicvoltaSt) => {
   if (!cyclicvoltaSt?.useCurrentDensity) return 1.0;
@@ -61,7 +70,89 @@ const computeCvYScaleFactor = (feature, cyclicvoltaSt) => {
   }
   return factor;
 };
-const onClickCb = (operation, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, analysis, decimalSt, integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData) => () => {
+const defaultThreshold = {
+  isEdit: true,
+  value: false,
+  upper: false,
+  lower: false
+};
+const pickFromList = (list, index, fallback = null) => Array.isArray(list) && list[index] !== undefined ? list[index] : fallback;
+const buildDstPayload = ({
+  feature,
+  curveIdx,
+  editPeakSt,
+  thresList,
+  shiftSt,
+  layoutSt,
+  scanSt,
+  integrationSt,
+  multiplicitySt,
+  allIntegrationSt,
+  aucValues,
+  waveLengthSt,
+  cyclicvoltaSt,
+  curveSt,
+  axesUnitsSt,
+  detectorSt,
+  dscMetaData,
+  isAscend,
+  isIntensity,
+  analysis,
+  decimalSt
+}) => {
+  const threshold = thresList?.[curveIdx] || thresList?.[0] || defaultThreshold;
+  const editPeakAtIndex = Object.assign({}, editPeakSt, {
+    selectedIdx: curveIdx
+  });
+  const peaksEdit = (0, _extractPeaksEdit.extractPeaksEdit)(feature, editPeakAtIndex, threshold, shiftSt, layoutSt, curveIdx);
+  const scan = (0, _chem.Convert2Scan)(feature, scanSt);
+  const thres = (0, _chem.Convert2Thres)(feature, threshold);
+  const integration = pickFromList(integrationSt?.integrations, curveIdx, integrationSt);
+  const multiplicity = pickFromList(multiplicitySt?.multiplicities, curveIdx, multiplicitySt);
+  const {
+    xLabel,
+    yLabel
+  } = resolveAxisLabels(feature?.xUnit, feature?.yUnit, axesUnitsSt, curveIdx);
+  const axisYLabel = _format.default.isCyclicVoltaLayout(layoutSt) ? buildCvAxisYLabel(yLabel, cyclicvoltaSt) : yLabel;
+  const axisDisplay = {
+    xLabel,
+    yLabel: axisYLabel
+  };
+  const cvDisplay = _format.default.isCyclicVoltaLayout(layoutSt) ? {
+    mode: cyclicvoltaSt?.useCurrentDensity ? 'density' : 'current',
+    yScaleFactor: computeCvYScaleFactor(feature, cyclicvoltaSt)
+  } : null;
+  const cyclicvoltaPayload = {
+    ...cyclicvoltaSt,
+    axisDisplay,
+    cvDisplay
+  };
+  const perCurveSt = Object.assign({}, curveSt, {
+    curveIdx
+  });
+  return {
+    peaks: peaksEdit,
+    layout: layoutSt,
+    shift: shiftSt,
+    scan,
+    thres,
+    isAscend,
+    isIntensity,
+    analysis,
+    decimal: decimalSt,
+    integration,
+    multiplicity,
+    allIntegration: allIntegrationSt,
+    aucValues,
+    waveLength: waveLengthSt,
+    cyclicvoltaSt: cyclicvoltaPayload,
+    curveSt: perCurveSt,
+    axesUnitsSt,
+    detectorSt,
+    dscMetaData
+  };
+};
+const onClickCb = (operation, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, analysis, decimalSt, integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData, curveList, editPeakSt, thresList, scanSt, feature) => () => {
   const payload = {
     peaks: peaksEdit,
     layout: layoutSt,
@@ -83,6 +174,38 @@ const onClickCb = (operation, peaksEdit, isAscend, isIntensity, scan, thres, lay
     detectorSt,
     dscMetaData
   };
+  const curves = Array.isArray(curveList) && curveList.length > 0 ? curveList : feature ? [{
+    feature
+  }] : [];
+  const fallbackIdx = Number.isFinite(curveSt?.curveIdx) ? curveSt.curveIdx : 0;
+  const indicesToSend = curves.length > 0 ? curves.map((_, index) => index) : [fallbackIdx];
+  payload.dst_list = indicesToSend.map(curveIdx => {
+    const curve = curves[curveIdx] || {};
+    const curveFeature = curve.feature || feature;
+    return buildDstPayload({
+      feature: curveFeature,
+      curveIdx,
+      editPeakSt,
+      thresList,
+      shiftSt,
+      layoutSt,
+      scanSt,
+      integrationSt,
+      multiplicitySt,
+      allIntegrationSt,
+      aucValues,
+      waveLengthSt,
+      cyclicvoltaSt,
+      curveSt,
+      axesUnitsSt,
+      detectorSt,
+      dscMetaData,
+      isAscend,
+      isIntensity,
+      analysis,
+      decimalSt
+    });
+  });
   if (_format.default.isCyclicVoltaLayout(layoutSt)) {
     console.log('[CV submit] payload', payload);
   }
@@ -96,6 +219,7 @@ const BtnSubmit = ({
   isIntensity,
   editPeakSt,
   thresSt,
+  thresList,
   layoutSt,
   shiftSt,
   scanSt,
@@ -107,6 +231,7 @@ const BtnSubmit = ({
   waveLengthSt,
   cyclicvoltaSt,
   curveSt,
+  curveList,
   axesUnitsSt,
   detectorSt,
   metaSt
@@ -123,10 +248,11 @@ const BtnSubmit = ({
   const {
     xLabel,
     yLabel
-  } = resolveAxisLabels(feature?.xUnit, feature?.yUnit, axesUnitsSt, curveSt);
+  } = resolveAxisLabels(feature?.xUnit, feature?.yUnit, axesUnitsSt, curveSt?.curveIdx);
+  const axisYLabel = isCvLayout ? buildCvAxisYLabel(yLabel, cyclicvoltaSt) : yLabel;
   const axisDisplay = {
     xLabel,
-    yLabel
+    yLabel: axisYLabel
   };
   const cvDisplay = isCvLayout ? {
     mode: cyclicvoltaSt?.useCurrentDensity ? 'density' : 'current',
@@ -146,7 +272,7 @@ const BtnSubmit = ({
     children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
       className: (0, _classnames.default)('btn-sv-bar-submit'),
       color: "primary",
-      onClick: onClickCb(operation.value, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt, integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt, cyclicvoltaPayload, curveSt, axesUnitsSt, detectorSt, dscMetaData),
+      onClick: onClickCb(operation.value, peaksEdit, isAscend, isIntensity, scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt, integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt, cyclicvoltaPayload, curveSt, axesUnitsSt, detectorSt, dscMetaData, curveList, editPeakSt, thresList, scanSt, feature),
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_PlayCircleOutline.default, {
         className: classes.icon
       })
@@ -158,6 +284,7 @@ const mapStateToProps = (state, props) => (
 {
   editPeakSt: state.editPeak.present,
   thresSt: state.threshold.list[state.curve.curveIdx],
+  thresList: state.threshold.list,
   layoutSt: state.layout,
   shiftSt: state.shift,
   scanSt: state.scan,
@@ -169,6 +296,7 @@ const mapStateToProps = (state, props) => (
   waveLengthSt: state.wavelength,
   cyclicvoltaSt: state.cyclicvolta,
   curveSt: state.curve,
+  curveList: state.curve.listCurves,
   axesUnitsSt: state.axesUnits,
   detectorSt: state.detector,
   metaSt: state.meta
@@ -182,6 +310,7 @@ BtnSubmit.propTypes = {
   operation: _propTypes.default.oneOfType([_propTypes.default.object, _propTypes.default.bool]).isRequired,
   editPeakSt: _propTypes.default.object.isRequired,
   thresSt: _propTypes.default.object.isRequired,
+  thresList: _propTypes.default.array.isRequired,
   layoutSt: _propTypes.default.string.isRequired,
   shiftSt: _propTypes.default.object.isRequired,
   scanSt: _propTypes.default.object.isRequired,
@@ -193,6 +322,7 @@ BtnSubmit.propTypes = {
   waveLengthSt: _propTypes.default.object.isRequired,
   cyclicvoltaSt: _propTypes.default.object.isRequired,
   curveSt: _propTypes.default.object,
+  curveList: _propTypes.default.array.isRequired,
   axesUnitsSt: _propTypes.default.object.isRequired,
   detectorSt: _propTypes.default.object.isRequired,
   metaSt: _propTypes.default.object.isRequired
