@@ -30,9 +30,9 @@ const buildCvYAxisLabel = (label, cyclicvoltaSt) => {
   const baseUnit = getBaseCurrentUnit(label);
   if (cyclicvoltaSt && cyclicvoltaSt.useCurrentDensity) {
     const areaUnit = cyclicvoltaSt.areaUnit || 'cm²';
-    return `Current density (${baseUnit}/${areaUnit})`;
+    return `Current density in ${baseUnit}/${areaUnit}`;
   }
-  return `Current (${baseUnit})`;
+  return `Current in ${baseUnit}`;
 };
 
 const resolveAxisLabels = ({
