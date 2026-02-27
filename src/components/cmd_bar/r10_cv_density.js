@@ -22,6 +22,18 @@ const styles = () => ({
   fieldUnit: {
     width: 75,
   },
+  toggleGroup: {
+    height: 30,
+    marginLeft: 8,
+  },
+  toggleBtn: {
+    fontSize: 10,
+    padding: '0 6px',
+    height: 30,
+    minHeight: 30,
+    lineHeight: '30px',
+    textTransform: 'none',
+  },
 });
 
 const units = ['cm²', 'mm²'];
@@ -73,7 +85,7 @@ const CvDensityControls = ({
   };
 
   return (
-    <span className={classes.groupRight}>
+    <span className={classes.group}>
       <FormControl className={classNames(classes.fieldArea)} variant="outlined" disabled={!useCurrentDensity}>
         <InputLabel htmlFor="cv-area" className={classNames(classes.selectLabel, 'select-sv-bar-label')}>WE-ECSA</InputLabel>
         <OutlinedInput
@@ -114,12 +126,12 @@ const CvDensityControls = ({
         size="small"
         value={useCurrentDensity ? 'density' : 'current'}
         onChange={handleToggle}
-        className={classNames(classes.selectInput, 'input-sv-bar-layout')}
+        className={classNames(classes.selectInput, classes.toggleGroup, 'input-sv-bar-layout')}
       >
-        <ToggleButton value="current" className={classNames(classes.txtOpt)}>
+        <ToggleButton value="current" className={classNames(classes.txtOpt, classes.toggleBtn)}>
           Current
         </ToggleButton>
-        <ToggleButton value="density" className={classNames(classes.txtOpt)}>
+        <ToggleButton value="density" className={classNames(classes.txtOpt, classes.toggleBtn)}>
           Current / Area
         </ToggleButton>
       </ToggleButtonGroup>

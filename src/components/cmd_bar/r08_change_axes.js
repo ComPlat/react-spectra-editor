@@ -1,7 +1,7 @@
 /* eslint-disable prefer-object-spread, react/jsx-one-expression-per-line,
 react/function-component-definition,
 max-len, no-unused-vars, no-multiple-empty-lines */
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
@@ -86,11 +86,12 @@ const axisY = (classes, layoutSt, axesUnitsSt, updateYAxisAct, curveSt) => {
   if (!selectedAxes) {
     selectedAxes = { xUnit: '', yUnit: '' };
   }
-  const { yUnit } = selectedAxes;
+  const yUnit = '';
   return (
     <FormControl
       className={classNames(classes.fieldLayout)}
       variant="outlined"
+      disabled
     >
       <Select
         labelId="select-y-axis-label"
@@ -98,6 +99,7 @@ const axisY = (classes, layoutSt, axesUnitsSt, updateYAxisAct, curveSt) => {
         value={yUnit}
         onChange={onChange}
         className={classNames(classes.selectInput, 'input-sv-bar-layout')}
+        disabled
       >
         {
           options.map(item => { // eslint-disable-line
@@ -137,11 +139,24 @@ const showSelect = (classes, layoutSt, curveSt, axesUnitsSt, updateXAxisAct, upd
 
 const ChangeAxes = ({
   classes, layoutSt, curveSt, axesUnitsSt, updateXAxisAct, updateYAxisAct,
-}) => (
-  <span className={classes.groupRight} data-testid="ChangeAxes">
-    { showSelect(classes, layoutSt, curveSt, axesUnitsSt, updateXAxisAct, updateYAxisAct) }
-  </span>
-);
+}) => {
+  const { curveIdx } = curveSt;
+  const axes = axesUnitsSt?.axes || [];
+
+  useEffect(() => {
+    if (layoutSt !== LIST_LAYOUT.CYCLIC_VOLTAMMETRY) return;
+    const selectedAxes = axes[curveIdx] || { yUnit: '' };
+    if (selectedAxes.yUnit !== '') {
+      updateYAxisAct({ value: '', curveIndex: curveIdx });
+    }
+  }, [layoutSt, axes, curveIdx, updateYAxisAct]);
+
+  return (
+    <span className={classes.groupRight} data-testid="ChangeAxes">
+      { showSelect(classes, layoutSt, curveSt, axesUnitsSt, updateXAxisAct, updateYAxisAct) }
+    </span>
+  );
+};
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
