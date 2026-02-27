@@ -225,9 +225,6 @@ const onClickCb = (
         decimalSt,
       });
     });
-    if (Format.isCyclicVoltaLayout(layoutSt)) {
-      console.log('[CV submit] payload', payload);
-    }
     operation(payload);
   }
 );
