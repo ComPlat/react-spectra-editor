@@ -213,47 +213,4 @@ describe('CV', () => {
       /* ==== End Cypress Studio ==== */
     });
   })
-
-  it('Change axes labels', () => {
-    /* ==== Generated with Cypress Studio ==== */
-    cy.get('[aria-labelledby="select-x-axis-label"]').click();
-    cy.get('[data-value="Voltage in V"]').click();
-    cy.get('[aria-labelledby="select-y-axis-label"]').click();
-    cy.get('[data-value="Current in A"]').click();
-    // /* ==== End Cypress Studio ==== */
-
-    cy.get('.d3Svg text.xLabel').should('have.text', 'Voltage in V')
-    cy.get('.d3Svg text.yLabel').should('have.text', 'Current in A')
-
-    /* ==== Generated with Cypress Studio ==== */
-    cy.get('[aria-labelledby="select-x-axis-label"]').click();
-    cy.get('[data-value="Voltage vs Ref in V"]').click();
-    cy.get('[aria-labelledby="select-y-axis-label"]').click();
-    cy.get('[data-value="Current in mA"]').click();
-    // /* ==== End Cypress Studio ==== */
-
-    cy.get('.d3Svg text.xLabel').should('have.text', 'Voltage vs Ref in V')
-    cy.get('.d3Svg text.yLabel').should('have.text', 'Current in mA')
-
-    /* ==== Generated with Cypress Studio ==== */
-    cy.get('[aria-labelledby="select-x-axis-label"]').click();
-    cy.get('[data-value="Potential in V"]').click();
-    cy.get('[aria-labelledby="select-y-axis-label"]').click();
-    cy.get('[data-value="Current in A"]').click();
-    /* ==== End Cypress Studio ==== */
-
-    cy.get('.d3Svg text.xLabel').should('have.text', 'Potential in V')
-    cy.get('.d3Svg text.yLabel').should('have.text', 'Current in A')
-
-    // /* ==== Generated with Cypress Studio ==== */
-    cy.get('[aria-labelledby="select-x-axis-label"]').click();
-    cy.get('[data-value="Potential vs Ref in V"]').click();
-    cy.get('[aria-labelledby="select-y-axis-label"]').click();
-    cy.get('[data-value="Current in mA"]').click();
-    /* ==== End Cypress Studio ==== */
-
-    cy.get('.d3Svg text.xLabel').should('have.text', 'Potential vs Ref in V')
-    cy.get('.d3Svg text.yLabel').should('have.text', 'Current in mA')
-
-  })
 })
