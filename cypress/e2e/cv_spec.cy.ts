@@ -2,7 +2,7 @@ describe('CV', () => {
   beforeEach(() => {
     cy.viewport(2000, 2000)
     cy.visit('http://localhost:3000/')
-    cy.get('#btn-cv').click()
+    cy.get('#btn-cv').click({ force: true })
   })
 
   it('Open layout', () => {

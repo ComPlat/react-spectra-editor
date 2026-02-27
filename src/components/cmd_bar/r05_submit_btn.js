@@ -192,9 +192,8 @@ const onClickCb = (
       detectorSt,
       dscMetaData,
     };
-    const curves = Array.isArray(curveList) && curveList.length > 0
-      ? curveList
-      : (feature ? [{ feature }] : []);
+    const defaultCurves = feature ? [{ feature }] : [];
+    const curves = Array.isArray(curveList) && curveList.length > 0 ? curveList : defaultCurves;
     const fallbackIdx = Number.isFinite(curveSt?.curveIdx) ? curveSt.curveIdx : 0;
     const indicesToSend = curves.length > 0
       ? curves.map((_, index) => index)
