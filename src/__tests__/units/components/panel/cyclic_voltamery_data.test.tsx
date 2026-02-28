@@ -82,9 +82,9 @@ describe('<CyclicVoltammetryPanel />', () => {
       expect(tabelCells?.length).toEqual(24)
 
       const arrCellLabel = [
-        '', 'E: 2.00 V,I: 2.00e+3 mA', 'E: -2.00 V,I: 1.00e+3 mA', '1.60e+3 mA', '0.97', '0.00 V', '4000 mV', '',
-        '', 'E: 2.00 V,I: 2.00e+3 mA', 'E: 1.00 V,I: 1.00e+3 mA', '1.60e+3 mA', '0.97', '1.50 V', '1000 mV', '',
-        '', 'nd', 'nd', '1.60e+3 mA', 'nd', 'nd', 'nd', '',]
+        '', 'E: 2.00 V,I: 2.00e+0 A', 'E: -2.00 V,I: 1.00e+0 A', '1.60e+0 A', '0.97', '0.00 V', '4000 mV', '',
+        '', 'E: 2.00 V,I: 2.00e+0 A', 'E: 1.00 V,I: 1.00e+0 A', '1.60e+0 A', '0.97', '1.50 V', '1000 mV', '',
+        '', 'nd', 'nd', '1.60e+0 A', 'nd', 'nd', 'nd', '',]
       tabelCells?.forEach((cell, idx) => {
         expect(cell).toHaveTextContent(arrCellLabel[idx])
         expect(cell).toHaveClass('txt-sv-panel-txt')

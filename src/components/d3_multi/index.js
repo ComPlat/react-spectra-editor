@@ -47,6 +47,60 @@ class ViewerMulti extends React.Component {
   componentDidMount() {
     this.renderChart(this.props, true);
     this.setupResizeObserver();
+    const {
+      curveSt,
+      seed, peak, cLabel, xLabel, yLabel, feature,
+      tTrEndPts, tSfPeaks, editPeakSt, layoutSt,
+      sweepExtentSt, isUiNoBrushSt,
+      isHidden, resetAllAct, cyclicvoltaSt,
+      integationSt, mtplySt, axesUnitsSt,
+    } = this.props;
+
+    drawDestroy(this.rootKlass);
+    resetAllAct(feature);
+
+    let xxLabel = xLabel;
+    let yyLabel = yLabel;
+
+    if (axesUnitsSt) {
+      const { curveIdx } = curveSt;
+      const { axes } = axesUnitsSt;
+      let selectedAxes = axes[curveIdx];
+      if (!selectedAxes) {
+        selectedAxes = { xUnit: '', yUnit: '' };
+      }
+      const { xUnit, yUnit } = selectedAxes;
+      xxLabel = xUnit === '' ? xLabel : xUnit;
+      yyLabel = yUnit === '' ? yLabel : yUnit;
+    }
+
+    if (cyclicvoltaSt && cyclicvoltaSt.useCurrentDensity) {
+      const areaUnit = cyclicvoltaSt.areaUnit || 'cm²';
+      const baseUnit = /mA/i.test(String(yyLabel)) ? 'mA' : 'A';
+      yyLabel = `Current density in ${baseUnit}/${areaUnit}`;
+    }
+
+    const filterSeed = seed;
+    const filterPeak = peak;
+
+    drawMain(this.rootKlass, W, H);
+    this.focus.create({
+      curveSt,
+      filterSeed,
+      filterPeak,
+      tTrEndPts,
+      tSfPeaks,
+      editPeakSt,
+      layoutSt,
+      sweepExtentSt,
+      isUiNoBrushSt,
+      cyclicvoltaSt,
+      integationSt,
+      mtplySt,
+    });
+    drawLabel(this.rootKlass, cLabel, xxLabel, yyLabel);
+    drawDisplay(this.rootKlass, isHidden);
+    drawArrowOnCurve(this.rootKlass, isHidden);
   }
 
   componentDidUpdate(prevProps) {
@@ -73,6 +127,11 @@ class ViewerMulti extends React.Component {
       const { xUnit, yUnit } = selectedAxes;
       xxLabel = xUnit === '' ? xLabel : xUnit;
       yyLabel = yUnit === '' ? yLabel : yUnit;
+    }
+    if (cyclicvoltaSt && cyclicvoltaSt.useCurrentDensity) {
+      const areaUnit = cyclicvoltaSt.areaUnit || 'cm²';
+      const baseUnit = /mA/i.test(String(yyLabel)) ? 'mA' : 'A';
+      yyLabel = `Current density in ${baseUnit}/${areaUnit}`;
     }
 
     const filterSeed = seed;
