@@ -13,6 +13,7 @@ describe('CV', () => {
 
   function addMaxPeak(view, offset=0) {
     cy.get('.btn-sv-bar-addpeak').click()
+    cy.get('.d3Svg').scrollIntoView()
     cy.get('.d3Svg')
       .trigger('click', 1110 + offset, 480, {
         which: 1,
@@ -22,8 +23,9 @@ describe('CV', () => {
 
   function addMinPeak(view, offset=0) {
     cy.get('.btn-sv-bar-addpeak').click()
+    cy.get('.d3Svg').scrollIntoView()
     cy.get('.d3Svg')
-      .trigger('click', 1050 + offset, 1480, {
+      .trigger('click', 1050 + offset, 750, {
         which: 1,
         view: view,
       })
@@ -31,8 +33,9 @@ describe('CV', () => {
 
   function addPecker(view, offset=0) {
     cy.get('.btn-sv-bar-addpecker').click()
+    cy.get('.d3Svg').scrollIntoView()
     cy.get('.d3Svg')
-      .trigger('click', 1350 + offset, 1480, {
+      .trigger('click', 1350 + offset, 750, {
         which: 1,
         view: view,
       })
@@ -40,6 +43,7 @@ describe('CV', () => {
 
   function removeMaxPeak(view, offset=0) {
     cy.get('.btn-sv-bar-rmpeak').click()
+    cy.get('.d3Svg').scrollIntoView()
     cy.get('.d3Svg')
     .trigger('click', 1110 + offset, 450, {
       which: 1,
@@ -49,8 +53,9 @@ describe('CV', () => {
 
   function removeMinPeak(view, offset=0) {
     cy.get('.btn-sv-bar-rmpeak').click()
+    cy.get('.d3Svg').scrollIntoView()
     cy.get('.d3Svg')
-      .trigger('click', 1050 + offset, 900, {
+      .trigger('click', 1050 + offset, 750, {
         which: 1,
         view: view,
       })
@@ -58,8 +63,9 @@ describe('CV', () => {
 
   function removePecker(view, offset=0) {
     cy.get('.btn-sv-bar-rmpecker').click()
+    cy.get('.d3Svg').scrollIntoView()
     cy.get('.d3Svg')
-      .trigger('click', 1350 + offset, 800, {
+      .trigger('click', 1350 + offset, 750, {
         which: 1,
         view: view,
       })

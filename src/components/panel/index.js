@@ -72,7 +72,7 @@ class PanelViewer extends React.Component {
     const {
       classes, feature, integration, editorOnly, molSvg, descriptions, layoutSt,
       canChangeDescription, jcampIdx, entityFileNames, curveSt, userManualLink,
-      subLayoutsInfo, exactMass,
+      subLayoutsInfo, exactMass, hideCyclicVolta,
     } = this.props;
     const onExapndInfo = () => this.onExapnd('info');
     const onExapndPeak = () => this.onExapnd('peak');
@@ -106,7 +106,15 @@ class PanelViewer extends React.Component {
             { Cfg.hidePanelPeak(layoutSt) ? null : <PeakPanel expand={expand === 'peak'} onExapnd={onExapndPeak} /> }
             { Cfg.hidePanelMpy(layoutSt) ? null : <MultiplicityPanel expand={expand === 'mpy'} onExapnd={onExapndMpy} /> }
             { (Cfg.hidePanelCompare(layoutSt) || listCurves.length > 1) ? null : <ComparePanel expand={expand === 'compare'} onExapnd={onExapndCompare} /> }
-            { Cfg.hidePanelCyclicVolta(layoutSt) ? null : <CyclicVoltammetryPanel jcampIdx={jcampIdx} feature={feature} expand={expand === 'cyclicvolta'} onExapnd={onExapndCyclicVolta} userManualLink={userManualLink ? userManualLink.cv : undefined} />}
+            { (Cfg.hidePanelCyclicVolta(layoutSt) || hideCyclicVolta) ? null : (
+              <CyclicVoltammetryPanel
+                jcampIdx={jcampIdx}
+                feature={feature}
+                expand={expand === 'cyclicvolta'}
+                onExapnd={onExapndCyclicVolta}
+                userManualLink={userManualLink ? userManualLink.cv : undefined}
+              />
+            )}
           </ThemeProvider>
         </StyledEngineProvider>
       </div>
@@ -141,6 +149,7 @@ PanelViewer.propTypes = {
   curveSt: PropTypes.object.isRequired,
   subLayoutsInfo: PropTypes.object,
   exactMass: PropTypes.string,
+  hideCyclicVolta: PropTypes.bool,
 };
 
 export default connect( // eslint-disable-line
