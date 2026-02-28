@@ -91,6 +91,21 @@ const setCylicVoltaRef = (payload) => (
   }
 );
 
+const setCyclicVoltaAreaValue = (value) => ({
+  type: CYCLIC_VOLTA_METRY.SET_AREA_VALUE,
+  payload: { value },
+});
+
+const setCyclicVoltaAreaUnit = (unit) => ({
+  type: CYCLIC_VOLTA_METRY.SET_AREA_UNIT,
+  payload: { unit },
+});
+
+const toggleCyclicVoltaDensity = (payload) => ({
+  type: CYCLIC_VOLTA_METRY.TOGGLE_DENSITY,
+  payload,
+});
+
 export {
   addNewCylicVoltaPairPeak, removeCylicVoltaPairPeak,
   addCylicVoltaMaxPeak, removeCylicVoltaMaxPeak,
@@ -99,4 +114,7 @@ export {
   addCylicVoltaPecker, removeCylicVoltaPecker,
   selectRefPeaks, setCylicVoltaRefFactor,
   setCylicVoltaRef,
+  setCyclicVoltaAreaValue,
+  setCyclicVoltaAreaUnit,
+  toggleCyclicVoltaDensity,
 };
