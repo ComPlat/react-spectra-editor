@@ -34,6 +34,36 @@ const styles = () => (
   )
 );
 
+const chemSubStyle = {
+  fontSize: '0.85em',
+  position: 'relative',
+  top: '0.24em',
+  lineHeight: 1,
+};
+
+const renderReadableSubscript = (txt = '') => {
+  if (typeof txt !== 'string') return txt;
+  const regex = /([A-Za-z])(\d+)/g;
+  if (!regex.test(txt)) return txt;
+  regex.lastIndex = 0;
+  const parts = [];
+  let cursor = 0;
+  let match = regex.exec(txt);
+  while (match) {
+    const [raw, prefix, digits] = match;
+    const at = match.index;
+    if (at > cursor) parts.push(txt.slice(cursor, at));
+    parts.push(prefix);
+    parts.push(
+      <span key={`${at}-${digits}`} style={chemSubStyle}>{digits}</span>,
+    );
+    cursor = at + raw.length;
+    match = regex.exec(txt);
+  }
+  if (cursor < txt.length) parts.push(txt.slice(cursor));
+  return parts;
+};
+
 const shiftSelect = (
   classes, layoutSt, setShiftRefAct, shiftSt, curveSt,
 ) => {
@@ -73,7 +103,8 @@ const shiftSelect = (
         {listShift.map((ref) => (
           <MenuItem value={ref.name} key={ref.name}>
             <span className={classNames(classes.txtOpt, 'option-sv-bar-shift')}>
-              {`${ref.name}: ${Format.strNumberFixedDecimal(ref.value, 2)} ppm`}
+              {renderReadableSubscript(ref.name)}
+              {`: ${Format.strNumberFixedDecimal(ref.value, 2)} ppm`}
             </span>
           </MenuItem>
         ))}
