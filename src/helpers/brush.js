@@ -71,7 +71,7 @@ const MountBrush = (focus, isUiAddIntgSt, isUiNoBrushSt, brushedClass = '.d3Svg'
   if (!(graphIndex === 0 && isIntegrationAdd) && !isZoomIn && !isMultiplicitySweepAdd) return;
 
   const isXAxisOnly = focus?.xOnlyBrush === true;
-  const xOnly = isUiAddIntgSt || isXAxisOnly;
+  const xOnly = isUiAddIntgSt || (isXAxisOnly && !isZoomIn);
   const brushedCb = (event) => brushed(focus, xOnly, event, brushedClass);
   const wheeledCb = (event) => wheeled(focus, event);
 

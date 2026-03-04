@@ -80,11 +80,16 @@ const zoomView = (classes, graphIndex, uiSt, zoomInAct) => {
   };
 
   const onSweepZoomReset = () => {
-    const payload = {
+    const resetPayload = {
       graphIndex,
       sweepType: LIST_UI_SWEEP_TYPE.ZOOMRESET,
     };
-    zoomInAct(payload);
+    zoomInAct(resetPayload);
+    // Re-enable zoom brush immediately after reset for LC/MS flow.
+    zoomInAct({
+      graphIndex,
+      sweepType: LIST_UI_SWEEP_TYPE.ZOOMIN,
+    });
   };
 
   const { zoom } = uiSt;
@@ -133,6 +138,10 @@ const wavelengthSelect = (classes, hplcMsSt, updateWavelengthAct) => {
       </span>
     </MenuItem>
   )) : [];
+  const hasSelectedWaveLength = listWaveLength && listWaveLength.includes(selectedWaveLength);
+  const resolvedSelectedWaveLength = hasSelectedWaveLength
+    ? selectedWaveLength
+    : (listWaveLength && listWaveLength[0]);
 
   return (
     <FormControl
@@ -146,13 +155,10 @@ const wavelengthSelect = (classes, hplcMsSt, updateWavelengthAct) => {
       <Select
         labelId="select-decimal-label"
         label="Decimal"
-        value={selectedWaveLength ?? ''}
+        value={resolvedSelectedWaveLength}
         onChange={updateWavelengthAct}
         className={classNames(classes.selectInput, 'input-sv-bar-decimal')}
       >
-        <MenuItem value="" key="wavelength-empty">
-          <span className={classNames(classes.txtOpt, 'option-sv-bar-decimal')} />
-        </MenuItem>
         { options }
       </Select>
     </FormControl>
@@ -180,6 +186,8 @@ const ticSelect = (classes, hplcMsSt, handleTicChanged) => {
   const onTicChange = (event) => {
     handleTicChanged(event);
   };
+  const optionValues = listOptions.map((d) => d.value);
+  const resolvedPolarity = optionValues.includes(polarity) ? polarity : optionValues[0];
 
   return (
     <FormControl
@@ -193,13 +201,10 @@ const ticSelect = (classes, hplcMsSt, handleTicChanged) => {
       <Select
         labelId="select-decimal-label"
         label="Decimal"
-        value={polarity || ''}
+        value={resolvedPolarity}
         onChange={onTicChange}
         className={classNames(classes.selectInput, 'input-sv-bar-decimal')}
       >
-        <MenuItem value="" key="tic-empty">
-          <span className={classNames(classes.txtOpt, 'option-sv-bar-decimal')} />
-        </MenuItem>
         { options }
       </Select>
     </FormControl>
