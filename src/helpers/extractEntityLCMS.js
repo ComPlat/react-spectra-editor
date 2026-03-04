@@ -7,19 +7,19 @@ export function catToString(cat) {
 }
 
 const collectCategories = (entity) => {
-  const cats = [];
+  const categories = [];
   if (Array.isArray(entity.features)) {
-    entity.features.forEach((f) => {
-      if (f?.csCategory) cats.push(...[].concat(f.csCategory));
+    entity.features.forEach((feature) => {
+      if (feature?.csCategory) categories.push(...[].concat(feature.csCategory));
     });
   }
   if (entity.feature?.csCategory) {
-    cats.push(...[].concat(entity.feature.csCategory));
+    categories.push(...[].concat(entity.feature.csCategory));
   }
   if (entity.csCategory) {
-    cats.push(...[].concat(entity.csCategory));
+    categories.push(...[].concat(entity.csCategory));
   }
-  return cats;
+  return categories;
 };
 
 const getEntityValue = (entity, path, fallback = '') => {
@@ -42,10 +42,10 @@ export function getLcMsInfo(entity = {}) {
     };
   }
 
-  const cats = collectCategories(entity);
-  const upperCats = cats.map(String).map((c) => c.toUpperCase());
-  const hasNeg = upperCats.some((c) => c.includes('NEGATIVE'));
-  const hasPos = upperCats.some((c) => c.includes('POSITIVE'));
+  const categories = collectCategories(entity);
+  const normalizedCategories = categories.map(String).map((category) => category.toUpperCase());
+  const hasNeg = normalizedCategories.some((category) => category.includes('NEGATIVE'));
+  const hasPos = normalizedCategories.some((category) => category.includes('POSITIVE'));
   let polarity = 'neutral';
   if (hasNeg) {
     polarity = 'negative';
@@ -54,9 +54,9 @@ export function getLcMsInfo(entity = {}) {
   }
 
   let kind = null;
-  if (upperCats.some((c) => c.includes('TIC'))) kind = 'tic';
-  if (!kind && upperCats.some((c) => c.includes('MZ'))) kind = 'mz';
-  if (!kind && upperCats.some((c) => c.includes('UVVIS'))) kind = 'uvvis';
+  if (normalizedCategories.some((category) => category.includes('TIC'))) kind = 'tic';
+  if (!kind && normalizedCategories.some((category) => category.includes('MZ'))) kind = 'mz';
+  if (!kind && normalizedCategories.some((category) => category.includes('UVVIS'))) kind = 'uvvis';
 
   const dataType = String(
     entity.dataType
@@ -100,7 +100,9 @@ export function splitAndReindexEntities(entities = []) {
   const uvvis = [];
   const unknown = [];
 
-  entities.forEach((e) => {
+  const normalizedEntities = entities.map((entity) => ({ ...entity }));
+
+  normalizedEntities.forEach((e) => {
     const info = getLcMsInfo(e);
     e.lcmsKind = info.kind;
     e.lcmsPolarity = info.polarity;
@@ -130,7 +132,7 @@ export function splitAndReindexEntities(entities = []) {
     uvvisEntities: uvvis,
     unknownEntities: unknown,
     dataEntities: [...mz, ...uvvis, ...unknown],
-    allEntities: entities,
+    allEntities: normalizedEntities,
   };
 }
 

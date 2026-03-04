@@ -18,11 +18,19 @@ import { extractParams } from './helpers/extractParams';
 const styles = () => ({
 });
 
+const getThresholdState = (state) => {
+  const curveIdx = state?.curve?.curveIdx;
+  const thresholdList = state?.threshold?.list;
+  if (!Array.isArray(thresholdList)) return {};
+  if (!Number.isInteger(curveIdx)) return thresholdList[0] || {};
+  return thresholdList[curveIdx] || thresholdList[0] || {};
+};
+
 const LayerPrism = ({
   entity, cLabel, xLabel, yLabel, forecast, operations,
   descriptions, molSvg, editorOnly, exactMass,
   thresSt, scanSt, uiSt,
-  canChangeDescription, onDescriptionChanged,
+  canChangeDescription, onDescriptionChanged, entityFileNames, userManualLink,
 }) => {
   const {
     topic, feature, hasEdit, integration, features,
@@ -46,7 +54,7 @@ const LayerPrism = ({
               <LayerContent
                 topic={topic}
                 feature={feature}
-                features={features}
+                features={features || []}
                 cLabel={cLabel}
                 xLabel={xLabel}
                 yLabel={yLabel}
@@ -75,7 +83,7 @@ const LayerPrism = ({
             <LayerContent
               topic={topic}
               feature={feature}
-              features={features}
+              features={features || []}
               cLabel={cLabel}
               xLabel={xLabel}
               yLabel={yLabel}
@@ -90,6 +98,8 @@ const LayerPrism = ({
               editorOnly={editorOnly}
               molSvg={molSvg}
               exactMass={exactMass}
+              entityFileNames={entityFileNames}
+              userManualLink={userManualLink}
               descriptions={descriptions}
               canChangeDescription={canChangeDescription}
               onDescriptionChanged={onDescriptionChanged}
@@ -104,7 +114,7 @@ const LayerPrism = ({
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     scanSt: state.scan,
-    thresSt: state.threshold.list[state.curve.curveIdx],
+    thresSt: getThresholdState(state),
     uiSt: state.ui,
   }
 );
@@ -130,6 +140,8 @@ LayerPrism.propTypes = {
   uiSt: PropTypes.object.isRequired,
   canChangeDescription: PropTypes.bool.isRequired,
   onDescriptionChanged: PropTypes.func,
+  entityFileNames: PropTypes.array,
+  userManualLink: PropTypes.object,
 };
 
 export default connect( // eslint-disable-line

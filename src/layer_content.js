@@ -6,13 +6,13 @@ import { bindActionCreators, compose } from 'redux';
 
 import ViewerLine from './components/d3_line/index';
 import ViewerRect from './components/d3_rect/index';
-import ViewerLineRect from './components/d3_line_rect/index';
 import ForecastViewer from './components/forecast_viewer';
 import Format from './helpers/format';
 
 const extractLayout = (forecast, layoutSt) => {
-  const isEmpty = Object.keys(forecast).length === 0
-    && forecast.constructor === Object;
+  const safeForecast = forecast && typeof forecast === 'object' ? forecast : {};
+  const isEmpty = Object.keys(safeForecast).length === 0
+    && safeForecast.constructor === Object;
   const isNmr = Format.isNmrLayout(layoutSt);
   const isMs = Format.isMsLayout(layoutSt);
   const isLCMs = Format.isLCMsLayout(layoutSt);
@@ -26,7 +26,7 @@ const extractLayout = (forecast, layoutSt) => {
 };
 
 const Content = ({
-  topic, feature, cLabel, xLabel, yLabel, forecast, operations, layoutSt, features,
+  topic, feature, cLabel, xLabel, yLabel, forecast, operations, layoutSt,
 }) => {
   const {
     showForecast, isNmr, isIr, isMs, isUvvis, isXRD, isLCMs,
@@ -65,9 +65,8 @@ const Content = ({
 
   if (isLCMs) {
     return (
-      <ViewerLineRect
+      <ViewerRect
         topic={topic}
-        features={features}
         cLabel={cLabel}
         xLabel={xLabel}
         yLabel={yLabel}
@@ -103,7 +102,6 @@ const mapDispatchToProps = (dispatch) => (
 Content.propTypes = {
   topic: PropTypes.object.isRequired,
   feature: PropTypes.object.isRequired,
-  features: PropTypes.array.isRequired,
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,

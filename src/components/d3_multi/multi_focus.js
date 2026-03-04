@@ -111,7 +111,13 @@ class MultiFocus {
     const sameLySt = prevLySt === this.layout;
     const sameTePt = prevTePt === this.tTrEndPts.length;
     const sameDtPk = prevDtPk === this.dataPks.length;
-    const sameSfPk = JSON.stringify(prevSfPk) === JSON.stringify(this.tSfPeaks);
+    const sameSfPk = prevSfPk === this.tSfPeaks
+      || (
+        Array.isArray(prevSfPk)
+        && Array.isArray(this.tSfPeaks)
+        && prevSfPk.length === this.tSfPeaks.length
+        && prevSfPk.every((peak, idx) => peak === this.tSfPeaks[idx])
+      );
     const sameData = prevData === this.data.length;
     const sameYFactor = prevYFactor === this.yTransformFactor;
     this.shouldUpdate = Object.assign(
@@ -272,6 +278,8 @@ class MultiFocus {
     this.path.style('stroke', this.pathColor);
     if (this.layout === LIST_LAYOUT.AIF) {
       this.path.attr('marker-mid', 'url(#arrow-left)');
+    } else {
+      this.path.attr('marker-mid', null);
     }
   }
 
@@ -302,6 +310,8 @@ class MultiFocus {
       path.attr('d', this.pathCall(data));
       if (this.layout === LIST_LAYOUT.AIF && this.isShowAllCurves === true) {
         path.attr('marker-mid', 'url(#arrow-left)');
+      } else {
+        path.attr('marker-mid', null);
       }
     });
     return null;
@@ -604,13 +614,13 @@ class MultiFocus {
       .on('click', (event, d) => this.onClickPecker(event, d));
   }
 
-  drawInteg(integationSt) {
+  drawInteg(integrationState) {
     const {
       sameXY, sameLySt, sameItSt, sameData,
     } = this.shouldUpdate;
     if (sameXY && sameLySt && sameItSt && sameData) return;
 
-    const { integrations } = integationSt;
+    const { integrations } = integrationState;
     const selectedIntegration = integrations[this.jcampIdx];
     if (selectedIntegration === false || selectedIntegration === undefined) {
       const itgs = [];
@@ -1053,7 +1063,7 @@ class MultiFocus {
     editPeakSt, layoutSt,
     sweepExtentSt, isUiNoBrushSt,
     cyclicvoltaSt,
-    integationSt, mtplySt, uiSt,
+    integrationSt, mtplySt, uiSt,
   }) {
     this.uiSt = uiSt;
     this.graphIndex = uiSt?.zoom?.graphIndex;
@@ -1089,7 +1099,7 @@ class MultiFocus {
       this.drawPeaks(editPeakSt);
       this.drawRef();
       this.drawPeckers();
-      this.drawInteg(integationSt);
+      this.drawInteg(integrationSt);
       this.drawMtply(mtplySt);
     }
     MountBrush(this, false, isUiNoBrushSt);
@@ -1101,7 +1111,7 @@ class MultiFocus {
     filterSeed, filterPeak, tTrEndPts, tSfPeaks,
     editPeakSt, layoutSt,
     sweepExtentSt, isUiNoBrushSt, cyclicvoltaSt,
-    integationSt, mtplySt, uiSt,
+    integrationSt, mtplySt, uiSt,
   }) {
     this.uiSt = uiSt;
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
@@ -1125,7 +1135,7 @@ class MultiFocus {
       this.drawPeaks(editPeakSt);
       this.drawRef();
       this.drawPeckers();
-      this.drawInteg(integationSt);
+      this.drawInteg(integrationSt);
       this.drawMtply(mtplySt);
     }
     MountBrush(this, false, isUiNoBrushSt, this.uiSt, this.graphIndex);

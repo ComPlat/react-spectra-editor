@@ -4,7 +4,7 @@ prefer-object-spread */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { bindActionCreators, compose } from 'redux';
+import { compose } from 'redux';
 import { withStyles } from '@mui/styles';
 import {
   Grid,
@@ -14,8 +14,6 @@ import PanelViewer from './panel/index';
 import CmdBar from './cmd_bar/index';
 import ViewerLineRect from './d3_line_rect/index';
 import { splitAndReindexEntities } from '../helpers/extractEntityLCMS';
-
-import { setAllCurves } from '../actions/curve';
 
 const styles = () => ({
   root: {
@@ -33,26 +31,29 @@ const styles = () => ({
 class HPLCViewer extends React.Component { // eslint-disable-line
   render() {
     const {
-      classes, curveSt, operations, entityFileNames,
-      entities, userManualLink, molSvg, theoryMass, integrationSt, hplcMsSt,
-      descriptions, canChangeDescription, onDescriptionChanged, editorOnly,
+      classes, curveState, operations, entityFileNames,
+      entities, userManualLink, molSvg, theoryMass, integrationState, hplcMsState,
+      descriptions, canChangeDescription, onDescriptionChanged, editorOnly, forecast,
     } = this.props;
     if (!entities || entities.length === 0) return (<div />);
-    const { curveIdx } = curveSt;
+    const { curveIdx } = curveState;
     const entity = entities[curveIdx];
     if (!entity) return (<div />);
     const { feature, topic } = entity || {};
     const { ticEntities, uvvisEntities, mzEntities } = splitAndReindexEntities(entities);
     const displayFeature = feature || (entities[0]?.feature) || (entities[0]?.features?.[0]) || {};
-    const { integrations } = integrationSt;
+    const hasEdit = !!displayFeature?.data?.[0]?.x?.length;
+    const { integrations } = integrationState;
     const currentIntegration = integrations[curveIdx];
 
     return (
       <div className={classes.root}>
         <CmdBar
           feature={displayFeature}
+          hasEdit={hasEdit}
+          forecast={forecast || {}}
           operations={operations}
-          editorOnly={true}
+          editorOnly={editorOnly}
           hideThreshold={true}
           hideMainEditTools={true}
         />
@@ -68,7 +69,8 @@ class HPLCViewer extends React.Component { // eslint-disable-line
                 yLabel={displayFeature?.yUnit || ''}
                 feature={displayFeature}
                 jcampIdx={curveIdx}
-                hplcMsSt={hplcMsSt}
+                hplcMsSt={hplcMsState}
+                isHidden={false}
               />
             </Grid>
             <Grid item xs={3} align="center">
@@ -94,35 +96,27 @@ class HPLCViewer extends React.Component { // eslint-disable-line
   }
 }
 
-const mapStateToProps = (state, _) => ( // eslint-disable-line
+const mapStateToProps = (state) => (
   {
-    curveSt: state.curve,
+    curveState: state.curve,
     entities: state.curve.listCurves,
-    layoutSt: state.layout,
-    integrationSt: state.integration.present,
-    hplcMsSt: state.hplcMs,
+    integrationState: state.integration.present,
+    hplcMsState: state.hplcMs,
   }
-);
-
-const mapDispatchToProps = (dispatch) => (
-  bindActionCreators({
-    setAllCurvesAct: setAllCurves,
-  }, dispatch)
 );
 
 HPLCViewer.propTypes = {
   classes: PropTypes.object.isRequired,
   entityFileNames: PropTypes.array.isRequired,
   molSvg: PropTypes.string.isRequired,
-  setAllCurvesAct: PropTypes.func.isRequired,
-  curveSt: PropTypes.object.isRequired,
+  curveState: PropTypes.object.isRequired,
   operations: PropTypes.array.isRequired,
+  forecast: PropTypes.object,
   userManualLink: PropTypes.object,
   entities: PropTypes.array,
-  layoutSt: PropTypes.string.isRequired,
   theoryMass: PropTypes.string,
-  integrationSt: PropTypes.object.isRequired,
-  hplcMsSt: PropTypes.object.isRequired,
+  integrationState: PropTypes.object.isRequired,
+  hplcMsState: PropTypes.object.isRequired,
   descriptions: PropTypes.array.isRequired,
   canChangeDescription: PropTypes.bool.isRequired,
   onDescriptionChanged: PropTypes.func,
@@ -136,10 +130,11 @@ HPLCViewer.defaultProps = {
   xLabel: '',
   yLabel: '',
   entities: [],
+  forecast: {},
   onDescriptionChanged: () => {},
 };
 
 export default compose(
-  connect(mapStateToProps, mapDispatchToProps),
+  connect(mapStateToProps),
   withStyles(styles),
 )(HPLCViewer);

@@ -255,7 +255,7 @@ class DemoWriteIr extends React.Component {
           hplcMsTicChemstationEntity, hplcMsMzChemstationEntity, hplcMsUvvisChemstationEntity,
         ];
       default:
-        return false;
+        return [];
     }
   }
 
@@ -448,8 +448,7 @@ class DemoWriteIr extends React.Component {
 
   savePeaks(payload) {
     const {
-      peaks, layout, shift, isAscend, decimal, analysis, isIntensity,
-      integration, multiplicity, waveLength,
+      peaks, layout, shift, isAscend, decimal, isIntensity, waveLength,
     } = pickSelectedSpectrumFromPayload(payload);
     const entity = this.loadEntity();
     const safeLayout = layout || entity?.layout;
@@ -473,18 +472,14 @@ class DemoWriteIr extends React.Component {
       hplcMsSt: store.getState().hplcMs,
     });
     /*eslint-disable */
+    let message = `Peaks: ${body}\n`;
     if (shift?.ref?.label) {
       const label = this.rmDollarSign(shift.ref.label);
-      alert(
-        `Peaks: ${body}` + '\n' +
-        '- - - - - - - - - - -' + '\n' +
-        `Shift solvent = ${label}, ${shift.ref.value}ppm` + '\n'
-      );
-    } else {
-      alert(
-        `Peaks: ${body}` + '\n'
-      );
+      message += '- - - - - - - - - - -\n';
+      message += `Shift solvent = ${label}, ${shift.ref.value}ppm\n`;
     }
+    console.info(message); // eslint-disable-line no-console
+    this.setState({ desc: message });
     /*eslint-disable */
   }
 
@@ -536,7 +531,9 @@ class DemoWriteIr extends React.Component {
       ];
     }
 
-    const refreshCb = () => alert('Refresch simulation!');
+    const refreshCb = () => {
+      console.info('Refresh simulation requested.'); // eslint-disable-line no-console
+    };
 
     const forecast = {
       btnCb: this.predictOp,

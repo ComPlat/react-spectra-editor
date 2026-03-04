@@ -2,7 +2,7 @@
 react/function-component-definition, react/require-default-props */
 import React from 'react';
 import { connect } from 'react-redux';
-import { bindActionCreators, compose } from 'redux';
+import { compose } from 'redux';
 import PropTypes from 'prop-types';
 
 import withStyles from '@mui/styles/withStyles';
@@ -82,11 +82,6 @@ const mapStateToProps = (state, _) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = (dispatch) => (
-  bindActionCreators({
-  }, dispatch)
-);
-
 CmdBar.propTypes = {
   classes: PropTypes.object.isRequired,
   feature: PropTypes.object.isRequired,
@@ -101,6 +96,6 @@ CmdBar.propTypes = {
 };
 
 export default compose(
-  connect(mapStateToProps, mapDispatchToProps),
+  connect(mapStateToProps, null),
   withStyles(styles),
 )(CmdBar);

@@ -5,7 +5,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
-import { bindActionCreators, compose } from 'redux';
+import { compose } from 'redux';
 
 import Tooltip from '@mui/material/Tooltip';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
@@ -303,11 +303,6 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = (dispatch) => (
-  bindActionCreators({
-  }, dispatch)
-);
-
 BtnSubmit.propTypes = {
   classes: PropTypes.object.isRequired,
   feature: PropTypes.object.isRequired,
@@ -335,10 +330,14 @@ BtnSubmit.propTypes = {
   axesUnitsSt: PropTypes.object.isRequired,
   detectorSt: PropTypes.object.isRequired,
   metaSt: PropTypes.object.isRequired,
-  hplcMsSt: PropTypes.object.isRequired,
+  hplcMsSt: PropTypes.object,
+};
+
+BtnSubmit.defaultProps = {
+  hplcMsSt: {},
 };
 
 export default compose(
-  connect(mapStateToProps, mapDispatchToProps),
+  connect(mapStateToProps, null),
   withStyles(styles),
 )(BtnSubmit);

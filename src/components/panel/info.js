@@ -241,8 +241,15 @@ const SECData = ({
 SECData.propTypes = {
   classes: PropTypes.object.isRequired,
   layout: PropTypes.string.isRequired,
-  detector: PropTypes.object.isRequired,
-  secData: PropTypes.object.isRequired,
+  detector: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.object,
+  ]),
+  secData: PropTypes.object,
+};
+
+SECData.defaultProps = {
+  detector: '',
 };
 
 const DSCData = ({
@@ -279,14 +286,14 @@ const DSCData = ({
 DSCData.propTypes = {
   classes: PropTypes.object.isRequired,
   layout: PropTypes.string.isRequired,
-  dscMetaData: PropTypes.object.isRequired,
+  dscMetaData: PropTypes.object,
   updateAction: PropTypes.func.isRequired,
 };
 
 const InfoPanel = ({
   classes, expand, feature, integration, editorOnly, molSvg, descriptions,
   layoutSt, simulationSt, shiftSt, curveSt, exactMass,
-  onExapnd, canChangeDescription, onDescriptionChanged, detectorSt,
+  onExapnd, onExpand, canChangeDescription, onDescriptionChanged, detectorSt,
   metaSt, updateDSCMetaDataAct, hplcMsSt, entities,
 }) => {
   if (!feature) return null;
@@ -295,7 +302,7 @@ const InfoPanel = ({
   } = feature;
   const { dscMetaData } = metaSt;
   const { curveIdx } = curveSt;
-  const { curves } = detectorSt;
+  const { curves = [] } = detectorSt || {};
   const currentEntity = Array.isArray(entities) ? entities[curveIdx] : null;
   const entityTitle = currentEntity?.entity?.title
     || currentEntity?.title
@@ -307,7 +314,7 @@ const InfoPanel = ({
   const getSelectedDetectorForCurve = (_detectorSt, targetCurveIdx) => {
     const targetCurve = curves.find((curve) => curve.curveIdx === targetCurveIdx);
 
-    return targetCurve ? targetCurve.selectedDetector.name : '';
+    return targetCurve?.selectedDetector?.name || '';
   };
 
   let selectedDetector = getSelectedDetectorForCurve(detectorSt, curveIdx);
@@ -334,7 +341,7 @@ const InfoPanel = ({
     <Accordion
       data-testid="PanelInfo"
       expanded={expand}
-      onChange={onExapnd}
+      onChange={onExpand || onExapnd}
       disableGutters
       sx={{
         '&.MuiAccordion-root.Mui-expanded': { margin: 0 },
@@ -502,8 +509,8 @@ const mapDispatchToProps = (dispatch) => (
 InfoPanel.propTypes = {
   classes: PropTypes.object.isRequired,
   expand: PropTypes.bool.isRequired,
-  feature: PropTypes.object.isRequired,
-  integration: PropTypes.object.isRequired,
+  feature: PropTypes.object,
+  integration: PropTypes.object,
   editorOnly: PropTypes.bool.isRequired,
   molSvg: PropTypes.string.isRequired,
   descriptions: PropTypes.oneOfType([
@@ -511,10 +518,11 @@ InfoPanel.propTypes = {
     PropTypes.array,
   ]).isRequired,
   layoutSt: PropTypes.string.isRequired,
-  simulationSt: PropTypes.array.isRequired,
+  simulationSt: PropTypes.object.isRequired,
   shiftSt: PropTypes.object.isRequired,
   curveSt: PropTypes.object.isRequired,
-  onExapnd: PropTypes.func.isRequired,
+  onExpand: PropTypes.func,
+  onExapnd: PropTypes.func,
   canChangeDescription: PropTypes.bool.isRequired,
   onDescriptionChanged: PropTypes.func,
   exactMass: PropTypes.string,

@@ -43,9 +43,20 @@ class LayerInit extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
+    const {
+      others, multiEntities, entity, operations,
+    } = this.props;
     this.normChange(prevProps);
-    this.updateOthers();
-    this.updateMultiEntities();
+    if (prevProps.operations !== operations || prevProps.entity !== entity) {
+      this.initReducer();
+    }
+    if (prevProps.others !== others) {
+      this.updateOthers();
+    }
+    if (prevProps.multiEntities !== multiEntities
+      || prevProps.entity !== entity) {
+      this.updateMultiEntities();
+    }
   }
 
   normChange(prevProps) {
@@ -61,9 +72,10 @@ class LayerInit extends React.Component {
       resetInitCommonAct, resetInitMsAct, resetInitNmrAct, resetInitCommonWithIntergationAct,
       resetDetectorAct, updateDSCMetaDataAct, resetMultiplicityAct, updateLayoutAct,
     } = this.props;
+    if (!entity || !entity.layout) return;
     resetInitCommonAct();
     resetDetectorAct();
-    const { layout, features } = entity;
+    const { layout, features = {} } = entity;
     updateLayoutAct(layout);
     if (Format.isMsLayout(layout)) {
       // const { autoPeak, editPeak } = features; // TBD
@@ -93,19 +105,32 @@ class LayerInit extends React.Component {
 
   initReducer() {
     const { operations, updateOperationAct } = this.props;
-    updateOperationAct(operations[0]);
+    if (Array.isArray(operations) && operations.length > 0) {
+      updateOperationAct(operations[0]);
+    }
   }
 
   updateOthers() {
     const { others, addOthersAct } = this.props;
-    addOthersAct(others);
+    if (others) {
+      addOthersAct(others);
+    }
   }
 
   updateMultiEntities() {
     const { multiEntities, setAllCurvesAct, entity } = this.props;
+    if (!entity || !entity.layout) return;
     const isMultiSpectra = Array.isArray(multiEntities) && multiEntities.length > 1;
     if (isMultiSpectra) {
       setAllCurvesAct(multiEntities);
+      return;
+    }
+
+    if (Format.isLCMsLayout(entity.layout)) {
+      const payload = (Array.isArray(multiEntities) && multiEntities.length > 0)
+        ? multiEntities
+        : [entity];
+      setAllCurvesAct(payload);
       return;
     }
 
@@ -128,23 +153,28 @@ class LayerInit extends React.Component {
       multiEntities, entityFileNames, userManualLink,
     } = this.props;
     const { layout } = entity;
-
-    const isLcms = Format.isLCMsLayout(layout)
-      || (Array.isArray(multiEntities) && isLcMsGroup(multiEntities));
+    const hasMultiEntities = Array.isArray(multiEntities) && multiEntities.length > 0;
+    const hasLcmsEntity = hasMultiEntities
+      && multiEntities.some((multiEntity) => Format.isLCMsLayout(multiEntity?.layout));
+    const isDetectedLcmsGroup = hasLcmsEntity && isLcMsGroup(multiEntities);
+    // For multi mode, trust multiEntities over single entity to avoid mixed-layout misrouting.
+    const isLcms = hasMultiEntities
+      ? isDetectedLcmsGroup
+      : Format.isLCMsLayout(layout);
     const target = isLcms
       ? null
       : (entity.spectra && Array.isArray(entity.spectra) && entity.spectra[0]) || null;
 
     const xxLabel = (!xLabel && xLabel === '' && target && target.xUnit) ? `X (${target.xUnit})` : xLabel;
     const yyLabel = (!yLabel && yLabel === '' && target && target.yUnit) ? `Y (${target.yUnit})` : yLabel;
-    const hasMultiEntities = Array.isArray(multiEntities) && multiEntities.length > 0;
     const isMultiSpectra = Array.isArray(multiEntities) && multiEntities.length > 1;
-    if (hasMultiEntities && (Format.isLCMsLayout(layout) || isLcMsGroup(multiEntities))) {
+    if (isLcms) {
       return (
         <HPLCViewer
           entityFileNames={entityFileNames}
           userManualLink={userManualLink}
           molSvg={molSvg}
+          forecast={forecast}
           operations={operations}
           descriptions={descriptions}
           canChangeDescription={canChangeDescription}
@@ -161,6 +191,8 @@ class LayerInit extends React.Component {
           userManualLink={userManualLink}
           molSvg={molSvg}
           exactMass={exactMass}
+          forecast={forecast}
+          editorOnly={editorOnly}
           operations={operations}
           descriptions={descriptions}
           canChangeDescription={canChangeDescription}
@@ -175,6 +207,8 @@ class LayerInit extends React.Component {
           userManualLink={userManualLink}
           molSvg={molSvg}
           exactMass={exactMass}
+          forecast={forecast}
+          editorOnly={editorOnly}
           operations={operations}
           descriptions={descriptions}
           canChangeDescription={canChangeDescription}
@@ -195,6 +229,8 @@ class LayerInit extends React.Component {
         molSvg={molSvg}
         editorOnly={editorOnly}
         exactMass={exactMass}
+        entityFileNames={entityFileNames}
+        userManualLink={userManualLink}
         canChangeDescription={canChangeDescription}
         onDescriptionChanged={onDescriptionChanged}
       />

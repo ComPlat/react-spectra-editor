@@ -22,7 +22,12 @@ const store = compose(
   applyMiddleware(...middlewares),
 )(createStore)(reducers);
 
-sagaMiddleware.run(sagas);
+try {
+  sagaMiddleware.run(sagas);
+} catch (error) {
+  // Keep startup failure visible without crashing silently.
+  console.error('[SpectraEditor] Failed to start sagas', error); // eslint-disable-line no-console
+}
 
 // - - - helper - - -
 const ensureQuillDelta = (descs) => {
@@ -87,7 +92,7 @@ SpectraEditor.propTypes = {
 
 SpectraEditor.defaultProps = {
   others: { others: [], addOthersCb: false },
-  multiEntities: false,
+  multiEntities: [],
   entityFileNames: [],
   cLabel: '',
   xLabel: '',

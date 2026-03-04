@@ -3,7 +3,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 
 import {
   createTheme, ThemeProvider, StyledEngineProvider,
@@ -51,7 +50,7 @@ class PanelViewer extends React.Component {
       expand: 'info',
     };
 
-    this.onExapnd = this.onExapnd.bind(this);
+    this.onToggleExpand = this.onToggleExpand.bind(this);
     this.handleDescriptionChanged = this.handleDescriptionChanged.bind(this);
   }
 
@@ -62,7 +61,7 @@ class PanelViewer extends React.Component {
     }
   }
 
-  onExapnd(input) {
+  onToggleExpand(input) {
     const { expand } = this.state;
     const nextExpand = input === expand ? '' : input;
     this.setState({ expand: nextExpand });
@@ -76,14 +75,15 @@ class PanelViewer extends React.Component {
       subLayoutsInfo, exactMass, entities,
       hideCyclicVolta,
     } = this.props;
-    const onExapndInfo = () => this.onExapnd('info');
-    const onExapndPeak = () => this.onExapnd('peak');
-    const onExapndMpy = () => this.onExapnd('mpy');
-    const onExapndCompare = () => this.onExapnd('compare');
-    const onExapndCyclicVolta = () => this.onExapnd('cyclicvolta');
-    const onExapndGraphSelection = () => this.onExapnd('graph');
+    const onExpandInfo = () => this.onToggleExpand('info');
+    const onExpandPeak = () => this.onToggleExpand('peak');
+    const onExpandMpy = () => this.onToggleExpand('mpy');
+    const onExpandCompare = () => this.onToggleExpand('compare');
+    const onExpandCyclicVolta = () => this.onToggleExpand('cyclicvolta');
+    const onExpandGraphSelection = () => this.onToggleExpand('graph');
     const { listCurves } = curveSt;
-    const hideGraphSelection = listCurves === false || listCurves === undefined || Format.isLCMsLayout(layoutSt);
+    const curveCount = Array.isArray(listCurves) ? listCurves.length : 0;
+    const hideGraphSelection = curveCount <= 1 || Format.isLCMsLayout(layoutSt);
 
     return (
       <div className={classNames(classes.panels)}>
@@ -91,7 +91,7 @@ class PanelViewer extends React.Component {
           <ThemeProvider
             theme={theme}
           >
-            { hideGraphSelection ? null : <GraphSelectionPanel jcampIdx={jcampIdx} entityFileNames={entityFileNames} expand={expand === 'graph'} onExapnd={onExapndGraphSelection} subLayoutsInfo={subLayoutsInfo} />}
+            { hideGraphSelection ? null : <GraphSelectionPanel jcampIdx={jcampIdx} entityFileNames={entityFileNames} expand={expand === 'graph'} onExpand={onExpandGraphSelection} subLayoutsInfo={subLayoutsInfo} />}
             <InfoPanel
               entities={entities}
               feature={feature}
@@ -100,20 +100,20 @@ class PanelViewer extends React.Component {
               expand={expand === 'info'}
               molSvg={molSvg}
               exactMass={exactMass}
-              onExapnd={onExapndInfo}
+              onExpand={onExpandInfo}
               descriptions={descriptions}
               canChangeDescription={canChangeDescription}
               onDescriptionChanged={this.handleDescriptionChanged}
             />
-            { Cfg.hidePanelPeak(layoutSt) ? null : <PeakPanel expand={expand === 'peak'} onExapnd={onExapndPeak} /> }
-            { Cfg.hidePanelMpy(layoutSt) ? null : <MultiplicityPanel expand={expand === 'mpy'} onExapnd={onExapndMpy} /> }
-            { (Cfg.hidePanelCompare(layoutSt) || listCurves.length > 1) ? null : <ComparePanel expand={expand === 'compare'} onExapnd={onExapndCompare} /> }
+            { Cfg.hidePanelPeak(layoutSt) ? null : <PeakPanel expand={expand === 'peak'} onExapnd={onExpandPeak} /> }
+            { Cfg.hidePanelMpy(layoutSt) ? null : <MultiplicityPanel expand={expand === 'mpy'} onExapnd={onExpandMpy} /> }
+            { (Cfg.hidePanelCompare(layoutSt) || curveCount > 1) ? null : <ComparePanel expand={expand === 'compare'} onExapnd={onExpandCompare} /> }
             { (Cfg.hidePanelCyclicVolta(layoutSt) || hideCyclicVolta) ? null : (
               <CyclicVoltammetryPanel
                 jcampIdx={jcampIdx}
                 feature={feature}
                 expand={expand === 'cyclicvolta'}
-                onExapnd={onExapndCyclicVolta}
+                onExapnd={onExpandCyclicVolta}
                 userManualLink={userManualLink ? userManualLink.cv : undefined}
               />
             )}
@@ -131,15 +131,10 @@ const mapStateToProps = (state, _) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = (dispatch) => (
-  bindActionCreators({
-  }, dispatch)
-);
-
 PanelViewer.propTypes = {
   classes: PropTypes.object.isRequired,
   feature: PropTypes.object.isRequired,
-  integration: PropTypes.object.isRequired,
+  integration: PropTypes.object,
   editorOnly: PropTypes.bool.isRequired,
   molSvg: PropTypes.string.isRequired,
   descriptions: PropTypes.array.isRequired,
@@ -155,6 +150,10 @@ PanelViewer.propTypes = {
   entities: PropTypes.array,
 };
 
+PanelViewer.defaultProps = {
+  integration: {},
+};
+
 export default connect( // eslint-disable-line
-  mapStateToProps, mapDispatchToProps,
+  mapStateToProps, null,
 )(withStyles(styles)(PanelViewer)); // eslint-disable-line

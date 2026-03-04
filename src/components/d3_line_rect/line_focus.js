@@ -308,6 +308,7 @@ class LineFocus {
   }
 
   drawInteg(hplcMsSt) {
+    if (!this.tags || !this.tags.igbPath || !this.tags.igcPath || !this.tags.igtPath) return;
     const {
       sameXY, sameLySt, sameItSt, sameData, sameIntegrationSig, sameSpectrumKey,
     } = this.shouldUpdate;
@@ -475,6 +476,7 @@ class LineFocus {
   }
 
   drawPeaks(hplcMsSt) {
+    if (!this.tags || !this.tags.pPath) return;
     const {
       sameXY, sameEpSt, sameDtPk, sameSfPk,
     } = this.shouldUpdate;
@@ -597,6 +599,22 @@ class LineFocus {
     this.scales = InitScale(this, false);
     this.setDataParams(filterSeed, tTrEndPts, layoutSt, editPeakSt);
     this.uiSt = uiSt;
+    const isInitialized = !!(
+      this.root && !this.root.empty() && this.path && this.grid && this.tags
+    );
+    if (!isInitialized) {
+      this.create({
+        filterSeed,
+        tTrEndPts,
+        layoutSt,
+        sweepExtentSt,
+        isUiAddIntgSt,
+        isUiNoBrushSt,
+        hplcMsSt,
+        editPeakSt,
+      });
+      return;
+    }
 
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);

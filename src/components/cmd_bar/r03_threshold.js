@@ -166,7 +166,7 @@ Threshold.propTypes = {
   updateThresholdValueAct: PropTypes.func.isRequired,
   resetThresholdValueAct: PropTypes.func.isRequired,
   toggleThresholdIsEditAct: PropTypes.func.isRequired,
-  hplcMsSt: PropTypes.bool.isRequired,
+  hplcMsSt: PropTypes.object.isRequired,
 };
 
 export default connect(

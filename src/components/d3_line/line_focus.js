@@ -102,7 +102,13 @@ class LineFocus {
     const sameMySt = prevMySt === nextMySt;
     const sameTePt = prevTePt === this.tTrEndPts.length;
     const sameDtPk = prevDtPk === this.dataPks.length;
-    const sameSfPk = JSON.stringify(prevSfPk) === JSON.stringify(this.tSfPeaks);
+    const sameSfPk = prevSfPk === this.tSfPeaks
+      || (
+        Array.isArray(prevSfPk)
+        && Array.isArray(this.tSfPeaks)
+        && prevSfPk.length === this.tSfPeaks.length
+        && prevSfPk.every((peak, idx) => peak === this.tSfPeaks[idx])
+      );
     const sameData = prevData === this.data.length;
     const sameRef = prevEpSt.prevOffset === nextEpSt.prevOffset;
     this.shouldUpdate = Object.assign(
@@ -380,13 +386,13 @@ class LineFocus {
     }
   }
 
-  drawInteg(integationSt) {
+  drawInteg(integrationState) {
     const {
       sameXY, sameLySt, sameItSt, sameData,
     } = this.shouldUpdate;
     if (sameXY && sameLySt && sameItSt && sameData) return;
 
-    const { selectedIdx, integrations } = integationSt;
+    const { selectedIdx, integrations } = integrationState;
     const selectedIntegration = integrations[selectedIdx];
 
     const {
@@ -794,7 +800,7 @@ class LineFocus {
 
   create({
     filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, comparisons,
-    editPeakSt, layoutSt, integationSt, mtplySt,
+    editPeakSt, layoutSt, integrationSt, mtplySt,
     sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
     wavelength, uiSt,
   }) {
@@ -826,17 +832,17 @@ class LineFocus {
       this.drawGrid();
       this.drawRef();
       this.drawPeaks(editPeakSt);
-      this.drawInteg(integationSt);
+      this.drawInteg(integrationSt);
       this.drawMtply(mtplySt);
       this.drawComparisons(comparisons);
     }
     MountBrush(this, isUiAddIntgSt, isUiNoBrushSt);
-    this.resetShouldUpdate(editPeakSt, integationSt, mtplySt);
+    this.resetShouldUpdate(editPeakSt, integrationSt, mtplySt);
   }
 
   update({
     filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, comparisons,
-    editPeakSt, layoutSt, integationSt, mtplySt, uiSt,
+    editPeakSt, layoutSt, integrationSt, mtplySt, uiSt,
     sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
     wavelength,
   }) {
@@ -848,18 +854,18 @@ class LineFocus {
 
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);
-      this.getShouldUpdate(editPeakSt, integationSt, mtplySt);
+      this.getShouldUpdate(editPeakSt, integrationSt, mtplySt);
       this.drawLine();
       this.drawThres();
       this.drawGrid();
       this.drawRef();
       this.drawPeaks(editPeakSt);
-      this.drawInteg(integationSt);
+      this.drawInteg(integrationSt);
       this.drawMtply(mtplySt);
       this.drawComparisons(comparisons);
     }
     MountBrush(this, isUiAddIntgSt, isUiNoBrushSt);
-    this.resetShouldUpdate(editPeakSt, integationSt, mtplySt);
+    this.resetShouldUpdate(editPeakSt, integrationSt, mtplySt);
   }
 }
 

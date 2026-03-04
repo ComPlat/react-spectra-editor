@@ -169,7 +169,10 @@ const operationSelect = (
     </MenuItem>
   ));
 
-  const selectedValue = operation.name || operations[0].name;
+  const operationNames = operations.map((o) => o.name);
+  const selectedValue = operationNames.includes(operation?.name)
+    ? operation.name
+    : operations[0].name;
 
   return (
     <FormControl

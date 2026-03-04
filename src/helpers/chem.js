@@ -1094,20 +1094,54 @@ const parseChemstationPages = (source, jcamp) => {
 const isChemstationLcms = (source, jcamp) => {
   if (typeof source !== 'string') return false;
   const dt = String(jcamp?.dataType || '').toUpperCase();
-  if (dt.includes('MASS TIC')) return true;
+  if (dt.includes('LC/MS') || dt.includes('MASS TIC')) return true;
+
+  const spectra = Array.isArray(jcamp?.spectra) ? jcamp.spectra : [];
+  const csCategory = jcamp?.info?.$CSCATEGORY;
+  const categories = Array.isArray(csCategory)
+    ? csCategory.map((c) => String(c).toUpperCase())
+    : [];
+
+  const hasPolarityCategory = categories.some(
+    (c) => c.includes('POSITIVE') || c.includes('NEGATIVE') || c.includes('NEUTRAL'),
+  );
+  const hasTicOrUvvisCategory = categories.some(
+    (c) => c.includes('TIC') || c.includes('UVVIS'),
+  );
+  const hasHplcUvvisSpectrumDataType = spectra.some((s) => {
+    const sdt = String(s?.dataType || '').toUpperCase();
+    return sdt.includes('HPLC UV-VIS') || sdt.includes('UVVIS');
+  });
+  const hasMassTicSpectrumDataType = spectra.some((s) => {
+    const sdt = String(s?.dataType || '').toUpperCase();
+    return sdt.includes('MASS TIC') || sdt.includes('TIC');
+  });
+  const hasMassSpectrumDataType = spectra.some((s) => {
+    const sdt = String(s?.dataType || '').toUpperCase();
+    return sdt.includes('MASS SPECTRUM');
+  });
+  const hasMultipleSpectra = spectra.length > 1;
+  const hasPageMetadata = spectra.some((s) => s?.page != null || s?.pageValue != null);
+
   const hasNtuplesPageHeader = /##NTUPLES_PAGE_HEADER\s*=/.test(source);
-  if (hasNtuplesPageHeader && (dt.includes('MASS') || dt.includes('UV') || dt.includes('HPLC'))) {
+  if (hasNtuplesPageHeader && (
+    hasTicOrUvvisCategory
+    || hasHplcUvvisSpectrumDataType
+    || hasMassTicSpectrumDataType
+    || (hasMassSpectrumDataType && hasPolarityCategory)
+  )) {
     return true;
   }
-  if (jcamp?.spectra && Array.isArray(jcamp.spectra) && jcamp.spectra.length > 0) {
-    const firstSpectrumDataType = String(jcamp.spectra[0]?.dataType || '').toUpperCase();
-    if (firstSpectrumDataType.includes('HPLC UV-VIS') || firstSpectrumDataType.includes('MASS SPECTRUM')) {
-      const csCategory = jcamp?.info?.$CSCATEGORY;
-      if (!csCategory || (Array.isArray(csCategory) && !csCategory.some((c) => String(c).toUpperCase().includes('POSITIVE') || String(c).toUpperCase().includes('NEGATIVE')))) {
-        return true;
-      }
-    }
+
+  if (hasMultipleSpectra && hasPageMetadata && (
+    hasTicOrUvvisCategory
+    || hasHplcUvvisSpectrumDataType
+    || hasMassTicSpectrumDataType
+    || (hasMassSpectrumDataType && hasPolarityCategory)
+  )) {
+    return true;
   }
+
   return false;
 };
 

@@ -54,6 +54,15 @@ const parsePageValue = (feature) => {
   return Number.isFinite(value) ? value : null;
 };
 
+const toSeed = (xValues = [], yValues = []) => {
+  const maxLength = Math.min(xValues.length, yValues.length);
+  const seed = new Array(maxLength);
+  for (let index = 0; index < maxLength; index += 1) {
+    seed[index] = { x: xValues[index], y: yValues[index] };
+  }
+  return seed;
+};
+
 const styles = () => (
   Object.assign(
     {},
@@ -114,7 +123,7 @@ const zoomView = (classes, graphIndex, uiSt, zoomInAct) => {
   );
 };
 
-const waveLengthSelect = (classes, hplcMsSt, updateWaveLengthAct) => {
+const wavelengthSelect = (classes, hplcMsSt, updateWavelengthAct) => {
   const uvvis = (hplcMsSt && hplcMsSt.uvvis) || {};
   const { listWaveLength = null, selectedWaveLength } = uvvis;
   const options = listWaveLength ? listWaveLength.map((d) => (
@@ -137,10 +146,13 @@ const waveLengthSelect = (classes, hplcMsSt, updateWaveLengthAct) => {
       <Select
         labelId="select-decimal-label"
         label="Decimal"
-        value={selectedWaveLength}
-        onChange={updateWaveLengthAct}
+        value={selectedWaveLength ?? ''}
+        onChange={updateWavelengthAct}
         className={classNames(classes.selectInput, 'input-sv-bar-decimal')}
       >
+        <MenuItem value="" key="wavelength-empty">
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-decimal')} />
+        </MenuItem>
         { options }
       </Select>
     </FormControl>
@@ -148,7 +160,7 @@ const waveLengthSelect = (classes, hplcMsSt, updateWaveLengthAct) => {
 };
 
 const ticSelect = (classes, hplcMsSt, handleTicChanged) => {
-  const { tic } = hplcMsSt;
+  const { tic = {} } = hplcMsSt || {};
   const { polarity, available } = tic;
   const listTIC = [
     { name: 'PLUS', value: 'positive', enabled: available?.positive },
@@ -181,10 +193,13 @@ const ticSelect = (classes, hplcMsSt, handleTicChanged) => {
       <Select
         labelId="select-decimal-label"
         label="Decimal"
-        value={polarity}
+        value={polarity || ''}
         onChange={onTicChange}
         className={classNames(classes.selectInput, 'input-sv-bar-decimal')}
       >
+        <MenuItem value="" key="tic-empty">
+          <span className={classNames(classes.txtOpt, 'option-sv-bar-decimal')} />
+        </MenuItem>
         { options }
       </Select>
     </FormControl>
@@ -242,7 +257,7 @@ class ViewerLineRect extends React.Component {
       curveSt, feature, ticEntities, hplcMsSt,
       tTrEndPts, layoutSt,
       isUiAddIntgSt, isUiNoBrushSt,
-      integationSt,
+      integrationSt,
       isHidden,
       resetAllAct, uiSt,
       editPeakSt,
@@ -256,16 +271,12 @@ class ViewerLineRect extends React.Component {
     const { sweepExtent } = zoom;
 
     const uvvisViewFeature = this.extractUvvisView();
-    if (!uvvisViewFeature || !uvvisViewFeature.data || uvvisViewFeature.data.length === 0) {
-      return;
+    let uvvisSeed = [];
+    if (uvvisViewFeature?.data?.[0]) {
+      const currentData = uvvisViewFeature.data[0];
+      const { x, y } = currentData;
+      uvvisSeed = toSeed(x, y);
     }
-    const { data } = uvvisViewFeature;
-    const currentData = data[0];
-    const { x, y } = currentData;
-    const uvvisSeed = x.map((d, index) => {
-      const s = { x: d, y: y[index] };
-      return s;
-    });
     drawMain(this.rootKlassLine, W, H, LIST_BRUSH_SVG_GRAPH.LINE);
     this.lineFocus.create({
       filterSeed: uvvisSeed,
@@ -274,7 +285,7 @@ class ViewerLineRect extends React.Component {
       layoutSt,
       isUiNoBrushSt: true,
       sweepExtentSt: sweepExtent[0],
-      integationSt,
+      integrationSt,
       isUiAddIntgSt,
       editPeakSt,
       hplcMsSt,
@@ -314,22 +325,26 @@ class ViewerLineRect extends React.Component {
       ticEntities, curveSt,
       tTrEndPts, layoutSt,
       isUiAddIntgSt, isUiNoBrushSt,
-      isHidden, uiSt, hplcMsSt, integationSt,
+      isHidden, uiSt, hplcMsSt, integrationSt,
       editPeakSt,
     } = this.props;
     this.normChange(prevProps);
     const { zoom } = uiSt;
-    const { sweepExtent } = zoom;
+    const { sweepExtent } = zoom || {};
+    if (!Array.isArray(sweepExtent)) return;
 
     const uvvisViewFeature = this.extractUvvisView();
     if (uvvisViewFeature) {
+      const hasLineSvg = !!document.querySelector(
+        `${this.rootKlassLine} .${LIST_BRUSH_SVG_GRAPH.LINE}`,
+      );
+      if (!hasLineSvg) {
+        drawMain(this.rootKlassLine, W, H, LIST_BRUSH_SVG_GRAPH.LINE);
+      }
       const { data } = uvvisViewFeature;
       const currentData = data[0];
       const { x, y } = currentData;
-      const uvvisSeed = x.map((d, index) => {
-        const s = { x: d, y: y[index] };
-        return s;
-      });
+      const uvvisSeed = toSeed(x, y);
       if (this.lineFocus) {
         this.lineFocus.update({
           filterSeed: uvvisSeed,
@@ -340,7 +355,7 @@ class ViewerLineRect extends React.Component {
           sweepExtentSt: sweepExtent[0],
           uiSt,
           layoutSt,
-          integationSt,
+          integrationSt,
           hplcMsSt,
           editPeakSt,
         });
@@ -350,6 +365,12 @@ class ViewerLineRect extends React.Component {
     }
 
     if (this.multiFocus) {
+      const hasMultiSvg = !!document.querySelector(
+        `${this.rootKlassMulti} .${LIST_BRUSH_SVG_GRAPH.MULTI}`,
+      );
+      if (!hasMultiSvg) {
+        drawMain(this.rootKlassMulti, W, H, LIST_BRUSH_SVG_GRAPH.MULTI);
+      }
       this.multiFocus.update({
         curveSt,
         ticEntities,
@@ -375,6 +396,12 @@ class ViewerLineRect extends React.Component {
 
     const subViewFeature = this.extractSubView();
     if (subViewFeature) {
+      const hasRectSvg = !!document.querySelector(
+        `${this.rootKlassRect} .${LIST_BRUSH_SVG_GRAPH.RECT}`,
+      );
+      if (!hasRectSvg) {
+        drawMain(this.rootKlassRect, W, H, LIST_BRUSH_SVG_GRAPH.RECT);
+      }
       const { threshold } = hplcMsSt;
       const curTrEndPts = convertThresEndPts(subViewFeature, threshold.value);
       const { data } = subViewFeature;
@@ -384,10 +411,7 @@ class ViewerLineRect extends React.Component {
         : (subViewFeature?.pageValue ?? subViewFeature?.page ?? null);
       const currentData = data[0];
       const { x, y } = currentData;
-      const subSeed = x.map((d, index) => {
-        const s = { x: d, y: y[index] };
-        return s;
-      });
+      const subSeed = toSeed(x, y);
       if (this.rectFocus) {
         this.rectFocus.update({
           filterSeed: subSeed,
@@ -410,7 +434,9 @@ class ViewerLineRect extends React.Component {
   }
 
   componentWillUnmount() {
+    drawDestroy(this.rootKlassLine);
     drawDestroy(this.rootKlassMulti);
+    drawDestroy(this.rootKlassRect);
   }
 
   normChange(prevProps) {
@@ -491,6 +517,8 @@ class ViewerLineRect extends React.Component {
       classes, hplcMsSt, selectWavelengthAct, updateTicAct, selectCurveAct,
       feature, zoomInAct, uiSt, ticEntities,
     } = this.props;
+    const resolvedFeature = feature || {};
+    const hasEdit = !!resolvedFeature?.data?.[0]?.x?.length;
     const handleTicChanged = (event) => {
       const selectedPolarity = event.target.value;
       updateTicAct({ polarity: selectedPolarity });
@@ -501,7 +529,7 @@ class ViewerLineRect extends React.Component {
         selectCurveAct(targetEntity.curveIdx);
       }
     };
-    const handleWaveLengthChange = (event) => {
+    const handleWavelengthChange = (event) => {
       selectWavelengthAct(event);
     };
     return (
@@ -510,10 +538,10 @@ class ViewerLineRect extends React.Component {
           zoomView(classes, 0, uiSt, zoomInAct)
         }
         {
-          waveLengthSelect(classes, hplcMsSt, handleWaveLengthChange)
+          wavelengthSelect(classes, hplcMsSt, handleWavelengthChange)
         }
         <Integration />
-        <Peak />
+        <Peak feature={resolvedFeature} />
         <div className={LIST_ROOT_SVG_GRAPH.LINE} />
         {
           zoomView(classes, 1, uiSt, zoomInAct)
@@ -522,13 +550,13 @@ class ViewerLineRect extends React.Component {
           ticSelect(classes, hplcMsSt, handleTicChanged)
         }
         <span style={{ display: 'inline-flex' }}>
-          <PeakGroup feature={feature} graphIndex={1} />
+          <PeakGroup feature={resolvedFeature} graphIndex={1} />
         </span>
         <div className={LIST_ROOT_SVG_GRAPH.MULTI} />
         {
           zoomView(classes, 2, uiSt, zoomInAct)
         }
-        <Threshold />
+        <Threshold feature={resolvedFeature} hasEdit={hasEdit} />
         <div className={LIST_ROOT_SVG_GRAPH.RECT} />
       </div>
     );
@@ -545,7 +573,7 @@ const mapStateToProps = (state, props) => (
     layoutSt: state.layout,
     hplcMsSt: state.hplcMs,
     editPeakSt: state.editPeak.present,
-    integationSt: state.integration.present,
+    integrationSt: state.integration.present,
     sweepExtentSt: state.ui.sweepExtent,
   }
 );
@@ -572,8 +600,8 @@ ViewerLineRect.propTypes = {
   uvvisEntities: PropTypes.array.isRequired,
   mzEntities: PropTypes.array.isRequired,
   layoutSt: PropTypes.string.isRequired,
-  integationSt: PropTypes.object.isRequired,
-  feature: PropTypes.object.isRequired,
+  integrationSt: PropTypes.object.isRequired,
+  feature: PropTypes.object,
   tTrEndPts: PropTypes.array.isRequired,
   isUiAddIntgSt: PropTypes.bool.isRequired,
   isUiNoBrushSt: PropTypes.bool.isRequired,
@@ -581,7 +609,7 @@ ViewerLineRect.propTypes = {
   clickUiTargetAct: PropTypes.func.isRequired,
   selectUiSweepAct: PropTypes.func.isRequired,
   scrollUiWheelAct: PropTypes.func.isRequired,
-  isHidden: PropTypes.bool.isRequired,
+  isHidden: PropTypes.bool,
   hplcMsSt: PropTypes.object.isRequired,
   selectWavelengthAct: PropTypes.func.isRequired,
   updateTicAct: PropTypes.func.isRequired,
@@ -589,6 +617,11 @@ ViewerLineRect.propTypes = {
   zoomInAct: PropTypes.func.isRequired,
   editPeakSt: PropTypes.object.isRequired,
   updateCurrentPageValueAct: PropTypes.func.isRequired,
+};
+
+ViewerLineRect.defaultProps = {
+  feature: {},
+  isHidden: false,
 };
 
 // export default connect(mapStateToProps, mapDispatchToProps)(ViewerLineRect);

@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import Dropzone from 'react-dropzone';
 
 import {
   Accordion, AccordionSummary, Table, TableBody, TableCell, TableRow,
@@ -135,38 +134,38 @@ const content = (classes, desc) => (
 );
 
 const inputOthers = (
-  classes, jcampSt,
-) => {
-  const { selectedIdx, jcamps } = jcampSt;
-  const selectedJcamp = jcamps[selectedIdx];
-  const { addOthersCb } = selectedJcamp;
-
-  const fileName = '';
-  const desc = fileName || msgDefault;
-  const onDrop = (jcampFiles) => {
-    if (!addOthersCb) return;
-    addOthersCb({ jcamps: jcampFiles });
-  };
-
-  return (
-    <Dropzone
-      className="dropbox"
-      onDrop={onDrop}
-    >
-      {
-        ({ getRootProps, getInputProps }) => (
-          <div
-            {...getRootProps()}
-            className={classNames(classes.baseDD)}
-          >
-            <input {...getInputProps()} />
-            { content(classes, desc) }
-          </div>
-        )
+  classes, desc, onDropFiles, onFileChange, inputRef,
+) => (
+  <div
+    className={classNames(classes.baseDD)}
+    role="button"
+    tabIndex={0}
+    onClick={() => inputRef.current?.click()}
+    onKeyDown={(event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        inputRef.current?.click();
       }
-    </Dropzone>
-  );
-};
+    }}
+    onDragOver={(event) => {
+      event.preventDefault();
+    }}
+    onDrop={(event) => {
+      event.preventDefault();
+      onDropFiles(event.dataTransfer?.files);
+    }}
+  >
+    <input
+      ref={inputRef}
+      type="file"
+      multiple
+      accept=".dx,.jdx,.jcamp,.JCAMP"
+      style={{ display: 'none' }}
+      onChange={onFileChange}
+    />
+    { content(classes, desc) }
+  </div>
+);
 
 const compareList = (
   classes, jcampSt, rmOthersOneAct, toggleShowAct,
@@ -231,36 +230,56 @@ const compareList = (
 const ComparePanel = ({
   classes, expand, onExapnd, jcampSt,
   rmOthersOneAct, toggleShowAct,
-}) => (
-  <Accordion
-    expanded={expand}
-    onChange={onExapnd}
-    disableGutters
-    sx={{
-      '&.MuiAccordion-root.Mui-expanded': { margin: 0 },
-      '&:before': { display: 'none' },
-    }}
-    TransitionProps={{ unmountOnExit: true }} // increase Accordion performance
-  >
-    <AccordionSummary
-      expandIcon={<ExpandMoreIcon />}
-      className={classNames(classes.panelSummary)}
+}) => {
+  const inputRef = React.useRef(null);
+  const { selectedIdx, jcamps } = jcampSt;
+  const selectedJcamp = jcamps[selectedIdx];
+  const { addOthersCb } = selectedJcamp;
+  const desc = msgDefault;
+  const onDropFiles = (filesLike) => {
+    if (!addOthersCb) return;
+    const droppedFiles = Array.from(filesLike || []);
+    if (droppedFiles.length === 0) return;
+    addOthersCb({ jcamps: droppedFiles });
+  };
+  const onFileChange = (event) => {
+    onDropFiles(event.target.files);
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
+  };
+
+  return (
+    <Accordion
+      expanded={expand}
+      onChange={onExapnd}
+      disableGutters
+      sx={{
+        '&.MuiAccordion-root.Mui-expanded': { margin: 0 },
+        '&:before': { display: 'none' },
+      }}
+      TransitionProps={{ unmountOnExit: true }} // increase Accordion performance
     >
-      <Typography className="txt-panel-header">
-        <span className={classNames(classes.txtBadge, 'txt-sv-panel-title')}>
-          Spectra Comparisons
-        </span>
-      </Typography>
-    </AccordionSummary>
-    <Divider />
-    { inputOthers(classes, jcampSt) }
-    <div className={classNames(classes.panelDetail)}>
-      {
-        compareList(classes, jcampSt, rmOthersOneAct, toggleShowAct)
-      }
-    </div>
-  </Accordion>
-);
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon />}
+        className={classNames(classes.panelSummary)}
+      >
+        <Typography className="txt-panel-header">
+          <span className={classNames(classes.txtBadge, 'txt-sv-panel-title')}>
+            Spectra Comparisons
+          </span>
+        </Typography>
+      </AccordionSummary>
+      <Divider />
+      { inputOthers(classes, desc, onDropFiles, onFileChange, inputRef) }
+      <div className={classNames(classes.panelDetail)}>
+        {
+          compareList(classes, jcampSt, rmOthersOneAct, toggleShowAct)
+        }
+      </div>
+    </Accordion>
+  );
+};
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {

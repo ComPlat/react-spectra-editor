@@ -7,9 +7,10 @@ import { LIST_UI_SWEEP_TYPE } from '../constants/list_ui';
 import { LIST_LAYOUT } from '../constants/list_layout';
 import { LIST_BRUSH_SVG_GRAPH } from '../constants/list_graph';
 
-const getUiSt = (state) => state.ui;
-const getCurveSt = (state) => state.curve;
-const getHplcMsSt = (state) => state.hplcMs;
+const getUiState = (state) => state.ui;
+const getCurveState = (state) => state.curve;
+const getHplcMsState = (state) => state.hplcMs;
+const getSubViewZoomActionType = () => UI.SWEEP.SELECT_ZOOMIN_SUBVIEW || UI.SWEEP.SELECT_ZOOMIN;
 
 const calcPeaks = (payload) => {
   const { xExtent, yExtent, dataPks } = payload;
@@ -20,19 +21,19 @@ const calcPeaks = (payload) => {
   return peaks;
 };
 
-const getLayoutSt = (state) => state.layout;
+const getLayoutState = (state) => state.layout;
 
 function* selectUiSweep(action) {
-  const uiSt = yield select(getUiSt);
-  const { sweepType, zoom } = uiSt;
+  const uiState = yield select(getUiState);
+  const { sweepType, zoom } = uiState;
   const { payload } = action;
 
-  const curveSt = yield select(getCurveSt);
-  const { curveIdx } = curveSt;
+  const curveState = yield select(getCurveState);
+  const { curveIdx } = curveState;
 
-  const hplcMsSt = yield select(getHplcMsSt);
-  const { uvvis } = hplcMsSt;
-  const layoutSt = yield select(getLayoutSt);
+  const hplcMsState = yield select(getHplcMsState);
+  const { uvvis } = hplcMsState;
+  const layoutState = yield select(getLayoutState);
 
   switch (sweepType) {
     case LIST_UI_SWEEP_TYPE.ZOOMIN:
@@ -59,7 +60,7 @@ function* selectUiSweep(action) {
       });
       break;
     case LIST_UI_SWEEP_TYPE.INTEGRATION_ADD: {
-      if (uvvis.selectedWaveLength && layoutSt === LIST_LAYOUT.LC_MS) {
+      if (uvvis.selectedWaveLength && layoutState === LIST_LAYOUT.LC_MS) {
         yield put({
           type: HPLC_MS.UPDATE_HPLCMS_INTEGRATIONS,
           payload: {
@@ -97,8 +98,9 @@ function* selectUiSweep(action) {
 }
 
 function* scrollUiWheel(action) {
-  const layoutSt = yield select(getLayoutSt);
+  const layoutState = yield select(getLayoutState);
   const { payload } = action;
+  if (!payload?.xExtent || !payload?.yExtent) return;
   const {
     xExtent, yExtent, direction, brushClass,
   } = payload;
@@ -108,7 +110,7 @@ function* scrollUiWheel(action) {
   let nextExtent = { xExtent: false, yExtent: false };
   let [nyeL, nyeU, h, nytL, nytU] = [0, 1, 1, 0, 1];
 
-  switch (layoutSt) {
+  switch (layoutState) {
     case LIST_LAYOUT.IR:
     case LIST_LAYOUT.RAMAN:
       [nyeL, nyeU] = [yeL + (yeU - yeL) * (1 - scale), yeU];
@@ -136,7 +138,7 @@ function* scrollUiWheel(action) {
   }
   if (brushClass === `.${LIST_BRUSH_SVG_GRAPH.RECT}`) {
     yield put({
-      type: UI.SWEEP.SELECT_ZOOMIN_SUBVIEW,
+      type: getSubViewZoomActionType(),
       payload: nextExtent,
     });
   } else {
@@ -155,15 +157,17 @@ function* clickUiTarget(action) {
   } = action;
   const uiSweepType = yield select(getUiSweepType);
 
-  const curveSt = yield select(getCurveSt);
-  const { curveIdx } = curveSt;
+  const curveState = yield select(getCurveState);
+  const { curveIdx } = curveState;
 
-  const hplcMsSt = yield select(getHplcMsSt);
-  const { uvvis } = hplcMsSt;
+  const hplcMsState = yield select(getHplcMsState);
+  const { uvvis } = hplcMsState;
+  const isLcmsLayout = (yield select(getLayoutState)) === LIST_LAYOUT.LC_MS;
 
   if (uiSweepType === LIST_UI_SWEEP_TYPE.PEAK_ADD && !onPeak) {
-    const spectrumId = hplcMsSt?.uvvis?.selectedWaveLength;
-    const currentPeaks = hplcMsSt?.uvvis?.currentSpectrum?.peaks || [];
+    const spectrumId = hplcMsState?.uvvis?.selectedWaveLength;
+    if (isLcmsLayout && spectrumId == null) return;
+    const currentPeaks = hplcMsState?.uvvis?.currentSpectrum?.peaks || [];
 
     const updatedPeaks = [...currentPeaks, payload];
 
@@ -175,8 +179,7 @@ function* clickUiTarget(action) {
       },
     });
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.PEAK_DELETE && onPeak) {
-    const layoutSt = yield select(getLayoutSt);
-    if (layoutSt === LIST_LAYOUT.LC_MS && uvvis.selectedWaveLength) {
+    if (isLcmsLayout && uvvis.selectedWaveLength) {
       yield put({
         type: HPLC_MS.REMOVE_HPLCMS_PEAK,
         payload: {
@@ -196,8 +199,7 @@ function* clickUiTarget(action) {
       payload: { dataToSet: payload, curveIdx },
     });
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_RM && onPeak) {
-    const layoutSt = yield select(getLayoutSt);
-    if (uvvis.selectedWaveLength && layoutSt === LIST_LAYOUT.LC_MS) {
+    if (uvvis.selectedWaveLength && isLcmsLayout) {
       yield put({
         type: HPLC_MS.UPDATE_HPLCMS_INTEGRATIONS,
         payload: {

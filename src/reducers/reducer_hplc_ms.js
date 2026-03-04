@@ -42,7 +42,14 @@ const initialState = {
   layout: 'LC/MS',
 };
 
-const updateHPLCData = (state, action) => {
+const normalizeSpectrumId = (value) => {
+  if (value == null) return null;
+  const numericValue = Number(value);
+  if (Number.isFinite(numericValue)) return numericValue;
+  return String(value);
+};
+
+const updateLcmsData = (state, action) => {
   const { payload } = action;
   if (!payload || payload.length === 0) return state;
 
@@ -191,11 +198,14 @@ const updateHPLCData = (state, action) => {
 };
 
 const updateHplcMsPeaks = (state, action) => {
-  const { spectrumId, peaks } = action.payload;
+  const { spectrumId, peaks } = action.payload || {};
 
   const { uvvis } = state;
-  const { spectraList, listWaveLength } = uvvis;
-  const spectrumIndex = listWaveLength.indexOf(spectrumId);
+  const { spectraList = [], listWaveLength = [] } = uvvis;
+  const normalizedSpectrumId = normalizeSpectrumId(spectrumId);
+  const spectrumIndex = listWaveLength
+    .map((waveLength) => normalizeSpectrumId(waveLength))
+    .indexOf(normalizedSpectrumId);
 
   if (spectrumIndex === -1) return state;
 
@@ -206,7 +216,7 @@ const updateHplcMsPeaks = (state, action) => {
   };
   newSpectraList[spectrumIndex] = updatedSpectrum;
 
-  const newCurrentSpectrum = spectrumId === uvvis.selectedWaveLength
+  const newCurrentSpectrum = normalizeSpectrumId(uvvis.selectedWaveLength) === normalizedSpectrumId
     ? updatedSpectrum
     : uvvis.currentSpectrum;
 
@@ -220,23 +230,27 @@ const updateHplcMsPeaks = (state, action) => {
   };
 };
 
-const updateWaveLength = (state, action) => {
+const updateWavelength = (state, action) => {
   const { payload } = action;
-  if (payload) {
+  if (payload?.target) {
     const { value } = payload.target;
     const { uvvis } = state;
-    const { listWaveLength, spectraList } = uvvis;
-    const wavelengthIdx = listWaveLength.indexOf(value);
+    const { listWaveLength = [], spectraList = [] } = uvvis;
+    const normalizedValue = normalizeSpectrumId(value);
+    const normalizedWaveLengths = listWaveLength.map(
+      (waveLength) => normalizeSpectrumId(waveLength),
+    );
+    const wavelengthIdx = normalizedWaveLengths.indexOf(normalizedValue);
 
     const currentSpectrum = spectraList.find(
-      (spectrum, index) => listWaveLength[index] === value,
+      (spectrum, index) => normalizedWaveLengths[index] === normalizedValue,
     );
 
     return {
       ...state,
       uvvis: {
         ...uvvis,
-        selectedWaveLength: value,
+        selectedWaveLength: normalizedValue,
         wavelengthIdx,
         spectraList,
         currentSpectrum,
@@ -296,12 +310,15 @@ const resetThresholdValue = (state) => ({
 const updateHplcMsIntegrations = (state, action) => {
   const {
     spectrumId, integration, remove, shift = 0,
-  } = action.payload;
+  } = action.payload || {};
 
   const { uvvis } = state;
-  const { spectraList, listWaveLength } = uvvis;
+  const { spectraList = [], listWaveLength = [] } = uvvis;
 
-  const curveIdx = listWaveLength.indexOf(spectrumId);
+  const normalizedSpectrumId = normalizeSpectrumId(spectrumId);
+  const curveIdx = listWaveLength
+    .map((waveLength) => normalizeSpectrumId(waveLength))
+    .indexOf(normalizedSpectrumId);
   if (curveIdx === -1) {
     return state;
   }
@@ -343,13 +360,18 @@ const updateHplcMsIntegrations = (state, action) => {
         ...uvvis,
         spectraList: newSpectraList,
         currentSpectrum:
-          spectrumId === uvvis.selectedWaveLength ? newSpectrum : uvvis.currentSpectrum,
+          normalizeSpectrumId(uvvis.selectedWaveLength) === normalizedSpectrumId
+            ? newSpectrum
+            : uvvis.currentSpectrum,
       },
     };
   }
 
+  if (!integration) {
+    return state;
+  }
   const { xExtent, data } = integration;
-  if (!xExtent || !data || !xExtent.xL || !xExtent.xU || xExtent.xU === xExtent.xL) {
+  if (!xExtent || !data || xExtent.xL == null || xExtent.xU == null || xExtent.xU === xExtent.xL) {
     return state;
   }
 
@@ -384,20 +406,26 @@ const updateHplcMsIntegrations = (state, action) => {
       ...uvvis,
       spectraList: newSpectraList,
       currentSpectrum:
-        spectrumId === uvvis.selectedWaveLength ? newSpectrum : uvvis.currentSpectrum,
+        normalizeSpectrumId(uvvis.selectedWaveLength) === normalizedSpectrumId
+          ? newSpectrum
+          : uvvis.currentSpectrum,
     },
   };
 };
 
 const removeHplcMsPeak = (state, action) => {
-  const { spectrumId, peak } = action.payload;
+  const { spectrumId, peak } = action.payload || {};
   const { uvvis } = state;
-  const { spectraList, listWaveLength } = uvvis;
+  const { spectraList = [], listWaveLength = [] } = uvvis;
 
-  const index = listWaveLength.indexOf(spectrumId);
+  const normalizedSpectrumId = normalizeSpectrumId(spectrumId);
+  const index = listWaveLength
+    .map((waveLength) => normalizeSpectrumId(waveLength))
+    .indexOf(normalizedSpectrumId);
   if (index === -1) return state;
 
   const spectrum = spectraList[index];
+  if (!spectrum || !Array.isArray(spectrum.peaks) || !peak) return state;
   const filteredPeaks = spectrum.peaks.filter(
     (p) => !(Math.abs(p.x - peak.x) < 1e-6 && Math.abs(p.y - peak.y) < 1e-6),
   );
@@ -415,7 +443,7 @@ const removeHplcMsPeak = (state, action) => {
     uvvis: {
       ...uvvis,
       spectraList: updatedSpectraList,
-      currentSpectrum: spectrumId === uvvis.selectedWaveLength
+      currentSpectrum: normalizeSpectrumId(uvvis.selectedWaveLength) === normalizedSpectrumId
         ? updatedSpectrum : uvvis.currentSpectrum,
     },
   };
@@ -469,9 +497,9 @@ const clearAllPeaksHplcMs = (state) => {
 const hplcMsReducer = (state = initialState, action) => {
   switch (action.type) {
     case CURVE.SET_ALL_CURVES:
-      return updateHPLCData(state, action);
+      return updateLcmsData(state, action);
     case HPLC_MS.UPDATE_UVVIS_WAVE_LENGTH:
-      return updateWaveLength(state, action);
+      return updateWavelength(state, action);
     case HPLC_MS.SELECT_TIC_CURVE:
       return updateTic(state, action);
     case HPLC_MS.UPDATE_CURRENT_PAGE_VALUE:
