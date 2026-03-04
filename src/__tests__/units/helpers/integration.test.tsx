@@ -3,13 +3,13 @@ import { calcArea, getAbsoluteArea, getArea } from "../../../helpers/integration
 describe('Test helper for integration', () => {
   describe('Test get area', () => {
     it('Do not have area', () => {
-      const area = getArea(0, 1, [{k: 1}, {k: 1}])
-      expect(area).toEqual(0)
+      const area = getArea(0, 1, [{x: 0, k: 0}, {x: 1, k: 0}])
+      expect(area).toEqual(0.0)
     })
 
     it('Have area', () => {
-      const area = getArea(0, 1, [{k: 2}, {k: 1}])
-      expect(area).toEqual(1)
+      const area = getArea(0, 1, [{x: 0, k: 2}, {x: 1, k: 0}])
+      expect(area).toEqual(1.0)
     })
   })
 
