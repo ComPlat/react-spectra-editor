@@ -134,8 +134,12 @@ const styles = () => ({
   },
   rowEven: {
     backgroundColor: '#fafafa',
-    textOverflow: 'clip',
-    whiteSpace: 'normal',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
+  cvModeWarning: {
+    color: 'red',
+    marginLeft: 12,
   },
 });
 
@@ -244,6 +248,13 @@ const CyclicVoltammetryPanel = ({
         <Typography className="txt-panel-header">
           <span className={classNames(classes.txtBadge, 'txt-sv-panel-title')}>
             Voltammetry data
+          </span>
+          {' - '}
+          <span>
+            Mode: {cyclicVotaSt.useCurrentDensity ? 'Current Density' : 'Current'}
+          </span>
+          <span className={classes.cvModeWarning}>
+            WE-ECSA must be set when switching to Current Density.
           </span>
         </Typography>
         <div className={classes.panelActions}>
