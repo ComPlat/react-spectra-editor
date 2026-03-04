@@ -35,12 +35,20 @@ const brushed = (focus, xOnly, event, brushedClass = '.d3Svg') => {
   selectUiSweepAct({
     xExtent, yExtent, data, dataPks,
   });
-  const svgSel = d3.select(brushedClass);
-  if (!svgSel.empty()) {
-    if (xOnly && brushX) {
-      svgSel.selectAll('.brushX').call(brushX.move, null);
-    } else {
-      svgSel.selectAll('.brush').call(brush.move, null);
+  let svgSel = null;
+  if (focus?.svg && typeof focus.svg.selectAll === 'function') {
+    svgSel = focus.svg;
+  } else if (typeof brushedClass === 'string') {
+    svgSel = d3.select(brushedClass);
+  }
+  if (svgSel && typeof svgSel.selectAll === 'function' && !svgSel.empty()) {
+    const brushSelection = xOnly ? svgSel.selectAll('.brushX') : svgSel.selectAll('.brush');
+    if (!brushSelection.empty()) {
+      if (xOnly && brushX) {
+        brushSelection.call(brushX.move, null);
+      } else if (brush) {
+        brushSelection.call(brush.move, null);
+      }
     }
   }
 };
@@ -54,10 +62,13 @@ const MountBrush = (focus, isUiAddIntgSt, isUiNoBrushSt, brushedClass = '.d3Svg'
 
   svg.selectAll('.brush, .brushX').remove();
 
-  const isZoomIn = uiSt?.zoom?.sweepTypes?.[graphIndex] === LIST_UI_SWEEP_TYPE.ZOOMIN;
+  const isZoomInSubview = uiSt?.zoom?.sweepTypes?.[graphIndex] === LIST_UI_SWEEP_TYPE.ZOOMIN;
+  const isZoomInGlobal = uiSt?.sweepType === LIST_UI_SWEEP_TYPE.ZOOMIN;
   const isIntegrationAdd = uiSt?.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD;
+  const isMultiplicitySweepAdd = uiSt?.sweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD;
+  const isZoomIn = isZoomInSubview || isZoomInGlobal;
 
-  if (!(graphIndex === 0 && isIntegrationAdd) && !isZoomIn) return;
+  if (!(graphIndex === 0 && isIntegrationAdd) && !isZoomIn && !isMultiplicitySweepAdd) return;
 
   const isXAxisOnly = focus?.xOnlyBrush === true;
   const xOnly = isUiAddIntgSt || isXAxisOnly;

@@ -37,7 +37,7 @@ function* selectUiSweep(action) {
 
   switch (sweepType) {
     case LIST_UI_SWEEP_TYPE.ZOOMIN:
-      if (uvvis.listWaveLength) {
+      if (layoutState === LIST_LAYOUT.LC_MS && uvvis.listWaveLength) {
         const { graphIndex } = zoom;
         yield put({
           type: UI.SWEEP.SELECT_ZOOMIN,

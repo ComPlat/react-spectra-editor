@@ -808,3 +808,7 @@ ReactDOM.render(
   <DemoWriteIr />,
   document.getElementById('root'),
 );
+
+if (typeof window !== 'undefined') {
+  window.__spectraStore = store;
+}

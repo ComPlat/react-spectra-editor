@@ -825,10 +825,18 @@ class MultiFocus {
       return;
     }
 
-    const { stack, smExtext, shift } = selectedMulti;
-    const mpys = stack;
+    const {
+      stack = [], smExtext = false, shift = 0,
+    } = selectedMulti || {};
+    const hasValidExtent = (extent) => (
+      extent
+      && Number.isFinite(extent.xL)
+      && Number.isFinite(extent.xU)
+    );
+    const mpys = stack.filter((m) => hasValidExtent(m?.xExtent));
     const isDisable = Cfg.btnCmdMpy(this.layout);
-    if (mpys === 0 || isDisable) return;
+    if (mpys.length === 0 || isDisable) return;
+    const activeExtent = hasValidExtent(smExtext) ? smExtext : mpys[0].xExtent;
     // rescale for zoom
     const { xt } = TfRescale(this);
 
@@ -846,7 +854,10 @@ class MultiFocus {
       .remove();
     let mPeaks = mpys.map((m) => {
       const { peaks, xExtent } = m;
-      return peaks.map((p) => Object.assign({}, p, { xExtent }));
+      const safePeaks = Array.isArray(peaks) ? peaks : [];
+      return safePeaks
+        .filter((p) => Number.isFinite(p?.x) && Number.isFinite(p?.y))
+        .map((p) => Object.assign({}, p, { xExtent }));
     });
     mPeaks = [].concat(...mPeaks);
     const mpyp = this.tags.mpypPath.selectAll('path').data(mPeaks);
@@ -869,7 +880,7 @@ class MultiFocus {
 
     const mpyColor = (d) => {
       const { xL, xU } = d.xExtent;
-      return (smExtext.xL === xL && smExtext.xU === xU) ? 'purple' : '#DA70D6';
+      return (activeExtent.xL === xL && activeExtent.xU === xU) ? 'purple' : '#DA70D6';
     };
 
     mpyb.enter()
