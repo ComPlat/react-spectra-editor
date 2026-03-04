@@ -15,7 +15,7 @@ import {
   Convert2Scan, Convert2Thres,
 } from '../../helpers/chem';
 import { MuButton, commonStyle } from './common';
-import { extractPeaksEdit, extractAreaUnderCurve } from '../../helpers/extractPeaksEdit';
+import { extractPeaksEdit } from '../../helpers/extractPeaksEdit';
 import Format from '../../helpers/format';
 
 const styles = () => (
@@ -79,7 +79,16 @@ const pickFromList = (list, index, fallback = null) => (
   Array.isArray(list) && list[index] !== undefined ? list[index] : fallback
 );
 
-const buildDstPayload = ({
+const hasBoolean = (value) => typeof value === 'boolean';
+
+const resolveOptionalBooleanFlags = (analysis) => {
+  const flags = {};
+  if (hasBoolean(analysis?.keepPred)) flags.keepPred = analysis.keepPred;
+  if (hasBoolean(analysis?.simulatenmr)) flags.simulatenmr = analysis.simulatenmr;
+  return flags;
+};
+
+const buildSpectrumPayload = ({
   feature,
   curveIdx,
   editPeakSt,
@@ -89,11 +98,8 @@ const buildDstPayload = ({
   scanSt,
   integrationSt,
   multiplicitySt,
-  allIntegrationSt,
-  aucValues,
   waveLengthSt,
   cyclicvoltaSt,
-  curveSt,
   axesUnitsSt,
   detectorSt,
   dscMetaData,
@@ -114,6 +120,7 @@ const buildDstPayload = ({
   );
   const scan = Convert2Scan(feature, scanSt);
   const thres = Convert2Thres(feature, threshold);
+  const shift = pickFromList(shiftSt?.shifts, curveIdx, shiftSt);
   const integration = pickFromList(integrationSt?.integrations, curveIdx, integrationSt);
   const multiplicity = pickFromList(multiplicitySt?.multiplicities, curveIdx, multiplicitySt);
   const { xLabel, yLabel } = resolveAxisLabels(
@@ -138,12 +145,12 @@ const buildDstPayload = ({
     axisDisplay,
     cvDisplay,
   };
-  const perCurveSt = Object.assign({}, curveSt, { curveIdx });
+  const optionalBooleanFlags = resolveOptionalBooleanFlags(analysis);
 
   return {
     peaks: peaksEdit,
     layout: layoutSt,
-    shift: shiftSt,
+    shift,
     scan,
     thres,
     isAscend,
@@ -152,56 +159,34 @@ const buildDstPayload = ({
     decimal: decimalSt,
     integration,
     multiplicity,
-    allIntegration: allIntegrationSt,
-    aucValues,
     waveLength: waveLengthSt,
     cyclicvoltaSt: cyclicvoltaPayload,
-    curveSt: perCurveSt,
+    curveSt: { curveIdx },
     axesUnitsSt,
     detectorSt,
     dscMetaData,
+    ...optionalBooleanFlags,
   };
 };
 
 const onClickCb = (
-  operation, peaksEdit, isAscend, isIntensity,
-  scan, thres, layoutSt, shiftSt, analysis, decimalSt,
-  integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt,
+  operationValue, isAscend, isIntensity,
+  layoutSt, shiftSt, analysis, decimalSt,
+  integrationSt, multiplicitySt, waveLengthSt,
   cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData,
   curveList, editPeakSt, thresList, scanSt, feature,
 ) => (
   () => {
-    const payload = {
-      peaks: peaksEdit,
-      layout: layoutSt,
-      shift: shiftSt,
-      scan,
-      thres,
-      isAscend,
-      isIntensity,
-      analysis,
-      decimal: decimalSt,
-      integration: integrationSt,
-      multiplicity: multiplicitySt,
-      allIntegration: allIntegrationSt,
-      aucValues,
-      waveLength: waveLengthSt,
-      cyclicvoltaSt,
-      curveSt,
-      axesUnitsSt,
-      detectorSt,
-      dscMetaData,
-    };
     const defaultCurves = feature ? [{ feature }] : [];
     const curves = Array.isArray(curveList) && curveList.length > 0 ? curveList : defaultCurves;
     const fallbackIdx = Number.isFinite(curveSt?.curveIdx) ? curveSt.curveIdx : 0;
     const indicesToSend = curves.length > 0
       ? curves.map((_, index) => index)
       : [fallbackIdx];
-    payload.dst_list = indicesToSend.map((curveIdx) => {
+    const spectraList = indicesToSend.map((curveIdx) => {
       const curve = curves[curveIdx] || {};
       const curveFeature = curve.feature || feature;
-      return buildDstPayload({
+      return buildSpectrumPayload({
         feature: curveFeature,
         curveIdx,
         editPeakSt,
@@ -211,11 +196,8 @@ const onClickCb = (
         scanSt,
         integrationSt,
         multiplicitySt,
-        allIntegrationSt,
-        aucValues,
         waveLengthSt,
         cyclicvoltaSt,
-        curveSt,
         axesUnitsSt,
         detectorSt,
         dscMetaData,
@@ -225,22 +207,24 @@ const onClickCb = (
         decimalSt,
       });
     });
-    operation(payload);
+    const payload = {
+      spectra_list: spectraList,
+    };
+    if (Number.isFinite(curveSt?.curveIdx)) {
+      payload.curveSt = { curveIdx: curveSt.curveIdx };
+    }
+    operationValue(payload);
   }
 );
 
 const BtnSubmit = ({
   classes, operation, feature, isAscend, isIntensity,
-  editPeakSt, thresSt, thresList, layoutSt, shiftSt, scanSt, forecastSt,
-  decimalSt, integrationSt, multiplicitySt, allIntegrationSt,
+  editPeakSt, thresList, layoutSt, shiftSt, scanSt, forecastSt,
+  decimalSt, integrationSt, multiplicitySt,
   waveLengthSt, cyclicvoltaSt, curveSt, curveList, axesUnitsSt, detectorSt,
   metaSt,
 }) => {
-  const peaksEdit = extractPeaksEdit(feature, editPeakSt, thresSt, shiftSt, layoutSt);
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
-  const scan = Convert2Scan(feature, scanSt);
-  const thres = Convert2Thres(feature, thresSt);
-  const aucValues = extractAreaUnderCurve(allIntegrationSt, integrationSt, layoutSt);
   const { dscMetaData } = metaSt;
   const isCvLayout = Format.isCyclicVoltaLayout(layoutSt);
   const { xLabel, yLabel } = resolveAxisLabels(
@@ -276,9 +260,9 @@ const BtnSubmit = ({
         }
         color="primary"
         onClick={onClickCb(
-          operation.value, peaksEdit, isAscend, isIntensity,
-          scan, thres, layoutSt, shiftSt, forecastSt.predictions, decimalSt,
-          integrationSt, multiplicitySt, allIntegrationSt, aucValues, waveLengthSt,
+          operation.value, isAscend, isIntensity,
+          layoutSt, shiftSt, forecastSt.predictions, decimalSt,
+          integrationSt, multiplicitySt, waveLengthSt,
           cyclicvoltaPayload, curveSt, axesUnitsSt, detectorSt, dscMetaData,
           curveList, editPeakSt, thresList, scanSt, feature,
         )}
@@ -292,7 +276,6 @@ const BtnSubmit = ({
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     editPeakSt: state.editPeak.present,
-    thresSt: state.threshold.list[state.curve.curveIdx],
     thresList: state.threshold.list,
     layoutSt: state.layout,
     shiftSt: state.shift,
@@ -301,7 +284,6 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     decimalSt: state.submit.decimal,
     integrationSt: state.integration.present,
     multiplicitySt: state.multiplicity.present,
-    allIntegrationSt: state.integration.past.concat(state.integration.present),
     waveLengthSt: state.wavelength,
     cyclicvoltaSt: state.cyclicvolta,
     curveSt: state.curve,
@@ -329,7 +311,6 @@ BtnSubmit.propTypes = {
     ],
   ).isRequired,
   editPeakSt: PropTypes.object.isRequired,
-  thresSt: PropTypes.object.isRequired,
   thresList: PropTypes.array.isRequired,
   layoutSt: PropTypes.string.isRequired,
   shiftSt: PropTypes.object.isRequired,
@@ -338,7 +319,6 @@ BtnSubmit.propTypes = {
   decimalSt: PropTypes.number.isRequired,
   integrationSt: PropTypes.object.isRequired,
   multiplicitySt: PropTypes.object.isRequired,
-  allIntegrationSt: PropTypes.object.isRequired,
   waveLengthSt: PropTypes.object.isRequired,
   cyclicvoltaSt: PropTypes.object.isRequired,
   curveSt: PropTypes.object,

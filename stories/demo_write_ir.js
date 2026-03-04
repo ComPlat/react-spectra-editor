@@ -9,6 +9,13 @@ import resultIr from './source/result_ir';
 import './style/svg.css';
 
 const entity = FN.ExtractJcamp(IREdit);
+const pickSelectedSpectrumFromPayload = (payload) => {
+  const spectraList = payload?.spectra_list;
+  if (!Array.isArray(spectraList)) return payload || {};
+  if (spectraList.length === 0) return {};
+  const selectedIdx = Number.isFinite(payload?.curveSt?.curveIdx) ? payload.curveSt.curveIdx : 0;
+  return spectraList[selectedIdx] || spectraList[0] || {};
+};
 
 class DemoWriteIr extends React.Component {
   constructor(props) {
@@ -30,9 +37,10 @@ class DemoWriteIr extends React.Component {
     return target.replace(/\$/g, '');
   }
 
-  writePeaks({
-    peaks, layout, shift, decimal, isAscend, isIntensity,
-  }) {
+  writePeaks(payload) {
+    const {
+      peaks, layout, shift, decimal, isAscend, isIntensity,
+    } = pickSelectedSpectrumFromPayload(payload);
     const { maxY, minY } = entity.features[0];
     const boundary = { maxY, minY };
     const body = FN.peaksBody({
@@ -43,9 +51,10 @@ class DemoWriteIr extends React.Component {
     this.setState({ desc });
   }
 
-  savePeaks({
-    peaks, layout, shift, decimal, analysis, isAscend, isIntensity,
-  }) {
+  savePeaks(payload) {
+    const {
+      peaks, layout, shift, decimal, analysis, isAscend, isIntensity,
+    } = pickSelectedSpectrumFromPayload(payload);
     const { maxY, minY } = entity.features[0];
     const boundary = { maxY, minY };
     const body = FN.peaksBody({

@@ -7,6 +7,13 @@ import { SpectraEditor, FN } from '../src/app';
 import MS2 from './source/MS2';
 
 const entity = FN.ExtractJcamp(MS2);
+const pickSelectedSpectrumFromPayload = (payload) => {
+  const spectraList = payload?.spectra_list;
+  if (!Array.isArray(spectraList)) return payload || {};
+  if (spectraList.length === 0) return {};
+  const selectedIdx = Number.isFinite(payload?.curveSt?.curveIdx) ? payload.curveSt.curveIdx : 0;
+  return spectraList[selectedIdx] || spectraList[0] || {};
+};
 
 class DemoWriteMs extends React.Component {
   constructor(props) {
@@ -28,9 +35,10 @@ class DemoWriteMs extends React.Component {
     return target.replace(/\$/g, '');
   }
 
-  writePeaks({
-    peaks, layout, shift, isAscend, decimal,
-  }) {
+  writePeaks(payload) {
+    const {
+      peaks, layout, shift, isAscend, decimal,
+    } = pickSelectedSpectrumFromPayload(payload);
     const body = FN.peaksBody({
       peaks, layout, decimal, shift, isAscend,
     });
@@ -39,9 +47,10 @@ class DemoWriteMs extends React.Component {
     this.setState({ desc });
   }
 
-  savePeaks({
-    peaks, layout, shift, isAscend, decimal, scan, thres,
-  }) {
+  savePeaks(payload) {
+    const {
+      peaks, layout, shift, isAscend, decimal, scan, thres,
+    } = pickSelectedSpectrumFromPayload(payload);
     const body = FN.peaksBody({
       peaks, layout, decimal, shift, isAscend,
     });

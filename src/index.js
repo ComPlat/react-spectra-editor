@@ -52,6 +52,14 @@ import dlsIntensityJcamp from './__tests__/fixtures/dls_intensity_jcamp';
 import { q1H, qIR, q13C } from './__tests__/fixtures/qDescValue';
 import './__tests__/style/svg.css';
 
+const pickSelectedSpectrumFromPayload = (payload) => {
+  const spectraList = payload?.spectra_list;
+  if (!Array.isArray(spectraList)) return payload || {};
+  if (spectraList.length === 0) return {};
+  const selectedIdx = Number.isFinite(payload?.curveSt?.curveIdx) ? payload.curveSt.curveIdx : 0;
+  return spectraList[selectedIdx] || spectraList[0] || {};
+};
+
 const nmr1HEntity = FN.ExtractJcamp(nmr1HJcamp);
 const nmr1HEntity2 = FN.ExtractJcamp(nmr1H2Jcamp);
 const nmr13CEntity = FN.ExtractJcamp(nmr13CJcamp);
@@ -360,10 +368,10 @@ class DemoWriteIr extends React.Component {
     return `${layout} NMR (${freqStr}${solvent}ppm) δ = ${str}.`;
   }
 
-  writeMpy({
-    layout, shift, isAscend, decimal,
-    multiplicity, integration,
-  }) {
+  writeMpy(payload) {
+    const {
+      layout, shift, isAscend, decimal, multiplicity, integration,
+    } = pickSelectedSpectrumFromPayload(payload);
     if (!FN.isNmrLayout(layout)) return;
     const desc = this.formatMpy({
       multiplicity, integration, shift, isAscend, decimal, layout,
@@ -371,10 +379,11 @@ class DemoWriteIr extends React.Component {
     this.setState({ desc });
   }
 
-  writePeak({
-    peaks, layout, shift, isAscend, decimal, isIntensity, integration, waveLength,
-    cyclicvoltaSt, curveSt,
-  }) {
+  writePeak(payload) {
+    const {
+      peaks, layout, shift, isAscend, decimal, isIntensity, integration, waveLength,
+      cyclicvoltaSt, curveSt,
+    } = pickSelectedSpectrumFromPayload(payload);
     const desc = this.formatPks({
       peaks, layout, shift, isAscend, decimal, isIntensity, integration, waveLength, // eslint-disable-line
       cyclicvoltaSt, curveSt, // eslint-disable-line
@@ -382,10 +391,11 @@ class DemoWriteIr extends React.Component {
     this.setState({ desc });
   }
 
-  savePeaks({
-    peaks, layout, shift, isAscend, decimal, analysis, isIntensity,
-    integration, multiplicity, waveLength,
-  }) {
+  savePeaks(payload) {
+    const {
+      peaks, layout, shift, isAscend, decimal, analysis, isIntensity,
+      integration, multiplicity, waveLength,
+    } = pickSelectedSpectrumFromPayload(payload);
     const entity = this.loadEntity();
     const { features } = entity;
     const { temperature } = entity;
@@ -394,7 +404,15 @@ class DemoWriteIr extends React.Component {
       : (features.editPeak || features.autoPeak);
     const boundary = { maxY, minY };
     const body = FN.peaksBody({
-      peaks, layout, decimal, shift, isAscend, isIntensity, boundary, waveLength, temperature,
+      peaks,
+      layout,
+      decimal,
+      shift,
+      isAscend,
+      isIntensity,
+      boundary,
+      waveLength,
+      temperature,
     });
     /*eslint-disable */
     console.log(analysis);

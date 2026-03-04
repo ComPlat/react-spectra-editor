@@ -9,6 +9,13 @@ import resultNmr from './source/result_nmr';
 import './style/svg.css';
 
 const entity = FN.ExtractJcamp(C13_CPD);
+const pickSelectedSpectrumFromPayload = (payload) => {
+  const spectraList = payload?.spectra_list;
+  if (!Array.isArray(spectraList)) return payload || {};
+  if (spectraList.length === 0) return {};
+  const selectedIdx = Number.isFinite(payload?.curveSt?.curveIdx) ? payload.curveSt.curveIdx : 0;
+  return spectraList[selectedIdx] || spectraList[0] || {};
+};
 
 class DemoWriteNmr extends React.Component {
   constructor(props) {
@@ -30,9 +37,10 @@ class DemoWriteNmr extends React.Component {
     return target.replace(/\$/g, '');
   }
 
-  writePeaks({
-    peaks, layout, shift, isAscend, decimal,
-  }) {
+  writePeaks(payload) {
+    const {
+      peaks, layout, shift, isAscend, decimal,
+    } = pickSelectedSpectrumFromPayload(payload);
     const body = FN.peaksBody({
       peaks, layout, decimal, shift, isAscend,
     });
@@ -41,9 +49,10 @@ class DemoWriteNmr extends React.Component {
     this.setState({ desc });
   }
 
-  savePeaks({
-    peaks, layout, shift, isAscend, decimal, analysis,
-  }) {
+  savePeaks(payload) {
+    const {
+      peaks, layout, shift, isAscend, decimal, analysis,
+    } = pickSelectedSpectrumFromPayload(payload);
     const body = FN.peaksBody({
       peaks, layout, decimal, shift, isAscend,
     });
