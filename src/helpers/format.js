@@ -359,6 +359,9 @@ const peaksWrapper = (layout, shift, atIndex = 0) => {
   }
 
   const ops = spectraOps[layout];
+  if (!ops) {
+    return { head: '', tail: '' };
+  }
   return { head: `${ops.head}${solvTxt} = `, tail: ops.tail };
 };
 

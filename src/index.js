@@ -60,6 +60,14 @@ const pickSelectedSpectrumFromPayload = (payload) => {
   return spectraList[selectedIdx] || spectraList[0] || {};
 };
 
+const normalizeShiftForFormatting = (shift) => {
+  if (shift && Array.isArray(shift.shifts)) return shift;
+  return {
+    selectedIdx: 0,
+    shifts: [shift || { ref: {}, peak: false, enable: true }],
+  };
+};
+
 const nmr1HEntity = FN.ExtractJcamp(nmr1HJcamp);
 const nmr1HEntity2 = FN.ExtractJcamp(nmr1H2Jcamp);
 const nmr13CEntity = FN.ExtractJcamp(nmr13CJcamp);
@@ -282,15 +290,17 @@ class DemoWriteIr extends React.Component {
     cyclicvoltaSt, curveSt,
   }) {
     const entity = this.loadEntity();
+    const safeLayout = layout || entity?.layout;
     const { features } = entity;
     const { temperature } = entity;
     const { maxY, minY } = Array.isArray(features) ? {} : (features.editPeak || features.autoPeak);
     const boundary = { maxY, minY };
+    const shiftForFormatting = normalizeShiftForFormatting(shift);
     const body = FN.peaksBody({
       peaks,
-      layout,
+      layout: safeLayout,
       decimal,
-      shift,
+      shift: shiftForFormatting,
       isAscend,
       isIntensity,
       boundary,
@@ -298,13 +308,18 @@ class DemoWriteIr extends React.Component {
       waveLength,
       temperature,
     });
-    const wrapper = FN.peaksWrapper(layout, shift);
+    const wrapper = FN.peaksWrapper(safeLayout, shiftForFormatting);
     let desc = this.rmDollarSign(wrapper.head) + body + wrapper.tail;
-    if (FN.isCyclicVoltaLayout(layout)) {
+    if (
+      FN.isCyclicVoltaLayout(safeLayout)
+      && cyclicvoltaSt?.spectraList
+      && curveSt?.listCurves
+    ) {
       const { spectraList } = cyclicvoltaSt;
       const { curveIdx, listCurves } = curveSt;
       const selectedVolta = spectraList[curveIdx];
       const selectedCurve = listCurves[curveIdx];
+      if (!selectedVolta || !selectedCurve?.feature) return desc;
       const { feature } = selectedCurve;
       const { scanRate } = feature;
       const data = {
@@ -344,10 +359,16 @@ class DemoWriteIr extends React.Component {
       const it = is.filter((i) => i.xL === xL && i.xU === xU)[0] || { area: 0 };
       const area = it.area * refFactor / refArea; // eslint-disable-line
       const center = FN.calcMpyCenter(peaks, shiftVal, mpyType);
+      const safeCenter = Number.isFinite(center) ? center : 0;
       const xs = m.peaks.map((p) => p.x).sort((a, b) => a - b);
       const [aIdx, bIdx] = isAscend ? [0, xs.length - 1] : [xs.length - 1, 0];
-      const mxA = mpyType === 'm' ? (xs[aIdx] - shiftVal).toFixed(decimal) : 0;
-      const mxB = mpyType === 'm' ? (xs[bIdx] - shiftVal).toFixed(decimal) : 0;
+      const hasValidRange = xs.length > 0 && Number.isFinite(shiftVal);
+      const mxA = (mpyType === 'm' && hasValidRange)
+        ? (xs[aIdx] - shiftVal).toFixed(decimal)
+        : safeCenter.toFixed(decimal);
+      const mxB = (mpyType === 'm' && hasValidRange)
+        ? (xs[bIdx] - shiftVal).toFixed(decimal)
+        : safeCenter.toFixed(decimal);
       return Object.assign({}, m, {
         area, center, mxA, mxB,
       });
@@ -363,8 +384,12 @@ class DemoWriteIr extends React.Component {
         ? `${location} (${type}${atomCount})`
         : `${location} (${type}, ${js}${atomCount})`;
     }).join(', ');
-    const { label, value, name } = shift.ref;
-    const solvent = label ? `${name.split('(')[0].trim()} [${value.toFixed(decimal)} ppm], ` : '';
+    const shiftRef = shift?.ref || {};
+    const { label, value, name } = shiftRef;
+    const hasValidShiftRef = !!label && Number.isFinite(value) && typeof name === 'string';
+    const solvent = hasValidShiftRef
+      ? `${name.split('(')[0].trim()} [${value.toFixed(decimal)} ppm], `
+      : '';
     return `${layout} NMR (${freqStr}${solvent}ppm) δ = ${str}.`;
   }
 
@@ -397,17 +422,19 @@ class DemoWriteIr extends React.Component {
       integration, multiplicity, waveLength,
     } = pickSelectedSpectrumFromPayload(payload);
     const entity = this.loadEntity();
+    const safeLayout = layout || entity?.layout;
     const { features } = entity;
     const { temperature } = entity;
     const { maxY, minY } = Array.isArray(features)
       ? features[0]
       : (features.editPeak || features.autoPeak);
     const boundary = { maxY, minY };
+    const shiftForFormatting = normalizeShiftForFormatting(shift);
     const body = FN.peaksBody({
       peaks,
-      layout,
+      layout: safeLayout,
       decimal,
-      shift,
+      shift: shiftForFormatting,
       isAscend,
       isIntensity,
       boundary,
