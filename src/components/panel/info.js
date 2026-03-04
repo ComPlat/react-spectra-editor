@@ -356,22 +356,6 @@ const InfoPanel = ({
         }
         <DSCData classes={classes} layout={layoutSt} dscMetaData={dscMetaData} updateAction={updateDSCMetaDataAct} />
         {
-          !editorOnly && Format.isNmrLayout(layoutSt)
-            ? (
-              <>
-                <div className={classes.subSectionHeader}>
-                  { simTitle() }
-                </div>
-                <div className={classNames(classes.rowRoot, classes.rowOddSim)}>
-                  <span className={classNames(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt')}>
-                    { simContent(simulationSt.nmrSimPeaks) }
-                  </span>
-                </div>
-              </>
-            )
-            : null
-        }
-        {
           !Format.isCyclicVoltaLayout(layoutSt)
             ? (
               <>
@@ -390,6 +374,22 @@ const InfoPanel = ({
                 </div>
               </>
             ) : null
+        }
+        {
+          !editorOnly && Format.isNmrLayout(layoutSt)
+            ? (
+              <>
+                <div className={classes.subSectionHeader}>
+                  { simTitle() }
+                </div>
+                <div className={classNames(classes.rowRoot, classes.rowOddSim)}>
+                  <span className={classNames(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt')}>
+                    { simContent(simulationSt.nmrSimPeaks) }
+                  </span>
+                </div>
+              </>
+            )
+            : null
         }
       </div>
     </Accordion>
