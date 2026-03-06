@@ -99,6 +99,7 @@ class MultiFocus {
     this.onClickPecker = this.onClickPecker.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
     this.cyclicvoltaSt = null;
+    this.yTransformFactor = 1.0;
   }
   getShouldUpdate(nextEpSt) {
     const {
@@ -109,7 +110,8 @@ class MultiFocus {
       prevTePt,
       prevDtPk,
       prevSfPk,
-      prevData
+      prevData,
+      prevYFactor
     } = this.shouldUpdate;
     const {
       xt,
@@ -120,8 +122,9 @@ class MultiFocus {
     const sameLySt = prevLySt === this.layout;
     const sameTePt = prevTePt === this.tTrEndPts.length;
     const sameDtPk = prevDtPk === this.dataPks.length;
-    const sameSfPk = JSON.stringify(prevSfPk) === JSON.stringify(this.tSfPeaks);
+    const sameSfPk = prevSfPk === this.tSfPeaks || Array.isArray(prevSfPk) && Array.isArray(this.tSfPeaks) && prevSfPk.length === this.tSfPeaks.length && prevSfPk.every((peak, idx) => peak === this.tSfPeaks[idx]);
     const sameData = prevData === this.data.length;
+    const sameYFactor = prevYFactor === this.yTransformFactor;
     this.shouldUpdate = Object.assign({}, this.shouldUpdate, {
       sameXY,
       sameEpSt,
@@ -130,7 +133,8 @@ class MultiFocus {
       sameTePt,
       sameDtPk,
       sameSfPk,
-      sameData // eslint-disable-line
+      sameData,
+      sameYFactor // eslint-disable-line
     });
   }
   resetShouldUpdate(prevEpSt) {
@@ -145,6 +149,7 @@ class MultiFocus {
     const prevSfPk = this.tSfPeaks;
     const prevData = this.data.length;
     const prevLySt = this.layout;
+    const prevYFactor = this.yTransformFactor;
     this.shouldUpdate = Object.assign({}, this.shouldUpdate, {
       prevXt,
       prevYt,
@@ -154,17 +159,41 @@ class MultiFocus {
       prevTePt,
       prevDtPk,
       prevSfPk,
-      prevData // eslint-disable-line
+      prevData,
+      prevYFactor // eslint-disable-line
     });
   }
   setTip() {
     this.tip = (0, _init.InitTip)();
     this.root.call(this.tip);
   }
+  computeYTransformFactor(layout, cyclicvoltaSt, feature) {
+    let factor = 1.0;
+    if (layout === _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY && cyclicvoltaSt && cyclicvoltaSt.useCurrentDensity) {
+      const rawArea = (cyclicvoltaSt.areaValue === '' ? 1.0 : cyclicvoltaSt.areaValue) || 1.0;
+      const areaUnit = cyclicvoltaSt.areaUnit || 'cm²';
+      const safeArea = rawArea > 0 ? rawArea : 1.0;
+      const areaInCm2 = areaUnit === 'mm²' ? safeArea / 100.0 : safeArea;
+      factor = 1.0 / areaInCm2;
+      const baseY = feature && feature.yUnit ? String(feature.yUnit) : 'A';
+      if (/mA/i.test(baseY)) {
+        factor *= 1000.0;
+      }
+      if (areaUnit === 'mm²') {
+        factor /= 100.0;
+      }
+    }
+    return factor;
+  }
+  transformYValue(y) {
+    return y * this.yTransformFactor;
+  }
   setDataParams(filterSeed, peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt, jcampIdx = 0) {
     this.data = [];
     this.otherLineData = [];
     let filterSubLayoutValue = null;
+    const currFeature = this.entities && this.entities[0] ? this.entities[0].feature : null;
+    this.yTransformFactor = this.computeYTransformFactor(layout, cyclicvoltaSt, currFeature);
     this.entities.forEach((entry, idx) => {
       const {
         topic,
@@ -208,6 +237,11 @@ class MultiFocus {
   updatePathCall(xt, yt) {
     this.pathCall = d3.line().x(d => xt(d.x)).y(d => yt(d.y));
   }
+  setYAxisTickFormat() {
+    const f = this.yTransformFactor || 1;
+    const format = d3.format('.2n');
+    this.axisCall.y.tickFormat(v => format(v * f));
+  }
   setConfig(sweepExtentSt) {
     // Domain Calculate
     let {
@@ -249,6 +283,9 @@ class MultiFocus {
     // Axis Call
     this.axisCall.x.scale(xt);
     this.axisCall.y.scale(yt);
+    if (this.layout === _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
+      this.setYAxisTickFormat();
+    }
     this.currentExtent = {
       xExtent,
       yExtent
@@ -264,6 +301,8 @@ class MultiFocus {
     this.path.style('stroke', this.pathColor);
     if (this.layout === _list_layout.LIST_LAYOUT.AIF) {
       this.path.attr('marker-mid', 'url(#arrow-left)');
+    } else {
+      this.path.attr('marker-mid', null);
     }
   }
   drawThres() {
@@ -296,15 +335,18 @@ class MultiFocus {
       path.attr('d', this.pathCall(data));
       if (this.layout === _list_layout.LIST_LAYOUT.AIF && this.isShowAllCurves === true) {
         path.attr('marker-mid', 'url(#arrow-left)');
+      } else {
+        path.attr('marker-mid', null);
       }
     });
     return null;
   }
   drawGrid() {
     const {
-      sameXY
+      sameXY,
+      sameYFactor
     } = this.shouldUpdate;
-    if (sameXY) return;
+    if (sameXY && sameYFactor) return;
     this.grid.x.call(this.axisCall.x.tickSize(-this.h, 0, 0)).selectAll('line').attr('stroke', '#ddd').attr('stroke-opacity', 0.6).attr('fill', 'none');
     this.grid.y.call(this.axisCall.y.tickSize(-this.w, 0, 0)).selectAll('line').attr('stroke', '#ddd').attr('stroke-opacity', 0.6).attr('fill', 'none');
   }
@@ -476,7 +518,8 @@ class MultiFocus {
       d3.select(`#bpt${Math.round(1000 * d.x)}`).style('fill', 'blue');
       const tipParams = {
         d,
-        layout: this.layout
+        layout: this.layout,
+        yFactor: this.yTransformFactor
       };
       this.tip.show(tipParams, event.target);
     }).on('mouseout', (event, d) => {
@@ -484,7 +527,8 @@ class MultiFocus {
       d3.select(`#bpt${Math.round(1000 * d.x)}`).style('fill', 'red');
       const tipParams = {
         d,
-        layout: this.layout
+        layout: this.layout,
+        yFactor: this.yTransformFactor
       };
       this.tip.hide(tipParams, event.target);
     }).on('click', (event, d) => this.onClickTarget(event, d));
@@ -537,7 +581,8 @@ class MultiFocus {
       d3.select(`#bpt${Math.round(1000 * d.x)}`).style('fill', 'blue');
       const tipParams = {
         d,
-        layout: this.layout
+        layout: this.layout,
+        yFactor: this.yTransformFactor
       };
       this.tip.show(tipParams, event.target);
     }).on('mouseout', (event, d) => {
@@ -545,12 +590,13 @@ class MultiFocus {
       d3.select(`#bpt${Math.round(1000 * d.x)}`).style('fill', '#228B22');
       const tipParams = {
         d,
-        layout: this.layout
+        layout: this.layout,
+        yFactor: this.yTransformFactor
       };
       this.tip.hide(tipParams, event.target);
     }).on('click', (event, d) => this.onClickPecker(event, d));
   }
-  drawInteg(integationSt) {
+  drawInteg(integrationState) {
     const {
       sameXY,
       sameLySt,
@@ -560,7 +606,7 @@ class MultiFocus {
     if (sameXY && sameLySt && sameItSt && sameData) return;
     const {
       integrations
-    } = integationSt;
+    } = integrationState;
     const selectedIntegration = integrations[this.jcampIdx];
     if (selectedIntegration === false || selectedIntegration === undefined) {
       const itgs = [];
@@ -681,13 +727,15 @@ class MultiFocus {
       return;
     }
     const {
-      stack,
-      smExtext,
-      shift
-    } = selectedMulti;
-    const mpys = stack;
+      stack = [],
+      smExtext = false,
+      shift = 0
+    } = selectedMulti || {};
+    const hasValidExtent = extent => extent && Number.isFinite(extent.xL) && Number.isFinite(extent.xU);
+    const mpys = stack.filter(m => hasValidExtent(m?.xExtent));
     const isDisable = _cfg.default.btnCmdMpy(this.layout);
-    if (mpys === 0 || isDisable) return;
+    if (mpys.length === 0 || isDisable) return;
+    const activeExtent = hasValidExtent(smExtext) ? smExtext : mpys[0].xExtent;
     // rescale for zoom
     const {
       xt
@@ -703,7 +751,8 @@ class MultiFocus {
         peaks,
         xExtent
       } = m;
-      return peaks.map(p => Object.assign({}, p, {
+      const safePeaks = Array.isArray(peaks) ? peaks : [];
+      return safePeaks.filter(p => Number.isFinite(p?.x) && Number.isFinite(p?.y)).map(p => Object.assign({}, p, {
         xExtent
       }));
     });
@@ -718,7 +767,7 @@ class MultiFocus {
         xL,
         xU
       } = d.xExtent;
-      return smExtext.xL === xL && smExtext.xU === xU ? 'purple' : '#DA70D6';
+      return activeExtent.xL === xL && activeExtent.xU === xU ? 'purple' : '#DA70D6';
     };
     mpyb.enter().append('path').attr('class', 'mpyb').attr('fill', 'none').attr('stroke-width', 2).merge(mpyb).attr('stroke', d => mpyColor(d)).attr('id', d => `mpyb${(0, _focus.mpyIdTag)(d)}`).attr('d', d => mpyBar(d)).on('mouseover', (event, d) => {
       d3.selectAll(`#mpyb${(0, _focus.mpyIdTag)(d)}`).attr('stroke', 'blue');
@@ -824,7 +873,7 @@ class MultiFocus {
     sweepExtentSt,
     isUiNoBrushSt,
     cyclicvoltaSt,
-    integationSt,
+    integrationSt,
     mtplySt,
     uiSt
   }) {
@@ -861,7 +910,7 @@ class MultiFocus {
       this.drawPeaks(editPeakSt);
       this.drawRef();
       this.drawPeckers();
-      this.drawInteg(integationSt);
+      this.drawInteg(integrationSt);
       this.drawMtply(mtplySt);
     }
     (0, _brush.default)(this, false, isUiNoBrushSt);
@@ -879,7 +928,7 @@ class MultiFocus {
     sweepExtentSt,
     isUiNoBrushSt,
     cyclicvoltaSt,
-    integationSt,
+    integrationSt,
     mtplySt,
     uiSt
   }) {
@@ -905,7 +954,7 @@ class MultiFocus {
       this.drawPeaks(editPeakSt);
       this.drawRef();
       this.drawPeckers();
-      this.drawInteg(integationSt);
+      this.drawInteg(integrationSt);
       this.drawMtply(mtplySt);
     }
     (0, _brush.default)(this, false, isUiNoBrushSt, this.uiSt, this.graphIndex);

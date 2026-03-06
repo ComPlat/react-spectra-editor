@@ -28,11 +28,11 @@ const styles = () => Object.assign({
     width: 100
   }
 }, _common.commonStyle);
-const wavelengthSelect = (classes, waveLengthSt, layoutSt, updateWaveLengthAct) => {
+const wavelengthSelect = (classes, waveLengthSt, layoutSt, updateWavelengthAct) => {
   if (!_format.default.isXRDLayout(layoutSt)) {
     return /*#__PURE__*/(0, _jsxRuntime.jsx)("i", {});
   }
-  const onChange = e => updateWaveLengthAct(e.target.value);
+  const onChange = e => updateWavelengthAct(e.target.value);
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
     className: (0, _classnames.default)(classes.fieldLayout),
     variant: "outlined",
@@ -46,15 +46,16 @@ const wavelengthSelect = (classes, waveLengthSt, layoutSt, updateWaveLengthAct) 
       value: waveLengthSt,
       onChange: onChange,
       className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-layout'),
-      children: _list_wavelength.LIST_WAVE_LENGTH.map(item => {
+      children: _list_wavelength.LIST_WAVE_LENGTH.map((item, idx) => {
         // eslint-disable-line
+        const itemKey = `${item.label}-${item.value}-${item.unit}-${idx}`;
         return /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
           value: item,
           children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
             className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
             children: [item.label, " (", item.value, " ", item.unit, ")"]
           })
-        });
+        }, itemKey);
       })
     })]
   });
@@ -63,10 +64,10 @@ const Wavelength = ({
   classes,
   waveLengthSt,
   layoutSt,
-  updateWaveLengthAct
+  updateWavelengthAct
 }) => /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
   className: classes.groupRight,
-  children: wavelengthSelect(classes, waveLengthSt, layoutSt, updateWaveLengthAct)
+  children: wavelengthSelect(classes, waveLengthSt, layoutSt, updateWavelengthAct)
 });
 const mapStateToProps = (state, props) => (
 // eslint-disable-line
@@ -75,12 +76,12 @@ const mapStateToProps = (state, props) => (
   layoutSt: state.layout
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
-  updateWaveLengthAct: _wavelength.updateWaveLength
+  updateWavelengthAct: _wavelength.updateWaveLength
 }, dispatch);
 Wavelength.propTypes = {
   classes: _propTypes.default.object.isRequired,
   layoutSt: _propTypes.default.string.isRequired,
   waveLengthSt: _propTypes.default.object.isRequired,
-  updateWaveLengthAct: _propTypes.default.func.isRequired
+  updateWavelengthAct: _propTypes.default.func.isRequired
 };
 var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _withStyles.default)(styles)(Wavelength));

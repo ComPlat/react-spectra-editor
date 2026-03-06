@@ -117,6 +117,35 @@ const normalizeQuillValue = val => {
   if (val === '<p><br></p>' || val === '<p></p>') return '';
   return val;
 };
+const chemSubStyle = {
+  fontSize: '0.85em',
+  position: 'relative',
+  top: '0.24em',
+  lineHeight: 1
+};
+const renderReadableSubscript = (txt = '') => {
+  if (typeof txt !== 'string') return txt;
+  const regex = /([A-Za-z])(\d+)/g;
+  if (!regex.test(txt)) return txt;
+  regex.lastIndex = 0;
+  const parts = [];
+  let cursor = 0;
+  let match = regex.exec(txt);
+  while (match) {
+    const [raw, prefix, digits] = match;
+    const at = match.index;
+    if (at > cursor) parts.push(txt.slice(cursor, at));
+    parts.push(prefix);
+    parts.push(/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+      style: chemSubStyle,
+      children: digits
+    }, `${at}-${digits}`));
+    cursor = at + raw.length;
+    match = regex.exec(txt);
+  }
+  if (cursor < txt.length) parts.push(txt.slice(cursor));
+  return parts;
+};
 const handleDescriptionChanged = (content, delta, source, editor, onDescriptionChanged) => {
   if (!onDescriptionChanged) return;
   onDescriptionChanged(normalizeQuillValue(content), delta, source, editor);
@@ -226,8 +255,11 @@ const SECData = ({
 SECData.propTypes = {
   classes: _propTypes.default.object.isRequired,
   layout: _propTypes.default.string.isRequired,
-  detector: _propTypes.default.object.isRequired,
-  secData: _propTypes.default.object.isRequired
+  detector: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.object]),
+  secData: _propTypes.default.object
+};
+SECData.defaultProps = {
+  detector: ''
 };
 const DSCData = ({
   classes,
@@ -285,7 +317,7 @@ const DSCData = ({
 DSCData.propTypes = {
   classes: _propTypes.default.object.isRequired,
   layout: _propTypes.default.string.isRequired,
-  dscMetaData: _propTypes.default.object.isRequired,
+  dscMetaData: _propTypes.default.object,
   updateAction: _propTypes.default.func.isRequired
 };
 const InfoPanel = ({
@@ -302,6 +334,7 @@ const InfoPanel = ({
   curveSt,
   exactMass,
   onExapnd,
+  onExpand,
   canChangeDescription,
   onDescriptionChanged,
   detectorSt,
@@ -324,14 +357,14 @@ const InfoPanel = ({
     curveIdx
   } = curveSt;
   const {
-    curves
-  } = detectorSt;
+    curves = []
+  } = detectorSt || {};
   const currentEntity = Array.isArray(entities) ? entities[curveIdx] : null;
   const entityTitle = currentEntity?.entity?.title || currentEntity?.title || currentEntity?.spectra?.[0]?.title || currentEntity?.entity?.spectra?.[0]?.title || '';
   const displayTitle = title || entityTitle;
   const getSelectedDetectorForCurve = (_detectorSt, targetCurveIdx) => {
     const targetCurve = curves.find(curve => curve.curveIdx === targetCurveIdx);
-    return targetCurve ? targetCurve.selectedDetector.name : '';
+    return targetCurve?.selectedDetector?.name || '';
   };
   let selectedDetector = getSelectedDetectorForCurve(detectorSt, curveIdx);
 
@@ -355,7 +388,7 @@ const InfoPanel = ({
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Accordion, {
     "data-testid": "PanelInfo",
     expanded: expand,
-    onChange: onExapnd,
+    onChange: onExpand || onExapnd,
     disableGutters: true,
     sx: {
       '&.MuiAccordion-root.Mui-expanded': {
@@ -406,7 +439,7 @@ const InfoPanel = ({
           children: "Solv : "
         }), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
           className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
-          children: showSolvName
+          children: renderReadableSubscript(showSolvName)
         })]
       }) : null, _format.default.isMsLayout(layoutSt) && exactMass ? /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
         className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd),
@@ -440,18 +473,7 @@ const InfoPanel = ({
         layout: layoutSt,
         dscMetaData: dscMetaData,
         updateAction: updateDSCMetaDataAct
-      }), !editorOnly && _format.default.isNmrLayout(layoutSt) ? /*#__PURE__*/(0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
-        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-          className: classes.subSectionHeader,
-          children: simTitle()
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-          className: (0, _classnames.default)(classes.rowRoot, classes.rowOddSim),
-          children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
-            className: (0, _classnames.default)(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt'),
-            children: simContent(simulationSt.nmrSimPeaks)
-          })
-        })]
-      }) : null, !_format.default.isCyclicVoltaLayout(layoutSt) ? /*#__PURE__*/(0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
+      }), !_format.default.isCyclicVoltaLayout(layoutSt) ? /*#__PURE__*/(0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
         children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
           className: classes.subSectionHeader,
           children: "Content"
@@ -466,6 +488,17 @@ const InfoPanel = ({
               toolbar: false
             },
             onChange: (content, delta, source, editor) => handleDescriptionChanged(content, delta, source, editor, onDescriptionChanged)
+          })
+        })]
+      }) : null, !editorOnly && _format.default.isNmrLayout(layoutSt) ? /*#__PURE__*/(0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+          className: classes.subSectionHeader,
+          children: simTitle()
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+          className: (0, _classnames.default)(classes.rowRoot, classes.rowOddSim),
+          children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+            className: (0, _classnames.default)(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt'),
+            children: simContent(simulationSt.nmrSimPeaks)
           })
         })]
       }) : null]
@@ -507,16 +540,17 @@ const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
 InfoPanel.propTypes = {
   classes: _propTypes.default.object.isRequired,
   expand: _propTypes.default.bool.isRequired,
-  feature: _propTypes.default.object.isRequired,
-  integration: _propTypes.default.object.isRequired,
+  feature: _propTypes.default.object,
+  integration: _propTypes.default.object,
   editorOnly: _propTypes.default.bool.isRequired,
   molSvg: _propTypes.default.string.isRequired,
   descriptions: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.array]).isRequired,
   layoutSt: _propTypes.default.string.isRequired,
-  simulationSt: _propTypes.default.array.isRequired,
+  simulationSt: _propTypes.default.object.isRequired,
   shiftSt: _propTypes.default.object.isRequired,
   curveSt: _propTypes.default.object.isRequired,
-  onExapnd: _propTypes.default.func.isRequired,
+  onExpand: _propTypes.default.func,
+  onExapnd: _propTypes.default.func,
   canChangeDescription: _propTypes.default.bool.isRequired,
   onDescriptionChanged: _propTypes.default.func,
   exactMass: _propTypes.default.string,

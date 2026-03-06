@@ -11,14 +11,14 @@ var _reactRedux = require("react-redux");
 var _redux = require("redux");
 var _index = _interopRequireDefault(require("./components/d3_line/index"));
 var _index2 = _interopRequireDefault(require("./components/d3_rect/index"));
-var _index3 = _interopRequireDefault(require("./components/d3_line_rect/index"));
 var _forecast_viewer = _interopRequireDefault(require("./components/forecast_viewer"));
 var _format = _interopRequireDefault(require("./helpers/format"));
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, default-param-last, react/function-component-definition */
 
 const extractLayout = (forecast, layoutSt) => {
-  const isEmpty = Object.keys(forecast).length === 0 && forecast.constructor === Object;
+  const safeForecast = forecast && typeof forecast === 'object' ? forecast : {};
+  const isEmpty = Object.keys(safeForecast).length === 0 && safeForecast.constructor === Object;
   const isNmr = _format.default.isNmrLayout(layoutSt);
   const isMs = _format.default.isMsLayout(layoutSt);
   const isLCMs = _format.default.isLCMsLayout(layoutSt);
@@ -44,8 +44,7 @@ const Content = ({
   yLabel,
   forecast,
   operations,
-  layoutSt,
-  features
+  layoutSt
 }) => {
   const {
     showForecast,
@@ -82,9 +81,8 @@ const Content = ({
     });
   }
   if (isLCMs) {
-    return /*#__PURE__*/(0, _jsxRuntime.jsx)(_index3.default, {
+    return /*#__PURE__*/(0, _jsxRuntime.jsx)(_index2.default, {
       topic: topic,
-      features: features,
       cLabel: cLabel,
       xLabel: xLabel,
       yLabel: yLabel,
@@ -110,7 +108,6 @@ const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({}, dispat
 Content.propTypes = {
   topic: _propTypes.default.object.isRequired,
   feature: _propTypes.default.object.isRequired,
-  features: _propTypes.default.array.isRequired,
   cLabel: _propTypes.default.string.isRequired,
   xLabel: _propTypes.default.string.isRequired,
   yLabel: _propTypes.default.string.isRequired,

@@ -33,6 +33,35 @@ const styles = () => Object.assign({
     width: 100
   }
 }, _common.commonStyle);
+const chemSubStyle = {
+  fontSize: '0.85em',
+  position: 'relative',
+  top: '0.24em',
+  lineHeight: 1
+};
+const renderReadableSubscript = (txt = '') => {
+  if (typeof txt !== 'string') return txt;
+  const regex = /([A-Za-z])(\d+)/g;
+  if (!regex.test(txt)) return txt;
+  regex.lastIndex = 0;
+  const parts = [];
+  let cursor = 0;
+  let match = regex.exec(txt);
+  while (match) {
+    const [raw, prefix, digits] = match;
+    const at = match.index;
+    if (at > cursor) parts.push(txt.slice(cursor, at));
+    parts.push(prefix);
+    parts.push(/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+      style: chemSubStyle,
+      children: digits
+    }, `${at}-${digits}`));
+    cursor = at + raw.length;
+    match = regex.exec(txt);
+  }
+  if (cursor < txt.length) parts.push(txt.slice(cursor));
+  return parts;
+};
 const shiftSelect = (classes, layoutSt, setShiftRefAct, shiftSt, curveSt) => {
   if (_cfg.default.hideSolvent(layoutSt)) {
     return null;
@@ -73,9 +102,9 @@ const shiftSelect = (classes, layoutSt, setShiftRefAct, shiftSt, curveSt) => {
       className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-shift'),
       children: listShift.map(ref => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
         value: ref.name,
-        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
           className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-shift'),
-          children: `${ref.name}: ${_format.default.strNumberFixedDecimal(ref.value, 2)} ppm`
+          children: [renderReadableSubscript(ref.name), `: ${_format.default.strNumberFixedDecimal(ref.value, 2)} ppm`]
         })
       }, ref.name))
     })]

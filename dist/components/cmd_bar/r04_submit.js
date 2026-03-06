@@ -150,7 +150,8 @@ const operationSelect = (classes, operations, operation, onChangeSelect) => {
       children: o.name
     })
   }, o.name));
-  const selectedValue = operation.name || operations[0].name;
+  const operationNames = operations.map(o => o.name);
+  const selectedValue = operationNames.includes(operation?.name) ? operation.name : operations[0].name;
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
     className: (0, _classnames.default)(classes.fieldOpertaion),
     variant: "outlined",

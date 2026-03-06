@@ -15,6 +15,7 @@ var _ui = require("../../actions/ui");
 var _line_focus = _interopRequireDefault(require("./line_focus"));
 var _draw = require("../common/draw");
 var _list_ui = require("../../constants/list_ui");
+var _list_graph = require("../../constants/list_graph");
 var _cyclic_voltammetry = require("../../actions/cyclic_voltammetry");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable no-mixed-operators */
@@ -30,7 +31,7 @@ class ViewerLine extends _react.default.Component {
       selectUiSweepAct,
       scrollUiWheelAct
     } = props;
-    this.rootKlass = '.d3Line';
+    this.rootKlass = `.${_list_graph.LIST_ROOT_SVG_GRAPH.LINE}`;
     this.focus = new _line_focus.default({
       W,
       H,
@@ -54,7 +55,7 @@ class ViewerLine extends _react.default.Component {
       tSfPeaks,
       editPeakSt,
       layoutSt,
-      integationSt,
+      integrationSt,
       mtplySt,
       sweepExtentSt,
       isUiAddIntgSt,
@@ -92,7 +93,7 @@ class ViewerLine extends _react.default.Component {
       tSfPeaks,
       editPeakSt,
       layoutSt,
-      integationSt,
+      integrationSt,
       mtplySt,
       sweepExtentSt,
       isUiAddIntgSt,
@@ -116,7 +117,7 @@ class ViewerLine extends _react.default.Component {
       tSfPeaks,
       editPeakSt,
       layoutSt,
-      integationSt,
+      integrationSt,
       mtplySt,
       sweepExtentSt,
       isUiAddIntgSt,
@@ -151,7 +152,7 @@ class ViewerLine extends _react.default.Component {
       tSfPeaks,
       editPeakSt,
       layoutSt,
-      integationSt,
+      integrationSt,
       mtplySt,
       sweepExtentSt,
       isUiAddIntgSt,
@@ -177,7 +178,7 @@ class ViewerLine extends _react.default.Component {
   }
   render() {
     return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-      className: "d3Line"
+      className: _list_graph.LIST_ROOT_SVG_GRAPH.LINE
     });
   }
 }
@@ -190,7 +191,7 @@ const mapStateToProps = (state, props) => ({
   tSfPeaks: (0, _chem.ToShiftPeaks)(state, props),
   editPeakSt: state.editPeak.present,
   layoutSt: state.layout,
-  integationSt: state.integration.present,
+  integrationSt: state.integration.present,
   mtplySt: state.multiplicity.present,
   sweepExtentSt: state.ui.sweepExtent,
   isUiAddIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
@@ -222,7 +223,7 @@ ViewerLine.propTypes = {
   tSfPeaks: _propTypes.default.array.isRequired,
   editPeakSt: _propTypes.default.object.isRequired,
   layoutSt: _propTypes.default.string.isRequired,
-  integationSt: _propTypes.default.object.isRequired,
+  integrationSt: _propTypes.default.object.isRequired,
   mtplySt: _propTypes.default.object.isRequired,
   sweepExtentSt: _propTypes.default.object.isRequired,
   isUiAddIntgSt: _propTypes.default.bool.isRequired,

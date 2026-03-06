@@ -10,9 +10,11 @@ var _reactRedux = require("react-redux");
 var _redux = require("redux");
 var _propTypes = _interopRequireDefault(require("prop-types"));
 var _chem = require("../../helpers/chem");
+var _format = _interopRequireDefault(require("../../helpers/format"));
 var _manager = require("../../actions/manager");
 var _ui = require("../../actions/ui");
 var _list_ui = require("../../constants/list_ui");
+var _list_graph = require("../../constants/list_graph");
 var _cyclic_voltammetry = require("../../actions/cyclic_voltammetry");
 var _multi_focus = _interopRequireDefault(require("./multi_focus"));
 var _draw = require("../common/draw");
@@ -32,7 +34,10 @@ class ViewerMulti extends _react.default.Component {
       selectUiSweepAct,
       scrollUiWheelAct
     } = this.props;
-    this.rootKlass = '.d3Line';
+    this.rootKlass = `.${_list_graph.LIST_ROOT_SVG_GRAPH.LINE}`;
+    this.containerRef = /*#__PURE__*/_react.default.createRef();
+    this.currentSize = null;
+    this.resizeObserver = null;
     this.focus = new _multi_focus.default({
       W,
       H,
@@ -42,76 +47,11 @@ class ViewerMulti extends _react.default.Component {
       scrollUiWheelAct
     });
     this.normChange = this.normChange.bind(this);
+    this.handleResize = this.handleResize.bind(this);
   }
   componentDidMount() {
-    const {
-      curveSt,
-      seed,
-      peak,
-      cLabel,
-      xLabel,
-      yLabel,
-      feature,
-      tTrEndPts,
-      tSfPeaks,
-      editPeakSt,
-      layoutSt,
-      sweepExtentSt,
-      isUiNoBrushSt,
-      isHidden,
-      resetAllAct,
-      cyclicvoltaSt,
-      integationSt,
-      mtplySt,
-      axesUnitsSt,
-      uiSt
-    } = this.props;
-    (0, _draw.drawDestroy)(this.rootKlass);
-    resetAllAct(feature);
-    let xxLabel = xLabel;
-    let yyLabel = yLabel;
-    if (axesUnitsSt) {
-      const {
-        curveIdx
-      } = curveSt;
-      const {
-        axes
-      } = axesUnitsSt;
-      let selectedAxes = axes[curveIdx];
-      if (!selectedAxes) {
-        selectedAxes = {
-          xUnit: '',
-          yUnit: ''
-        };
-      }
-      const {
-        xUnit,
-        yUnit
-      } = selectedAxes;
-      xxLabel = xUnit === '' ? xLabel : xUnit;
-      yyLabel = yUnit === '' ? yLabel : yUnit;
-    }
-    const filterSeed = seed;
-    const filterPeak = peak;
-    (0, _draw.drawMain)(this.rootKlass, W, H);
-    this.focus.create({
-      curveSt,
-      filterSeed,
-      filterPeak,
-      tTrEndPts,
-      tSfPeaks,
-      editPeakSt,
-      layoutSt,
-      sweepExtentSt,
-      isUiNoBrushSt,
-      cyclicvoltaSt,
-      integationSt,
-      mtplySt,
-      uiSt
-    });
-    (0, _draw.drawLabel)(this.rootKlass, cLabel, xxLabel, yyLabel);
-    (0, _draw.drawDisplay)(this.rootKlass, isHidden);
-    (0, _draw.drawArrowOnCurve)(this.rootKlass, isHidden);
+    this.renderChart(this.props, true);
+    this.setupResizeObserver();
   }
   componentDidUpdate(prevProps) {
     const {
@@ -130,12 +70,99 @@ class ViewerMulti extends _react.default.Component {
       isUiNoBrushSt,
       isHidden,
       cyclicvoltaSt,
-      integationSt,
+      integrationSt,
       mtplySt,
       axesUnitsSt,
       uiSt
     } = this.props;
     this.normChange(prevProps);
+    if (_format.default.isCyclicVoltaLayout(layoutSt)) {
+      this.handleResize();
+    }
+    const hasRelevantChange = prevProps.entities !== entities || prevProps.curveSt !== curveSt || prevProps.seed !== seed || prevProps.peak !== peak || prevProps.tTrEndPts !== tTrEndPts || prevProps.tSfPeaks !== tSfPeaks || prevProps.editPeakSt !== editPeakSt || prevProps.layoutSt !== layoutSt || prevProps.sweepExtentSt !== sweepExtentSt || prevProps.isUiNoBrushSt !== isUiNoBrushSt || prevProps.isHidden !== isHidden || prevProps.cyclicvoltaSt !== cyclicvoltaSt || prevProps.integrationSt !== integrationSt || prevProps.mtplySt !== mtplySt || prevProps.axesUnitsSt !== axesUnitsSt || prevProps.uiSt !== uiSt || prevProps.cLabel !== cLabel || prevProps.xLabel !== xLabel || prevProps.yLabel !== yLabel;
+    if (!hasRelevantChange) return;
+    const {
+      xxLabel,
+      yyLabel
+    } = this.resolveAxisLabels(this.props);
+    this.focus.update({
+      entities,
+      curveSt,
+      filterSeed: seed,
+      filterPeak: peak,
+      tTrEndPts,
+      tSfPeaks,
+      editPeakSt,
+      layoutSt,
+      sweepExtentSt,
+      isUiNoBrushSt,
+      cyclicvoltaSt,
+      integrationSt,
+      mtplySt,
+      uiSt
+    });
+    (0, _draw.drawLabel)(this.rootKlass, cLabel, xxLabel, yyLabel);
+    (0, _draw.drawDisplay)(this.rootKlass, isHidden);
+    (0, _draw.drawArrowOnCurve)(this.rootKlass, isHidden || !_format.default.isAIFLayout(layoutSt));
+  }
+  componentWillUnmount() {
+    (0, _draw.drawDestroy)(this.rootKlass);
+    this.teardownResizeObserver();
+  }
+  handleResize() {
+    const {
+      layoutSt
+    } = this.props;
+    if (!_format.default.isCyclicVoltaLayout(layoutSt)) return;
+    const size = this.getContainerSize();
+    if (!size) return;
+    if (!this.currentSize || size.width !== this.currentSize.width || size.height !== this.currentSize.height) {
+      this.renderChart(this.props, false);
+    }
+  }
+  getContainerSize() {
+    const node = this.containerRef.current;
+    if (!node) return null;
+    const {
+      clientWidth,
+      clientHeight
+    } = node;
+    if (!clientWidth || !clientHeight) return null;
+    return {
+      width: clientWidth,
+      height: clientHeight
+    };
+  }
+  getTargetSize(layoutSt) {
+    if (_format.default.isCyclicVoltaLayout(layoutSt)) {
+      const size = this.getContainerSize();
+      if (size) return size;
+    }
+    return {
+      width: W,
+      height: H
+    };
+  }
+  setupResizeObserver() {
+    if (typeof ResizeObserver === 'undefined') return;
+    if (!this.containerRef.current || this.resizeObserver) return;
+    this.resizeObserver = new ResizeObserver(this.handleResize);
+    this.resizeObserver.observe(this.containerRef.current);
+  }
+  teardownResizeObserver() {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
+    }
+  }
+  resolveAxisLabels(props) {
+    const {
+      curveSt,
+      xLabel,
+      yLabel,
+      axesUnitsSt,
+      cyclicvoltaSt
+    } = props;
     let xxLabel = xLabel;
     let yyLabel = yLabel;
     if (axesUnitsSt) {
@@ -145,13 +172,10 @@ class ViewerMulti extends _react.default.Component {
       const {
         axes
       } = axesUnitsSt;
-      let selectedAxes = axes[curveIdx];
-      if (!selectedAxes) {
-        selectedAxes = {
-          xUnit: '',
-          yUnit: ''
-        };
-      }
+      const selectedAxes = axes[curveIdx] || {
+        xUnit: '',
+        yUnit: ''
+      };
       const {
         xUnit,
         yUnit
@@ -159,30 +183,15 @@ class ViewerMulti extends _react.default.Component {
       xxLabel = xUnit === '' ? xLabel : xUnit;
       yyLabel = yUnit === '' ? yLabel : yUnit;
     }
-    const filterSeed = seed;
-    const filterPeak = peak;
-    this.focus.update({
-      entities,
-      curveSt,
-      filterSeed,
-      filterPeak,
-      tTrEndPts,
-      tSfPeaks,
-      editPeakSt,
-      layoutSt,
-      sweepExtentSt,
-      isUiNoBrushSt,
-      cyclicvoltaSt,
-      integationSt,
-      mtplySt,
-      uiSt
-    });
-    (0, _draw.drawLabel)(this.rootKlass, cLabel, xxLabel, yyLabel);
-    (0, _draw.drawDisplay)(this.rootKlass, isHidden);
-    (0, _draw.drawArrowOnCurve)(this.rootKlass, isHidden);
-  }
-  componentWillUnmount() {
-    (0, _draw.drawDestroy)(this.rootKlass);
+    if (cyclicvoltaSt && cyclicvoltaSt.useCurrentDensity) {
+      const areaUnit = cyclicvoltaSt.areaUnit || 'cm²';
+      const baseUnit = /mA/i.test(String(yyLabel)) ? 'mA' : 'A';
+      yyLabel = `Current density in ${baseUnit}/${areaUnit}`;
+    }
+    return {
+      xxLabel,
+      yyLabel
+    };
   }
   normChange(prevProps) {
     const {
@@ -195,9 +204,79 @@ class ViewerMulti extends _react.default.Component {
       resetAllAct(feature);
     }
   }
+  renderChart(props, shouldReset) {
+    const {
+      curveSt,
+      seed,
+      peak,
+      cLabel,
+      feature,
+      tTrEndPts,
+      tSfPeaks,
+      editPeakSt,
+      layoutSt,
+      sweepExtentSt,
+      isUiNoBrushSt,
+      isHidden,
+      resetAllAct,
+      cyclicvoltaSt,
+      integrationSt,
+      mtplySt,
+      uiSt,
+      entities,
+      clickUiTargetAct,
+      selectUiSweepAct,
+      scrollUiWheelAct
+    } = props;
+    const size = this.getTargetSize(layoutSt);
+    this.currentSize = size;
+    (0, _draw.drawDestroy)(this.rootKlass);
+    if (shouldReset) {
+      resetAllAct(feature);
+    }
+    const {
+      xxLabel,
+      yyLabel
+    } = this.resolveAxisLabels(props);
+    this.focus = new _multi_focus.default({
+      W: size.width,
+      H: size.height,
+      entities,
+      clickUiTargetAct,
+      selectUiSweepAct,
+      scrollUiWheelAct
+    });
+    (0, _draw.drawMain)(this.rootKlass, size.width, size.height);
+    this.focus.create({
+      curveSt,
+      filterSeed: seed,
+      filterPeak: peak,
+      tTrEndPts,
+      tSfPeaks,
+      editPeakSt,
+      layoutSt,
+      sweepExtentSt,
+      isUiNoBrushSt,
+      cyclicvoltaSt,
+      integrationSt,
+      mtplySt,
+      uiSt
+    });
+    (0, _draw.drawLabel)(this.rootKlass, cLabel, xxLabel, yyLabel);
+    (0, _draw.drawDisplay)(this.rootKlass, isHidden);
+    (0, _draw.drawArrowOnCurve)(this.rootKlass, isHidden || !_format.default.isAIFLayout(layoutSt));
+  }
   render() {
+    const {
+      layoutSt
+    } = this.props;
+    const isCyclicVolta = _format.default.isCyclicVoltaLayout(layoutSt);
     return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-      className: "d3Line"
+      className: _list_graph.LIST_ROOT_SVG_GRAPH.LINE,
+      ref: this.containerRef,
+      style: isCyclicVolta ? {
+        height: '100%'
+      } : undefined
     });
   }
 }
@@ -214,7 +293,7 @@ const mapStateToProps = (state, props) => ({
   isUiNoBrushSt: _list_ui.LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
   cyclicvoltaSt: state.cyclicvolta,
   maxminPeakSt: (0, _chem.Feature2MaxMinPeak)(state, props),
-  integationSt: state.integration.present,
+  integrationSt: state.integration.present,
   mtplySt: state.multiplicity.present,
   axesUnitsSt: state.axesUnits
 });
@@ -240,7 +319,7 @@ ViewerMulti.propTypes = {
   tSfPeaks: _propTypes.default.array.isRequired,
   editPeakSt: _propTypes.default.object.isRequired,
   layoutSt: _propTypes.default.string.isRequired,
-  integationSt: _propTypes.default.object.isRequired,
+  integrationSt: _propTypes.default.object.isRequired,
   mtplySt: _propTypes.default.object.isRequired,
   sweepExtentSt: _propTypes.default.object.isRequired,
   isUiNoBrushSt: _propTypes.default.bool.isRequired,

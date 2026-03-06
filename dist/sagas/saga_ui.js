@@ -9,9 +9,10 @@ var _action_type = require("../constants/action_type");
 var _list_ui = require("../constants/list_ui");
 var _list_layout = require("../constants/list_layout");
 var _list_graph = require("../constants/list_graph");
-const getUiSt = state => state.ui;
-const getCurveSt = state => state.curve;
-const getHplcMsSt = state => state.hplcMs;
+const getUiState = state => state.ui;
+const getCurveState = state => state.curve;
+const getHplcMsState = state => state.hplcMs;
+const getSubViewZoomActionType = () => _action_type.UI.SWEEP.SELECT_ZOOMIN_SUBVIEW || _action_type.UI.SWEEP.SELECT_ZOOMIN;
 const calcPeaks = payload => {
   const {
     xExtent,
@@ -30,28 +31,28 @@ const calcPeaks = payload => {
   const peaks = dataPks.filter(p => xL <= p.x && p.x <= xU && yL <= p.y && p.y <= yU);
   return peaks;
 };
-const getLayoutSt = state => state.layout;
+const getLayoutState = state => state.layout;
 function* selectUiSweep(action) {
-  const uiSt = yield (0, _effects.select)(getUiSt);
+  const uiState = yield (0, _effects.select)(getUiState);
   const {
     sweepType,
     zoom
-  } = uiSt;
+  } = uiState;
   const {
     payload
   } = action;
-  const curveSt = yield (0, _effects.select)(getCurveSt);
+  const curveState = yield (0, _effects.select)(getCurveState);
   const {
     curveIdx
-  } = curveSt;
-  const hplcMsSt = yield (0, _effects.select)(getHplcMsSt);
+  } = curveState;
+  const hplcMsState = yield (0, _effects.select)(getHplcMsState);
   const {
     uvvis
-  } = hplcMsSt;
-  const layoutSt = yield (0, _effects.select)(getLayoutSt);
+  } = hplcMsState;
+  const layoutState = yield (0, _effects.select)(getLayoutState);
   switch (sweepType) {
     case _list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN:
-      if (uvvis.listWaveLength) {
+      if (layoutState === _list_layout.LIST_LAYOUT.LC_MS && uvvis.listWaveLength) {
         const {
           graphIndex
         } = zoom;
@@ -77,7 +78,7 @@ function* selectUiSweep(action) {
       break;
     case _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD:
       {
-        if (uvvis.selectedWaveLength && layoutSt === _list_layout.LIST_LAYOUT.LC_MS) {
+        if (uvvis.selectedWaveLength && layoutState === _list_layout.LIST_LAYOUT.LC_MS) {
           yield (0, _effects.put)({
             type: _action_type.HPLC_MS.UPDATE_HPLCMS_INTEGRATIONS,
             payload: {
@@ -129,10 +130,11 @@ function* selectUiSweep(action) {
   return null;
 }
 function* scrollUiWheel(action) {
-  const layoutSt = yield (0, _effects.select)(getLayoutSt);
+  const layoutState = yield (0, _effects.select)(getLayoutState);
   const {
     payload
   } = action;
+  if (!payload?.xExtent || !payload?.yExtent) return;
   const {
     xExtent,
     yExtent,
@@ -150,7 +152,7 @@ function* scrollUiWheel(action) {
     yExtent: false
   };
   let [nyeL, nyeU, h, nytL, nytU] = [0, 1, 1, 0, 1];
-  switch (layoutSt) {
+  switch (layoutState) {
     case _list_layout.LIST_LAYOUT.IR:
     case _list_layout.LIST_LAYOUT.RAMAN:
       [nyeL, nyeU] = [yeL + (yeU - yeL) * (1 - scale), yeU];
@@ -196,7 +198,7 @@ function* scrollUiWheel(action) {
   }
   if (brushClass === `.${_list_graph.LIST_BRUSH_SVG_GRAPH.RECT}`) {
     yield (0, _effects.put)({
-      type: _action_type.UI.SWEEP.SELECT_ZOOMIN_SUBVIEW,
+      type: getSubViewZoomActionType(),
       payload: nextExtent
     });
   } else {
@@ -215,17 +217,19 @@ function* clickUiTarget(action) {
     onPecker
   } = action;
   const uiSweepType = yield (0, _effects.select)(getUiSweepType);
-  const curveSt = yield (0, _effects.select)(getCurveSt);
+  const curveState = yield (0, _effects.select)(getCurveState);
   const {
     curveIdx
-  } = curveSt;
-  const hplcMsSt = yield (0, _effects.select)(getHplcMsSt);
+  } = curveState;
+  const hplcMsState = yield (0, _effects.select)(getHplcMsState);
   const {
     uvvis
-  } = hplcMsSt;
+  } = hplcMsState;
+  const isLcmsLayout = (yield (0, _effects.select)(getLayoutState)) === _list_layout.LIST_LAYOUT.LC_MS;
   if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.PEAK_ADD && !onPeak) {
-    const spectrumId = hplcMsSt?.uvvis?.selectedWaveLength;
-    const currentPeaks = hplcMsSt?.uvvis?.currentSpectrum?.peaks || [];
+    const spectrumId = hplcMsState?.uvvis?.selectedWaveLength;
+    if (isLcmsLayout && spectrumId == null) return;
+    const currentPeaks = hplcMsState?.uvvis?.currentSpectrum?.peaks || [];
     const updatedPeaks = [...currentPeaks, payload];
     yield (0, _effects.put)({
       type: _action_type.HPLC_MS.UPDATE_HPLCMS_PEAKS,
@@ -235,8 +239,7 @@ function* clickUiTarget(action) {
       }
     });
   } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.PEAK_DELETE && onPeak) {
-    const layoutSt = yield (0, _effects.select)(getLayoutSt);
-    if (layoutSt === _list_layout.LIST_LAYOUT.LC_MS && uvvis.selectedWaveLength) {
+    if (isLcmsLayout && uvvis.selectedWaveLength) {
       yield (0, _effects.put)({
         type: _action_type.HPLC_MS.REMOVE_HPLCMS_PEAK,
         payload: {
@@ -262,8 +265,7 @@ function* clickUiTarget(action) {
       }
     });
   } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_RM && onPeak) {
-    const layoutSt = yield (0, _effects.select)(getLayoutSt);
-    if (uvvis.selectedWaveLength && layoutSt === _list_layout.LIST_LAYOUT.LC_MS) {
+    if (uvvis.selectedWaveLength && isLcmsLayout) {
       yield (0, _effects.put)({
         type: _action_type.HPLC_MS.UPDATE_HPLCMS_INTEGRATIONS,
         payload: {

@@ -114,7 +114,7 @@ class LineFocus {
     const sameMySt = prevMySt === nextMySt;
     const sameTePt = prevTePt === this.tTrEndPts.length;
     const sameDtPk = prevDtPk === this.dataPks.length;
-    const sameSfPk = JSON.stringify(prevSfPk) === JSON.stringify(this.tSfPeaks);
+    const sameSfPk = prevSfPk === this.tSfPeaks || Array.isArray(prevSfPk) && Array.isArray(this.tSfPeaks) && prevSfPk.length === this.tSfPeaks.length && prevSfPk.every((peak, idx) => peak === this.tSfPeaks[idx]);
     const sameData = prevData === this.data.length;
     const sameRef = prevEpSt.prevOffset === nextEpSt.prevOffset;
     this.shouldUpdate = Object.assign({}, this.shouldUpdate, {
@@ -358,7 +358,7 @@ class LineFocus {
       bpTxt.enter().append('text').attr('class', 'peak-text').attr('font-family', 'Helvetica').style('font-size', '12px').attr('fill', '#228B22').style('text-anchor', 'middle').merge(bpTxt).attr('id', d => `mpp${Math.round(1000 * d.x)}`).text(d => d.x.toFixed(2)).attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y) - 25})`).on('click', (event, d) => this.onClickTarget(event, d));
     }
   }
-  drawInteg(integationSt) {
+  drawInteg(integrationState) {
     const {
       sameXY,
       sameLySt,
@@ -369,7 +369,7 @@ class LineFocus {
     const {
       selectedIdx,
       integrations
-    } = integationSt;
+    } = integrationState;
     const selectedIntegration = integrations[selectedIdx];
     const {
       stack,
@@ -455,17 +455,19 @@ class LineFocus {
     if (sameXY && sameLySt && sameMySt) return;
     const {
       selectedIdx,
-      multiplicities
-    } = mtplySt;
-    const selectedMulti = multiplicities[selectedIdx];
+      multiplicities = []
+    } = mtplySt || {};
+    const selectedMulti = multiplicities[selectedIdx] || {};
     const {
-      stack,
-      smExtext,
-      shift
+      stack = [],
+      smExtext = false,
+      shift = 0
     } = selectedMulti;
-    const mpys = stack;
+    const hasValidExtent = extent => extent && Number.isFinite(extent.xL) && Number.isFinite(extent.xU);
+    const mpys = stack.filter(m => hasValidExtent(m?.xExtent));
     const isDisable = _cfg.default.btnCmdMpy(this.layout);
-    if (mpys === 0 || isDisable) return;
+    if (mpys.length === 0 || isDisable) return;
+    const activeExtent = hasValidExtent(smExtext) ? smExtext : mpys[0].xExtent;
     // rescale for zoom
     const {
       xt
@@ -481,7 +483,8 @@ class LineFocus {
         peaks,
         xExtent
       } = m;
-      return peaks.map(p => Object.assign({}, p, {
+      const safePeaks = Array.isArray(peaks) ? peaks : [];
+      return safePeaks.filter(p => Number.isFinite(p?.x) && Number.isFinite(p?.y)).map(p => Object.assign({}, p, {
         xExtent
       }));
     });
@@ -496,7 +499,7 @@ class LineFocus {
         xL,
         xU
       } = d.xExtent;
-      return smExtext.xL === xL && smExtext.xU === xU ? 'purple' : '#DA70D6';
+      return activeExtent.xL === xL && activeExtent.xU === xU ? 'purple' : '#DA70D6';
     };
     mpyb.enter().append('path').attr('class', 'mpyb').attr('fill', 'none').attr('stroke-width', 2).merge(mpyb).attr('stroke', d => mpyColor(d)).attr('id', d => `mpyb${(0, _focus.mpyIdTag)(d)}`).attr('d', d => mpyBar(d)).on('mouseover', (event, d) => {
       d3.selectAll(`#mpyb${(0, _focus.mpyIdTag)(d)}`).attr('stroke', 'blue');
@@ -610,7 +613,7 @@ class LineFocus {
     comparisons,
     editPeakSt,
     layoutSt,
-    integationSt,
+    integrationSt,
     mtplySt,
     sweepExtentSt,
     isUiAddIntgSt,
@@ -643,12 +646,12 @@ class LineFocus {
       this.drawGrid();
       this.drawRef();
       this.drawPeaks(editPeakSt);
-      this.drawInteg(integationSt);
+      this.drawInteg(integrationSt);
       this.drawMtply(mtplySt);
       this.drawComparisons(comparisons);
     }
     (0, _brush.default)(this, isUiAddIntgSt, isUiNoBrushSt);
-    this.resetShouldUpdate(editPeakSt, integationSt, mtplySt);
+    this.resetShouldUpdate(editPeakSt, integrationSt, mtplySt);
   }
   update({
     filterSeed,
@@ -659,7 +662,7 @@ class LineFocus {
     comparisons,
     editPeakSt,
     layoutSt,
-    integationSt,
+    integrationSt,
     mtplySt,
     uiSt,
     sweepExtentSt,
@@ -674,18 +677,18 @@ class LineFocus {
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt, wavelength);
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);
-      this.getShouldUpdate(editPeakSt, integationSt, mtplySt);
+      this.getShouldUpdate(editPeakSt, integrationSt, mtplySt);
       this.drawLine();
       this.drawThres();
       this.drawGrid();
       this.drawRef();
       this.drawPeaks(editPeakSt);
-      this.drawInteg(integationSt);
+      this.drawInteg(integrationSt);
       this.drawMtply(mtplySt);
       this.drawComparisons(comparisons);
     }
     (0, _brush.default)(this, isUiAddIntgSt, isUiNoBrushSt);
-    this.resetShouldUpdate(editPeakSt, integationSt, mtplySt);
+    this.resetShouldUpdate(editPeakSt, integrationSt, mtplySt);
   }
 }
 var _default = exports.default = LineFocus;

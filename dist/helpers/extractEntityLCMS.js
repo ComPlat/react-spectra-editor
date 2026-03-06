@@ -15,19 +15,19 @@ function catToString(cat) {
   return Array.isArray(cat) ? String(cat[cat.length - 1] || '').toUpperCase() : String(cat || '').toUpperCase();
 }
 const collectCategories = entity => {
-  const cats = [];
+  const categories = [];
   if (Array.isArray(entity.features)) {
-    entity.features.forEach(f => {
-      if (f?.csCategory) cats.push(...[].concat(f.csCategory));
+    entity.features.forEach(feature => {
+      if (feature?.csCategory) categories.push(...[].concat(feature.csCategory));
     });
   }
   if (entity.feature?.csCategory) {
-    cats.push(...[].concat(entity.feature.csCategory));
+    categories.push(...[].concat(entity.feature.csCategory));
   }
   if (entity.csCategory) {
-    cats.push(...[].concat(entity.csCategory));
+    categories.push(...[].concat(entity.csCategory));
   }
-  return cats;
+  return categories;
 };
 const getEntityValue = (entity, path, fallback = '') => {
   const parts = path.split('.');
@@ -46,10 +46,10 @@ function getLcMsInfo(entity = {}) {
       polarity: entity.lcmsPolarity || 'neutral'
     };
   }
-  const cats = collectCategories(entity);
-  const upperCats = cats.map(String).map(c => c.toUpperCase());
-  const hasNeg = upperCats.some(c => c.includes('NEGATIVE'));
-  const hasPos = upperCats.some(c => c.includes('POSITIVE'));
+  const categories = collectCategories(entity);
+  const normalizedCategories = categories.map(String).map(category => category.toUpperCase());
+  const hasNeg = normalizedCategories.some(category => category.includes('NEGATIVE') || category.startsWith('NEGATIV'));
+  const hasPos = normalizedCategories.some(category => category.includes('POSITIVE') || category.startsWith('POSITIV'));
   let polarity = 'neutral';
   if (hasNeg) {
     polarity = 'negative';
@@ -57,9 +57,9 @@ function getLcMsInfo(entity = {}) {
     polarity = 'positive';
   }
   let kind = null;
-  if (upperCats.some(c => c.includes('TIC'))) kind = 'tic';
-  if (!kind && upperCats.some(c => c.includes('MZ'))) kind = 'mz';
-  if (!kind && upperCats.some(c => c.includes('UVVIS'))) kind = 'uvvis';
+  if (normalizedCategories.some(category => category.includes('TIC'))) kind = 'tic';
+  if (!kind && normalizedCategories.some(category => category.includes('MZ'))) kind = 'mz';
+  if (!kind && normalizedCategories.some(category => category.includes('UVVIS'))) kind = 'uvvis';
   const dataType = String(entity.dataType || getEntityValue(entity, 'spectra.0.dataType') || getEntityValue(entity, 'feature.dataType') || getEntityValue(entity, 'features.0.dataType')).toUpperCase();
   if (!kind && dataType.includes('MASS TIC')) kind = 'tic';
   if (!kind && dataType.includes('MASS SPECTRUM')) kind = 'mz';
@@ -88,7 +88,10 @@ function splitAndReindexEntities(entities = []) {
   const mz = [];
   const uvvis = [];
   const unknown = [];
-  entities.forEach(e => {
+  const normalizedEntities = entities.map(entity => ({
+    ...entity
+  }));
+  normalizedEntities.forEach(e => {
     const info = getLcMsInfo(e);
     e.lcmsKind = info.kind;
     e.lcmsPolarity = info.polarity;
@@ -116,7 +119,7 @@ function splitAndReindexEntities(entities = []) {
     uvvisEntities: uvvis,
     unknownEntities: unknown,
     dataEntities: [...mz, ...uvvis, ...unknown],
-    allEntities: entities
+    allEntities: normalizedEntities
   };
 }
 function useSplitAndReindexEntities(entities = []) {

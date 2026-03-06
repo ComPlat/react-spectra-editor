@@ -15,7 +15,6 @@ var _index = _interopRequireDefault(require("./panel/index"));
 var _index2 = _interopRequireDefault(require("./cmd_bar/index"));
 var _index3 = _interopRequireDefault(require("./d3_line_rect/index"));
 var _extractEntityLCMS = require("../helpers/extractEntityLCMS");
-var _curve = require("../actions/curve");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable react/default-props-match-prop-types,
 react/require-default-props, react/no-unused-prop-types, react/jsx-boolean-value,
@@ -38,24 +37,25 @@ class HPLCViewer extends _react.default.Component {
   render() {
     const {
       classes,
-      curveSt,
+      curveState,
       operations,
       entityFileNames,
       entities,
       userManualLink,
       molSvg,
       theoryMass,
-      integrationSt,
-      hplcMsSt,
+      integrationState,
+      hplcMsState,
       descriptions,
       canChangeDescription,
       onDescriptionChanged,
-      editorOnly
+      editorOnly,
+      forecast
     } = this.props;
     if (!entities || entities.length === 0) return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {});
     const {
       curveIdx
-    } = curveSt;
+    } = curveState;
     const entity = entities[curveIdx];
     if (!entity) return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {});
     const {
@@ -68,16 +68,19 @@ class HPLCViewer extends _react.default.Component {
       mzEntities
     } = (0, _extractEntityLCMS.splitAndReindexEntities)(entities);
     const displayFeature = feature || entities[0]?.feature || entities[0]?.features?.[0] || {};
+    const hasEdit = !!displayFeature?.data?.[0]?.x?.length;
     const {
       integrations
-    } = integrationSt;
+    } = integrationState;
     const currentIntegration = integrations[curveIdx];
     return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
       className: classes.root,
       children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_index2.default, {
         feature: displayFeature,
+        hasEdit: hasEdit,
+        forecast: forecast || {},
         operations: operations,
-        editorOnly: true,
+        editorOnly: editorOnly,
         hideThreshold: true,
         hideMainEditTools: true
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
@@ -96,7 +99,8 @@ class HPLCViewer extends _react.default.Component {
               yLabel: displayFeature?.yUnit || '',
               feature: displayFeature,
               jcampIdx: curveIdx,
-              hplcMsSt: hplcMsSt
+              hplcMsSt: hplcMsState,
+              isHidden: false
             })
           }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Grid, {
             item: true,
@@ -122,31 +126,24 @@ class HPLCViewer extends _react.default.Component {
     });
   }
 }
-const mapStateToProps = (state, _) => (
-// eslint-disable-line
-{
-  curveSt: state.curve,
+const mapStateToProps = state => ({
+  curveState: state.curve,
   entities: state.curve.listCurves,
-  layoutSt: state.layout,
-  integrationSt: state.integration.present,
-  hplcMsSt: state.hplcMs
+  integrationState: state.integration.present,
+  hplcMsState: state.hplcMs
 });
-const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
-  setAllCurvesAct: _curve.setAllCurves
-}, dispatch);
 HPLCViewer.propTypes = {
   classes: _propTypes.default.object.isRequired,
   entityFileNames: _propTypes.default.array.isRequired,
   molSvg: _propTypes.default.string.isRequired,
-  setAllCurvesAct: _propTypes.default.func.isRequired,
-  curveSt: _propTypes.default.object.isRequired,
+  curveState: _propTypes.default.object.isRequired,
   operations: _propTypes.default.array.isRequired,
+  forecast: _propTypes.default.object,
   userManualLink: _propTypes.default.object,
   entities: _propTypes.default.array,
-  layoutSt: _propTypes.default.string.isRequired,
   theoryMass: _propTypes.default.string,
-  integrationSt: _propTypes.default.object.isRequired,
-  hplcMsSt: _propTypes.default.object.isRequired,
+  integrationState: _propTypes.default.object.isRequired,
+  hplcMsState: _propTypes.default.object.isRequired,
   descriptions: _propTypes.default.array.isRequired,
   canChangeDescription: _propTypes.default.bool.isRequired,
   onDescriptionChanged: _propTypes.default.func,
@@ -159,6 +156,7 @@ HPLCViewer.defaultProps = {
   xLabel: '',
   yLabel: '',
   entities: [],
+  forecast: {},
   onDescriptionChanged: () => {}
 };
-var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(HPLCViewer);
+var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps), (0, _styles.withStyles)(styles))(HPLCViewer);

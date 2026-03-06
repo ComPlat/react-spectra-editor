@@ -34,7 +34,13 @@ const sagaMiddleware = (0, _reduxSaga.default)();
 const middlewares = [sagaMiddleware]; // logger
 
 const store = exports.store = (0, _redux.compose)((0, _redux.applyMiddleware)(...middlewares))(_redux.createStore)(_index.default);
-sagaMiddleware.run(_index2.default);
+_fn.default.setLcmsStateGetter(() => store.getState().hplcMs);
+try {
+  sagaMiddleware.run(_index2.default);
+} catch (error) {
+  // Keep startup failure visible without crashing silently.
+  console.error('[SpectraEditor] Failed to start sagas', error); // eslint-disable-line no-console
+}
 
 // - - - helper - - -
 const ensureQuillDelta = descs => {
@@ -113,7 +119,7 @@ SpectraEditor.defaultProps = {
     others: [],
     addOthersCb: false
   },
-  multiEntities: false,
+  multiEntities: [],
   entityFileNames: [],
   cLabel: '',
   xLabel: '',

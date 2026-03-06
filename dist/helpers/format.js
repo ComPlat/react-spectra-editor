@@ -11,6 +11,10 @@ var _multiplicity_calc = require("./multiplicity_calc");
 /* eslint-disable no-mixed-operators, prefer-object-spread,
 function-paren-newline, no-unused-vars, default-param-last */
 
+let lcmsStateGetter = null;
+function getLcmsState() {
+  return typeof lcmsStateGetter === 'function' ? lcmsStateGetter() : undefined;
+}
 const spectraDigit = layout => {
   switch (layout) {
     case _list_layout.LIST_LAYOUT.IR:
@@ -258,7 +262,7 @@ const formatedLCMS = (hplcMsSt, isAscend, decimal) => {
     if (currentIndex >= 0 && ms[polarityKey].peaks[currentIndex]) {
       const peaks = ms[polarityKey].peaks[currentIndex];
       const maxIntensity = Math.max(...peaks.map(p => p.y)) || 1;
-      const thresholdValue = threshold?.value ?? 5;
+      const thresholdValue = threshold?.value != null ? threshold.value : 5;
       const filtered = peaks.filter(peak => peak.y / maxIntensity * 100 >= thresholdValue);
       const sortedPeaks = [...filtered].sort((a, b) => {
         if (isAscend) {
@@ -503,7 +507,8 @@ const peaksBody = ({
   const ordered = result.sort(sortFunc);
   const maxY = Math.max(...ordered.map(o => o.y));
   if (layout === _list_layout.LIST_LAYOUT.LC_MS) {
-    return formatedLCMS(hplcMsSt, isAscend, decimal);
+    const lcmsState = hplcMsSt ?? getLcmsState();
+    return formatedLCMS(lcmsState, isAscend, decimal);
   }
   if (layout === _list_layout.LIST_LAYOUT.MS) {
     return formatedMS(ordered, maxY, decimal, isAscend);
@@ -547,6 +552,12 @@ const peaksWrapper = (layout, shift, atIndex = 0) => {
     };
   }
   const ops = spectraOps[layout];
+  if (!ops) {
+    return {
+      head: '',
+      tail: ''
+    };
+  }
   return {
     head: `${ops.head}${solvTxt} = `,
     tail: ops.tail
@@ -735,6 +746,10 @@ const inlineNotation = (layout, data, sampleName = '') => {
   };
 };
 const Format = {
+  setLcmsStateGetter(getter) {
+    lcmsStateGetter = getter;
+  },
+  getLcmsState,
   toPeakStr,
   extractUvvisLcmsPeaks,
   buildData,

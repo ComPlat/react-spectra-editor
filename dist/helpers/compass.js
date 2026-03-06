@@ -7,6 +7,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.TfRescale = exports.MouseMove = exports.MountCompass = exports.ClickCompass = void 0;
 var _format = _interopRequireDefault(require("./format"));
 var _chem = require("./chem");
+var _list_ui = require("../constants/list_ui");
 const d3 = require('d3');
 const TfRescale = focus => {
   const xt = focus.scales.x;
@@ -114,6 +115,9 @@ exports.MouseMove = MouseMove;
 const ClickCompass = (event, focus) => {
   event.stopPropagation();
   event.preventDefault();
+  const isPeakGroupSelect = focus.uiSt?.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.PEAK_GROUP_SELECT;
+  const isMsGraph = focus.graphIndex === 2;
+  if (isPeakGroupSelect && isMsGraph) return;
   const {
     xt,
     yt

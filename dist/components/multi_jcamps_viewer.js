@@ -7,11 +7,13 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 var _react = _interopRequireDefault(require("react"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
+var _classnames = _interopRequireDefault(require("classnames"));
 var _reactRedux = require("react-redux");
 var _redux = require("redux");
 var _Grid = _interopRequireDefault(require("@mui/material/Grid"));
 var _styles = require("@mui/styles");
 var _index = _interopRequireDefault(require("./panel/index"));
+var _cyclic_voltamery_data = _interopRequireDefault(require("./panel/cyclic_voltamery_data"));
 var _index2 = _interopRequireDefault(require("./cmd_bar/index"));
 var _index3 = _interopRequireDefault(require("./d3_multi/index"));
 var _curve = require("../actions/curve");
@@ -33,6 +35,32 @@ const styles = () => ({
   },
   tabLabel: {
     fontSize: '14px'
+  },
+  cvEditor: {
+    height: 'calc(90vh - 220px)',
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: 0,
+    overflow: 'hidden'
+  },
+  cvTopRow: {
+    flex: '1 1 auto',
+    minHeight: 0,
+    overflow: 'hidden'
+  },
+  cvViewerCol: {
+    height: '100%',
+    minHeight: 0,
+    display: 'flex',
+    flexDirection: 'column'
+  },
+  cvViewerWrap: {
+    flex: '1 1 auto',
+    minHeight: 0
+  },
+  cvPanelBelow: {
+    marginTop: 16,
+    width: '100%'
   }
 });
 const seperatingSubLayout = (entities, featureCondition, layoutSt) => {
@@ -69,7 +97,9 @@ class MultiJcampsViewer extends _react.default.Component {
       integrationSt,
       descriptions,
       canChangeDescription,
-      onDescriptionChanged
+      onDescriptionChanged,
+      forecast,
+      editorOnly
     } = this.props;
     if (!entities || entities.length === 0) return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {});
     const separateCondition = _format.default.isGCLayout(layoutSt) ? 'yUnit' : 'xUnit';
@@ -86,27 +116,45 @@ class MultiJcampsViewer extends _react.default.Component {
       integrations
     } = integrationSt;
     const currentIntegration = integrations[curveIdx];
+    const hasEdit = !!feature?.data?.[0]?.x?.length;
+    const xLabel = feature?.xUnit || '';
+    const yLabel = feature?.yUnit || '';
+    const isCyclicVolta = _format.default.isCyclicVoltaLayout(layoutSt);
     return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
       className: classes.root,
       children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_index2.default, {
         feature: feature,
+        hasEdit: hasEdit,
+        forecast: forecast || {},
         operations: operations,
-        editorOnly: true,
+        editorOnly: editorOnly,
         hideThreshold: !_format.default.isNmrLayout(layoutSt)
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-        className: "react-spectrum-editor",
+        className: (0, _classnames.default)('react-spectrum-editor', isCyclicVolta && classes.cvEditor),
         children: /*#__PURE__*/(0, _jsxRuntime.jsxs)(_Grid.default, {
           container: true,
-          children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
+          className: isCyclicVolta ? classes.cvTopRow : undefined,
+          children: [/*#__PURE__*/(0, _jsxRuntime.jsxs)(_Grid.default, {
             item: true,
             xs: 9,
-            children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_index3.default, {
-              entities: entities,
-              topic: topic,
-              xLabel: feature.xUnit,
-              yLabel: feature.yUnit,
-              feature: feature
-            })
+            className: isCyclicVolta ? classes.cvViewerCol : undefined,
+            children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+              className: isCyclicVolta ? classes.cvViewerWrap : undefined,
+              children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_index3.default, {
+                entities: entities,
+                topic: topic,
+                xLabel: xLabel,
+                yLabel: yLabel,
+                feature: feature
+              })
+            }), isCyclicVolta ? /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+              className: classes.cvPanelBelow,
+              children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_cyclic_voltamery_data.default, {
+                jcampIdx: curveIdx,
+                feature: feature,
+                userManualLink: userManualLink ? userManualLink.cv : undefined
+              })
+            }) : null]
           }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
             item: true,
             xs: 3,
@@ -121,8 +169,10 @@ class MultiJcampsViewer extends _react.default.Component {
               subLayoutsInfo: seperatedSubLayouts,
               integration: currentIntegration,
               descriptions: descriptions,
+              editorOnly: editorOnly,
               canChangeDescription: canChangeDescription,
-              onDescriptionChanged: onDescriptionChanged
+              onDescriptionChanged: onDescriptionChanged,
+              hideCyclicVolta: isCyclicVolta
             })
           })]
         })
@@ -157,7 +207,9 @@ MultiJcampsViewer.propTypes = {
   addNewCylicVoltaPairPeakAct: _propTypes.default.func.isRequired,
   addCylicVoltaMaxPeakAct: _propTypes.default.func.isRequired,
   addCylicVoltaMinPeakAct: _propTypes.default.func.isRequired,
-  operations: _propTypes.default.func.isRequired,
+  operations: _propTypes.default.array.isRequired,
+  forecast: _propTypes.default.object,
+  editorOnly: _propTypes.default.bool,
   userManualLink: _propTypes.default.object,
   entities: _propTypes.default.array,
   layoutSt: _propTypes.default.string.isRequired,
@@ -175,6 +227,8 @@ MultiJcampsViewer.defaultProps = {
   xLabel: '',
   yLabel: '',
   entities: [],
+  forecast: {},
+  editorOnly: false,
   descriptions: [],
   canChangeDescription: false
 };

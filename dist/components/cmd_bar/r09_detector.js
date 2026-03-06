@@ -64,13 +64,13 @@ const detectorSelect = (classes, detectorSt, curveSt, layoutSt, updateDetectorAc
         children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
           className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout')
         })
-      }), _list_detectors.LIST_DETECTORS.map(item => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+      }, "detector-empty"), _list_detectors.LIST_DETECTORS.map((item, idx) => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
         value: item,
         children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
           className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
           children: item.name
         })
-      }))]
+      }, item?.name || item?.id || `detector-${idx}`))]
     })]
   });
 };

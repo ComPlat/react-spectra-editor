@@ -9,7 +9,10 @@ var _chem = require("../helpers/chem");
 /* eslint-disable prefer-object-spread, default-param-last */
 
 const initialState = {
-  spectraList: []
+  spectraList: [],
+  areaValue: 1.0,
+  areaUnit: 'cm²',
+  useCurrentDensity: false
 };
 const initSpectra = {
   list: [],
@@ -563,6 +566,36 @@ const cyclicVoltaReducer = (state = initialState, action) => {
       return Object.assign({}, state, {
         spectraList: []
       });
+    case _action_type.CYCLIC_VOLTA_METRY.SET_AREA_VALUE:
+      {
+        const {
+          value
+        } = action.payload;
+        if (value === '') {
+          return Object.assign({}, state, {
+            areaValue: ''
+          });
+        }
+        const areaValue = Number.isFinite(value) ? value : state.areaValue;
+        return Object.assign({}, state, {
+          areaValue
+        });
+      }
+    case _action_type.CYCLIC_VOLTA_METRY.SET_AREA_UNIT:
+      {
+        const {
+          unit
+        } = action.payload;
+        return Object.assign({}, state, {
+          areaUnit: unit
+        });
+      }
+    case _action_type.CYCLIC_VOLTA_METRY.TOGGLE_DENSITY:
+      {
+        return Object.assign({}, state, {
+          useCurrentDensity: !state.useCurrentDensity
+        });
+      }
     default:
       return state;
   }

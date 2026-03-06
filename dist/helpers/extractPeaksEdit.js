@@ -8,6 +8,7 @@ exports.extractAutoPeaks = exports.extractAreaUnderCurve = void 0;
 exports.extractPeaksEdit = extractPeaksEdit;
 exports.formatLcmsIntegralsForBackend = formatLcmsIntegralsForBackend;
 exports.formatLcmsPeaksForBackend = formatLcmsPeaksForBackend;
+exports.getLcmsMzPageData = getLcmsMzPageData;
 var _chem = require("./chem");
 var _shift = require("./shift");
 var _format = _interopRequireDefault(require("./format"));
@@ -70,6 +71,20 @@ function formatLcmsIntegralsForBackend(hplcMsSt) {
     });
   }
   return allIntegrals;
+}
+function getLcmsMzPageData(hplcMsSt) {
+  const tic = hplcMsSt?.tic;
+  const ms = hplcMsSt?.ms;
+  if (!tic || !ms) return null;
+  const polarity = tic.polarity || 'positive';
+  let polarityKey = 'neutral';
+  if (polarity === 'negative') polarityKey = 'negative';else if (polarity === 'positive') polarityKey = 'positive';
+  const ticDataX = tic[polarityKey]?.data?.x;
+  if (!Array.isArray(ticDataX) || !Number.isFinite(tic.currentPageValue)) return null;
+  const currentIndex = ticDataX.findIndex(x => Math.abs(x - tic.currentPageValue) < 1e-6);
+  if (currentIndex < 0) return null;
+  const peaks = ms[polarityKey]?.peaks?.[currentIndex];
+  return Array.isArray(peaks) ? peaks : null;
 }
 function extractPeaksEdit(hplcMsSt) {
   if (!hplcMsSt || !hplcMsSt.uvvis || !hplcMsSt.uvvis.spectraList) return [];

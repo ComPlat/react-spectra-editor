@@ -82,7 +82,7 @@ const onClickReady = (forecast, peaksEdit, layoutSt, scan, shiftSt, thres, analy
     });
   };
 };
-const onClicUnknown = (feature, forecast, peaksEdit, layoutSt, scan, shiftSt, thres, analysis, integrationSt, multiplicitySt, curveSt) => {
+const onClickUnknown = (feature, forecast, peaksEdit, layoutSt, scan, shiftSt, thres, analysis, integrationSt, multiplicitySt, curveSt) => {
   const {
     refreshCb
   } = forecast;
@@ -191,7 +191,7 @@ const BtnPredict = ({
     realCount = stack.length;
   }
   if (is13Cor1H && simuCount === 0) {
-    const onClickUnknownCb = onClicUnknown(feature, forecast, peaksEdit, layoutSt, scan, shiftSt, thres, forecast.predictions, integrationSt, multiplicitySt, curveSt);
+    const onClickUnknownCb = onClickUnknown(feature, forecast, peaksEdit, layoutSt, scan, shiftSt, thres, forecast.predictions, integrationSt, multiplicitySt, curveSt);
     return renderBtnUnknown(classes, onClickUnknownCb);
   }
   const predictable = isIr || simuCount >= realCount && realCount > 0;
@@ -221,7 +221,7 @@ BtnPredict.propTypes = {
   feature: _propTypes.default.object.isRequired,
   forecast: _propTypes.default.object.isRequired,
   layoutSt: _propTypes.default.string.isRequired,
-  simulationSt: _propTypes.default.array.isRequired,
+  simulationSt: _propTypes.default.object.isRequired,
   editPeakSt: _propTypes.default.object.isRequired,
   scanSt: _propTypes.default.object.isRequired,
   shiftSt: _propTypes.default.object.isRequired,

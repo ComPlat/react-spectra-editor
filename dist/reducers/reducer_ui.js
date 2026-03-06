@@ -86,9 +86,7 @@ const updateZoom = (state, action) => {
   const {
     zoom
   } = state;
-  const {
-    sweepExtent
-  } = zoom;
+  const sweepExtent = Array.isArray(zoom.sweepExtent) ? [...zoom.sweepExtent] : [];
   const selectedGraph = sweepExtent[graphIndex];
   const newSweepExtent = Object.assign({}, selectedGraph, zoomValue);
   sweepExtent[graphIndex] = newSweepExtent;
@@ -118,9 +116,7 @@ const resetZoom = (state, action) => {
   const {
     zoom
   } = state;
-  const {
-    sweepExtent
-  } = zoom;
+  const sweepExtent = Array.isArray(zoom.sweepExtent) ? [...zoom.sweepExtent] : [];
   const selectedGraph = sweepExtent[graphIndex];
   const newSweepExtent = Object.assign({}, selectedGraph, {
     xExtent: false,

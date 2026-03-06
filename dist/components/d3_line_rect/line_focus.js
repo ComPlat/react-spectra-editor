@@ -291,13 +291,14 @@ class LineFocus {
         return yt(0);
       }).y1(d => yt(d.y))(ps);
     };
-    auc.enter().append('path').attr('class', 'auc').attr('fill', 'red').attr('stroke', 'none').attr('fill-opacity', 0.2).attr('stroke-width', 2).merge(auc).attr('d', d => integCurve(d)).attr('id', d => `auc${(0, _focus.itgIdTag)(d)}`).on('mouseover', function () {
+    auc.enter().append('path').attr('class', 'auc').attr('fill', 'red').attr('stroke', 'none').attr('fill-opacity', 0.2).attr('stroke-width', 2).merge(auc).attr('d', d => integCurve(d)).attr('id', d => `auc${(0, _focus.itgIdTag)(d)}`).on('mouseover', function handleAucMouseover() {
       d3.select(this).attr('stroke', 'blue').style('fill', 'blue');
-    }).on('mouseout', function () {
+    }).on('mouseout', function handleAucMouseout() {
       d3.select(this).attr('stroke', 'none').style('fill', 'red').style('fill-opacity', 0.2);
     }).on('click', (event, d) => this.onClickTarget(event, d));
   }
   drawInteg(hplcMsSt) {
+    if (!this.tags || !this.tags.igbPath || !this.tags.igcPath || !this.tags.igtPath) return;
     const {
       sameXY,
       sameLySt,
@@ -391,6 +392,7 @@ class LineFocus {
     return currentSpectrum.peaks;
   }
   drawPeaks(hplcMsSt) {
+    if (!this.tags || !this.tags.pPath) return;
     const {
       sameXY,
       sameEpSt,
@@ -454,10 +456,7 @@ class LineFocus {
     (0, _mount.MountMainFrame)(this, 'focus');
     (0, _mount.MountClip)(this);
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
-    if (!this.root || this.root.empty()) {
-      console.error('Failed to initialize root element');
-      return;
-    }
+    if (!this.root || this.root.empty()) return;
     this.scales = (0, _init.InitScale)(this, false);
     this.setTip();
     this.setDataParams(filterSeed, tTrEndPts, layoutSt, editPeakSt);
@@ -497,6 +496,20 @@ class LineFocus {
     this.scales = (0, _init.InitScale)(this, false);
     this.setDataParams(filterSeed, tTrEndPts, layoutSt, editPeakSt);
     this.uiSt = uiSt;
+    const isInitialized = !!(this.root && !this.root.empty() && this.path && this.grid && this.tags);
+    if (!isInitialized) {
+      this.create({
+        filterSeed,
+        tTrEndPts,
+        layoutSt,
+        sweepExtentSt,
+        isUiAddIntgSt,
+        isUiNoBrushSt,
+        hplcMsSt,
+        editPeakSt
+      });
+      return;
+    }
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);
       this.getShouldUpdate(hplcMsSt);
