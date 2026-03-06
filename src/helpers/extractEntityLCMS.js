@@ -44,8 +44,12 @@ export function getLcMsInfo(entity = {}) {
 
   const categories = collectCategories(entity);
   const normalizedCategories = categories.map(String).map((category) => category.toUpperCase());
-  const hasNeg = normalizedCategories.some((category) => category.includes('NEGATIVE'));
-  const hasPos = normalizedCategories.some((category) => category.includes('POSITIVE'));
+  const hasNeg = normalizedCategories.some(
+    (category) => category.includes('NEGATIVE') || category.startsWith('NEGATIV'),
+  );
+  const hasPos = normalizedCategories.some(
+    (category) => category.includes('POSITIVE') || category.startsWith('POSITIV'),
+  );
   let polarity = 'neutral';
   if (hasNeg) {
     polarity = 'negative';

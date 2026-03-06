@@ -15,7 +15,12 @@ import {
   Convert2Scan, Convert2Thres,
 } from '../../helpers/chem';
 import { MuButton, commonStyle } from './common';
-import { extractPeaksEdit, formatLcmsPeaksForBackend, formatLcmsIntegralsForBackend } from '../../helpers/extractPeaksEdit';
+import {
+  extractPeaksEdit,
+  formatLcmsPeaksForBackend,
+  formatLcmsIntegralsForBackend,
+  getLcmsMzPageData,
+} from '../../helpers/extractPeaksEdit';
 import Format from '../../helpers/format';
 
 const styles = () => (
@@ -29,7 +34,10 @@ const getAxesSelection = (axesUnitsSt, curveIdx) => {
   const axes = axesUnitsSt?.axes;
   if (!Array.isArray(axes) || axes.length === 0) return { xUnit: '', yUnit: '' };
   const idx = Number.isFinite(curveIdx) ? curveIdx : 0;
-  return axes[idx] || axes[0] || { xUnit: '', yUnit: '' };
+  return axes[idx] || axes[0] || {
+    xUnit: '',
+    yUnit: '',
+  };
 };
 
 const resolveAxisLabels = (xLabel, yLabel, axesUnitsSt, curveIdx) => {
@@ -178,7 +186,11 @@ const onClickCb = (
 ) => (
   () => {
     const defaultCurves = feature ? [{ feature }] : [];
-    const curves = Array.isArray(curveList) && curveList.length > 0 ? curveList : defaultCurves;
+    let curves = Array.isArray(curveList) && curveList.length > 0 ? curveList : defaultCurves;
+    if (layoutSt === 'LC/MS') {
+      curves = curves.filter((c) => c.lcmsKind === 'uvvis');
+      if (curves.length === 0) curves = defaultCurves;
+    }
     const fallbackIdx = Number.isFinite(curveSt?.curveIdx) ? curveSt.curveIdx : 0;
     const indicesToSend = curves.length > 0
       ? curves.map((_, index) => index)
@@ -216,6 +228,7 @@ const onClickCb = (
       payload.lcms_peaks_text = Format.formatedLCMS(hplcMsSt, isAscend, decimalSt);
       payload.lcms_uvvis_wavelength = hplcMsSt?.uvvis?.selectedWaveLength ?? null;
       payload.lcms_mz_page = hplcMsSt?.tic?.currentPageValue ?? null;
+      payload.lcms_mz_page_data = getLcmsMzPageData(hplcMsSt);
     }
     if (Number.isFinite(curveSt?.curveIdx)) {
       payload.curveSt = { curveIdx: curveSt.curveIdx };

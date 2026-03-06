@@ -1,5 +1,6 @@
 import Format from './format';
 import { Convert2DValue } from './chem';
+import { LIST_UI_SWEEP_TYPE } from '../constants/list_ui';
 
 const d3 = require('d3');
 
@@ -122,6 +123,9 @@ const MouseMove = (event, focus) => {
 const ClickCompass = (event, focus) => {
   event.stopPropagation();
   event.preventDefault();
+  const isPeakGroupSelect = focus.uiSt?.sweepType === LIST_UI_SWEEP_TYPE.PEAK_GROUP_SELECT;
+  const isMsGraph = focus.graphIndex === 2;
+  if (isPeakGroupSelect && isMsGraph) return;
   const { xt, yt } = TfRescale(focus);
   let pt = fetchPt(event, focus, xt);
   const { layout, cyclicvoltaSt, jcampIdx } = focus;

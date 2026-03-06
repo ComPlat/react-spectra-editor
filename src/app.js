@@ -22,6 +22,8 @@ const store = compose(
   applyMiddleware(...middlewares),
 )(createStore)(reducers);
 
+FN.setLcmsStateGetter(() => store.getState().hplcMs);
+
 try {
   sagaMiddleware.run(sagas);
 } catch (error) {
