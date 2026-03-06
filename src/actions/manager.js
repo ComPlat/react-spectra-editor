@@ -39,6 +39,10 @@ const resetDetector = () => ({
   type: MANAGER.RESET_DETECTOR,
 });
 
+const resetMultiplicity = () => ({
+  type: MANAGER.RESET_MULTIPLICITY,
+});
+
 export {
   resetAll,
   resetInitCommon,
@@ -46,4 +50,5 @@ export {
   resetInitMs,
   resetInitCommonWithIntergation,
   resetDetector,
+  resetMultiplicity,
 }; // eslint-disable-line

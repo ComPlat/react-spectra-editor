@@ -15,6 +15,7 @@ import HowToRegOutlinedIcon from '@mui/icons-material/HowToRegOutlined';
 import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
 
 import Cfg from '../../helpers/cfg';
+import Format from '../../helpers/format';
 import {
   updateThresholdValue, resetThresholdValue, toggleThresholdIsEdit,
 } from '../../actions/threshold';
@@ -89,43 +90,55 @@ const restoreTp = (hasEdit, isEdit) => (
 
 const Threshold = ({
   classes, feature, hasEdit,
-  hideThresSt, thresValSt, isEditSt, curveSt,
+  hideThresSt, thresValSt, isEditSt, curveSt, hplcMsSt, layoutSt,
   updateThresholdValueAct, resetThresholdValueAct, toggleThresholdIsEditAct,
 }) => {
-  const thresVal = thresValSt || feature.thresRef;
+  const isLcMs = Format.isLCMsLayout(layoutSt);
+  let thresVal;
+  if (isLcMs) {
+    thresVal = hplcMsSt?.threshold?.value != null
+      ? hplcMsSt.threshold.value
+      : (feature?.thresRef ?? thresValSt ?? 5);
+  } else {
+    thresVal = thresValSt || (feature ? feature.thresRef : hplcMsSt?.threshold?.value);
+  }
 
   return (
     <span className={classes.groupRight}>
       { setThreshold(classes, thresVal, updateThresholdValueAct, curveSt) }
       <Tooltip title={<span className="txt-sv-tp">Restore Threshold</span>}>
-        <MuButton
-          className={
-            classNames(
-              'btn-sv-bar-thresref',
-            )
-          }
-          disabled={Cfg.btnCmdThres(thresVal)}
-          onClick={resetThresholdValueAct}
-        >
-          <RefreshOutlinedIcon className={classes.icon} />
-        </MuButton>
+        <span>
+          <MuButton
+            className={
+              classNames(
+                'btn-sv-bar-thresref',
+              )
+            }
+            disabled={Cfg.btnCmdThres(thresVal)}
+            onClick={resetThresholdValueAct}
+          >
+            <RefreshOutlinedIcon className={classes.icon} />
+          </MuButton>
+        </span>
       </Tooltip>
       {
         hideThresSt
           ? null
           : (
             <Tooltip title={<span className="txt-sv-tp">{restoreTp(hasEdit, isEditSt)}</span>}>
-              <MuButton
-                className={
-                  classNames(
-                    'btn-sv-bar-thresrst',
-                  )
-                }
-                disabled={Cfg.btnCmdThres(thresVal)}
-                onClick={toggleThresholdIsEditAct}
-              >
-                { restoreIcon(classes, hasEdit, isEditSt) }
-              </MuButton>
+              <span>
+                <MuButton
+                  className={
+                    classNames(
+                      'btn-sv-bar-thresrst',
+                    )
+                  }
+                  disabled={Cfg.btnCmdThres(thresVal)}
+                  onClick={toggleThresholdIsEditAct}
+                >
+                  { restoreIcon(classes, hasEdit, isEditSt) }
+                </MuButton>
+              </span>
             </Tooltip>
           )
       }
@@ -139,6 +152,8 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     isEditSt: state.threshold.list[state.curve.curveIdx].isEdit,
     thresValSt: parseFloat(state.threshold.list[state.curve.curveIdx].value) || 0,
     curveSt: state.curve,
+    hplcMsSt: state.hplcMs,
+    layoutSt: state.layout,
   }
 );
 
@@ -161,6 +176,12 @@ Threshold.propTypes = {
   updateThresholdValueAct: PropTypes.func.isRequired,
   resetThresholdValueAct: PropTypes.func.isRequired,
   toggleThresholdIsEditAct: PropTypes.func.isRequired,
+  hplcMsSt: PropTypes.object.isRequired,
+  layoutSt: PropTypes.string,
+};
+
+Threshold.defaultProps = {
+  layoutSt: undefined,
 };
 
 export default connect(

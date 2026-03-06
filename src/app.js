@@ -22,7 +22,14 @@ const store = compose(
   applyMiddleware(...middlewares),
 )(createStore)(reducers);
 
-sagaMiddleware.run(sagas);
+FN.setLcmsStateGetter(() => store.getState().hplcMs);
+
+try {
+  sagaMiddleware.run(sagas);
+} catch (error) {
+  // Keep startup failure visible without crashing silently.
+  console.error('[SpectraEditor] Failed to start sagas', error); // eslint-disable-line no-console
+}
 
 // - - - helper - - -
 const ensureQuillDelta = (descs) => {
@@ -87,8 +94,8 @@ SpectraEditor.propTypes = {
 
 SpectraEditor.defaultProps = {
   others: { others: [], addOthersCb: false },
-  multiEntities: false,
-  entityFileNames: false,
+  multiEntities: [],
+  entityFileNames: [],
   cLabel: '',
   xLabel: '',
   yLabel: '',
@@ -104,5 +111,5 @@ SpectraEditor.defaultProps = {
 };
 
 export {
-  SpectraEditor, FN,
+  SpectraEditor, FN, store,
 };

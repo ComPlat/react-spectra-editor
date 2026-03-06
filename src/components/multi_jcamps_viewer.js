@@ -3,6 +3,7 @@ react/require-default-props, react/no-unused-prop-types, react/jsx-boolean-value
 prefer-object-spread */
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
 
@@ -10,6 +11,7 @@ import Grid from '@mui/material/Grid';
 import { withStyles } from '@mui/styles';
 
 import PanelViewer from './panel/index';
+import CyclicVoltammetryPanel from './panel/cyclic_voltamery_data';
 import CmdBar from './cmd_bar/index';
 import ViewerMulti from './d3_multi/index';
 
@@ -30,6 +32,32 @@ const styles = () => ({
   },
   tabLabel: {
     fontSize: '14px',
+  },
+  cvEditor: {
+    height: 'calc(90vh - 220px)',
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: 0,
+    overflow: 'hidden',
+  },
+  cvTopRow: {
+    flex: '1 1 auto',
+    minHeight: 0,
+    overflow: 'hidden',
+  },
+  cvViewerCol: {
+    height: '100%',
+    minHeight: 0,
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  cvViewerWrap: {
+    flex: '1 1 auto',
+    minHeight: 0,
+  },
+  cvPanelBelow: {
+    marginTop: 16,
+    width: '100%',
   },
 });
 
@@ -55,7 +83,8 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
     const {
       classes, curveSt, operations, entityFileNames,
       entities, userManualLink, molSvg, exactMass, layoutSt,
-      integrationSt,
+      integrationSt, descriptions, canChangeDescription, onDescriptionChanged,
+      forecast, editorOnly,
     } = this.props;
     if (!entities || entities.length === 0) return (<div />);
 
@@ -66,25 +95,43 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
     const { feature, topic } = entity;
     const { integrations } = integrationSt;
     const currentIntegration = integrations[curveIdx];
+    const hasEdit = !!feature?.data?.[0]?.x?.length;
+    const xLabel = feature?.xUnit || '';
+    const yLabel = feature?.yUnit || '';
+
+    const isCyclicVolta = Format.isCyclicVoltaLayout(layoutSt);
 
     return (
       <div className={classes.root}>
         <CmdBar
           feature={feature}
+          hasEdit={hasEdit}
+          forecast={forecast || {}}
           operations={operations}
-          editorOnly={true}
+          editorOnly={editorOnly}
           hideThreshold={!Format.isNmrLayout(layoutSt)}
         />
-        <div className="react-spectrum-editor">
-          <Grid container>
-            <Grid item xs={9}>
-              <ViewerMulti
-                entities={entities}
-                topic={topic}
-                xLabel={feature.xUnit}
-                yLabel={feature.yUnit}
-                feature={feature}
-              />
+        <div className={classNames('react-spectrum-editor', isCyclicVolta && classes.cvEditor)}>
+          <Grid container className={isCyclicVolta ? classes.cvTopRow : undefined}>
+            <Grid item xs={9} className={isCyclicVolta ? classes.cvViewerCol : undefined}>
+              <div className={isCyclicVolta ? classes.cvViewerWrap : undefined}>
+                <ViewerMulti
+                  entities={entities}
+                  topic={topic}
+                  xLabel={xLabel}
+                  yLabel={yLabel}
+                  feature={feature}
+                />
+              </div>
+              {isCyclicVolta ? (
+                <div className={classes.cvPanelBelow}>
+                  <CyclicVoltammetryPanel
+                    jcampIdx={curveIdx}
+                    feature={feature}
+                    userManualLink={userManualLink ? userManualLink.cv : undefined}
+                  />
+                </div>
+              ) : null}
             </Grid>
             <Grid item xs={3} align="center">
               <PanelViewer
@@ -96,9 +143,11 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
                 exactMass={exactMass}
                 subLayoutsInfo={seperatedSubLayouts}
                 integration={currentIntegration}
-                descriptions=""
-                canChangeDescription={() => {}}
-                onDescriptionChanged={() => {}}
+                descriptions={descriptions}
+                editorOnly={editorOnly}
+                canChangeDescription={canChangeDescription}
+                onDescriptionChanged={onDescriptionChanged}
+                hideCyclicVolta={isCyclicVolta}
               />
             </Grid>
           </Grid>
@@ -139,12 +188,17 @@ MultiJcampsViewer.propTypes = {
   addNewCylicVoltaPairPeakAct: PropTypes.func.isRequired,
   addCylicVoltaMaxPeakAct: PropTypes.func.isRequired,
   addCylicVoltaMinPeakAct: PropTypes.func.isRequired,
-  operations: PropTypes.func.isRequired,
+  operations: PropTypes.array.isRequired,
+  forecast: PropTypes.object,
+  editorOnly: PropTypes.bool,
   userManualLink: PropTypes.object,
   entities: PropTypes.array,
   layoutSt: PropTypes.string.isRequired,
   exactMass: PropTypes.string,
   integrationSt: PropTypes.object.isRequired,
+  descriptions: PropTypes.array.isRequired,
+  canChangeDescription: PropTypes.bool.isRequired,
+  onDescriptionChanged: PropTypes.func,
 };
 
 MultiJcampsViewer.defaultProps = {
@@ -155,6 +209,10 @@ MultiJcampsViewer.defaultProps = {
   xLabel: '',
   yLabel: '',
   entities: [],
+  forecast: {},
+  editorOnly: false,
+  descriptions: [],
+  canChangeDescription: false,
 };
 
 export default compose(

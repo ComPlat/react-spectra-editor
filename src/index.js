@@ -8,7 +8,7 @@ import {
 
 import ReactQuill from 'react-quill';
 
-import { SpectraEditor, FN } from './app';
+import { SpectraEditor, FN, store } from './app';
 import nmr1HJcamp from './__tests__/fixtures/nmr1h_jcamp';
 import nmr1H2Jcamp from './__tests__/fixtures/nmr1h_2_jcamp';
 import nmr13CDeptJcamp from './__tests__/fixtures/nmr13c_dept_jcamp';
@@ -22,6 +22,14 @@ import compareIr1Jcamp from './__tests__/fixtures/compare_ir_1_jcamp';
 import compareIr2Jcamp from './__tests__/fixtures/compare_ir_2_jcamp';
 import ramanJcamp from './__tests__/fixtures/raman_jcamp';
 import msJcamp from './__tests__/fixtures/ms_jcamp';
+import lcmsJcamp from './__tests__/fixtures/lc_ms_jcamp';
+import lcmsJcamp2 from './__tests__/fixtures/lc_ms_jcamp_2';
+import hplcMsTicPosJcamp from './__tests__/fixtures/lc_ms_jcamp_tic_pos';
+import hplcMsTicNegJcamp from './__tests__/fixtures/lc_ms_jcamp_tic_neg';
+import hplcMsUvvisJcamp from './__tests__/fixtures/lc_ms_jcamp_uvvis';
+import lcMsTicChemstationJcamp from './__tests__/fixtures/lc_ms_jcamp_tic_chemstation';
+import lcMsMzChemstationJcamp from './__tests__/fixtures/lc_ms_jcamp_mz_chemstation';
+import lcMsUvvisChemstationJcamp from './__tests__/fixtures/lc_ms_jcamp_uvvis_chemstation';
 import nmrResult from './__tests__/fixtures/nmr_result';
 import irResult from './__tests__/fixtures/ir_result';
 import Phenylalanin from './__tests__/fixtures/phenylalanin';
@@ -52,6 +60,22 @@ import dlsIntensityJcamp from './__tests__/fixtures/dls_intensity_jcamp';
 import { q1H, qIR, q13C } from './__tests__/fixtures/qDescValue';
 import './__tests__/style/svg.css';
 
+const pickSelectedSpectrumFromPayload = (payload) => {
+  const spectraList = payload?.spectra_list;
+  if (!Array.isArray(spectraList)) return payload || {};
+  if (spectraList.length === 0) return {};
+  const selectedIdx = Number.isFinite(payload?.curveSt?.curveIdx) ? payload.curveSt.curveIdx : 0;
+  return spectraList[selectedIdx] || spectraList[0] || {};
+};
+
+const normalizeShiftForFormatting = (shift) => {
+  if (shift && Array.isArray(shift.shifts)) return shift;
+  return {
+    selectedIdx: 0,
+    shifts: [shift || { ref: {}, peak: false, enable: true }],
+  };
+};
+
 const nmr1HEntity = FN.ExtractJcamp(nmr1HJcamp);
 const nmr1HEntity2 = FN.ExtractJcamp(nmr1H2Jcamp);
 const nmr13CEntity = FN.ExtractJcamp(nmr13CJcamp);
@@ -65,6 +89,14 @@ const compIr1Entity = FN.ExtractJcamp(compareIr1Jcamp);
 const compIr2Entity = FN.ExtractJcamp(compareIr2Jcamp);
 const ramanEntity = FN.ExtractJcamp(ramanJcamp);
 const msEntity = FN.ExtractJcamp(msJcamp);
+const lcmsEntity = FN.ExtractJcamp(lcmsJcamp);
+const lcmsEntity2 = FN.ExtractJcamp(lcmsJcamp2);
+const hplcMsTicPosEntity = FN.ExtractJcamp(hplcMsTicPosJcamp);
+const hplcMsTicNegEntity = FN.ExtractJcamp(hplcMsTicNegJcamp);
+const hplcMsUvvisEntity = FN.ExtractJcamp(hplcMsUvvisJcamp);
+const hplcMsTicChemstationEntity = FN.ExtractJcamp(lcMsTicChemstationJcamp);
+const hplcMsMzChemstationEntity = FN.ExtractJcamp(lcMsMzChemstationJcamp);
+const hplcMsUvvisChemstationEntity = FN.ExtractJcamp(lcMsUvvisChemstationJcamp);
 const uvVisEntity = FN.ExtractJcamp(uvVisJcamp);
 const compUvVisEntity = FN.ExtractJcamp(compareUvVisJcamp);
 const hplcUVVisEntity = FN.ExtractJcamp(hplcUVVisJcamp);
@@ -187,6 +219,11 @@ class DemoWriteIr extends React.Component {
       case 'gc':
         return gcEntity1;
       case 'ms':
+        return msEntity;
+      case 'lcms':
+        return lcmsEntity;
+      case 'lcms chemstation':
+        return hplcMsUvvisChemstationEntity;
       default:
         return msEntity;
     }
@@ -211,8 +248,14 @@ class DemoWriteIr extends React.Component {
         return [aifEntity1, aifEntity2];
       case 'gc':
         return [gcEntity1, gcEntity2, gcEntity3];
+      case 'lcms':
+        return [hplcMsTicPosEntity, hplcMsTicNegEntity, hplcMsUvvisEntity, lcmsEntity, lcmsEntity2];
+      case 'lcms chemstation':
+        return [
+          hplcMsTicChemstationEntity, hplcMsMzChemstationEntity, hplcMsUvvisChemstationEntity,
+        ];
       default:
-        return false;
+        return [];
     }
   }
 
@@ -238,6 +281,8 @@ class DemoWriteIr extends React.Component {
       case 'dsc':
       case 'xrd':
       case 'ms':
+      case 'lcms':
+      case 'lcms chemstation':
       case 'cyclic volta':
       case 'cds':
       case 'sec':
@@ -274,29 +319,37 @@ class DemoWriteIr extends React.Component {
     cyclicvoltaSt, curveSt,
   }) {
     const entity = this.loadEntity();
+    const safeLayout = layout || entity?.layout;
     const { features } = entity;
     const { temperature } = entity;
     const { maxY, minY } = Array.isArray(features) ? {} : (features.editPeak || features.autoPeak);
     const boundary = { maxY, minY };
+    const shiftForFormatting = normalizeShiftForFormatting(shift);
     const body = FN.peaksBody({
       peaks,
-      layout,
+      layout: safeLayout,
       decimal,
-      shift,
+      shift: shiftForFormatting,
       isAscend,
       isIntensity,
       boundary,
       integration,
       waveLength,
       temperature,
+      hplcMsSt: store.getState().hplcMs,
     });
-    const wrapper = FN.peaksWrapper(layout, shift);
+    const wrapper = FN.peaksWrapper(safeLayout, shiftForFormatting);
     let desc = this.rmDollarSign(wrapper.head) + body + wrapper.tail;
-    if (FN.isCyclicVoltaLayout(layout)) {
+    if (
+      FN.isCyclicVoltaLayout(safeLayout)
+      && cyclicvoltaSt?.spectraList
+      && curveSt?.listCurves
+    ) {
       const { spectraList } = cyclicvoltaSt;
       const { curveIdx, listCurves } = curveSt;
       const selectedVolta = spectraList[curveIdx];
       const selectedCurve = listCurves[curveIdx];
+      if (!selectedVolta || !selectedCurve?.feature) return desc;
       const { feature } = selectedCurve;
       const { scanRate } = feature;
       const data = {
@@ -336,10 +389,16 @@ class DemoWriteIr extends React.Component {
       const it = is.filter((i) => i.xL === xL && i.xU === xU)[0] || { area: 0 };
       const area = it.area * refFactor / refArea; // eslint-disable-line
       const center = FN.calcMpyCenter(peaks, shiftVal, mpyType);
+      const safeCenter = Number.isFinite(center) ? center : 0;
       const xs = m.peaks.map((p) => p.x).sort((a, b) => a - b);
       const [aIdx, bIdx] = isAscend ? [0, xs.length - 1] : [xs.length - 1, 0];
-      const mxA = mpyType === 'm' ? (xs[aIdx] - shiftVal).toFixed(decimal) : 0;
-      const mxB = mpyType === 'm' ? (xs[bIdx] - shiftVal).toFixed(decimal) : 0;
+      const hasValidRange = xs.length > 0 && Number.isFinite(shiftVal);
+      const mxA = (mpyType === 'm' && hasValidRange)
+        ? (xs[aIdx] - shiftVal).toFixed(decimal)
+        : safeCenter.toFixed(decimal);
+      const mxB = (mpyType === 'm' && hasValidRange)
+        ? (xs[bIdx] - shiftVal).toFixed(decimal)
+        : safeCenter.toFixed(decimal);
       return Object.assign({}, m, {
         area, center, mxA, mxB,
       });
@@ -355,15 +414,19 @@ class DemoWriteIr extends React.Component {
         ? `${location} (${type}${atomCount})`
         : `${location} (${type}, ${js}${atomCount})`;
     }).join(', ');
-    const { label, value, name } = shift.ref;
-    const solvent = label ? `${name.split('(')[0].trim()} [${value.toFixed(decimal)} ppm], ` : '';
+    const shiftRef = shift?.ref || {};
+    const { label, value, name } = shiftRef;
+    const hasValidShiftRef = !!label && Number.isFinite(value) && typeof name === 'string';
+    const solvent = hasValidShiftRef
+      ? `${name.split('(')[0].trim()} [${value.toFixed(decimal)} ppm], `
+      : '';
     return `${layout} NMR (${freqStr}${solvent}ppm) δ = ${str}.`;
   }
 
-  writeMpy({
-    layout, shift, isAscend, decimal,
-    multiplicity, integration,
-  }) {
+  writeMpy(payload) {
+    const {
+      layout, shift, isAscend, decimal, multiplicity, integration,
+    } = pickSelectedSpectrumFromPayload(payload);
     if (!FN.isNmrLayout(layout)) return;
     const desc = this.formatMpy({
       multiplicity, integration, shift, isAscend, decimal, layout,
@@ -371,10 +434,11 @@ class DemoWriteIr extends React.Component {
     this.setState({ desc });
   }
 
-  writePeak({
-    peaks, layout, shift, isAscend, decimal, isIntensity, integration, waveLength,
-    cyclicvoltaSt, curveSt,
-  }) {
+  writePeak(payload) {
+    const {
+      peaks, layout, shift, isAscend, decimal, isIntensity, integration, waveLength,
+      cyclicvoltaSt, curveSt,
+    } = pickSelectedSpectrumFromPayload(payload);
     const desc = this.formatPks({
       peaks, layout, shift, isAscend, decimal, isIntensity, integration, waveLength, // eslint-disable-line
       cyclicvoltaSt, curveSt, // eslint-disable-line
@@ -382,36 +446,40 @@ class DemoWriteIr extends React.Component {
     this.setState({ desc });
   }
 
-  savePeaks({
-    peaks, layout, shift, isAscend, decimal, analysis, isIntensity,
-    integration, multiplicity, waveLength,
-  }) {
+  savePeaks(payload) {
+    const {
+      peaks, layout, shift, isAscend, decimal, isIntensity, waveLength,
+    } = pickSelectedSpectrumFromPayload(payload);
     const entity = this.loadEntity();
+    const safeLayout = layout || entity?.layout;
     const { features } = entity;
     const { temperature } = entity;
     const { maxY, minY } = Array.isArray(features)
       ? features[0]
       : (features.editPeak || features.autoPeak);
     const boundary = { maxY, minY };
+    const shiftForFormatting = normalizeShiftForFormatting(shift);
     const body = FN.peaksBody({
-      peaks, layout, decimal, shift, isAscend, isIntensity, boundary, waveLength, temperature,
+      peaks,
+      layout: safeLayout,
+      decimal,
+      shift: shiftForFormatting,
+      isAscend,
+      isIntensity,
+      boundary,
+      waveLength,
+      temperature,
+      hplcMsSt: store.getState().hplcMs,
     });
     /*eslint-disable */
-    console.log(analysis);
-    console.log(integration);
-    console.log(multiplicity);
-    if (shift.ref.label) {
+    let message = `Peaks: ${body}\n`;
+    if (shift?.ref?.label) {
       const label = this.rmDollarSign(shift.ref.label);
-      alert(
-        `Peaks: ${body}` + '\n' +
-        '- - - - - - - - - - -' + '\n' +
-        `Shift solvent = ${label}, ${shift.ref.value}ppm` + '\n'
-      );
-    } else {
-      alert(
-        `Peaks: ${body}` + '\n'
-      );
+      message += '- - - - - - - - - - -\n';
+      message += `Shift solvent = ${label}, ${shift.ref.value}ppm\n`;
     }
+    console.info(message); // eslint-disable-line no-console
+    this.setState({ desc: message });
     /*eslint-disable */
   }
 
@@ -463,7 +531,9 @@ class DemoWriteIr extends React.Component {
       ];
     }
 
-    const refreshCb = () => alert('Refresch simulation!');
+    const refreshCb = () => {
+      console.info('Refresh simulation requested.'); // eslint-disable-line no-console
+    };
 
     const forecast = {
       btnCb: this.predictOp,
@@ -652,6 +722,20 @@ class DemoWriteIr extends React.Component {
           <Button
             variant="contained"
             style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('lcms')}
+          >
+            LC/MS OpenLab
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('lcms chemstation')}
+          >
+            LC/MS Chemstation
+          </Button>
+          <Button
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
             onClick={this.onClick('multi')}
           >
             Multi NMR
@@ -683,6 +767,7 @@ class DemoWriteIr extends React.Component {
           multiEntities={multiEntities}
           others={others}
           editorOnly={false}
+          descriptions={desc}
           canChangeDescription={true}
           onDescriptionChanged={this.onDescriptionChanged}
           molSvg={molSvg}
@@ -723,3 +808,7 @@ ReactDOM.render(
   <DemoWriteIr />,
   document.getElementById('root'),
 );
+
+if (typeof window !== 'undefined') {
+  window.__spectraStore = store;
+}

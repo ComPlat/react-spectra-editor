@@ -15,6 +15,7 @@ import {
   drawMain, drawLabel, drawDisplay, drawDestroy,
 } from '../common/draw';
 import { LIST_UI_SWEEP_TYPE, LIST_NON_BRUSH_TYPES } from '../../constants/list_ui';
+import { LIST_ROOT_SVG_GRAPH } from '../../constants/list_graph';
 import { addNewCylicVoltaPairPeak, addCylicVoltaMaxPeak, addCylicVoltaMinPeak } from '../../actions/cyclic_voltammetry';
 
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
@@ -25,7 +26,7 @@ class ViewerLine extends React.Component {
     super(props);
 
     const { clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct } = props;
-    this.rootKlass = '.d3Line';
+    this.rootKlass = `.${LIST_ROOT_SVG_GRAPH.LINE}`;
     this.focus = new LineFocus({
       W, H, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
     });
@@ -36,10 +37,10 @@ class ViewerLine extends React.Component {
   componentDidMount() {
     const {
       seed, peak, cLabel, xLabel, yLabel, feature, freq, comparisons,
-      tTrEndPts, tSfPeaks, editPeakSt, layoutSt, integationSt, mtplySt,
+      tTrEndPts, tSfPeaks, editPeakSt, layoutSt, integrationSt, mtplySt,
       sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
       isHidden, wavelength, axesUnitsSt,
-      resetAllAct,
+      resetAllAct, uiSt,
     } = this.props;
     drawDestroy(this.rootKlass);
     resetAllAct(feature);
@@ -67,12 +68,13 @@ class ViewerLine extends React.Component {
       tSfPeaks,
       editPeakSt,
       layoutSt,
-      integationSt,
+      integrationSt,
       mtplySt,
       sweepExtentSt,
       isUiAddIntgSt,
       isUiNoBrushSt,
       wavelength,
+      uiSt,
     });
     drawLabel(this.rootKlass, cLabel, xxLabel, yyLabel);
     drawDisplay(this.rootKlass, isHidden);
@@ -81,9 +83,9 @@ class ViewerLine extends React.Component {
   componentDidUpdate(prevProps) {
     const {
       seed, peak, cLabel, xLabel, yLabel, freq, comparisons,
-      tTrEndPts, tSfPeaks, editPeakSt, layoutSt, integationSt, mtplySt,
+      tTrEndPts, tSfPeaks, editPeakSt, layoutSt, integrationSt, mtplySt,
       sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
-      isHidden, wavelength, axesUnitsSt,
+      isHidden, wavelength, axesUnitsSt, uiSt,
     } = this.props;
     this.normChange(prevProps);
 
@@ -109,12 +111,13 @@ class ViewerLine extends React.Component {
       tSfPeaks,
       editPeakSt,
       layoutSt,
-      integationSt,
+      integrationSt,
       mtplySt,
       sweepExtentSt,
       isUiAddIntgSt,
       isUiNoBrushSt,
       wavelength,
+      uiSt,
     });
     drawLabel(this.rootKlass, cLabel, xxLabel, yyLabel);
     drawDisplay(this.rootKlass, isHidden);
@@ -134,7 +137,7 @@ class ViewerLine extends React.Component {
 
   render() {
     return (
-      <div className="d3Line" />
+      <div className={LIST_ROOT_SVG_GRAPH.LINE} />
     );
   }
 }
@@ -149,13 +152,14 @@ const mapStateToProps = (state, props) => (
     tSfPeaks: ToShiftPeaks(state, props),
     editPeakSt: state.editPeak.present,
     layoutSt: state.layout,
-    integationSt: state.integration.present,
+    integrationSt: state.integration.present,
     mtplySt: state.multiplicity.present,
     sweepExtentSt: state.ui.sweepExtent,
     isUiAddIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
     isUiNoBrushSt: LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
     wavelength: state.wavelength,
     axesUnitsSt: state.axesUnits,
+    uiSt: state.ui,
   }
 );
 
@@ -179,6 +183,7 @@ ViewerLine.propTypes = {
     PropTypes.number,
   ]).isRequired,
   comparisons: PropTypes.array.isRequired,
+  uiSt: PropTypes.object.isRequired,
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,
@@ -187,7 +192,7 @@ ViewerLine.propTypes = {
   tSfPeaks: PropTypes.array.isRequired,
   editPeakSt: PropTypes.object.isRequired,
   layoutSt: PropTypes.string.isRequired,
-  integationSt: PropTypes.object.isRequired,
+  integrationSt: PropTypes.object.isRequired,
   mtplySt: PropTypes.object.isRequired,
   sweepExtentSt: PropTypes.object.isRequired,
   isUiAddIntgSt: PropTypes.bool.isRequired,

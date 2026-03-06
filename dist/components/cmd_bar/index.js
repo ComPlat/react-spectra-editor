@@ -24,49 +24,58 @@ var _r07_wavelength_btn = _interopRequireDefault(require("./r07_wavelength_btn")
 var _pecker = _interopRequireDefault(require("./07_pecker"));
 var _r08_change_axes = _interopRequireDefault(require("./r08_change_axes"));
 var _r09_detector = _interopRequireDefault(require("./r09_detector"));
+var _r10_cv_density = _interopRequireDefault(require("./r10_cv_density"));
+var _format = _interopRequireDefault(require("../../helpers/format"));
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, function-paren-newline,
 react/function-component-definition, react/require-default-props */
 
 const styles = () => Object.assign({}, {}, _common.commonStyle);
-const CmdBar = _ref => {
-  let {
-    classes,
-    feature,
-    hasEdit,
-    forecast,
-    operations,
-    editorOnly,
-    jcampIdx,
-    hideThreshold
-  } = _ref;
-  return /*#__PURE__*/_react.default.createElement("div", {
-    className: classes.card
-  }, /*#__PURE__*/_react.default.createElement(_viewer.default, {
-    editorOnly: editorOnly
-  }), /*#__PURE__*/_react.default.createElement(_zoom.default, null), /*#__PURE__*/_react.default.createElement(_peak.default, {
-    jcampIdx: jcampIdx,
-    feature: feature
-  }), /*#__PURE__*/_react.default.createElement(_pecker.default, {
-    jcampIdx: jcampIdx
-  }), /*#__PURE__*/_react.default.createElement(_integration.default, null), /*#__PURE__*/_react.default.createElement(_multiplicity.default, null), /*#__PURE__*/_react.default.createElement(_undo_redo.default, null), /*#__PURE__*/_react.default.createElement(_r04_submit.default, {
-    operations: operations,
-    feature: feature,
-    forecast: forecast,
-    editorOnly: editorOnly,
-    hideSwitch: false,
-    disabled: false
-  }), hideThreshold ? null : /*#__PURE__*/_react.default.createElement(_r03_threshold.default, {
-    feature: feature,
-    hasEdit: hasEdit
-  }), /*#__PURE__*/_react.default.createElement(_r01_layout.default, {
-    feature: feature,
-    hasEdit: hasEdit
-  }), /*#__PURE__*/_react.default.createElement(_r07_wavelength_btn.default, null), /*#__PURE__*/_react.default.createElement(_r08_change_axes.default, null), /*#__PURE__*/_react.default.createElement(_r09_detector.default, null));
+const CmdBar = ({
+  classes,
+  feature,
+  hasEdit,
+  forecast,
+  operations,
+  editorOnly,
+  jcampIdx,
+  hideThreshold,
+  hideMainEditTools,
+  layoutSt
+}) => {
+  const isCvLayout = _format.default.isCyclicVoltaLayout(layoutSt);
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+    className: classes.card,
+    children: [hideMainEditTools ? null : /*#__PURE__*/(0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_viewer.default, {
+        editorOnly: editorOnly
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_zoom.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_peak.default, {
+        jcampIdx: jcampIdx,
+        feature: feature
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_pecker.default, {
+        jcampIdx: jcampIdx
+      }), isCvLayout ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_integration.default, {}), isCvLayout ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_multiplicity.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_undo_redo.default, {})]
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r04_submit.default, {
+      operations: operations,
+      feature: feature,
+      forecast: forecast,
+      editorOnly: editorOnly,
+      hideSwitch: false,
+      disabled: false
+    }), hideThreshold ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_r03_threshold.default, {
+      feature: feature,
+      hasEdit: hasEdit
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r01_layout.default, {
+      feature: feature,
+      hasEdit: hasEdit
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r07_wavelength_btn.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r10_cv_density.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r08_change_axes.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r09_detector.default, {})]
+  });
 };
 const mapStateToProps = (state, _) => (
 // eslint-disable-line
-{});
-const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({}, dispatch);
+{
+  layoutSt: state.layout
+});
 CmdBar.propTypes = {
   classes: _propTypes.default.object.isRequired,
   feature: _propTypes.default.object.isRequired,
@@ -74,7 +83,9 @@ CmdBar.propTypes = {
   hasEdit: _propTypes.default.bool.isRequired,
   operations: _propTypes.default.array.isRequired,
   editorOnly: _propTypes.default.bool.isRequired,
+  layoutSt: _propTypes.default.string.isRequired,
   jcampIdx: _propTypes.default.any,
-  hideThreshold: _propTypes.default.bool
+  hideThreshold: _propTypes.default.bool,
+  hideMainEditTools: _propTypes.default.bool
 };
-var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _withStyles.default)(styles))(CmdBar);
+var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, null), (0, _withStyles.default)(styles))(CmdBar);

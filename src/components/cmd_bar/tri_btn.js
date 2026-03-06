@@ -142,7 +142,11 @@ TriBtn.propTypes = {
   content: PropTypes.object.isRequired,
   cb: PropTypes.func.isRequired,
   children: PropTypes.node.isRequired,
-  isClearAllDisabled: PropTypes.bool.isRequired,
+  isClearAllDisabled: PropTypes.bool,
+};
+
+TriBtn.defaultProps = {
+  isClearAllDisabled: false,
 };
 
 export default connect(

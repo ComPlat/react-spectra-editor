@@ -44,7 +44,7 @@ const tpStyle = () => {
   return style;
 };
 
-const tpDiv = (d, digits) => (
+const tpDiv = (d, digits, yFactor = 1) => (
   `
   <div
     class="peak-tp"
@@ -52,7 +52,7 @@ const tpDiv = (d, digits) => (
   >
     <span> x: ${FN.fixDigit(d.x, digits)}</span>
     <br/>
-    <span> y: ${d3.format('.2~e')(d.y)}</span>
+    <span> y: ${d3.format('.2~e')(d.y * (yFactor || 1))}</span>
   <div>
   `
 );
@@ -61,7 +61,7 @@ const InitTip = () => {
   d3.select('.peak-tp').remove();
   const tip = d3Tip()
     .attr('class', 'd3-tip')
-    .html(({ d, layout }) => tpDiv(d, FN.spectraDigit(layout)));
+    .html(({ d, layout, yFactor }) => tpDiv(d, FN.spectraDigit(layout), yFactor || 1));
   return tip;
 };
 

@@ -10,6 +10,7 @@ var _shift = require("../helpers/shift");
 /* eslint-disable prefer-object-spread, default-param-last */
 
 const shiftNone = _list_shift.LIST_SHIFT_1H[0];
+const normalizeShiftName = input => (input || '').toString().normalize('NFKD').replace(/[^a-z0-9]+/gi, '').toLowerCase();
 
 // const initialState = {
 //   ref: shiftNone,
@@ -37,10 +38,11 @@ const resetRef = payload => {
   } = payload;
   if (!shift || !shift.solventName || !shift.solventValue) return shiftNone;
   const name = shift.solventName;
+  const normalizedName = normalizeShiftName(name);
   let target = false;
   const listShift = (0, _list_shift.getListShift)(layout);
   listShift.forEach(l => {
-    if (l.name === name) {
+    if (normalizeShiftName(l.name) === normalizedName) {
       target = l;
     }
   });
@@ -217,9 +219,7 @@ const addNegative = (state, action) => {
     selectedIdx: curveIdx
   });
 };
-const shiftReducer = function () {
-  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-  let action = arguments.length > 1 ? arguments[1] : undefined;
+const shiftReducer = (state = initialState, action) => {
   switch (action.type) {
     case _action_type.SHIFT.SET_REF:
       return setRef(state, action);

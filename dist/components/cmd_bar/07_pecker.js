@@ -19,6 +19,7 @@ var _common = require("./common");
 var _list_ui = require("../../constants/list_ui");
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 var _cyclic_voltammetry = require("../../actions/cyclic_voltammetry");
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, function-paren-newline,
 react/function-component-definition, react/require-default-props, max-len,
 react/no-unused-prop-types */
@@ -59,7 +60,7 @@ const setRef = (classes, cyclicVotaSt, curveIdx, setCylicVoltaRefFactorAct) => {
       });
     }
   };
-  return /*#__PURE__*/_react.default.createElement(_material.TextField, {
+  return /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TextField, {
     className: classes.field,
     id: "intg-factor-name",
     type: "number",
@@ -68,28 +69,28 @@ const setRef = (classes, cyclicVotaSt, curveIdx, setCylicVoltaRefFactorAct) => {
     InputProps: {
       className: (0, _classnames.default)(classes.txtInput, 'txtfield-sv-bar-input')
     },
-    label: /*#__PURE__*/_react.default.createElement("span", {
-      className: (0, _classnames.default)(classes.txtLabel, 'txtfield-sv-bar-label')
-    }, hasRefPeaks ? 'Ref Value (V)' : 'Shift'),
+    label: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+      className: (0, _classnames.default)(classes.txtLabel, 'txtfield-sv-bar-label'),
+      children: hasRefPeaks ? 'Ref Value (V)' : 'Shift'
+    }),
     variant: "outlined",
     onChange: onFactorChanged,
     onBlur: onFactorChanged,
     onKeyUp: onEnterPress
   });
 };
-const Pecker = _ref => {
-  let {
-    classes,
-    layoutSt,
-    isFocusAddPeckerSt,
-    isFocusRmPeckerSt,
-    setUiSweepTypeAct,
-    curveSt,
-    cyclicVotaSt,
-    setCylicVoltaRefFactorAct,
-    isFocusSetRefSt,
-    setCylicVoltaRefAct
-  } = _ref;
+const Pecker = ({
+  classes,
+  layoutSt,
+  isFocusAddPeckerSt,
+  isFocusRmPeckerSt,
+  setUiSweepTypeAct,
+  curveSt,
+  cyclicVotaSt,
+  setCylicVoltaRefFactorAct,
+  isFocusSetRefSt,
+  setCylicVoltaRefAct
+}) => {
   const {
     curveIdx
   } = curveSt;
@@ -109,36 +110,58 @@ const Pecker = _ref => {
     } = spectra;
     hasRefPeaks = hasRefPeak;
   }
-  return !_cfg.default.hidePanelCyclicVolta(layoutSt) ? /*#__PURE__*/_react.default.createElement("span", {
-    "data-testid": "Pecker"
-  }, /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
-    title: /*#__PURE__*/_react.default.createElement("span", {
-      className: "txt-sv-tp"
-    }, "Add Pecker")
-  }, /*#__PURE__*/_react.default.createElement("span", null, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
-    className: (0, _classnames.default)((0, _common.focusStyle)(isFocusAddPeckerSt, classes), 'btn-sv-bar-addpecker'),
-    onClick: onSweepPeckerAdd
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txt, 'txt-sv-bar-addpeak')
-  }, "I", /*#__PURE__*/_react.default.createElement("sub", null, "\u03BB0"), "+")))), /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
-    title: /*#__PURE__*/_react.default.createElement("span", {
-      className: "txt-sv-tp"
-    }, "Remove Pecker")
-  }, /*#__PURE__*/_react.default.createElement("span", null, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
-    className: (0, _classnames.default)((0, _common.focusStyle)(isFocusRmPeckerSt, classes), 'btn-sv-bar-rmpecker'),
-    onClick: onSweepPeckerDELETE
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txt, 'txt-sv-bar-rmpeak')
-  }, "I", /*#__PURE__*/_react.default.createElement("sub", null, "\u03BB0"), "-")))), setRef(classes, cyclicVotaSt, curveIdx, setCylicVoltaRefFactorAct), /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
-    title: /*#__PURE__*/_react.default.createElement("span", {
-      className: "txt-sv-tp"
-    }, hasRefPeaks ? 'Set Reference' : 'Set Shift')
-  }, /*#__PURE__*/_react.default.createElement("span", null, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
-    className: (0, _classnames.default)((0, _common.focusStyle)(isFocusSetRefSt, classes), 'btn-sv-bar-setref'),
-    onClick: onConfirmSetRef
-  }, /*#__PURE__*/_react.default.createElement(_AddLocationOutlined.default, {
-    className: classes.icon
-  }))))) : /*#__PURE__*/_react.default.createElement("span", null);
+  return !_cfg.default.hidePanelCyclicVolta(layoutSt) ? /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+    "data-testid": "Pecker",
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
+      title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        className: "txt-sv-tp",
+        children: "Add Pecker"
+      }),
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
+          className: (0, _classnames.default)((0, _common.focusStyle)(isFocusAddPeckerSt, classes), 'btn-sv-bar-addpecker'),
+          onClick: onSweepPeckerAdd,
+          children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+            className: (0, _classnames.default)(classes.txt, 'txt-sv-bar-addpeak'),
+            children: ["I", /*#__PURE__*/(0, _jsxRuntime.jsx)("sub", {
+              children: "\u03BB0"
+            }), "+"]
+          })
+        })
+      })
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
+      title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        className: "txt-sv-tp",
+        children: "Remove Pecker"
+      }),
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
+          className: (0, _classnames.default)((0, _common.focusStyle)(isFocusRmPeckerSt, classes), 'btn-sv-bar-rmpecker'),
+          onClick: onSweepPeckerDELETE,
+          children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+            className: (0, _classnames.default)(classes.txt, 'txt-sv-bar-rmpeak'),
+            children: ["I", /*#__PURE__*/(0, _jsxRuntime.jsx)("sub", {
+              children: "\u03BB0"
+            }), "-"]
+          })
+        })
+      })
+    }), setRef(classes, cyclicVotaSt, curveIdx, setCylicVoltaRefFactorAct), /*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
+      title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        className: "txt-sv-tp",
+        children: hasRefPeaks ? 'Set Reference' : 'Set Shift'
+      }),
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
+          className: (0, _classnames.default)((0, _common.focusStyle)(isFocusSetRefSt, classes), 'btn-sv-bar-setref'),
+          onClick: onConfirmSetRef,
+          children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_AddLocationOutlined.default, {
+            className: classes.icon
+          })
+        })
+      })
+    })]
+  }) : /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {});
 };
 const mapStateToProps = (state, _) => (
 // eslint-disable-line

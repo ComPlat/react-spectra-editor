@@ -2,12 +2,13 @@
 react/no-unused-prop-types, react/jsx-closing-tag-location, max-len, react/jsx-one-expression-per-line,
 react/jsx-indent, react/no-unescaped-entities, react/jsx-wrap-multilines, camelcase, no-shadow,
 arrow-body-style, react/function-component-definition */
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
@@ -15,8 +16,8 @@ import InfoIcon from '@mui/icons-material/Info';
 import HelpIcon from '@mui/icons-material/Help';
 import { withStyles } from '@mui/styles';
 import {
-  Accordion, AccordionSummary, Table, TableHead, TableBody, TableCell, TableRow,
-  Tooltip, Divider, Typography, Checkbox,
+  Table, TableHead, TableBody, TableCell, TableRow,
+  Tooltip, Divider, Typography, Checkbox, IconButton,
 } from '@mui/material';
 import {
   addNewCylicVoltaPairPeak, setWorkWithMaxPeak, selectPairPeak, removeCylicVoltaPairPeak, selectRefPeaks,
@@ -26,24 +27,68 @@ import { LIST_UI_SWEEP_TYPE } from '../../constants/list_ui';
 import { GetCyclicVoltaRatio, GetCyclicVoltaPeakSeparate } from '../../helpers/chem';
 import Format from '../../helpers/format';
 
+const MAX_VISIBLE_ROWS = 6;
+const ROW_HEIGHT_PX = 28;
+const HEADER_HEIGHT_PX = 24;
+const EXPANDED_HEIGHT = HEADER_HEIGHT_PX + (MAX_VISIBLE_ROWS * ROW_HEIGHT_PX);
+
 const styles = () => ({
   panel: {
-    backgroundColor: '#eee',
-    display: 'table-row',
+    backgroundColor: '#f7f7f7',
+    border: '1px solid #e6e6e6',
+    borderRadius: 8,
+    overflow: 'hidden',
   },
-  panelSummary: {
+  panelHeader: {
     backgroundColor: '#eee',
-    height: 32,
+    padding: '4px 8px',
+    display: 'flex',
+    alignItems: 'center',
   },
-  panelDetail: {
-    backgroundColor: '#fff',
-    maxHeight: 'calc(90vh - 220px)', // ROI
-    overflow: 'auto',
+  panelActions: {
+    marginLeft: 'auto',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+  },
+  howToWrap: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 4,
+  },
+  toggleBtn: {
+    padding: 0,
   },
   table: {
     width: '100%',
     overflowWrap: 'anywhere',
-    fontSize: '14px !important',
+    fontSize: '11px !important',
+  },
+  tableWrap: {
+    padding: '3px 6px 5px',
+    height: 'auto',
+    maxHeight: EXPANDED_HEIGHT,
+    overflowY: 'auto',
+    overflowX: 'hidden',
+    transition: 'max-height 200ms ease',
+  },
+  tableWrapCollapsed: {
+    maxHeight: 0,
+    padding: '0 5px',
+    overflow: 'hidden',
+  },
+  tableHeadRow: {
+    backgroundColor: '#f5f5f5',
+  },
+  tableHeadCell: {
+    fontWeight: 600,
+    color: '#333',
+    fontSize: '11px !important',
+  },
+  tableBodyRow: {
+    '&:nth-of-type(even)': {
+      backgroundColor: '#fafafa',
+    },
   },
   td: {
     wordWrap: 'break-all',
@@ -52,7 +97,7 @@ const styles = () => ({
   cellSelected: {
     backgroundColor: '#2196f3',
     color: '#fff',
-    fontSize: '14px !important',
+    fontSize: '13px !important',
   },
   btnRemove: {
     color: 'red',
@@ -61,7 +106,10 @@ const styles = () => ({
     color: 'green',
   },
   tTxt: {
-    padding: 5,
+    padding: '5px 2px',
+    lineHeight: 1.2,
+    verticalAlign: 'top',
+    fontSize: '11px !important',
   },
   infoIcon: {
     width: '15px',
@@ -72,36 +120,65 @@ const styles = () => ({
     fontSize: '14px !important',
   },
   rowRoot: {
-    border: '1px solid #eee',
-    height: 36,
-    lineHeight: '36px',
-    overflow: 'hidden',
-    paddingLeft: 24,
+    border: '1px solid #e6e6e6',
+    borderRadius: 6,
+    minHeight: 40,
+    lineHeight: 1.4,
+    padding: '10px 16px',
     textAlign: 'left',
   },
   rowOdd: {
     backgroundColor: '#fff',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
+    textOverflow: 'clip',
+    whiteSpace: 'normal',
   },
   rowEven: {
     backgroundColor: '#fafafa',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
   },
+  cvModeWarning: {
+    color: 'red',
+    marginLeft: 12,
+  },
 });
 
 const CyclicVoltammetryPanel = ({
-  classes, cyclicVotaSt, feature,
+  classes, cyclicVoltaState, feature,
   addNewPairPeakAct, setWorkWithMaxPeakAct, selectPairPeakAct, removePairPeakAct,
   selectRefPeaksAct, sweepTypeSt, setUiSweepTypeAct, jcampIdx, userManualLink,
 }) => {
-  const { spectraList } = cyclicVotaSt;
+  const [isExpanded, setIsExpanded] = useState(false);
+  const { spectraList } = cyclicVoltaState;
   const spectra = spectraList[jcampIdx];
   let list = [];
   if (spectra !== undefined) {
     list = spectra.list;
   }
+
+  const formatCurrent = (y, feature, cyclicVoltaState) => {
+    const baseY = feature && feature.yUnit ? String(feature.yUnit) : 'A';
+    const isMilli = /mA/i.test(baseY);
+    const useDensity = cyclicVoltaState && cyclicVoltaState.useCurrentDensity;
+
+    const rawArea = (cyclicVoltaState && cyclicVoltaState.areaValue === '' ? 1.0 : cyclicVoltaState?.areaValue) || 1.0;
+    const areaUnit = (cyclicVoltaState && cyclicVoltaState.areaUnit) ? cyclicVoltaState.areaUnit : 'cm²';
+    const safeArea = rawArea > 0 ? rawArea : 1.0;
+
+    let val = y;
+    let unit = isMilli ? 'mA' : 'A';
+
+    if (useDensity) {
+      val = y / safeArea;
+      unit = `${unit}/${areaUnit}`;
+    }
+
+    if (isMilli) {
+      val *= 1000.0;
+    }
+
+    return `${parseFloat(val).toExponential(2)} ${unit}`;
+  };
 
   const selectCell = (idx, isMax) => {
     setWorkWithMaxPeakAct({ isMax, jcampIdx });
@@ -139,9 +216,9 @@ const CyclicVoltammetryPanel = ({
   const rows = list.map((o, idx) => (
     {
       idx,
-      max: o.max ? `E: ${Format.strNumberFixedLength(parseFloat(o.max.x), 3)} V,\nI: ${parseFloat((o.max.y) * 1000).toExponential(2)} mA` : 'nd',
-      min: o.min ? `E: ${Format.strNumberFixedLength(parseFloat(o.min.x), 3)} V,\nI: ${parseFloat((o.min.y) * 1000).toExponential(2)} mA` : 'nd',
-      pecker: o.pecker ? `${parseFloat((o.pecker.y) * 1000).toExponential(2)} mA` : 'nd',
+      max: o.max ? `E: ${Format.strNumberFixedLength(parseFloat(o.max.x), 3)} V,\nI: ${formatCurrent(o.max.y, feature, cyclicVoltaState)}` : 'nd',
+      min: o.min ? `E: ${Format.strNumberFixedLength(parseFloat(o.min.x), 3)} V,\nI: ${formatCurrent(o.min.y, feature, cyclicVoltaState)}` : 'nd',
+      pecker: o.pecker ? `${formatCurrent(o.pecker.y, feature, cyclicVoltaState)}` : 'nd',
       delta: `${getDelta(o)} mV`,
       ratio: getRatio(feature, o),
       e12: (typeof o.e12 === 'number') ? `${Format.strNumberFixedLength(o.e12, 3)} V` : 'nd',
@@ -154,44 +231,86 @@ const CyclicVoltammetryPanel = ({
   ));
 
   return (
-    <Accordion
-      data-testid="PanelVoltammetry"
-    >
-      <AccordionSummary
-        expandIcon={<ExpandMoreIcon />}
-        className={classNames(classes.panelSummary)}
+    <div className={classes.panel} data-testid="PanelVoltammetry">
+      <div
+        className={classes.panelHeader}
+        role="button"
+        tabIndex={0}
+        onClick={() => setIsExpanded((prev) => !prev)}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            setIsExpanded((prev) => !prev);
+          }
+        }}
+        aria-expanded={isExpanded}
       >
         <Typography className="txt-panel-header">
-        <span className={classNames(classes.txtBadge, 'txt-sv-panel-title')}>
-          Voltammetry data
-        </span>
+          <span className={classNames(classes.txtBadge, 'txt-sv-panel-title')}>
+            Voltammetry data
+          </span>
+          {' - '}
+          <span>
+            Mode: {cyclicVoltaState.useCurrentDensity ? 'Current Density' : 'Current'}
+          </span>
+          <span className={classes.cvModeWarning}>
+            WE-ECSA must be set when switching to Current Density.
+          </span>
         </Typography>
-      </AccordionSummary>
+        <div className={classes.panelActions}>
+          <Tooltip
+            title={
+              (
+                <span className={classNames(classes.txtToolTip)}>
+                  Click here to open the User manual document
+                </span>
+              )
+            }
+          >
+            <span className={classes.howToWrap}>
+              <a target="_blank" rel="noopener noreferrer" href={userManualLink}>How-To</a>
+              <HelpIcon className={classNames(classes.infoIcon)} />
+            </span>
+          </Tooltip>
+          <IconButton
+            size="small"
+            className={classes.toggleBtn}
+            onClick={(event) => {
+              event.stopPropagation();
+              setIsExpanded((prev) => !prev);
+            }}
+            aria-label={isExpanded ? 'Collapse table' : 'Expand table'}
+          >
+            {isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          </IconButton>
+        </div>
+      </div>
       <Divider />
-      <Table className={classes.table}>
-        <TableHead>
-          <TableRow>
+      <div className={classNames(classes.tableWrap, !isExpanded && classes.tableWrapCollapsed)}>
+        <Table className={classes.table}>
+          <TableHead>
+            <TableRow className={classes.tableHeadRow}>
             <TableCell
               align="left"
-              className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
+              className={classNames(classes.tTxt, classes.tableHeadCell, classes.square, 'txt-sv-panel-txt')}
             >
               Ref
             </TableCell>
             <TableCell
               align="left"
-              className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
+              className={classNames(classes.tTxt, classes.tableHeadCell, classes.square, 'txt-sv-panel-txt')}
             >
               Anodic
             </TableCell>
             <TableCell
               align="left"
-              className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
+              className={classNames(classes.tTxt, classes.tableHeadCell, classes.square, 'txt-sv-panel-txt')}
             >
               Cathodic
             </TableCell>
             <TableCell
               align="left"
-              className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
+              className={classNames(classes.tTxt, classes.tableHeadCell, classes.square, 'txt-sv-panel-txt')}
             >
               I <sub>λ0</sub>
               <Tooltip
@@ -207,7 +326,7 @@ const CyclicVoltammetryPanel = ({
             </TableCell>
             <TableCell
               align="left"
-              className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
+              className={classNames(classes.tTxt, classes.tableHeadCell, classes.square, 'txt-sv-panel-txt')}
             >
               I ratio
               <Tooltip
@@ -224,13 +343,13 @@ https://doi.org/10.1021/ac60242a030</i>
             </TableCell>
             <TableCell
               align="left"
-              className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
+              className={classNames(classes.tTxt, classes.tableHeadCell, classes.square, 'txt-sv-panel-txt')}
             >
               E<sub>1/2</sub>
             </TableCell>
             <TableCell
               align="left"
-              className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
+              className={classNames(classes.tTxt, classes.tableHeadCell, classes.square, 'txt-sv-panel-txt')}
             >
               ΔE<sub>p</sub>
               <Tooltip
@@ -247,7 +366,7 @@ https://doi.org/10.1021/ac60242a030</i>
             </TableCell>
             <TableCell
               align="left"
-              className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
+              className={classNames(classes.tTxt, classes.tableHeadCell, classes.square, 'txt-sv-panel-txt')}
             >
               <AddCircleOutlineIcon onClick={() => addNewPairPeakAct(jcampIdx)} className={classNames(classes.btnAddRow)} />
             </TableCell>
@@ -256,12 +375,12 @@ https://doi.org/10.1021/ac60242a030</i>
         <TableBody>
           {
             rows.map((row) => (
-              <TableRow key={row.idx}>
+              <TableRow key={row.idx} className={classes.tableBodyRow} hover>
                 <TableCell
                   align="left"
                   className={classNames(classes.tTxt, classes.square, 'txt-sv-panel-txt')}
                 >
-                  <Checkbox checked={row.isRef} onChange={row.onCheckRefChanged} />
+                  <Checkbox size="small" checked={row.isRef} onChange={row.onCheckRefChanged} sx={{ padding: 0 }} />
                 </TableCell>
                 <TableCell
                   align="left"
@@ -332,32 +451,16 @@ https://doi.org/10.1021/ac60242a030</i>
             ))
           }
         </TableBody>
-      </Table>
-
-      <div className={classNames(classes.rowRoot, classes.rowEven)}>
-        <Tooltip
-          title={
-            (
-              <span className={classNames(classes.txtToolTip)}>
-                Click here to open the User manual document
-              </span>
-            )
-          }
-        >
-          <span>
-            <a target="_blank" rel="noopener noreferrer" href={userManualLink}>How-To </a>
-            <HelpIcon className={classNames(classes.infoIcon)} />
-          </span>
-        </Tooltip>
+        </Table>
       </div>
-    </Accordion>
+
+    </div>
   );
 };
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
-    layoutSt: state.layout,
-    cyclicVotaSt: state.cyclicvolta,
+    cyclicVoltaState: state.cyclicvolta,
     sweepTypeSt: state.ui.sweepType,
   }
 );
@@ -375,12 +478,8 @@ const mapDispatchToProps = (dispatch) => (
 
 CyclicVoltammetryPanel.propTypes = {
   classes: PropTypes.object.isRequired,
-  expand: PropTypes.bool.isRequired,
   feature: PropTypes.object.isRequired,
-  molSvg: PropTypes.string.isRequired,
-  layoutSt: PropTypes.string.isRequired,
-  onExapnd: PropTypes.func.isRequired,
-  cyclicVotaSt: PropTypes.object.isRequired,
+  cyclicVoltaState: PropTypes.object.isRequired,
   addNewPairPeakAct: PropTypes.func.isRequired,
   setWorkWithMaxPeakAct: PropTypes.func.isRequired,
   selectPairPeakAct: PropTypes.func.isRequired,

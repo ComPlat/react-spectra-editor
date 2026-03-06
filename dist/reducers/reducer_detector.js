@@ -25,9 +25,7 @@ const updateOrAppendCurve = (curves, targetCurveIdx, newCurve) => {
   }
   return [...curves, newCurve];
 };
-const detectorReducer = function () {
-  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-  let action = arguments.length > 1 ? arguments[1] : undefined;
+const detectorReducer = (state = initialState, action) => {
   switch (action.type) {
     case _action_type.SEC.UPDATE_DETECTOR:
       const {

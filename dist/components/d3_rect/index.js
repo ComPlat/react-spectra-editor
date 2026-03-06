@@ -15,6 +15,7 @@ var _ui = require("../../actions/ui");
 var _rect_focus = _interopRequireDefault(require("./rect_focus"));
 var _draw = require("../common/draw");
 var _list_ui = require("../../constants/list_ui");
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable no-mixed-operators */
 
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
@@ -110,7 +111,7 @@ class ViewerRect extends _react.default.Component {
     }
   }
   render() {
-    return /*#__PURE__*/_react.default.createElement("div", {
+    return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
       className: "d3Rect"
     });
   }

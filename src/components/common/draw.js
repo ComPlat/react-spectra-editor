@@ -1,8 +1,9 @@
 const d3 = require('d3');
+const { LIST_BRUSH_SVG_GRAPH } = require('../../constants/list_graph');
 
-const drawMain = (klass, w, h) => {
+const drawMain = (klass, w, h, d3svgClass = LIST_BRUSH_SVG_GRAPH.LINE) => {
   d3.select(klass).append('svg')
-    .attr('class', 'd3Svg')
+    .attr('class', d3svgClass)
     .attr('preserveAspectRatio', 'xMinYMin meet')
     .attr('viewBox', `0 0 ${w} ${h}`);
 };

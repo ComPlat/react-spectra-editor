@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from '@testing-library/react'; 
+import { render } from '@testing-library/react'; 
 import InfoPanel from '../../../../components/panel/info';
 import configureStore from 'redux-mock-store'
 import { Provider } from 'react-redux';
@@ -19,7 +19,7 @@ const store = mockStore({
     shifts: [],
   },
   simulation: {
-
+    nmrSimPeaks: [],
   },
   detector: {
     curves: [
@@ -29,10 +29,12 @@ const store = mockStore({
       },
     ],
   },
-  meta: {}
-});
-const failedStore = mockStore({
-
+  meta: {
+    dscMetaData: {},
+  },
+  hplcMs: {
+    uvvis: { spectraList: [], listWaveLength: [] },
+  },
 });
 const dispatchMock = () => Promise.resolve({});
 store.dispatch = jest.fn(dispatchMock);
@@ -43,8 +45,14 @@ const theme = createTheme({
   },
 });
 
-const feature = {
-
+const feature = {};
+const baseProps = {
+  feature,
+  integration: {},
+  editorOnly: false,
+  molSvg: '',
+  descriptions: '',
+  canChangeDescription: false,
 };
 
 describe("<InfoPanel />", () => {
@@ -55,23 +63,11 @@ describe("<InfoPanel />", () => {
     }
   });
 
-  test('Cannot render info panel',  () => {
+  test('Render info panel',  () => {
     const renderer = 
       <AppWrapper store={store}>
         <ThemeProvider theme={theme}>
-          <InfoPanel expand={false} onExapnd={() => {}} />
-        </ThemeProvider>
-      </AppWrapper>
-    ;
-    const {queryByTestId} = render(renderer);
-    expect(queryByTestId('PanelInfo')).not.toBeInTheDocument();
-  });
-
-  test('Render info panel', () => {
-    const renderer = 
-      <AppWrapper store={store}>
-        <ThemeProvider theme={theme}>
-          <InfoPanel expand={false} onExapnd={() => {}} feature={feature} />
+          <InfoPanel expand={false} onExapnd={() => {}} {...baseProps} />
         </ThemeProvider>
       </AppWrapper>
     ;

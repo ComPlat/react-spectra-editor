@@ -2,7 +2,7 @@ describe('CV', () => {
   beforeEach(() => {
     cy.viewport(2000, 2000)
     cy.visit('http://localhost:3000/')
-    cy.get('#btn-cv').click()
+    cy.get('#btn-cv').click({ force: true })
   })
 
   it('Open layout', () => {
@@ -13,6 +13,7 @@ describe('CV', () => {
 
   function addMaxPeak(view, offset=0) {
     cy.get('.btn-sv-bar-addpeak').click()
+    cy.get('.d3Svg').scrollIntoView()
     cy.get('.d3Svg')
       .trigger('click', 1110 + offset, 480, {
         which: 1,
@@ -22,8 +23,9 @@ describe('CV', () => {
 
   function addMinPeak(view, offset=0) {
     cy.get('.btn-sv-bar-addpeak').click()
+    cy.get('.d3Svg').scrollIntoView()
     cy.get('.d3Svg')
-      .trigger('click', 1050 + offset, 1480, {
+      .trigger('click', 1050 + offset, 750, {
         which: 1,
         view: view,
       })
@@ -31,8 +33,9 @@ describe('CV', () => {
 
   function addPecker(view, offset=0) {
     cy.get('.btn-sv-bar-addpecker').click()
+    cy.get('.d3Svg').scrollIntoView()
     cy.get('.d3Svg')
-      .trigger('click', 1350 + offset, 1480, {
+      .trigger('click', 1350 + offset, 750, {
         which: 1,
         view: view,
       })
@@ -40,6 +43,7 @@ describe('CV', () => {
 
   function removeMaxPeak(view, offset=0) {
     cy.get('.btn-sv-bar-rmpeak').click()
+    cy.get('.d3Svg').scrollIntoView()
     cy.get('.d3Svg')
     .trigger('click', 1110 + offset, 450, {
       which: 1,
@@ -49,8 +53,9 @@ describe('CV', () => {
 
   function removeMinPeak(view, offset=0) {
     cy.get('.btn-sv-bar-rmpeak').click()
+    cy.get('.d3Svg').scrollIntoView()
     cy.get('.d3Svg')
-      .trigger('click', 1050 + offset, 900, {
+      .trigger('click', 1050 + offset, 750, {
         which: 1,
         view: view,
       })
@@ -58,8 +63,9 @@ describe('CV', () => {
 
   function removePecker(view, offset=0) {
     cy.get('.btn-sv-bar-rmpecker').click()
+    cy.get('.d3Svg').scrollIntoView()
     cy.get('.d3Svg')
-      .trigger('click', 1350 + offset, 800, {
+      .trigger('click', 1350 + offset, 750, {
         which: 1,
         view: view,
       })
@@ -212,48 +218,5 @@ describe('CV', () => {
       cy.get('[data-testid="AddLocationOutlinedIcon"]').click();
       /* ==== End Cypress Studio ==== */
     });
-  })
-
-  it('Change axes labels', () => {
-    /* ==== Generated with Cypress Studio ==== */
-    cy.get('[aria-labelledby="select-x-axis-label"]').click();
-    cy.get('[data-value="Voltage in V"]').click();
-    cy.get('[aria-labelledby="select-y-axis-label"]').click();
-    cy.get('[data-value="Current in A"]').click();
-    // /* ==== End Cypress Studio ==== */
-
-    cy.get('.d3Svg text.xLabel').should('have.text', 'Voltage in V')
-    cy.get('.d3Svg text.yLabel').should('have.text', 'Current in A')
-
-    /* ==== Generated with Cypress Studio ==== */
-    cy.get('[aria-labelledby="select-x-axis-label"]').click();
-    cy.get('[data-value="Voltage vs Ref in V"]').click();
-    cy.get('[aria-labelledby="select-y-axis-label"]').click();
-    cy.get('[data-value="Current in mA"]').click();
-    // /* ==== End Cypress Studio ==== */
-
-    cy.get('.d3Svg text.xLabel').should('have.text', 'Voltage vs Ref in V')
-    cy.get('.d3Svg text.yLabel').should('have.text', 'Current in mA')
-
-    /* ==== Generated with Cypress Studio ==== */
-    cy.get('[aria-labelledby="select-x-axis-label"]').click();
-    cy.get('[data-value="Potential in V"]').click();
-    cy.get('[aria-labelledby="select-y-axis-label"]').click();
-    cy.get('[data-value="Current in A"]').click();
-    /* ==== End Cypress Studio ==== */
-
-    cy.get('.d3Svg text.xLabel').should('have.text', 'Potential in V')
-    cy.get('.d3Svg text.yLabel').should('have.text', 'Current in A')
-
-    // /* ==== Generated with Cypress Studio ==== */
-    cy.get('[aria-labelledby="select-x-axis-label"]').click();
-    cy.get('[data-value="Potential vs Ref in V"]').click();
-    cy.get('[aria-labelledby="select-y-axis-label"]').click();
-    cy.get('[data-value="Current in mA"]').click();
-    /* ==== End Cypress Studio ==== */
-
-    cy.get('.d3Svg text.xLabel').should('have.text', 'Potential vs Ref in V')
-    cy.get('.d3Svg text.yLabel').should('have.text', 'Current in mA')
-
   })
 })

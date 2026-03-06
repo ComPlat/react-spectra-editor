@@ -6,36 +6,33 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.extractParams = void 0;
 var _format = _interopRequireDefault(require("./format"));
-const getScanIdx = (entity, scanSt) => {
+var _extractEntityLCMS = require("./extractEntityLCMS");
+const getScanIdx = (entity, scanState) => {
   const {
     target,
     isAuto
-  } = scanSt;
+  } = scanState || {};
   const {
-    features,
-    spectra
-  } = entity;
-  const defaultFeat = features.editPeak || features.autoPeak || features[0];
-  const hasEdit = !!defaultFeat.scanEditTarget;
-  const defaultIdx = isAuto || !hasEdit ? defaultFeat.scanAutoTarget : defaultFeat.scanEditTarget;
+    features = {},
+    spectra = []
+  } = entity || {};
+  const defaultFeature = features.editPeak || features.autoPeak || features[0] || {};
+  const hasEdit = !!defaultFeature?.scanEditTarget;
+  const defaultIdx = isAuto || !hasEdit ? defaultFeature?.scanAutoTarget : defaultFeature?.scanEditTarget;
   const defaultCount = +spectra.length;
   let idx = +(target || defaultIdx || 0);
-  if (idx > defaultCount) {
-    idx = defaultCount;
-  }
-  return idx - 1;
+  if (idx > defaultCount) idx = defaultCount;
+  return Math.max(idx - 1, 0);
 };
-const extrShare = function (entity, thresSt) {
-  let scanIdx = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+const extractSharedParams = (entity, thresholdState, scanIdx = 0) => {
   const {
-    spectra,
-    features
-  } = entity;
-  // const { autoPeak, editPeak } = features; // TBD
-  const autoPeak = features.autoPeak || features[scanIdx] || features[0];
-  const editPeak = features.editPeak || features[scanIdx] || features[0];
-  const hasEdit = editPeak && editPeak.data ? editPeak.data[0].x.length > 0 : false;
-  const feature = hasEdit && thresSt.isEdit ? editPeak : autoPeak;
+    spectra = [],
+    features = {}
+  } = entity || {};
+  const autoPeak = features.autoPeak || features[scanIdx] || features[0] || {};
+  const editPeak = features.editPeak || features[scanIdx] || features[0] || {};
+  const hasEdit = !!editPeak?.data?.[0]?.x?.length;
+  const feature = hasEdit && thresholdState?.isEdit ? editPeak : autoPeak;
   const {
     integration,
     multiplicity
@@ -48,21 +45,99 @@ const extrShare = function (entity, thresSt) {
     multiplicity
   };
 };
-const extrMs = (entity, thresSt, scanSt) => {
-  const scanIdx = getScanIdx(entity, scanSt);
+const extractLcmsParams = entity => {
   const {
-    spectra,
-    feature,
-    hasEdit
-  } = extrShare(entity, thresSt, scanIdx);
-  const topic = spectra[scanIdx].data[0];
+    features,
+    layout
+  } = entity;
+  let topicX = [];
+  let topicY = [];
+  const entityInfo = (0, _extractEntityLCMS.getLcMsInfo)(entity);
+  let featuresArray = [];
+  if (Array.isArray(features)) {
+    featuresArray = features;
+  } else if (features && typeof features === 'object') {
+    featuresArray = Object.values(features);
+  }
+  if (entityInfo.kind === 'tic') {
+    const ticFeature = featuresArray.find(spectrum => spectrum?.data?.[0]?.x?.length > 0);
+    if (ticFeature?.data?.[0]) {
+      const {
+        x,
+        y
+      } = ticFeature.data[0];
+      topicX = x;
+      topicY = y;
+    }
+  } else {
+    featuresArray.forEach(spectrum => {
+      if (!spectrum?.data?.[0]) return;
+      const {
+        y
+      } = spectrum.data[0];
+      const {
+        pageValue
+      } = spectrum;
+      topicX.push(pageValue);
+      topicY.push(Math.max(...y));
+    });
+  }
   return {
-    topic,
-    feature,
-    hasEdit
+    topic: {
+      x: topicX,
+      y: topicY
+    },
+    feature: {
+      maxY: topicY.length ? Math.max(...topicY) : 0,
+      operation: {
+        layout
+      },
+      data: [{
+        x: topicX,
+        y: topicY
+      }],
+      isPeaktable: false
+    }
   };
 };
-const extrNi = (entity, thresSt) => {
+const extractMsParams = (entity, thresholdState, scanState, forceLcms = false) => {
+  const {
+    layout
+  } = entity;
+  if (_format.default.isMsLayout(layout) && !forceLcms) {
+    const scanIdx = getScanIdx(entity, scanState);
+    const {
+      spectra,
+      feature,
+      hasEdit
+    } = extractSharedParams(entity, thresholdState, scanIdx);
+    const topic = spectra?.[scanIdx]?.data?.[0] || {
+      x: [],
+      y: []
+    };
+    return {
+      topic,
+      feature,
+      hasEdit
+    };
+  }
+  const {
+    spectra,
+    features
+  } = entity;
+  const {
+    topic,
+    feature
+  } = extractLcmsParams(entity);
+  return {
+    entity,
+    spectra,
+    features,
+    topic,
+    feature
+  };
+};
+const extractNonMsParams = (entity, thresholdState) => {
   const scanIdx = 0;
   const {
     spectra,
@@ -70,8 +145,11 @@ const extrNi = (entity, thresSt) => {
     hasEdit,
     integration,
     multiplicity
-  } = extrShare(entity, thresSt, scanIdx);
-  const topic = spectra[0].data[0];
+  } = extractSharedParams(entity, thresholdState, scanIdx);
+  const topic = spectra?.[0]?.data?.[0] || {
+    x: [],
+    y: []
+  };
   return {
     topic,
     feature,
@@ -80,7 +158,13 @@ const extrNi = (entity, thresSt) => {
     multiplicity
   };
 };
-const extractParams = (entity, thresSt, scanSt) => _format.default.isMsLayout(entity.layout) ? extrMs(entity, thresSt, scanSt) : extrNi(entity, thresSt);
+const extractParams = (entity, thresholdState, scanState, options = {}) => {
+  const {
+    forceLcms = false
+  } = options;
+  const shouldUseLcmsPath = forceLcms || _format.default.isLCMsLayout(entity.layout);
+  return _format.default.isMsLayout(entity.layout) || shouldUseLcmsPath ? extractMsParams(entity, thresholdState, scanState, shouldUseLcmsPath) : extractNonMsParams(entity, thresholdState);
+};
 
 // eslint-disable-line
 exports.extractParams = extractParams;

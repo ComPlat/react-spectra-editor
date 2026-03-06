@@ -18,6 +18,8 @@ import { LIST_UI_SWEEP_TYPE } from '../../constants/list_ui';
 import TriBtn from './tri_btn';
 import { clearAllPeaks } from '../../actions/edit_peak';
 import { extractAutoPeaks } from '../../helpers/extractPeaksEdit';
+import { clearAllPeaksHplcMs } from '../../actions/hplc_ms';
+import { LIST_LAYOUT } from '../../constants/list_layout';
 
 const styles = () => (
   Object.assign(
@@ -32,29 +34,33 @@ const Peak = ({
   isFocusRmPeakSt, disableRmPeakSt,
   isFocusSetRefSt, disableSetRefSt,
   isHandleMaxAndMinPeaksSt,
-  cyclicVotaSt, curveSt,
+  cyclicVoltaState, curveSt,
   clearAllPeaksAct, feature,
-  editPeakSt, thresSt, shiftSt, layoutSt,
+  editPeakSt, thresSt, shiftSt, layoutSt, clearAllPeaksHplcMsAct,
 }) => {
   let onSweepPeakAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.PEAK_ADD);
-  let onSweepPeakDELETE = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.PEAK_DELETE);
+  let onSweepPeakDelete = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.PEAK_DELETE);
   let onSweepAnchorShift = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT);
   const { curveIdx } = curveSt;
   const onClearAll = () => {
-    const dataPeaks = extractAutoPeaks(feature, thresSt, shiftSt, layoutSt);
-    clearAllPeaksAct({ curveIdx, dataPeaks });
+    if (layoutSt === LIST_LAYOUT.LC_MS) {
+      clearAllPeaksHplcMsAct();
+    } else {
+      const dataPeaks = extractAutoPeaks(feature, thresSt, shiftSt, layoutSt);
+      clearAllPeaksAct({ curveIdx, dataPeaks });
+    }
   };
   if (isHandleMaxAndMinPeaksSt) {
-    const { spectraList } = cyclicVotaSt;
+    const { spectraList } = cyclicVoltaState;
     const spectra = spectraList[curveIdx];
     if (spectra) {
       const { isWorkMaxPeak } = spectra;
       if (isWorkMaxPeak) {
         onSweepPeakAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MAX_PEAK, curveIdx);
-        onSweepPeakDELETE = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MAX_PEAK, curveIdx);
+        onSweepPeakDelete = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MAX_PEAK, curveIdx);
       } else {
         onSweepPeakAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MIN_PEAK, curveIdx);
-        onSweepPeakDELETE = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MIN_PEAK, curveIdx);
+        onSweepPeakDelete = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MIN_PEAK, curveIdx);
       }
       onSweepAnchorShift = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_SET_REF, curveIdx);
     }
@@ -88,7 +94,7 @@ const Peak = ({
               )
             }
             disabled={disableRmPeakSt}
-            onClick={onSweepPeakDELETE}
+            onClick={onSweepPeakDelete}
           >
             <span className={classNames(classes.txt, 'txt-sv-bar-rmpeak')}>P-</span>
           </MuButton>
@@ -135,7 +141,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     isFocusSetRefSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT || state.ui.sweepType === LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_SET_REF,
     disableSetRefSt: Cfg.btnCmdSetRef(state.layout),
     isHandleMaxAndMinPeaksSt: !Cfg.hidePanelCyclicVolta(state.layout),
-    cyclicVotaSt: state.cyclicvolta,
+    cyclicVoltaState: state.cyclicvolta,
     curveSt: state.curve,
     editPeakSt: state.editPeak.present,
     thresSt: state.threshold.list[state.curve.curveIdx],
@@ -148,6 +154,7 @@ const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     setUiSweepTypeAct: setUiSweepType,
     clearAllPeaksAct: clearAllPeaks,
+    clearAllPeaksHplcMsAct: clearAllPeaksHplcMs,
   }, dispatch)
 );
 
@@ -161,7 +168,7 @@ Peak.propTypes = {
   disableSetRefSt: PropTypes.bool.isRequired,
   setUiSweepTypeAct: PropTypes.func.isRequired,
   isHandleMaxAndMinPeaksSt: PropTypes.bool.isRequired,
-  cyclicVotaSt: PropTypes.object.isRequired,
+  cyclicVoltaState: PropTypes.object.isRequired,
   curveSt: PropTypes.object.isRequired,
   clearAllPeaksAct: PropTypes.func.isRequired,
   feature: PropTypes.object.isRequired,
@@ -169,6 +176,7 @@ Peak.propTypes = {
   thresSt: PropTypes.object.isRequired,
   layoutSt: PropTypes.string.isRequired,
   shiftSt: PropTypes.object.isRequired,
+  clearAllPeaksHplcMsAct: PropTypes.func.isRequired,
 };
 
 export default compose(

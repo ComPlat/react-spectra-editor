@@ -4,14 +4,18 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.extractPeaksEdit = exports.extractAutoPeaks = exports.extractAreaUnderCurve = void 0;
-var _converter = require("./converter");
+exports.extractAutoPeaks = exports.extractAreaUnderCurve = void 0;
+exports.extractPeaksEdit = extractPeaksEdit;
+exports.formatLcmsIntegralsForBackend = formatLcmsIntegralsForBackend;
+exports.formatLcmsPeaksForBackend = formatLcmsPeaksForBackend;
+exports.getLcmsMzPageData = getLcmsMzPageData;
 var _chem = require("./chem");
 var _shift = require("./shift");
 var _format = _interopRequireDefault(require("./format"));
 var _integration = require("./integration");
-const niOffset = function (shiftSt) {
-  let atIndex = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+/* eslint-disable max-len */
+
+const niOffset = (shiftSt, atIndex = 0) => {
   const {
     shifts
   } = shiftSt;
@@ -27,17 +31,67 @@ const niOffset = function (shiftSt) {
   return offset;
 };
 const msOffset = () => 0;
-const extractPeaksEdit = function (feature, editPeakSt, thresSt, shiftSt, layoutSt) {
-  let atIndex = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 0;
-  const offset = _format.default.isMsLayout(layoutSt) ? msOffset() : niOffset(shiftSt, atIndex);
-  const peaks = (0, _chem.Convert2Peak)(feature, thresSt.value, offset);
-  const peaksEdit = (0, _converter.PksEdit)(peaks, editPeakSt);
-  return peaksEdit;
-};
-exports.extractPeaksEdit = extractPeaksEdit;
-const extractAutoPeaks = function (feature, thresSt, shiftSt, layoutSt) {
-  let atIndex = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 0;
-  const offset = _format.default.isMsLayout(layoutSt) ? msOffset() : niOffset(shiftSt, atIndex);
+function formatLcmsPeaksForBackend(hplcMsSt) {
+  const allPeaks = [];
+  if (hplcMsSt && hplcMsSt.uvvis && hplcMsSt.uvvis.spectraList) {
+    hplcMsSt.uvvis.spectraList.forEach(spectrum => {
+      if (spectrum.peaks && spectrum.peaks.length > 0) {
+        const {
+          pageValue
+        } = spectrum;
+        spectrum.peaks.forEach(peak => {
+          allPeaks.push({
+            ...peak,
+            wavelength: pageValue
+          });
+        });
+      }
+    });
+  }
+  return allPeaks;
+}
+function formatLcmsIntegralsForBackend(hplcMsSt) {
+  const allIntegrals = [];
+  if (hplcMsSt && hplcMsSt.uvvis && hplcMsSt.uvvis.spectraList) {
+    hplcMsSt.uvvis.spectraList.forEach(spectrum => {
+      if (spectrum.integrations && spectrum.integrations.length > 0) {
+        const {
+          pageValue
+        } = spectrum;
+        spectrum.integrations.forEach(integral => {
+          allIntegrals.push({
+            from: integral.xL,
+            to: integral.xU,
+            value: integral.area,
+            integral: integral.absoluteArea,
+            wavelength: pageValue
+          });
+        });
+      }
+    });
+  }
+  return allIntegrals;
+}
+function getLcmsMzPageData(hplcMsSt) {
+  const tic = hplcMsSt?.tic;
+  const ms = hplcMsSt?.ms;
+  if (!tic || !ms) return null;
+  const polarity = tic.polarity || 'positive';
+  let polarityKey = 'neutral';
+  if (polarity === 'negative') polarityKey = 'negative';else if (polarity === 'positive') polarityKey = 'positive';
+  const ticDataX = tic[polarityKey]?.data?.x;
+  if (!Array.isArray(ticDataX) || !Number.isFinite(tic.currentPageValue)) return null;
+  const currentIndex = ticDataX.findIndex(x => Math.abs(x - tic.currentPageValue) < 1e-6);
+  if (currentIndex < 0) return null;
+  const peaks = ms[polarityKey]?.peaks?.[currentIndex];
+  return Array.isArray(peaks) ? peaks : null;
+}
+function extractPeaksEdit(hplcMsSt) {
+  if (!hplcMsSt || !hplcMsSt.uvvis || !hplcMsSt.uvvis.spectraList) return [];
+  return hplcMsSt.uvvis.spectraList.flatMap(spectrum => spectrum.peaks || []);
+}
+const extractAutoPeaks = (feature, thresSt, shiftSt, layoutSt, atIndex = 0) => {
+  const offset = _format.default.isMsLayout(layoutSt) || _format.default.isLCMsLayout(layoutSt) ? msOffset() : niOffset(shiftSt, atIndex);
   const peaks = (0, _chem.Convert2Peak)(feature, thresSt.value, offset);
   return peaks;
 };

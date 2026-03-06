@@ -30,29 +30,33 @@ const Zoom = ({
   return (
     <span className={classes.group} data-testid="Zoom">
       <Tooltip title={<span className="txt-sv-tp">Zoom In</span>}>
-        <MuButton
-          className={
-            classNames(
-              focusStyle(isfocusZoomSt, classes),
-              'btn-sv-bar-zoomin',
-            )
-          }
-          onClick={onSweepZoomIn}
-        >
-          <ZoomInOutlinedIcon className={classNames(classes.icon, classes.iconWp)} />
-        </MuButton>
+        <span>
+          <MuButton
+            className={
+              classNames(
+                focusStyle(isfocusZoomSt, classes),
+                'btn-sv-bar-zoomin',
+              )
+            }
+            onClick={onSweepZoomIn}
+          >
+            <ZoomInOutlinedIcon className={classNames(classes.icon, classes.iconWp)} />
+          </MuButton>
+        </span>
       </Tooltip>
       <Tooltip title={<span className="txt-sv-tp">Reset Zoom</span>}>
-        <MuButton
-          className={
-            classNames(
-              'btn-sv-bar-zoomreset',
-            )
-          }
-          onClick={onSweepZoomReset}
-        >
-          <FindReplaceOutlinedIcon className={classes.icon} />
-        </MuButton>
+        <span>
+          <MuButton
+            className={
+              classNames(
+                'btn-sv-bar-zoomreset',
+              )
+            }
+            onClick={onSweepZoomReset}
+          >
+            <FindReplaceOutlinedIcon className={classes.icon} />
+          </MuButton>
+        </span>
       </Tooltip>
     </span>
   );

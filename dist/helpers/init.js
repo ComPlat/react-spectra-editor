@@ -8,8 +8,7 @@ exports.InitTip = exports.InitScale = exports.InitPathCall = exports.InitAxisCal
 var _d3Tip = _interopRequireDefault(require("d3-tip"));
 var _format = _interopRequireDefault(require("./format"));
 const d3 = require('d3');
-const InitScale = function (target) {
-  let reverse = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+const InitScale = (target, reverse = true) => {
   const xRange = reverse ? [target.w, 0] : [0, target.w];
   const x = d3.scaleLinear().range(xRange);
   const y = d3.scaleLinear().range([target.h, 0]);
@@ -46,25 +45,23 @@ const tpStyle = () => {
   const style = stBorder + stBorderRadius + stBackground + stColor + stPadding + stOpacity + stPadding + stZindex + stFontFamily;
   return style;
 };
-const tpDiv = (d, digits) => `
+const tpDiv = (d, digits, yFactor = 1) => `
   <div
     class="peak-tp"
     style="${tpStyle()}"
   >
     <span> x: ${_format.default.fixDigit(d.x, digits)}</span>
     <br/>
-    <span> y: ${d3.format('.2~e')(d.y)}</span>
+    <span> y: ${d3.format('.2~e')(d.y * (yFactor || 1))}</span>
   <div>
   `;
 const InitTip = () => {
   d3.select('.peak-tp').remove();
-  const tip = (0, _d3Tip.default)().attr('class', 'd3-tip').html(_ref => {
-    let {
-      d,
-      layout
-    } = _ref;
-    return tpDiv(d, _format.default.spectraDigit(layout));
-  });
+  const tip = (0, _d3Tip.default)().attr('class', 'd3-tip').html(({
+    d,
+    layout,
+    yFactor
+  }) => tpDiv(d, _format.default.spectraDigit(layout), yFactor || 1));
   return tip;
 };
 exports.InitTip = InitTip;

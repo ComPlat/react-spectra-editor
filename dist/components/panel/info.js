@@ -17,6 +17,7 @@ var _ExpandMore = _interopRequireDefault(require("@mui/icons-material/ExpandMore
 var _styles = require("@mui/styles");
 var _format = _interopRequireDefault(require("../../helpers/format"));
 var _meta = require("../../actions/meta");
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable no-mixed-operators, react/function-component-definition,
 react/require-default-props, max-len */
 
@@ -31,6 +32,18 @@ const styles = () => ({
   panelSummary: {
     backgroundColor: '#eee',
     height: 32
+  },
+  subSectionHeader: {
+    backgroundColor: '#eee',
+    height: 32,
+    lineHeight: '32px',
+    paddingLeft: 10,
+    textAlign: 'left',
+    fontWeight: 'bold',
+    fontSize: '0.8rem',
+    fontFamily: 'Helvetica',
+    borderTop: '1px solid #dcdcdc',
+    color: 'rgba(0, 0, 0, 0.87)'
   },
   panelDetail: {
     backgroundColor: '#fff',
@@ -81,16 +94,65 @@ const styles = () => ({
     fontSize: '0.8rem',
     fontFamily: 'Helvetica',
     textAlign: 'left'
+  },
+  quillContainer: {
+    margin: '10px 10px',
+    backgroundColor: '#fff',
+    '& .ql-container': {
+      border: 'none'
+    },
+    '& .ql-editor': {
+      minHeight: '60px'
+    },
+    '& .ql-editor.ql-blank::before': {
+      fontStyle: 'normal',
+      color: 'rgba(0, 0, 0, 0.54)'
+    }
   }
 });
 const simTitle = () => 'Simulated signals from NMRshiftDB';
 const simContent = nmrSimPeaks => nmrSimPeaks && nmrSimPeaks.sort((a, b) => a - b).join(', ');
-const aucValue = integration => {
-  if (!integration) {
-    return '';
+const normalizeQuillValue = val => {
+  if (!val) return '';
+  if (val === '<p><br></p>' || val === '<p></p>') return '';
+  return val;
+};
+const chemSubStyle = {
+  fontSize: '0.85em',
+  position: 'relative',
+  top: '0.24em',
+  lineHeight: 1
+};
+const renderReadableSubscript = (txt = '') => {
+  if (typeof txt !== 'string') return txt;
+  const regex = /([A-Za-z])(\d+)/g;
+  if (!regex.test(txt)) return txt;
+  regex.lastIndex = 0;
+  const parts = [];
+  let cursor = 0;
+  let match = regex.exec(txt);
+  while (match) {
+    const [raw, prefix, digits] = match;
+    const at = match.index;
+    if (at > cursor) parts.push(txt.slice(cursor, at));
+    parts.push(prefix);
+    parts.push(/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+      style: chemSubStyle,
+      children: digits
+    }, `${at}-${digits}`));
+    cursor = at + raw.length;
+    match = regex.exec(txt);
   }
+  if (cursor < txt.length) parts.push(txt.slice(cursor));
+  return parts;
+};
+const handleDescriptionChanged = (content, delta, source, editor, onDescriptionChanged) => {
+  if (!onDescriptionChanged) return;
+  onDescriptionChanged(normalizeQuillValue(content), delta, source, editor);
+};
+const aucValue = (integration, hplcMsSt) => {
   const values = [];
-  const stackIntegration = integration.stack;
+  const stackIntegration = integration?.stack;
   if (Array.isArray(stackIntegration)) {
     let sumVal = 0.0;
     stackIntegration.forEach(inte => {
@@ -108,15 +170,30 @@ const aucValue = integration => {
       }
     });
   }
-  return values.join(', ');
+  const spectraList = hplcMsSt?.uvvis?.spectraList || [];
+  const listWaveLength = hplcMsSt?.uvvis?.listWaveLength || [];
+  spectraList.forEach((spectrum, idx) => {
+    const wavelength = listWaveLength[idx];
+    const integrations = spectrum?.integrations || [];
+    if (integrations.length > 0) {
+      const sumArea = integrations.reduce((sum, integ) => sum + (integ.absoluteArea ?? integ.area ?? 0), 0);
+      const integrationStrings = integrations.map(integ => {
+        const rawArea = integ.absoluteArea ?? integ.area ?? 0;
+        const areaVal = rawArea.toFixed(2);
+        const percent = sumArea > 0 ? (rawArea * 100 / sumArea).toFixed(2) : '0.00';
+        return `${areaVal} (${percent}%)`;
+      });
+      values.push(`[${wavelength} nm]: ${integrationStrings.join(', ')}`);
+    }
+  });
+  return values.join('\n');
 };
-const SECData = _ref => {
-  let {
-    classes,
-    layout,
-    detector,
-    secData
-  } = _ref;
+const SECData = ({
+  classes,
+  layout,
+  detector,
+  secData
+}) => {
   if (_format.default.isSECLayout(layout) && secData) {
     const {
       d,
@@ -124,53 +201,72 @@ const SECData = _ref => {
       mp,
       mw
     } = secData;
-    return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("div", {
-      className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd)
-    }, /*#__PURE__*/_react.default.createElement("span", {
-      className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
-    }, "Detector: "), /*#__PURE__*/_react.default.createElement("span", {
-      className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
-    }, detector)), /*#__PURE__*/_react.default.createElement("div", {
-      className: (0, _classnames.default)(classes.rowRoot, classes.rowEven)
-    }, /*#__PURE__*/_react.default.createElement("span", {
-      className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
-    }, "D: "), /*#__PURE__*/_react.default.createElement("span", {
-      className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
-    }, d)), /*#__PURE__*/_react.default.createElement("div", {
-      className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd)
-    }, /*#__PURE__*/_react.default.createElement("span", {
-      className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
-    }, "MN: "), /*#__PURE__*/_react.default.createElement("span", {
-      className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
-    }, mn)), /*#__PURE__*/_react.default.createElement("div", {
-      className: (0, _classnames.default)(classes.rowRoot, classes.rowEven)
-    }, /*#__PURE__*/_react.default.createElement("span", {
-      className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
-    }, "MP: "), /*#__PURE__*/_react.default.createElement("span", {
-      className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
-    }, mp)), /*#__PURE__*/_react.default.createElement("div", {
-      className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd)
-    }, /*#__PURE__*/_react.default.createElement("span", {
-      className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
-    }, "MW: "), /*#__PURE__*/_react.default.createElement("span", {
-      className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
-    }, mw)));
+    return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+        className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd),
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt'),
+          children: "Detector: "
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
+          children: detector
+        })]
+      }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+        className: (0, _classnames.default)(classes.rowRoot, classes.rowEven),
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt'),
+          children: "D: "
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
+          children: d
+        })]
+      }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+        className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd),
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt'),
+          children: "MN: "
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
+          children: mn
+        })]
+      }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+        className: (0, _classnames.default)(classes.rowRoot, classes.rowEven),
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt'),
+          children: "MP: "
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
+          children: mp
+        })]
+      }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+        className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd),
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt'),
+          children: "MW: "
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
+          children: mw
+        })]
+      })]
+    });
   }
   return null;
 };
 SECData.propTypes = {
   classes: _propTypes.default.object.isRequired,
   layout: _propTypes.default.string.isRequired,
-  detector: _propTypes.default.object.isRequired,
-  secData: _propTypes.default.object.isRequired
+  detector: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.object]),
+  secData: _propTypes.default.object
 };
-const DSCData = _ref2 => {
-  let {
-    classes,
-    layout,
-    dscMetaData,
-    updateAction
-  } = _ref2;
+SECData.defaultProps = {
+  detector: ''
+};
+const DSCData = ({
+  classes,
+  layout,
+  dscMetaData,
+  updateAction
+}) => {
   if (_format.default.isDSCLayout(layout) && dscMetaData !== undefined) {
     const {
       meltingPoint,
@@ -188,57 +284,65 @@ const DSCData = _ref2 => {
       dataToUpdate[name] = value;
       updateAction(dataToUpdate);
     };
-    return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("div", {
-      className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd)
-    }, /*#__PURE__*/_react.default.createElement("span", {
-      className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
-    }, "Melting Point: "), /*#__PURE__*/_react.default.createElement("input", {
-      type: "text",
-      name: "meltingPoint",
-      className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
-      value: meltingPoint,
-      onChange: onChange
-    })), /*#__PURE__*/_react.default.createElement("div", {
-      className: (0, _classnames.default)(classes.rowRoot, classes.rowEven)
-    }, /*#__PURE__*/_react.default.createElement("span", {
-      className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
-    }, "TG: "), /*#__PURE__*/_react.default.createElement("input", {
-      type: "text",
-      name: "tg",
-      className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
-      value: tg,
-      onChange: onChange
-    })));
+    return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+        className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd),
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt'),
+          children: "Melting Point: "
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)("input", {
+          type: "text",
+          name: "meltingPoint",
+          className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
+          value: meltingPoint,
+          onChange: onChange
+        })]
+      }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+        className: (0, _classnames.default)(classes.rowRoot, classes.rowEven),
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt'),
+          children: "TG: "
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)("input", {
+          type: "text",
+          name: "tg",
+          className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
+          value: tg,
+          onChange: onChange
+        })]
+      })]
+    });
   }
   return null;
 };
 DSCData.propTypes = {
   classes: _propTypes.default.object.isRequired,
   layout: _propTypes.default.string.isRequired,
-  dscMetaData: _propTypes.default.object.isRequired,
+  dscMetaData: _propTypes.default.object,
   updateAction: _propTypes.default.func.isRequired
 };
-const InfoPanel = _ref3 => {
-  let {
-    classes,
-    expand,
-    feature,
-    integration,
-    editorOnly,
-    molSvg,
-    descriptions,
-    layoutSt,
-    simulationSt,
-    shiftSt,
-    curveSt,
-    exactMass,
-    onExapnd,
-    canChangeDescription,
-    onDescriptionChanged,
-    detectorSt,
-    metaSt,
-    updateDSCMetaDataAct
-  } = _ref3;
+const InfoPanel = ({
+  classes,
+  expand,
+  feature,
+  integration,
+  editorOnly,
+  molSvg,
+  descriptions,
+  layoutSt,
+  simulationSt,
+  shiftSt,
+  curveSt,
+  exactMass,
+  onExapnd,
+  onExpand,
+  canChangeDescription,
+  onDescriptionChanged,
+  detectorSt,
+  metaSt,
+  updateDSCMetaDataAct,
+  hplcMsSt,
+  entities
+}) => {
   if (!feature) return null;
   const {
     title,
@@ -253,11 +357,14 @@ const InfoPanel = _ref3 => {
     curveIdx
   } = curveSt;
   const {
-    curves
-  } = detectorSt;
+    curves = []
+  } = detectorSt || {};
+  const currentEntity = Array.isArray(entities) ? entities[curveIdx] : null;
+  const entityTitle = currentEntity?.entity?.title || currentEntity?.title || currentEntity?.spectra?.[0]?.title || currentEntity?.entity?.spectra?.[0]?.title || '';
+  const displayTitle = title || entityTitle;
   const getSelectedDetectorForCurve = (_detectorSt, targetCurveIdx) => {
     const targetCurve = curves.find(curve => curve.curveIdx === targetCurveIdx);
-    return targetCurve ? targetCurve.selectedDetector.name : '';
+    return targetCurve?.selectedDetector?.name || '';
   };
   let selectedDetector = getSelectedDetectorForCurve(detectorSt, curveIdx);
 
@@ -278,82 +385,143 @@ const InfoPanel = _ref3 => {
   if (integration) {
     originStack = integration.originStack; // eslint-disable-line
   }
-  return /*#__PURE__*/_react.default.createElement(_material.Accordion, {
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Accordion, {
     "data-testid": "PanelInfo",
     expanded: expand,
-    onChange: onExapnd,
-    className: (0, _classnames.default)(classes.panel),
+    onChange: onExpand || onExapnd,
+    disableGutters: true,
+    sx: {
+      '&.MuiAccordion-root.Mui-expanded': {
+        margin: 0
+      },
+      '&:before': {
+        display: 'none'
+      }
+    },
     TransitionProps: {
       unmountOnExit: true
     } // increase Accordion performance
-  }, /*#__PURE__*/_react.default.createElement(_material.AccordionSummary, {
-    expandIcon: /*#__PURE__*/_react.default.createElement(_ExpandMore.default, null),
-    className: (0, _classnames.default)(classes.panelSummary)
-  }, /*#__PURE__*/_react.default.createElement(_material.Typography, {
-    className: "txt-panel-header"
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title')
-  }, "Info"))), /*#__PURE__*/_react.default.createElement(_material.Divider, null), /*#__PURE__*/_react.default.createElement("div", {
-    className: (0, _classnames.default)(classes.panelDetail)
-  }, /*#__PURE__*/_react.default.createElement("div", {
-    className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd)
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
-  }, "Title : "), /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
-  }, title)), _format.default.isNmrLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement("div", {
-    className: (0, _classnames.default)(classes.rowRoot, classes.rowEven)
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
-  }, "Freq : "), /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
-  }, `${parseInt(observeFrequency, 10)} Hz` || ' - ')) : null, _format.default.isNmrLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement("div", {
-    className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd)
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
-  }, "Solv : "), /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
-  }, showSolvName)) : null, _format.default.isMsLayout(layoutSt) && exactMass ? /*#__PURE__*/_react.default.createElement("div", {
-    className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd)
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
-  }, "Exact mass: "), /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt')
-  }, `${parseFloat(exactMass).toFixed(6)} g/mol`)) : null, /*#__PURE__*/_react.default.createElement(SECData, {
-    classes: classes,
-    layout: layoutSt,
-    detector: selectedDetector,
-    secData: secData
-  }), !molSvg ? null : /*#__PURE__*/_react.default.createElement(_reactSvgFileZoomPan.default, {
-    svg: molSvg,
-    duration: 300,
-    resize: true
-  }), _format.default.isHplcUvVisLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement("div", {
-    className: (0, _classnames.default)(classes.rowRoot, classes.rowOddSim)
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
-  }, "Area under curve (AUC):"), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt')
-  }, aucValue(integration))) : null, /*#__PURE__*/_react.default.createElement(DSCData, {
-    classes: classes,
-    layout: layoutSt,
-    dscMetaData: dscMetaData,
-    updateAction: updateDSCMetaDataAct
-  })), !_format.default.isCyclicVoltaLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement(_reactQuill.default, {
-    className: (0, _classnames.default)(classes.quill, 'card-sv-quill'),
-    value: descriptions,
-    modules: {
-      toolbar: false
-    },
-    onChange: onDescriptionChanged,
-    readOnly: canChangeDescription !== undefined ? !canChangeDescription : true
-  }) : null, /*#__PURE__*/_react.default.createElement("div", null, !editorOnly && _format.default.isNmrLayout(layoutSt) ? /*#__PURE__*/_react.default.createElement("div", {
-    className: (0, _classnames.default)(classes.rowRoot, classes.rowOddSim)
-  }, /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')
-  }, simTitle(), ":"), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt')
-  }, simContent(simulationSt.nmrSimPeaks))) : null));
+    ,
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.AccordionSummary, {
+      expandIcon: /*#__PURE__*/(0, _jsxRuntime.jsx)(_ExpandMore.default, {}),
+      className: (0, _classnames.default)(classes.panelSummary),
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Typography, {
+        className: "txt-panel-header",
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title'),
+          children: "Info"
+        })
+      })
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Divider, {}), /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+      className: (0, _classnames.default)(classes.panelDetail),
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+        className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd),
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt'),
+          children: "Title : "
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
+          children: displayTitle
+        })]
+      }), _format.default.isNmrLayout(layoutSt) ? /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+        className: (0, _classnames.default)(classes.rowRoot, classes.rowEven),
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt'),
+          children: "Freq : "
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
+          children: `${parseInt(observeFrequency, 10)} MHz` || ' - '
+        })]
+      }) : null, _format.default.isNmrLayout(layoutSt) ? /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+        className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd),
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt'),
+          children: "Solv : "
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
+          children: renderReadableSubscript(showSolvName)
+        })]
+      }) : null, _format.default.isMsLayout(layoutSt) && exactMass ? /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+        className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd),
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt'),
+          children: "Exact mass: "
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
+          children: `${parseFloat(exactMass).toFixed(6)} g/mol`
+        })]
+      }) : null, /*#__PURE__*/(0, _jsxRuntime.jsx)(SECData, {
+        classes: classes,
+        layout: layoutSt,
+        detector: selectedDetector,
+        secData: secData
+      }), !molSvg ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_reactSvgFileZoomPan.default, {
+        svg: molSvg,
+        duration: 300,
+        resize: true
+      }), _format.default.isHplcUvVisLayout(layoutSt) ? /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+        className: (0, _classnames.default)(classes.rowRoot, classes.rowOddSim),
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt'),
+          children: "Area under curve (AUC):"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)("br", {}), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt'),
+          children: aucValue(integration)
+        })]
+      }) : null, /*#__PURE__*/(0, _jsxRuntime.jsx)(DSCData, {
+        classes: classes,
+        layout: layoutSt,
+        dscMetaData: dscMetaData,
+        updateAction: updateDSCMetaDataAct
+      }), !_format.default.isCyclicVoltaLayout(layoutSt) ? /*#__PURE__*/(0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+          className: classes.subSectionHeader,
+          children: "Content"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+          className: classes.quillContainer,
+          children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_reactQuill.default, {
+            className: (0, _classnames.default)(classes.quill, 'card-sv-quill'),
+            value: normalizeQuillValue(descriptions),
+            placeholder: canChangeDescription ? 'Peaks will be written here...' : undefined,
+            readOnly: !canChangeDescription,
+            modules: {
+              toolbar: false
+            },
+            onChange: (content, delta, source, editor) => handleDescriptionChanged(content, delta, source, editor, onDescriptionChanged)
+          })
+        })]
+      }) : null, !editorOnly && _format.default.isNmrLayout(layoutSt) ? /*#__PURE__*/(0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+          className: classes.subSectionHeader,
+          children: simTitle()
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+          className: (0, _classnames.default)(classes.rowRoot, classes.rowOddSim),
+          children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+            className: (0, _classnames.default)(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt'),
+            children: simContent(simulationSt.nmrSimPeaks)
+          })
+        })]
+      }) : null]
+    }), _format.default.isLCMsLayout(layoutSt) ? /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+      className: (0, _classnames.default)(classes.rowRoot, classes.rowOddSim),
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt'),
+        children: "Area under curve (AUC):"
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)("br", {}), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+        className: (0, _classnames.default)(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt'),
+        style: {
+          maxHeight: '80px',
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          wordBreak: 'break-word',
+          marginBottom: '100px'
+        },
+        children: aucValue(integration, hplcMsSt).split('\n').map((line, idx) => /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+          children: line
+        }, idx))
+      })]
+    }) : null]
+  });
 };
 const mapStateToProps = (state, props) => (
 // eslint-disable-line
@@ -363,7 +531,8 @@ const mapStateToProps = (state, props) => (
   shiftSt: state.shift,
   curveSt: state.curve,
   detectorSt: state.detector,
-  metaSt: state.meta
+  metaSt: state.meta,
+  hplcMsSt: state.hplcMs
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   updateDSCMetaDataAct: _meta.updateDSCMetaData
@@ -371,22 +540,25 @@ const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
 InfoPanel.propTypes = {
   classes: _propTypes.default.object.isRequired,
   expand: _propTypes.default.bool.isRequired,
-  feature: _propTypes.default.object.isRequired,
-  integration: _propTypes.default.object.isRequired,
+  feature: _propTypes.default.object,
+  integration: _propTypes.default.object,
   editorOnly: _propTypes.default.bool.isRequired,
   molSvg: _propTypes.default.string.isRequired,
-  descriptions: _propTypes.default.array.isRequired,
+  descriptions: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.array]).isRequired,
   layoutSt: _propTypes.default.string.isRequired,
-  simulationSt: _propTypes.default.array.isRequired,
+  simulationSt: _propTypes.default.object.isRequired,
   shiftSt: _propTypes.default.object.isRequired,
   curveSt: _propTypes.default.object.isRequired,
-  onExapnd: _propTypes.default.func.isRequired,
+  onExpand: _propTypes.default.func,
+  onExapnd: _propTypes.default.func,
   canChangeDescription: _propTypes.default.bool.isRequired,
   onDescriptionChanged: _propTypes.default.func,
   exactMass: _propTypes.default.string,
   detectorSt: _propTypes.default.object.isRequired,
   metaSt: _propTypes.default.object.isRequired,
-  updateDSCMetaDataAct: _propTypes.default.func.isRequired
+  updateDSCMetaDataAct: _propTypes.default.func.isRequired,
+  hplcMsSt: _propTypes.default.object.isRequired,
+  entities: _propTypes.default.array
 };
 var _default = exports.default = (0, _reactRedux.connect)(
 // eslint-disable-line

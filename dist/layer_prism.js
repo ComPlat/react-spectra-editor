@@ -16,104 +16,129 @@ var _index2 = _interopRequireDefault(require("./components/cmd_bar/index"));
 var _layer_content = _interopRequireDefault(require("./layer_content"));
 var _list_ui = require("./constants/list_ui");
 var _extractParams = require("./helpers/extractParams");
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, default-param-last,
 react/function-component-definition, react/require-default-props
 */
 
 const styles = () => ({});
-const LayerPrism = _ref => {
-  let {
-    entity,
-    cLabel,
-    xLabel,
-    yLabel,
-    forecast,
-    operations,
-    descriptions,
-    molSvg,
-    editorOnly,
-    theoryMass,
-    thresSt,
-    scanSt,
-    uiSt,
-    canChangeDescription,
-    onDescriptionChanged
-  } = _ref;
+const getThresholdState = state => {
+  const curveIdx = state?.curve?.curveIdx;
+  const thresholdList = state?.threshold?.list;
+  if (!Array.isArray(thresholdList)) return {};
+  if (!Number.isInteger(curveIdx)) return thresholdList[0] || {};
+  return thresholdList[curveIdx] || thresholdList[0] || {};
+};
+const LayerPrism = ({
+  entity,
+  cLabel,
+  xLabel,
+  yLabel,
+  forecast,
+  operations,
+  descriptions,
+  molSvg,
+  editorOnly,
+  exactMass,
+  thresSt,
+  scanSt,
+  uiSt,
+  canChangeDescription,
+  onDescriptionChanged,
+  entityFileNames,
+  userManualLink
+}) => {
   const {
     topic,
     feature,
     hasEdit,
-    integration
+    integration,
+    features
   } = (0, _extractParams.extractParams)(entity, thresSt, scanSt);
   if (!topic) return null;
   const {
     viewer
   } = uiSt;
   if (viewer === _list_ui.LIST_UI_VIEWER_TYPE.ANALYSIS) {
-    return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement(_index2.default, {
+    return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_index2.default, {
+        feature: feature,
+        hasEdit: hasEdit,
+        forecast: forecast,
+        operations: operations,
+        editorOnly: editorOnly
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+        className: "react-spectrum-editor",
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
+          container: true,
+          children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
+            item: true,
+            xs: 12,
+            children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_layer_content.default, {
+              topic: topic,
+              feature: feature,
+              features: features || [],
+              cLabel: cLabel,
+              xLabel: xLabel,
+              yLabel: yLabel,
+              forecast: forecast,
+              operations: operations
+            })
+          })
+        })
+      })]
+    });
+  }
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_index2.default, {
       feature: feature,
       hasEdit: hasEdit,
       forecast: forecast,
       operations: operations,
       editorOnly: editorOnly
-    }), /*#__PURE__*/_react.default.createElement("div", {
-      className: "react-spectrum-editor"
-    }, /*#__PURE__*/_react.default.createElement(_Grid.default, {
-      container: true
-    }, /*#__PURE__*/_react.default.createElement(_Grid.default, {
-      item: true,
-      xs: 12
-    }, /*#__PURE__*/_react.default.createElement(_layer_content.default, {
-      topic: topic,
-      feature: feature,
-      cLabel: cLabel,
-      xLabel: xLabel,
-      yLabel: yLabel,
-      forecast: forecast,
-      operations: operations
-    })))));
-  }
-  return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement(_index2.default, {
-    feature: feature,
-    hasEdit: hasEdit,
-    forecast: forecast,
-    operations: operations,
-    editorOnly: editorOnly
-  }), /*#__PURE__*/_react.default.createElement("div", {
-    className: "react-spectrum-editor"
-  }, /*#__PURE__*/_react.default.createElement(_Grid.default, {
-    container: true
-  }, /*#__PURE__*/_react.default.createElement(_Grid.default, {
-    item: true,
-    xs: 9
-  }, /*#__PURE__*/_react.default.createElement(_layer_content.default, {
-    topic: topic,
-    feature: feature,
-    cLabel: cLabel,
-    xLabel: xLabel,
-    yLabel: yLabel,
-    forecast: forecast,
-    operations: operations
-  })), /*#__PURE__*/_react.default.createElement(_Grid.default, {
-    item: true,
-    xs: 3,
-    align: "center"
-  }, /*#__PURE__*/_react.default.createElement(_index.default, {
-    feature: feature,
-    integration: integration,
-    editorOnly: editorOnly,
-    molSvg: molSvg,
-    theoryMass: theoryMass,
-    descriptions: descriptions,
-    canChangeDescription: canChangeDescription,
-    onDescriptionChanged: onDescriptionChanged
-  })))));
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+      className: "react-spectrum-editor",
+      children: /*#__PURE__*/(0, _jsxRuntime.jsxs)(_Grid.default, {
+        container: true,
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
+          item: true,
+          xs: 9,
+          children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_layer_content.default, {
+            topic: topic,
+            feature: feature,
+            features: features || [],
+            cLabel: cLabel,
+            xLabel: xLabel,
+            yLabel: yLabel,
+            forecast: forecast,
+            operations: operations
+          })
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
+          item: true,
+          xs: 3,
+          align: "center",
+          children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_index.default, {
+            feature: feature,
+            integration: integration,
+            editorOnly: editorOnly,
+            molSvg: molSvg,
+            exactMass: exactMass,
+            entityFileNames: entityFileNames,
+            userManualLink: userManualLink,
+            descriptions: descriptions,
+            canChangeDescription: canChangeDescription,
+            onDescriptionChanged: onDescriptionChanged
+          })
+        })]
+      })
+    })]
+  });
 };
 const mapStateToProps = (state, props) => (
 // eslint-disable-line
 {
   scanSt: state.scan,
-  thresSt: state.threshold.list[state.curve.curveIdx],
+  thresSt: getThresholdState(state),
   uiSt: state.ui
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({}, dispatch);
@@ -124,7 +149,7 @@ LayerPrism.propTypes = {
   yLabel: _propTypes.default.string.isRequired,
   molSvg: _propTypes.default.string.isRequired,
   editorOnly: _propTypes.default.bool.isRequired,
-  theoryMass: _propTypes.default.string,
+  exactMass: _propTypes.default.string,
   forecast: _propTypes.default.object.isRequired,
   operations: _propTypes.default.array.isRequired,
   descriptions: _propTypes.default.array.isRequired,
@@ -132,7 +157,9 @@ LayerPrism.propTypes = {
   scanSt: _propTypes.default.object.isRequired,
   uiSt: _propTypes.default.object.isRequired,
   canChangeDescription: _propTypes.default.bool.isRequired,
-  onDescriptionChanged: _propTypes.default.func
+  onDescriptionChanged: _propTypes.default.func,
+  entityFileNames: _propTypes.default.array,
+  userManualLink: _propTypes.default.object
 };
 var _default = exports.default = (0, _reactRedux.connect)(
 // eslint-disable-line

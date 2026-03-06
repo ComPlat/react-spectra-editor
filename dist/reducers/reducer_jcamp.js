@@ -14,11 +14,10 @@ const initialState = {
     addOthersCb: false
   }]
 };
-const addOthers = (state, _ref) => {
-  let {
-    others,
-    addOthersCb
-  } = _ref;
+const addOthers = (state, {
+  others,
+  addOthersCb
+}) => {
   const {
     selectedIdx,
     jcamps
@@ -81,9 +80,7 @@ const toggleShow = (state, payload) => {
     jcamps
   });
 };
-const layoutReducer = function () {
-  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-  let action = arguments.length > 1 ? arguments[1] : undefined;
+const layoutReducer = (state = initialState, action) => {
   switch (action.type) {
     case _action_type.JCAMP.ADD_OTHERS:
       return addOthers(state, action.payload);

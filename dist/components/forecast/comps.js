@@ -16,6 +16,7 @@ var _Help = _interopRequireDefault(require("@mui/icons-material/Help"));
 var _material = require("@mui/material");
 var _CloudOff = _interopRequireDefault(require("@mui/icons-material/CloudOff"));
 var _section_loading = _interopRequireDefault(require("./section_loading"));
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable react/function-component-definition, react/destructuring-assignment,
 max-len */
 
@@ -33,157 +34,193 @@ const titleStyle = {
 const txtStyle = {
   lineHeight: '20px'
 };
-const TxtLabel = function (classes, label) {
-  let extClsName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'txt-label';
-  return /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtLabel, extClsName)
-  }, label);
-};
+const TxtLabel = (classes, label, extClsName = 'txt-label') => /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+  className: (0, _classnames.default)(classes.txtLabel, extClsName),
+  children: label
+});
 exports.TxtLabel = TxtLabel;
 const StatusIcon = status => {
   switch (status) {
     case 'accept':
-      return /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
-        title: /*#__PURE__*/_react.default.createElement("span", {
-          className: "txt-sv-tp"
-        }, "Accept"),
-        placement: "left"
-      }, /*#__PURE__*/_react.default.createElement(_CheckCircleOutline.default, {
-        style: {
-          color: '#4caf50'
-        }
-      }));
+      return /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tooltip, {
+        title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: "txt-sv-tp",
+          children: "Accept"
+        }),
+        placement: "left",
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_CheckCircleOutline.default, {
+          style: {
+            color: '#4caf50'
+          }
+        })
+      });
     case 'warning':
-      return /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
-        title: /*#__PURE__*/_react.default.createElement("span", {
-          className: "txt-sv-tp"
-        }, "Warning"),
-        placement: "left"
-      }, /*#__PURE__*/_react.default.createElement(_ErrorOutline.default, {
-        style: {
-          color: '#ffc107'
-        }
-      }));
+      return /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tooltip, {
+        title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: "txt-sv-tp",
+          children: "Warning"
+        }),
+        placement: "left",
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_ErrorOutline.default, {
+          style: {
+            color: '#ffc107'
+          }
+        })
+      });
     case 'reject':
-      return /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
-        title: /*#__PURE__*/_react.default.createElement("span", {
-          className: "txt-sv-tp"
-        }, "Reject"),
-        placement: "left"
-      }, /*#__PURE__*/_react.default.createElement(_HighlightOff.default, {
-        style: {
-          color: '#e91e63'
-        }
-      }));
+      return /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tooltip, {
+        title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: "txt-sv-tp",
+          children: "Reject"
+        }),
+        placement: "left",
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_HighlightOff.default, {
+          style: {
+            color: '#e91e63'
+          }
+        })
+      });
     case 'missing':
-      return /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
-        title: /*#__PURE__*/_react.default.createElement("span", {
-          className: "txt-sv-tp"
-        }, "Missing"),
-        placement: "left"
-      }, /*#__PURE__*/_react.default.createElement(_HelpOutline.default, {
-        style: {
-          color: '#5d4037'
-        }
-      }));
+      return /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tooltip, {
+        title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: "txt-sv-tp",
+          children: "Missing"
+        }),
+        placement: "left",
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_HelpOutline.default, {
+          style: {
+            color: '#5d4037'
+          }
+        })
+      });
     case 'unknown':
-      return /*#__PURE__*/_react.default.createElement(_material.Tooltip, {
-        title: /*#__PURE__*/_react.default.createElement("span", {
-          className: "txt-sv-tp"
-        }, "Not Support"),
-        placement: "left"
-      }, /*#__PURE__*/_react.default.createElement(_Help.default, {
-        style: {
-          color: '#5d4037'
-        }
-      }));
+      return /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tooltip, {
+        title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: "txt-sv-tp",
+          children: "Not Support"
+        }),
+        placement: "left",
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_Help.default, {
+          style: {
+            color: '#5d4037'
+          }
+        })
+      });
     default:
       return null;
   }
 };
 exports.StatusIcon = StatusIcon;
-const ConfidenceLabel = function (classes, confidence) {
-  let extClsName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'txt-label';
-  if (!confidence) return /*#__PURE__*/_react.default.createElement("span", null, " - - ");
+const ConfidenceLabel = (classes, confidence, extClsName = 'txt-label') => {
+  if (!confidence) return /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+    children: " - - "
+  });
   const confidenceDp = parseFloat(Math.round(confidence * 100) / 100).toFixed(2);
-  return /*#__PURE__*/_react.default.createElement("span", {
-    className: (0, _classnames.default)(classes.txtLabel, extClsName)
-  }, `${confidenceDp} %`);
+  return /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+    className: (0, _classnames.default)(classes.txtLabel, extClsName),
+    children: `${confidenceDp} %`
+  });
 };
 exports.ConfidenceLabel = ConfidenceLabel;
 const sectionInput = (classes, molecule, inputFuncCb) => {
   if (!inputFuncCb) return null;
-  return /*#__PURE__*/_react.default.createElement("div", {
-    className: (0, _classnames.default)(classes.inputRoot)
-  }, /*#__PURE__*/_react.default.createElement(_material.Grid, {
-    container: true
-  }, /*#__PURE__*/_react.default.createElement(_material.Grid, {
-    item: true,
-    xs: 6
-  }, /*#__PURE__*/_react.default.createElement(_material.TextField, {
-    fullWidth: true,
-    label: TxtLabel(classes, 'Molfile', 'txt-mol-label'),
-    margin: "normal",
-    multiline: true,
-    onChange: inputFuncCb,
-    rows: "2",
-    variant: "outlined",
-    value: molecule
-  }))));
+  return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+    className: (0, _classnames.default)(classes.inputRoot),
+    children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Grid, {
+      container: true,
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Grid, {
+        item: true,
+        xs: 6,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TextField, {
+          fullWidth: true,
+          label: TxtLabel(classes, 'Molfile', 'txt-mol-label'),
+          margin: "normal",
+          multiline: true,
+          onChange: inputFuncCb,
+          rows: "2",
+          variant: "outlined",
+          value: molecule
+        })
+      })
+    })
+  });
 };
 exports.sectionInput = sectionInput;
-const SectionRunning = () => /*#__PURE__*/_react.default.createElement("div", {
-  style: titleStyle
-}, /*#__PURE__*/_react.default.createElement("h2", {
-  style: txtStyle
-}, /*#__PURE__*/_react.default.createElement(_material.CircularProgress, {
-  style: {
-    color: 'blue',
-    fontSize: 50
-  }
-}), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("p", null, "The server is making predictions...")));
-const SectionMissMatch = () => /*#__PURE__*/_react.default.createElement("div", {
-  style: titleStyle
-}, /*#__PURE__*/_react.default.createElement("h2", {
-  style: txtStyle
-}, /*#__PURE__*/_react.default.createElement(_ErrorOutline.default, {
-  style: {
-    color: 'red',
-    fontSize: 50
-  }
-}), /*#__PURE__*/_react.default.createElement("p", {
-  className: "txt-predict-fail"
-}, "Peak & Element count mismatch!"), /*#__PURE__*/_react.default.createElement("p", {
-  className: "txt-predict-fail"
-}, /*#__PURE__*/_react.default.createElement("sup", null, "1"), "H multiplicity count should not be more than the proton group count. Multiplicity must be assigned manulally before predictions."), /*#__PURE__*/_react.default.createElement("p", {
-  className: "txt-predict-fail"
-}, /*#__PURE__*/_react.default.createElement("sup", null, "13"), "C peak count should not be more than the carbon count, and solvent peaks should be excluded.")));
-const SectionNoService = () => /*#__PURE__*/_react.default.createElement("div", {
-  style: titleStyle
-}, /*#__PURE__*/_react.default.createElement("h2", {
-  style: txtStyle
-}, /*#__PURE__*/_react.default.createElement(_CloudOff.default, {
-  style: {
-    color: 'red',
-    fontSize: 50
-  }
-}), /*#__PURE__*/_react.default.createElement("p", null, "Service is not available."), /*#__PURE__*/_react.default.createElement("p", null, "Please try it again later.")));
-const SectionUnknown = () => /*#__PURE__*/_react.default.createElement("div", {
-  style: titleStyle
-}, /*#__PURE__*/_react.default.createElement("h2", {
-  style: txtStyle
-}, /*#__PURE__*/_react.default.createElement(_HelpOutline.default, {
-  style: {
-    color: 'purple',
-    fontSize: 50
-  }
-}), /*#__PURE__*/_react.default.createElement("p", null, "Unknown state.")));
+const SectionRunning = () => /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+  style: titleStyle,
+  children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("h2", {
+    style: txtStyle,
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.CircularProgress, {
+      style: {
+        color: 'blue',
+        fontSize: 50
+      }
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)("br", {}), /*#__PURE__*/(0, _jsxRuntime.jsx)("br", {}), /*#__PURE__*/(0, _jsxRuntime.jsx)("p", {
+      children: "The server is making predictions..."
+    })]
+  })
+});
+const SectionMissMatch = () => /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+  style: titleStyle,
+  children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("h2", {
+    style: txtStyle,
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_ErrorOutline.default, {
+      style: {
+        color: 'red',
+        fontSize: 50
+      }
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)("p", {
+      className: "txt-predict-fail",
+      children: "Peak & Element count mismatch!"
+    }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("p", {
+      className: "txt-predict-fail",
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("sup", {
+        children: "1"
+      }), "H multiplicity count should not be more than the proton group count. Multiplicity must be assigned manulally before predictions."]
+    }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("p", {
+      className: "txt-predict-fail",
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("sup", {
+        children: "13"
+      }), "C peak count should not be more than the carbon count, and solvent peaks should be excluded."]
+    })]
+  })
+});
+const SectionNoService = () => /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+  style: titleStyle,
+  children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("h2", {
+    style: txtStyle,
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_CloudOff.default, {
+      style: {
+        color: 'red',
+        fontSize: 50
+      }
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)("p", {
+      children: "Service is not available."
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)("p", {
+      children: "Please try it again later."
+    })]
+  })
+});
+const SectionUnknown = () => /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+  style: titleStyle,
+  children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("h2", {
+    style: txtStyle,
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_HelpOutline.default, {
+      style: {
+        color: 'purple',
+        fontSize: 50
+      }
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)("p", {
+      children: "Unknown state."
+    })]
+  })
+});
 const notToRenderAnalysis = pds => {
-  if (pds.running) return /*#__PURE__*/_react.default.createElement(SectionRunning, null);
-  if (!pds.outline || !pds.outline.code) return /*#__PURE__*/_react.default.createElement("div", null);
-  if (pds.outline.code >= 500) return /*#__PURE__*/_react.default.createElement(SectionNoService, null);
-  if (pds.outline.code === 400) return /*#__PURE__*/_react.default.createElement(SectionMissMatch, null);
-  if (pds.outline.code >= 300) return /*#__PURE__*/_react.default.createElement(SectionUnknown, null);
+  if (pds.running) return /*#__PURE__*/(0, _jsxRuntime.jsx)(SectionRunning, {});
+  if (!pds.outline || !pds.outline.code) return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {});
+  if (pds.outline.code >= 500) return /*#__PURE__*/(0, _jsxRuntime.jsx)(SectionNoService, {});
+  if (pds.outline.code === 400) return /*#__PURE__*/(0, _jsxRuntime.jsx)(SectionMissMatch, {});
+  if (pds.outline.code >= 300) return /*#__PURE__*/(0, _jsxRuntime.jsx)(SectionUnknown, {});
   return false;
 };
 exports.notToRenderAnalysis = notToRenderAnalysis;
@@ -192,8 +229,8 @@ const sectionSvg = (classes, predictions) => {
   if (renderMsg) return null;
   if (!predictions.output) return null;
   const targetSvg = predictions.output.result[0].svgs[0];
-  if (!targetSvg) return /*#__PURE__*/_react.default.createElement(_section_loading.default, null);
-  return /*#__PURE__*/_react.default.createElement(_reactSvgFileZoomPan.default, {
+  if (!targetSvg) return /*#__PURE__*/(0, _jsxRuntime.jsx)(_section_loading.default, {});
+  return /*#__PURE__*/(0, _jsxRuntime.jsx)(_reactSvgFileZoomPan.default, {
     svg: targetSvg,
     duration: 300,
     resize: true

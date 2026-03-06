@@ -169,16 +169,15 @@ class RectFocus {
     this.dataPks = (0, _converter.PksEdit)(this.dataPks, editPeakSt);
     return this.dataPks;
   }
-  create(_ref) {
-    let {
-      filterSeed,
-      filterPeak,
-      tTrEndPts,
-      tSfPeaks,
-      sweepExtentSt,
-      isUiAddIntgSt,
-      isUiNoBrushSt
-    } = _ref;
+  create({
+    filterSeed,
+    filterPeak,
+    tTrEndPts,
+    tSfPeaks,
+    sweepExtentSt,
+    isUiAddIntgSt,
+    isUiNoBrushSt
+  }) {
     this.svg = d3.select('.d3Svg');
     (0, _mount.MountMainFrame)(this, 'focus');
     (0, _mount.MountClip)(this);
@@ -201,16 +200,15 @@ class RectFocus {
     }
     (0, _brush.default)(this, isUiAddIntgSt, isUiNoBrushSt);
   }
-  update(_ref2) {
-    let {
-      filterSeed,
-      filterPeak,
-      tTrEndPts,
-      tSfPeaks,
-      sweepExtentSt,
-      isUiAddIntgSt,
-      isUiNoBrushSt
-    } = _ref2;
+  update({
+    filterSeed,
+    filterPeak,
+    tTrEndPts,
+    tSfPeaks,
+    sweepExtentSt,
+    isUiAddIntgSt,
+    isUiNoBrushSt
+  }) {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks);
     if (this.data && this.data.length > 0) {

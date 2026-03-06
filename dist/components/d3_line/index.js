@@ -15,7 +15,9 @@ var _ui = require("../../actions/ui");
 var _line_focus = _interopRequireDefault(require("./line_focus"));
 var _draw = require("../common/draw");
 var _list_ui = require("../../constants/list_ui");
+var _list_graph = require("../../constants/list_graph");
 var _cyclic_voltammetry = require("../../actions/cyclic_voltammetry");
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable no-mixed-operators */
 
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
@@ -29,7 +31,7 @@ class ViewerLine extends _react.default.Component {
       selectUiSweepAct,
       scrollUiWheelAct
     } = props;
-    this.rootKlass = '.d3Line';
+    this.rootKlass = `.${_list_graph.LIST_ROOT_SVG_GRAPH.LINE}`;
     this.focus = new _line_focus.default({
       W,
       H,
@@ -53,7 +55,7 @@ class ViewerLine extends _react.default.Component {
       tSfPeaks,
       editPeakSt,
       layoutSt,
-      integationSt,
+      integrationSt,
       mtplySt,
       sweepExtentSt,
       isUiAddIntgSt,
@@ -61,7 +63,8 @@ class ViewerLine extends _react.default.Component {
       isHidden,
       wavelength,
       axesUnitsSt,
-      resetAllAct
+      resetAllAct,
+      uiSt
     } = this.props;
     (0, _draw.drawDestroy)(this.rootKlass);
     resetAllAct(feature);
@@ -90,12 +93,13 @@ class ViewerLine extends _react.default.Component {
       tSfPeaks,
       editPeakSt,
       layoutSt,
-      integationSt,
+      integrationSt,
       mtplySt,
       sweepExtentSt,
       isUiAddIntgSt,
       isUiNoBrushSt,
-      wavelength
+      wavelength,
+      uiSt
     });
     (0, _draw.drawLabel)(this.rootKlass, cLabel, xxLabel, yyLabel);
     (0, _draw.drawDisplay)(this.rootKlass, isHidden);
@@ -113,14 +117,15 @@ class ViewerLine extends _react.default.Component {
       tSfPeaks,
       editPeakSt,
       layoutSt,
-      integationSt,
+      integrationSt,
       mtplySt,
       sweepExtentSt,
       isUiAddIntgSt,
       isUiNoBrushSt,
       isHidden,
       wavelength,
-      axesUnitsSt
+      axesUnitsSt,
+      uiSt
     } = this.props;
     this.normChange(prevProps);
     let xxLabel = xLabel;
@@ -147,12 +152,13 @@ class ViewerLine extends _react.default.Component {
       tSfPeaks,
       editPeakSt,
       layoutSt,
-      integationSt,
+      integrationSt,
       mtplySt,
       sweepExtentSt,
       isUiAddIntgSt,
       isUiNoBrushSt,
-      wavelength
+      wavelength,
+      uiSt
     });
     (0, _draw.drawLabel)(this.rootKlass, cLabel, xxLabel, yyLabel);
     (0, _draw.drawDisplay)(this.rootKlass, isHidden);
@@ -171,8 +177,8 @@ class ViewerLine extends _react.default.Component {
     }
   }
   render() {
-    return /*#__PURE__*/_react.default.createElement("div", {
-      className: "d3Line"
+    return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+      className: _list_graph.LIST_ROOT_SVG_GRAPH.LINE
     });
   }
 }
@@ -185,13 +191,14 @@ const mapStateToProps = (state, props) => ({
   tSfPeaks: (0, _chem.ToShiftPeaks)(state, props),
   editPeakSt: state.editPeak.present,
   layoutSt: state.layout,
-  integationSt: state.integration.present,
+  integrationSt: state.integration.present,
   mtplySt: state.multiplicity.present,
   sweepExtentSt: state.ui.sweepExtent,
   isUiAddIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
   isUiNoBrushSt: _list_ui.LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
   wavelength: state.wavelength,
-  axesUnitsSt: state.axesUnits
+  axesUnitsSt: state.axesUnits,
+  uiSt: state.ui
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   resetAllAct: _manager.resetAll,
@@ -207,6 +214,7 @@ ViewerLine.propTypes = {
   peak: _propTypes.default.array.isRequired,
   freq: _propTypes.default.oneOfType([_propTypes.default.bool, _propTypes.default.number]).isRequired,
   comparisons: _propTypes.default.array.isRequired,
+  uiSt: _propTypes.default.object.isRequired,
   cLabel: _propTypes.default.string.isRequired,
   xLabel: _propTypes.default.string.isRequired,
   yLabel: _propTypes.default.string.isRequired,
@@ -215,7 +223,7 @@ ViewerLine.propTypes = {
   tSfPeaks: _propTypes.default.array.isRequired,
   editPeakSt: _propTypes.default.object.isRequired,
   layoutSt: _propTypes.default.string.isRequired,
-  integationSt: _propTypes.default.object.isRequired,
+  integrationSt: _propTypes.default.object.isRequired,
   mtplySt: _propTypes.default.object.isRequired,
   sweepExtentSt: _propTypes.default.object.isRequired,
   isUiAddIntgSt: _propTypes.default.bool.isRequired,

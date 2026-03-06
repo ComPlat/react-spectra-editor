@@ -4,27 +4,28 @@ import { LIST_SHIFT_1H } from "../../../constants/list_shift";
 
 describe('Test extract edited peaks and area under curve', () => {
   describe('Test extract edited peaks', () => {
-    const editPeakSt = {
-      peaks: { x: [1, 2], y: [1, 2]},
-      selectedIdx: 0
-    }
-    const feature = { data: [{ x: [1, 2, 3], y: [1, 2, 3] }],  operation: { layout: '1H'}, maxY: 2, peakUp: true }
-    const threshold = { value: 55 }
-    const shiftSt = {
-      shifts: [
-        { ref: LIST_SHIFT_1H[1], peak: { x: 2, y: 2 } }
-      ]
+    const hplcMsSt = {
+      uvvis: {
+        spectraList: [
+          {
+            peaks: [{ x: 2, y: 2 }, { x: 3, y: 3 }],
+          },
+          {
+            peaks: [{ x: 4, y: 4 }],
+          },
+        ],
+      },
     }
 
-    it('Extract with MS layout', () => {
-      const peaks = extractPeaksEdit(feature, editPeakSt, threshold, shiftSt, LIST_LAYOUT.MS)
-      const expectedPeaks = [{x: 2, y: 2}, {x: 3, y: 3}]
+    it('Extract flattened peaks from LCMS spectra list', () => {
+      const peaks = extractPeaksEdit(hplcMsSt)
+      const expectedPeaks = [{ x: 2, y: 2 }, { x: 3, y: 3 }, { x: 4, y: 4 }]
       expect(peaks).toEqual(expectedPeaks)
     })
 
-    it('Extract with non-MS layout', () => {
-      const peaks = extractPeaksEdit(feature, editPeakSt, threshold, shiftSt, LIST_LAYOUT.H1)
-      const expectedPeaks = [{x: 2.04, y: 2}, {x: 3.04, y: 3}]
+    it('Return empty array when LCMS state is missing', () => {
+      const peaks = extractPeaksEdit(null)
+      const expectedPeaks = []
       expect(peaks).toEqual(expectedPeaks)
     })
   })

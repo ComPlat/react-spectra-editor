@@ -27,9 +27,7 @@ const updateMetaData = (state, action) => {
     dscMetaData
   });
 };
-const metaReducer = function () {
-  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-  let action = arguments.length > 1 ? arguments[1] : undefined;
+const metaReducer = (state = initialState, action) => {
   switch (action.type) {
     case _action_type.META.UPDATE_PEAKS_RDC:
       return Object.assign({}, state, action.payload);

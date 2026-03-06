@@ -16,43 +16,52 @@ var _Tooltip = _interopRequireDefault(require("@mui/material/Tooltip"));
 var _RedoOutlined = _interopRequireDefault(require("@mui/icons-material/RedoOutlined"));
 var _UndoOutlined = _interopRequireDefault(require("@mui/icons-material/UndoOutlined"));
 var _common = require("./common");
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, function-paren-newline,
 react/function-component-definition, react/require-default-props, max-len,
 react/no-unused-prop-types */
 
 const styles = () => Object.assign({}, _common.commonStyle);
-const UndoRedo = _ref => {
-  let {
-    classes,
-    canUndo,
-    canRedo,
-    onUndoAct,
-    onRedoAct
-  } = _ref;
-  return /*#__PURE__*/_react.default.createElement("span", {
-    className: classes.group
-  }, /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
-    title: /*#__PURE__*/_react.default.createElement("span", {
-      className: "txt-sv-tp"
-    }, "Undo")
-  }, /*#__PURE__*/_react.default.createElement("span", null, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
-    className: (0, _classnames.default)('btn-sv-bar-undo'),
-    disabled: !canUndo,
-    onClick: onUndoAct
-  }, /*#__PURE__*/_react.default.createElement(_UndoOutlined.default, {
-    className: classes.icon
-  })))), /*#__PURE__*/_react.default.createElement(_Tooltip.default, {
-    title: /*#__PURE__*/_react.default.createElement("span", {
-      className: "txt-sv-tp"
-    }, "Redo")
-  }, /*#__PURE__*/_react.default.createElement("span", null, /*#__PURE__*/_react.default.createElement(_common.MuButton, {
-    className: (0, _classnames.default)('btn-sv-bar-redo'),
-    disabled: !canRedo,
-    onClick: onRedoAct
-  }, /*#__PURE__*/_react.default.createElement(_RedoOutlined.default, {
-    className: classes.icon
-  })))));
-};
+const UndoRedo = ({
+  classes,
+  canUndo,
+  canRedo,
+  onUndoAct,
+  onRedoAct
+}) => /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+  className: classes.group,
+  children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
+    title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+      className: "txt-sv-tp",
+      children: "Undo"
+    }),
+    children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
+        className: (0, _classnames.default)('btn-sv-bar-undo'),
+        disabled: !canUndo,
+        onClick: onUndoAct,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_UndoOutlined.default, {
+          className: classes.icon
+        })
+      })
+    })
+  }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
+    title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+      className: "txt-sv-tp",
+      children: "Redo"
+    }),
+    children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
+        className: (0, _classnames.default)('btn-sv-bar-redo'),
+        disabled: !canRedo,
+        onClick: onRedoAct,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_RedoOutlined.default, {
+          className: classes.icon
+        })
+      })
+    })
+  })]
+});
 const canUndoFunc = state => state.editPeak.past.length > 0 || state.integration.past.length > 0 || state.multiplicity.past.length > 0;
 const canRedoFunc = state => state.editPeak.future.length > 0 || state.integration.future.length > 0 || state.multiplicity.future.length > 0;
 const mapStateToProps = (state, _) => (

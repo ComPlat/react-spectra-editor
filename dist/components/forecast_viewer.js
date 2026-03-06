@@ -16,6 +16,7 @@ var _ir_viewer = _interopRequireDefault(require("./forecast/ir_viewer"));
 var _forecast = require("../actions/forecast");
 var _ui = require("../actions/ui");
 var _list_ui = require("../constants/list_ui");
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable react/no-unused-prop-types */
 
 const styles = () => ({
@@ -94,23 +95,24 @@ class ForecastViewer extends _react.default.Component {
       jcamps
     } = jcampSt;
     const comparisons = jcamps[curveIdx].others;
-    return /*#__PURE__*/_react.default.createElement("div", {
-      className: classes.root
-    }, /*#__PURE__*/_react.default.createElement(_index.default, {
-      topic: topic,
-      feature: feature,
-      cLabel: cLabel,
-      xLabel: isXRD && wavelength ? `${xLabel}, WL=${wavelength.value} ${wavelength.unit}` : xLabel,
-      yLabel: yLabel,
-      comparisons: comparisons,
-      isHidden: viewer !== _list_ui.LIST_UI_VIEWER_TYPE.SPECTRUM
-    }), viewer === _list_ui.LIST_UI_VIEWER_TYPE.ANALYSIS && isNmr && /*#__PURE__*/_react.default.createElement(_nmr_viewer.default, {
-      molecule: molecule,
-      inputCb: inputCb
-    }), viewer === _list_ui.LIST_UI_VIEWER_TYPE.ANALYSIS && isIr && /*#__PURE__*/_react.default.createElement(_ir_viewer.default, {
-      molecule: molecule,
-      inputCb: inputCb
-    }));
+    return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+      className: classes.root,
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_index.default, {
+        topic: topic,
+        feature: feature,
+        cLabel: cLabel,
+        xLabel: isXRD && wavelength ? `${xLabel}, WL=${wavelength.value} ${wavelength.unit}` : xLabel,
+        yLabel: yLabel,
+        comparisons: comparisons,
+        isHidden: viewer !== _list_ui.LIST_UI_VIEWER_TYPE.SPECTRUM
+      }), viewer === _list_ui.LIST_UI_VIEWER_TYPE.ANALYSIS && isNmr && /*#__PURE__*/(0, _jsxRuntime.jsx)(_nmr_viewer.default, {
+        molecule: molecule,
+        inputCb: inputCb
+      }), viewer === _list_ui.LIST_UI_VIEWER_TYPE.ANALYSIS && isIr && /*#__PURE__*/(0, _jsxRuntime.jsx)(_ir_viewer.default, {
+        molecule: molecule,
+        inputCb: inputCb
+      })]
+    });
   }
 }
 const mapStateToProps = (state, _) => (

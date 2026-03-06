@@ -29,6 +29,18 @@ const styles = () => ({
     backgroundColor: '#eee',
     height: 32,
   },
+  subSectionHeader: {
+    backgroundColor: '#eee',
+    height: 32,
+    lineHeight: '32px',
+    paddingLeft: 10,
+    textAlign: 'left',
+    fontWeight: 'bold',
+    fontSize: '0.8rem',
+    fontFamily: 'Helvetica',
+    borderTop: '1px solid #dcdcdc',
+    color: 'rgba(0, 0, 0, 0.87)',
+  },
   panelDetail: {
     backgroundColor: '#fff',
     maxHeight: 'calc(90vh - 220px)', // ROI
@@ -78,6 +90,20 @@ const styles = () => ({
     fontFamily: 'Helvetica',
     textAlign: 'left',
   },
+  quillContainer: {
+    margin: '10px 10px',
+    backgroundColor: '#fff',
+    '& .ql-container': {
+      border: 'none',
+    },
+    '& .ql-editor': {
+      minHeight: '60px',
+    },
+    '& .ql-editor.ql-blank::before': {
+      fontStyle: 'normal',
+      color: 'rgba(0, 0, 0, 0.54)',
+    },
+  },
 });
 
 const simTitle = () => (
@@ -88,12 +114,50 @@ const simContent = (nmrSimPeaks) => (
   nmrSimPeaks && nmrSimPeaks.sort((a, b) => a - b).join(', ')
 );
 
-const aucValue = (integration) => {
-  if (!integration) {
-    return '';
+const normalizeQuillValue = (val) => {
+  if (!val) return '';
+  if (val === '<p><br></p>' || val === '<p></p>') return '';
+  return val;
+};
+
+const chemSubStyle = {
+  fontSize: '0.85em',
+  position: 'relative',
+  top: '0.24em',
+  lineHeight: 1,
+};
+
+const renderReadableSubscript = (txt = '') => {
+  if (typeof txt !== 'string') return txt;
+  const regex = /([A-Za-z])(\d+)/g;
+  if (!regex.test(txt)) return txt;
+  regex.lastIndex = 0;
+  const parts = [];
+  let cursor = 0;
+  let match = regex.exec(txt);
+  while (match) {
+    const [raw, prefix, digits] = match;
+    const at = match.index;
+    if (at > cursor) parts.push(txt.slice(cursor, at));
+    parts.push(prefix);
+    parts.push(
+      <span key={`${at}-${digits}`} style={chemSubStyle}>{digits}</span>,
+    );
+    cursor = at + raw.length;
+    match = regex.exec(txt);
   }
+  if (cursor < txt.length) parts.push(txt.slice(cursor));
+  return parts;
+};
+
+const handleDescriptionChanged = (content, delta, source, editor, onDescriptionChanged) => {
+  if (!onDescriptionChanged) return;
+  onDescriptionChanged(normalizeQuillValue(content), delta, source, editor);
+};
+
+const aucValue = (integration, hplcMsSt) => {
   const values = [];
-  const stackIntegration = integration.stack;
+  const stackIntegration = integration?.stack;
   if (Array.isArray(stackIntegration)) {
     let sumVal = 0.0;
     stackIntegration.forEach((inte) => {
@@ -111,7 +175,32 @@ const aucValue = (integration) => {
       }
     });
   }
-  return values.join(', ');
+
+  const spectraList = hplcMsSt?.uvvis?.spectraList || [];
+  const listWaveLength = hplcMsSt?.uvvis?.listWaveLength || [];
+
+  spectraList.forEach((spectrum, idx) => {
+    const wavelength = listWaveLength[idx];
+    const integrations = spectrum?.integrations || [];
+
+    if (integrations.length > 0) {
+      const sumArea = integrations.reduce(
+        (sum, integ) => sum + (integ.absoluteArea ?? integ.area ?? 0),
+        0,
+      );
+
+      const integrationStrings = integrations.map((integ) => {
+        const rawArea = integ.absoluteArea ?? integ.area ?? 0;
+        const areaVal = rawArea.toFixed(2);
+        const percent = sumArea > 0 ? ((rawArea * 100) / sumArea).toFixed(2) : '0.00';
+        return `${areaVal} (${percent}%)`;
+      });
+
+      values.push(`[${wavelength} nm]: ${integrationStrings.join(', ')}`);
+    }
+  });
+
+  return values.join('\n');
 };
 
 const SECData = ({
@@ -152,8 +241,15 @@ const SECData = ({
 SECData.propTypes = {
   classes: PropTypes.object.isRequired,
   layout: PropTypes.string.isRequired,
-  detector: PropTypes.object.isRequired,
-  secData: PropTypes.object.isRequired,
+  detector: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.object,
+  ]),
+  secData: PropTypes.object,
+};
+
+SECData.defaultProps = {
+  detector: '',
 };
 
 const DSCData = ({
@@ -190,15 +286,15 @@ const DSCData = ({
 DSCData.propTypes = {
   classes: PropTypes.object.isRequired,
   layout: PropTypes.string.isRequired,
-  dscMetaData: PropTypes.object.isRequired,
+  dscMetaData: PropTypes.object,
   updateAction: PropTypes.func.isRequired,
 };
 
 const InfoPanel = ({
   classes, expand, feature, integration, editorOnly, molSvg, descriptions,
   layoutSt, simulationSt, shiftSt, curveSt, exactMass,
-  onExapnd, canChangeDescription, onDescriptionChanged, detectorSt,
-  metaSt, updateDSCMetaDataAct,
+  onExapnd, onExpand, canChangeDescription, onDescriptionChanged, detectorSt,
+  metaSt, updateDSCMetaDataAct, hplcMsSt, entities,
 }) => {
   if (!feature) return null;
   const {
@@ -206,12 +302,19 @@ const InfoPanel = ({
   } = feature;
   const { dscMetaData } = metaSt;
   const { curveIdx } = curveSt;
-  const { curves } = detectorSt;
+  const { curves = [] } = detectorSt || {};
+  const currentEntity = Array.isArray(entities) ? entities[curveIdx] : null;
+  const entityTitle = currentEntity?.entity?.title
+    || currentEntity?.title
+    || currentEntity?.spectra?.[0]?.title
+    || currentEntity?.entity?.spectra?.[0]?.title
+    || '';
+  const displayTitle = title || entityTitle;
 
   const getSelectedDetectorForCurve = (_detectorSt, targetCurveIdx) => {
     const targetCurve = curves.find((curve) => curve.curveIdx === targetCurveIdx);
 
-    return targetCurve ? targetCurve.selectedDetector.name : '';
+    return targetCurve?.selectedDetector?.name || '';
   };
 
   let selectedDetector = getSelectedDetectorForCurve(detectorSt, curveIdx);
@@ -238,8 +341,12 @@ const InfoPanel = ({
     <Accordion
       data-testid="PanelInfo"
       expanded={expand}
-      onChange={onExapnd}
-      className={classNames(classes.panel)}
+      onChange={onExpand || onExapnd}
+      disableGutters
+      sx={{
+        '&.MuiAccordion-root.Mui-expanded': { margin: 0 },
+        '&:before': { display: 'none' },
+      }}
       TransitionProps={{ unmountOnExit: true }} // increase Accordion performance
     >
       <AccordionSummary
@@ -256,14 +363,14 @@ const InfoPanel = ({
       <div className={classNames(classes.panelDetail)}>
         <div className={classNames(classes.rowRoot, classes.rowOdd)}>
           <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Title : </span>
-          <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{ title }</span>
+          <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{ displayTitle }</span>
         </div>
         {
           Format.isNmrLayout(layoutSt)
             ? (
               <div className={classNames(classes.rowRoot, classes.rowEven)}>
                 <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Freq : </span>
-                <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{ `${parseInt(observeFrequency, 10)} Hz` || ' - ' }</span>
+                <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{ `${parseInt(observeFrequency, 10)} MHz` || ' - ' }</span>
               </div>
             )
             : null
@@ -273,7 +380,7 @@ const InfoPanel = ({
             ? (
               <div className={classNames(classes.rowRoot, classes.rowOdd)}>
                 <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Solv : </span>
-                <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{showSolvName}</span>
+                <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{renderReadableSubscript(showSolvName)}</span>
               </div>
             )
             : null
@@ -314,43 +421,69 @@ const InfoPanel = ({
           ) : null
         }
         <DSCData classes={classes} layout={layoutSt} dscMetaData={dscMetaData} updateAction={updateDSCMetaDataAct} />
-      </div>
-      {/* <ReactQuill
-        className={classNames(classes.quill, 'card-sv-quill')}
-        value={descriptions}
-        modules={{ toolbar: false }}
-        readOnly
-      /> */}
-      {
-        !Format.isCyclicVoltaLayout(layoutSt)
-          ? (
-            <ReactQuill
-              className={classNames(classes.quill, 'card-sv-quill')}
-              value={descriptions}
-              modules={{ toolbar: false }}
-              onChange={onDescriptionChanged}
-              readOnly={canChangeDescription !== undefined ? !canChangeDescription : true}
-            />
-          ) : null
-      }
-      <div>
         {
-            !editorOnly && Format.isNmrLayout(layoutSt)
-              ? (
+          !Format.isCyclicVoltaLayout(layoutSt)
+            ? (
+              <>
+                <div className={classes.subSectionHeader}>
+                  Content
+                </div>
+                <div className={classes.quillContainer}>
+                  <ReactQuill
+                    className={classNames(classes.quill, 'card-sv-quill')}
+                    value={normalizeQuillValue(descriptions)}
+                    placeholder={canChangeDescription ? 'Peaks will be written here...' : undefined}
+                    readOnly={!canChangeDescription}
+                    modules={{ toolbar: false }}
+                    onChange={(content, delta, source, editor) => handleDescriptionChanged(content, delta, source, editor, onDescriptionChanged)}
+                  />
+                </div>
+              </>
+            ) : null
+        }
+        {
+          !editorOnly && Format.isNmrLayout(layoutSt)
+            ? (
+              <>
+                <div className={classes.subSectionHeader}>
+                  { simTitle() }
+                </div>
                 <div className={classNames(classes.rowRoot, classes.rowOddSim)}>
-                  <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>
-                    { simTitle() }
-                    :
-                  </span>
-                  <br />
                   <span className={classNames(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt')}>
                     { simContent(simulationSt.nmrSimPeaks) }
                   </span>
                 </div>
-              )
-              : null
-          }
+              </>
+            )
+            : null
+        }
       </div>
+      {
+        Format.isLCMsLayout(layoutSt) ? (
+          <div className={classNames(classes.rowRoot, classes.rowOddSim)}>
+            <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>
+              Area under curve (AUC):
+            </span>
+            <br />
+            <div
+              className={classNames(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt')}
+              style={{
+                maxHeight: '80px',
+                overflowY: 'auto',
+                overflowX: 'hidden',
+                wordBreak: 'break-word',
+                marginBottom: '100px',
+              }}
+            >
+              {aucValue(integration, hplcMsSt)
+                .split('\n')
+                .map((line, idx) => (
+                  <div key={idx}>{line}</div>
+                ))}
+            </div>
+          </div>
+        ) : null
+      }
     </Accordion>
   );
 };
@@ -363,6 +496,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     curveSt: state.curve,
     detectorSt: state.detector,
     metaSt: state.meta,
+    hplcMsSt: state.hplcMs,
   }
 );
 
@@ -375,22 +509,28 @@ const mapDispatchToProps = (dispatch) => (
 InfoPanel.propTypes = {
   classes: PropTypes.object.isRequired,
   expand: PropTypes.bool.isRequired,
-  feature: PropTypes.object.isRequired,
-  integration: PropTypes.object.isRequired,
+  feature: PropTypes.object,
+  integration: PropTypes.object,
   editorOnly: PropTypes.bool.isRequired,
   molSvg: PropTypes.string.isRequired,
-  descriptions: PropTypes.array.isRequired,
+  descriptions: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.array,
+  ]).isRequired,
   layoutSt: PropTypes.string.isRequired,
-  simulationSt: PropTypes.array.isRequired,
+  simulationSt: PropTypes.object.isRequired,
   shiftSt: PropTypes.object.isRequired,
   curveSt: PropTypes.object.isRequired,
-  onExapnd: PropTypes.func.isRequired,
+  onExpand: PropTypes.func,
+  onExapnd: PropTypes.func,
   canChangeDescription: PropTypes.bool.isRequired,
   onDescriptionChanged: PropTypes.func,
   exactMass: PropTypes.string,
   detectorSt: PropTypes.object.isRequired,
   metaSt: PropTypes.object.isRequired,
   updateDSCMetaDataAct: PropTypes.func.isRequired,
+  hplcMsSt: PropTypes.object.isRequired,
+  entities: PropTypes.array,
 };
 
 export default connect( // eslint-disable-line

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.MountThresLine = exports.MountTags = exports.MountRef = exports.MountPath = exports.MountMarker = exports.MountMainFrame = exports.MountGrid = exports.MountComparePath = exports.MountClip = exports.MountBars = exports.MountAxisLabelY = exports.MountAxisLabelX = exports.MountAxis = void 0;
+exports.MountThresLine = exports.MountTags = exports.MountRef = exports.MountPath = exports.MountMarker = exports.MountMainFrame = exports.MountGrid = exports.MountGraphLabel = exports.MountComparePath = exports.MountClip = exports.MountBars = exports.MountAxisLabelY = exports.MountAxisLabelX = exports.MountAxis = void 0;
 var _compass = require("./compass");
 const MountTags = target => {
   const igbPath = target.root.append('g').attr('class', 'igbPath-clip').attr('clip-path', 'url(#clip)');
@@ -49,8 +49,7 @@ const MountPath = (target, color) => {
   return path;
 };
 exports.MountPath = MountPath;
-const MountComparePath = function (target, color, id) {
-  let alpha = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
+const MountComparePath = (target, color, id, alpha = 1) => {
   const path = target.root.append('g').attr('class', 'line-clip-compare').attr('id', id).attr('clip-path', 'url(#clip)').append('path').attr('class', 'line').style('fill', 'none').style('stroke', color).style('stroke-opacity', alpha).style('stroke-width', 1).style('stroke-dasharray', '30, 3').on('click', event => (0, _compass.ClickCompass)(event, target));
   return path;
 };
@@ -92,6 +91,11 @@ const MountAxisLabelY = target => {
   target.root.append('text').attr('text-anchor', 'middle').attr('transform', yTrans).attr('class', 'yLabel').attr('font-family', 'Helvetica').style('font-size', '12px');
 };
 exports.MountAxisLabelY = MountAxisLabelY;
+const MountGraphLabel = target => {
+  const xTrans = `translate(${target.w / 2}, ${20})`;
+  target.root.append('text').attr('text-anchor', 'middle').attr('transform', xTrans).attr('class', 'mark-text').attr('font-family', 'Helvetica').style('font-size', '12px');
+};
+exports.MountGraphLabel = MountGraphLabel;
 const MountMarker = (target, color) => {
   const tTrans = `translate(${target.w - 80}, -10)`;
   const lTrans = `translate(${target.w - 200}, -18)`;

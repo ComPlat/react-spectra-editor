@@ -66,8 +66,7 @@ const pksAddPos = (dataPks, editPeakSt) => {
   const result = [...posPks, ...pos];
   return result;
 };
-const PksEdit = function (dataPks, editPeakSt) {
-  let voltammetryPeak = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+const PksEdit = (dataPks, editPeakSt, voltammetryPeak = false) => {
   if (voltammetryPeak && voltammetryPeak.length > 0) {
     let modDataPks = [];
     voltammetryPeak.forEach(peak => {

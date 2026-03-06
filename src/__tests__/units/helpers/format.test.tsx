@@ -339,7 +339,7 @@ describe('Test format helper', () => {
   describe('Test get multi curves colors', () => {
     it('Get the first color', () => {
       const index = 7
-      const expectedColor = '#d35400'
+      const expectedColor = '#2980b9'
       const color = Format.mutiEntitiesColors(index)
       expect(color).toEqual(expectedColor)
     })

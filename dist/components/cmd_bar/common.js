@@ -5,12 +5,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.focusStyle = exports.commonStyle = exports.MuButton = void 0;
-var _extends2 = _interopRequireDefault(require("@babel/runtime/helpers/extends"));
-var _objectWithoutProperties2 = _interopRequireDefault(require("@babel/runtime/helpers/objectWithoutProperties"));
 var _react = _interopRequireDefault(require("react"));
 var _styles = require("@mui/styles");
 var _Button = _interopRequireDefault(require("@mui/material/Button"));
 var _classnames = _interopRequireDefault(require("classnames"));
+var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable no-unused-vars, max-len, indent, react/function-component-definition, react/self-closing-comp, react/prop-types, react/jsx-props-no-spreading */
 
 const useStyles = (0, _styles.makeStyles)(theme => ({
@@ -27,17 +26,19 @@ const useStyles = (0, _styles.makeStyles)(theme => ({
     color: 'black'
   }
 }));
-const MuButton = props => {
+const MuButton = exports.MuButton = /*#__PURE__*/_react.default.forwardRef((props, ref) => {
   const classes = useStyles();
   const {
-      className
-    } = props,
-    other = (0, _objectWithoutProperties2.default)(props, ["className"]);
-  return /*#__PURE__*/_react.default.createElement(_Button.default, (0, _extends2.default)({
-    className: (0, _classnames.default)(classes.muiBtn, className)
-  }, other));
-};
-exports.MuButton = MuButton;
+    className,
+    ...other
+  } = props;
+  return /*#__PURE__*/(0, _jsxRuntime.jsx)(_Button.default, {
+    ref: ref,
+    className: (0, _classnames.default)(classes.muiBtn, className),
+    ...other
+  });
+});
+MuButton.displayName = 'MuButton';
 const commonStyle = exports.commonStyle = {
   card: {
     margin: '0 0 5px 52px',

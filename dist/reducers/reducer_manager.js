@@ -8,9 +8,7 @@ exports.default = void 0;
 // import { MANAGER } from '../constants/action_type';
 
 const initialState = {};
-const managerReducer = function () {
-  let state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-  let action = arguments.length > 1 ? arguments[1] : undefined;
+const managerReducer = (state = initialState, action) => {
   switch (action.type) {
     default:
       return state;

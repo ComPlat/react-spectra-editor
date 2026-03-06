@@ -148,6 +148,16 @@ const MountAxisLabelY = (target) => {
     .style('font-size', '12px');
 };
 
+const MountGraphLabel = (target) => {
+  const xTrans = `translate(${target.w / 2}, ${20})`;
+  target.root.append('text')
+    .attr('text-anchor', 'middle')
+    .attr('transform', xTrans)
+    .attr('class', 'mark-text')
+    .attr('font-family', 'Helvetica')
+    .style('font-size', '12px');
+};
+
 const MountMarker = (target, color) => {
   const tTrans = `translate(${target.w - 80}, -10)`;
   const lTrans = `translate(${target.w - 200}, -18)`;
@@ -188,5 +198,5 @@ const MountMainFrame = (target, name) => {
 export {
   MountTags, MountRef, MountPath, MountThresLine, MountGrid, MountAxis,
   MountComparePath, MountAxisLabelX, MountAxisLabelY,
-  MountMarker, MountClip, MountMainFrame, MountBars,
+  MountMarker, MountClip, MountMainFrame, MountBars, MountGraphLabel,
 };

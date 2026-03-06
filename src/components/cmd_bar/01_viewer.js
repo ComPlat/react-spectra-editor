@@ -33,35 +33,39 @@ const Viewer = ({
   return (
     <span className={classes.group} data-testid="Viewer">
       <Tooltip title={<span className="txt-sv-tp">Spectrum Viewer</span>}>
-        <MuButton
-          className={
-            classNames(
-              focusStyle(isfocusSpectrumSt, classes),
-              'btn-sv-bar-spctrum',
-            )
-          }
-          onClick={onViewSpectrum}
-        >
-          <TimelineOutlinedIcon className={classes.icon} />
-        </MuButton>
+        <span>
+          <MuButton
+            className={
+              classNames(
+                focusStyle(isfocusSpectrumSt, classes),
+                'btn-sv-bar-spctrum',
+              )
+            }
+            onClick={onViewSpectrum}
+          >
+            <TimelineOutlinedIcon className={classes.icon} />
+          </MuButton>
+        </span>
       </Tooltip>
       {
         hideCmdAnaViewerSt
           ? null
           : (
             <Tooltip title={<span className="txt-sv-tp">Analysis Viewer</span>}>
-              <MuButton
-                className={
-                  classNames(
-                    focusStyle(isfocusAnalysisSt, classes),
-                    'btn-sv-bar-analysis',
-                  )
-                }
-                disabled={disableCmdAnaViewerSt}
-                onClick={onViewAnalysis}
-              >
-                <SpellcheckOutlinedIcon className={classes.icon} />
-              </MuButton>
+              <span>
+                <MuButton
+                  className={
+                    classNames(
+                      focusStyle(isfocusAnalysisSt, classes),
+                      'btn-sv-bar-analysis',
+                    )
+                  }
+                  disabled={disableCmdAnaViewerSt}
+                  onClick={onViewAnalysis}
+                >
+                  <SpellcheckOutlinedIcon className={classes.icon} />
+                </MuButton>
+              </span>
             </Tooltip>
           )
       }
