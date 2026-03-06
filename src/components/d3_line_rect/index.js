@@ -1,0 +1,636 @@
+/* eslint-disable no-mixed-operators, prefer-object-spread, react/function-component-definition */
+import React from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators, compose } from 'redux';
+import PropTypes from 'prop-types';
+import classNames from 'classnames';
+import withStyles from '@mui/styles/withStyles';
+import {
+  Select, MenuItem, FormControl, InputLabel,
+  Tooltip,
+} from '@mui/material';
+import ZoomInOutlinedIcon from '@mui/icons-material/ZoomInOutlined';
+import FindReplaceOutlinedIcon from '@mui/icons-material/FindReplaceOutlined';
+import { MuButton, commonStyle, focusStyle } from '../cmd_bar/common';
+
+import {
+  ToThresEndPts, convertThresEndPts,
+} from '../../helpers/chem';
+import { resetAll } from '../../actions/manager';
+import {
+  selectUiSweep, scrollUiWheel, clickUiTarget, setUiSweepType,
+} from '../../actions/ui';
+import { selectWavelength, changeTic, updateCurrentPageValue } from '../../actions/hplc_ms';
+import { selectCurve } from '../../actions/curve';
+import RectFocus from './rect_focus';
+import MultiFocus from './multi_focus';
+import LineFocus from './line_focus';
+import { extractParams } from '../../helpers/extractParams';
+import { findClosest } from '../../helpers/calc';
+import {
+  drawMain, drawLabel, drawDisplay, drawDestroy,
+} from '../common/draw';
+import { LIST_UI_SWEEP_TYPE, LIST_NON_BRUSH_TYPES } from '../../constants/list_ui';
+import { LIST_ROOT_SVG_GRAPH, LIST_BRUSH_SVG_GRAPH } from '../../constants/list_graph';
+import PeakGroup from '../cmd_bar/08_peak_group';
+import Threshold from '../cmd_bar/r03_threshold';
+import Integration from '../cmd_bar/04_integration';
+import Peak from '../cmd_bar/03_peak';
+import { getLcMsInfo } from '../../helpers/extractEntityLCMS';
+
+const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
+const H = Math.round(window.innerHeight * 0.90 * 0.8 / 3); // ROI
+
+const parsePageValue = (feature) => {
+  const raw = feature?.pageSymbol ?? feature?.pageValue ?? feature?.page;
+  if (raw == null) return null;
+  if (typeof raw === 'number') {
+    return Number.isFinite(raw) ? raw : null;
+  }
+  const text = String(raw).split('\n')[0].trim();
+  const match = text.match(/[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?/);
+  if (!match) return null;
+  const value = Number(match[0]);
+  return Number.isFinite(value) ? value : null;
+};
+
+const toSeed = (xValues = [], yValues = []) => {
+  const maxLength = Math.min(xValues.length, yValues.length);
+  const seed = new Array(maxLength);
+  for (let index = 0; index < maxLength; index += 1) {
+    seed[index] = { x: xValues[index], y: yValues[index] };
+  }
+  return seed;
+};
+
+const styles = () => (
+  Object.assign(
+    {},
+    commonStyle,
+  )
+);
+
+const zoomView = (classes, graphIndex, uiSt, zoomInAct) => {
+  const onSweepZoomIn = () => {
+    const payload = {
+      graphIndex,
+      sweepType: LIST_UI_SWEEP_TYPE.ZOOMIN,
+    };
+    zoomInAct(payload);
+  };
+
+  const onSweepZoomReset = () => {
+    const resetPayload = {
+      graphIndex,
+      sweepType: LIST_UI_SWEEP_TYPE.ZOOMRESET,
+    };
+    zoomInAct(resetPayload);
+    // Re-enable zoom brush immediately after reset for LC/MS flow.
+    zoomInAct({
+      graphIndex,
+      sweepType: LIST_UI_SWEEP_TYPE.ZOOMIN,
+    });
+  };
+
+  const { zoom } = uiSt;
+  const { sweepTypes } = zoom;
+
+  const isZoomFocus = sweepTypes[graphIndex] === LIST_UI_SWEEP_TYPE.ZOOMIN;
+
+  return (
+    <span className={classes.group} data-testid="Zoom">
+      <Tooltip title={<span className="txt-sv-tp">Zoom In</span>}>
+        <MuButton
+          className={
+            classNames(
+              focusStyle(isZoomFocus, classes),
+              'btn-sv-bar-zoomin',
+            )
+          }
+          onClick={onSweepZoomIn}
+        >
+          <ZoomInOutlinedIcon className={classNames(classes.icon, classes.iconWp)} />
+        </MuButton>
+      </Tooltip>
+      <Tooltip title={<span className="txt-sv-tp">Reset Zoom</span>}>
+        <MuButton
+          className={
+            classNames(
+              'btn-sv-bar-zoomreset',
+            )
+          }
+          onClick={onSweepZoomReset}
+        >
+          <FindReplaceOutlinedIcon className={classes.icon} />
+        </MuButton>
+      </Tooltip>
+    </span>
+  );
+};
+
+const wavelengthSelect = (classes, hplcMsSt, updateWavelengthAct) => {
+  const uvvis = (hplcMsSt && hplcMsSt.uvvis) || {};
+  const { listWaveLength = null, selectedWaveLength } = uvvis;
+  const options = listWaveLength ? listWaveLength.map((d) => (
+    <MenuItem value={d} key={d}>
+      <span className={classNames(classes.txtOpt, 'option-sv-bar-decimal')}>
+        {d}
+      </span>
+    </MenuItem>
+  )) : [];
+  const hasSelectedWaveLength = listWaveLength && listWaveLength.includes(selectedWaveLength);
+  const resolvedSelectedWaveLength = hasSelectedWaveLength
+    ? selectedWaveLength
+    : (listWaveLength && listWaveLength[0]);
+
+  return (
+    <FormControl
+      className={classNames(classes.fieldDecimal)}
+      variant="outlined"
+      style={{ width: '140px' }}
+    >
+      <InputLabel id="select-decimal-label" className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
+        Wavelength (nm)
+      </InputLabel>
+      <Select
+        labelId="select-decimal-label"
+        label="Decimal"
+        value={resolvedSelectedWaveLength}
+        onChange={updateWavelengthAct}
+        className={classNames(classes.selectInput, 'input-sv-bar-decimal')}
+      >
+        { options }
+      </Select>
+    </FormControl>
+  );
+};
+
+const ticSelect = (classes, hplcMsSt, handleTicChanged) => {
+  const { tic = {} } = hplcMsSt || {};
+  const { polarity, available } = tic;
+  const listTIC = [
+    { name: 'PLUS', value: 'positive', enabled: available?.positive },
+    { name: 'MINUS', value: 'negative', enabled: available?.negative },
+    { name: 'NEUTRAL', value: 'neutral', enabled: available?.neutral },
+  ];
+  const filtered = listTIC.filter((d) => d.enabled);
+  const listOptions = filtered.length > 0 ? filtered : listTIC;
+  const options = listOptions.map((d) => (
+    <MenuItem value={d.value} key={d.value}>
+      <span className={classNames(classes.txtOpt, 'option-sv-bar-decimal')}>
+        {d.name}
+      </span>
+    </MenuItem>
+  ));
+
+  const onTicChange = (event) => {
+    handleTicChanged(event);
+  };
+  const optionValues = listOptions.map((d) => d.value);
+  const resolvedPolarity = optionValues.includes(polarity) ? polarity : optionValues[0];
+
+  return (
+    <FormControl
+      className={classNames(classes.fieldDecimal)}
+      variant="outlined"
+      style={{ width: '110px' }}
+    >
+      <InputLabel id="select-decimal-label" className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
+        TIC
+      </InputLabel>
+      <Select
+        labelId="select-decimal-label"
+        label="Decimal"
+        value={resolvedPolarity}
+        onChange={onTicChange}
+        className={classNames(classes.selectInput, 'input-sv-bar-decimal')}
+      >
+        { options }
+      </Select>
+    </FormControl>
+  );
+};
+class ViewerLineRect extends React.Component {
+  constructor(props) {
+    super(props);
+
+    const {
+      clickUiTargetAct,
+      selectUiSweepAct,
+      scrollUiWheelAct,
+      ticEntities,
+      uvvisEntities,
+      uiSt,
+    } = props;
+
+    this.rootKlassLine = `.${LIST_ROOT_SVG_GRAPH.LINE}`;
+    this.lineFocus = new LineFocus({
+      W,
+      H,
+      uvvisEntities,
+      clickUiTargetAct,
+      selectUiSweepAct,
+      scrollUiWheelAct,
+      graphIndex: 0,
+      uiSt,
+    });
+
+    this.rootKlassMulti = `.${LIST_ROOT_SVG_GRAPH.MULTI}`;
+    this.multiFocus = new MultiFocus({
+      W,
+      H,
+      ticEntities,
+      clickUiTargetAct,
+      selectUiSweepAct,
+      scrollUiWheelAct,
+      graphIndex: 1,
+      uiSt,
+    });
+
+    this.rootKlassRect = `.${LIST_ROOT_SVG_GRAPH.RECT}`;
+    this.rectFocus = new RectFocus({
+      W, H, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct, graphIndex: 2, uiSt,
+    });
+
+    this.normChange = this.normChange.bind(this);
+    this.extractSubView = this.extractSubView.bind(this);
+    this.extractUvvisView = this.extractUvvisView.bind(this);
+  }
+
+  componentDidMount() {
+    const {
+      curveSt, feature, ticEntities, hplcMsSt,
+      tTrEndPts, layoutSt,
+      isUiAddIntgSt, isUiNoBrushSt,
+      integrationSt,
+      isHidden,
+      resetAllAct, uiSt,
+      editPeakSt,
+    } = this.props;
+    drawDestroy(this.rootKlassMulti);
+    drawDestroy(this.rootKlassLine);
+    drawDestroy(this.rootKlassRect);
+    resetAllAct(feature);
+
+    const { zoom } = uiSt;
+    const { sweepExtent } = zoom;
+
+    const uvvisViewFeature = this.extractUvvisView();
+    let uvvisSeed = [];
+    if (uvvisViewFeature?.data?.[0]) {
+      const currentData = uvvisViewFeature.data[0];
+      const { x, y } = currentData;
+      uvvisSeed = toSeed(x, y);
+    }
+    drawMain(this.rootKlassLine, W, H, LIST_BRUSH_SVG_GRAPH.LINE);
+    this.lineFocus.create({
+      filterSeed: uvvisSeed,
+      filterPeak: [],
+      tTrEndPts,
+      layoutSt,
+      isUiNoBrushSt: true,
+      sweepExtentSt: sweepExtent[0],
+      integrationSt,
+      isUiAddIntgSt,
+      editPeakSt,
+      hplcMsSt,
+    });
+    drawLabel(this.rootKlassLine, null, 'Minutes', 'Intensity');
+    drawDisplay(this.rootKlassLine, false);
+
+    drawMain(this.rootKlassMulti, W, H, LIST_BRUSH_SVG_GRAPH.MULTI);
+    this.multiFocus.create({
+      ticEntities,
+      curveSt,
+      hplcMsSt,
+      tTrEndPts,
+      layoutSt,
+      sweepExtentSt: sweepExtent[1],
+      isUiAddIntgSt,
+      isUiNoBrushSt,
+    });
+    drawLabel(this.rootKlassMulti, null, 'Minutes', 'Intensity');
+    drawDisplay(this.rootKlassMulti, isHidden);
+
+    drawMain(this.rootKlassRect, W, H, LIST_BRUSH_SVG_GRAPH.RECT);
+    this.rectFocus.create({
+      filterSeed: [],
+      filterPeak: [],
+      tTrEndPts,
+      layoutSt,
+      isUiNoBrushSt: true,
+      sweepExtentSt: sweepExtent[2],
+    });
+    drawLabel(this.rootKlassRect, null, 'm/z', 'Intensity');
+    drawDisplay(this.rootKlassRect, false);
+  }
+
+  componentDidUpdate(prevProps) {
+    const {
+      ticEntities, curveSt,
+      tTrEndPts, layoutSt,
+      isUiAddIntgSt, isUiNoBrushSt,
+      isHidden, uiSt, hplcMsSt, integrationSt,
+      editPeakSt,
+    } = this.props;
+    this.normChange(prevProps);
+    const { zoom } = uiSt;
+    const { sweepExtent } = zoom || {};
+    if (!Array.isArray(sweepExtent)) return;
+
+    const uvvisViewFeature = this.extractUvvisView();
+    if (uvvisViewFeature) {
+      const hasLineSvg = !!document.querySelector(
+        `${this.rootKlassLine} .${LIST_BRUSH_SVG_GRAPH.LINE}`,
+      );
+      if (!hasLineSvg) {
+        drawMain(this.rootKlassLine, W, H, LIST_BRUSH_SVG_GRAPH.LINE);
+      }
+      const { data } = uvvisViewFeature;
+      const currentData = data[0];
+      const { x, y } = currentData;
+      const uvvisSeed = toSeed(x, y);
+      if (this.lineFocus) {
+        this.lineFocus.update({
+          filterSeed: uvvisSeed,
+          filterPeak: [],
+          tTrEndPts,
+          isUiNoBrushSt: true,
+          isUiAddIntgSt,
+          sweepExtentSt: sweepExtent[0],
+          uiSt,
+          layoutSt,
+          integrationSt,
+          hplcMsSt,
+          editPeakSt,
+        });
+      }
+      drawLabel(this.rootKlassLine, null, 'Minutes', 'Intensity');
+      drawDisplay(this.rootKlassLine, false);
+    }
+
+    if (this.multiFocus) {
+      const hasMultiSvg = !!document.querySelector(
+        `${this.rootKlassMulti} .${LIST_BRUSH_SVG_GRAPH.MULTI}`,
+      );
+      if (!hasMultiSvg) {
+        drawMain(this.rootKlassMulti, W, H, LIST_BRUSH_SVG_GRAPH.MULTI);
+      }
+      this.multiFocus.update({
+        curveSt,
+        ticEntities,
+        hplcMsSt,
+        tTrEndPts,
+        layoutSt,
+        sweepExtentSt: sweepExtent[1],
+        isUiAddIntgSt,
+        isUiNoBrushSt,
+        uiSt,
+        editPeakSt,
+      });
+    }
+    const { polarity } = hplcMsSt.tic;
+    let ticLabel = 'NEUTRAL';
+    if (polarity === 'negative') {
+      ticLabel = 'MINUS';
+    } else if (polarity === 'positive') {
+      ticLabel = 'PLUS';
+    }
+    drawLabel(this.rootKlassMulti, ticLabel, 'Minutes', 'Intensity');
+    drawDisplay(this.rootKlassMulti, isHidden);
+
+    const subViewFeature = this.extractSubView();
+    if (subViewFeature) {
+      const hasRectSvg = !!document.querySelector(
+        `${this.rootKlassRect} .${LIST_BRUSH_SVG_GRAPH.RECT}`,
+      );
+      if (!hasRectSvg) {
+        drawMain(this.rootKlassRect, W, H, LIST_BRUSH_SVG_GRAPH.RECT);
+      }
+      const { threshold } = hplcMsSt;
+      const curTrEndPts = convertThresEndPts(subViewFeature, threshold.value);
+      const { data } = subViewFeature;
+      const pageValue = parsePageValue(subViewFeature);
+      const labelValue = Number.isFinite(pageValue)
+        ? pageValue
+        : (subViewFeature?.pageValue ?? subViewFeature?.page ?? null);
+      const currentData = data[0];
+      const { x, y } = currentData;
+      const subSeed = toSeed(x, y);
+      if (this.rectFocus) {
+        this.rectFocus.update({
+          filterSeed: subSeed,
+          filterPeak: [],
+          tTrEndPts: curTrEndPts,
+          layoutSt,
+          isUiNoBrushSt: true,
+          sweepExtentSt: sweepExtent[2],
+          uiSt,
+        });
+      }
+      drawLabel(
+        this.rootKlassRect,
+        labelValue != null ? `${labelValue} min` : null,
+        'm/z',
+        'Intensity',
+      );
+      drawDisplay(this.rootKlassRect, false);
+    }
+  }
+
+  componentWillUnmount() {
+    drawDestroy(this.rootKlassLine);
+    drawDestroy(this.rootKlassMulti);
+    drawDestroy(this.rootKlassRect);
+  }
+
+  normChange(prevProps) {
+    const { feature } = this.props;
+    const oldFeature = prevProps.feature;
+    if (oldFeature !== feature) {
+      // resetAllAct(feature);
+    }
+  }
+
+  extractUvvisView() {
+    const { uvvisEntities, hplcMsSt } = this.props;
+    if (!uvvisEntities || !uvvisEntities[0]) {
+      return null;
+    }
+    const { features } = extractParams(uvvisEntities[0], 0, 1);
+    let featuresArr = [];
+    if (Array.isArray(features)) {
+      featuresArr = features;
+    } else if (features && typeof features === 'object') {
+      featuresArr = Object.values(features);
+    }
+    if (featuresArr.length === 0) {
+      return null;
+    }
+    const { uvvis } = hplcMsSt;
+    const { wavelengthIdx } = uvvis;
+    if (wavelengthIdx < 0 || wavelengthIdx >= featuresArr.length) {
+      return null;
+    }
+    return featuresArr[wavelengthIdx];
+  }
+
+  extractSubView() {
+    const {
+      uiSt, mzEntities, hplcMsSt, updateCurrentPageValueAct,
+    } = this.props;
+    const { polarity } = hplcMsSt.tic;
+    const pickEntity = mzEntities?.find((ent) => (
+      getLcMsInfo(ent).polarity === polarity
+    )) || mzEntities?.[0];
+    if (!pickEntity || !pickEntity.layout) {
+      return null;
+    }
+    const { subViewerAt } = uiSt;
+    const { features } = extractParams(pickEntity, 0, 1);
+    let featuresArr = [];
+    if (Array.isArray(features)) {
+      featuresArr = features;
+    } else if (features && typeof features === 'object') {
+      featuresArr = Object.values(features);
+    }
+    if (featuresArr.length === 0) return null;
+
+    const pageValues = featuresArr
+      .map((fe) => parsePageValue(fe))
+      .filter((val) => Number.isFinite(val));
+    if (pageValues.length === 0) return featuresArr[0];
+
+    const hasValidClick = subViewerAt && subViewerAt.x !== undefined;
+    const closestPage = hasValidClick
+      ? findClosest(pageValues, subViewerAt.x)
+      : pageValues[Math.floor(pageValues.length / 2)];
+
+    if (closestPage !== hplcMsSt.tic.currentPageValue) {
+      updateCurrentPageValueAct(closestPage);
+    }
+
+    const selectFeature = featuresArr.find((fe) => {
+      const value = parsePageValue(fe);
+      return Number.isFinite(value) && Math.abs(value - closestPage) < 1e-9;
+    });
+    return selectFeature || featuresArr[0];
+  }
+
+  render() {
+    const {
+      classes, hplcMsSt, selectWavelengthAct, updateTicAct, selectCurveAct,
+      feature, zoomInAct, uiSt, ticEntities,
+    } = this.props;
+    const resolvedFeature = feature || {};
+    const hasEdit = !!resolvedFeature?.data?.[0]?.x?.length;
+    const handleTicChanged = (event) => {
+      const selectedPolarity = event.target.value;
+      updateTicAct({ polarity: selectedPolarity });
+      const targetEntity = ticEntities?.find((ent) => (
+        getLcMsInfo(ent).polarity === selectedPolarity
+      ));
+      if (targetEntity?.curveIdx !== undefined) {
+        selectCurveAct(targetEntity.curveIdx);
+      }
+    };
+    const handleWavelengthChange = (event) => {
+      selectWavelengthAct(event);
+    };
+    return (
+      <div>
+        {
+          zoomView(classes, 0, uiSt, zoomInAct)
+        }
+        {
+          wavelengthSelect(classes, hplcMsSt, handleWavelengthChange)
+        }
+        <Integration />
+        <Peak feature={resolvedFeature} />
+        <div className={LIST_ROOT_SVG_GRAPH.LINE} />
+        {
+          zoomView(classes, 1, uiSt, zoomInAct)
+        }
+        {
+          ticSelect(classes, hplcMsSt, handleTicChanged)
+        }
+        <span style={{ display: 'inline-flex' }}>
+          <PeakGroup feature={resolvedFeature} graphIndex={1} />
+        </span>
+        <div className={LIST_ROOT_SVG_GRAPH.MULTI} />
+        {
+          zoomView(classes, 2, uiSt, zoomInAct)
+        }
+        <Threshold feature={resolvedFeature} hasEdit={hasEdit} />
+        <div className={LIST_ROOT_SVG_GRAPH.RECT} />
+      </div>
+    );
+  }
+}
+
+const mapStateToProps = (state, props) => (
+  {
+    curveSt: state.curve,
+    tTrEndPts: ToThresEndPts(state, props),
+    isUiAddIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
+    isUiNoBrushSt: LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
+    uiSt: state.ui,
+    layoutSt: state.layout,
+    hplcMsSt: state.hplcMs,
+    editPeakSt: state.editPeak.present,
+    integrationSt: state.integration.present,
+    sweepExtentSt: state.ui.sweepExtent,
+  }
+);
+
+const mapDispatchToProps = (dispatch) => (
+  bindActionCreators({
+    resetAllAct: resetAll,
+    clickUiTargetAct: clickUiTarget,
+    selectUiSweepAct: selectUiSweep,
+    scrollUiWheelAct: scrollUiWheel,
+    selectWavelengthAct: selectWavelength,
+    updateTicAct: changeTic,
+    selectCurveAct: selectCurve,
+    zoomInAct: setUiSweepType,
+    updateCurrentPageValueAct: updateCurrentPageValue,
+  }, dispatch)
+);
+
+ViewerLineRect.propTypes = {
+  classes: PropTypes.object.isRequired,
+  uiSt: PropTypes.object.isRequired,
+  curveSt: PropTypes.object.isRequired,
+  ticEntities: PropTypes.array.isRequired,
+  uvvisEntities: PropTypes.array.isRequired,
+  mzEntities: PropTypes.array.isRequired,
+  layoutSt: PropTypes.string.isRequired,
+  integrationSt: PropTypes.object.isRequired,
+  feature: PropTypes.object,
+  tTrEndPts: PropTypes.array.isRequired,
+  isUiAddIntgSt: PropTypes.bool.isRequired,
+  isUiNoBrushSt: PropTypes.bool.isRequired,
+  resetAllAct: PropTypes.func.isRequired,
+  clickUiTargetAct: PropTypes.func.isRequired,
+  selectUiSweepAct: PropTypes.func.isRequired,
+  scrollUiWheelAct: PropTypes.func.isRequired,
+  isHidden: PropTypes.bool,
+  hplcMsSt: PropTypes.object.isRequired,
+  selectWavelengthAct: PropTypes.func.isRequired,
+  updateTicAct: PropTypes.func.isRequired,
+  selectCurveAct: PropTypes.func.isRequired,
+  zoomInAct: PropTypes.func.isRequired,
+  editPeakSt: PropTypes.object.isRequired,
+  updateCurrentPageValueAct: PropTypes.func.isRequired,
+};
+
+ViewerLineRect.defaultProps = {
+  feature: {},
+  isHidden: false,
+};
+
+// export default connect(mapStateToProps, mapDispatchToProps)(ViewerLineRect);
+export default compose(
+  connect(mapStateToProps, mapDispatchToProps),
+  withStyles(styles),
+)(ViewerLineRect);

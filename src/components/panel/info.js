@@ -155,12 +155,9 @@ const handleDescriptionChanged = (content, delta, source, editor, onDescriptionC
   onDescriptionChanged(normalizeQuillValue(content), delta, source, editor);
 };
 
-const aucValue = (integration) => {
-  if (!integration) {
-    return '';
-  }
+const aucValue = (integration, hplcMsSt) => {
   const values = [];
-  const stackIntegration = integration.stack;
+  const stackIntegration = integration?.stack;
   if (Array.isArray(stackIntegration)) {
     let sumVal = 0.0;
     stackIntegration.forEach((inte) => {
@@ -178,7 +175,32 @@ const aucValue = (integration) => {
       }
     });
   }
-  return values.join(', ');
+
+  const spectraList = hplcMsSt?.uvvis?.spectraList || [];
+  const listWaveLength = hplcMsSt?.uvvis?.listWaveLength || [];
+
+  spectraList.forEach((spectrum, idx) => {
+    const wavelength = listWaveLength[idx];
+    const integrations = spectrum?.integrations || [];
+
+    if (integrations.length > 0) {
+      const sumArea = integrations.reduce(
+        (sum, integ) => sum + (integ.absoluteArea ?? integ.area ?? 0),
+        0,
+      );
+
+      const integrationStrings = integrations.map((integ) => {
+        const rawArea = integ.absoluteArea ?? integ.area ?? 0;
+        const areaVal = rawArea.toFixed(2);
+        const percent = sumArea > 0 ? ((rawArea * 100) / sumArea).toFixed(2) : '0.00';
+        return `${areaVal} (${percent}%)`;
+      });
+
+      values.push(`[${wavelength} nm]: ${integrationStrings.join(', ')}`);
+    }
+  });
+
+  return values.join('\n');
 };
 
 const SECData = ({
@@ -219,8 +241,15 @@ const SECData = ({
 SECData.propTypes = {
   classes: PropTypes.object.isRequired,
   layout: PropTypes.string.isRequired,
-  detector: PropTypes.object.isRequired,
-  secData: PropTypes.object.isRequired,
+  detector: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.object,
+  ]),
+  secData: PropTypes.object,
+};
+
+SECData.defaultProps = {
+  detector: '',
 };
 
 const DSCData = ({
@@ -257,15 +286,15 @@ const DSCData = ({
 DSCData.propTypes = {
   classes: PropTypes.object.isRequired,
   layout: PropTypes.string.isRequired,
-  dscMetaData: PropTypes.object.isRequired,
+  dscMetaData: PropTypes.object,
   updateAction: PropTypes.func.isRequired,
 };
 
 const InfoPanel = ({
   classes, expand, feature, integration, editorOnly, molSvg, descriptions,
   layoutSt, simulationSt, shiftSt, curveSt, exactMass,
-  onExapnd, canChangeDescription, onDescriptionChanged, detectorSt,
-  metaSt, updateDSCMetaDataAct,
+  onExapnd, onExpand, canChangeDescription, onDescriptionChanged, detectorSt,
+  metaSt, updateDSCMetaDataAct, hplcMsSt, entities,
 }) => {
   if (!feature) return null;
   const {
@@ -273,12 +302,19 @@ const InfoPanel = ({
   } = feature;
   const { dscMetaData } = metaSt;
   const { curveIdx } = curveSt;
-  const { curves } = detectorSt;
+  const { curves = [] } = detectorSt || {};
+  const currentEntity = Array.isArray(entities) ? entities[curveIdx] : null;
+  const entityTitle = currentEntity?.entity?.title
+    || currentEntity?.title
+    || currentEntity?.spectra?.[0]?.title
+    || currentEntity?.entity?.spectra?.[0]?.title
+    || '';
+  const displayTitle = title || entityTitle;
 
   const getSelectedDetectorForCurve = (_detectorSt, targetCurveIdx) => {
     const targetCurve = curves.find((curve) => curve.curveIdx === targetCurveIdx);
 
-    return targetCurve ? targetCurve.selectedDetector.name : '';
+    return targetCurve?.selectedDetector?.name || '';
   };
 
   let selectedDetector = getSelectedDetectorForCurve(detectorSt, curveIdx);
@@ -305,7 +341,7 @@ const InfoPanel = ({
     <Accordion
       data-testid="PanelInfo"
       expanded={expand}
-      onChange={onExapnd}
+      onChange={onExpand || onExapnd}
       disableGutters
       sx={{
         '&.MuiAccordion-root.Mui-expanded': { margin: 0 },
@@ -327,7 +363,7 @@ const InfoPanel = ({
       <div className={classNames(classes.panelDetail)}>
         <div className={classNames(classes.rowRoot, classes.rowOdd)}>
           <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Title : </span>
-          <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{ title }</span>
+          <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{ displayTitle }</span>
         </div>
         {
           Format.isNmrLayout(layoutSt)
@@ -422,6 +458,32 @@ const InfoPanel = ({
             : null
         }
       </div>
+      {
+        Format.isLCMsLayout(layoutSt) ? (
+          <div className={classNames(classes.rowRoot, classes.rowOddSim)}>
+            <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>
+              Area under curve (AUC):
+            </span>
+            <br />
+            <div
+              className={classNames(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt')}
+              style={{
+                maxHeight: '80px',
+                overflowY: 'auto',
+                overflowX: 'hidden',
+                wordBreak: 'break-word',
+                marginBottom: '100px',
+              }}
+            >
+              {aucValue(integration, hplcMsSt)
+                .split('\n')
+                .map((line, idx) => (
+                  <div key={idx}>{line}</div>
+                ))}
+            </div>
+          </div>
+        ) : null
+      }
     </Accordion>
   );
 };
@@ -434,6 +496,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     curveSt: state.curve,
     detectorSt: state.detector,
     metaSt: state.meta,
+    hplcMsSt: state.hplcMs,
   }
 );
 
@@ -446,8 +509,8 @@ const mapDispatchToProps = (dispatch) => (
 InfoPanel.propTypes = {
   classes: PropTypes.object.isRequired,
   expand: PropTypes.bool.isRequired,
-  feature: PropTypes.object.isRequired,
-  integration: PropTypes.object.isRequired,
+  feature: PropTypes.object,
+  integration: PropTypes.object,
   editorOnly: PropTypes.bool.isRequired,
   molSvg: PropTypes.string.isRequired,
   descriptions: PropTypes.oneOfType([
@@ -455,16 +518,19 @@ InfoPanel.propTypes = {
     PropTypes.array,
   ]).isRequired,
   layoutSt: PropTypes.string.isRequired,
-  simulationSt: PropTypes.array.isRequired,
+  simulationSt: PropTypes.object.isRequired,
   shiftSt: PropTypes.object.isRequired,
   curveSt: PropTypes.object.isRequired,
-  onExapnd: PropTypes.func.isRequired,
+  onExpand: PropTypes.func,
+  onExapnd: PropTypes.func,
   canChangeDescription: PropTypes.bool.isRequired,
   onDescriptionChanged: PropTypes.func,
   exactMass: PropTypes.string,
   detectorSt: PropTypes.object.isRequired,
   metaSt: PropTypes.object.isRequired,
   updateDSCMetaDataAct: PropTypes.func.isRequired,
+  hplcMsSt: PropTypes.object.isRequired,
+  entities: PropTypes.array,
 };
 
 export default connect( // eslint-disable-line

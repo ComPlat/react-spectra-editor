@@ -5,7 +5,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
-import { bindActionCreators, compose } from 'redux';
+import { compose } from 'redux';
 
 import Tooltip from '@mui/material/Tooltip';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
@@ -15,7 +15,12 @@ import {
   Convert2Scan, Convert2Thres,
 } from '../../helpers/chem';
 import { MuButton, commonStyle } from './common';
-import { extractPeaksEdit } from '../../helpers/extractPeaksEdit';
+import {
+  extractPeaksEdit,
+  formatLcmsPeaksForBackend,
+  formatLcmsIntegralsForBackend,
+  getLcmsMzPageData,
+} from '../../helpers/extractPeaksEdit';
 import Format from '../../helpers/format';
 
 const styles = () => (
@@ -29,7 +34,10 @@ const getAxesSelection = (axesUnitsSt, curveIdx) => {
   const axes = axesUnitsSt?.axes;
   if (!Array.isArray(axes) || axes.length === 0) return { xUnit: '', yUnit: '' };
   const idx = Number.isFinite(curveIdx) ? curveIdx : 0;
-  return axes[idx] || axes[0] || { xUnit: '', yUnit: '' };
+  return axes[idx] || axes[0] || {
+    xUnit: '',
+    yUnit: '',
+  };
 };
 
 const resolveAxisLabels = (xLabel, yLabel, axesUnitsSt, curveIdx) => {
@@ -174,11 +182,15 @@ const onClickCb = (
   layoutSt, shiftSt, analysis, decimalSt,
   integrationSt, multiplicitySt, waveLengthSt,
   cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData,
-  curveList, editPeakSt, thresList, scanSt, feature,
+  curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt,
 ) => (
   () => {
     const defaultCurves = feature ? [{ feature }] : [];
-    const curves = Array.isArray(curveList) && curveList.length > 0 ? curveList : defaultCurves;
+    let curves = Array.isArray(curveList) && curveList.length > 0 ? curveList : defaultCurves;
+    if (layoutSt === 'LC/MS') {
+      curves = curves.filter((c) => c.lcmsKind === 'uvvis');
+      if (curves.length === 0) curves = defaultCurves;
+    }
     const fallbackIdx = Number.isFinite(curveSt?.curveIdx) ? curveSt.curveIdx : 0;
     const indicesToSend = curves.length > 0
       ? curves.map((_, index) => index)
@@ -210,6 +222,14 @@ const onClickCb = (
     const payload = {
       spectra_list: spectraList,
     };
+    if (layoutSt === 'LC/MS') {
+      payload.lcms_peaks = formatLcmsPeaksForBackend(hplcMsSt);
+      payload.lcms_integrals = formatLcmsIntegralsForBackend(hplcMsSt);
+      payload.lcms_peaks_text = Format.formatedLCMS(hplcMsSt, isAscend, decimalSt);
+      payload.lcms_uvvis_wavelength = hplcMsSt?.uvvis?.selectedWaveLength ?? null;
+      payload.lcms_mz_page = hplcMsSt?.tic?.currentPageValue ?? null;
+      payload.lcms_mz_page_data = getLcmsMzPageData(hplcMsSt);
+    }
     if (Number.isFinite(curveSt?.curveIdx)) {
       payload.curveSt = { curveIdx: curveSt.curveIdx };
     }
@@ -223,6 +243,7 @@ const BtnSubmit = ({
   decimalSt, integrationSt, multiplicitySt,
   waveLengthSt, cyclicvoltaSt, curveSt, curveList, axesUnitsSt, detectorSt,
   metaSt,
+  hplcMsSt,
 }) => {
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
   const { dscMetaData } = metaSt;
@@ -264,7 +285,7 @@ const BtnSubmit = ({
           layoutSt, shiftSt, forecastSt.predictions, decimalSt,
           integrationSt, multiplicitySt, waveLengthSt,
           cyclicvoltaPayload, curveSt, axesUnitsSt, detectorSt, dscMetaData,
-          curveList, editPeakSt, thresList, scanSt, feature,
+          curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt,
         )}
       >
         <PlayCircleOutlineIcon className={classes.icon} />
@@ -291,12 +312,8 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     axesUnitsSt: state.axesUnits,
     detectorSt: state.detector,
     metaSt: state.meta,
+    hplcMsSt: state.hplcMs,
   }
-);
-
-const mapDispatchToProps = (dispatch) => (
-  bindActionCreators({
-  }, dispatch)
 );
 
 BtnSubmit.propTypes = {
@@ -326,9 +343,14 @@ BtnSubmit.propTypes = {
   axesUnitsSt: PropTypes.object.isRequired,
   detectorSt: PropTypes.object.isRequired,
   metaSt: PropTypes.object.isRequired,
+  hplcMsSt: PropTypes.object,
+};
+
+BtnSubmit.defaultProps = {
+  hplcMsSt: {},
 };
 
 export default compose(
-  connect(mapStateToProps, mapDispatchToProps),
+  connect(mapStateToProps, null),
   withStyles(styles),
 )(BtnSubmit);

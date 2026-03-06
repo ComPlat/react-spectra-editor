@@ -26,6 +26,7 @@ const LIST_UI_SWEEP_TYPE = {
   CYCLIC_VOLTA_ADD_PECKER: 'cyclic voltammetry add pecker',
   CYCLIC_VOLTA_RM_PECKER: 'cyclic voltammetry remove pecker',
   CYCLIC_VOLTA_SET_REF: 'cyclic voltammetry set ref',
+  PEAK_GROUP_SELECT: 'peak group select',
 };
 
 const LIST_NON_BRUSH_TYPES = [
@@ -45,6 +46,7 @@ const LIST_NON_BRUSH_TYPES = [
   LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_PECKER,
   LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_PECKER,
   LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_SET_REF,
+  LIST_UI_SWEEP_TYPE.PEAK_GROUP_SELECT,
 ];
 
 export {

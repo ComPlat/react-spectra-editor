@@ -2,7 +2,7 @@
 react/function-component-definition, react/require-default-props */
 import React from 'react';
 import { connect } from 'react-redux';
-import { bindActionCreators, compose } from 'redux';
+import { compose } from 'redux';
 import PropTypes from 'prop-types';
 
 import withStyles from '@mui/styles/withStyles';
@@ -35,19 +35,27 @@ const styles = () => (
 );
 
 const CmdBar = ({
-  classes, feature, hasEdit, forecast, operations, editorOnly, jcampIdx, hideThreshold, layoutSt,
+  classes, feature, hasEdit, forecast, operations, editorOnly, jcampIdx, hideThreshold,
+  hideMainEditTools,
+  layoutSt,
 }) => {
   const isCvLayout = Format.isCyclicVoltaLayout(layoutSt);
 
   return (
     <div className={classes.card}>
-      <Viewer editorOnly={editorOnly} />
-      <Zoom />
-      <Peak jcampIdx={jcampIdx} feature={feature} />
-      <Pecker jcampIdx={jcampIdx} />
-      {isCvLayout ? null : <Integration />}
-      {isCvLayout ? null : <Multiplicity />}
-      <UndoRedo />
+      {
+        hideMainEditTools ? null : (
+          <>
+            <Viewer editorOnly={editorOnly} />
+            <Zoom />
+            <Peak jcampIdx={jcampIdx} feature={feature} />
+            <Pecker jcampIdx={jcampIdx} />
+            {isCvLayout ? null : <Integration />}
+            {isCvLayout ? null : <Multiplicity />}
+            <UndoRedo />
+          </>
+        )
+      }
       <Submit
         operations={operations}
         feature={feature}
@@ -74,11 +82,6 @@ const mapStateToProps = (state, _) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = (dispatch) => (
-  bindActionCreators({
-  }, dispatch)
-);
-
 CmdBar.propTypes = {
   classes: PropTypes.object.isRequired,
   feature: PropTypes.object.isRequired,
@@ -89,9 +92,10 @@ CmdBar.propTypes = {
   layoutSt: PropTypes.string.isRequired,
   jcampIdx: PropTypes.any,
   hideThreshold: PropTypes.bool,
+  hideMainEditTools: PropTypes.bool,
 };
 
 export default compose(
-  connect(mapStateToProps, mapDispatchToProps),
+  connect(mapStateToProps, null),
   withStyles(styles),
 )(CmdBar);
