@@ -388,6 +388,54 @@ const extrSpectraShare = (spectra, layout) => (
   spectra.map((s) => Object.assign({ layout }, s)).filter((r) => r != null)
 );
 
+const normalizeLcMsMode = (value) => {
+  const mode = String(value || '').toUpperCase();
+  if (!mode) return 'NEUTRAL';
+  if (mode.includes('NEGATIVE') || mode.includes('NEGATIV')) return 'NEGATIVE';
+  if (mode.includes('POSITIVE') || mode.includes('POSITIV')) return 'POSITIVE';
+  if (mode.includes('NEUTRAL')) return 'NEUTRAL';
+  return 'NEUTRAL';
+};
+
+const inferLcMsKind = (spectrum, jcamp) => {
+  const spectrumDataType = String(spectrum?.dataType || '').toUpperCase();
+  const jcampDataType = String(jcamp?.dataType || '').toUpperCase();
+  const type = String(jcamp?.info?.TYPE || '').toUpperCase();
+  const xUnit = String(
+    spectrum?.xUnit || jcamp?.info?.XUNITS || jcamp?.xUnit || '',
+  ).toUpperCase();
+  const yUnit = String(
+    spectrum?.yUnit || jcamp?.info?.YUNITS || jcamp?.yUnit || '',
+  ).toUpperCase();
+
+  if (
+    spectrumDataType.includes('MASS TIC')
+    || jcampDataType.includes('MASS TIC')
+    || type.includes('CHROMATOGRAM')
+  ) {
+    return 'TIC';
+  }
+  if (spectrumDataType.includes('MASS SPECTRUM') || jcampDataType.includes('MASS SPECTRUM')) {
+    return 'MZ';
+  }
+  if (xUnit.includes('TIME') || xUnit.includes('MINUTE')) {
+    if (yUnit.includes('INTENSITY') || yUnit.includes('COUNT')) return 'TIC';
+  }
+  if (xUnit.includes('M/Z') || xUnit.includes('MZ')) return 'MZ';
+  return 'SPECTRUM';
+};
+
+const inferLcMsCategory = (spectrum, jcamp) => {
+  const existing = spectrum?.csCategory;
+  if (existing) return existing;
+
+  const category = inferLcMsKind(spectrum, jcamp);
+  const mode = normalizeLcMsMode(jcamp?.info?.SCAN_MODE || jcamp?.info?.SCANMODE);
+  if (category === 'UVVIS') return 'UVVIS PEAK TABLE';
+  if (category === 'TIC' || category === 'MZ') return `${category} ${mode} SPECTRUM`;
+  return `${category} SPECTRUM`;
+};
+
 const extrSpectraMs = (jcamp, layout) => {
   const csCategories = []
     .concat(jcamp?.info?.$CSCATEGORY || [])
@@ -546,14 +594,14 @@ const extrSpectraMs = (jcamp, layout) => {
     (jcamp.spectra || []).forEach((s) => {
       const hasPoints = s?.data?.[0]?.x?.length > 0;
       if (hasPoints) {
-        finalSpectra.push({ ...s });
+        finalSpectra.push({ ...s, csCategory: inferLcMsCategory(s, jcamp) });
       }
     });
   } else {
     (jcamp.spectra || []).forEach((s) => {
       const hasPoints = s?.data?.[0]?.x?.length > 0;
       if (hasPoints) {
-        finalSpectra.push({ ...s });
+        finalSpectra.push({ ...s, csCategory: inferLcMsCategory(s, jcamp) });
       }
     });
   }
@@ -694,7 +742,7 @@ const buildPeakFeature = (jcamp, layout, peakUp, s, thresRef, upperThres = false
     weAreaValue: info.$CSWEAREAVALUE || '',
     weAreaUnit: info.$CSWEAREAUNIT || '',
     currentMode: (info.$CSCURRENTMODE || ''),
-    csCategory: info.$CSCATEGORY,
+    csCategory: info.$CSCATEGORY || s.csCategory,
   };
 
   if (layout === 'LC/MS') {
@@ -1054,7 +1102,9 @@ const parseChemstationPages = (source, jcamp) => {
     const pageLine = (lines[0] || '').trim();
     const pageValue = parsePageValue(pageLine);
 
-    const dataStart = lines.findIndex((line) => line.startsWith('##DATA TABLE'));
+    const dataStart = lines.findIndex(
+      (line) => line.startsWith('##DATA TABLE') || line.startsWith('##XYDATA'),
+    );
     if (dataStart >= 0) {
       const x = [];
       const y = [];
@@ -1093,10 +1143,14 @@ const parseChemstationPages = (source, jcamp) => {
 
 const isChemstationLcms = (source, jcamp) => {
   if (typeof source !== 'string') return false;
-  const dt = String(jcamp?.dataType || '').toUpperCase();
+  const dt = String(jcamp?.dataType || jcamp?.info?.DATATYPE || '').toUpperCase();
   if (dt.includes('LC/MS') || dt.includes('MASS TIC')) return true;
 
   const spectra = Array.isArray(jcamp?.spectra) ? jcamp.spectra : [];
+  const info = jcamp?.info || {};
+  const scanMode = String(info.SCAN_MODE || info.SCANMODE || '').toUpperCase();
+  const type = String(info.TYPE || '').toUpperCase();
+  const software = String(info.SOFTWARE || '').toUpperCase();
   const csCategory = jcamp?.info?.$CSCATEGORY;
   const categories = Array.isArray(csCategory)
     ? csCategory.map((c) => String(c).toUpperCase())
@@ -1120,6 +1174,15 @@ const isChemstationLcms = (source, jcamp) => {
     const sdt = String(s?.dataType || '').toUpperCase();
     return sdt.includes('MASS SPECTRUM');
   });
+  const hasMassSpectrumRootDataType = dt.includes('MASS SPECTRUM');
+  const hasScanModeHint = (
+    scanMode.includes('POSITIVE')
+    || scanMode.includes('NEGATIVE')
+    || scanMode.includes('POSITIV')
+    || scanMode.includes('NEGATIV')
+  );
+  const hasTypeHint = type.includes('MS SPECTRUM') || type.includes('MS CHROMATOGRAM');
+  const hasSoftwareHint = software.includes('OPENLAB');
   const hasMultipleSpectra = spectra.length > 1;
   const hasPageMetadata = spectra.some((s) => s?.page != null || s?.pageValue != null);
 
@@ -1142,6 +1205,19 @@ const isChemstationLcms = (source, jcamp) => {
     return true;
   }
 
+  if (
+    hasMassSpectrumRootDataType
+    && (hasMassSpectrumDataType || hasScanModeHint || hasTypeHint || hasSoftwareHint)
+  ) {
+    return true;
+  }
+  if (
+    hasMassTicSpectrumDataType
+    && (hasTypeHint || hasSoftwareHint || hasScanModeHint || spectra.length > 0)
+  ) {
+    return true;
+  }
+
   return false;
 };
 
@@ -1150,7 +1226,7 @@ const ExtractJcamp = (source) => {
     source,
     {
       xy: true,
-      keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS|\$CSUPPERTHRESHOLD|\$CSLOWERTHRESHOLD|\$CSCYCLICVOLTAMMETRYDATA|UNITS|SYMBOL|\$CSAUTOMETADATA|\$DETECTOR|MN|MW|D|MP|MELTINGPOINT|TG|\$CSSCANRATE|\$CSSPECTRUMDIRECTION|\$CSWEAREAVALUE|\$CSWEAREAUNIT|\$CSCURRENTMODE)/, // eslint-disable-line
+      keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS|\$CSUPPERTHRESHOLD|\$CSLOWERTHRESHOLD|\$CSCYCLICVOLTAMMETRYDATA|UNITS|SYMBOL|\$CSAUTOMETADATA|\$DETECTOR|MN|MW|D|MP|MELTINGPOINT|TG|\$CSSCANRATE|\$CSSPECTRUMDIRECTION|\$CSWEAREAVALUE|\$CSWEAREAUNIT|\$CSCURRENTMODE|SCAN_MODE|SCANMODE|TYPE|SOFTWARE|DATATYPE)/, // eslint-disable-line
     },
   );
   const isChemstation = isChemstationLcms(source, jcamp);
