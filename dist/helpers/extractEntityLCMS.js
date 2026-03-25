@@ -39,6 +39,26 @@ const getEntityValue = (entity, path, fallback = '') => {
   return current ?? fallback;
 };
 const normalizeUnit = value => String(value || '').toUpperCase().replace(/\s+/g, '');
+const normalizeText = value => String(value || '').toUpperCase();
+const parseNumeric = value => {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null;
+  const text = String(value || '').trim();
+  if (!text) return null;
+  const match = text.match(/[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?/);
+  if (!match) return null;
+  const parsed = Number(match[0]);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+const firstSpectrum = entity => entity?.spectra?.[0] || entity?.feature || entity?.features?.[0] || null;
+const getFirstTicX = entity => {
+  const spectrum = firstSpectrum(entity);
+  const x0 = spectrum?.data?.[0]?.x?.[0];
+  return parseNumeric(x0);
+};
+const getMzPage = entity => {
+  const spectrum = firstSpectrum(entity);
+  return parseNumeric(spectrum?.pageValue ?? spectrum?.page ?? spectrum?.pageSymbol);
+};
 function getLcMsInfo(entity = {}) {
   if (entity.lcmsKind) {
     return {
@@ -48,8 +68,9 @@ function getLcMsInfo(entity = {}) {
   }
   const categories = collectCategories(entity);
   const normalizedCategories = categories.map(String).map(category => category.toUpperCase());
-  const hasNeg = normalizedCategories.some(category => category.includes('NEGATIVE') || category.startsWith('NEGATIV'));
-  const hasPos = normalizedCategories.some(category => category.includes('POSITIVE') || category.startsWith('POSITIV'));
+  const scanMode = normalizeText(entity.scanMode || entity.SCAN_MODE || entity.SCANMODE || getEntityValue(entity, 'info.SCAN_MODE') || getEntityValue(entity, 'info.SCANMODE') || getEntityValue(entity, 'spectra.0.scanMode') || getEntityValue(entity, 'spectra.0.SCAN_MODE') || getEntityValue(entity, 'spectra.0.SCANMODE') || getEntityValue(entity, 'feature.scanMode') || getEntityValue(entity, 'feature.SCAN_MODE') || getEntityValue(entity, 'feature.SCANMODE') || getEntityValue(entity, 'features.0.scanMode') || getEntityValue(entity, 'features.0.SCAN_MODE') || getEntityValue(entity, 'features.0.SCANMODE'));
+  const hasNeg = normalizedCategories.some(category => category.includes('NEGATIVE') || category.startsWith('NEGATIV')) || scanMode.includes('NEGATIVE') || scanMode.includes('NEGATIV');
+  const hasPos = normalizedCategories.some(category => category.includes('POSITIVE') || category.startsWith('POSITIV')) || scanMode.includes('POSITIVE') || scanMode.includes('POSITIV');
   let polarity = 'neutral';
   if (hasNeg) {
     polarity = 'negative';
@@ -60,14 +81,17 @@ function getLcMsInfo(entity = {}) {
   if (normalizedCategories.some(category => category.includes('TIC'))) kind = 'tic';
   if (!kind && normalizedCategories.some(category => category.includes('MZ'))) kind = 'mz';
   if (!kind && normalizedCategories.some(category => category.includes('UVVIS'))) kind = 'uvvis';
-  const dataType = String(entity.dataType || getEntityValue(entity, 'spectra.0.dataType') || getEntityValue(entity, 'feature.dataType') || getEntityValue(entity, 'features.0.dataType')).toUpperCase();
+  const dataType = String(entity.dataType || entity.DATATYPE || getEntityValue(entity, 'info.DATATYPE') || getEntityValue(entity, 'spectra.0.dataType') || getEntityValue(entity, 'spectra.0.DATATYPE') || getEntityValue(entity, 'feature.dataType') || getEntityValue(entity, 'feature.DATATYPE') || getEntityValue(entity, 'features.0.dataType') || getEntityValue(entity, 'features.0.DATATYPE')).toUpperCase();
+  const type = normalizeText(entity.type || entity.TYPE || getEntityValue(entity, 'info.TYPE') || getEntityValue(entity, 'spectra.0.type') || getEntityValue(entity, 'spectra.0.TYPE') || getEntityValue(entity, 'feature.type') || getEntityValue(entity, 'feature.TYPE') || getEntityValue(entity, 'features.0.type') || getEntityValue(entity, 'features.0.TYPE'));
   if (!kind && dataType.includes('MASS TIC')) kind = 'tic';
   if (!kind && dataType.includes('MASS SPECTRUM')) kind = 'mz';
   if (!kind && (dataType.includes('UV') || dataType.includes('UV-VIS'))) kind = 'uvvis';
+  if (!kind && type.includes('CHROMATOGRAM')) kind = 'tic';
+  if (!kind && type.includes('SPECTRUM') && dataType.includes('MASS')) kind = 'mz';
   const xUnit = normalizeUnit(entity.xUnit || getEntityValue(entity, 'spectra.0.xUnit') || getEntityValue(entity, 'feature.xUnit') || getEntityValue(entity, 'features.0.xUnit'));
   const yUnit = normalizeUnit(entity.yUnit || getEntityValue(entity, 'spectra.0.yUnit') || getEntityValue(entity, 'feature.yUnit') || getEntityValue(entity, 'features.0.yUnit'));
   if (!kind && xUnit.includes('M/Z')) kind = 'mz';
-  if (!kind && (xUnit.includes('TIME') || xUnit.includes('MINUTE')) && yUnit.includes('INTENSITY')) {
+  if (!kind && (xUnit.includes('TIME') || xUnit.includes('MINUTE')) && (yUnit.includes('INTENSITY') || yUnit.includes('COUNT'))) {
     kind = 'tic';
   }
   return {
@@ -75,6 +99,35 @@ function getLcMsInfo(entity = {}) {
     polarity
   };
 }
+const alignMzPolarityWithTic = (ticEntities, mzEntities) => {
+  const ticByPolarity = {};
+  ticEntities.forEach(tic => {
+    const info = getLcMsInfo(tic);
+    const x = getFirstTicX(tic);
+    if (info.polarity && x != null) ticByPolarity[info.polarity] = x;
+  });
+  const ticPolarityKeys = Object.keys(ticByPolarity);
+  if (ticPolarityKeys.length < 2) return mzEntities;
+  return mzEntities.map(mzEntity => {
+    const mzPage = getMzPage(mzEntity);
+    if (mzPage == null) return mzEntity;
+    let nearestPolarity = null;
+    let nearestDistance = Infinity;
+    ticPolarityKeys.forEach(polarity => {
+      const ticX = ticByPolarity[polarity];
+      const distance = Math.abs(mzPage - ticX);
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestPolarity = polarity;
+      }
+    });
+    if (!nearestPolarity) return mzEntity;
+    return {
+      ...mzEntity,
+      lcmsPolarity: nearestPolarity
+    };
+  });
+};
 function classify(entity) {
   const {
     kind,
@@ -85,7 +138,7 @@ function classify(entity) {
 }
 function splitAndReindexEntities(entities = []) {
   const tic = [];
-  const mz = [];
+  let mz = [];
   const uvvis = [];
   const unknown = [];
   const normalizedEntities = entities.map(entity => ({
@@ -97,6 +150,7 @@ function splitAndReindexEntities(entities = []) {
     e.lcmsPolarity = info.polarity;
     if (info.kind === 'tic') tic.push(e);else if (info.kind === 'mz') mz.push(e);else if (info.kind === 'uvvis') uvvis.push(e);else unknown.push(e);
   });
+  mz = alignMzPolarityWithTic(tic, mz);
   const polarityRank = {
     positive: 0,
     negative: 1,

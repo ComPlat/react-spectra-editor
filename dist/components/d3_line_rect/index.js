@@ -40,16 +40,23 @@ const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.8 / 3); // ROI
 
 const parsePageValue = feature => {
-  const raw = feature?.pageSymbol ?? feature?.pageValue ?? feature?.page;
-  if (raw == null) return null;
-  if (typeof raw === 'number') {
-    return Number.isFinite(raw) ? raw : null;
+  const candidates = [feature?.pageValue, feature?.page, feature?.pageSymbol];
+  for (let i = 0; i < candidates.length; i += 1) {
+    const raw = candidates[i];
+    if (raw != null) {
+      if (typeof raw === 'number') {
+        if (Number.isFinite(raw)) return raw;
+      } else {
+        const text = String(raw).split('\n')[0].trim();
+        const match = text.match(/[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?/);
+        if (match) {
+          const value = Number(match[0]);
+          if (Number.isFinite(value)) return value;
+        }
+      }
+    }
   }
-  const text = String(raw).split('\n')[0].trim();
-  const match = text.match(/[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?/);
-  if (!match) return null;
-  const value = Number(match[0]);
-  return Number.isFinite(value) ? value : null;
+  return null;
 };
 const toSeed = (xValues = [], yValues = []) => {
   const maxLength = Math.min(xValues.length, yValues.length);
