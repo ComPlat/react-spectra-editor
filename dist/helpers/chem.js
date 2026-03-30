@@ -562,11 +562,16 @@ const extrSpectraMs = (jcamp, layout) => {
       }
     });
     const container = jcamp?.info?.$OBSERVEDINTEGRALS ?? null;
+    const jcampUnitsField = String(jcamp?.info?.UNITS || '').toUpperCase();
+    const jcampUnitsIndicatesMinutes = jcampUnitsField.includes('MINUTE');
     uvvisSpectra.forEach(({
       spectrum
     }, pairIdx) => {
-      const isTimeAxis = String(spectrum?.xUnit || '').toLowerCase().includes('time');
-      const scaleX = value => isTimeAxis ? value / 60 : value;
+      const xUnitUpper = String(spectrum?.xUnit || '').toUpperCase();
+      const isExplicitMinutes = xUnitUpper.includes('MINUTE') || jcampUnitsIndicatesMinutes;
+      const isTimeAxis = xUnitUpper.includes('TIME') || xUnitUpper.includes('SECOND');
+      const needsSecToMin = isTimeAxis && !isExplicitMinutes;
+      const scaleX = value => needsSecToMin ? value / 60 : value;
       const pageKey = spectrum.pageValue ?? spectrum.page;
       const peakTable = peakTablesByPage.get(pageKey);
       let selectedPeakTable = null;
@@ -579,8 +584,17 @@ const extrSpectraMs = (jcamp, layout) => {
       } else {
         selectedPeakTable = peakTable?.edit || peakTable?.auto || peakTable?.other || null;
       }
+      const originalData = spectrum?.data?.[0];
+      let normalizedData = spectrum.data;
+      if (needsSecToMin && originalData?.x) {
+        normalizedData = [{
+          ...originalData,
+          x: originalData.x.map(scaleX)
+        }];
+      }
       const mainSpectrum = {
         ...spectrum,
+        data: normalizedData,
         peaks: [],
         integrations: [],
         csCategory: 'UVVIS PEAK TABLE'
