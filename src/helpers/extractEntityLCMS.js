@@ -158,30 +158,34 @@ const alignMzPolarityWithTic = (ticEntities, mzEntities) => {
   ticEntities.forEach((tic) => {
     const info = getLcMsInfo(tic);
     const x = getFirstTicX(tic);
-    if (info.polarity && x != null) ticByPolarity[info.polarity] = x;
+    if (info.polarity && x != null) {
+      ticByPolarity[info.polarity] = x;
+    }
   });
 
   const ticPolarityKeys = Object.keys(ticByPolarity);
-  if (ticPolarityKeys.length < 2) return mzEntities;
+  if (ticPolarityKeys.length < 2) return;
 
-  return mzEntities.map((mzEntity) => {
-    const mzPage = getMzPage(mzEntity);
-    if (mzPage == null) return mzEntity;
+  for (let i = 0; i < mzEntities.length; i += 1) {
+    const entity = mzEntities[i];
+    const mzPage = getMzPage(entity);
+    if (mzPage != null) {
+      let nearestPolarity = null;
+      let nearestDistance = Infinity;
+      ticPolarityKeys.forEach((polarity) => {
+        const ticX = ticByPolarity[polarity];
+        const distance = Math.abs(mzPage - ticX);
+        if (distance < nearestDistance) {
+          nearestDistance = distance;
+          nearestPolarity = polarity;
+        }
+      });
 
-    let nearestPolarity = null;
-    let nearestDistance = Infinity;
-    ticPolarityKeys.forEach((polarity) => {
-      const ticX = ticByPolarity[polarity];
-      const distance = Math.abs(mzPage - ticX);
-      if (distance < nearestDistance) {
-        nearestDistance = distance;
-        nearestPolarity = polarity;
+      if (nearestPolarity) {
+        entity.lcmsPolarity = nearestPolarity;
       }
-    });
-
-    if (!nearestPolarity) return mzEntity;
-    return { ...mzEntity, lcmsPolarity: nearestPolarity };
-  });
+    }
+  }
 };
 
 export function classify(entity) {
@@ -192,7 +196,7 @@ export function classify(entity) {
 
 export function splitAndReindexEntities(entities = []) {
   const tic = [];
-  let mz = [];
+  const mz = [];
   const uvvis = [];
   const unknown = [];
 
@@ -208,7 +212,7 @@ export function splitAndReindexEntities(entities = []) {
     else unknown.push(e);
   });
 
-  mz = alignMzPolarityWithTic(tic, mz);
+  alignMzPolarityWithTic(tic, mz);
 
   const polarityRank = { positive: 0, negative: 1, neutral: 2 };
   const byPolarity = (a, b) => {

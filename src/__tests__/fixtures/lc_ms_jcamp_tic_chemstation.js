@@ -1,7 +1,7 @@
 const lcMsTicChemstationJcamp = `
 ##TITLE=Spectrum
-##JCAMP-DX=5.00 $$ chemotion-converter-app (1.5.0)
-##DATA TYPE=LC/MS
+##JCAMP-DX=5.00 $$ chemotion-converter-app (1.8.0)
+##DATA TYPE=MASS TIC
 ##DATA CLASS=XYPOINTS
 ##ORIGIN=
 ##OWNER=
@@ -17,7 +17,7 @@ const lcMsTicChemstationJcamp = `
 ##FIRSTY=3027291.0
 ##XUNITS=MINUTES
 ##YUNITS=Intensity
-##DATA TABLE= (XY..XY), PEAKS
+##XYDATA=(XY..XY)
 1.1228166666666666, 3027291.0
 1.1384333333333334, 2614443.0
 1.1540666666666666, 2082582.0
