@@ -103,9 +103,12 @@ const MouseMove = (event, focus) => {
           .attr('transform', `translate(${tx},${10})`)
           .text(`X: ${pt.x.toFixed(3)}, Y: ${pt.y.toFixed(3)}`);
       } else {
+        const xPrecision = Format.isMsLayout(layout)
+          ? Format.clampDecimalPlaces(focus.decimal)
+          : 3;
         focus.root.select('.cursor-txt')
           .attr('transform', `translate(${tx},${10})`)
-          .text(pt.x.toFixed(3));
+          .text(pt.x.toFixed(xPrecision));
         if (freq) {
           focus.root.select('.cursor-txt-hz')
             .attr('transform', `translate(${tx},${20})`)

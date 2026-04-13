@@ -57,11 +57,20 @@ const tpDiv = (d, digits, yFactor = 1) => (
   `
 );
 
+const peakTipHtml = ({
+  d, layout, yFactor, xDigits,
+}) => {
+  const digits = xDigits != null && xDigits !== ''
+    ? FN.clampDecimalPlaces(xDigits, FN.spectraDigit(layout))
+    : FN.spectraDigit(layout);
+  return tpDiv(d, digits, yFactor || 1);
+};
+
 const InitTip = () => {
   d3.select('.peak-tp').remove();
   const tip = d3Tip()
     .attr('class', 'd3-tip')
-    .html(({ d, layout, yFactor }) => tpDiv(d, FN.spectraDigit(layout), yFactor || 1));
+    .html(peakTipHtml);
   return tip;
 };
 

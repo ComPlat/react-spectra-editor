@@ -39,6 +39,13 @@ const fixDigit = (input, precision) => {
   return output.toFixed(precision);
 };
 
+/** Integer 0–20 for toFixed; invalid input uses fallback (e.g. toolbar decimal). */
+const clampDecimalPlaces = (value, fallback = 2) => {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.max(0, Math.min(20, Math.trunc(n)));
+};
+
 const buildData = (entity) => {
   if (!entity) return { isExist: false };
   const sp = entity && entity.spectrum;
@@ -567,6 +574,7 @@ const Format = {
   isEmWaveLayout,
   isGCLayout,
   fixDigit,
+  clampDecimalPlaces,
   formatPeaksByPrediction,
   formatedMS,
   formatedEm,
