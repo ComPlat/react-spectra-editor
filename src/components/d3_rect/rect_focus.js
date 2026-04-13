@@ -125,6 +125,7 @@ class RectFocus {
     this.updatePathCall(xt, yt);
 
     const yRef = this.tTrEndPts[0].y;
+    const msMaxY = d3.max(this.data, (row) => row.y) || 0;
 
     const bars = this.bars.selectAll('rect')
       .data(this.data);
@@ -148,7 +149,7 @@ class RectFocus {
           .attr('stroke-opacity', '1.0');
         d3.select(`#bpt${Math.round(1000 * d.x)}`)
           .style('fill', 'blue');
-        const tipParams = { d, layout: this.layout };
+        const tipParams = { d, layout: this.layout, msMaxY };
         this.tip.show(tipParams, event.target);
       })
       .on('mouseout', (event, d) => {
@@ -156,7 +157,7 @@ class RectFocus {
           .attr('stroke-opacity', '1.0');
         d3.select(`#bpt${Math.round(1000 * d.x)}`)
           .style('fill', 'red');
-        const tipParams = { d, layout: this.layout };
+        const tipParams = { d, layout: this.layout, msMaxY };
         this.tip.hide(tipParams, event.target);
       });
   }
