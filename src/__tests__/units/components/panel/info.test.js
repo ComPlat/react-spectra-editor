@@ -105,7 +105,7 @@ describe("<InfoPanel />", () => {
       <AppWrapper store={msStore}>
         <ThemeProvider theme={theme}>
           <InfoPanel
-            expand={false}
+            expand
             onExapnd={() => {}}
             feature={feature}
             exactMass="121.0653"
