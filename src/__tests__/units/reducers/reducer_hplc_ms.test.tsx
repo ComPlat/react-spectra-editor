@@ -30,11 +30,31 @@ const createMzCurve = (polarity: 'positive' | 'negative' | 'neutral') => ({
 });
 
 describe('Test redux reducer_hplc_ms', () => {
+  beforeEach(() => {
+    sessionStorage.clear();
+  });
+
   it('gets default state', () => {
     const state = hplcMsReducer(undefined, { type: '@@INIT' } as any);
     expect(state.layout).toEqual('LC/MS');
     expect(state.tic.polarity).toEqual('positive');
     expect(state.uvvis.spectraList).toEqual([]);
+    expect(state.lcmsIntegrationsExport).toEqual('percent');
+    expect(state.lcmsDatasetKey).toEqual(null);
+  });
+
+  it('sets lcmsIntegrationsExport and normalizes invalid values', () => {
+    const s0 = hplcMsReducer(undefined, { type: '@@INIT' } as any);
+    const s1 = hplcMsReducer(s0, {
+      type: HPLC_MS.SET_LCMS_INTEGRATIONS_EXPORT,
+      payload: { lcmsIntegrationsExport: 'both' },
+    } as any);
+    expect(s1.lcmsIntegrationsExport).toEqual('both');
+    const s2 = hplcMsReducer(s1, {
+      type: HPLC_MS.SET_LCMS_INTEGRATIONS_EXPORT,
+      payload: { lcmsIntegrationsExport: 'invalid' },
+    } as any);
+    expect(s2.lcmsIntegrationsExport).toEqual('percent');
   });
 
   it('sets LCMS curves and applies TIC fallback polarity', () => {
@@ -103,5 +123,143 @@ describe('Test redux reducer_hplc_ms', () => {
     } as any);
     expect(clearedPeaks.uvvis.spectraList.every((sp: any) => sp.peaks.length === 0)).toEqual(true);
     expect(clearedPeaks.uvvis.currentSpectrum?.pageValue).toEqual(220);
+  });
+
+  it('restores TIC RT from sessionStorage for the same dataset id', () => {
+    const payload = [
+      createTicCurve('positive', [1, 2, 3], [10, 20, 30]),
+      createUvvisCurve(),
+      createMzCurve('positive'),
+    ];
+    let state = hplcMsReducer(undefined, {
+      type: CURVE.SET_ALL_CURVES,
+      payload,
+      meta: { idDt: 'persist-rt-1' },
+    } as any);
+    state = hplcMsReducer(state, {
+      type: HPLC_MS.UPDATE_CURRENT_PAGE_VALUE,
+      payload: { currentPageValue: 2 },
+    } as any);
+    const cleared = hplcMsReducer(undefined, { type: '@@INIT' } as any);
+    expect(cleared.tic.currentPageValue).toEqual(null);
+    const reloaded = hplcMsReducer(cleared, {
+      type: CURVE.SET_ALL_CURVES,
+      payload,
+      meta: { idDt: 'persist-rt-1' },
+    } as any);
+    expect(reloaded.tic.currentPageValue).toEqual(2);
+  });
+
+  it('restores TIC polarity and RT page from meta (ELN / JCAMP reopen)', () => {
+    const payload = [
+      createTicCurve('negative', [1, 2, 3], [10, 20, 30]),
+      createUvvisCurve(),
+      createMzCurve('negative'),
+    ];
+    const state = hplcMsReducer(undefined, {
+      type: CURVE.SET_ALL_CURVES,
+      payload,
+      meta: { lcmsPolarity: 'negative', lcmsMzPage: 2 },
+    } as any);
+    expect(state.tic.polarity).toEqual('negative');
+    expect(state.tic.currentPageValue).toEqual(2);
+  });
+
+  it('restores TIC RT from UVVIS ##$CSLCMSMZPAGE (lcms_mz_page on uvvis curve)', () => {
+    const uvvis = { ...createUvvisCurve(), lcms_mz_page: 2 };
+    const payload = [
+      createTicCurve('positive', [1, 2, 3], [10, 20, 30]),
+      uvvis,
+      createMzCurve('positive'),
+    ];
+    const state = hplcMsReducer(undefined, {
+      type: CURVE.SET_ALL_CURVES,
+      payload,
+    } as any);
+    expect(state.tic.currentPageValue).toEqual(2);
+  });
+
+  it('selects wavelength from meta.lcmsUvvisWavelength when nothing to restore from state', () => {
+    const payload = [
+      createTicCurve('positive'),
+      createUvvisCurve(),
+      createMzCurve('positive'),
+    ];
+    const state = hplcMsReducer(undefined, {
+      type: CURVE.SET_ALL_CURVES,
+      payload,
+      meta: { idDt: 'test-dt', lcmsUvvisWavelength: 220 },
+    } as any);
+    expect(state.uvvis.selectedWaveLength).toEqual(220);
+    expect(state.uvvis.wavelengthIdx).toEqual(1);
+    expect(state.lcmsDatasetKey).toEqual('test-dt');
+  });
+
+  it('preserves selected wavelength when SET_ALL_CURVES reloads the same UVVIS order', () => {
+    const payload = [
+      createTicCurve('positive'),
+      createUvvisCurve(),
+      createMzCurve('positive'),
+    ];
+    let state = hplcMsReducer(undefined, { type: CURVE.SET_ALL_CURVES, payload } as any);
+    state = hplcMsReducer(state, {
+      type: HPLC_MS.UPDATE_UVVIS_WAVE_LENGTH,
+      payload: { target: { value: 220 } },
+    } as any);
+    expect(state.uvvis.selectedWaveLength).toEqual(220);
+    const reloaded = hplcMsReducer(state, { type: CURVE.SET_ALL_CURVES, payload } as any);
+    expect(reloaded.uvvis.selectedWaveLength).toEqual(220);
+    expect(reloaded.uvvis.wavelengthIdx).toEqual(1);
+  });
+
+  it('restores selected wavelength after a full reset with a new dataset id', () => {
+    const payload = [
+      createTicCurve('positive'),
+      createUvvisCurve(),
+      createMzCurve('positive'),
+    ];
+    let state = hplcMsReducer(undefined, {
+      type: CURVE.SET_ALL_CURVES,
+      payload,
+      meta: { idDt: 'before-save' },
+    } as any);
+    state = hplcMsReducer(state, {
+      type: HPLC_MS.UPDATE_UVVIS_WAVE_LENGTH,
+      payload: { target: { value: 220 } },
+    } as any);
+
+    const resetState = hplcMsReducer(undefined, { type: '@@INIT' } as any);
+    const reloaded = hplcMsReducer(resetState, {
+      type: CURVE.SET_ALL_CURVES,
+      payload,
+      meta: { idDt: 'after-save' },
+    } as any);
+
+    expect(reloaded.uvvis.selectedWaveLength).toEqual(220);
+    expect(reloaded.uvvis.wavelengthIdx).toEqual(1);
+  });
+
+  it('uvvis undo/redo restores peaks after UPDATE_HPLCMS_PEAKS', () => {
+    const payload = [
+      createTicCurve('positive'),
+      createUvvisCurve(),
+      createMzCurve('positive'),
+    ];
+    let state = hplcMsReducer(undefined, { type: CURVE.SET_ALL_CURVES, payload } as any);
+    const origPeaks = state.uvvis.spectraList[0].peaks;
+    state = hplcMsReducer(state, {
+      type: HPLC_MS.UPDATE_HPLCMS_PEAKS,
+      payload: {
+        spectrumId: state.uvvis.listWaveLength[0],
+        peaks: [...origPeaks, { x: 5, y: 0.5 }],
+      },
+    } as any);
+    expect(state.uvvis.spectraList[0].peaks.length).toEqual(origPeaks.length + 1);
+    expect(state.uvvisEditHistory.past.length).toEqual(1);
+    state = hplcMsReducer(state, { type: HPLC_MS.UVVIS_UNDO } as any);
+    expect(state.uvvis.spectraList[0].peaks).toEqual(origPeaks);
+    expect(state.uvvisEditHistory.future.length).toEqual(1);
+    state = hplcMsReducer(state, { type: HPLC_MS.UVVIS_REDO } as any);
+    expect(state.uvvis.spectraList[0].peaks.length).toEqual(origPeaks.length + 1);
   });
 });

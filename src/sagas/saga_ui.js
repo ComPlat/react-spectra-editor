@@ -39,11 +39,16 @@ function* selectUiSweep(action) {
     case LIST_UI_SWEEP_TYPE.ZOOMIN:
       if (layoutState === LIST_LAYOUT.LC_MS && uvvis.listWaveLength) {
         const { graphIndex } = zoom;
+        let lcmsSyncX;
+        if ((graphIndex === 0 || graphIndex === 1) && payload?.xExtent) {
+          lcmsSyncX = graphIndex === 0 ? 1 : 0;
+        }
         yield put({
           type: UI.SWEEP.SELECT_ZOOMIN,
           payload: {
             graphIndex,
             zoomValue: payload,
+            ...(lcmsSyncX != null ? { lcmsSyncX } : {}),
           },
         });
       } else {
@@ -54,10 +59,22 @@ function* selectUiSweep(action) {
       }
       break;
     case LIST_UI_SWEEP_TYPE.ZOOMRESET:
-      yield put({
-        type: UI.SWEEP.SELECT_ZOOMRESET,
-        payload,
-      });
+      if (layoutState === LIST_LAYOUT.LC_MS
+        && (payload?.graphIndex === 0 || payload?.graphIndex === 1)) {
+        yield put({
+          type: UI.SWEEP.SELECT_ZOOMRESET,
+          payload: { graphIndex: 0 },
+        });
+        yield put({
+          type: UI.SWEEP.SELECT_ZOOMRESET,
+          payload: { graphIndex: 1 },
+        });
+      } else {
+        yield put({
+          type: UI.SWEEP.SELECT_ZOOMRESET,
+          payload,
+        });
+      }
       break;
     case LIST_UI_SWEEP_TYPE.INTEGRATION_ADD: {
       if (uvvis.selectedWaveLength && layoutState === LIST_LAYOUT.LC_MS) {

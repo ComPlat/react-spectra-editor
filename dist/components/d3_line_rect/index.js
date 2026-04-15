@@ -14,6 +14,8 @@ var _withStyles = _interopRequireDefault(require("@mui/styles/withStyles"));
 var _material = require("@mui/material");
 var _ZoomInOutlined = _interopRequireDefault(require("@mui/icons-material/ZoomInOutlined"));
 var _FindReplaceOutlined = _interopRequireDefault(require("@mui/icons-material/FindReplaceOutlined"));
+var _Undo = _interopRequireDefault(require("@mui/icons-material/Undo"));
+var _Redo = _interopRequireDefault(require("@mui/icons-material/Redo"));
 var _common = require("../cmd_bar/common");
 var _chem = require("../../helpers/chem");
 var _manager = require("../../actions/manager");
@@ -69,7 +71,37 @@ const toSeed = (xValues = [], yValues = []) => {
   }
   return seed;
 };
-const styles = () => Object.assign({}, _common.commonStyle);
+const styles = () => Object.assign({}, {
+  lcMsStackRoot: {
+    margin: '0 0 5px 52px'
+  },
+  lcMsToolbarRow: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    columnGap: 8,
+    rowGap: 4
+  },
+  lcMsToolbarLeft: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    columnGap: 4,
+    rowGap: 4,
+    flex: '1 1 auto',
+    minWidth: 0
+  },
+  lcMsToolbarRight: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    columnGap: 8,
+    rowGap: 4,
+    flex: '0 1 auto'
+  }
+}, _common.commonStyle);
 const zoomView = (classes, graphIndex, uiSt, zoomInAct) => {
   const onSweepZoomIn = () => {
     const payload = {
@@ -162,6 +194,11 @@ const wavelengthSelect = (classes, hplcMsSt, updateWavelengthAct) => {
     })]
   });
 };
+const countAvailableTicPolarities = hplcMsSt => {
+  const a = hplcMsSt?.tic?.available;
+  if (!a || typeof a !== 'object') return 0;
+  return ['positive', 'negative', 'neutral'].filter(k => a[k]).length;
+};
 const ticSelect = (classes, hplcMsSt, handleTicChanged) => {
   const {
     tic = {}
@@ -184,7 +221,10 @@ const ticSelect = (classes, hplcMsSt, handleTicChanged) => {
     enabled: available?.neutral
   }];
   const filtered = listTIC.filter(d => d.enabled);
-  const listOptions = filtered.length > 0 ? filtered : listTIC;
+  if (filtered.length <= 1) {
+    return null;
+  }
+  const listOptions = filtered;
   const options = listOptions.map(d => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
     value: d.value,
     children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
@@ -263,6 +303,8 @@ class ViewerLineRect extends _react.default.Component {
     this.normChange = this.normChange.bind(this);
     this.extractSubView = this.extractSubView.bind(this);
     this.extractUvvisView = this.extractUvvisView.bind(this);
+    this.handleUvvisUndo = this.handleUvvisUndo.bind(this);
+    this.handleUvvisRedo = this.handleUvvisRedo.bind(this);
   }
   componentDidMount() {
     const {
@@ -416,11 +458,15 @@ class ViewerLineRect extends _react.default.Component {
     const {
       polarity
     } = hplcMsSt.tic;
-    let ticLabel = 'NEUTRAL';
-    if (polarity === 'negative') {
-      ticLabel = 'MINUS';
-    } else if (polarity === 'positive') {
-      ticLabel = 'PLUS';
+    const ticPolarityCount = countAvailableTicPolarities(hplcMsSt);
+    let ticLabel = null;
+    if (ticPolarityCount > 1) {
+      ticLabel = 'NEUTRAL';
+      if (polarity === 'negative') {
+        ticLabel = 'MINUS';
+      } else if (polarity === 'positive') {
+        ticLabel = 'PLUS';
+      }
     }
     (0, _draw.drawLabel)(this.rootKlassMulti, ticLabel, 'Minutes', 'Intensity');
     (0, _draw.drawDisplay)(this.rootKlassMulti, isHidden);
@@ -464,6 +510,18 @@ class ViewerLineRect extends _react.default.Component {
     (0, _draw.drawDestroy)(this.rootKlassLine);
     (0, _draw.drawDestroy)(this.rootKlassMulti);
     (0, _draw.drawDestroy)(this.rootKlassRect);
+  }
+  handleUvvisUndo() {
+    const {
+      uvvisUndoAct
+    } = this.props;
+    uvvisUndoAct();
+  }
+  handleUvvisRedo() {
+    const {
+      uvvisRedoAct
+    } = this.props;
+    uvvisRedoAct();
   }
   normChange(prevProps) {
     const {
@@ -534,9 +592,18 @@ class ViewerLineRect extends _react.default.Component {
     if (featuresArr.length === 0) return null;
     const pageValues = featuresArr.map(fe => parsePageValue(fe)).filter(val => Number.isFinite(val));
     if (pageValues.length === 0) return featuresArr[0];
-    const hasValidClick = subViewerAt && subViewerAt.x !== undefined;
-    const closestPage = hasValidClick ? (0, _calc.findClosest)(pageValues, subViewerAt.x) : pageValues[Math.floor(pageValues.length / 2)];
-    if (closestPage !== hplcMsSt.tic.currentPageValue) {
+    const hasValidClick = subViewerAt != null && Number.isFinite(subViewerAt.x);
+    let anchor;
+    if (hasValidClick) {
+      anchor = subViewerAt.x;
+    } else if (Number.isFinite(hplcMsSt.tic.currentPageValue)) {
+      anchor = hplcMsSt.tic.currentPageValue;
+    } else {
+      anchor = pageValues[Math.floor(pageValues.length / 2)];
+    }
+    const closestPage = (0, _calc.findClosest)(pageValues, anchor);
+    const prevRt = hplcMsSt.tic.currentPageValue;
+    if (!Number.isFinite(prevRt) || Math.abs(closestPage - prevRt) > 1e-5) {
       updateCurrentPageValueAct(closestPage);
     }
     const selectFeature = featuresArr.find(fe => {
@@ -555,7 +622,8 @@ class ViewerLineRect extends _react.default.Component {
       feature,
       zoomInAct,
       uiSt,
-      ticEntities
+      ticEntities,
+      omitUvvisToolbarRow
     } = this.props;
     const resolvedFeature = feature || {};
     const hasEdit = !!resolvedFeature?.data?.[0]?.x?.length;
@@ -573,23 +641,90 @@ class ViewerLineRect extends _react.default.Component {
       selectWavelengthAct(event);
     };
     return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
-      children: [zoomView(classes, 0, uiSt, zoomInAct), wavelengthSelect(classes, hplcMsSt, handleWavelengthChange), /*#__PURE__*/(0, _jsxRuntime.jsx)(_integration.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_peak.default, {
-        feature: resolvedFeature
+      className: classes.lcMsStackRoot,
+      children: [omitUvvisToolbarRow ? null : /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+        className: classes.lcMsToolbarRow,
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+          className: classes.lcMsToolbarLeft,
+          children: [zoomView(classes, 0, uiSt, zoomInAct), wavelengthSelect(classes, hplcMsSt, handleWavelengthChange), /*#__PURE__*/(0, _jsxRuntime.jsx)(_integration.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_peak.default, {
+            feature: resolvedFeature
+          }), (() => {
+            const hist = hplcMsSt?.uvvisEditHistory || {
+              past: [],
+              future: []
+            };
+            const canUndo = hist.past && hist.past.length > 0;
+            const canRedo = hist.future && hist.future.length > 0;
+            return /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+              className: classes.group,
+              style: {
+                display: 'inline-flex',
+                alignItems: 'center'
+              },
+              children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tooltip, {
+                title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+                  className: "txt-sv-tp",
+                  children: "Undo"
+                }),
+                children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
+                  className: "btn-sv-bar-uvvis-undo",
+                  disabled: !canUndo,
+                  onClick: this.handleUvvisUndo,
+                  children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_Undo.default, {
+                    className: classes.icon
+                  })
+                })
+              }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tooltip, {
+                title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+                  className: "txt-sv-tp",
+                  children: "Redo"
+                }),
+                children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
+                  className: "btn-sv-bar-uvvis-redo",
+                  disabled: !canRedo,
+                  onClick: this.handleUvvisRedo,
+                  children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_Redo.default, {
+                    className: classes.icon
+                  })
+                })
+              })]
+            });
+          })()]
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+          className: classes.lcMsToolbarRight
+        })]
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
         className: _list_graph.LIST_ROOT_SVG_GRAPH.LINE
-      }), zoomView(classes, 1, uiSt, zoomInAct), ticSelect(classes, hplcMsSt, handleTicChanged), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
-        style: {
-          display: 'inline-flex'
-        },
-        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_peak_group.default, {
-          feature: resolvedFeature,
-          graphIndex: 1
-        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+        className: classes.lcMsToolbarRow,
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+          className: classes.lcMsToolbarLeft,
+          children: [zoomView(classes, 1, uiSt, zoomInAct), ticSelect(classes, hplcMsSt, handleTicChanged), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+            style: {
+              display: 'inline-flex'
+            },
+            children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_peak_group.default, {
+              feature: resolvedFeature,
+              graphIndex: 1
+            })
+          })]
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+          className: classes.lcMsToolbarRight
+        })]
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
         className: _list_graph.LIST_ROOT_SVG_GRAPH.MULTI
-      }), zoomView(classes, 2, uiSt, zoomInAct), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r03_threshold.default, {
-        feature: resolvedFeature,
-        hasEdit: hasEdit
+      }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+        className: classes.lcMsToolbarRow,
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+          className: classes.lcMsToolbarLeft,
+          children: zoomView(classes, 2, uiSt, zoomInAct)
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+          className: classes.lcMsToolbarRight,
+          children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_r03_threshold.default, {
+            feature: resolvedFeature,
+            hasEdit: hasEdit
+          })
+        })]
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
         className: _list_graph.LIST_ROOT_SVG_GRAPH.RECT
       })]
@@ -617,7 +752,9 @@ const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   updateTicAct: _hplc_ms.changeTic,
   selectCurveAct: _curve.selectCurve,
   zoomInAct: _ui.setUiSweepType,
-  updateCurrentPageValueAct: _hplc_ms.updateCurrentPageValue
+  updateCurrentPageValueAct: _hplc_ms.updateCurrentPageValue,
+  uvvisUndoAct: _hplc_ms.uvvisUndo,
+  uvvisRedoAct: _hplc_ms.uvvisRedo
 }, dispatch);
 ViewerLineRect.propTypes = {
   classes: _propTypes.default.object.isRequired,
@@ -643,11 +780,15 @@ ViewerLineRect.propTypes = {
   selectCurveAct: _propTypes.default.func.isRequired,
   zoomInAct: _propTypes.default.func.isRequired,
   editPeakSt: _propTypes.default.object.isRequired,
-  updateCurrentPageValueAct: _propTypes.default.func.isRequired
+  updateCurrentPageValueAct: _propTypes.default.func.isRequired,
+  uvvisUndoAct: _propTypes.default.func.isRequired,
+  uvvisRedoAct: _propTypes.default.func.isRequired,
+  omitUvvisToolbarRow: _propTypes.default.bool
 };
 ViewerLineRect.defaultProps = {
   feature: {},
-  isHidden: false
+  isHidden: false,
+  omitUvvisToolbarRow: false
 };
 
 // export default connect(mapStateToProps, mapDispatchToProps)(ViewerLineRect);

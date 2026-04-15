@@ -15,6 +15,7 @@ import { itgIdTag } from '../../helpers/focus';
 import Cfg from '../../helpers/cfg';
 import Format from '../../helpers/format';
 import { calcArea } from '../../helpers/integration';
+import { LIST_UI_SWEEP_TYPE } from '../../constants/list_ui';
 
 const d3 = require('d3');
 
@@ -244,6 +245,13 @@ class LineFocus {
   onClickTarget(event, data) {
     event.stopPropagation();
     event.preventDefault();
+    if (
+      Format.isLCMsLayout(this.layout)
+      && this.graphIndex === 0
+      && this.uiSt?.sweepType === LIST_UI_SWEEP_TYPE.PEAK_GROUP_SELECT
+    ) {
+      return;
+    }
     const onPeak = true;
     this.clickUiTargetAct(data, onPeak);
   }

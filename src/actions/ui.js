@@ -40,10 +40,16 @@ const clickUiTarget = (payload, onPeak, voltammetryPeakIdx = 0, jcampIdx = 0, on
   }
 );
 
+const displaySubViewerAt = (payload) => ({
+  type: UI.SUB_VIEWER.DISPLAY_VIEWER_AT,
+  payload: payload == null ? { x: null, y: null } : payload,
+});
+
 export {
   setUiViewerType,
   setUiSweepType,
   selectUiSweep,
   scrollUiWheel,
   clickUiTarget,
+  displaySubViewerAt,
 };

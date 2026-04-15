@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.setUiViewerType = exports.setUiSweepType = exports.selectUiSweep = exports.scrollUiWheel = exports.clickUiTarget = void 0;
+exports.setUiViewerType = exports.setUiSweepType = exports.selectUiSweep = exports.scrollUiWheel = exports.displaySubViewerAt = exports.clickUiTarget = void 0;
 var _action_type = require("../constants/action_type");
 const setUiViewerType = payload => ({
   type: _action_type.UI.VIEWER.SET_TYPE,
@@ -35,3 +35,11 @@ const clickUiTarget = (payload, onPeak, voltammetryPeakIdx = 0, jcampIdx = 0, on
   onPecker
 });
 exports.clickUiTarget = clickUiTarget;
+const displaySubViewerAt = payload => ({
+  type: _action_type.UI.SUB_VIEWER.DISPLAY_VIEWER_AT,
+  payload: payload == null ? {
+    x: null,
+    y: null
+  } : payload
+});
+exports.displaySubViewerAt = displaySubViewerAt;

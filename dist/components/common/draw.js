@@ -15,9 +15,7 @@ exports.drawMain = drawMain;
 const drawLabel = (klass, cLabel, xLabel, yLabel) => {
   d3.select(klass).selectAll('.xLabel').text(xLabel);
   d3.select(klass).selectAll('.yLabel').text(yLabel);
-  if (cLabel) {
-    d3.select(klass).selectAll('.mark-text').text(cLabel);
-  }
+  d3.select(klass).selectAll('.mark-text').text(cLabel || '');
 };
 exports.drawLabel = drawLabel;
 const drawDisplay = (klass, isHidden) => {

@@ -16,6 +16,7 @@ var _focus = require("../../helpers/focus");
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 var _format = _interopRequireDefault(require("../../helpers/format"));
 var _integration = require("../../helpers/integration");
+var _list_ui = require("../../constants/list_ui");
 /* eslint-disable prefer-object-spread, no-mixed-operators */
 
 const d3 = require('d3');
@@ -256,6 +257,9 @@ class LineFocus {
   onClickTarget(event, data) {
     event.stopPropagation();
     event.preventDefault();
+    if (_format.default.isLCMsLayout(this.layout) && this.graphIndex === 0 && this.uiSt?.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.PEAK_GROUP_SELECT) {
+      return;
+    }
     const onPeak = true;
     this.clickUiTargetAct(data, onPeak);
   }

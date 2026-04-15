@@ -15,10 +15,12 @@ import {
   toggleIsAscend, toggleIsIntensity,
   updateOperation, updateDecimal,
 } from '../../actions/submit';
+import { setLcmsIntegrationsExport } from '../../actions/hplc_ms';
 import BtnSubmit from './r05_submit_btn';
 import BtnPredict from './r06_predict_btn';
 import { commonStyle } from './common';
 import Format from '../../helpers/format';
+import { LIST_LAYOUT } from '../../constants/list_layout';
 
 const styles = () => (
   Object.assign(
@@ -31,6 +33,10 @@ const styles = () => (
       },
       fieldDecimal: {
         width: 80,
+      },
+      fieldLcmsIntegrationsExport: {
+        width: 148,
+        minWidth: 148,
       },
       fieldOpertaion: {
         width: 120,
@@ -160,6 +166,43 @@ const decimalSelect = (
   );
 };
 
+const lcmsIntegrationsExportSelect = (
+  classes, layoutSt, value, onChange,
+) => {
+  if (layoutSt !== LIST_LAYOUT.LC_MS) return null;
+  const v = ['percent', 'area', 'both'].includes(value) ? value : 'percent';
+  return (
+    <FormControl
+      className={classNames(classes.fieldLcmsIntegrationsExport)}
+      variant="outlined"
+    >
+      <InputLabel
+        id="select-lcms-intg-export-label"
+        className={classNames(classes.selectLabel, 'select-sv-bar-label')}
+      >
+        Integrations text
+      </InputLabel>
+      <Select
+        labelId="select-lcms-intg-export-label"
+        label="Integrations text"
+        value={v}
+        onChange={onChange}
+        className={classNames(classes.selectInput, 'input-sv-bar-lcms-intg-export')}
+      >
+        <MenuItem value="percent">
+          <span className={classNames(classes.txtOpt)}>Percent only</span>
+        </MenuItem>
+        <MenuItem value="area">
+          <span className={classNames(classes.txtOpt)}>Area (AUC) only</span>
+        </MenuItem>
+        <MenuItem value="both">
+          <span className={classNames(classes.txtOpt)}>Percent and area</span>
+        </MenuItem>
+      </Select>
+    </FormControl>
+  );
+};
+
 const operationSelect = (
   classes, operations, operation, onChangeSelect,
 ) => {
@@ -216,11 +259,16 @@ const selectOperation = (name, operations, updateOperationAct) => {
 const Submit = ({
   operations, classes, feature, forecast, editorOnly, hideSwitch, disabled,
   isAscendSt, isIntensitySt, operationSt, decimalSt, isEmWaveSt,
+  layoutSt, lcmsIntegrationsExportSt,
   toggleIsAscendAct, toggleIsIntensityAct,
   updateOperationAct, updateDecimalAct,
+  setLcmsIntegrationsExportAct,
 }) => {
   const onChangeSelect = (e) => (
     selectOperation(e.target.value, operations, updateOperationAct)
+  );
+  const onLcmsIntegrationsExport = (e) => (
+    setLcmsIntegrationsExportAct(e.target.value)
   );
 
   if (!operations || operations.length === 0) return null;
@@ -240,6 +288,14 @@ const Submit = ({
       {
         decimalSelect(
           classes, hideSwitch, decimalSt, updateDecimalAct,
+        )
+      }
+      {
+        lcmsIntegrationsExportSelect(
+          classes,
+          layoutSt,
+          lcmsIntegrationsExportSt,
+          onLcmsIntegrationsExport,
         )
       }
       {
@@ -270,11 +326,13 @@ const Submit = ({
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
+    layoutSt: state.layout,
     isEmWaveSt: Format.isEmWaveLayout(state.layout),
     isAscendSt: state.submit.isAscend,
     isIntensitySt: state.submit.isIntensity,
     decimalSt: state.submit.decimal,
     operationSt: state.submit.operation,
+    lcmsIntegrationsExportSt: state.hplcMs?.lcmsIntegrationsExport || 'percent',
   }
 );
 
@@ -284,6 +342,7 @@ const mapDispatchToProps = (dispatch) => (
     toggleIsIntensityAct: toggleIsIntensity,
     updateOperationAct: updateOperation,
     updateDecimalAct: updateDecimal,
+    setLcmsIntegrationsExportAct: setLcmsIntegrationsExport,
   }, dispatch)
 );
 
@@ -304,6 +363,9 @@ Submit.propTypes = {
   toggleIsIntensityAct: PropTypes.func.isRequired,
   updateOperationAct: PropTypes.func.isRequired,
   updateDecimalAct: PropTypes.func.isRequired,
+  layoutSt: PropTypes.string.isRequired,
+  lcmsIntegrationsExportSt: PropTypes.string.isRequired,
+  setLcmsIntegrationsExportAct: PropTypes.func.isRequired,
 };
 
 export default compose(

@@ -147,14 +147,34 @@ class LayerInit extends _react.default.Component {
       entity
     } = this.props;
     if (!entity || !entity.layout) return;
+    const lcmsCurveMeta = () => {
+      const idDt = entity?.idDt ?? entity?.id ?? entity?.datasetId ?? null;
+      const lcmsUvvisWavelength = entity?.lcms_uvvis_wavelength ?? entity?.lcmsUvvisWavelength;
+      const uvvisFromMulti = Array.isArray(multiEntities) ? multiEntities.find(e => (0, _extractEntityLCMS.getLcMsInfo)(e).kind === 'uvvis') : null;
+      const lcmsMzPage = entity?.lcms_mz_page ?? entity?.lcmsMzPage ?? uvvisFromMulti?.lcms_mz_page ?? uvvisFromMulti?.lcmsMzPage;
+      const lcmsPolarity = entity?.lcms_polarity ?? entity?.lcmsPolarity ?? entity?.ticPolarity;
+      const out = {};
+      if (idDt != null) out.idDt = idDt;
+      if (lcmsUvvisWavelength != null && lcmsUvvisWavelength !== '') {
+        out.lcmsUvvisWavelength = lcmsUvvisWavelength;
+      }
+      if (lcmsMzPage != null && lcmsMzPage !== '') {
+        out.lcmsMzPage = lcmsMzPage;
+      }
+      if (lcmsPolarity != null && lcmsPolarity !== '') {
+        out.lcmsPolarity = lcmsPolarity;
+      }
+      return Object.keys(out).length ? out : undefined;
+    };
     const isMultiSpectra = Array.isArray(multiEntities) && multiEntities.length > 1;
     if (isMultiSpectra) {
-      setAllCurvesAct(multiEntities);
+      const meta = _format.default.isLCMsLayout(entity.layout) ? lcmsCurveMeta() : undefined;
+      setAllCurvesAct(multiEntities, meta);
       return;
     }
     if (_format.default.isLCMsLayout(entity.layout)) {
       const payload = Array.isArray(multiEntities) && multiEntities.length > 0 ? multiEntities : [entity];
-      setAllCurvesAct(payload);
+      setAllCurvesAct(payload, lcmsCurveMeta());
       return;
     }
     if (_format.default.isCyclicVoltaLayout(entity.layout)) {

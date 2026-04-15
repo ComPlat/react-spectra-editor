@@ -504,4 +504,84 @@ describe('Test format helper', () => {
       expect(quillData).toEqual(expectedQuillData)
     })
   })
+
+  describe('formatedLCMS (LC-MS UV/VIS export)', () => {
+    it('skips wavelength section when there are no peaks and no integrations', () => {
+      const hplcMsSt = {
+        uvvis: {
+          listWaveLength: [230, 254, 280],
+          spectraList: [
+            { peaks: [{ x: 14, y: 100 }], integrations: [] },
+            { peaks: [], integrations: [] },
+            { peaks: [{ x: 1, y: 100 }], integrations: [] },
+          ],
+        },
+      };
+      const text = Format.formatedLCMS(hplcMsSt, true, 0);
+      expect(text).not.toContain('Wavelength 254 nm:');
+      expect(text).toContain('Wavelength 230 nm:');
+      expect(text).toContain('Wavelength 280 nm:');
+    })
+
+    it('formats MS block RT with at least 3 decimal places', () => {
+      const hplcMsSt = {
+        uvvis: { listWaveLength: [], spectraList: [] },
+        tic: {
+          polarity: 'positive',
+          currentPageValue: 1,
+          positive: { data: { x: [1], y: [1] } },
+          negative: { data: { x: [], y: [] } },
+          neutral: { data: { x: [], y: [] } },
+        },
+        ms: {
+          positive: {
+            peaks: [[{ x: 119, y: 100 }, { x: 177, y: 16 }]],
+          },
+          negative: { peaks: [] },
+          neutral: { peaks: [] },
+        },
+        threshold: { value: 5 },
+      };
+      const text = Format.formatedLCMS(hplcMsSt, true, 0);
+      expect(text).toContain('RT 1.000 min');
+    })
+
+    it('integration text: percent, area-only, or both (options + state)', () => {
+      const base = {
+        uvvis: {
+          listWaveLength: [210],
+          spectraList: [{
+            peaks: [],
+            integrations: [{
+              refArea: 100,
+              stack: [
+                { xL: 2, area: 50 },
+                { xL: 5, area: 100 },
+              ],
+            }],
+          }],
+        },
+      };
+      const pct = Format.formatedLCMS(base, true, 0, { lcmsIntegrationsExport: 'percent' });
+      expect(pct).toContain('Integrations: 2 min (50.0%), 5 min (100.0%)');
+      expect(pct).not.toContain('A=');
+
+      const areaOnly = Format.formatedLCMS(base, true, 0, { lcmsIntegrationsExport: 'area' });
+      expect(areaOnly).toContain('Integrations:');
+      expect(areaOnly).toMatch(/2 min \(A=/);
+      expect(areaOnly).not.toContain('%');
+
+      const both = Format.formatedLCMS(base, true, 0, { lcmsIntegrationsExport: 'both' });
+      expect(both).toContain('2 min (50.0%, A=');
+      expect(both).toContain('5 min (100.0%, A=');
+
+      const fromState = Format.formatedLCMS(
+        { ...base, lcmsIntegrationsExport: 'area' },
+        true,
+        0,
+        {},
+      );
+      expect(fromState).toMatch(/2 min \(A=/);
+    })
+  })
 })

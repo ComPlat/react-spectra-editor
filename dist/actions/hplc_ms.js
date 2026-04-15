@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.updateCurrentPageValue = exports.selectWavelength = exports.clearIntegrationAllHplcMs = exports.clearAllPeaksHplcMs = exports.changeTic = void 0;
+exports.uvvisUndo = exports.uvvisRedo = exports.updateCurrentPageValue = exports.setLcmsIntegrationsExport = exports.selectWavelength = exports.clearIntegrationAllHplcMs = exports.clearAllPeaksHplcMs = exports.changeTic = void 0;
 var _action_type = require("../constants/action_type");
 const normalizeTicPolarity = value => {
   if (value === 0 || value === '0') return 'positive';
@@ -12,6 +12,13 @@ const normalizeTicPolarity = value => {
   if (value === 'positive' || value === 'negative' || value === 'neutral') return value;
   return 'positive';
 };
+const setLcmsIntegrationsExport = lcmsIntegrationsExport => ({
+  type: _action_type.HPLC_MS.SET_LCMS_INTEGRATIONS_EXPORT,
+  payload: {
+    lcmsIntegrationsExport
+  }
+});
+exports.setLcmsIntegrationsExport = setLcmsIntegrationsExport;
 const selectWavelength = payload => ({
   type: _action_type.HPLC_MS.UPDATE_UVVIS_WAVE_LENGTH,
   payload
@@ -35,6 +42,14 @@ const updateCurrentPageValue = currentPageValue => ({
   }
 });
 exports.updateCurrentPageValue = updateCurrentPageValue;
+const uvvisUndo = () => ({
+  type: _action_type.HPLC_MS.UVVIS_UNDO
+});
+exports.uvvisUndo = uvvisUndo;
+const uvvisRedo = () => ({
+  type: _action_type.HPLC_MS.UVVIS_REDO
+});
+exports.uvvisRedo = uvvisRedo;
 const clearIntegrationAllHplcMs = payload => ({
   type: _action_type.HPLC_MS.CLEAR_INTEGRATION_ALL_HPLCMS,
   payload

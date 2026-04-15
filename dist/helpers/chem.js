@@ -1071,6 +1071,14 @@ const parsePageValue = raw => {
   const match = String(raw).match(/[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?/);
   return match ? parseFloat(match[0]) : null;
 };
+const readLcmsMzPageFromJcampInfo = info => {
+  if (!info || info.$CSLCMSMZPAGE == null || info.$CSLCMSMZPAGE === '') return null;
+  const raw = info.$CSLCMSMZPAGE;
+  const scalar = Array.isArray(raw) ? raw[0] : raw;
+  if (scalar == null || scalar === '') return null;
+  const parsed = typeof scalar === 'number' && Number.isFinite(scalar) ? scalar : parsePageValue(String(scalar).trim());
+  return Number.isFinite(parsed) ? parsed : null;
+};
 const normalizeXyData = raw => {
   if (!raw) return null;
   if (Array.isArray(raw)) {
@@ -1239,7 +1247,7 @@ const isChemstationLcms = (source, jcamp) => {
 const ExtractJcamp = source => {
   const jcamp = _jcampconverter.default.convert(source, {
     xy: true,
-    keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS|\$CSUPPERTHRESHOLD|\$CSLOWERTHRESHOLD|\$CSCYCLICVOLTAMMETRYDATA|UNITS|SYMBOL|\$CSAUTOMETADATA|\$DETECTOR|MN|MW|D|MP|MELTINGPOINT|TG|\$CSSCANRATE|\$CSSPECTRUMDIRECTION|\$CSWEAREAVALUE|\$CSWEAREAUNIT|\$CSCURRENTMODE|SCAN_MODE|SCANMODE|TYPE|SOFTWARE|DATATYPE)/ // eslint-disable-line
+    keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS|\$CSUPPERTHRESHOLD|\$CSLOWERTHRESHOLD|\$CSCYCLICVOLTAMMETRYDATA|UNITS|SYMBOL|\$CSAUTOMETADATA|\$DETECTOR|MN|MW|D|MP|MELTINGPOINT|TG|\$CSSCANRATE|\$CSSPECTRUMDIRECTION|\$CSWEAREAVALUE|\$CSWEAREAUNIT|\$CSCURRENTMODE|\$CSLCMSMZPAGE|SCAN_MODE|SCANMODE|TYPE|SOFTWARE|DATATYPE)/ // eslint-disable-line
   });
   const isChemstation = isChemstationLcms(source, jcamp);
   const parsedPages = parseChemstationPages(source, jcamp);
@@ -1334,6 +1342,15 @@ const ExtractJcamp = source => {
   //   : ((Format.isXRDLayout(layout) || Format.isCyclicVoltaLayout(layout))
   //     ? extrFeaturesXrd(jcamp, layout, peakUp) : extrFeaturesNi(jcamp, layout, peakUp, spectra));
 
+  const lcmsMzPageFromInfo = _format.default.isLCMsLayout(layout) ? readLcmsMzPageFromJcampInfo(jcamp.info) : null;
+  if (lcmsMzPageFromInfo != null) {
+    return {
+      spectra,
+      features,
+      layout,
+      lcms_mz_page: lcmsMzPageFromInfo
+    };
+  }
   return {
     spectra,
     features,

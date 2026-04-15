@@ -14,6 +14,7 @@ var _material = require("@mui/material");
 var _index = _interopRequireDefault(require("./panel/index"));
 var _index2 = _interopRequireDefault(require("./cmd_bar/index"));
 var _index3 = _interopRequireDefault(require("./d3_line_rect/index"));
+var _lc_ms_uv_tools_bar = _interopRequireDefault(require("./lc_ms_uv_tools_bar"));
 var _extractEntityLCMS = require("../helpers/extractEntityLCMS");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable react/default-props-match-prop-types,
@@ -82,7 +83,8 @@ class HPLCViewer extends _react.default.Component {
         operations: operations,
         editorOnly: editorOnly,
         hideThreshold: true,
-        hideMainEditTools: true
+        hideMainEditTools: true,
+        prependLcMsToolbar: /*#__PURE__*/(0, _jsxRuntime.jsx)(_lc_ms_uv_tools_bar.default, {})
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
         className: "react-spectrum-editor",
         children: /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Grid, {
@@ -100,7 +102,8 @@ class HPLCViewer extends _react.default.Component {
               feature: displayFeature,
               jcampIdx: curveIdx,
               hplcMsSt: hplcMsState,
-              isHidden: false
+              isHidden: false,
+              omitUvvisToolbarRow: true
             })
           }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Grid, {
             item: true,

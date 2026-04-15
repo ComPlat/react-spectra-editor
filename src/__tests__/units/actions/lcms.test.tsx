@@ -90,6 +90,24 @@ describe('LCMS ExtractJcamp', () => {
     expect(getLcMsInfo(entity).kind).toEqual('uvvis');
   });
 
+  it('Extract UVVIS reads ##$CSLCMSMZPAGE from first CHEMSPECTRA UVVIS peak table block', () => {
+    const injected = hplcMsUvvisJcamp.replace(
+      '$$ === CHEMSPECTRA UVVIS PEAK TABLE ===\n',
+      '$$ === CHEMSPECTRA UVVIS PEAK TABLE ===\n##$CSLCMSMZPAGE=1.234\n',
+    );
+    const entity: any = ExtractJcamp(injected);
+    expect(entity.lcms_mz_page).toBeCloseTo(1.234);
+  });
+
+  it('Extract UVVIS ignores empty ##$CSLCMSMZPAGE (fallback: no lcms_mz_page key)', () => {
+    const injected = hplcMsUvvisJcamp.replace(
+      '$$ === CHEMSPECTRA UVVIS PEAK TABLE ===\n',
+      '$$ === CHEMSPECTRA UVVIS PEAK TABLE ===\n##$CSLCMSMZPAGE=\n',
+    );
+    const entity: any = ExtractJcamp(injected);
+    expect(entity.lcms_mz_page).toBeUndefined();
+  });
+
   it('Extract Chemstation MZ with multiple pages', () => {
     const entity: any = ExtractJcamp(lcMsMzChemstationJcamp);
     expect(entity.layout).toEqual(LIST_LAYOUT.LC_MS);

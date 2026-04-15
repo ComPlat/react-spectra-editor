@@ -11,9 +11,7 @@ const drawMain = (klass, w, h, d3svgClass = LIST_BRUSH_SVG_GRAPH.LINE) => {
 const drawLabel = (klass, cLabel, xLabel, yLabel) => {
   d3.select(klass).selectAll('.xLabel').text(xLabel);
   d3.select(klass).selectAll('.yLabel').text(yLabel);
-  if (cLabel) {
-    d3.select(klass).selectAll('.mark-text').text(cLabel);
-  }
+  d3.select(klass).selectAll('.mark-text').text(cLabel || '');
 };
 
 const drawDisplay = (klass, isHidden) => {

@@ -187,9 +187,23 @@ const rmRef = (peaks, shift, atIndex = 0) => {
   const refValue = selectedShift.ref.value || selectedShift.peak.x;
   return peaks.map(p => (0, _converter.IsSame)(p.x, refValue) ? null : p).filter(r => r != null);
 };
-const formatedLCMS = (hplcMsSt, isAscend, decimal) => {
+const isValidLcmsWavelengthLabel = wl => Number.isFinite(wl) && wl > 0;
+const LCMS_INTEGRATION_EXPORT_MODES = ['percent', 'area', 'both'];
+const isLcmsIntegrationExportMode = v => LCMS_INTEGRATION_EXPORT_MODES.includes(v);
+const formatedLCMS = (hplcMsSt, isAscend, decimal, options = {}) => {
   if (!hplcMsSt?.uvvis) {
     return '';
+  }
+  const {
+    lcmsIntegrationsExport: modeOpt,
+    includeIntegrationArea = false
+  } = options;
+  let lcmsIntegrationsExport = modeOpt;
+  if (!isLcmsIntegrationExportMode(lcmsIntegrationsExport)) {
+    lcmsIntegrationsExport = hplcMsSt?.lcmsIntegrationsExport;
+  }
+  if (!isLcmsIntegrationExportMode(lcmsIntegrationsExport)) {
+    lcmsIntegrationsExport = includeIntegrationArea ? 'both' : 'percent';
   }
   let result = '\n';
   const sections = [];
@@ -209,8 +223,19 @@ const formatedLCMS = (hplcMsSt, isAscend, decimal) => {
     }
     const peaks = spectrum.peaks || [];
     const integrations = spectrum.integrations || [];
-    const lines = [`Wavelength ${wavelength} nm:`];
-    if (peaks.length > 0) {
+    const stack = integrations?.[0]?.stack;
+    const hasStack = Array.isArray(stack) && stack.length > 0;
+    const hasList = !hasStack && Array.isArray(integrations) && integrations.length > 0;
+    const hasIntegrations = hasStack || hasList;
+    const hasPeaks = peaks.length > 0;
+    if (!hasPeaks && !hasIntegrations) {
+      return;
+    }
+    const lines = [];
+    if (isValidLcmsWavelengthLabel(wavelength)) {
+      lines.push(`Wavelength ${wavelength} nm:`);
+    }
+    if (hasPeaks) {
       const sortedPeaks = [...peaks].sort((a, b) => b.y - a.y);
       const maxIntensity = sortedPeaks[0].y || 1;
       const peakLines = sortedPeaks.map(peak => {
@@ -220,10 +245,7 @@ const formatedLCMS = (hplcMsSt, isAscend, decimal) => {
       });
       lines.push(`Peaks: ${peakLines.join(', ')}`);
     }
-    const stack = integrations?.[0]?.stack;
-    const hasStack = Array.isArray(stack) && stack.length > 0;
-    const hasList = !hasStack && Array.isArray(integrations) && integrations.length > 0;
-    if (hasStack || hasList) {
+    if (hasIntegrations) {
       const entries = hasStack ? stack : integrations;
       const refAreaCandidate = hasStack ? integrations?.[0]?.refArea : integrations?.[0]?.refArea ?? integrations?.[0]?.area;
       const refArea = refAreaCandidate && refAreaCandidate > 0 ? refAreaCandidate : 1;
@@ -232,6 +254,13 @@ const formatedLCMS = (hplcMsSt, isAscend, decimal) => {
         const rt = integ.xL.toFixed(resolvedDecimal);
         const area = integ.area || integ.absoluteArea || 0;
         const percent = (area / refArea * 100).toFixed(1);
+        const areaStr = Number.isFinite(area) ? area.toExponential(3) : String(area);
+        if (lcmsIntegrationsExport === 'area') {
+          return `${rt} min (A=${areaStr})`;
+        }
+        if (lcmsIntegrationsExport === 'both') {
+          return `${rt} min (${percent}%, A=${areaStr})`;
+        }
         return `${rt} min (${percent}%)`;
       });
       lines.push(`Integrations: ${integrationLines.join(', ')}`);
@@ -274,7 +303,10 @@ const formatedLCMS = (hplcMsSt, isAscend, decimal) => {
       if (result) {
         result += '\n\n';
       }
-      result += `MS (${label}), m/z (≥${thresholdValue}%):\n`;
+      const rtPage = tic?.currentPageValue;
+      const rtDecimal = Math.max(resolvedDecimal, 3);
+      const rtPart = Number.isFinite(rtPage) ? `RT ${fixDigit(rtPage, rtDecimal)} min, ` : '';
+      result += `MS (${label}), ${rtPart}m/z (≥${thresholdValue}%):\n`;
       const lines = sortedPeaks.map(peak => {
         const mass = fixDigit(peak.x, resolvedDecimal);
         const percent = Math.round(peak.y / maxIntensity * 100);

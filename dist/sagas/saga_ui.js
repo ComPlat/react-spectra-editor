@@ -56,11 +56,18 @@ function* selectUiSweep(action) {
         const {
           graphIndex
         } = zoom;
+        let lcmsSyncX;
+        if ((graphIndex === 0 || graphIndex === 1) && payload?.xExtent) {
+          lcmsSyncX = graphIndex === 0 ? 1 : 0;
+        }
         yield (0, _effects.put)({
           type: _action_type.UI.SWEEP.SELECT_ZOOMIN,
           payload: {
             graphIndex,
-            zoomValue: payload
+            zoomValue: payload,
+            ...(lcmsSyncX != null ? {
+              lcmsSyncX
+            } : {})
           }
         });
       } else {
@@ -71,10 +78,25 @@ function* selectUiSweep(action) {
       }
       break;
     case _list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET:
-      yield (0, _effects.put)({
-        type: _action_type.UI.SWEEP.SELECT_ZOOMRESET,
-        payload
-      });
+      if (layoutState === _list_layout.LIST_LAYOUT.LC_MS && (payload?.graphIndex === 0 || payload?.graphIndex === 1)) {
+        yield (0, _effects.put)({
+          type: _action_type.UI.SWEEP.SELECT_ZOOMRESET,
+          payload: {
+            graphIndex: 0
+          }
+        });
+        yield (0, _effects.put)({
+          type: _action_type.UI.SWEEP.SELECT_ZOOMRESET,
+          payload: {
+            graphIndex: 1
+          }
+        });
+      } else {
+        yield (0, _effects.put)({
+          type: _action_type.UI.SWEEP.SELECT_ZOOMRESET,
+          payload
+        });
+      }
       break;
     case _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD:
       {

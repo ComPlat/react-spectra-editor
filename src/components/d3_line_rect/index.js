@@ -11,6 +11,8 @@ import {
 } from '@mui/material';
 import ZoomInOutlinedIcon from '@mui/icons-material/ZoomInOutlined';
 import FindReplaceOutlinedIcon from '@mui/icons-material/FindReplaceOutlined';
+import UndoIcon from '@mui/icons-material/Undo';
+import RedoIcon from '@mui/icons-material/Redo';
 import { MuButton, commonStyle, focusStyle } from '../cmd_bar/common';
 
 import {
@@ -20,7 +22,9 @@ import { resetAll } from '../../actions/manager';
 import {
   selectUiSweep, scrollUiWheel, clickUiTarget, setUiSweepType,
 } from '../../actions/ui';
-import { selectWavelength, changeTic, updateCurrentPageValue } from '../../actions/hplc_ms';
+import {
+  selectWavelength, changeTic, updateCurrentPageValue, uvvisUndo, uvvisRedo,
+} from '../../actions/hplc_ms';
 import { selectCurve } from '../../actions/curve';
 import RectFocus from './rect_focus';
 import MultiFocus from './multi_focus';
@@ -73,6 +77,37 @@ const toSeed = (xValues = [], yValues = []) => {
 const styles = () => (
   Object.assign(
     {},
+    {
+      lcMsStackRoot: {
+        margin: '0 0 5px 52px',
+      },
+      lcMsToolbarRow: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        columnGap: 8,
+        rowGap: 4,
+      },
+      lcMsToolbarLeft: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        columnGap: 4,
+        rowGap: 4,
+        flex: '1 1 auto',
+        minWidth: 0,
+      },
+      lcMsToolbarRight: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        columnGap: 8,
+        rowGap: 4,
+        flex: '0 1 auto',
+      },
+    },
     commonStyle,
   )
 );
@@ -172,6 +207,12 @@ const wavelengthSelect = (classes, hplcMsSt, updateWavelengthAct) => {
   );
 };
 
+const countAvailableTicPolarities = (hplcMsSt) => {
+  const a = hplcMsSt?.tic?.available;
+  if (!a || typeof a !== 'object') return 0;
+  return ['positive', 'negative', 'neutral'].filter((k) => a[k]).length;
+};
+
 const ticSelect = (classes, hplcMsSt, handleTicChanged) => {
   const { tic = {} } = hplcMsSt || {};
   const { polarity, available } = tic;
@@ -181,7 +222,10 @@ const ticSelect = (classes, hplcMsSt, handleTicChanged) => {
     { name: 'NEUTRAL', value: 'neutral', enabled: available?.neutral },
   ];
   const filtered = listTIC.filter((d) => d.enabled);
-  const listOptions = filtered.length > 0 ? filtered : listTIC;
+  if (filtered.length <= 1) {
+    return null;
+  }
+  const listOptions = filtered;
   const options = listOptions.map((d) => (
     <MenuItem value={d.value} key={d.value}>
       <span className={classNames(classes.txtOpt, 'option-sv-bar-decimal')}>
@@ -262,6 +306,8 @@ class ViewerLineRect extends React.Component {
     this.normChange = this.normChange.bind(this);
     this.extractSubView = this.extractSubView.bind(this);
     this.extractUvvisView = this.extractUvvisView.bind(this);
+    this.handleUvvisUndo = this.handleUvvisUndo.bind(this);
+    this.handleUvvisRedo = this.handleUvvisRedo.bind(this);
   }
 
   componentDidMount() {
@@ -397,11 +443,15 @@ class ViewerLineRect extends React.Component {
       });
     }
     const { polarity } = hplcMsSt.tic;
-    let ticLabel = 'NEUTRAL';
-    if (polarity === 'negative') {
-      ticLabel = 'MINUS';
-    } else if (polarity === 'positive') {
-      ticLabel = 'PLUS';
+    const ticPolarityCount = countAvailableTicPolarities(hplcMsSt);
+    let ticLabel = null;
+    if (ticPolarityCount > 1) {
+      ticLabel = 'NEUTRAL';
+      if (polarity === 'negative') {
+        ticLabel = 'MINUS';
+      } else if (polarity === 'positive') {
+        ticLabel = 'PLUS';
+      }
     }
     drawLabel(this.rootKlassMulti, ticLabel, 'Minutes', 'Intensity');
     drawDisplay(this.rootKlassMulti, isHidden);
@@ -449,6 +499,16 @@ class ViewerLineRect extends React.Component {
     drawDestroy(this.rootKlassLine);
     drawDestroy(this.rootKlassMulti);
     drawDestroy(this.rootKlassRect);
+  }
+
+  handleUvvisUndo() {
+    const { uvvisUndoAct } = this.props;
+    uvvisUndoAct();
+  }
+
+  handleUvvisRedo() {
+    const { uvvisRedoAct } = this.props;
+    uvvisRedoAct();
   }
 
   normChange(prevProps) {
@@ -508,12 +568,19 @@ class ViewerLineRect extends React.Component {
       .filter((val) => Number.isFinite(val));
     if (pageValues.length === 0) return featuresArr[0];
 
-    const hasValidClick = subViewerAt && subViewerAt.x !== undefined;
-    const closestPage = hasValidClick
-      ? findClosest(pageValues, subViewerAt.x)
-      : pageValues[Math.floor(pageValues.length / 2)];
+    const hasValidClick = subViewerAt != null && Number.isFinite(subViewerAt.x);
+    let anchor;
+    if (hasValidClick) {
+      anchor = subViewerAt.x;
+    } else if (Number.isFinite(hplcMsSt.tic.currentPageValue)) {
+      anchor = hplcMsSt.tic.currentPageValue;
+    } else {
+      anchor = pageValues[Math.floor(pageValues.length / 2)];
+    }
+    const closestPage = findClosest(pageValues, anchor);
 
-    if (closestPage !== hplcMsSt.tic.currentPageValue) {
+    const prevRt = hplcMsSt.tic.currentPageValue;
+    if (!Number.isFinite(prevRt) || Math.abs(closestPage - prevRt) > 1e-5) {
       updateCurrentPageValueAct(closestPage);
     }
 
@@ -527,7 +594,7 @@ class ViewerLineRect extends React.Component {
   render() {
     const {
       classes, hplcMsSt, selectWavelengthAct, updateTicAct, selectCurveAct,
-      feature, zoomInAct, uiSt, ticEntities,
+      feature, zoomInAct, uiSt, ticEntities, omitUvvisToolbarRow,
     } = this.props;
     const resolvedFeature = feature || {};
     const hasEdit = !!resolvedFeature?.data?.[0]?.x?.length;
@@ -545,30 +612,79 @@ class ViewerLineRect extends React.Component {
       selectWavelengthAct(event);
     };
     return (
-      <div>
+      <div className={classes.lcMsStackRoot}>
         {
-          zoomView(classes, 0, uiSt, zoomInAct)
+          omitUvvisToolbarRow ? null : (
+            <div className={classes.lcMsToolbarRow}>
+              <div className={classes.lcMsToolbarLeft}>
+                {
+                  zoomView(classes, 0, uiSt, zoomInAct)
+                }
+                {
+                  wavelengthSelect(classes, hplcMsSt, handleWavelengthChange)
+                }
+                <Integration />
+                <Peak feature={resolvedFeature} />
+                {
+                  (() => {
+                    const hist = hplcMsSt?.uvvisEditHistory || { past: [], future: [] };
+                    const canUndo = hist.past && hist.past.length > 0;
+                    const canRedo = hist.future && hist.future.length > 0;
+                    return (
+                      <span className={classes.group} style={{ display: 'inline-flex', alignItems: 'center' }}>
+                        <Tooltip title={<span className="txt-sv-tp">Undo</span>}>
+                          <MuButton
+                            className="btn-sv-bar-uvvis-undo"
+                            disabled={!canUndo}
+                            onClick={this.handleUvvisUndo}
+                          >
+                            <UndoIcon className={classes.icon} />
+                          </MuButton>
+                        </Tooltip>
+                        <Tooltip title={<span className="txt-sv-tp">Redo</span>}>
+                          <MuButton
+                            className="btn-sv-bar-uvvis-redo"
+                            disabled={!canRedo}
+                            onClick={this.handleUvvisRedo}
+                          >
+                            <RedoIcon className={classes.icon} />
+                          </MuButton>
+                        </Tooltip>
+                      </span>
+                    );
+                  })()
+                }
+              </div>
+              <div className={classes.lcMsToolbarRight} />
+            </div>
+          )
         }
-        {
-          wavelengthSelect(classes, hplcMsSt, handleWavelengthChange)
-        }
-        <Integration />
-        <Peak feature={resolvedFeature} />
         <div className={LIST_ROOT_SVG_GRAPH.LINE} />
-        {
-          zoomView(classes, 1, uiSt, zoomInAct)
-        }
-        {
-          ticSelect(classes, hplcMsSt, handleTicChanged)
-        }
-        <span style={{ display: 'inline-flex' }}>
-          <PeakGroup feature={resolvedFeature} graphIndex={1} />
-        </span>
+        <div className={classes.lcMsToolbarRow}>
+          <div className={classes.lcMsToolbarLeft}>
+            {
+              zoomView(classes, 1, uiSt, zoomInAct)
+            }
+            {
+              ticSelect(classes, hplcMsSt, handleTicChanged)
+            }
+            <span style={{ display: 'inline-flex' }}>
+              <PeakGroup feature={resolvedFeature} graphIndex={1} />
+            </span>
+          </div>
+          <div className={classes.lcMsToolbarRight} />
+        </div>
         <div className={LIST_ROOT_SVG_GRAPH.MULTI} />
-        {
-          zoomView(classes, 2, uiSt, zoomInAct)
-        }
-        <Threshold feature={resolvedFeature} hasEdit={hasEdit} />
+        <div className={classes.lcMsToolbarRow}>
+          <div className={classes.lcMsToolbarLeft}>
+            {
+              zoomView(classes, 2, uiSt, zoomInAct)
+            }
+          </div>
+          <div className={classes.lcMsToolbarRight}>
+            <Threshold feature={resolvedFeature} hasEdit={hasEdit} />
+          </div>
+        </div>
         <div className={LIST_ROOT_SVG_GRAPH.RECT} />
       </div>
     );
@@ -601,6 +717,8 @@ const mapDispatchToProps = (dispatch) => (
     selectCurveAct: selectCurve,
     zoomInAct: setUiSweepType,
     updateCurrentPageValueAct: updateCurrentPageValue,
+    uvvisUndoAct: uvvisUndo,
+    uvvisRedoAct: uvvisRedo,
   }, dispatch)
 );
 
@@ -629,11 +747,15 @@ ViewerLineRect.propTypes = {
   zoomInAct: PropTypes.func.isRequired,
   editPeakSt: PropTypes.object.isRequired,
   updateCurrentPageValueAct: PropTypes.func.isRequired,
+  uvvisUndoAct: PropTypes.func.isRequired,
+  uvvisRedoAct: PropTypes.func.isRequired,
+  omitUvvisToolbarRow: PropTypes.bool,
 };
 
 ViewerLineRect.defaultProps = {
   feature: {},
   isHidden: false,
+  omitUvvisToolbarRow: false,
 };
 
 // export default connect(mapStateToProps, mapDispatchToProps)(ViewerLineRect);

@@ -8,6 +8,11 @@ const normalizeTicPolarity = (value) => {
   return 'positive';
 };
 
+export const setLcmsIntegrationsExport = (lcmsIntegrationsExport) => ({
+  type: HPLC_MS.SET_LCMS_INTEGRATIONS_EXPORT,
+  payload: { lcmsIntegrationsExport },
+});
+
 export const selectWavelength = (payload) => ({
   type: HPLC_MS.UPDATE_UVVIS_WAVE_LENGTH,
   payload,
@@ -26,7 +31,17 @@ export const changeTic = (payload) => {
 
 export const updateCurrentPageValue = (currentPageValue) => ({
   type: HPLC_MS.UPDATE_CURRENT_PAGE_VALUE,
-  payload: { currentPageValue },
+  payload: {
+    currentPageValue,
+  },
+});
+
+export const uvvisUndo = () => ({
+  type: HPLC_MS.UVVIS_UNDO,
+});
+
+export const uvvisRedo = () => ({
+  type: HPLC_MS.UVVIS_REDO,
 });
 
 export const clearIntegrationAllHplcMs = (payload) => ({

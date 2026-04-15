@@ -16,7 +16,7 @@ import { updateMetaPeaks, updateDSCMetaData } from './actions/meta';
 import { addOthers } from './actions/jcamp';
 import LayerPrism from './layer_prism';
 import Format from './helpers/format';
-import { isLcMsGroup } from './helpers/extractEntityLCMS';
+import { getLcMsInfo, isLcMsGroup } from './helpers/extractEntityLCMS';
 import MultiJcampsViewer from './components/multi_jcamps_viewer';
 import HPLCViewer from './components/hplc_viewer';
 import { setAllCurves } from './actions/curve';
@@ -120,9 +120,32 @@ class LayerInit extends React.Component {
   updateMultiEntities() {
     const { multiEntities, setAllCurvesAct, entity } = this.props;
     if (!entity || !entity.layout) return;
+    const lcmsCurveMeta = () => {
+      const idDt = entity?.idDt ?? entity?.id ?? entity?.datasetId ?? null;
+      const lcmsUvvisWavelength = entity?.lcms_uvvis_wavelength ?? entity?.lcmsUvvisWavelength;
+      const uvvisFromMulti = Array.isArray(multiEntities)
+        ? multiEntities.find((e) => getLcMsInfo(e).kind === 'uvvis')
+        : null;
+      const lcmsMzPage = entity?.lcms_mz_page ?? entity?.lcmsMzPage
+        ?? uvvisFromMulti?.lcms_mz_page ?? uvvisFromMulti?.lcmsMzPage;
+      const lcmsPolarity = entity?.lcms_polarity ?? entity?.lcmsPolarity ?? entity?.ticPolarity;
+      const out = {};
+      if (idDt != null) out.idDt = idDt;
+      if (lcmsUvvisWavelength != null && lcmsUvvisWavelength !== '') {
+        out.lcmsUvvisWavelength = lcmsUvvisWavelength;
+      }
+      if (lcmsMzPage != null && lcmsMzPage !== '') {
+        out.lcmsMzPage = lcmsMzPage;
+      }
+      if (lcmsPolarity != null && lcmsPolarity !== '') {
+        out.lcmsPolarity = lcmsPolarity;
+      }
+      return Object.keys(out).length ? out : undefined;
+    };
     const isMultiSpectra = Array.isArray(multiEntities) && multiEntities.length > 1;
     if (isMultiSpectra) {
-      setAllCurvesAct(multiEntities);
+      const meta = Format.isLCMsLayout(entity.layout) ? lcmsCurveMeta() : undefined;
+      setAllCurvesAct(multiEntities, meta);
       return;
     }
 
@@ -130,7 +153,7 @@ class LayerInit extends React.Component {
       const payload = (Array.isArray(multiEntities) && multiEntities.length > 0)
         ? multiEntities
         : [entity];
-      setAllCurvesAct(payload);
+      setAllCurvesAct(payload, lcmsCurveMeta());
       return;
     }
 

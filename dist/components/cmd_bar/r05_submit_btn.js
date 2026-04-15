@@ -76,6 +76,21 @@ const defaultThreshold = {
   upper: false,
   lower: false
 };
+const LCMS_INTEGRATIONS_EXPORT_MODES = ['percent', 'area', 'both'];
+const isLcmsIntegrationsExportMode = v => LCMS_INTEGRATIONS_EXPORT_MODES.includes(v);
+
+const resolveLcmsIntegrationsExportForSubmit = (analysis, hplcMsSt) => {
+  if (isLcmsIntegrationsExportMode(analysis?.lcmsIntegrationsExport)) {
+    return analysis.lcmsIntegrationsExport;
+  }
+  if (analysis?.lcmsIncludeIntegrationArea === true) {
+    return 'both';
+  }
+  if (isLcmsIntegrationsExportMode(hplcMsSt?.lcmsIntegrationsExport)) {
+    return hplcMsSt.lcmsIntegrationsExport;
+  }
+  return 'percent';
+};
 const pickFromList = (list, index, fallback = null) => Array.isArray(list) && list[index] !== undefined ? list[index] : fallback;
 const hasBoolean = value => typeof value === 'boolean';
 const resolveOptionalBooleanFlags = analysis => {
@@ -167,10 +182,25 @@ const onClickCb = (operationValue, isAscend, isIntensity, layoutSt, shiftSt, ana
   }
   const fallbackIdx = Number.isFinite(curveSt?.curveIdx) ? curveSt.curveIdx : 0;
   const indicesToSend = curves.length > 0 ? curves.map((_, index) => index) : [fallbackIdx];
+  let lcmsGlobalFields = null;
+  if (layoutSt === 'LC/MS') {
+    const lcmsIntegrationsExport = resolveLcmsIntegrationsExportForSubmit(analysis, hplcMsSt);
+    lcmsGlobalFields = {
+      lcms_peaks: (0, _extractPeaksEdit.formatLcmsPeaksForBackend)(hplcMsSt),
+      lcms_integrals: (0, _extractPeaksEdit.formatLcmsIntegralsForBackend)(hplcMsSt),
+      lcms_integrations_export: lcmsIntegrationsExport,
+      lcms_peaks_text: _format.default.formatedLCMS(hplcMsSt, isAscend, decimalSt, {
+        lcmsIntegrationsExport
+      }),
+      lcms_uvvis_wavelength: hplcMsSt?.uvvis?.selectedWaveLength ?? null,
+      lcms_mz_page: hplcMsSt?.tic?.currentPageValue ?? null,
+      lcms_mz_page_data: (0, _extractPeaksEdit.getLcmsMzPageData)(hplcMsSt)
+    };
+  }
   const spectraList = indicesToSend.map(curveIdx => {
     const curve = curves[curveIdx] || {};
     const curveFeature = curve.feature || feature;
-    return buildSpectrumPayload({
+    const spectrumPayload = buildSpectrumPayload({
       feature: curveFeature,
       curveIdx,
       editPeakSt,
@@ -190,17 +220,19 @@ const onClickCb = (operationValue, isAscend, isIntensity, layoutSt, shiftSt, ana
       analysis,
       decimalSt
     });
+    if (lcmsGlobalFields && curve.lcmsKind === 'uvvis') {
+      return {
+        ...spectrumPayload,
+        ...lcmsGlobalFields
+      };
+    }
+    return spectrumPayload;
   });
   const payload = {
     spectra_list: spectraList
   };
-  if (layoutSt === 'LC/MS') {
-    payload.lcms_peaks = (0, _extractPeaksEdit.formatLcmsPeaksForBackend)(hplcMsSt);
-    payload.lcms_integrals = (0, _extractPeaksEdit.formatLcmsIntegralsForBackend)(hplcMsSt);
-    payload.lcms_peaks_text = _format.default.formatedLCMS(hplcMsSt, isAscend, decimalSt);
-    payload.lcms_uvvis_wavelength = hplcMsSt?.uvvis?.selectedWaveLength ?? null;
-    payload.lcms_mz_page = hplcMsSt?.tic?.currentPageValue ?? null;
-    payload.lcms_mz_page_data = (0, _extractPeaksEdit.getLcmsMzPageData)(hplcMsSt);
+  if (lcmsGlobalFields) {
+    Object.assign(payload, lcmsGlobalFields);
   }
   if (Number.isFinite(curveSt?.curveIdx)) {
     payload.curveSt = {

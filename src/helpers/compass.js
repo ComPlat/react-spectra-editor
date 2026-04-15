@@ -123,12 +123,14 @@ const MouseMove = (event, focus) => {
 const ClickCompass = (event, focus) => {
   event.stopPropagation();
   event.preventDefault();
+  const { layout, cyclicvoltaSt, jcampIdx } = focus;
   const isPeakGroupSelect = focus.uiSt?.sweepType === LIST_UI_SWEEP_TYPE.PEAK_GROUP_SELECT;
   const isMsGraph = focus.graphIndex === 2;
+  const isUvvisGraph = focus.graphIndex === 0;
   if (isPeakGroupSelect && isMsGraph) return;
+  if (isPeakGroupSelect && Format.isLCMsLayout(layout) && isUvvisGraph) return;
   const { xt, yt } = TfRescale(focus);
   let pt = fetchPt(event, focus, xt);
-  const { layout, cyclicvoltaSt, jcampIdx } = focus;
   if (Format.isCyclicVoltaLayout(layout)) {
     pt = fetchFreePt(event, focus, xt, yt);
     const onPeak = false;

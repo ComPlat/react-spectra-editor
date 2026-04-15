@@ -57,9 +57,13 @@ const updateSweepType = (state, action) => {
     zoom
   } = state;
   let newSweepTypes = zoom.sweepTypes.slice();
-  newSweepTypes[graphIndex] = sweepType;
   if (sweepType === _list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN) {
     newSweepTypes = newSweepTypes.map((val, idx) => idx === graphIndex ? _list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN : _list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET);
+  } else {
+    newSweepTypes = newSweepTypes.map(() => _list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET);
+    if (graphIndex !== undefined) {
+      newSweepTypes[graphIndex] = sweepType;
+    }
   }
   const newZoom = Object.assign({}, zoom, {
     sweepTypes: newSweepTypes,
@@ -76,7 +80,8 @@ const updateZoom = (state, action) => {
   } = action;
   const {
     graphIndex,
-    zoomValue
+    zoomValue,
+    lcmsSyncX
   } = payload;
   if (!zoomValue) {
     return Object.assign({}, state, {
@@ -90,6 +95,14 @@ const updateZoom = (state, action) => {
   const selectedGraph = sweepExtent[graphIndex];
   const newSweepExtent = Object.assign({}, selectedGraph, zoomValue);
   sweepExtent[graphIndex] = newSweepExtent;
+  if (lcmsSyncX != null && zoomValue && zoomValue.xExtent) {
+    const otherIdx = lcmsSyncX;
+    const otherGraph = sweepExtent[otherIdx] || {};
+    sweepExtent[otherIdx] = Object.assign({}, otherGraph, {
+      xExtent: zoomValue.xExtent,
+      yExtent: false
+    });
+  }
   const newZoom = Object.assign({}, zoom, {
     sweepExtent,
     graphIndex
@@ -104,7 +117,7 @@ const resetZoom = (state, action) => {
   } = action;
   const {
     graphIndex
-  } = payload;
+  } = payload || {};
   if (graphIndex === undefined) {
     return Object.assign({}, state, {
       sweepExtent: {
@@ -117,12 +130,14 @@ const resetZoom = (state, action) => {
     zoom
   } = state;
   const sweepExtent = Array.isArray(zoom.sweepExtent) ? [...zoom.sweepExtent] : [];
-  const selectedGraph = sweepExtent[graphIndex];
-  const newSweepExtent = Object.assign({}, selectedGraph, {
-    xExtent: false,
-    yExtent: false
+  const indicesToReset = graphIndex === 0 || graphIndex === 1 ? [0, 1] : [graphIndex];
+  indicesToReset.forEach(idx => {
+    const selectedGraph = sweepExtent[idx] || {};
+    sweepExtent[idx] = Object.assign({}, selectedGraph, {
+      xExtent: false,
+      yExtent: false
+    });
   });
-  sweepExtent[graphIndex] = newSweepExtent;
   return Object.assign({}, state, {
     zoom: {
       sweepExtent,
