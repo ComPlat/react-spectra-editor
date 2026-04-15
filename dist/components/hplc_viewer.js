@@ -51,7 +51,8 @@ class HPLCViewer extends _react.default.Component {
       canChangeDescription,
       onDescriptionChanged,
       editorOnly,
-      forecast
+      forecast,
+      onLcmsPageRequest
     } = this.props;
     if (!entities || entities.length === 0) return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {});
     const {
@@ -103,7 +104,8 @@ class HPLCViewer extends _react.default.Component {
               jcampIdx: curveIdx,
               hplcMsSt: hplcMsState,
               isHidden: false,
-              omitUvvisToolbarRow: true
+              omitUvvisToolbarRow: true,
+              onLcmsPageRequest: onLcmsPageRequest
             })
           }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Grid, {
             item: true,
@@ -150,6 +152,7 @@ HPLCViewer.propTypes = {
   descriptions: _propTypes.default.array.isRequired,
   canChangeDescription: _propTypes.default.bool.isRequired,
   onDescriptionChanged: _propTypes.default.func,
+  onLcmsPageRequest: _propTypes.default.func,
   editorOnly: _propTypes.default.bool.isRequired
 };
 HPLCViewer.defaultProps = {
@@ -160,6 +163,7 @@ HPLCViewer.defaultProps = {
   yLabel: '',
   entities: [],
   forecast: {},
-  onDescriptionChanged: () => {}
+  onDescriptionChanged: () => {},
+  onLcmsPageRequest: null
 };
 var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps), (0, _styles.withStyles)(styles))(HPLCViewer);

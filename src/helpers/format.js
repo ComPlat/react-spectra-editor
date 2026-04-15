@@ -230,14 +230,22 @@ const formatedLCMS = (hplcMsSt, isAscend, decimal, options = {}) => {
   }
 
   if (tic && ms[polarityKey]) {
+    const pageValues = Array.isArray(ms[polarityKey].pageValues) ? ms[polarityKey].pageValues : [];
+    const peaksByPage = Array.isArray(ms[polarityKey].peaks) ? ms[polarityKey].peaks : [];
     let currentIndex = -1;
-    if (Array.isArray(tic[polarityKey]?.data?.x)) {
-      currentIndex = tic[polarityKey].data.x.findIndex(
-        (x) => Math.abs(x - tic.currentPageValue) < 1e-6,
+    if (Number.isFinite(tic.currentPageValue) && pageValues.length > 0) {
+      currentIndex = pageValues.findIndex(
+        (value) => Number.isFinite(value) && Math.abs(value - tic.currentPageValue) < 1e-6,
       );
     }
-    if (currentIndex >= 0 && ms[polarityKey].peaks[currentIndex]) {
-      const peaks = ms[polarityKey].peaks[currentIndex];
+    if (Array.isArray(tic[polarityKey]?.data?.x)) {
+      const fallbackIndex = tic[polarityKey].data.x.findIndex(
+        (x) => Math.abs(x - tic.currentPageValue) < 1e-6,
+      );
+      if (currentIndex < 0) currentIndex = fallbackIndex;
+    }
+    if (currentIndex >= 0 && peaksByPage[currentIndex]) {
+      const peaks = peaksByPage[currentIndex];
       const maxIntensity = Math.max(...peaks.map((p) => p.y)) || 1;
       const thresholdValue = (threshold?.value != null) ? threshold.value : 5;
 
@@ -495,7 +503,7 @@ const rmShiftFromPeaks = (peaks, shift, atIndex = 0) => {
 const peaksBody = ({
   peaks, layout, decimal, shift, isAscend,
   isIntensity = false, boundary = {},
-  integration, atIndex = 0, waveLength, temperature, hplcMsSt,
+  integration, atIndex = 0, waveLength, temperature, hplcMsSt = null,
 }) => {
   const result = rmShiftFromPeaks(peaks, shift, atIndex);
 

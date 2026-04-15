@@ -1,4 +1,9 @@
-import { extractPeaksEdit, extractAreaUnderCurve, extractAutoPeaks } from "../../../helpers/extractPeaksEdit";
+import {
+  extractPeaksEdit,
+  extractAreaUnderCurve,
+  extractAutoPeaks,
+  getLcmsMzPageData,
+} from "../../../helpers/extractPeaksEdit";
 import { LIST_LAYOUT } from "../../../constants/list_layout";
 import { LIST_SHIFT_1H } from "../../../constants/list_shift";
 
@@ -25,7 +30,7 @@ describe('Test extract edited peaks and area under curve', () => {
 
     it('Return empty array when LCMS state is missing', () => {
       const peaks = extractPeaksEdit(null)
-      const expectedPeaks = []
+      const expectedPeaks: any[] = []
       expect(peaks).toEqual(expectedPeaks)
     })
   })
@@ -49,6 +54,25 @@ describe('Test extract edited peaks and area under curve', () => {
       const peaks = extractAutoPeaks(feature, threshold, shiftSt, LIST_LAYOUT.H1)
       const expectedPeaks = [{x: 2.04, y: 2}, {x: 3.04, y: 3}]
       expect(peaks).toEqual(expectedPeaks)
+    })
+  })
+
+  describe('Test LCMS page extraction by retention time', () => {
+    it('Get MS peaks by pageValues in single-page payload mode', () => {
+      const hplcMsSt = {
+        tic: {
+          polarity: 'positive',
+          currentPageValue: 7.2,
+          positive: { data: { x: [0.1, 0.2, 0.3] } },
+        },
+        ms: {
+          positive: {
+            pageValues: [7.2],
+            peaks: [[{ x: 101.1, y: 12 }]],
+          },
+        },
+      }
+      expect(getLcmsMzPageData(hplcMsSt as any)).toEqual([{ x: 101.1, y: 12 }])
     })
   })
 

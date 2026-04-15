@@ -367,7 +367,7 @@ class MultiFocus {
     event.stopPropagation();
     event.preventDefault();
     const onPeak = true;
-    this.clickUiTargetAct(data, onPeak, false, this.jcampIdx);
+    this.clickUiTargetAct(data, onPeak, false, this.jcampIdx, false, 'lcms_tic');
   }
 
   create({

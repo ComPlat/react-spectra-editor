@@ -168,9 +168,25 @@ function* scrollUiWheel(action) {
 
 const getUiSweepType = (state) => state.ui.sweepType;
 
+export const shouldDisplayLcmsSubViewerAt = ({
+  isLcmsLayout,
+  payload,
+  sourceHint,
+  uiSweepType,
+}) => (
+  isLcmsLayout
+  && sourceHint === 'lcms_tic'
+  && Number.isFinite(payload?.x)
+  && [
+    LIST_UI_SWEEP_TYPE.ZOOMIN,
+    LIST_UI_SWEEP_TYPE.ZOOMRESET,
+    LIST_UI_SWEEP_TYPE.PEAK_GROUP_SELECT,
+  ].includes(uiSweepType)
+);
+
 function* clickUiTarget(action) {
   const {
-    payload, onPeak, voltammetryPeakIdx, onPecker,
+    payload, onPeak, voltammetryPeakIdx, onPecker, sourceHint,
   } = action;
   const uiSweepType = yield select(getUiSweepType);
 
@@ -180,6 +196,36 @@ function* clickUiTarget(action) {
   const hplcMsState = yield select(getHplcMsState);
   const { uvvis } = hplcMsState;
   const isLcmsLayout = (yield select(getLayoutState)) === LIST_LAYOUT.LC_MS;
+  if (sourceHint === 'lcms_tic' || isLcmsLayout) {
+    // eslint-disable-next-line no-console
+    console.log('[Chemspectra][LCMS_SAGA_CLICK_UI_TARGET]', {
+      payload,
+      onPeak,
+      sourceHint,
+      uiSweepType,
+      isLcmsLayout,
+      curveIdx,
+    });
+  }
+
+  if (shouldDisplayLcmsSubViewerAt({
+    isLcmsLayout,
+    payload,
+    sourceHint,
+    uiSweepType,
+  })) {
+    // eslint-disable-next-line no-console
+    console.log('[Chemspectra][LCMS_SAGA_DISPLAY_SUBVIEWER_AT]', {
+      payload,
+      sourceHint,
+      uiSweepType,
+    });
+    yield put({
+      type: UI.SUB_VIEWER.DISPLAY_VIEWER_AT,
+      payload,
+    });
+    return;
+  }
 
   if (uiSweepType === LIST_UI_SWEEP_TYPE.PEAK_ADD && !onPeak) {
     const spectrumId = hplcMsState?.uvvis?.selectedWaveLength;

@@ -154,6 +154,11 @@ const uiReducer = (state = initialState, action) => {
         viewer: action.payload
       });
     case _action_type.UI.SWEEP.SET_TYPE:
+      // eslint-disable-next-line no-console
+      console.log('[Chemspectra][LCMS_REDUCER_SWEEP_SET_TYPE]', {
+        payload: action.payload,
+        prevSweepType: state.sweepType
+      });
       if (action.payload.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET || action.payload === _list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET) {
         // return Object.assign({}, state, {
         //   sweepExtent: { xExtent: false, yExtent: false },
@@ -173,6 +178,11 @@ const uiReducer = (state = initialState, action) => {
         return updateZoom(state, action);
       }
     case _action_type.UI.SUB_VIEWER.DISPLAY_VIEWER_AT:
+      // eslint-disable-next-line no-console
+      console.log('[Chemspectra][LCMS_REDUCER_DISPLAY_SUBVIEWER_AT]', {
+        payload: action.payload,
+        prevSubViewerAt: state.subViewerAt
+      });
       return Object.assign({}, state, {
         subViewerAt: action.payload
       });

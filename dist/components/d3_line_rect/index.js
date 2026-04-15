@@ -4,7 +4,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.isLcmsMsPageLoading = exports.default = void 0;
 var _react = _interopRequireDefault(require("react"));
 var _reactRedux = require("react-redux");
 var _redux = require("redux");
@@ -60,6 +60,7 @@ const parsePageValue = feature => {
   }
   return null;
 };
+const resolveLcmsTrigger = subViewerAt => subViewerAt && subViewerAt.x !== undefined ? 'user_click' : 'initial';
 const toSeed = (xValues = [], yValues = []) => {
   const maxLength = Math.min(xValues.length, yValues.length);
   const seed = new Array(maxLength);
@@ -71,6 +72,27 @@ const toSeed = (xValues = [], yValues = []) => {
   }
   return seed;
 };
+const isLcmsMsPageLoading = (mzEntities = [], hplcMsSt = {}) => {
+  const currentPageValue = hplcMsSt?.tic?.currentPageValue;
+  if (!Number.isFinite(currentPageValue)) return false;
+  const polarity = hplcMsSt?.tic?.polarity;
+  const pickEntity = mzEntities?.find(ent => (0, _extractEntityLCMS.getLcMsInfo)(ent).polarity === polarity) || mzEntities?.[0];
+  if (!pickEntity) return true;
+  const {
+    features
+  } = (0, _extractParams.extractParams)(pickEntity, 0, 1);
+  let featuresArr = [];
+  if (Array.isArray(features)) {
+    featuresArr = features;
+  } else if (features && typeof features === 'object') {
+    featuresArr = Object.values(features);
+  }
+  if (featuresArr.length === 0) return true;
+  const pageValues = featuresArr.map(feature => parsePageValue(feature)).filter(value => Number.isFinite(value));
+  if (pageValues.length === 0) return true;
+  return !pageValues.some(value => Math.abs(value - currentPageValue) < 1e-5);
+};
+exports.isLcmsMsPageLoading = isLcmsMsPageLoading;
 const styles = () => Object.assign({}, {
   lcMsStackRoot: {
     margin: '0 0 5px 52px'
@@ -100,6 +122,28 @@ const styles = () => Object.assign({}, {
     columnGap: 8,
     rowGap: 4,
     flex: '0 1 auto'
+  },
+  lcMsGraphPanel: {
+    position: 'relative'
+  },
+  lcMsLoadingOverlay: {
+    position: 'absolute',
+    inset: 0,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.72)',
+    pointerEvents: 'none',
+    zIndex: 2
+  },
+  lcMsLoadingIndicator: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    borderRadius: '50%',
+    backgroundColor: 'rgba(255, 255, 255, 0.92)',
+    boxShadow: '0 1px 4px rgba(0, 0, 0, 0.18)'
   }
 }, _common.commonStyle);
 const zoomView = (classes, graphIndex, uiSt, zoomInAct) => {
@@ -568,7 +612,8 @@ class ViewerLineRect extends _react.default.Component {
       uiSt,
       mzEntities,
       hplcMsSt,
-      updateCurrentPageValueAct
+      updateCurrentPageValueAct,
+      onLcmsPageRequest
     } = this.props;
     const {
       polarity
@@ -593,23 +638,35 @@ class ViewerLineRect extends _react.default.Component {
     const pageValues = featuresArr.map(fe => parsePageValue(fe)).filter(val => Number.isFinite(val));
     if (pageValues.length === 0) return featuresArr[0];
     const hasValidClick = subViewerAt != null && Number.isFinite(subViewerAt.x);
-    let anchor;
+    let requestedPageValue;
     if (hasValidClick) {
-      anchor = subViewerAt.x;
+      requestedPageValue = subViewerAt.x;
     } else if (Number.isFinite(hplcMsSt.tic.currentPageValue)) {
-      anchor = hplcMsSt.tic.currentPageValue;
+      requestedPageValue = hplcMsSt.tic.currentPageValue;
     } else {
-      anchor = pageValues[Math.floor(pageValues.length / 2)];
+      requestedPageValue = pageValues[Math.floor(pageValues.length / 2)];
     }
-    const closestPage = (0, _calc.findClosest)(pageValues, anchor);
-    const prevRt = hplcMsSt.tic.currentPageValue;
-    if (!Number.isFinite(prevRt) || Math.abs(closestPage - prevRt) > 1e-5) {
-      updateCurrentPageValueAct(closestPage);
-    }
+    const closestPage = (0, _calc.findClosest)(pageValues, requestedPageValue);
     const selectFeature = featuresArr.find(fe => {
       const value = parsePageValue(fe);
       return Number.isFinite(value) && Math.abs(value - closestPage) < 1e-9;
     });
+    const exactRequestedFeature = featuresArr.find(fe => {
+      const value = parsePageValue(fe);
+      return Number.isFinite(value) && Math.abs(value - requestedPageValue) < 1e-9;
+    });
+    const requestRetentionTime = exactRequestedFeature?.pageSymbol ?? exactRequestedFeature?.page ?? exactRequestedFeature?.pageValue ?? requestedPageValue;
+    const prevRt = hplcMsSt.tic.currentPageValue;
+    if (!Number.isFinite(prevRt) || Math.abs(requestedPageValue - prevRt) > 1e-5) {
+      updateCurrentPageValueAct(requestedPageValue);
+      if (typeof onLcmsPageRequest === 'function' && Number.isFinite(requestedPageValue)) {
+        onLcmsPageRequest({
+          retentionTime: requestRetentionTime,
+          polarity,
+          trigger: resolveLcmsTrigger(subViewerAt)
+        });
+      }
+    }
     return selectFeature || featuresArr[0];
   }
   render() {
@@ -623,10 +680,12 @@ class ViewerLineRect extends _react.default.Component {
       zoomInAct,
       uiSt,
       ticEntities,
+      mzEntities,
       omitUvvisToolbarRow
     } = this.props;
     const resolvedFeature = feature || {};
     const hasEdit = !!resolvedFeature?.data?.[0]?.x?.length;
+    const isMsLoading = isLcmsMsPageLoading(mzEntities, hplcMsSt);
     const handleTicChanged = event => {
       const selectedPolarity = event.target.value;
       updateTicAct({
@@ -725,8 +784,21 @@ class ViewerLineRect extends _react.default.Component {
             hasEdit: hasEdit
           })
         })]
-      }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-        className: _list_graph.LIST_ROOT_SVG_GRAPH.RECT
+      }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+        className: classes.lcMsGraphPanel,
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+          className: _list_graph.LIST_ROOT_SVG_GRAPH.RECT
+        }), isMsLoading ? /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+          className: classes.lcMsLoadingOverlay,
+          "data-testid": "lcms-ms-loading",
+          "aria-label": "Loading MS spectrum",
+          children: /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+            className: classes.lcMsLoadingIndicator,
+            children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.CircularProgress, {
+              size: 28
+            })
+          })
+        }) : null]
       })]
     });
   }
@@ -783,12 +855,14 @@ ViewerLineRect.propTypes = {
   updateCurrentPageValueAct: _propTypes.default.func.isRequired,
   uvvisUndoAct: _propTypes.default.func.isRequired,
   uvvisRedoAct: _propTypes.default.func.isRequired,
-  omitUvvisToolbarRow: _propTypes.default.bool
+  omitUvvisToolbarRow: _propTypes.default.bool,
+  onLcmsPageRequest: _propTypes.default.func
 };
 ViewerLineRect.defaultProps = {
   feature: {},
   isHidden: false,
-  omitUvvisToolbarRow: false
+  omitUvvisToolbarRow: false,
+  onLcmsPageRequest: null
 };
 
 // export default connect(mapStateToProps, mapDispatchToProps)(ViewerLineRect);

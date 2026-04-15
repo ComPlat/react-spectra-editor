@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import withStyles from '@mui/styles/withStyles';
 import {
   Select, MenuItem, FormControl, InputLabel,
-  Tooltip,
+  Tooltip, CircularProgress,
 } from '@mui/material';
 import ZoomInOutlinedIcon from '@mui/icons-material/ZoomInOutlined';
 import FindReplaceOutlinedIcon from '@mui/icons-material/FindReplaceOutlined';
@@ -65,6 +65,10 @@ const parsePageValue = (feature) => {
   return null;
 };
 
+const resolveLcmsTrigger = (subViewerAt) => (
+  subViewerAt && subViewerAt.x !== undefined ? 'user_click' : 'initial'
+);
+
 const toSeed = (xValues = [], yValues = []) => {
   const maxLength = Math.min(xValues.length, yValues.length);
   const seed = new Array(maxLength);
@@ -72,6 +76,33 @@ const toSeed = (xValues = [], yValues = []) => {
     seed[index] = { x: xValues[index], y: yValues[index] };
   }
   return seed;
+};
+
+export const isLcmsMsPageLoading = (mzEntities = [], hplcMsSt = {}) => {
+  const currentPageValue = hplcMsSt?.tic?.currentPageValue;
+  if (!Number.isFinite(currentPageValue)) return false;
+
+  const polarity = hplcMsSt?.tic?.polarity;
+  const pickEntity = mzEntities?.find((ent) => (
+    getLcMsInfo(ent).polarity === polarity
+  )) || mzEntities?.[0];
+  if (!pickEntity) return true;
+
+  const { features } = extractParams(pickEntity, 0, 1);
+  let featuresArr = [];
+  if (Array.isArray(features)) {
+    featuresArr = features;
+  } else if (features && typeof features === 'object') {
+    featuresArr = Object.values(features);
+  }
+  if (featuresArr.length === 0) return true;
+
+  const pageValues = featuresArr
+    .map((feature) => parsePageValue(feature))
+    .filter((value) => Number.isFinite(value));
+  if (pageValues.length === 0) return true;
+
+  return !pageValues.some((value) => Math.abs(value - currentPageValue) < 1e-5);
 };
 
 const styles = () => (
@@ -106,6 +137,28 @@ const styles = () => (
         columnGap: 8,
         rowGap: 4,
         flex: '0 1 auto',
+      },
+      lcMsGraphPanel: {
+        position: 'relative',
+      },
+      lcMsLoadingOverlay: {
+        position: 'absolute',
+        inset: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'rgba(255, 255, 255, 0.72)',
+        pointerEvents: 'none',
+        zIndex: 2,
+      },
+      lcMsLoadingIndicator: {
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 10,
+        borderRadius: '50%',
+        backgroundColor: 'rgba(255, 255, 255, 0.92)',
+        boxShadow: '0 1px 4px rgba(0, 0, 0, 0.18)',
       },
     },
     commonStyle,
@@ -544,7 +597,7 @@ class ViewerLineRect extends React.Component {
 
   extractSubView() {
     const {
-      uiSt, mzEntities, hplcMsSt, updateCurrentPageValueAct,
+      uiSt, mzEntities, hplcMsSt, updateCurrentPageValueAct, onLcmsPageRequest,
     } = this.props;
     const { polarity } = hplcMsSt.tic;
     const pickEntity = mzEntities?.find((ent) => (
@@ -569,35 +622,50 @@ class ViewerLineRect extends React.Component {
     if (pageValues.length === 0) return featuresArr[0];
 
     const hasValidClick = subViewerAt != null && Number.isFinite(subViewerAt.x);
-    let anchor;
+    let requestedPageValue;
     if (hasValidClick) {
-      anchor = subViewerAt.x;
+      requestedPageValue = subViewerAt.x;
     } else if (Number.isFinite(hplcMsSt.tic.currentPageValue)) {
-      anchor = hplcMsSt.tic.currentPageValue;
+      requestedPageValue = hplcMsSt.tic.currentPageValue;
     } else {
-      anchor = pageValues[Math.floor(pageValues.length / 2)];
+      requestedPageValue = pageValues[Math.floor(pageValues.length / 2)];
     }
-    const closestPage = findClosest(pageValues, anchor);
-
-    const prevRt = hplcMsSt.tic.currentPageValue;
-    if (!Number.isFinite(prevRt) || Math.abs(closestPage - prevRt) > 1e-5) {
-      updateCurrentPageValueAct(closestPage);
-    }
-
+    const closestPage = findClosest(pageValues, requestedPageValue);
     const selectFeature = featuresArr.find((fe) => {
       const value = parsePageValue(fe);
       return Number.isFinite(value) && Math.abs(value - closestPage) < 1e-9;
     });
+    const exactRequestedFeature = featuresArr.find((fe) => {
+      const value = parsePageValue(fe);
+      return Number.isFinite(value) && Math.abs(value - requestedPageValue) < 1e-9;
+    });
+    const requestRetentionTime = exactRequestedFeature?.pageSymbol
+      ?? exactRequestedFeature?.page
+      ?? exactRequestedFeature?.pageValue
+      ?? requestedPageValue;
+
+    const prevRt = hplcMsSt.tic.currentPageValue;
+    if (!Number.isFinite(prevRt) || Math.abs(requestedPageValue - prevRt) > 1e-5) {
+      updateCurrentPageValueAct(requestedPageValue);
+      if (typeof onLcmsPageRequest === 'function' && Number.isFinite(requestedPageValue)) {
+        onLcmsPageRequest({
+          retentionTime: requestRetentionTime,
+          polarity,
+          trigger: resolveLcmsTrigger(subViewerAt),
+        });
+      }
+    }
     return selectFeature || featuresArr[0];
   }
 
   render() {
     const {
       classes, hplcMsSt, selectWavelengthAct, updateTicAct, selectCurveAct,
-      feature, zoomInAct, uiSt, ticEntities, omitUvvisToolbarRow,
+      feature, zoomInAct, uiSt, ticEntities, mzEntities, omitUvvisToolbarRow,
     } = this.props;
     const resolvedFeature = feature || {};
     const hasEdit = !!resolvedFeature?.data?.[0]?.x?.length;
+    const isMsLoading = isLcmsMsPageLoading(mzEntities, hplcMsSt);
     const handleTicChanged = (event) => {
       const selectedPolarity = event.target.value;
       updateTicAct({ polarity: selectedPolarity });
@@ -685,7 +753,22 @@ class ViewerLineRect extends React.Component {
             <Threshold feature={resolvedFeature} hasEdit={hasEdit} />
           </div>
         </div>
-        <div className={LIST_ROOT_SVG_GRAPH.RECT} />
+        <div className={classes.lcMsGraphPanel}>
+          <div className={LIST_ROOT_SVG_GRAPH.RECT} />
+          {
+            isMsLoading ? (
+              <div
+                className={classes.lcMsLoadingOverlay}
+                data-testid="lcms-ms-loading"
+                aria-label="Loading MS spectrum"
+              >
+                <div className={classes.lcMsLoadingIndicator}>
+                  <CircularProgress size={28} />
+                </div>
+              </div>
+            ) : null
+          }
+        </div>
       </div>
     );
   }
@@ -750,12 +833,14 @@ ViewerLineRect.propTypes = {
   uvvisUndoAct: PropTypes.func.isRequired,
   uvvisRedoAct: PropTypes.func.isRequired,
   omitUvvisToolbarRow: PropTypes.bool,
+  onLcmsPageRequest: PropTypes.func,
 };
 
 ViewerLineRect.defaultProps = {
   feature: {},
   isHidden: false,
   omitUvvisToolbarRow: false,
+  onLcmsPageRequest: null,
 };
 
 // export default connect(mapStateToProps, mapDispatchToProps)(ViewerLineRect);

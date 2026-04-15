@@ -15,6 +15,7 @@ var _list_layout = require("./constants/list_layout");
 
 const FN = Object.assign({}, _format.default, {
   ExtractJcamp: _chem.ExtractJcamp,
+  buildLcmsMsPageJcamp: _chem.buildLcmsMsPageJcamp,
   ToXY: _converter.ToXY,
   LIST_LAYOUT: _list_layout.LIST_LAYOUT,
   CalcMpyCenter: _multiplicity_calc.calcMpyCenter,

@@ -123,6 +123,7 @@ const ClickCompass = (event, focus) => {
   const isPeakGroupSelect = focus.uiSt?.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.PEAK_GROUP_SELECT;
   const isMsGraph = focus.graphIndex === 2;
   const isUvvisGraph = focus.graphIndex === 0;
+  const isLcmsTicGraph = _format.default.isLCMsLayout(layout) && focus.graphIndex === 1;
   if (isPeakGroupSelect && isMsGraph) return;
   if (isPeakGroupSelect && _format.default.isLCMsLayout(layout) && isUvvisGraph) return;
   const {
@@ -130,6 +131,16 @@ const ClickCompass = (event, focus) => {
     yt
   } = TfRescale(focus);
   let pt = fetchPt(event, focus, xt);
+  // eslint-disable-next-line no-console
+  console.log('[Chemspectra][LCMS_CLICK_COMPASS]', {
+    layout,
+    graphIndex: focus.graphIndex,
+    jcampIdx,
+    sweepType: focus.uiSt?.sweepType,
+    isPeakGroupSelect,
+    isLcmsTicGraph,
+    point: pt
+  });
   if (_format.default.isCyclicVoltaLayout(layout)) {
     pt = fetchFreePt(event, focus, xt, yt);
     const onPeak = false;
@@ -144,7 +155,11 @@ const ClickCompass = (event, focus) => {
       focus.clickUiTargetAct(pt, onPeak);
     }
   } else {
-    focus.clickUiTargetAct(pt, false);
+    if (isLcmsTicGraph) {
+      focus.clickUiTargetAct(pt, false, false, jcampIdx, false, 'lcms_tic');
+    } else {
+      focus.clickUiTargetAct(pt, false);
+    }
   }
 };
 exports.ClickCompass = ClickCompass;

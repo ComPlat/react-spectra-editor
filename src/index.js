@@ -9,6 +9,7 @@ import {
 import ReactQuill from 'react-quill';
 
 import { SpectraEditor, FN, store } from './app';
+import { getLcMsInfo } from './helpers/extractEntityLCMS';
 import nmr1HJcamp from './__tests__/fixtures/nmr1h_jcamp';
 import nmr1H2Jcamp from './__tests__/fixtures/nmr1h_2_jcamp';
 import nmr13CDeptJcamp from './__tests__/fixtures/nmr13c_dept_jcamp';
@@ -122,6 +123,74 @@ const emissionsEntity = FN.ExtractJcamp(emissionsJcamp);
 const dlsAcfEntity = FN.ExtractJcamp(dlsAcfJcamp);
 const dlsIntensityEntity = FN.ExtractJcamp(dlsIntensityJcamp);
 
+const cloneData = (value) => JSON.parse(JSON.stringify(value));
+
+const parseNumericPage = (feature) => {
+  const candidates = [feature?.pageValue, feature?.page, feature?.pageSymbol];
+  for (let i = 0; i < candidates.length; i += 1) {
+    const raw = candidates[i];
+    if (raw != null) {
+      if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
+      const text = String(raw).split('\n')[0].trim();
+      const match = text.match(/[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?/);
+      if (match) {
+        const value = Number(match[0]);
+        if (Number.isFinite(value)) return value;
+      }
+    }
+  }
+  return null;
+};
+
+const getCurveFeatures = (curve) => {
+  if (Array.isArray(curve?.features)) return curve.features;
+  if (curve?.features && typeof curve.features === 'object') {
+    return Object.values(curve.features);
+  }
+  return [];
+};
+
+const selectClosestMsFeature = (retentionTime, polarity) => {
+  const featurePool = [
+    ...getCurveFeatures(lcmsEntity).map((feature) => ({ curve: lcmsEntity, feature })),
+    ...getCurveFeatures(lcmsEntity2).map((feature) => ({ curve: lcmsEntity2, feature })),
+  ].filter((entry) => Number.isFinite(parseNumericPage(entry.feature)));
+  if (featurePool.length === 0) return null;
+  const normalizedPolarity = polarity ? String(polarity).toLowerCase() : null;
+  const filteredPool = normalizedPolarity
+    ? featurePool.filter((entry) => getLcMsInfo(entry.curve).polarity === normalizedPolarity)
+    : featurePool;
+  const pool = filteredPool.length > 0 ? filteredPool : featurePool;
+  if (pool.length === 0) return null;
+  if (!Number.isFinite(retentionTime)) return pool[0];
+  return pool.reduce((best, entry) => {
+    const bestRt = parseNumericPage(best.feature);
+    const currentRt = parseNumericPage(entry.feature);
+    if (!Number.isFinite(bestRt)) return entry;
+    if (!Number.isFinite(currentRt)) return best;
+    return Math.abs(currentRt - retentionTime) < Math.abs(bestRt - retentionTime) ? entry : best;
+  }, pool[0]);
+};
+
+const buildLcmsStandaloneMultiEntities = (retentionTime, polarity) => {
+  const selected = selectClosestMsFeature(retentionTime, polarity);
+  const selectedMsCurve = selected?.curve || lcmsEntity;
+  const selectedMsFeature = selected?.feature || getCurveFeatures(selectedMsCurve)[0];
+  const msCurve = cloneData(selectedMsCurve);
+  msCurve.features = selectedMsFeature ? [cloneData(selectedMsFeature)] : [];
+  return [
+    cloneData(hplcMsTicPosEntity),
+    cloneData(hplcMsTicNegEntity),
+    cloneData(hplcMsUvvisEntity),
+    msCurve,
+  ];
+};
+
+const getInitialLcmsRetentionTime = () => {
+  const ticX = hplcMsTicPosEntity?.features?.[0]?.data?.[0]?.x;
+  return Array.isArray(ticX) && Number.isFinite(ticX[0]) ? ticX[0] : null;
+};
+
 class DemoWriteIr extends React.Component {
   constructor(props) {
     super(props);
@@ -133,6 +202,7 @@ class DemoWriteIr extends React.Component {
       molecule: '',
       showOthers: false,
       descChanged: '',
+      lcmsDynamicMultiEntities: null,
     };
 
     this.onClick = this.onClick.bind(this);
@@ -149,17 +219,8 @@ class DemoWriteIr extends React.Component {
     this.loadOthers = this.loadOthers.bind(this);
     this.onDescriptionChanged = this.onDescriptionChanged.bind(this);
     this.loadMultiEntities = this.loadMultiEntities.bind(this);
-  }
-
-  onClick(typ) {
-    return () => {
-      this.setState({
-        typ,
-        desc: '',
-        predictions: false,
-        molecule: '',
-      });
-    };
+    this.handleLcmsPageRequest = this.handleLcmsPageRequest.bind(this);
+    this.lcmsRequestCounter = 0;
   }
 
   onShowOthers(jcamp) { // eslint-disable-line
@@ -169,6 +230,51 @@ class DemoWriteIr extends React.Component {
   onDescriptionChanged(content) {
     // console.log(content)
     this.setState({ descChanged: content });
+  }
+
+  handleLcmsPageRequest(request) {
+    const { typ } = this.state;
+    if (typ !== 'lcms') return;
+    const retentionTime = request?.retentionTime;
+    const polarity = request?.polarity;
+    const trigger = request?.trigger || 'unknown';
+    this.lcmsRequestCounter += 1;
+    const requestId = this.lcmsRequestCounter;
+    if (typeof window !== 'undefined') {
+      // eslint-disable-next-line no-underscore-dangle
+      const history = Array.isArray(window.__lcmsDemoRequests) ? window.__lcmsDemoRequests : [];
+      history.push({
+        requestId,
+        retentionTime,
+        polarity,
+        trigger,
+        createdAt: Date.now(),
+      });
+      // eslint-disable-next-line no-underscore-dangle
+      window.__lcmsDemoRequests = history;
+    }
+    setTimeout(() => {
+      if (requestId !== this.lcmsRequestCounter) return;
+      this.setState({
+        lcmsDynamicMultiEntities: buildLcmsStandaloneMultiEntities(retentionTime, polarity),
+      });
+    }, 250);
+  }
+
+  onClick(typ) {
+    return () => {
+      const isLcms = typ === 'lcms';
+      const initialRt = getInitialLcmsRetentionTime();
+      this.setState({
+        typ,
+        desc: '',
+        predictions: false,
+        molecule: '',
+        lcmsDynamicMultiEntities: isLcms
+          ? buildLcmsStandaloneMultiEntities(initialRt)
+          : null,
+      });
+    };
   }
 
   loadEntity() {
@@ -230,7 +336,7 @@ class DemoWriteIr extends React.Component {
   }
 
   loadMultiEntities() {
-    const { typ } = this.state;
+    const { typ, lcmsDynamicMultiEntities } = this.state;
     switch (typ) {
       case 'cyclic volta':
         return [cyclicVoltaEntity1, cyclicVoltaEntity2, cyclicVoltaEntity3];
@@ -249,7 +355,8 @@ class DemoWriteIr extends React.Component {
       case 'gc':
         return [gcEntity1, gcEntity2, gcEntity3];
       case 'lcms':
-        return [hplcMsTicPosEntity, hplcMsTicNegEntity, hplcMsUvvisEntity, lcmsEntity, lcmsEntity2];
+        return lcmsDynamicMultiEntities
+          || buildLcmsStandaloneMultiEntities(getInitialLcmsRetentionTime());
       case 'lcms chemstation':
         return [
           hplcMsTicChemstationEntity, hplcMsMzChemstationEntity, hplcMsUvvisChemstationEntity,
@@ -765,6 +872,7 @@ class DemoWriteIr extends React.Component {
         <SpectraEditor
           entity={entity}
           multiEntities={multiEntities}
+          onLcmsPageRequest={this.handleLcmsPageRequest}
           others={others}
           editorOnly={false}
           descriptions={desc}
@@ -811,4 +919,6 @@ ReactDOM.render(
 
 if (typeof window !== 'undefined') {
   window.__spectraStore = store;
+  // eslint-disable-next-line no-underscore-dangle
+  window.__lcmsDemoRequests = [];
 }

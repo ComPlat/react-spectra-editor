@@ -35,6 +35,7 @@ class HPLCViewer extends React.Component { // eslint-disable-line
       classes, curveState, operations, entityFileNames,
       entities, userManualLink, molSvg, theoryMass, integrationState, hplcMsState,
       descriptions, canChangeDescription, onDescriptionChanged, editorOnly, forecast,
+      onLcmsPageRequest,
     } = this.props;
     if (!entities || entities.length === 0) return (<div />);
     const { curveIdx } = curveState;
@@ -74,6 +75,7 @@ class HPLCViewer extends React.Component { // eslint-disable-line
                 hplcMsSt={hplcMsState}
                 isHidden={false}
                 omitUvvisToolbarRow
+                onLcmsPageRequest={onLcmsPageRequest}
               />
             </Grid>
             <Grid item xs={3} align="center">
@@ -123,6 +125,7 @@ HPLCViewer.propTypes = {
   descriptions: PropTypes.array.isRequired,
   canChangeDescription: PropTypes.bool.isRequired,
   onDescriptionChanged: PropTypes.func,
+  onLcmsPageRequest: PropTypes.func,
   editorOnly: PropTypes.bool.isRequired,
 };
 
@@ -135,6 +138,7 @@ HPLCViewer.defaultProps = {
   entities: [],
   forecast: {},
   onDescriptionChanged: () => {},
+  onLcmsPageRequest: null,
 };
 
 export default compose(

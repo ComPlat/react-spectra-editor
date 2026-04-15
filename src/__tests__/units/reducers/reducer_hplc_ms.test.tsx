@@ -85,6 +85,7 @@ describe('Test redux reducer_hplc_ms', () => {
       { x: 100, y: 5 },
       { x: 101, y: 6 },
     ]);
+    expect(state.ms.positive.pageValues).toEqual([null]);
   });
 
   it('keeps previous state when SET_ALL_CURVES does not contain UVVIS', () => {
@@ -177,6 +178,28 @@ describe('Test redux reducer_hplc_ms', () => {
       payload,
     } as any);
     expect(state.tic.currentPageValue).toEqual(2);
+  });
+
+  it('lets a user-selected TIC page override UVVIS ##$CSLCMSMZPAGE after bootstrap', () => {
+    const uvvis = { ...createUvvisCurve(), lcms_mz_page: 2 };
+    const payload = [
+      createTicCurve('positive', [1, 2, 3], [10, 20, 30]),
+      uvvis,
+      createMzCurve('positive'),
+    ];
+    let state = hplcMsReducer(undefined, {
+      type: CURVE.SET_ALL_CURVES,
+      payload,
+    } as any);
+
+    expect(state.tic.currentPageValue).toEqual(2);
+
+    state = hplcMsReducer(state, {
+      type: HPLC_MS.UPDATE_CURRENT_PAGE_VALUE,
+      payload: { currentPageValue: 3 },
+    } as any);
+
+    expect(state.tic.currentPageValue).toEqual(3);
   });
 
   it('selects wavelength from meta.lcmsUvvisWavelength when nothing to restore from state', () => {

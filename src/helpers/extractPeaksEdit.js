@@ -63,9 +63,14 @@ function getLcmsMzPageData(hplcMsSt) {
   else if (polarity === 'positive') polarityKey = 'positive';
   const ticDataX = tic[polarityKey]?.data?.x;
   if (!Array.isArray(ticDataX) || !Number.isFinite(tic.currentPageValue)) return null;
-  const currentIndex = ticDataX.findIndex(
-    (x) => Math.abs(x - tic.currentPageValue) < 1e-6,
+  let currentIndex = ms[polarityKey]?.pageValues?.findIndex(
+    (value) => Number.isFinite(value) && Math.abs(value - tic.currentPageValue) < 1e-6,
   );
+  if (!Number.isFinite(currentIndex) || currentIndex < 0) {
+    currentIndex = ticDataX.findIndex(
+      (x) => Math.abs(x - tic.currentPageValue) < 1e-6,
+    );
+  }
   if (currentIndex < 0) return null;
   const peaks = ms[polarityKey]?.peaks?.[currentIndex];
   return Array.isArray(peaks) ? peaks : null;

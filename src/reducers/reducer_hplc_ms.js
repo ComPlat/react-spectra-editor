@@ -12,9 +12,9 @@ const initialState = {
     currentSpectrum: null,
   },
   ms: {
-    positive: { peaks: [] },
-    negative: { peaks: [] },
-    neutral: { peaks: [] },
+    positive: { peaks: [], pageValues: [] },
+    negative: { peaks: [], pageValues: [] },
+    neutral: { peaks: [], pageValues: [] },
   },
   uvvisEditHistory: {
     past: [],
@@ -260,6 +260,27 @@ const updateLcmsData = (state, action) => {
     return [];
   };
 
+  const getFeaturePageValue = (feature) => {
+    const candidates = [feature?.pageValue, feature?.page, feature?.pageSymbol];
+    for (let i = 0; i < candidates.length; i += 1) {
+      const raw = candidates[i];
+      if (raw != null) {
+        if (typeof raw === 'number' && Number.isFinite(raw)) {
+          return raw;
+        }
+        const text = String(raw).split('\n')[0].trim();
+        const match = text.match(/[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?/);
+        if (match) {
+          const value = Number(match[0]);
+          if (Number.isFinite(value)) {
+            return value;
+          }
+        }
+      }
+    }
+    return null;
+  };
+
   let ticPosData = { x: [], y: [] };
   let ticNegData = { x: [], y: [] };
   let ticNeutralData = { x: [], y: [] };
@@ -387,16 +408,24 @@ const updateLcmsData = (state, action) => {
     currentSpectrum,
   };
 
-  const toPeaks = (fts) => fts.map((f) => {
-    const data = f?.data?.[0] || {};
-    const xValues = Array.isArray(data.x) ? data.x : [];
-    const yValues = Array.isArray(data.y) ? data.y : [];
-    const length = Math.min(xValues.length, yValues.length);
-    return xValues.slice(0, length).map((x, i) => ({
-      x,
-      y: yValues[i] || 0,
-    }));
-  });
+  const toMsPayload = (fts) => {
+    const peaks = [];
+    const pageValues = [];
+    fts.forEach((feature) => {
+      const data = feature?.data?.[0] || {};
+      const xValues = Array.isArray(data.x) ? data.x : [];
+      const yValues = Array.isArray(data.y) ? data.y : [];
+      const length = Math.min(xValues.length, yValues.length);
+      peaks.push(
+        xValues.slice(0, length).map((x, i) => ({
+          x,
+          y: yValues[i] || 0,
+        })),
+      );
+      pageValues.push(getFeaturePageValue(feature));
+    });
+    return { peaks, pageValues };
+  };
 
   const available = {
     positive: ticPosData?.x?.length > 0,
@@ -409,14 +438,11 @@ const updateLcmsData = (state, action) => {
   const readMetaPolarity = () => normalizeHintPolarity(
     meta.lcmsPolarity ?? meta.lcms_polarity ?? meta.ticPolarity,
   );
-  const persistedTicHints = readPersistedLcmsTicHints(nextDatasetKey);
-  const persistedPol = normalizeHintPolarity(persistedTicHints.polarity);
-  const statePol = available[state.tic.polarity] ? state.tic.polarity : null;
   const metaPol = readMetaPolarity();
 
   const selectedPolarity = pickFirstAvailablePolarity(
     available,
-    [metaPol, statePol, persistedPol],
+    [metaPol],
   ) || fallbackPolarity;
 
   const ticXsFor = (pol) => {
@@ -438,21 +464,26 @@ const updateLcmsData = (state, action) => {
   };
 
   const metaRt = readFiniteNumber(meta.lcms_mz_page ?? meta.lcmsMzPage);
-  const persistedRt = readFiniteNumber(persistedTicHints.mzPage);
   const curveRt = rtHintFromMzCurve(selectedPolarity);
   const uvvisRtHint = readFiniteNumber(
     uvvisCurve?.lcms_mz_page ?? uvvisCurve?.lcmsMzPage
       ?? uvvisCurve?.entity?.lcms_mz_page ?? uvvisCurve?.entity?.lcmsMzPage,
   );
-  const stateRt = (Number.isFinite(state.tic?.currentPageValue)
-    && nextRtXs.some((x) => Math.abs(x - state.tic.currentPageValue) < 1e-5))
-    ? state.tic.currentPageValue
-    : null;
 
   const nextCurrentPageValue = pickFirstRtOnAxis(
-    [metaRt, uvvisRtHint, stateRt, persistedRt, curveRt],
+    [metaRt, uvvisRtHint, curveRt],
     nextRtXs,
-  );
+  ) ?? nextRtXs[0] ?? null;
+  // eslint-disable-next-line no-console
+  console.log('[Chemspectra][LCMS_BOOTSTRAP_RT]', {
+    nextDatasetKey,
+    metaRt,
+    uvvisRtHint,
+    curveRt,
+    selectedPolarity,
+    firstTicRt: nextRtXs[0] ?? null,
+    nextCurrentPageValue,
+  });
 
   return {
     ...state,
@@ -460,9 +491,9 @@ const updateLcmsData = (state, action) => {
     uvvis: newUvvis,
     uvvisEditHistory: emptyUvvisHistory(),
     ms: {
-      positive: { peaks: toPeaks(mzPosFeatures) },
-      negative: { peaks: toPeaks(mzNegFeatures) },
-      neutral: { peaks: toPeaks(mzNeutralFeatures) },
+      positive: toMsPayload(mzPosFeatures),
+      negative: toMsPayload(mzNegFeatures),
+      neutral: toMsPayload(mzNeutralFeatures),
     },
     tic: {
       ...state.tic,

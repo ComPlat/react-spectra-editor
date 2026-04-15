@@ -43,6 +43,7 @@ const SpectraEditor = ({
   operations, forecast, molSvg, editorOnly, descriptions, exactMass,
   canChangeDescription, onDescriptionChanged,
   multiEntities, multiMolSvgs, entityFileNames, userManualLink,
+  onLcmsPageRequest,
 }) => (
   <Provider store={store}>
     <StyledEngineProvider injectFirst>
@@ -64,6 +65,7 @@ const SpectraEditor = ({
         exactMass={exactMass}
         canChangeDescription={canChangeDescription}
         onDescriptionChanged={onDescriptionChanged}
+        onLcmsPageRequest={onLcmsPageRequest}
       />
     </StyledEngineProvider>
   </Provider>
@@ -88,6 +90,7 @@ SpectraEditor.propTypes = {
   editorOnly: PropTypes.bool,
   canChangeDescription: PropTypes.bool,
   onDescriptionChanged: PropTypes.func,
+  onLcmsPageRequest: PropTypes.func,
   userManualLink: PropTypes.object,
   exactMass: PropTypes.string,
 };
@@ -108,6 +111,7 @@ SpectraEditor.defaultProps = {
   editorOnly: false,
   canChangeDescription: false,
   userManualLink: {},
+  onLcmsPageRequest: null,
 };
 
 export {

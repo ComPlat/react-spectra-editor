@@ -173,7 +173,7 @@ class LayerInit extends React.Component {
       entity, cLabel, xLabel, yLabel, forecast, operations,
       descriptions, molSvg, editorOnly, exactMass,
       canChangeDescription, onDescriptionChanged,
-      multiEntities, entityFileNames, userManualLink,
+      multiEntities, entityFileNames, userManualLink, onLcmsPageRequest,
     } = this.props;
     const { layout } = entity;
     const hasMultiEntities = Array.isArray(multiEntities) && multiEntities.length > 0;
@@ -203,6 +203,7 @@ class LayerInit extends React.Component {
           canChangeDescription={canChangeDescription}
           onDescriptionChanged={onDescriptionChanged}
           editorOnly={editorOnly}
+          onLcmsPageRequest={onLcmsPageRequest}
         />
       );
     }
@@ -306,11 +307,16 @@ LayerInit.propTypes = {
   addOthersAct: PropTypes.func.isRequired,
   canChangeDescription: PropTypes.bool.isRequired,
   onDescriptionChanged: PropTypes.func, // eslint-disable-line
+  onLcmsPageRequest: PropTypes.func,
   setAllCurvesAct: PropTypes.func.isRequired,
   userManualLink: PropTypes.object, // eslint-disable-line
   resetDetectorAct: PropTypes.func.isRequired,
   resetMultiplicityAct: PropTypes.func.isRequired,
   updateDSCMetaDataAct: PropTypes.func.isRequired,
+};
+
+LayerInit.defaultProps = {
+  onLcmsPageRequest: null,
 };
 
 export default connect( // eslint-disable-line

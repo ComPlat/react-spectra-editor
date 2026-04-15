@@ -68,7 +68,8 @@ const SpectraEditor = ({
   multiEntities,
   multiMolSvgs,
   entityFileNames,
-  userManualLink
+  userManualLink,
+  onLcmsPageRequest
 }) => /*#__PURE__*/(0, _jsxRuntime.jsx)(_reactRedux.Provider, {
   store: store,
   children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.StyledEngineProvider, {
@@ -90,7 +91,8 @@ const SpectraEditor = ({
       editorOnly: editorOnly,
       exactMass: exactMass,
       canChangeDescription: canChangeDescription,
-      onDescriptionChanged: onDescriptionChanged
+      onDescriptionChanged: onDescriptionChanged,
+      onLcmsPageRequest: onLcmsPageRequest
     })
   })
 });
@@ -111,6 +113,7 @@ SpectraEditor.propTypes = {
   editorOnly: _propTypes.default.bool,
   canChangeDescription: _propTypes.default.bool,
   onDescriptionChanged: _propTypes.default.func,
+  onLcmsPageRequest: _propTypes.default.func,
   userManualLink: _propTypes.default.object,
   exactMass: _propTypes.default.string
 };
@@ -132,5 +135,6 @@ SpectraEditor.defaultProps = {
   multiMolSvgs: [],
   editorOnly: false,
   canChangeDescription: false,
-  userManualLink: {}
+  userManualLink: {},
+  onLcmsPageRequest: null
 };

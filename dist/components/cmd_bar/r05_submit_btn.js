@@ -78,7 +78,6 @@ const defaultThreshold = {
 };
 const LCMS_INTEGRATIONS_EXPORT_MODES = ['percent', 'area', 'both'];
 const isLcmsIntegrationsExportMode = v => LCMS_INTEGRATIONS_EXPORT_MODES.includes(v);
-
 const resolveLcmsIntegrationsExportForSubmit = (analysis, hplcMsSt) => {
   if (isLcmsIntegrationsExportMode(analysis?.lcmsIntegrationsExport)) {
     return analysis.lcmsIntegrationsExport;

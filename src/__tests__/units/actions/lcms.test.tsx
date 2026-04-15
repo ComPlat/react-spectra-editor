@@ -5,10 +5,12 @@ import {
   clearIntegrationAllHplcMs,
   clearAllPeaksHplcMs,
 } from "../../../actions/hplc_ms";
+import { clickUiTarget } from "../../../actions/ui";
 import { HPLC_MS } from "../../../constants/action_type";
-import { ExtractJcamp } from "../../../helpers/chem";
+import { ExtractJcamp, buildLcmsMsPageJcamp } from "../../../helpers/chem";
 import { LIST_LAYOUT } from "../../../constants/list_layout";
 import { getLcMsInfo, splitAndReindexEntities } from "../../../helpers/extractEntityLCMS";
+import { shouldDisplayLcmsSubViewerAt } from "../../../sagas/saga_ui";
 import hplcMsTicPosJcamp from "../../fixtures/lc_ms_jcamp_tic_pos";
 import hplcMsTicNegJcamp from "../../fixtures/lc_ms_jcamp_tic_neg";
 import hplcMsUvvisJcamp from "../../fixtures/lc_ms_jcamp_uvvis";
@@ -27,6 +29,21 @@ const extractPages = (entity: any) => {
     .filter((value: number) => Number.isFinite(value));
   return parsed;
 };
+
+const buildMzEntity = (polarity: 'positive' | 'negative' | 'neutral', pageValues: number[]) => ({
+  layout: LIST_LAYOUT.LC_MS,
+  lcmsKind: 'mz',
+  lcmsPolarity: polarity,
+  title: `ms-${polarity}`,
+  spectra: pageValues.map((pageValue) => ({
+    pageValue,
+    page: String(pageValue),
+    pageSymbol: String(pageValue),
+    xUnit: 'm/z',
+    yUnit: 'Intensity',
+    data: [{ x: [100, 101, 102], y: [10, 15, 8] }],
+  })),
+});
 
 describe('LCMS actions', () => {
   it('selectWavelength returns correct action', () => {
@@ -63,6 +80,43 @@ describe('LCMS actions', () => {
     const action = clearAllPeaksHplcMs({ source: 'test' });
     expect(action.type).toEqual(HPLC_MS.CLEAR_ALL_PEAKS_HPLCMS);
     expect(action.payload).toEqual({ source: 'test' });
+  });
+
+  it('clickUiTarget keeps the LCMS TIC source hint', () => {
+    const action = clickUiTarget(
+      { x: 1.234, y: 42 },
+      true,
+      0,
+      1,
+      false,
+      'lcms_tic',
+    );
+    expect(action.payload).toEqual({ x: 1.234, y: 42 });
+    expect(action.sourceHint).toEqual('lcms_tic');
+    expect(action.jcampIdx).toEqual(1);
+  });
+
+  it('opens the LCMS subviewer from TIC clicks in zoom mode', () => {
+    expect(shouldDisplayLcmsSubViewerAt({
+      isLcmsLayout: true,
+      payload: { x: 1.234, y: 42 },
+      sourceHint: 'lcms_tic',
+      uiSweepType: 'zoom in',
+    })).toEqual(true);
+
+    expect(shouldDisplayLcmsSubViewerAt({
+      isLcmsLayout: true,
+      payload: { x: 1.234, y: 42 },
+      sourceHint: 'lcms_tic',
+      uiSweepType: 'peak add',
+    })).toEqual(false);
+
+    expect(shouldDisplayLcmsSubViewerAt({
+      isLcmsLayout: true,
+      payload: { x: 1.234, y: 42 },
+      sourceHint: null,
+      uiSweepType: 'zoom in',
+    })).toEqual(false);
   });
 });
 
@@ -130,5 +184,57 @@ describe('LCMS grouping', () => {
     expect(ticEntities.length).toBeGreaterThanOrEqual(2);
     expect(uvvisEntities.length).toBeGreaterThanOrEqual(1);
     expect(mzEntities.length).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe('LCMS MS page on request', () => {
+  let infoSpy: jest.SpyInstance;
+
+  beforeEach(() => {
+    infoSpy = jest.spyOn(console, 'info').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    infoSpy.mockRestore();
+  });
+
+  it('chooses the MS source from requested polarity and returns a single-page JCAMP', () => {
+    const positiveEntity = buildMzEntity('positive', [1.16165161, 2.5]);
+    const negativeEntity = buildMzEntity('negative', [1.16165161]);
+
+    const result = buildLcmsMsPageJcamp(
+      [positiveEntity, negativeEntity],
+      { retentionTime: '1.16165161', polarity: 'positive' },
+    );
+
+    expect(result.selection.msSourceChosen?.polarity).toEqual('positive');
+    expect(result.selection.pageChosen?.selected).toEqual('1.16165161');
+    expect(result.selection.fallbackApplied).toEqual(false);
+    expect(result.jcamp).toContain('##PAGE=1.16165161');
+    expect(result.jcamp.match(/##PAGE=/g)).toHaveLength(1);
+    expect(result.jcamp).not.toContain('##PAGE=2.5');
+    expect(infoSpy).toHaveBeenCalledWith(
+      '[Chemspectra][LCMS_MS_PAGE_REQUEST]',
+      expect.objectContaining({
+        retentionTime: '1.16165161',
+        polarity: 'positive',
+        hasPageHeader: true,
+        fallbackApplied: false,
+      }),
+    );
+  });
+
+  it('uses the only MS source even when polarity is not discriminant', () => {
+    const onlyMsEntity = buildMzEntity('neutral', [1.16165161, 1.8]);
+
+    const result = buildLcmsMsPageJcamp(
+      [onlyMsEntity],
+      { retentionTime: '1.16165161', polarity: 'negative' },
+    );
+
+    expect(result.selection.msSourceChosen?.polarity).toEqual('neutral');
+    expect(result.selection.fallbackApplied).toEqual(true);
+    expect(result.jcamp).toContain('##PAGE=1.16165161');
+    expect(result.jcamp.match(/##PAGE=/g)).toHaveLength(1);
   });
 });

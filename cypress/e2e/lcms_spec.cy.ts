@@ -36,6 +36,36 @@ describe('LC/MS layouts', () => {
     assertLcmsViewerIsStable()
   })
 
+  it('requests MS page on initial load and TIC click in standalone simulation', () => {
+    openLayout('LC/MS OpenLab')
+    assertLcmsViewerIsStable()
+
+    cy.window().then((win) => {
+      const initialRequests = (win as any).__lcmsDemoRequests || []
+      expect(initialRequests.length).to.be.greaterThan(0)
+    })
+
+    cy.window().then((win) => {
+      (win as any).__spectraStore.dispatch({
+        type: 'DISPLAY_VIEWER_AT',
+        payload: { x: 0.8, y: 0, graphIndex: 1 },
+      })
+    })
+
+    cy.wait(400)
+    cy.window().then((win) => {
+      const requests = (win as any).__lcmsDemoRequests || []
+      expect(requests.length).to.be.greaterThan(1)
+      const latestRequest = requests[requests.length - 1]
+      expect(latestRequest.trigger).to.equal('user_click')
+      expect(Number.isFinite(latestRequest.retentionTime)).to.equal(true)
+    })
+
+    getAppState().then((stateAfter) => {
+      expect(Number.isFinite(stateAfter.hplcMs.tic.currentPageValue)).to.equal(true)
+    })
+  })
+
   it('updates reducer when adding peak and integration action', () => {
     openLayout('LC/MS OpenLab')
     assertLcmsViewerIsStable()

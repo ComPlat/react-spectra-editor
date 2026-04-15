@@ -200,7 +200,8 @@ class LayerInit extends _react.default.Component {
       onDescriptionChanged,
       multiEntities,
       entityFileNames,
-      userManualLink
+      userManualLink,
+      onLcmsPageRequest
     } = this.props;
     const {
       layout
@@ -224,7 +225,8 @@ class LayerInit extends _react.default.Component {
         descriptions: descriptions,
         canChangeDescription: canChangeDescription,
         onDescriptionChanged: onDescriptionChanged,
-        editorOnly: editorOnly
+        editorOnly: editorOnly,
+        onLcmsPageRequest: onLcmsPageRequest
       });
     }
     if (isMultiSpectra) {
@@ -319,12 +321,16 @@ LayerInit.propTypes = {
   canChangeDescription: _propTypes.default.bool.isRequired,
   onDescriptionChanged: _propTypes.default.func,
   // eslint-disable-line
+  onLcmsPageRequest: _propTypes.default.func,
   setAllCurvesAct: _propTypes.default.func.isRequired,
   userManualLink: _propTypes.default.object,
   // eslint-disable-line
   resetDetectorAct: _propTypes.default.func.isRequired,
   resetMultiplicityAct: _propTypes.default.func.isRequired,
   updateDSCMetaDataAct: _propTypes.default.func.isRequired
+};
+LayerInit.defaultProps = {
+  onLcmsPageRequest: null
 };
 var _default = exports.default = (0, _reactRedux.connect)(
 // eslint-disable-line

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.shouldDisplayLcmsSubViewerAt = exports.default = void 0;
 var _effects = require("redux-saga/effects");
 var _action_type = require("../constants/action_type");
 var _list_ui = require("../constants/list_ui");
@@ -231,12 +231,20 @@ function* scrollUiWheel(action) {
   }
 }
 const getUiSweepType = state => state.ui.sweepType;
+const shouldDisplayLcmsSubViewerAt = ({
+  isLcmsLayout,
+  payload,
+  sourceHint,
+  uiSweepType
+}) => isLcmsLayout && sourceHint === 'lcms_tic' && Number.isFinite(payload?.x) && [_list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN, _list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET, _list_ui.LIST_UI_SWEEP_TYPE.PEAK_GROUP_SELECT].includes(uiSweepType);
+exports.shouldDisplayLcmsSubViewerAt = shouldDisplayLcmsSubViewerAt;
 function* clickUiTarget(action) {
   const {
     payload,
     onPeak,
     voltammetryPeakIdx,
-    onPecker
+    onPecker,
+    sourceHint
   } = action;
   const uiSweepType = yield (0, _effects.select)(getUiSweepType);
   const curveState = yield (0, _effects.select)(getCurveState);
@@ -248,6 +256,35 @@ function* clickUiTarget(action) {
     uvvis
   } = hplcMsState;
   const isLcmsLayout = (yield (0, _effects.select)(getLayoutState)) === _list_layout.LIST_LAYOUT.LC_MS;
+  if (sourceHint === 'lcms_tic' || isLcmsLayout) {
+    // eslint-disable-next-line no-console
+    console.log('[Chemspectra][LCMS_SAGA_CLICK_UI_TARGET]', {
+      payload,
+      onPeak,
+      sourceHint,
+      uiSweepType,
+      isLcmsLayout,
+      curveIdx
+    });
+  }
+  if (shouldDisplayLcmsSubViewerAt({
+    isLcmsLayout,
+    payload,
+    sourceHint,
+    uiSweepType
+  })) {
+    // eslint-disable-next-line no-console
+    console.log('[Chemspectra][LCMS_SAGA_DISPLAY_SUBVIEWER_AT]', {
+      payload,
+      sourceHint,
+      uiSweepType
+    });
+    yield (0, _effects.put)({
+      type: _action_type.UI.SUB_VIEWER.DISPLAY_VIEWER_AT,
+      payload
+    });
+    return;
+  }
   if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.PEAK_ADD && !onPeak) {
     const spectrumId = hplcMsState?.uvvis?.selectedWaveLength;
     if (isLcmsLayout && spectrumId == null) return;
