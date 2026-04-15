@@ -131,16 +131,6 @@ const ClickCompass = (event, focus) => {
     yt
   } = TfRescale(focus);
   let pt = fetchPt(event, focus, xt);
-  // eslint-disable-next-line no-console
-  console.log('[Chemspectra][LCMS_CLICK_COMPASS]', {
-    layout,
-    graphIndex: focus.graphIndex,
-    jcampIdx,
-    sweepType: focus.uiSt?.sweepType,
-    isPeakGroupSelect,
-    isLcmsTicGraph,
-    point: pt
-  });
   if (_format.default.isCyclicVoltaLayout(layout)) {
     pt = fetchFreePt(event, focus, xt, yt);
     const onPeak = false;

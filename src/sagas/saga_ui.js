@@ -196,17 +196,6 @@ function* clickUiTarget(action) {
   const hplcMsState = yield select(getHplcMsState);
   const { uvvis } = hplcMsState;
   const isLcmsLayout = (yield select(getLayoutState)) === LIST_LAYOUT.LC_MS;
-  if (sourceHint === 'lcms_tic' || isLcmsLayout) {
-    // eslint-disable-next-line no-console
-    console.log('[Chemspectra][LCMS_SAGA_CLICK_UI_TARGET]', {
-      payload,
-      onPeak,
-      sourceHint,
-      uiSweepType,
-      isLcmsLayout,
-      curveIdx,
-    });
-  }
 
   if (shouldDisplayLcmsSubViewerAt({
     isLcmsLayout,
@@ -214,12 +203,6 @@ function* clickUiTarget(action) {
     sourceHint,
     uiSweepType,
   })) {
-    // eslint-disable-next-line no-console
-    console.log('[Chemspectra][LCMS_SAGA_DISPLAY_SUBVIEWER_AT]', {
-      payload,
-      sourceHint,
-      uiSweepType,
-    });
     yield put({
       type: UI.SUB_VIEWER.DISPLAY_VIEWER_AT,
       payload,

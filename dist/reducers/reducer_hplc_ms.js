@@ -473,16 +473,6 @@ const updateLcmsData = (state, action) => {
   const curveRt = rtHintFromMzCurve(selectedPolarity);
   const uvvisRtHint = readFiniteNumber(uvvisCurve?.lcms_mz_page ?? uvvisCurve?.lcmsMzPage ?? uvvisCurve?.entity?.lcms_mz_page ?? uvvisCurve?.entity?.lcmsMzPage);
   const nextCurrentPageValue = pickFirstRtOnAxis([metaRt, uvvisRtHint, curveRt], nextRtXs) ?? nextRtXs[0] ?? null;
-  // eslint-disable-next-line no-console
-  console.log('[Chemspectra][LCMS_BOOTSTRAP_RT]', {
-    nextDatasetKey,
-    metaRt,
-    uvvisRtHint,
-    curveRt,
-    selectedPolarity,
-    firstTicRt: nextRtXs[0] ?? null,
-    nextCurrentPageValue
-  });
   return {
     ...state,
     lcmsDatasetKey: nextDatasetKey,

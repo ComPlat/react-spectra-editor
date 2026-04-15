@@ -37,17 +37,6 @@ const clickUiTarget = (
   onPecker = false,
   sourceHint = null,
 ) => {
-  if (sourceHint === 'lcms_tic') {
-    // eslint-disable-next-line no-console
-    console.log('[Chemspectra][LCMS_TIC_CLICK_TARGET_ACTION]', {
-      payload,
-      onPeak,
-      voltammetryPeakIdx,
-      jcampIdx,
-      onPecker,
-      sourceHint,
-    });
-  }
   return {
     type: UI.CLICK_TARGET,
     payload,

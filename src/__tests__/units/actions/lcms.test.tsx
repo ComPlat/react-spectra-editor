@@ -89,7 +89,7 @@ describe('LCMS actions', () => {
       0,
       1,
       false,
-      'lcms_tic',
+      'lcms_tic' as any,
     );
     expect(action.payload).toEqual({ x: 1.234, y: 42 });
     expect(action.sourceHint).toEqual('lcms_tic');
@@ -188,16 +188,6 @@ describe('LCMS grouping', () => {
 });
 
 describe('LCMS MS page on request', () => {
-  let infoSpy: jest.SpyInstance;
-
-  beforeEach(() => {
-    infoSpy = jest.spyOn(console, 'info').mockImplementation(() => {});
-  });
-
-  afterEach(() => {
-    infoSpy.mockRestore();
-  });
-
   it('chooses the MS source from requested polarity and returns a single-page JCAMP', () => {
     const positiveEntity = buildMzEntity('positive', [1.16165161, 2.5]);
     const negativeEntity = buildMzEntity('negative', [1.16165161]);
@@ -213,15 +203,6 @@ describe('LCMS MS page on request', () => {
     expect(result.jcamp).toContain('##PAGE=1.16165161');
     expect(result.jcamp.match(/##PAGE=/g)).toHaveLength(1);
     expect(result.jcamp).not.toContain('##PAGE=2.5');
-    expect(infoSpy).toHaveBeenCalledWith(
-      '[Chemspectra][LCMS_MS_PAGE_REQUEST]',
-      expect.objectContaining({
-        retentionTime: '1.16165161',
-        polarity: 'positive',
-        hasPageHeader: true,
-        fallbackApplied: false,
-      }),
-    );
   });
 
   it('uses the only MS source even when polarity is not discriminant', () => {

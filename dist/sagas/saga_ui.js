@@ -256,29 +256,12 @@ function* clickUiTarget(action) {
     uvvis
   } = hplcMsState;
   const isLcmsLayout = (yield (0, _effects.select)(getLayoutState)) === _list_layout.LIST_LAYOUT.LC_MS;
-  if (sourceHint === 'lcms_tic' || isLcmsLayout) {
-    // eslint-disable-next-line no-console
-    console.log('[Chemspectra][LCMS_SAGA_CLICK_UI_TARGET]', {
-      payload,
-      onPeak,
-      sourceHint,
-      uiSweepType,
-      isLcmsLayout,
-      curveIdx
-    });
-  }
   if (shouldDisplayLcmsSubViewerAt({
     isLcmsLayout,
     payload,
     sourceHint,
     uiSweepType
   })) {
-    // eslint-disable-next-line no-console
-    console.log('[Chemspectra][LCMS_SAGA_DISPLAY_SUBVIEWER_AT]', {
-      payload,
-      sourceHint,
-      uiSweepType
-    });
     yield (0, _effects.put)({
       type: _action_type.UI.SUB_VIEWER.DISPLAY_VIEWER_AT,
       payload
