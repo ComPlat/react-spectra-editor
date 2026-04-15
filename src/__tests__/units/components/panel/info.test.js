@@ -78,4 +78,44 @@ describe("<InfoPanel />", () => {
     const {queryByTestId} = render(renderer);
     expect(queryByTestId('PanelInfo')).toBeInTheDocument();
   });
+
+  test('Render M+ exact mass for MS layout', () => {
+    const msStore = mockStore({
+      curve: {
+        listCurves: [{feature: {}}],
+        curveIdx: 0
+      },
+      layout: LIST_LAYOUT.MS,
+      shift: {
+        shifts: [],
+      },
+      simulation: [],
+      detector: {
+        curves: [
+          {
+            curveIdx: 0,
+            selectedDetector: { name: 'Refractive index', label: 'RI' },
+          },
+        ],
+      },
+      meta: {}
+    });
+
+    const renderer =
+      <AppWrapper store={msStore}>
+        <ThemeProvider theme={theme}>
+          <InfoPanel
+            expand={false}
+            onExapnd={() => {}}
+            feature={feature}
+            exactMass="121.0653"
+          />
+        </ThemeProvider>
+      </AppWrapper>
+    ;
+
+    render(renderer);
+
+    expect(screen.getByText('121.064751 g/mol')).toBeInTheDocument();
+  });
 });
