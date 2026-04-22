@@ -9,6 +9,7 @@ var _action_type = require("../constants/action_type");
 var _list_ui = require("../constants/list_ui");
 var _list_layout = require("../constants/list_layout");
 var _list_graph = require("../constants/list_graph");
+var _saga_lcms_ui = require("./saga_lcms_ui");
 const getUiState = state => state.ui;
 const getCurveState = state => state.curve;
 const getHplcMsState = state => state.hplcMs;
@@ -53,22 +54,9 @@ function* selectUiSweep(action) {
   switch (sweepType) {
     case _list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN:
       if (layoutState === _list_layout.LIST_LAYOUT.LC_MS && uvvis.listWaveLength) {
-        const {
-          graphIndex
-        } = zoom;
-        let lcmsSyncX;
-        if ((graphIndex === 0 || graphIndex === 1) && payload?.xExtent) {
-          lcmsSyncX = graphIndex === 0 ? 1 : 0;
-        }
-        yield (0, _effects.put)({
-          type: _action_type.UI.SWEEP.SELECT_ZOOMIN,
-          payload: {
-            graphIndex,
-            zoomValue: payload,
-            ...(lcmsSyncX != null ? {
-              lcmsSyncX
-            } : {})
-          }
+        yield* (0, _saga_lcms_ui.lcmsHandleSelectZoomIn)({
+          payload,
+          zoom
         });
       } else {
         yield (0, _effects.put)({
@@ -79,18 +67,7 @@ function* selectUiSweep(action) {
       break;
     case _list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET:
       if (layoutState === _list_layout.LIST_LAYOUT.LC_MS && (payload?.graphIndex === 0 || payload?.graphIndex === 1)) {
-        yield (0, _effects.put)({
-          type: _action_type.UI.SWEEP.SELECT_ZOOMRESET,
-          payload: {
-            graphIndex: 0
-          }
-        });
-        yield (0, _effects.put)({
-          type: _action_type.UI.SWEEP.SELECT_ZOOMRESET,
-          payload: {
-            graphIndex: 1
-          }
-        });
+        yield* (0, _saga_lcms_ui.lcmsHandleSelectZoomReset)();
       } else {
         yield (0, _effects.put)({
           type: _action_type.UI.SWEEP.SELECT_ZOOMRESET,
@@ -101,12 +78,9 @@ function* selectUiSweep(action) {
     case _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD:
       {
         if (uvvis.selectedWaveLength && layoutState === _list_layout.LIST_LAYOUT.LC_MS) {
-          yield (0, _effects.put)({
-            type: _action_type.HPLC_MS.UPDATE_HPLCMS_INTEGRATIONS,
-            payload: {
-              spectrumId: uvvis.selectedWaveLength,
-              integration: payload
-            }
+          yield* (0, _saga_lcms_ui.lcmsHandleIntegrationAdd)({
+            uvvis,
+            payload
           });
         } else {
           yield (0, _effects.put)({
@@ -282,12 +256,9 @@ function* clickUiTarget(action) {
     });
   } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.PEAK_DELETE && onPeak) {
     if (isLcmsLayout && uvvis.selectedWaveLength) {
-      yield (0, _effects.put)({
-        type: _action_type.HPLC_MS.REMOVE_HPLCMS_PEAK,
-        payload: {
-          spectrumId: uvvis.selectedWaveLength,
-          peak: payload
-        }
+      yield* (0, _saga_lcms_ui.lcmsHandlePeakDelete)({
+        uvvis,
+        payload
       });
     } else {
       yield (0, _effects.put)({
@@ -308,13 +279,9 @@ function* clickUiTarget(action) {
     });
   } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_RM && onPeak) {
     if (uvvis.selectedWaveLength && isLcmsLayout) {
-      yield (0, _effects.put)({
-        type: _action_type.HPLC_MS.UPDATE_HPLCMS_INTEGRATIONS,
-        payload: {
-          spectrumId: uvvis.selectedWaveLength,
-          integration: payload,
-          remove: true
-        }
+      yield* (0, _saga_lcms_ui.lcmsHandleIntegrationRm)({
+        uvvis,
+        payload
       });
     } else {
       yield (0, _effects.put)({

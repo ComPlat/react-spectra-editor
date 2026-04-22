@@ -34,7 +34,6 @@ const sagaMiddleware = (0, _reduxSaga.default)();
 const middlewares = [sagaMiddleware]; // logger
 
 const store = exports.store = (0, _redux.compose)((0, _redux.applyMiddleware)(...middlewares))(_redux.createStore)(_index.default);
-_fn.default.setLcmsStateGetter(() => store.getState().hplcMs);
 try {
   sagaMiddleware.run(_index2.default);
 } catch (error) {
@@ -51,6 +50,10 @@ const ensureQuillDelta = descs => {
 };
 
 // - - - React - - -
+// LC/MS: when `onLcmsPageRequest` is set, the host (e.g. ELN) must reload `multiEntities`
+// with MS data for the requested RT/polarity. Triggers include `user_click`, `initial`,
+// and `tic_polarity` (TIC polarity dropdown). The standalone demo in `src/index.js`
+// implements a local mock via `buildLcmsStandaloneMultiEntities`.
 const SpectraEditor = ({
   entity,
   others,

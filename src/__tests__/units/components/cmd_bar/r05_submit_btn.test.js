@@ -7,10 +7,10 @@ import BtnSubmit from '../../../../components/cmd_bar/r05_submit_btn';
 import Format from '../../../../helpers/format';
 
 jest.mock('../../../../helpers/extractPeaksEdit', () => ({
-  extractPeaksEdit: jest.fn(() => [{ x: 1, y: 2 }]),
-  formatLcmsPeaksForBackend: jest.fn(() => [{ peakMock: true }]),
-  formatLcmsIntegralsForBackend: jest.fn(() => [{ integralMock: true }]),
-  getLcmsMzPageData: jest.fn(() => ({ mzPageDataMock: true })),
+  extractPeaksEdit: () => [{ x: 1, y: 2 }],
+  formatLcmsPeaksForBackend: () => [{ peakMock: true }],
+  formatLcmsIntegralsForBackend: () => [{ integralMock: true }],
+  getLcmsMzPageData: () => ({ mzPageDataMock: true }),
 }));
 
 const mockStore = configureStore([]);
@@ -127,7 +127,7 @@ describe('<BtnSubmit payload contract />', () => {
       formatedLcmsSpy.mockRestore();
     });
 
-    it('réplique lcms_* sur chaque entrée UVVIS de spectra_list', () => {
+    it('replicates lcms_* onto each UVVIS entry in spectra_list', () => {
       const operationValue = jest.fn();
       const state = buildBaseState({
         layout: 'LC/MS',
@@ -161,7 +161,7 @@ describe('<BtnSubmit payload contract />', () => {
       expect(formatedLcmsSpy).toHaveBeenCalled();
     });
 
-    it('sans UVVIS dans listCurves (repli sur feature), pas de lcms_* sur l’item du spectre', () => {
+    it('with no UVVIS in listCurves (fallback to feature), no lcms_* on the spectrum item', () => {
       const operationValue = jest.fn();
       const state = buildBaseState({
         layout: 'LC/MS',

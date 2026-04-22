@@ -144,12 +144,10 @@ const ClickCompass = (event, focus) => {
     } else {
       focus.clickUiTargetAct(pt, onPeak);
     }
+  } else if (isLcmsTicGraph) {
+    focus.clickUiTargetAct(pt, false, false, jcampIdx, false, 'lcms_tic');
   } else {
-    if (isLcmsTicGraph) {
-      focus.clickUiTargetAct(pt, false, false, jcampIdx, false, 'lcms_tic');
-    } else {
-      focus.clickUiTargetAct(pt, false);
-    }
+    focus.clickUiTargetAct(pt, false);
   }
 };
 exports.ClickCompass = ClickCompass;

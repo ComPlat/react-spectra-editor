@@ -11,10 +11,6 @@ var _multiplicity_calc = require("./multiplicity_calc");
 /* eslint-disable no-mixed-operators, prefer-object-spread,
 function-paren-newline, no-unused-vars, default-param-last */
 
-let lcmsStateGetter = null;
-function getLcmsState() {
-  return typeof lcmsStateGetter === 'function' ? lcmsStateGetter() : undefined;
-}
 const spectraDigit = layout => {
   switch (layout) {
     case _list_layout.LIST_LAYOUT.IR:
@@ -545,8 +541,7 @@ const peaksBody = ({
   const ordered = result.sort(sortFunc);
   const maxY = Math.max(...ordered.map(o => o.y));
   if (layout === _list_layout.LIST_LAYOUT.LC_MS) {
-    const lcmsState = hplcMsSt ?? getLcmsState();
-    return formatedLCMS(lcmsState, isAscend, decimal);
+    return formatedLCMS(hplcMsSt, isAscend, decimal);
   }
   if (layout === _list_layout.LIST_LAYOUT.MS) {
     return formatedMS(ordered, maxY, decimal, isAscend);
@@ -784,10 +779,6 @@ const inlineNotation = (layout, data, sampleName = '') => {
   };
 };
 const Format = {
-  setLcmsStateGetter(getter) {
-    lcmsStateGetter = getter;
-  },
-  getLcmsState,
   toPeakStr,
   extractUvvisLcmsPeaks,
   buildData,

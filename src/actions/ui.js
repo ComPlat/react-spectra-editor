@@ -36,17 +36,15 @@ const clickUiTarget = (
   jcampIdx = 0,
   onPecker = false,
   sourceHint = null,
-) => {
-  return {
-    type: UI.CLICK_TARGET,
-    payload,
-    onPeak,
-    voltammetryPeakIdx,
-    jcampIdx,
-    onPecker,
-    sourceHint,
-  };
-};
+) => ({
+  type: UI.CLICK_TARGET,
+  payload,
+  onPeak,
+  voltammetryPeakIdx,
+  jcampIdx,
+  onPecker,
+  sourceHint,
+});
 
 const displaySubViewerAt = (payload) => ({
   type: UI.SUB_VIEWER.DISPLAY_VIEWER_AT,

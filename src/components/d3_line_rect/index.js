@@ -35,6 +35,7 @@ import {
   drawMain, drawLabel, drawDisplay, drawDestroy,
 } from '../common/draw';
 import { LIST_UI_SWEEP_TYPE, LIST_NON_BRUSH_TYPES } from '../../constants/list_ui';
+import renderWavelengthSelect from '../../features/lc-ms/ui/wavelengthSelect';
 import { LIST_ROOT_SVG_GRAPH, LIST_BRUSH_SVG_GRAPH } from '../../constants/list_graph';
 import PeakGroup from '../cmd_bar/08_peak_group';
 import Threshold from '../cmd_bar/r03_threshold';
@@ -64,10 +65,6 @@ const parsePageValue = (feature) => {
   }
   return null;
 };
-
-const resolveLcmsTrigger = (subViewerAt) => (
-  subViewerAt && subViewerAt.x !== undefined ? 'user_click' : 'initial'
-);
 
 const toSeed = (xValues = [], yValues = []) => {
   const maxLength = Math.min(xValues.length, yValues.length);
@@ -223,42 +220,9 @@ const zoomView = (classes, graphIndex, uiSt, zoomInAct) => {
   );
 };
 
-const wavelengthSelect = (classes, hplcMsSt, updateWavelengthAct) => {
-  const uvvis = (hplcMsSt && hplcMsSt.uvvis) || {};
-  const { listWaveLength = null, selectedWaveLength } = uvvis;
-  const options = listWaveLength ? listWaveLength.map((d) => (
-    <MenuItem value={d} key={d}>
-      <span className={classNames(classes.txtOpt, 'option-sv-bar-decimal')}>
-        {d}
-      </span>
-    </MenuItem>
-  )) : [];
-  const hasSelectedWaveLength = listWaveLength && listWaveLength.includes(selectedWaveLength);
-  const resolvedSelectedWaveLength = hasSelectedWaveLength
-    ? selectedWaveLength
-    : (listWaveLength && listWaveLength[0]);
-
-  return (
-    <FormControl
-      className={classNames(classes.fieldDecimal)}
-      variant="outlined"
-      style={{ width: '140px' }}
-    >
-      <InputLabel id="select-decimal-label" className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
-        Wavelength (nm)
-      </InputLabel>
-      <Select
-        labelId="select-decimal-label"
-        label="Decimal"
-        value={resolvedSelectedWaveLength}
-        onChange={updateWavelengthAct}
-        className={classNames(classes.selectInput, 'input-sv-bar-decimal')}
-      >
-        { options }
-      </Select>
-    </FormControl>
-  );
-};
+const wavelengthSelect = (classes, hplcMsSt, updateWavelengthAct) => (
+  renderWavelengthSelect(classes, hplcMsSt, updateWavelengthAct)
+);
 
 const countAvailableTicPolarities = (hplcMsSt) => {
   const a = hplcMsSt?.tic?.available;
@@ -358,6 +322,7 @@ class ViewerLineRect extends React.Component {
 
     this.normChange = this.normChange.bind(this);
     this.extractSubView = this.extractSubView.bind(this);
+    this.notifyHostOnSubViewerChange = this.notifyHostOnSubViewerChange.bind(this);
     this.extractUvvisView = this.extractUvvisView.bind(this);
     this.handleUvvisUndo = this.handleUvvisUndo.bind(this);
     this.handleUvvisRedo = this.handleUvvisRedo.bind(this);
@@ -509,6 +474,7 @@ class ViewerLineRect extends React.Component {
     drawLabel(this.rootKlassMulti, ticLabel, 'Minutes', 'Intensity');
     drawDisplay(this.rootKlassMulti, isHidden);
 
+    this.notifyHostOnSubViewerChange(prevProps);
     const subViewFeature = this.extractSubView();
     if (subViewFeature) {
       const hasRectSvg = !!document.querySelector(
@@ -596,34 +562,27 @@ class ViewerLineRect extends React.Component {
   }
 
   extractSubView() {
-    const {
-      uiSt, mzEntities, hplcMsSt, updateCurrentPageValueAct, onLcmsPageRequest,
-    } = this.props;
+    const { uiSt, mzEntities, hplcMsSt } = this.props;
     const { polarity } = hplcMsSt.tic;
     const pickEntity = mzEntities?.find((ent) => (
       getLcMsInfo(ent).polarity === polarity
     )) || mzEntities?.[0];
-    if (!pickEntity || !pickEntity.layout) {
-      return null;
-    }
-    const { subViewerAt } = uiSt;
+    if (!pickEntity || !pickEntity.layout) return null;
+
     const { features } = extractParams(pickEntity, 0, 1);
     let featuresArr = [];
-    if (Array.isArray(features)) {
-      featuresArr = features;
-    } else if (features && typeof features === 'object') {
-      featuresArr = Object.values(features);
-    }
+    if (Array.isArray(features)) featuresArr = features;
+    else if (features && typeof features === 'object') featuresArr = Object.values(features);
     if (featuresArr.length === 0) return null;
 
+    const { subViewerAt } = uiSt;
     const pageValues = featuresArr
       .map((fe) => parsePageValue(fe))
       .filter((val) => Number.isFinite(val));
     if (pageValues.length === 0) return featuresArr[0];
 
-    const hasValidClick = subViewerAt != null && Number.isFinite(subViewerAt.x);
     let requestedPageValue;
-    if (hasValidClick) {
+    if (subViewerAt != null && Number.isFinite(subViewerAt.x)) {
       requestedPageValue = subViewerAt.x;
     } else if (Number.isFinite(hplcMsSt.tic.currentPageValue)) {
       requestedPageValue = hplcMsSt.tic.currentPageValue;
@@ -635,33 +594,74 @@ class ViewerLineRect extends React.Component {
       const value = parsePageValue(fe);
       return Number.isFinite(value) && Math.abs(value - closestPage) < 1e-9;
     });
-    const exactRequestedFeature = featuresArr.find((fe) => {
-      const value = parsePageValue(fe);
-      return Number.isFinite(value) && Math.abs(value - requestedPageValue) < 1e-9;
-    });
-    const requestRetentionTime = exactRequestedFeature?.pageSymbol
-      ?? exactRequestedFeature?.page
-      ?? exactRequestedFeature?.pageValue
-      ?? requestedPageValue;
-
-    const prevRt = hplcMsSt.tic.currentPageValue;
-    if (!Number.isFinite(prevRt) || Math.abs(requestedPageValue - prevRt) > 1e-5) {
-      updateCurrentPageValueAct(requestedPageValue);
-      if (typeof onLcmsPageRequest === 'function' && Number.isFinite(requestedPageValue)) {
-        onLcmsPageRequest({
-          retentionTime: requestRetentionTime,
-          polarity,
-          trigger: resolveLcmsTrigger(subViewerAt),
-        });
-      }
-    }
     return selectFeature || featuresArr[0];
+  }
+
+  notifyHostOnSubViewerChange(prevProps) {
+    const {
+      uiSt, hplcMsSt, mzEntities, onLcmsPageRequest, updateCurrentPageValueAct,
+    } = this.props;
+    const subViewerAt = uiSt?.subViewerAt;
+    if (!subViewerAt || !Number.isFinite(subViewerAt.x)) return;
+
+    const prevSubViewerAt = prevProps?.uiSt?.subViewerAt;
+    const sameClickAsBefore = prevSubViewerAt
+      && Number.isFinite(prevSubViewerAt.x)
+      && Math.abs(subViewerAt.x - prevSubViewerAt.x) < 1e-9
+      && Math.abs((subViewerAt.y ?? 0) - (prevSubViewerAt.y ?? 0)) < 1e-9;
+    if (sameClickAsBefore) return;
+
+    const { polarity } = hplcMsSt.tic;
+    const pickEntity = mzEntities?.find((ent) => (
+      getLcMsInfo(ent).polarity === polarity
+    )) || mzEntities?.[0];
+    if (!pickEntity || !pickEntity.layout) return;
+
+    const { features } = extractParams(pickEntity, 0, 1);
+    let featuresArr = [];
+    if (Array.isArray(features)) featuresArr = features;
+    else if (features && typeof features === 'object') featuresArr = Object.values(features);
+
+    const pageValues = featuresArr
+      .map((fe) => parsePageValue(fe))
+      .filter((val) => Number.isFinite(val));
+
+    const requestedRt = subViewerAt.x;
+    const matchesLoadedScan = pageValues.some((pv) => Math.abs(pv - requestedRt) < 1e-5);
+    const needsRemoteFetch = !matchesLoadedScan;
+
+    const exactFeature = featuresArr.find((fe) => {
+      const value = parsePageValue(fe);
+      return Number.isFinite(value) && Math.abs(value - requestedRt) < 1e-9;
+    });
+    const requestRetentionTime = exactFeature?.pageSymbol
+      ?? exactFeature?.page
+      ?? exactFeature?.pageValue
+      ?? requestedRt;
+
+    const persistedRt = needsRemoteFetch
+      ? requestedRt
+      : findClosest(pageValues, requestedRt);
+
+    const prevPersistedRt = hplcMsSt.tic.currentPageValue;
+    if (!Number.isFinite(prevPersistedRt) || Math.abs(persistedRt - prevPersistedRt) > 1e-5) {
+      updateCurrentPageValueAct(persistedRt);
+    }
+
+    if (needsRemoteFetch && typeof onLcmsPageRequest === 'function') {
+      onLcmsPageRequest({
+        retentionTime: requestRetentionTime,
+        polarity,
+        trigger: 'user_click',
+      });
+    }
   }
 
   render() {
     const {
       classes, hplcMsSt, selectWavelengthAct, updateTicAct, selectCurveAct,
       feature, zoomInAct, uiSt, ticEntities, mzEntities, omitUvvisToolbarRow,
+      onLcmsPageRequest,
     } = this.props;
     const resolvedFeature = feature || {};
     const hasEdit = !!resolvedFeature?.data?.[0]?.x?.length;
@@ -674,6 +674,16 @@ class ViewerLineRect extends React.Component {
       ));
       if (targetEntity?.curveIdx !== undefined) {
         selectCurveAct(targetEntity.curveIdx);
+      }
+      const rt = hplcMsSt?.tic?.currentPageValue;
+      // Always notify the host on polarity change so it can fetch the mz page for the
+      // other trace. If RT is not set yet, pass undefined — ELN resolves initial RT.
+      if (typeof onLcmsPageRequest === 'function') {
+        onLcmsPageRequest({
+          retentionTime: Number.isFinite(rt) ? rt : undefined,
+          polarity: selectedPolarity,
+          trigger: 'tic_polarity',
+        });
       }
     };
     const handleWavelengthChange = (event) => {

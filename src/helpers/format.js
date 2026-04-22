@@ -5,11 +5,6 @@ import { ToXY, IsSame } from './converter';
 import { LIST_LAYOUT } from '../constants/list_layout';
 import { calcMpyCenter } from './multiplicity_calc';
 
-let lcmsStateGetter = null;
-function getLcmsState() {
-  return typeof lcmsStateGetter === 'function' ? lcmsStateGetter() : undefined;
-}
-
 const spectraDigit = (layout) => {
   switch (layout) {
     case LIST_LAYOUT.IR:
@@ -514,8 +509,7 @@ const peaksBody = ({
   const maxY = Math.max(...ordered.map((o) => o.y));
 
   if (layout === LIST_LAYOUT.LC_MS) {
-    const lcmsState = hplcMsSt ?? getLcmsState();
-    return formatedLCMS(lcmsState, isAscend, decimal);
+    return formatedLCMS(hplcMsSt, isAscend, decimal);
   }
   if (layout === LIST_LAYOUT.MS) {
     return formatedMS(ordered, maxY, decimal, isAscend);
@@ -741,10 +735,6 @@ const inlineNotation = (layout, data, sampleName = '') => {
 };
 
 const Format = {
-  setLcmsStateGetter(getter) {
-    lcmsStateGetter = getter;
-  },
-  getLcmsState,
   toPeakStr,
   extractUvvisLcmsPeaks,
   buildData,

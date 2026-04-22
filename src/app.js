@@ -22,8 +22,6 @@ const store = compose(
   applyMiddleware(...middlewares),
 )(createStore)(reducers);
 
-FN.setLcmsStateGetter(() => store.getState().hplcMs);
-
 try {
   sagaMiddleware.run(sagas);
 } catch (error) {
@@ -38,6 +36,10 @@ const ensureQuillDelta = (descs) => {
 };
 
 // - - - React - - -
+// LC/MS: when `onLcmsPageRequest` is set, the host (e.g. ELN) must reload `multiEntities`
+// with MS data for the requested RT/polarity. Triggers include `user_click`, `initial`,
+// and `tic_polarity` (TIC polarity dropdown). The standalone demo in `src/index.js`
+// implements a local mock via `buildLcmsStandaloneMultiEntities`.
 const SpectraEditor = ({
   entity, others, cLabel, xLabel, yLabel,
   operations, forecast, molSvg, editorOnly, descriptions, exactMass,

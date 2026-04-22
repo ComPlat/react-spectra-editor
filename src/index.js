@@ -10,6 +10,7 @@ import ReactQuill from 'react-quill';
 
 import { SpectraEditor, FN, store } from './app';
 import { getLcMsInfo } from './helpers/extractEntityLCMS';
+import { snapRtToAxis } from './reducers/reducer_hplc_ms/utils';
 import nmr1HJcamp from './__tests__/fixtures/nmr1h_jcamp';
 import nmr1H2Jcamp from './__tests__/fixtures/nmr1h_2_jcamp';
 import nmr13CDeptJcamp from './__tests__/fixtures/nmr13c_dept_jcamp';
@@ -175,15 +176,59 @@ const selectClosestMsFeature = (retentionTime, polarity) => {
 const buildLcmsStandaloneMultiEntities = (retentionTime, polarity) => {
   const selected = selectClosestMsFeature(retentionTime, polarity);
   const selectedMsCurve = selected?.curve || lcmsEntity;
-  const selectedMsFeature = selected?.feature || getCurveFeatures(selectedMsCurve)[0];
+  const allFeatures = getCurveFeatures(selectedMsCurve);
+
   const msCurve = cloneData(selectedMsCurve);
-  msCurve.features = selectedMsFeature ? [cloneData(selectedMsFeature)] : [];
-  return [
+  const spectrArr = Array.isArray(msCurve.spectra) ? msCurve.spectra : [];
+  const nFeat = allFeatures.length;
+  const nSpec = spectrArr.length;
+  const primaryIdx = selected?.feature != null && allFeatures.indexOf(selected.feature) >= 0
+    ? allFeatures.indexOf(selected.feature)
+    : 0;
+
+  let rawLen = Math.min(nFeat, nSpec);
+  if (primaryIdx >= rawLen) {
+    rawLen = Math.min(primaryIdx + 1, nFeat, nSpec);
+  }
+  const safePrimary = Math.min(primaryIdx, Math.max(0, rawLen - 1));
+  const allIndices = Array.from({ length: rawLen }, (_, i) => i);
+  const orderedIdx = [safePrimary, ...allIndices.filter((i) => i !== safePrimary)];
+
+  msCurve.features = orderedIdx.map((i) => cloneData(allFeatures[i]));
+  msCurve.spectra = orderedIdx.map((i) => cloneData(spectrArr[i]));
+
+  const multi = [
     cloneData(hplcMsTicPosEntity),
     cloneData(hplcMsTicNegEntity),
     cloneData(hplcMsUvvisEntity),
     msCurve,
   ];
+  const pol = polarity ? String(polarity).toLowerCase() : 'positive';
+  const ticEntityForPolarity = pol === 'negative' ? multi[1] : multi[0];
+  const ticXs = ticEntityForPolarity?.features?.[0]?.data?.[0]?.x || [];
+  const rtNum = Number.isFinite(retentionTime)
+    ? retentionTime
+    : parseNumericPage({
+      pageValue: retentionTime,
+      page: retentionTime,
+      pageSymbol: retentionTime,
+    });
+  const snapped = Array.isArray(ticXs) && ticXs.length > 0 && Number.isFinite(rtNum)
+    ? snapRtToAxis(rtNum, ticXs)
+    : null;
+  if (snapped != null && Number.isFinite(snapped)) {
+    if (msCurve.features[0]) {
+      msCurve.features[0].pageValue = snapped;
+      msCurve.features[0].page = String(snapped);
+      msCurve.features[0].pageSymbol = String(snapped);
+    }
+    if (msCurve.spectra?.[0]) {
+      msCurve.spectra[0].pageValue = snapped;
+      msCurve.spectra[0].page = String(snapped);
+      msCurve.spectra[0].pageSymbol = String(snapped);
+    }
+  }
+  return multi;
 };
 
 const getInitialLcmsRetentionTime = () => {

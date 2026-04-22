@@ -7,6 +7,7 @@ var _material = require("@mui/material");
 var _reactQuill = _interopRequireDefault(require("react-quill"));
 var _app = require("./app");
 var _extractEntityLCMS = require("./helpers/extractEntityLCMS");
+var _utils = require("./reducers/reducer_hplc_ms/utils");
 var _nmr1h_jcamp = _interopRequireDefault(require("./__tests__/fixtures/nmr1h_jcamp"));
 var _nmr1h_2_jcamp = _interopRequireDefault(require("./__tests__/fixtures/nmr1h_2_jcamp"));
 var _nmr13c_dept_jcamp = _interopRequireDefault(require("./__tests__/fixtures/nmr13c_dept_jcamp"));
@@ -172,10 +173,46 @@ const selectClosestMsFeature = (retentionTime, polarity) => {
 const buildLcmsStandaloneMultiEntities = (retentionTime, polarity) => {
   const selected = selectClosestMsFeature(retentionTime, polarity);
   const selectedMsCurve = selected?.curve || lcmsEntity;
-  const selectedMsFeature = selected?.feature || getCurveFeatures(selectedMsCurve)[0];
+  const allFeatures = getCurveFeatures(selectedMsCurve);
   const msCurve = cloneData(selectedMsCurve);
-  msCurve.features = selectedMsFeature ? [cloneData(selectedMsFeature)] : [];
-  return [cloneData(hplcMsTicPosEntity), cloneData(hplcMsTicNegEntity), cloneData(hplcMsUvvisEntity), msCurve];
+  const spectrArr = Array.isArray(msCurve.spectra) ? msCurve.spectra : [];
+  const nFeat = allFeatures.length;
+  const nSpec = spectrArr.length;
+  const primaryIdx = selected?.feature != null && allFeatures.indexOf(selected.feature) >= 0 ? allFeatures.indexOf(selected.feature) : 0;
+  let rawLen = Math.min(nFeat, nSpec);
+  if (primaryIdx >= rawLen) {
+    rawLen = Math.min(primaryIdx + 1, nFeat, nSpec);
+  }
+  const safePrimary = Math.min(primaryIdx, Math.max(0, rawLen - 1));
+  const allIndices = Array.from({
+    length: rawLen
+  }, (_, i) => i);
+  const orderedIdx = [safePrimary, ...allIndices.filter(i => i !== safePrimary)];
+  msCurve.features = orderedIdx.map(i => cloneData(allFeatures[i]));
+  msCurve.spectra = orderedIdx.map(i => cloneData(spectrArr[i]));
+  const multi = [cloneData(hplcMsTicPosEntity), cloneData(hplcMsTicNegEntity), cloneData(hplcMsUvvisEntity), msCurve];
+  const pol = polarity ? String(polarity).toLowerCase() : 'positive';
+  const ticEntityForPolarity = pol === 'negative' ? multi[1] : multi[0];
+  const ticXs = ticEntityForPolarity?.features?.[0]?.data?.[0]?.x || [];
+  const rtNum = Number.isFinite(retentionTime) ? retentionTime : parseNumericPage({
+    pageValue: retentionTime,
+    page: retentionTime,
+    pageSymbol: retentionTime
+  });
+  const snapped = Array.isArray(ticXs) && ticXs.length > 0 && Number.isFinite(rtNum) ? (0, _utils.snapRtToAxis)(rtNum, ticXs) : null;
+  if (snapped != null && Number.isFinite(snapped)) {
+    if (msCurve.features[0]) {
+      msCurve.features[0].pageValue = snapped;
+      msCurve.features[0].page = String(snapped);
+      msCurve.features[0].pageSymbol = String(snapped);
+    }
+    if (msCurve.spectra?.[0]) {
+      msCurve.spectra[0].pageValue = snapped;
+      msCurve.spectra[0].page = String(snapped);
+      msCurve.spectra[0].pageSymbol = String(snapped);
+    }
+  }
+  return multi;
 };
 const getInitialLcmsRetentionTime = () => {
   const ticX = hplcMsTicPosEntity?.features?.[0]?.data?.[0]?.x;

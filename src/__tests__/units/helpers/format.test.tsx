@@ -154,6 +154,22 @@ describe('Test format helper', () => {
         const body = Format.peaksBody(params)
         expect(body).toEqual('2.0 nm (2.00 %), 1.0 nm (1.00 %)')
       })
+
+      describe('LC_MS layout', () => {
+        const lcmsState = {
+          uvvis: {
+            listWaveLength: [254],
+            spectraList: [{ peaks: [{ x: 14, y: 100 }], integrations: [] }],
+          },
+        }
+
+        it('Get peaks for LC_MS layout from explicit hplcMsSt', () => {
+          params.layout = LIST_LAYOUT.LC_MS
+          const explicit = Format.peaksBody({ ...params, hplcMsSt: lcmsState })
+          const reference = Format.formatedLCMS(lcmsState, params.isAscend, params.decimal)
+          expect(explicit).toEqual(reference)
+        })
+      })
     })
 
     describe('Test get peak wrapper string', () => {

@@ -24,6 +24,24 @@ const createUvvisCurve = () => ({
   ],
 });
 
+const createUvvisCurveNoServerIntegrations = () => ({
+  csCategory: ['uvvis'],
+  features: [
+    {
+      pageSymbol: 'Wavelength=210',
+      data: [{ x: [1, 2], y: [0.1, 0.2] }],
+      integrations: [],
+      peaks: [{ x: 1.5, y: 0.15 }],
+    },
+    {
+      pageValue: '220',
+      data: [{ x: [3, 4], y: [0.3, 0.4] }],
+      integrations: [],
+      peaks: [{ x: 3.5, y: 0.35 }],
+    },
+  ],
+});
+
 const createMzCurve = (polarity: 'positive' | 'negative' | 'neutral') => ({
   csCategory: ['mz', polarity],
   features: [{ data: [{ x: [100, 101], y: [5, 6] }] }],
@@ -200,6 +218,12 @@ describe('Test redux reducer_hplc_ms', () => {
     } as any);
 
     expect(state.tic.currentPageValue).toEqual(3);
+
+    const afterReload = hplcMsReducer(state, {
+      type: CURVE.SET_ALL_CURVES,
+      payload,
+    } as any);
+    expect(afterReload.tic.currentPageValue).toEqual(3);
   });
 
   it('selects wavelength from meta.lcmsUvvisWavelength when nothing to restore from state', () => {
@@ -216,6 +240,40 @@ describe('Test redux reducer_hplc_ms', () => {
     expect(state.uvvis.selectedWaveLength).toEqual(220);
     expect(state.uvvis.wavelengthIdx).toEqual(1);
     expect(state.lcmsDatasetKey).toEqual('test-dt');
+  });
+
+  it('preserves unsaved UVVIS peaks and integrations when SET_ALL_CURVES refreshes curves', () => {
+    const payload = [
+      createTicCurve('positive', [1, 2, 3], [10, 20, 30]),
+      createUvvisCurveNoServerIntegrations(),
+      createMzCurve('positive'),
+    ];
+    let state = hplcMsReducer(undefined, { type: CURVE.SET_ALL_CURVES, payload } as any);
+    state = hplcMsReducer(state, {
+      type: HPLC_MS.UPDATE_HPLCMS_PEAKS,
+      payload: {
+        spectrumId: state.uvvis.listWaveLength[0],
+        peaks: [{ x: 1.1, y: 0.11 }],
+      },
+    } as any);
+    state = hplcMsReducer(state, {
+      type: HPLC_MS.UPDATE_HPLCMS_INTEGRATIONS,
+      payload: {
+        spectrumId: state.uvvis.listWaveLength[0],
+        integration: {
+          xExtent: { xL: 1, xU: 1.5 },
+          data: { x: [1, 1.5], y: [0.1, 0.15] },
+        },
+      },
+    } as any);
+    const refreshedPayload = [
+      createTicCurve('positive', [1, 2, 3, 4], [10, 20, 30, 40]),
+      createUvvisCurveNoServerIntegrations(),
+      createMzCurve('positive'),
+    ];
+    state = hplcMsReducer(state, { type: CURVE.SET_ALL_CURVES, payload: refreshedPayload } as any);
+    expect(state.uvvis.spectraList[0].peaks).toEqual([{ x: 1.1, y: 0.11 }]);
+    expect(state.uvvis.spectraList[0].integrations.length).toEqual(1);
   });
 
   it('preserves selected wavelength when SET_ALL_CURVES reloads the same UVVIS order', () => {

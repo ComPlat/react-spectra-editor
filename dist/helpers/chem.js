@@ -4,14 +4,21 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.convertTopic = exports.convertThresEndPts = exports.buildLcmsMsPageJcamp = exports.Topic2Seed = exports.ToThresEndPts = exports.ToShiftPeaks = exports.ToFrequency = exports.GetCyclicVoltaShiftOffset = exports.GetCyclicVoltaRatio = exports.GetCyclicVoltaPreviousShift = exports.GetCyclicVoltaPeakSeparate = exports.GetComparisons = exports.Feature2Peak = exports.Feature2MaxMinPeak = exports.ExtractJcamp = exports.Convert2Thres = exports.Convert2Scan = exports.Convert2Peak = exports.Convert2MaxMinPeak = exports.Convert2DValue = void 0;
+exports.Topic2Seed = exports.ToThresEndPts = exports.ToShiftPeaks = exports.ToFrequency = exports.GetCyclicVoltaShiftOffset = exports.GetCyclicVoltaRatio = exports.GetCyclicVoltaPreviousShift = exports.GetCyclicVoltaPeakSeparate = exports.GetComparisons = exports.Feature2Peak = exports.Feature2MaxMinPeak = exports.ExtractJcamp = exports.Convert2Thres = exports.Convert2Scan = exports.Convert2Peak = exports.Convert2MaxMinPeak = exports.Convert2DValue = void 0;
+Object.defineProperty(exports, "buildLcmsMsPageJcamp", {
+  enumerable: true,
+  get: function get() {
+    return _parsing.buildLcmsMsPageJcamp;
+  }
+});
+exports.convertTopic = exports.convertThresEndPts = void 0;
 var _jcampconverter = _interopRequireDefault(require("jcampconverter"));
 var _reselect = require("reselect");
 var _shift = require("./shift");
 var _format = _interopRequireDefault(require("./format"));
 var _list_layout = require("../constants/list_layout");
 var _integration = require("./integration");
-var _extractEntityLCMS = require("./extractEntityLCMS");
+var _parsing = require("../features/lc-ms/parsing");
 /* eslint-disable
 no-mixed-operators, react/function-component-definition,
 prefer-object-spread, camelcase,  no-plusplus, prefer-destructuring,
@@ -422,41 +429,6 @@ const readLayout = jcamp => {
 const extrSpectraShare = (spectra, layout) => spectra.map(s => Object.assign({
   layout
 }, s)).filter(r => r != null);
-const normalizeLcMsMode = value => {
-  const mode = String(value || '').toUpperCase();
-  if (!mode) return 'NEUTRAL';
-  if (mode.includes('NEGATIVE') || mode.includes('NEGATIV')) return 'NEGATIVE';
-  if (mode.includes('POSITIVE') || mode.includes('POSITIV')) return 'POSITIVE';
-  if (mode.includes('NEUTRAL')) return 'NEUTRAL';
-  return 'NEUTRAL';
-};
-const inferLcMsKind = (spectrum, jcamp) => {
-  const spectrumDataType = String(spectrum?.dataType || '').toUpperCase();
-  const jcampDataType = String(jcamp?.dataType || '').toUpperCase();
-  const type = String(jcamp?.info?.TYPE || '').toUpperCase();
-  const xUnit = String(spectrum?.xUnit || jcamp?.info?.XUNITS || jcamp?.xUnit || '').toUpperCase();
-  const yUnit = String(spectrum?.yUnit || jcamp?.info?.YUNITS || jcamp?.yUnit || '').toUpperCase();
-  if (spectrumDataType.includes('MASS TIC') || jcampDataType.includes('MASS TIC') || type.includes('CHROMATOGRAM')) {
-    return 'TIC';
-  }
-  if (spectrumDataType.includes('MASS SPECTRUM') || jcampDataType.includes('MASS SPECTRUM')) {
-    return 'MZ';
-  }
-  if (xUnit.includes('TIME') || xUnit.includes('MINUTE')) {
-    if (yUnit.includes('INTENSITY') || yUnit.includes('COUNT')) return 'TIC';
-  }
-  if (xUnit.includes('M/Z') || xUnit.includes('MZ')) return 'MZ';
-  return 'SPECTRUM';
-};
-const inferLcMsCategory = (spectrum, jcamp) => {
-  const existing = spectrum?.csCategory;
-  if (existing) return existing;
-  const category = inferLcMsKind(spectrum, jcamp);
-  const mode = normalizeLcMsMode(jcamp?.info?.SCAN_MODE || jcamp?.info?.SCANMODE);
-  if (category === 'UVVIS') return 'UVVIS PEAK TABLE';
-  if (category === 'TIC' || category === 'MZ') return `${category} ${mode} SPECTRUM`;
-  return `${category} SPECTRUM`;
-};
 const extrSpectraMs = (jcamp, layout) => {
   const csCategories = [].concat(jcamp?.info?.$CSCATEGORY || []).map(c => String(c).toUpperCase());
   const hasUvvisCategory = csCategories.some(c => c.includes('UVVIS'));
@@ -625,7 +597,7 @@ const extrSpectraMs = (jcamp, layout) => {
       if (hasPoints) {
         finalSpectra.push({
           ...s,
-          csCategory: inferLcMsCategory(s, jcamp)
+          csCategory: (0, _parsing.inferLcMsCategory)(s, jcamp)
         });
       }
     });
@@ -635,7 +607,7 @@ const extrSpectraMs = (jcamp, layout) => {
       if (hasPoints) {
         finalSpectra.push({
           ...s,
-          csCategory: inferLcMsCategory(s, jcamp)
+          csCategory: (0, _parsing.inferLcMsCategory)(s, jcamp)
         });
       }
     });
@@ -1067,246 +1039,6 @@ const extractTemperature = jcamp => {
   }
   return 'xxx';
 };
-const parsePageValue = raw => {
-  if (!raw) return null;
-  const match = String(raw).match(/[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?/);
-  return match ? parseFloat(match[0]) : null;
-};
-const normalizeLcmsRequestPolarity = value => {
-  if (value == null || value === '') return null;
-  const text = String(value).trim().toLowerCase();
-  if (text === 'positive' || text === 'pos' || text === '+') return 'positive';
-  if (text === 'negative' || text === 'neg' || text === '-') return 'negative';
-  if (text === 'neutral' || text === 'neu' || text === '0') return 'neutral';
-  return text || null;
-};
-const stringifyLcmsPageValue = value => {
-  if (value == null) return '';
-  return String(value).trim();
-};
-const getLcmsPageCandidates = (entity = {}) => {
-  const spectra = Array.isArray(entity?.spectra) ? entity.spectra : [];
-  if (spectra.length > 0) return spectra;
-  const features = entity?.features;
-  if (Array.isArray(features)) return features;
-  if (features && typeof features === 'object') return Object.values(features);
-  if (entity?.feature) return [entity.feature];
-  return [];
-};
-const getSpectrumDataPairs = (spectrum = {}) => {
-  const data = spectrum?.data?.[0];
-  const x = Array.isArray(data?.x) ? data.x : [];
-  const y = Array.isArray(data?.y) ? data.y : [];
-  const size = Math.min(x.length, y.length);
-  return {
-    x: x.slice(0, size),
-    y: y.slice(0, size)
-  };
-};
-const describeLcmsMsSource = (entity = {}, entityIndex = -1) => {
-  const info = (0, _extractEntityLCMS.getLcMsInfo)(entity);
-  const title = entity?.title || entity?.info?.TITLE || entity?.info?.$TITLE || 'untitled';
-  const scanMode = entity?.scanMode || entity?.SCAN_MODE || entity?.info?.SCAN_MODE || entity?.info?.SCANMODE || '';
-  return {
-    index: entityIndex,
-    kind: info.kind,
-    polarity: info.polarity,
-    title,
-    scanMode,
-    spectraCount: getLcmsPageCandidates(entity).length
-  };
-};
-const selectLcmsMsPage = (entities = [], request = {}) => {
-  const retentionTimeRaw = stringifyLcmsPageValue(request?.retentionTime);
-  const retentionTime = parsePageValue(retentionTimeRaw);
-  const polarity = normalizeLcmsRequestPolarity(request?.polarity);
-  const tolerance = 1e-5;
-  const split = (0, _extractEntityLCMS.splitAndReindexEntities)(entities);
-  const mzEntities = split?.mzEntities || [];
-  if (mzEntities.length === 0) {
-    return {
-      retentionTimeRaw,
-      retentionTime,
-      polarity,
-      entity: null,
-      entityIndex: -1,
-      spectrum: null,
-      sourceFallback: false,
-      pageFallback: false
-    };
-  }
-  let candidateEntries = mzEntities.map((entity, index) => ({
-    entity,
-    index
-  }));
-  let sourceFallback = false;
-  if (candidateEntries.length === 1) {
-    const onlyPolarity = (0, _extractEntityLCMS.getLcMsInfo)(candidateEntries[0].entity).polarity;
-    sourceFallback = polarity != null && polarity !== onlyPolarity;
-  } else if (polarity != null) {
-    const matchingEntries = candidateEntries.filter(({
-      entity
-    }) => (0, _extractEntityLCMS.getLcMsInfo)(entity).polarity === polarity);
-    if (matchingEntries.length > 0) {
-      candidateEntries = matchingEntries;
-    } else {
-      sourceFallback = true;
-    }
-  }
-  let best = null;
-  candidateEntries.forEach(({
-    entity,
-    index
-  }) => {
-    getLcmsPageCandidates(entity).forEach((spectrum, spectrumIndex) => {
-      const pageValue = parsePageValue(spectrum?.pageValue ?? spectrum?.page ?? spectrum?.pageSymbol);
-      const distance = Number.isFinite(retentionTime) && Number.isFinite(pageValue) ? Math.abs(pageValue - retentionTime) : Number.POSITIVE_INFINITY;
-      const hasExactMatch = Number.isFinite(distance) && distance <= tolerance;
-      if (!best) {
-        best = {
-          entity,
-          entityIndex: index,
-          spectrum,
-          spectrumIndex,
-          pageValue,
-          distance,
-          hasExactMatch
-        };
-        return;
-      }
-      if (hasExactMatch && !best.hasExactMatch) {
-        best = {
-          entity,
-          entityIndex: index,
-          spectrum,
-          spectrumIndex,
-          pageValue,
-          distance,
-          hasExactMatch
-        };
-        return;
-      }
-      if (hasExactMatch === best.hasExactMatch && distance < best.distance) {
-        best = {
-          entity,
-          entityIndex: index,
-          spectrum,
-          spectrumIndex,
-          pageValue,
-          distance,
-          hasExactMatch
-        };
-      }
-    });
-  });
-  if (!best) {
-    const fallbackEntity = candidateEntries[0]?.entity || mzEntities[0];
-    const fallbackEntityIndex = candidateEntries[0]?.index ?? 0;
-    const fallbackSpectrum = getLcmsPageCandidates(fallbackEntity)[0] || null;
-    return {
-      retentionTimeRaw,
-      retentionTime,
-      polarity,
-      entity: fallbackEntity,
-      entityIndex: fallbackEntityIndex,
-      spectrum: fallbackSpectrum,
-      sourceFallback,
-      pageFallback: Number.isFinite(retentionTime)
-    };
-  }
-  return {
-    retentionTimeRaw,
-    retentionTime,
-    polarity,
-    entity: best.entity,
-    entityIndex: best.entityIndex,
-    spectrum: best.spectrum,
-    sourceFallback,
-    pageFallback: Number.isFinite(retentionTime) && !best.hasExactMatch
-  };
-};
-const buildLcmsMsPageJcamp = (entities = [], request = {}) => {
-  const selection = selectLcmsMsPage(entities, request);
-  const {
-    retentionTimeRaw,
-    retentionTime,
-    polarity,
-    entity,
-    entityIndex,
-    spectrum,
-    sourceFallback,
-    pageFallback
-  } = selection;
-  const pageHeader = retentionTimeRaw || stringifyLcmsPageValue(spectrum?.pageValue ?? spectrum?.page ?? spectrum?.pageSymbol);
-  if (!entity || !spectrum) {
-    const emptyResult = {
-      jcamp: '',
-      selection: {
-        retentionTime: retentionTimeRaw,
-        polarity,
-        msSourceChosen: null,
-        pageChosen: null,
-        hasPageHeader: false,
-        fallbackApplied: sourceFallback || pageFallback
-      }
-    };
-    return emptyResult;
-  }
-  const {
-    x,
-    y
-  } = getSpectrumDataPairs(spectrum);
-  const points = x.map((xValue, index) => `${xValue}, ${y[index]}`);
-  const minX = x.length > 0 ? Math.min(...x) : null;
-  const maxX = x.length > 0 ? Math.max(...x) : null;
-  const minY = y.length > 0 ? Math.min(...y) : null;
-  const maxY = y.length > 0 ? Math.max(...y) : null;
-  const xUnit = spectrum?.xUnit || entity?.xUnit || entity?.info?.XUNITS || 'm/z';
-  const yUnit = spectrum?.yUnit || entity?.yUnit || entity?.info?.YUNITS || 'Intensity';
-  const scanMode = spectrum?.scanMode || entity?.scanMode || entity?.info?.SCAN_MODE || entity?.info?.SCANMODE || '';
-  const title = spectrum?.title || entity?.title || entity?.info?.TITLE || 'Spectrum';
-  const pageChosen = stringifyLcmsPageValue(spectrum?.pageValue ?? spectrum?.page ?? spectrum?.pageSymbol);
-  const lines = [`##TITLE=${title}`, '##JCAMP-DX=5.00', '##DATA TYPE=MASS SPECTRUM', '##DATA CLASS=XYPOINTS', '##ORIGIN=Chemspectra', '##OWNER=', `##XUNITS=${xUnit}`, `##YUNITS=${yUnit}`];
-  if (scanMode) lines.push(`##SCAN_MODE=${scanMode}`);
-  if (pageHeader) lines.push(`##PAGE=${pageHeader}`);
-  lines.push(`##NPOINTS=${points.length}`);
-  if (minX != null) lines.push(`##FIRSTX=${x[0]}`);
-  if (maxX != null) lines.push(`##LASTX=${x[x.length - 1]}`);
-  if (minX != null) lines.push(`##MINX=${minX}`);
-  if (maxX != null) lines.push(`##MAXX=${maxX}`);
-  if (minY != null) lines.push(`##MINY=${minY}`);
-  if (maxY != null) lines.push(`##MAXY=${maxY}`);
-  if (y.length > 0) lines.push(`##FIRSTY=${y[0]}`);
-  lines.push('##XYDATA=(XY..XY)');
-  lines.push(...points);
-  lines.push('##END=');
-  const jcamp = `${lines.join('\n')}\n`;
-  const selectionLog = {
-    retentionTime: retentionTimeRaw,
-    polarity,
-    msSourceChosen: describeLcmsMsSource(entity, entityIndex),
-    pageChosen: {
-      requested: retentionTimeRaw,
-      selected: pageChosen,
-      numericRequested: Number.isFinite(retentionTime) ? retentionTime : null
-    },
-    hasPageHeader: pageHeader ? jcamp.includes(`##PAGE=${pageHeader}`) : false,
-    fallbackApplied: sourceFallback || pageFallback
-  };
-  return {
-    jcamp,
-    selection: selectionLog
-  };
-};
-exports.buildLcmsMsPageJcamp = buildLcmsMsPageJcamp;
-const readLcmsMzPageFromJcampInfo = info => {
-  if (!info || info.$CSLCMSMZPAGE == null || info.$CSLCMSMZPAGE === '') return null;
-  const raw = info.$CSLCMSMZPAGE;
-  const scalar = Array.isArray(raw) ? raw[0] : raw;
-  if (scalar == null || scalar === '') return null;
-  const parsed = typeof scalar === 'number' && Number.isFinite(scalar) ? scalar : parsePageValue(String(scalar).trim());
-  return Number.isFinite(parsed) ? parsed : null;
-};
 const normalizeXyData = raw => {
   if (!raw) return null;
   if (Array.isArray(raw)) {
@@ -1373,112 +1105,13 @@ const ensureSpectrumData = (spectrum, source) => {
   }
   return result;
 };
-const parseChemstationPages = (source, jcamp) => {
-  if (typeof source !== 'string') return [];
-  const parts = source.split(/##PAGE=/);
-  if (parts.length <= 1) return [];
-  const info = jcamp?.info || {};
-  const baseSpectrum = Array.isArray(jcamp?.spectra) ? jcamp.spectra[0] : null;
-  const dataType = baseSpectrum?.dataType || jcamp?.dataType || 'LC/MS';
-  const xUnit = info.XUNITS || baseSpectrum?.xUnit || jcamp?.xUnit || '';
-  const yUnit = info.YUNITS || baseSpectrum?.yUnit || jcamp?.yUnit || '';
-  const spectra = [];
-  for (let i = 1; i < parts.length; i += 1) {
-    const block = parts[i];
-    const lines = block.split(/\r?\n/);
-    const pageLine = (lines[0] || '').trim();
-    const pageValue = parsePageValue(pageLine);
-    const dataStart = lines.findIndex(line => line.startsWith('##DATA TABLE') || line.startsWith('##XYDATA'));
-    if (dataStart >= 0) {
-      const x = [];
-      const y = [];
-      for (let j = dataStart + 1; j < lines.length; j += 1) {
-        const rawLine = lines[j].trim();
-        if (rawLine) {
-          if (rawLine.startsWith('##')) break;
-          const partsLine = rawLine.split(/[,\s]+/).filter(Boolean);
-          if (partsLine.length >= 2) {
-            const xVal = Number(partsLine[0]);
-            const yVal = Number(partsLine[1]);
-            if (Number.isFinite(xVal) && Number.isFinite(yVal)) {
-              x.push(xVal);
-              y.push(yVal);
-            }
-          }
-        }
-      }
-      if (x.length > 0) {
-        const pageSymbol = pageLine || pageValue;
-        spectra.push({
-          dataType,
-          xUnit,
-          yUnit,
-          pageValue,
-          page: pageLine || pageValue,
-          pageSymbol,
-          data: [{
-            x,
-            y
-          }]
-        });
-      }
-    }
-  }
-  return spectra;
-};
-const isChemstationLcms = (source, jcamp) => {
-  if (typeof source !== 'string') return false;
-  const dt = String(jcamp?.dataType || jcamp?.info?.DATATYPE || '').toUpperCase();
-  if (dt.includes('LC/MS') || dt.includes('MASS TIC')) return true;
-  const spectra = Array.isArray(jcamp?.spectra) ? jcamp.spectra : [];
-  const info = jcamp?.info || {};
-  const scanMode = String(info.SCAN_MODE || info.SCANMODE || '').toUpperCase();
-  const type = String(info.TYPE || '').toUpperCase();
-  const software = String(info.SOFTWARE || '').toUpperCase();
-  const csCategory = jcamp?.info?.$CSCATEGORY;
-  const categories = Array.isArray(csCategory) ? csCategory.map(c => String(c).toUpperCase()) : [];
-  const hasPolarityCategory = categories.some(c => c.includes('POSITIVE') || c.includes('NEGATIVE') || c.includes('NEUTRAL'));
-  const hasTicOrUvvisCategory = categories.some(c => c.includes('TIC') || c.includes('UVVIS'));
-  const hasHplcUvvisSpectrumDataType = spectra.some(s => {
-    const sdt = String(s?.dataType || '').toUpperCase();
-    return sdt.includes('HPLC UV-VIS') || sdt.includes('UVVIS');
-  });
-  const hasMassTicSpectrumDataType = spectra.some(s => {
-    const sdt = String(s?.dataType || '').toUpperCase();
-    return sdt.includes('MASS TIC') || sdt.includes('TIC');
-  });
-  const hasMassSpectrumDataType = spectra.some(s => {
-    const sdt = String(s?.dataType || '').toUpperCase();
-    return sdt.includes('MASS SPECTRUM');
-  });
-  const hasMassSpectrumRootDataType = dt.includes('MASS SPECTRUM');
-  const hasScanModeHint = scanMode.includes('POSITIVE') || scanMode.includes('NEGATIVE') || scanMode.includes('POSITIV') || scanMode.includes('NEGATIV');
-  const hasTypeHint = type.includes('MS SPECTRUM') || type.includes('MS CHROMATOGRAM');
-  const hasSoftwareHint = software.includes('OPENLAB');
-  const hasMultipleSpectra = spectra.length > 1;
-  const hasPageMetadata = spectra.some(s => s?.page != null || s?.pageValue != null);
-  const hasNtuplesPageHeader = /##NTUPLES_PAGE_HEADER\s*=/.test(source);
-  if (hasNtuplesPageHeader && (hasTicOrUvvisCategory || hasHplcUvvisSpectrumDataType || hasMassTicSpectrumDataType || hasMassSpectrumDataType && hasPolarityCategory)) {
-    return true;
-  }
-  if (hasMultipleSpectra && hasPageMetadata && (hasTicOrUvvisCategory || hasHplcUvvisSpectrumDataType || hasMassTicSpectrumDataType || hasMassSpectrumDataType && hasPolarityCategory)) {
-    return true;
-  }
-  if (hasMassSpectrumRootDataType && (hasMassSpectrumDataType || hasScanModeHint || hasTypeHint || hasSoftwareHint)) {
-    return true;
-  }
-  if (hasMassTicSpectrumDataType && (hasTypeHint || hasSoftwareHint || hasScanModeHint || spectra.length > 0)) {
-    return true;
-  }
-  return false;
-};
 const ExtractJcamp = source => {
   const jcamp = _jcampconverter.default.convert(source, {
     xy: true,
     keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS|\$CSUPPERTHRESHOLD|\$CSLOWERTHRESHOLD|\$CSCYCLICVOLTAMMETRYDATA|UNITS|SYMBOL|\$CSAUTOMETADATA|\$DETECTOR|MN|MW|D|MP|MELTINGPOINT|TG|\$CSSCANRATE|\$CSSPECTRUMDIRECTION|\$CSWEAREAVALUE|\$CSWEAREAUNIT|\$CSCURRENTMODE|\$CSLCMSMZPAGE|SCAN_MODE|SCANMODE|TYPE|SOFTWARE|DATATYPE)/ // eslint-disable-line
   });
-  const isChemstation = isChemstationLcms(source, jcamp);
-  const parsedPages = parseChemstationPages(source, jcamp);
+  const isChemstation = (0, _parsing.isChemstationLcms)(source, jcamp);
+  const parsedPages = (0, _parsing.parseChemstationPages)(source, jcamp);
   const spectraCount = Array.isArray(jcamp.spectra) ? jcamp.spectra.length : 0;
   if (parsedPages.length > 1 && spectraCount < parsedPages.length) {
     jcamp.spectra = parsedPages;
@@ -1570,7 +1203,7 @@ const ExtractJcamp = source => {
   //   : ((Format.isXRDLayout(layout) || Format.isCyclicVoltaLayout(layout))
   //     ? extrFeaturesXrd(jcamp, layout, peakUp) : extrFeaturesNi(jcamp, layout, peakUp, spectra));
 
-  const lcmsMzPageFromInfo = _format.default.isLCMsLayout(layout) ? readLcmsMzPageFromJcampInfo(jcamp.info) : null;
+  const lcmsMzPageFromInfo = _format.default.isLCMsLayout(layout) ? (0, _parsing.readLcmsMzPageFromJcampInfo)(jcamp.info) : null;
   if (lcmsMzPageFromInfo != null) {
     return {
       spectra,

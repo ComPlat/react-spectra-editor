@@ -6,7 +6,6 @@ import { bindActionCreators, compose } from 'redux';
 import classNames from 'classnames';
 import withStyles from '@mui/styles/withStyles';
 import {
-  Select, MenuItem, FormControl, InputLabel,
   Tooltip,
 } from '@mui/material';
 import ZoomInOutlinedIcon from '@mui/icons-material/ZoomInOutlined';
@@ -20,6 +19,7 @@ import Peak from './cmd_bar/03_peak';
 import { setUiSweepType } from '../actions/ui';
 import { selectWavelength, uvvisUndo, uvvisRedo } from '../actions/hplc_ms';
 import { LIST_UI_SWEEP_TYPE } from '../constants/list_ui';
+import renderWavelengthSelect from '../features/lc-ms/ui/wavelengthSelect';
 
 const styles = () => (
   Object.assign(
@@ -78,42 +78,12 @@ const zoomView = (classes, graphIndex, uiSt, zoomInAct) => {
   );
 };
 
-const wavelengthSelect = (classes, hplcMsSt, updateWavelengthAct) => {
-  const uvvis = (hplcMsSt && hplcMsSt.uvvis) || {};
-  const { listWaveLength = null, selectedWaveLength } = uvvis;
-  const options = listWaveLength ? listWaveLength.map((d) => (
-    <MenuItem value={d} key={d}>
-      <span className={classNames(classes.txtOpt, 'option-sv-bar-decimal')}>
-        {d}
-      </span>
-    </MenuItem>
-  )) : [];
-  const hasSelectedWaveLength = listWaveLength && listWaveLength.includes(selectedWaveLength);
-  const resolvedSelectedWaveLength = hasSelectedWaveLength
-    ? selectedWaveLength
-    : (listWaveLength && listWaveLength[0]);
-
-  return (
-    <FormControl
-      className={classNames(classes.fieldDecimal)}
-      variant="outlined"
-      style={{ width: '140px' }}
-    >
-      <InputLabel id="lcms-select-wavelength-label" className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
-        Wavelength (nm)
-      </InputLabel>
-      <Select
-        labelId="lcms-select-wavelength-label"
-        label="Wavelength (nm)"
-        value={resolvedSelectedWaveLength}
-        onChange={updateWavelengthAct}
-        className={classNames(classes.selectInput, 'input-sv-bar-decimal')}
-      >
-        { options }
-      </Select>
-    </FormControl>
-  );
-};
+const wavelengthSelect = (classes, hplcMsSt, updateWavelengthAct) => (
+  renderWavelengthSelect(classes, hplcMsSt, updateWavelengthAct, {
+    labelId: 'lcms-select-wavelength-label',
+    label: 'Wavelength (nm)',
+  })
+);
 
 const LcMsUvToolsBar = ({
   classes, uiSt, hplcMsSt, feature, zoomInAct, selectWavelengthAct,
@@ -159,7 +129,10 @@ const LcMsUvToolsBar = ({
 const mapStateToProps = (state) => {
   const { curveIdx, listCurves } = state.curve;
   const entity = listCurves[curveIdx];
-  const displayFeature = entity?.feature || (listCurves[0]?.feature) || (listCurves[0]?.features?.[0]) || {};
+  const displayFeature = entity?.feature
+    || (listCurves[0]?.feature)
+    || (listCurves[0]?.features?.[0])
+    || {};
   return {
     uiSt: state.ui,
     hplcMsSt: state.hplcMs,

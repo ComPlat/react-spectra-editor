@@ -6,7 +6,13 @@ import {
 import { LIST_UI_SWEEP_TYPE } from '../constants/list_ui';
 import { LIST_LAYOUT } from '../constants/list_layout';
 import { LIST_BRUSH_SVG_GRAPH } from '../constants/list_graph';
-
+import {
+  lcmsHandleSelectZoomIn,
+  lcmsHandleSelectZoomReset,
+  lcmsHandleIntegrationAdd,
+  lcmsHandlePeakDelete,
+  lcmsHandleIntegrationRm,
+} from './saga_lcms_ui';
 const getUiState = (state) => state.ui;
 const getCurveState = (state) => state.curve;
 const getHplcMsState = (state) => state.hplcMs;
@@ -38,19 +44,7 @@ function* selectUiSweep(action) {
   switch (sweepType) {
     case LIST_UI_SWEEP_TYPE.ZOOMIN:
       if (layoutState === LIST_LAYOUT.LC_MS && uvvis.listWaveLength) {
-        const { graphIndex } = zoom;
-        let lcmsSyncX;
-        if ((graphIndex === 0 || graphIndex === 1) && payload?.xExtent) {
-          lcmsSyncX = graphIndex === 0 ? 1 : 0;
-        }
-        yield put({
-          type: UI.SWEEP.SELECT_ZOOMIN,
-          payload: {
-            graphIndex,
-            zoomValue: payload,
-            ...(lcmsSyncX != null ? { lcmsSyncX } : {}),
-          },
-        });
+        yield* lcmsHandleSelectZoomIn({ payload, zoom });
       } else {
         yield put({
           type: UI.SWEEP.SELECT_ZOOMIN,
@@ -61,14 +55,7 @@ function* selectUiSweep(action) {
     case LIST_UI_SWEEP_TYPE.ZOOMRESET:
       if (layoutState === LIST_LAYOUT.LC_MS
         && (payload?.graphIndex === 0 || payload?.graphIndex === 1)) {
-        yield put({
-          type: UI.SWEEP.SELECT_ZOOMRESET,
-          payload: { graphIndex: 0 },
-        });
-        yield put({
-          type: UI.SWEEP.SELECT_ZOOMRESET,
-          payload: { graphIndex: 1 },
-        });
+        yield* lcmsHandleSelectZoomReset();
       } else {
         yield put({
           type: UI.SWEEP.SELECT_ZOOMRESET,
@@ -78,13 +65,7 @@ function* selectUiSweep(action) {
       break;
     case LIST_UI_SWEEP_TYPE.INTEGRATION_ADD: {
       if (uvvis.selectedWaveLength && layoutState === LIST_LAYOUT.LC_MS) {
-        yield put({
-          type: HPLC_MS.UPDATE_HPLCMS_INTEGRATIONS,
-          payload: {
-            spectrumId: uvvis.selectedWaveLength,
-            integration: payload,
-          },
-        });
+        yield* lcmsHandleIntegrationAdd({ uvvis, payload });
       } else {
         yield put({
           type: UI.SWEEP.SELECT_INTEGRATION,
@@ -226,13 +207,7 @@ function* clickUiTarget(action) {
     });
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.PEAK_DELETE && onPeak) {
     if (isLcmsLayout && uvvis.selectedWaveLength) {
-      yield put({
-        type: HPLC_MS.REMOVE_HPLCMS_PEAK,
-        payload: {
-          spectrumId: uvvis.selectedWaveLength,
-          peak: payload,
-        },
-      });
+      yield* lcmsHandlePeakDelete({ uvvis, payload });
     } else {
       yield put({
         type: EDITPEAK.ADD_NEGATIVE,
@@ -246,14 +221,7 @@ function* clickUiTarget(action) {
     });
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_RM && onPeak) {
     if (uvvis.selectedWaveLength && isLcmsLayout) {
-      yield put({
-        type: HPLC_MS.UPDATE_HPLCMS_INTEGRATIONS,
-        payload: {
-          spectrumId: uvvis.selectedWaveLength,
-          integration: payload,
-          remove: true,
-        },
-      });
+      yield* lcmsHandleIntegrationRm({ uvvis, payload });
     } else {
       yield put({
         type: INTEGRATION.RM_ONE,

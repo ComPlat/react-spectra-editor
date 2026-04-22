@@ -26,17 +26,15 @@ const scrollUiWheel = payload => ({
   payload
 });
 exports.scrollUiWheel = scrollUiWheel;
-const clickUiTarget = (payload, onPeak, voltammetryPeakIdx = 0, jcampIdx = 0, onPecker = false, sourceHint = null) => {
-  return {
-    type: _action_type.UI.CLICK_TARGET,
-    payload,
-    onPeak,
-    voltammetryPeakIdx,
-    jcampIdx,
-    onPecker,
-    sourceHint
-  };
-};
+const clickUiTarget = (payload, onPeak, voltammetryPeakIdx = 0, jcampIdx = 0, onPecker = false, sourceHint = null) => ({
+  type: _action_type.UI.CLICK_TARGET,
+  payload,
+  onPeak,
+  voltammetryPeakIdx,
+  jcampIdx,
+  onPecker,
+  sourceHint
+});
 exports.clickUiTarget = clickUiTarget;
 const displaySubViewerAt = payload => ({
   type: _action_type.UI.SUB_VIEWER.DISPLAY_VIEWER_AT,

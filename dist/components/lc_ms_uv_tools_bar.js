@@ -22,6 +22,7 @@ var _peak = _interopRequireDefault(require("./cmd_bar/03_peak"));
 var _ui = require("../actions/ui");
 var _hplc_ms = require("../actions/hplc_ms");
 var _list_ui = require("../constants/list_ui");
+var _wavelengthSelect = _interopRequireDefault(require("../features/lc-ms/ui/wavelengthSelect"));
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable no-mixed-operators, prefer-object-spread, react/function-component-definition */
 
@@ -80,41 +81,10 @@ const zoomView = (classes, graphIndex, uiSt, zoomInAct) => {
     })]
   });
 };
-const wavelengthSelect = (classes, hplcMsSt, updateWavelengthAct) => {
-  const uvvis = hplcMsSt && hplcMsSt.uvvis || {};
-  const {
-    listWaveLength = null,
-    selectedWaveLength
-  } = uvvis;
-  const options = listWaveLength ? listWaveLength.map(d => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
-    value: d,
-    children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
-      className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-decimal'),
-      children: d
-    })
-  }, d)) : [];
-  const hasSelectedWaveLength = listWaveLength && listWaveLength.includes(selectedWaveLength);
-  const resolvedSelectedWaveLength = hasSelectedWaveLength ? selectedWaveLength : listWaveLength && listWaveLength[0];
-  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
-    className: (0, _classnames.default)(classes.fieldDecimal),
-    variant: "outlined",
-    style: {
-      width: '140px'
-    },
-    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputLabel, {
-      id: "lcms-select-wavelength-label",
-      className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label'),
-      children: "Wavelength (nm)"
-    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Select, {
-      labelId: "lcms-select-wavelength-label",
-      label: "Wavelength (nm)",
-      value: resolvedSelectedWaveLength,
-      onChange: updateWavelengthAct,
-      className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-decimal'),
-      children: options
-    })]
-  });
-};
+const wavelengthSelect = (classes, hplcMsSt, updateWavelengthAct) => (0, _wavelengthSelect.default)(classes, hplcMsSt, updateWavelengthAct, {
+  labelId: 'lcms-select-wavelength-label',
+  label: 'Wavelength (nm)'
+});
 const LcMsUvToolsBar = ({
   classes,
   uiSt,
