@@ -302,6 +302,18 @@ class DemoWriteIr extends _react.default.Component {
       });
     };
   }
+  componentDidUpdate(_prevProps, prevState) {
+    // Standalone demo only: when switching to "LC/MS OpenLab", notify like the ELN would on
+    // first paint so the host can resolve the MS sub-view (see e2e __lcmsDemoRequests).
+    if (this.state.typ === 'lcms' && prevState.typ !== 'lcms') {
+      const initialRt = getInitialLcmsRetentionTime();
+      this.handleLcmsPageRequest({
+        retentionTime: initialRt,
+        polarity: 'positive',
+        trigger: 'initial_load'
+      });
+    }
+  }
   loadEntity() {
     const {
       typ

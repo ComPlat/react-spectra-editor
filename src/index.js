@@ -277,6 +277,19 @@ class DemoWriteIr extends React.Component {
     this.setState({ descChanged: content });
   }
 
+  componentDidUpdate(_prevProps, prevState) {
+    const { typ } = this.state;
+    const { typ: prevTyp } = prevState;
+    if (typ === 'lcms' && prevTyp !== 'lcms') {
+      const initialRt = getInitialLcmsRetentionTime();
+      this.handleLcmsPageRequest({
+        retentionTime: initialRt,
+        polarity: 'positive',
+        trigger: 'initial_load',
+      });
+    }
+  }
+
   handleLcmsPageRequest(request) {
     const { typ } = this.state;
     if (typ !== 'lcms') return;

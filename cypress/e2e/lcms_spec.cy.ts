@@ -40,10 +40,8 @@ describe('LC/MS layouts', () => {
     openLayout('LC/MS OpenLab')
     assertLcmsViewerIsStable()
 
-    cy.window().then((win) => {
-      const initialRequests = (win as any).__lcmsDemoRequests || []
-      expect(initialRequests.length).to.be.greaterThan(0)
-    })
+    // Waits until React has run componentDidUpdate (initial_load on __lcmsDemoRequests).
+    cy.window().its('__lcmsDemoRequests').should('have.length.above', 0)
 
     cy.window().then((win) => {
       (win as any).__spectraStore.dispatch({
@@ -53,9 +51,9 @@ describe('LC/MS layouts', () => {
     })
 
     cy.wait(400)
+    cy.window().its('__lcmsDemoRequests').should('have.length.above', 1)
     cy.window().then((win) => {
       const requests = (win as any).__lcmsDemoRequests || []
-      expect(requests.length).to.be.greaterThan(1)
       const latestRequest = requests[requests.length - 1]
       expect(latestRequest.trigger).to.equal('user_click')
       expect(Number.isFinite(latestRequest.retentionTime)).to.equal(true)
