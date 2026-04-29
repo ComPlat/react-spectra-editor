@@ -27,6 +27,10 @@ react/no-unused-prop-types */
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.85); // ROI
 
+const buildResetPayload = (feature, curveSt) => ({
+  ...feature,
+  curveIdx: curveSt.curveIdx
+});
 class ViewerMulti extends _react.default.Component {
   constructor(props) {
     super(props);
@@ -232,11 +236,12 @@ class ViewerMulti extends _react.default.Component {
     const {
       feature,
       resetAllAct,
-      entities
+      entities,
+      curveSt
     } = this.props;
     const oldEntities = prevProps.entities;
     if (oldEntities !== entities) {
-      resetAllAct(feature);
+      resetAllAct(buildResetPayload(feature, curveSt));
     }
   }
   createMultiFocus(size, props) {
@@ -288,7 +293,7 @@ class ViewerMulti extends _react.default.Component {
     this.currentSize = size;
     (0, _draw.drawDestroy)(this.rootKlass);
     if (shouldReset) {
-      resetAllAct(feature);
+      resetAllAct(buildResetPayload(feature, curveSt));
     }
     const {
       xxLabel,

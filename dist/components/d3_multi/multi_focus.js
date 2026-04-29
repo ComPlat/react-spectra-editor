@@ -127,7 +127,8 @@ class MultiFocus {
       prevDtPk,
       prevSfPk,
       prevData,
-      prevYFactor
+      prevYFactor,
+      prevJcampIdx
     } = this.shouldUpdate;
     const {
       xt,
@@ -141,6 +142,7 @@ class MultiFocus {
     const sameSfPk = prevSfPk === this.tSfPeaks || Array.isArray(prevSfPk) && Array.isArray(this.tSfPeaks) && prevSfPk.length === this.tSfPeaks.length && prevSfPk.every((peak, idx) => peak === this.tSfPeaks[idx]);
     const sameData = prevData === this.data.length;
     const sameYFactor = prevYFactor === this.yTransformFactor;
+    const sameJcampIdx = prevJcampIdx === this.jcampIdx;
     this.shouldUpdate = Object.assign({}, this.shouldUpdate, {
       sameXY,
       sameEpSt,
@@ -150,7 +152,8 @@ class MultiFocus {
       sameDtPk,
       sameSfPk,
       sameData,
-      sameYFactor // eslint-disable-line
+      sameYFactor,
+      sameJcampIdx // eslint-disable-line
     });
   }
   resetShouldUpdate(prevEpSt) {
@@ -166,6 +169,7 @@ class MultiFocus {
     const prevData = this.data.length;
     const prevLySt = this.layout;
     const prevYFactor = this.yTransformFactor;
+    const prevJcampIdx = this.jcampIdx;
     this.shouldUpdate = Object.assign({}, this.shouldUpdate, {
       prevXt,
       prevYt,
@@ -176,7 +180,8 @@ class MultiFocus {
       prevDtPk,
       prevSfPk,
       prevData,
-      prevYFactor // eslint-disable-line
+      prevYFactor,
+      prevJcampIdx // eslint-disable-line
     });
   }
   setTip() {
@@ -439,9 +444,10 @@ class MultiFocus {
       sameXY,
       sameEpSt,
       sameDtPk,
-      sameSfPk
+      sameSfPk,
+      sameJcampIdx
     } = this.shouldUpdate;
-    if (!_format.default.isCyclicVoltaLayout(this.layout) && sameXY && sameEpSt && sameDtPk && sameSfPk) return;
+    if (!_format.default.isCyclicVoltaLayout(this.layout) && sameXY && sameEpSt && sameDtPk && sameSfPk && sameJcampIdx) return;
 
     // rescale for zoom
     const {
@@ -474,6 +480,10 @@ class MultiFocus {
     }
     const mpp = this.tags.pPath.selectAll('path').data(dPks);
     mpp.exit().attr('class', 'exit').remove();
+    const clearPeakLabels = () => {
+      const bpTxt = this.tags.bpTxt.selectAll('text').data([]);
+      bpTxt.exit().attr('class', 'exit').remove();
+    };
     const linePath = [{
       x: -0.5,
       y: 10
@@ -530,6 +540,8 @@ class MultiFocus {
       const bpTxt = this.tags.bpTxt.selectAll('text').data(dPks);
       bpTxt.exit().attr('class', 'exit').remove();
       bpTxt.enter().append('text').attr('class', 'peak-text').attr('font-family', 'Helvetica').style('font-size', '12px').attr('fill', '#228B22').style('text-anchor', 'middle').merge(bpTxt).attr('id', d => `mpp${Math.round(1000 * d.x)}`).text(d => d.x.toFixed(2)).attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y) - 25})`).on('click', (event, d) => this.onClickTarget(event, d));
+    } else {
+      clearPeakLabels();
     }
     mpp.attr('fill', (_, index) => {
       return indexOfCVRefPeaks[index] === -1 ? 'blue' : 'red';
@@ -543,9 +555,10 @@ class MultiFocus {
       sameXY,
       sameEpSt,
       sameDtPk,
-      sameSfPk
+      sameSfPk,
+      sameJcampIdx
     } = this.shouldUpdate;
-    if (!_format.default.isCyclicVoltaLayout(this.layout) && sameXY && sameEpSt && sameDtPk && sameSfPk) return;
+    if (!_format.default.isCyclicVoltaLayout(this.layout) && sameXY && sameEpSt && sameDtPk && sameSfPk && sameJcampIdx) return;
 
     // rescale for zoom
     const {
@@ -594,29 +607,30 @@ class MultiFocus {
       sameXY,
       sameLySt,
       sameItSt,
-      sameData
+      sameData,
+      sameJcampIdx
     } = this.shouldUpdate;
-    if (sameXY && sameLySt && sameItSt && sameData) return;
+    if (sameXY && sameLySt && sameItSt && sameData && sameJcampIdx) return;
+    const clearIntegralPaths = () => {
+      const empty = [];
+      const igbp = this.tags.igbPath.selectAll('path').data(empty);
+      igbp.exit().attr('class', 'exit').remove();
+      const igcp = this.tags.igcPath.selectAll('path').data(empty);
+      igcp.exit().attr('class', 'exit').remove();
+      const igtp = this.tags.igtPath.selectAll('text').data(empty);
+      igtp.exit().attr('class', 'exit').remove();
+    };
+    const clearAUC = () => {
+      const auc = this.tags.aucPath.selectAll('path').data([]);
+      auc.exit().attr('class', 'exit').remove();
+    };
     const {
       integrations
     } = integrationState;
     const selectedIntegration = integrations[this.jcampIdx];
     if (selectedIntegration === false || selectedIntegration === undefined) {
-      Object.assign(this, {
-        integrationSplitTargets: {
-          stack: [],
-          shift: 0,
-          ignoreRef: false
-        }
-      });
-      const itgs = [];
-      const igbp = this.tags.igbPath.selectAll('path').data(itgs);
-      igbp.exit().attr('class', 'exit').remove();
-      const igcp = this.tags.igcPath.selectAll('path').data(itgs);
-      igcp.exit().attr('class', 'exit').remove();
-      const igtp = this.tags.igtPath.selectAll('text').data(itgs);
-      igtp.exit().attr('class', 'exit').remove();
-      this.drawVisualSplitLines([], 0, false);
+      clearIntegralPaths();
+      clearAUC();
       return;
     }
     const {
@@ -646,16 +660,15 @@ class MultiFocus {
     const igtp = this.tags.igtPath.selectAll('text').data(itgs);
     igtp.exit().attr('class', 'exit').remove();
     if (itgs.length === 0 || isDisable) {
-      // remove drawn area under curve
-      const auc = this.tags.aucPath.selectAll('path').data(stack);
-      auc.exit().attr('class', 'exit').remove();
-      auc.merge(auc);
-      this.drawVisualSplitLines(showIntegSplit ? itgs : [], shift, ignoreRef);
+      clearIntegralPaths();
+      clearAUC();
       return;
     }
     if (ignoreRef) {
+      clearIntegralPaths();
       this.drawAUC(stack, shift);
     } else {
+      clearAUC();
       // rescale for zoom
       const {
         xt
@@ -714,9 +727,10 @@ class MultiFocus {
     const {
       sameXY,
       sameLySt,
-      sameMySt
+      sameMySt,
+      sameJcampIdx
     } = this.shouldUpdate;
-    if (sameXY && sameLySt && sameMySt) return;
+    if (sameXY && sameLySt && sameMySt && sameJcampIdx) return;
     const {
       multiplicities
     } = mtplySt;

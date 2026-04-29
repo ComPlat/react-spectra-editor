@@ -109,6 +109,16 @@ const Threshold = ({
   } else {
     thresVal = thresValSt || (feature ? feature.thresRef : hplcMsSt?.threshold?.value);
   }
+  const {
+    curveIdx
+  } = curveSt;
+  const onResetThreshold = () => resetThresholdValueAct({
+    value: false,
+    curveIdx
+  });
+  const onToggleThreshold = () => toggleThresholdIsEditAct({
+    curveIdx
+  });
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
     className: classes.groupRight,
     children: [setThreshold(classes, thresVal, updateThresholdValueAct, curveSt), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tooltip, {
@@ -120,7 +130,7 @@ const Threshold = ({
         children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
           className: (0, _classnames.default)('btn-sv-bar-thresref'),
           disabled: _cfg.default.btnCmdThres(thresVal),
-          onClick: resetThresholdValueAct,
+          onClick: onResetThreshold,
           children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_RefreshOutlined.default, {
             className: classes.icon
           })
@@ -135,7 +145,7 @@ const Threshold = ({
         children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
           className: (0, _classnames.default)('btn-sv-bar-thresrst'),
           disabled: _cfg.default.btnCmdThres(thresVal),
-          onClick: toggleThresholdIsEditAct,
+          onClick: onToggleThreshold,
           children: restoreIcon(classes, hasEdit, isEditSt)
         })
       })
