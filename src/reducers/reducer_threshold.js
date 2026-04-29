@@ -13,12 +13,12 @@ const initialState = {
   ],
 };
 
-// const defaultThresHold = {
-//   isEdit: true,
-//   value: false,
-//   upper: false,
-//   lower: false,
-// };
+const defaultThresHold = {
+  isEdit: true,
+  value: false,
+  upper: false,
+  lower: false,
+};
 
 const setThresHoldValue = (state, action) => {
   const { payload } = action;
@@ -77,19 +77,34 @@ const setThresHoldLower = (state, action) => {
   return Object.assign({}, state, { list: newListThres });
 };
 
-const setThresHoldIsEdit = (state) => {
+const setThresHoldIsEdit = (state, action) => {
+  const { payload } = action;
   const { list, selectedIdx } = state;
-  const selectedThres = list[selectedIdx];
+  const curveIdx = payload && payload.curveIdx !== undefined ? payload.curveIdx : selectedIdx;
+  const selectedThres = list[curveIdx] || defaultThresHold;
   const { isEdit } = selectedThres;
   const newSelectedThres = Object.assign({}, selectedThres, { isEdit: !isEdit });
   const newListThres = [...list];
-  newListThres[selectedIdx] = newSelectedThres;
-  return Object.assign({}, state, { list: newListThres });
+  newListThres[curveIdx] = newSelectedThres;
+  return Object.assign({}, state, { list: newListThres, selectedIdx: curveIdx });
 };
 
 const resetAll = (state, action) => {
   const { payload } = action;
   const { list } = state;
+  if (payload && payload.curveIdx !== undefined) {
+    const { curveIdx } = payload;
+    const selectedThres = list[curveIdx] || defaultThresHold;
+    const newSelectedThres = Object.assign(
+      {},
+      selectedThres,
+      { value: payload.thresRef },
+    );
+    const newListThres = [...list];
+    newListThres[curveIdx] = newSelectedThres;
+    return Object.assign({}, state, { selectedIdx: curveIdx, list: newListThres });
+  }
+
   const newList = list.map((item) => (
     {
       isEdit: item.isEdit,
@@ -158,7 +173,7 @@ const thresholdReducer = (state = initialState, action) => {
     case THRESHOLD.RESET_VALUE:
       return setThresHoldValue(state, action);
     case THRESHOLD.TOGGLE_ISEDIT:
-      return setThresHoldIsEdit(state);
+      return setThresHoldIsEdit(state, action);
     case MANAGER.RESET_INIT_COMMON:
       return resetInitCommon(state);
     case MANAGER.RESETALL:

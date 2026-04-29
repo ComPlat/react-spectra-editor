@@ -24,6 +24,10 @@ import {
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.85); // ROI
 
+const buildResetPayload = (feature, curveSt) => (
+  { ...feature, curveIdx: curveSt.curveIdx }
+);
+
 class ViewerMulti extends React.Component {
   constructor(props) {
     super(props);
@@ -57,7 +61,7 @@ class ViewerMulti extends React.Component {
     } = this.props;
 
     drawDestroy(this.rootKlass);
-    resetAllAct(feature);
+    resetAllAct(buildResetPayload(feature, curveSt));
 
     let xxLabel = xLabel;
     let yyLabel = yLabel;
@@ -209,10 +213,12 @@ class ViewerMulti extends React.Component {
   }
 
   normChange(prevProps) {
-    const { feature, resetAllAct, entities } = this.props;
+    const {
+      feature, resetAllAct, entities, curveSt,
+    } = this.props;
     const oldEntities = prevProps.entities;
     if (oldEntities !== entities) {
-      resetAllAct(feature);
+      resetAllAct(buildResetPayload(feature, curveSt));
     }
   }
 
@@ -232,7 +238,7 @@ class ViewerMulti extends React.Component {
 
     drawDestroy(this.rootKlass);
     if (shouldReset) {
-      resetAllAct(feature);
+      resetAllAct(buildResetPayload(feature, curveSt));
     }
 
     let xxLabel = xLabel;

@@ -103,6 +103,7 @@ class MultiFocus {
     const {
       prevXt, prevYt, prevEpSt, prevLySt,
       prevTePt, prevDtPk, prevSfPk, prevData, prevYFactor,
+      prevJcampIdx,
     } = this.shouldUpdate;
     const { xt, yt } = TfRescale(this);
     const sameXY = xt(1.1) === prevXt && prevYt === yt(1.1);
@@ -113,12 +114,13 @@ class MultiFocus {
     const sameSfPk = JSON.stringify(prevSfPk) === JSON.stringify(this.tSfPeaks);
     const sameData = prevData === this.data.length;
     const sameYFactor = prevYFactor === this.yTransformFactor;
+    const sameJcampIdx = prevJcampIdx === this.jcampIdx;
     this.shouldUpdate = Object.assign(
       {},
       this.shouldUpdate,
       {
         sameXY, sameEpSt, sameLySt, // eslint-disable-line
-        sameTePt, sameDtPk, sameSfPk, sameData, sameYFactor, // eslint-disable-line
+        sameTePt, sameDtPk, sameSfPk, sameData, sameYFactor, sameJcampIdx, // eslint-disable-line
       },
     );
   }
@@ -133,12 +135,13 @@ class MultiFocus {
     const prevData = this.data.length;
     const prevLySt = this.layout;
     const prevYFactor = this.yTransformFactor;
+    const prevJcampIdx = this.jcampIdx;
     this.shouldUpdate = Object.assign(
       {},
       this.shouldUpdate,
       {
         prevXt, prevYt, prevEpSt, prevLySt, // eslint-disable-line
-        prevTePt, prevDtPk, prevSfPk, prevData, prevYFactor, // eslint-disable-line
+        prevTePt, prevDtPk, prevSfPk, prevData, prevYFactor, prevJcampIdx, // eslint-disable-line
       },
     );
   }
@@ -433,11 +436,11 @@ class MultiFocus {
 
   drawPeaks(editPeakSt) {
     const {
-      sameXY, sameEpSt, sameDtPk, sameSfPk,
+      sameXY, sameEpSt, sameDtPk, sameSfPk, sameJcampIdx,
     } = this.shouldUpdate;
 
     if (!Format.isCyclicVoltaLayout(this.layout)
-    && sameXY && sameEpSt && sameDtPk && sameSfPk) return;
+    && sameXY && sameEpSt && sameDtPk && sameSfPk && sameJcampIdx) return;
 
     // rescale for zoom
     const { xt, yt } = TfRescale(this);
@@ -461,6 +464,12 @@ class MultiFocus {
     mpp.exit()
       .attr('class', 'exit')
       .remove();
+    const clearPeakLabels = () => {
+      const bpTxt = this.tags.bpTxt.selectAll('text').data([]);
+      bpTxt.exit()
+        .attr('class', 'exit')
+        .remove();
+    };
 
     const linePath = [
       { x: -0.5, y: 10 },
@@ -535,6 +544,8 @@ class MultiFocus {
         .text((d) => d.x.toFixed(2))
         .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(d.y) - 25})`)
         .on('click', (event, d) => this.onClickTarget(event, d));
+    } else {
+      clearPeakLabels();
     }
 
     mpp.attr('fill', (_, index) => {
@@ -548,11 +559,11 @@ class MultiFocus {
 
   drawPeckers() {
     const {
-      sameXY, sameEpSt, sameDtPk, sameSfPk,
+      sameXY, sameEpSt, sameDtPk, sameSfPk, sameJcampIdx,
     } = this.shouldUpdate;
 
     if (!Format.isCyclicVoltaLayout(this.layout) && sameXY
-    && sameEpSt && sameDtPk && sameSfPk) return;
+    && sameEpSt && sameDtPk && sameSfPk && sameJcampIdx) return;
 
     // rescale for zoom
     const { xt, yt } = TfRescale(this);
@@ -605,27 +616,37 @@ class MultiFocus {
 
   drawInteg(integationSt) {
     const {
-      sameXY, sameLySt, sameItSt, sameData,
+      sameXY, sameLySt, sameItSt, sameData, sameJcampIdx,
     } = this.shouldUpdate;
-    if (sameXY && sameLySt && sameItSt && sameData) return;
+    if (sameXY && sameLySt && sameItSt && sameData && sameJcampIdx) return;
+
+    const clearIntegralPaths = () => {
+      const empty = [];
+      const igbp = this.tags.igbPath.selectAll('path').data(empty);
+      igbp.exit()
+        .attr('class', 'exit')
+        .remove();
+      const igcp = this.tags.igcPath.selectAll('path').data(empty);
+      igcp.exit()
+        .attr('class', 'exit')
+        .remove();
+      const igtp = this.tags.igtPath.selectAll('text').data(empty);
+      igtp.exit()
+        .attr('class', 'exit')
+        .remove();
+    };
+    const clearAUC = () => {
+      const auc = this.tags.aucPath.selectAll('path').data([]);
+      auc.exit()
+        .attr('class', 'exit')
+        .remove();
+    };
 
     const { integrations } = integationSt;
     const selectedIntegration = integrations[this.jcampIdx];
     if (selectedIntegration === false || selectedIntegration === undefined) {
-      const itgs = [];
-      const igbp = this.tags.igbPath.selectAll('path').data(itgs);
-      igbp.exit()
-        .attr('class', 'exit')
-        .remove();
-      const igcp = this.tags.igcPath.selectAll('path').data(itgs);
-      igcp.exit()
-        .attr('class', 'exit')
-        .remove();
-
-      const igtp = this.tags.igtPath.selectAll('text').data(itgs);
-      igtp.exit()
-        .attr('class', 'exit')
-        .remove();
+      clearIntegralPaths();
+      clearAUC();
       return;
     }
 
@@ -652,18 +673,16 @@ class MultiFocus {
       .remove();
 
     if (itgs.length === 0 || isDisable) {
-      // remove drawn area under curve
-      const auc = this.tags.aucPath.selectAll('path').data(stack);
-      auc.exit()
-        .attr('class', 'exit')
-        .remove();
-      auc.merge(auc);
+      clearIntegralPaths();
+      clearAUC();
       return;
     }
 
     if (ignoreRef) {
+      clearIntegralPaths();
       this.drawAUC(stack);
     } else {
+      clearAUC();
       // rescale for zoom
       const { xt } = TfRescale(this);
 
@@ -782,8 +801,10 @@ class MultiFocus {
   }
 
   drawMtply(mtplySt) {
-    const { sameXY, sameLySt, sameMySt } = this.shouldUpdate;
-    if (sameXY && sameLySt && sameMySt) return;
+    const {
+      sameXY, sameLySt, sameMySt, sameJcampIdx,
+    } = this.shouldUpdate;
+    if (sameXY && sameLySt && sameMySt && sameJcampIdx) return;
 
     const { multiplicities } = mtplySt;
     const selectedMulti = multiplicities[this.jcampIdx];

@@ -101,9 +101,9 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
       <div className={classes.root}>
         <CmdBar
           feature={feature}
+          hasEdit={entity.hasEdit}
           operations={operations}
           editorOnly={true}
-          hideThreshold={!Format.isNmrLayout(layoutSt)}
         />
         <div className={classNames('react-spectrum-editor', isCyclicVolta && classes.cvEditor)}>
           <Grid container className={isCyclicVolta ? classes.cvTopRow : undefined}>

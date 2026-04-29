@@ -93,6 +93,9 @@ const Threshold = ({
   updateThresholdValueAct, resetThresholdValueAct, toggleThresholdIsEditAct,
 }) => {
   const thresVal = thresValSt || feature.thresRef;
+  const { curveIdx } = curveSt;
+  const onResetThreshold = () => resetThresholdValueAct({ value: false, curveIdx });
+  const onToggleThreshold = () => toggleThresholdIsEditAct({ curveIdx });
 
   return (
     <span className={classes.groupRight}>
@@ -106,7 +109,7 @@ const Threshold = ({
               )
             }
             disabled={Cfg.btnCmdThres(thresVal)}
-            onClick={resetThresholdValueAct}
+            onClick={onResetThreshold}
           >
             <RefreshOutlinedIcon className={classes.icon} />
           </MuButton>
@@ -125,7 +128,7 @@ const Threshold = ({
                     )
                   }
                   disabled={Cfg.btnCmdThres(thresVal)}
-                  onClick={toggleThresholdIsEditAct}
+                  onClick={onToggleThreshold}
                 >
                   { restoreIcon(classes, hasEdit, isEditSt) }
                 </MuButton>
