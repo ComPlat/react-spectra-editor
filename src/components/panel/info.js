@@ -69,10 +69,15 @@ const styles = () => ({
   },
   rowOddSim: {
     backgroundColor: '#fff',
-    height: 108,
+    height: 'auto',
+    minHeight: 36,
     lineHeight: '24px',
-    overflowY: 'hidden',
+    overflow: 'visible',
     overflowWrap: 'word-break',
+  },
+  simPlaceholder: {
+    color: 'rgba(0, 0, 0, 0.54)',
+    fontStyle: 'italic',
   },
   tHead: {
     fontWeight: 'bold',
@@ -110,8 +115,13 @@ const simTitle = () => (
   'Simulated signals from NMRshiftDB'
 );
 
-const simContent = (nmrSimPeaks) => (
-  nmrSimPeaks && nmrSimPeaks.sort((a, b) => a - b).join(', ')
+const simContent = (nmrSimPeaks) => {
+  if (!Array.isArray(nmrSimPeaks) || nmrSimPeaks.length === 0) return '';
+  return [...nmrSimPeaks].sort((a, b) => a - b).join(', ');
+};
+
+const simPlaceholder = () => (
+  'No simulated signals available.'
 );
 
 const normalizeQuillValue = (val) => {
@@ -300,6 +310,7 @@ const InfoPanel = ({
   if (integration) {
     originStack = integration.originStack;  // eslint-disable-line
   }
+  const simulatedSignals = simContent(simulationSt.nmrSimPeaks);
 
   return (
     <Accordion
@@ -413,8 +424,15 @@ const InfoPanel = ({
                   { simTitle() }
                 </div>
                 <div className={classNames(classes.rowRoot, classes.rowOddSim)}>
-                  <span className={classNames(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt')}>
-                    { simContent(simulationSt.nmrSimPeaks) }
+                  <span
+                    className={classNames(
+                      classes.tTxt,
+                      classes.tTxtSim,
+                      !simulatedSignals && classes.simPlaceholder,
+                      'txt-sv-panel-txt',
+                    )}
+                  >
+                    { simulatedSignals || simPlaceholder() }
                   </span>
                 </div>
               </>
