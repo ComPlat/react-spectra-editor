@@ -22,13 +22,6 @@ react/function-component-definition, react/require-default-props
 */
 
 const styles = () => ({});
-const getThresholdState = state => {
-  const curveIdx = state?.curve?.curveIdx;
-  const thresholdList = state?.threshold?.list;
-  if (!Array.isArray(thresholdList)) return {};
-  if (!Number.isInteger(curveIdx)) return thresholdList[0] || {};
-  return thresholdList[curveIdx] || thresholdList[0] || {};
-};
 const LayerPrism = ({
   entity,
   cLabel,
@@ -43,25 +36,16 @@ const LayerPrism = ({
   thresSt,
   scanSt,
   uiSt,
-  curveSt,
-  integrationSt,
   canChangeDescription,
-  onDescriptionChanged,
-  entityFileNames,
-  userManualLink
+  onDescriptionChanged
 }) => {
   const {
     topic,
     feature,
     hasEdit,
-    integration: initialIntegration,
-    features
+    integration
   } = (0, _extractParams.extractParams)(entity, thresSt, scanSt);
   if (!topic) return null;
-  const curveIdx = curveSt && Number.isFinite(curveSt.curveIdx) ? curveSt.curveIdx : 0;
-  const liveIntegrations = integrationSt && Array.isArray(integrationSt.integrations) ? integrationSt.integrations : null;
-  const liveIntegration = liveIntegrations ? liveIntegrations[curveIdx] : null;
-  const integration = liveIntegration || initialIntegration;
   const {
     viewer
   } = uiSt;
@@ -83,7 +67,6 @@ const LayerPrism = ({
             children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_layer_content.default, {
               topic: topic,
               feature: feature,
-              features: features || [],
               cLabel: cLabel,
               xLabel: xLabel,
               yLabel: yLabel,
@@ -112,7 +95,6 @@ const LayerPrism = ({
           children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_layer_content.default, {
             topic: topic,
             feature: feature,
-            features: features || [],
             cLabel: cLabel,
             xLabel: xLabel,
             yLabel: yLabel,
@@ -129,8 +111,6 @@ const LayerPrism = ({
             editorOnly: editorOnly,
             molSvg: molSvg,
             exactMass: exactMass,
-            entityFileNames: entityFileNames,
-            userManualLink: userManualLink,
             descriptions: descriptions,
             canChangeDescription: canChangeDescription,
             onDescriptionChanged: onDescriptionChanged
@@ -144,10 +124,8 @@ const mapStateToProps = (state, props) => (
 // eslint-disable-line
 {
   scanSt: state.scan,
-  thresSt: getThresholdState(state),
-  uiSt: state.ui,
-  curveSt: state.curve,
-  integrationSt: state.integration.present
+  thresSt: state.threshold.list[state.curve.curveIdx],
+  uiSt: state.ui
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({}, dispatch);
 LayerPrism.propTypes = {
@@ -164,12 +142,8 @@ LayerPrism.propTypes = {
   thresSt: _propTypes.default.object.isRequired,
   scanSt: _propTypes.default.object.isRequired,
   uiSt: _propTypes.default.object.isRequired,
-  curveSt: _propTypes.default.object.isRequired,
-  integrationSt: _propTypes.default.object.isRequired,
   canChangeDescription: _propTypes.default.bool.isRequired,
-  onDescriptionChanged: _propTypes.default.func,
-  entityFileNames: _propTypes.default.array,
-  userManualLink: _propTypes.default.object
+  onDescriptionChanged: _propTypes.default.func
 };
 var _default = exports.default = (0, _reactRedux.connect)(
 // eslint-disable-line

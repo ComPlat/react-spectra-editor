@@ -97,9 +97,7 @@ class MultiJcampsViewer extends _react.default.Component {
       integrationSt,
       descriptions,
       canChangeDescription,
-      onDescriptionChanged,
-      forecast,
-      editorOnly
+      onDescriptionChanged
     } = this.props;
     if (!entities || entities.length === 0) return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {});
     const separateCondition = _format.default.isGCLayout(layoutSt) ? 'yUnit' : 'xUnit';
@@ -116,19 +114,14 @@ class MultiJcampsViewer extends _react.default.Component {
       integrations
     } = integrationSt;
     const currentIntegration = integrations[curveIdx];
-    const hasEdit = !!feature?.data?.[0]?.x?.length;
-    const xLabel = feature?.xUnit || '';
-    const yLabel = feature?.yUnit || '';
     const isCyclicVolta = _format.default.isCyclicVoltaLayout(layoutSt);
     return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
       className: classes.root,
       children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_index2.default, {
         feature: feature,
-        hasEdit: hasEdit,
-        forecast: forecast || {},
+        hasEdit: entity.hasEdit,
         operations: operations,
-        editorOnly: editorOnly,
-        hideThreshold: !_format.default.isNmrLayout(layoutSt)
+        editorOnly: true
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
         className: (0, _classnames.default)('react-spectrum-editor', isCyclicVolta && classes.cvEditor),
         children: /*#__PURE__*/(0, _jsxRuntime.jsxs)(_Grid.default, {
@@ -143,8 +136,8 @@ class MultiJcampsViewer extends _react.default.Component {
               children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_index3.default, {
                 entities: entities,
                 topic: topic,
-                xLabel: xLabel,
-                yLabel: yLabel,
+                xLabel: feature.xUnit,
+                yLabel: feature.yUnit,
                 feature: feature
               })
             }), isCyclicVolta ? /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
@@ -169,7 +162,6 @@ class MultiJcampsViewer extends _react.default.Component {
               subLayoutsInfo: seperatedSubLayouts,
               integration: currentIntegration,
               descriptions: descriptions,
-              editorOnly: editorOnly,
               canChangeDescription: canChangeDescription,
               onDescriptionChanged: onDescriptionChanged,
               hideCyclicVolta: isCyclicVolta
@@ -207,9 +199,7 @@ MultiJcampsViewer.propTypes = {
   addNewCylicVoltaPairPeakAct: _propTypes.default.func.isRequired,
   addCylicVoltaMaxPeakAct: _propTypes.default.func.isRequired,
   addCylicVoltaMinPeakAct: _propTypes.default.func.isRequired,
-  operations: _propTypes.default.array.isRequired,
-  forecast: _propTypes.default.object,
-  editorOnly: _propTypes.default.bool,
+  operations: _propTypes.default.func.isRequired,
   userManualLink: _propTypes.default.object,
   entities: _propTypes.default.array,
   layoutSt: _propTypes.default.string.isRequired,
@@ -227,8 +217,6 @@ MultiJcampsViewer.defaultProps = {
   xLabel: '',
   yLabel: '',
   entities: [],
-  forecast: {},
-  editorOnly: false,
   descriptions: [],
   canChangeDescription: false
 };

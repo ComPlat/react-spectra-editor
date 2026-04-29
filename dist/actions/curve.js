@@ -10,12 +10,9 @@ const selectCurve = payload => ({
   payload
 });
 exports.selectCurve = selectCurve;
-const setAllCurves = (payload, meta) => ({
+const setAllCurves = payload => ({
   type: _action_type.CURVE.SET_ALL_CURVES,
-  payload,
-  ...(meta && typeof meta === 'object' ? {
-    meta
-  } : {})
+  payload
 });
 exports.setAllCurves = setAllCurves;
 const toggleShowAllCurves = payload => ({

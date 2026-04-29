@@ -10,7 +10,7 @@ Object.defineProperty(exports, "FN", {
     return _fn.default;
   }
 });
-exports.store = exports.SpectraEditor = void 0;
+exports.SpectraEditor = void 0;
 var _react = _interopRequireDefault(require("react"));
 var _reactRedux = require("react-redux");
 var _redux = require("redux");
@@ -33,13 +33,8 @@ var _jsxRuntime = require("react/jsx-runtime");
 const sagaMiddleware = (0, _reduxSaga.default)();
 const middlewares = [sagaMiddleware]; // logger
 
-const store = exports.store = (0, _redux.compose)((0, _redux.applyMiddleware)(...middlewares))(_redux.createStore)(_index.default);
-try {
-  sagaMiddleware.run(_index2.default);
-} catch (error) {
-  // Keep startup failure visible without crashing silently.
-  console.error('[SpectraEditor] Failed to start sagas', error); // eslint-disable-line no-console
-}
+const store = (0, _redux.compose)((0, _redux.applyMiddleware)(...middlewares))(_redux.createStore)(_index.default);
+sagaMiddleware.run(_index2.default);
 
 // - - - helper - - -
 const ensureQuillDelta = descs => {
@@ -50,10 +45,6 @@ const ensureQuillDelta = descs => {
 };
 
 // - - - React - - -
-// LC/MS: when `onLcmsPageRequest` is set, the host (e.g. ELN) must reload `multiEntities`
-// with MS data for the requested RT/polarity. Triggers include `user_click`, `initial`,
-// and `tic_polarity` (TIC polarity dropdown). The standalone demo in `src/index.js`
-// implements a local mock via `buildLcmsStandaloneMultiEntities`.
 const SpectraEditor = ({
   entity,
   others,
@@ -71,8 +62,7 @@ const SpectraEditor = ({
   multiEntities,
   multiMolSvgs,
   entityFileNames,
-  userManualLink,
-  onLcmsPageRequest
+  userManualLink
 }) => /*#__PURE__*/(0, _jsxRuntime.jsx)(_reactRedux.Provider, {
   store: store,
   children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.StyledEngineProvider, {
@@ -94,8 +84,7 @@ const SpectraEditor = ({
       editorOnly: editorOnly,
       exactMass: exactMass,
       canChangeDescription: canChangeDescription,
-      onDescriptionChanged: onDescriptionChanged,
-      onLcmsPageRequest: onLcmsPageRequest
+      onDescriptionChanged: onDescriptionChanged
     })
   })
 });
@@ -116,7 +105,6 @@ SpectraEditor.propTypes = {
   editorOnly: _propTypes.default.bool,
   canChangeDescription: _propTypes.default.bool,
   onDescriptionChanged: _propTypes.default.func,
-  onLcmsPageRequest: _propTypes.default.func,
   userManualLink: _propTypes.default.object,
   exactMass: _propTypes.default.string
 };
@@ -125,8 +113,8 @@ SpectraEditor.defaultProps = {
     others: [],
     addOthersCb: false
   },
-  multiEntities: [],
-  entityFileNames: [],
+  multiEntities: false,
+  entityFileNames: false,
   cLabel: '',
   xLabel: '',
   yLabel: '',
@@ -138,6 +126,5 @@ SpectraEditor.defaultProps = {
   multiMolSvgs: [],
   editorOnly: false,
   canChangeDescription: false,
-  userManualLink: {},
-  onLcmsPageRequest: null
+  userManualLink: {}
 };

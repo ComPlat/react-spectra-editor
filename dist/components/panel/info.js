@@ -21,7 +21,6 @@ var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable no-mixed-operators, react/function-component-definition,
 react/require-default-props, max-len */
 
-const ELECTRON_MASS = 0.000548579909065;
 const styles = () => ({
   chip: {
     margin: '1px 0 1px 0'
@@ -75,15 +74,10 @@ const styles = () => ({
   },
   rowOddSim: {
     backgroundColor: '#fff',
-    height: 'auto',
-    minHeight: 36,
+    height: 108,
     lineHeight: '24px',
-    overflow: 'visible',
+    overflowY: 'hidden',
     overflowWrap: 'word-break'
-  },
-  simPlaceholder: {
-    color: 'rgba(0, 0, 0, 0.54)',
-    fontStyle: 'italic'
   },
   tHead: {
     fontWeight: 'bold',
@@ -117,20 +111,11 @@ const styles = () => ({
   }
 });
 const simTitle = () => 'Simulated signals from NMRshiftDB';
-const simContent = nmrSimPeaks => {
-  if (!Array.isArray(nmrSimPeaks) || nmrSimPeaks.length === 0) return '';
-  return [...nmrSimPeaks].sort((a, b) => a - b).join(', ');
-};
-const simPlaceholder = () => 'No simulated signals available.';
+const simContent = nmrSimPeaks => nmrSimPeaks && nmrSimPeaks.sort((a, b) => a - b).join(', ');
 const normalizeQuillValue = val => {
   if (!val) return '';
   if (val === '<p><br></p>' || val === '<p></p>') return '';
   return val;
-};
-const formatMsExactMass = exactMass => {
-  const neutralMass = parseFloat(exactMass);
-  if (Number.isNaN(neutralMass)) return null;
-  return (neutralMass - ELECTRON_MASS).toFixed(6);
 };
 const chemSubStyle = {
   fontSize: '0.85em',
@@ -165,9 +150,12 @@ const handleDescriptionChanged = (content, delta, source, editor, onDescriptionC
   if (!onDescriptionChanged) return;
   onDescriptionChanged(normalizeQuillValue(content), delta, source, editor);
 };
-const aucValue = (integration, hplcMsSt) => {
+const aucValue = integration => {
+  if (!integration) {
+    return '';
+  }
   const values = [];
-  const stackIntegration = integration?.stack;
+  const stackIntegration = integration.stack;
   if (Array.isArray(stackIntegration)) {
     let sumVal = 0.0;
     stackIntegration.forEach(inte => {
@@ -185,23 +173,7 @@ const aucValue = (integration, hplcMsSt) => {
       }
     });
   }
-  const spectraList = hplcMsSt?.uvvis?.spectraList || [];
-  const listWaveLength = hplcMsSt?.uvvis?.listWaveLength || [];
-  spectraList.forEach((spectrum, idx) => {
-    const wavelength = listWaveLength[idx];
-    const integrations = spectrum?.integrations || [];
-    if (integrations.length > 0) {
-      const sumArea = integrations.reduce((sum, integ) => sum + (integ.absoluteArea ?? integ.area ?? 0), 0);
-      const integrationStrings = integrations.map(integ => {
-        const rawArea = integ.absoluteArea ?? integ.area ?? 0;
-        const areaVal = rawArea.toFixed(2);
-        const percent = sumArea > 0 ? (rawArea * 100 / sumArea).toFixed(2) : '0.00';
-        return `${areaVal} (${percent}%)`;
-      });
-      values.push(`[${wavelength} nm]: ${integrationStrings.join(', ')}`);
-    }
-  });
-  return values.join('\n');
+  return values.join(', ');
 };
 const SECData = ({
   classes,
@@ -270,11 +242,8 @@ const SECData = ({
 SECData.propTypes = {
   classes: _propTypes.default.object.isRequired,
   layout: _propTypes.default.string.isRequired,
-  detector: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.object]),
-  secData: _propTypes.default.object
-};
-SECData.defaultProps = {
-  detector: ''
+  detector: _propTypes.default.object.isRequired,
+  secData: _propTypes.default.object.isRequired
 };
 const DSCData = ({
   classes,
@@ -332,7 +301,7 @@ const DSCData = ({
 DSCData.propTypes = {
   classes: _propTypes.default.object.isRequired,
   layout: _propTypes.default.string.isRequired,
-  dscMetaData: _propTypes.default.object,
+  dscMetaData: _propTypes.default.object.isRequired,
   updateAction: _propTypes.default.func.isRequired
 };
 const InfoPanel = ({
@@ -348,17 +317,14 @@ const InfoPanel = ({
   shiftSt,
   curveSt,
   exactMass,
-  onExpand,
+  onExapnd,
   canChangeDescription,
   onDescriptionChanged,
   detectorSt,
   metaSt,
-  updateDSCMetaDataAct,
-  hplcMsSt,
-  entities
+  updateDSCMetaDataAct
 }) => {
   if (!feature) return null;
-  const msExactMass = _format.default.isMsLayout(layoutSt) && exactMass ? formatMsExactMass(exactMass) : null;
   const {
     title,
     observeFrequency,
@@ -372,14 +338,11 @@ const InfoPanel = ({
     curveIdx
   } = curveSt;
   const {
-    curves = []
-  } = detectorSt || {};
-  const currentEntity = Array.isArray(entities) ? entities[curveIdx] : null;
-  const entityTitle = currentEntity?.entity?.title || currentEntity?.title || currentEntity?.spectra?.[0]?.title || currentEntity?.entity?.spectra?.[0]?.title || '';
-  const displayTitle = title || entityTitle;
+    curves
+  } = detectorSt;
   const getSelectedDetectorForCurve = (_detectorSt, targetCurveIdx) => {
     const targetCurve = curves.find(curve => curve.curveIdx === targetCurveIdx);
-    return targetCurve?.selectedDetector?.name || '';
+    return targetCurve ? targetCurve.selectedDetector.name : '';
   };
   let selectedDetector = getSelectedDetectorForCurve(detectorSt, curveIdx);
 
@@ -400,11 +363,10 @@ const InfoPanel = ({
   if (integration) {
     originStack = integration.originStack; // eslint-disable-line
   }
-  const simulatedSignals = simContent(simulationSt.nmrSimPeaks);
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Accordion, {
     "data-testid": "PanelInfo",
     expanded: expand,
-    onChange: onExpand,
+    onChange: onExapnd,
     disableGutters: true,
     sx: {
       '&.MuiAccordion-root.Mui-expanded': {
@@ -437,7 +399,7 @@ const InfoPanel = ({
           children: "Title : "
         }), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
           className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
-          children: displayTitle
+          children: title
         })]
       }), _format.default.isNmrLayout(layoutSt) ? /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
         className: (0, _classnames.default)(classes.rowRoot, classes.rowEven),
@@ -457,14 +419,14 @@ const InfoPanel = ({
           className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
           children: renderReadableSubscript(showSolvName)
         })]
-      }) : null, msExactMass ? /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+      }) : null, _format.default.isMsLayout(layoutSt) && exactMass ? /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
         className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd),
         children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
           className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt'),
-          children: "Exact mass (M+): "
+          children: "Exact mass: "
         }), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
           className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
-          children: `${msExactMass} g/mol`
+          children: `${parseFloat(exactMass).toFixed(6)} g/mol`
         })]
       }) : null, /*#__PURE__*/(0, _jsxRuntime.jsx)(SECData, {
         classes: classes,
@@ -513,30 +475,12 @@ const InfoPanel = ({
         }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
           className: (0, _classnames.default)(classes.rowRoot, classes.rowOddSim),
           children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
-            className: (0, _classnames.default)(classes.tTxt, classes.tTxtSim, !simulatedSignals && classes.simPlaceholder, 'txt-sv-panel-txt'),
-            children: simulatedSignals || simPlaceholder()
+            className: (0, _classnames.default)(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt'),
+            children: simContent(simulationSt.nmrSimPeaks)
           })
         })]
       }) : null]
-    }), _format.default.isLCMsLayout(layoutSt) ? /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
-      className: (0, _classnames.default)(classes.rowRoot, classes.rowOddSim),
-      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
-        className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt'),
-        children: "Area under curve (AUC):"
-      }), /*#__PURE__*/(0, _jsxRuntime.jsx)("br", {}), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-        className: (0, _classnames.default)(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt'),
-        style: {
-          maxHeight: '80px',
-          overflowY: 'auto',
-          overflowX: 'hidden',
-          wordBreak: 'break-word',
-          marginBottom: '100px'
-        },
-        children: aucValue(integration, hplcMsSt).split('\n').map((line, idx) => /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-          children: line
-        }, idx))
-      })]
-    }) : null]
+    })]
   });
 };
 const mapStateToProps = (state, props) => (
@@ -547,8 +491,7 @@ const mapStateToProps = (state, props) => (
   shiftSt: state.shift,
   curveSt: state.curve,
   detectorSt: state.detector,
-  metaSt: state.meta,
-  hplcMsSt: state.hplcMs
+  metaSt: state.meta
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   updateDSCMetaDataAct: _meta.updateDSCMetaData
@@ -556,24 +499,22 @@ const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
 InfoPanel.propTypes = {
   classes: _propTypes.default.object.isRequired,
   expand: _propTypes.default.bool.isRequired,
-  feature: _propTypes.default.object,
-  integration: _propTypes.default.object,
+  feature: _propTypes.default.object.isRequired,
+  integration: _propTypes.default.object.isRequired,
   editorOnly: _propTypes.default.bool.isRequired,
   molSvg: _propTypes.default.string.isRequired,
   descriptions: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.array]).isRequired,
   layoutSt: _propTypes.default.string.isRequired,
-  simulationSt: _propTypes.default.object.isRequired,
+  simulationSt: _propTypes.default.array.isRequired,
   shiftSt: _propTypes.default.object.isRequired,
   curveSt: _propTypes.default.object.isRequired,
-  onExpand: _propTypes.default.func,
+  onExapnd: _propTypes.default.func.isRequired,
   canChangeDescription: _propTypes.default.bool.isRequired,
   onDescriptionChanged: _propTypes.default.func,
   exactMass: _propTypes.default.string,
   detectorSt: _propTypes.default.object.isRequired,
   metaSt: _propTypes.default.object.isRequired,
-  updateDSCMetaDataAct: _propTypes.default.func.isRequired,
-  hplcMsSt: _propTypes.default.object.isRequired,
-  entities: _propTypes.default.array
+  updateDSCMetaDataAct: _propTypes.default.func.isRequired
 };
 var _default = exports.default = (0, _reactRedux.connect)(
 // eslint-disable-line

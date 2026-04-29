@@ -12,12 +12,9 @@ var _propTypes = _interopRequireDefault(require("prop-types"));
 var _chem = require("../../helpers/chem");
 var _manager = require("../../actions/manager");
 var _ui = require("../../actions/ui");
-var _integration = require("../../actions/integration");
 var _line_focus = _interopRequireDefault(require("./line_focus"));
 var _draw = require("../common/draw");
 var _list_ui = require("../../constants/list_ui");
-var _list_graph = require("../../constants/list_graph");
-var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 var _cyclic_voltammetry = require("../../actions/cyclic_voltammetry");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable no-mixed-operators */
@@ -31,24 +28,17 @@ class ViewerLine extends _react.default.Component {
     const {
       clickUiTargetAct,
       selectUiSweepAct,
-      scrollUiWheelAct,
-      splitIntegrationAct,
-      addVisualSplitLineAct,
-      removeVisualSplitLineAct
+      scrollUiWheelAct
     } = props;
-    this.rootKlass = `.${_list_graph.LIST_ROOT_SVG_GRAPH.LINE}`;
+    this.rootKlass = '.d3Line';
     this.focus = new _line_focus.default({
       W,
       H,
       clickUiTargetAct,
       selectUiSweepAct,
-      scrollUiWheelAct,
-      splitIntegrationAct,
-      addVisualSplitLineAct,
-      removeVisualSplitLineAct
+      scrollUiWheelAct
     });
     this.normChange = this.normChange.bind(this);
-    this.syncFocusActions = this.syncFocusActions.bind(this);
   }
   componentDidMount() {
     const {
@@ -64,20 +54,16 @@ class ViewerLine extends _react.default.Component {
       tSfPeaks,
       editPeakSt,
       layoutSt,
-      integrationSt,
+      integationSt,
       mtplySt,
       sweepExtentSt,
       isUiAddIntgSt,
-      isUiSplitIntgSt,
-      isUiVisualSplitIntgSt,
       isUiNoBrushSt,
       isHidden,
       wavelength,
       axesUnitsSt,
-      resetAllAct,
-      uiSt
+      resetAllAct
     } = this.props;
-    this.syncFocusActions();
     (0, _draw.drawDestroy)(this.rootKlass);
     resetAllAct(feature);
     let xxLabel = xLabel;
@@ -105,15 +91,12 @@ class ViewerLine extends _react.default.Component {
       tSfPeaks,
       editPeakSt,
       layoutSt,
-      integrationSt,
+      integationSt,
       mtplySt,
       sweepExtentSt,
       isUiAddIntgSt,
-      isUiSplitIntgSt,
-      isUiVisualSplitIntgSt,
       isUiNoBrushSt,
-      wavelength,
-      uiSt
+      wavelength
     });
     (0, _draw.drawLabel)(this.rootKlass, cLabel, xxLabel, yyLabel);
     (0, _draw.drawDisplay)(this.rootKlass, isHidden);
@@ -131,19 +114,15 @@ class ViewerLine extends _react.default.Component {
       tSfPeaks,
       editPeakSt,
       layoutSt,
-      integrationSt,
+      integationSt,
       mtplySt,
       sweepExtentSt,
       isUiAddIntgSt,
-      isUiSplitIntgSt,
-      isUiVisualSplitIntgSt,
       isUiNoBrushSt,
       isHidden,
       wavelength,
-      axesUnitsSt,
-      uiSt
+      axesUnitsSt
     } = this.props;
-    this.syncFocusActions();
     this.normChange(prevProps);
     let xxLabel = xLabel;
     let yyLabel = yLabel;
@@ -169,40 +148,18 @@ class ViewerLine extends _react.default.Component {
       tSfPeaks,
       editPeakSt,
       layoutSt,
-      integrationSt,
+      integationSt,
       mtplySt,
       sweepExtentSt,
       isUiAddIntgSt,
-      isUiSplitIntgSt,
-      isUiVisualSplitIntgSt,
       isUiNoBrushSt,
-      wavelength,
-      uiSt
+      wavelength
     });
     (0, _draw.drawLabel)(this.rootKlass, cLabel, xxLabel, yyLabel);
     (0, _draw.drawDisplay)(this.rootKlass, isHidden);
   }
   componentWillUnmount() {
     (0, _draw.drawDestroy)(this.rootKlass);
-  }
-  syncFocusActions() {
-    if (!this.focus) return;
-    const {
-      clickUiTargetAct,
-      selectUiSweepAct,
-      scrollUiWheelAct,
-      splitIntegrationAct,
-      addVisualSplitLineAct,
-      removeVisualSplitLineAct
-    } = this.props;
-    Object.assign(this.focus, {
-      clickUiTargetAct,
-      selectUiSweepAct,
-      scrollUiWheelAct,
-      splitIntegrationAct,
-      addVisualSplitLineAct,
-      removeVisualSplitLineAct
-    });
   }
   normChange(prevProps) {
     const {
@@ -216,7 +173,7 @@ class ViewerLine extends _react.default.Component {
   }
   render() {
     return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-      className: _list_graph.LIST_ROOT_SVG_GRAPH.LINE
+      className: "d3Line"
     });
   }
 }
@@ -229,25 +186,19 @@ const mapStateToProps = (state, props) => ({
   tSfPeaks: (0, _chem.ToShiftPeaks)(state, props),
   editPeakSt: state.editPeak.present,
   layoutSt: state.layout,
-  integrationSt: state.integration.present,
+  integationSt: state.integration.present,
   mtplySt: state.multiplicity.present,
   sweepExtentSt: state.ui.sweepExtent,
   isUiAddIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
-  isUiSplitIntgSt: _cfg.default.showIntegSplitTools(state.layout) && state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_SPLIT,
-  isUiVisualSplitIntgSt: _cfg.default.showIntegSplitTools(state.layout) && state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_VISUAL_SPLIT,
   isUiNoBrushSt: _list_ui.LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
   wavelength: state.wavelength,
-  axesUnitsSt: state.axesUnits,
-  uiSt: state.ui
+  axesUnitsSt: state.axesUnits
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   resetAllAct: _manager.resetAll,
   clickUiTargetAct: _ui.clickUiTarget,
   selectUiSweepAct: _ui.selectUiSweep,
   scrollUiWheelAct: _ui.scrollUiWheel,
-  splitIntegrationAct: _integration.splitIntegration,
-  addVisualSplitLineAct: _integration.addVisualSplitLine,
-  removeVisualSplitLineAct: _integration.removeVisualSplitLine,
   addNewCylicVoltaPairPeakAct: _cyclic_voltammetry.addNewCylicVoltaPairPeak,
   addCylicVoltaMaxPeakAct: _cyclic_voltammetry.addCylicVoltaMaxPeak,
   addCylicVoltaMinPeakAct: _cyclic_voltammetry.addCylicVoltaMinPeak
@@ -257,7 +208,6 @@ ViewerLine.propTypes = {
   peak: _propTypes.default.array.isRequired,
   freq: _propTypes.default.oneOfType([_propTypes.default.bool, _propTypes.default.number]).isRequired,
   comparisons: _propTypes.default.array.isRequired,
-  uiSt: _propTypes.default.object.isRequired,
   cLabel: _propTypes.default.string.isRequired,
   xLabel: _propTypes.default.string.isRequired,
   yLabel: _propTypes.default.string.isRequired,
@@ -266,20 +216,15 @@ ViewerLine.propTypes = {
   tSfPeaks: _propTypes.default.array.isRequired,
   editPeakSt: _propTypes.default.object.isRequired,
   layoutSt: _propTypes.default.string.isRequired,
-  integrationSt: _propTypes.default.object.isRequired,
+  integationSt: _propTypes.default.object.isRequired,
   mtplySt: _propTypes.default.object.isRequired,
   sweepExtentSt: _propTypes.default.object.isRequired,
   isUiAddIntgSt: _propTypes.default.bool.isRequired,
-  isUiSplitIntgSt: _propTypes.default.bool.isRequired,
-  isUiVisualSplitIntgSt: _propTypes.default.bool.isRequired,
   isUiNoBrushSt: _propTypes.default.bool.isRequired,
   resetAllAct: _propTypes.default.func.isRequired,
   clickUiTargetAct: _propTypes.default.func.isRequired,
   selectUiSweepAct: _propTypes.default.func.isRequired,
   scrollUiWheelAct: _propTypes.default.func.isRequired,
-  splitIntegrationAct: _propTypes.default.func.isRequired,
-  addVisualSplitLineAct: _propTypes.default.func.isRequired,
-  removeVisualSplitLineAct: _propTypes.default.func.isRequired,
   isHidden: _propTypes.default.bool.isRequired,
   wavelength: _propTypes.default.object.isRequired,
   axesUnitsSt: _propTypes.default.object.isRequired

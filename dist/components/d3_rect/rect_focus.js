@@ -11,7 +11,6 @@ var _mount = require("../../helpers/mount");
 var _compass = require("../../helpers/compass");
 var _converter = require("../../helpers/converter");
 var _list_layout = require("../../constants/list_layout");
-var _format = _interopRequireDefault(require("../../helpers/format"));
 const d3 = require('d3');
 class RectFocus {
   constructor(props) {
@@ -54,7 +53,6 @@ class RectFocus {
     this.factor = 0.125;
     this.currentExtent = null;
     this.layout = _list_layout.LIST_LAYOUT.MS;
-    this.decimal = 3;
     this.setTip = this.setTip.bind(this);
     this.setDataParams = this.setDataParams.bind(this);
     this.create = this.create.bind(this);
@@ -70,14 +68,11 @@ class RectFocus {
     this.tip = (0, _init.InitTip)();
     this.root.call(this.tip);
   }
-  setDataParams(data, peaks, tTrEndPts, tSfPeaks, decimal) {
+  setDataParams(data, peaks, tTrEndPts, tSfPeaks) {
     this.data = [...data];
     this.dataPks = [...peaks];
     this.tTrEndPts = tTrEndPts;
     this.tSfPeaks = tSfPeaks;
-    if (decimal !== undefined) {
-      this.decimal = _format.default.clampDecimalPlaces(decimal);
-    }
   }
   updatePathCall(xt, yt) {
     this.pathCall = d3.line().x(d => xt(d.x)).y(d => yt(d.y));
@@ -136,7 +131,6 @@ class RectFocus {
     } = (0, _compass.TfRescale)(this);
     this.updatePathCall(xt, yt);
     const yRef = this.tTrEndPts[0].y;
-    const msMaxY = d3.max(this.data, row => row.y) || 0;
     const bars = this.bars.selectAll('rect').data(this.data);
     bars.exit().attr('class', 'exit').remove();
     const gnd = yt(0);
@@ -145,9 +139,7 @@ class RectFocus {
       d3.select(`#bpt${Math.round(1000 * d.x)}`).style('fill', 'blue');
       const tipParams = {
         d,
-        layout: this.layout,
-        msMaxY,
-        xDigits: this.decimal
+        layout: this.layout
       };
       this.tip.show(tipParams, event.target);
     }).on('mouseout', (event, d) => {
@@ -155,9 +147,7 @@ class RectFocus {
       d3.select(`#bpt${Math.round(1000 * d.x)}`).style('fill', 'red');
       const tipParams = {
         d,
-        layout: this.layout,
-        msMaxY,
-        xDigits: this.decimal
+        layout: this.layout
       };
       this.tip.hide(tipParams, event.target);
     });
@@ -184,7 +174,6 @@ class RectFocus {
     filterPeak,
     tTrEndPts,
     tSfPeaks,
-    decimal,
     sweepExtentSt,
     isUiAddIntgSt,
     isUiNoBrushSt
@@ -194,7 +183,7 @@ class RectFocus {
     (0, _mount.MountClip)(this);
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.setTip();
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, decimal);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks);
     (0, _compass.MountCompass)(this);
     this.axis = (0, _mount.MountAxis)(this);
     [this.thresLine] = (0, _mount.MountThresLine)(this, 'green');
@@ -216,13 +205,12 @@ class RectFocus {
     filterPeak,
     tTrEndPts,
     tSfPeaks,
-    decimal,
     sweepExtentSt,
     isUiAddIntgSt,
     isUiNoBrushSt
   }) {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, decimal);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks);
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);
       this.drawBar();

@@ -126,9 +126,6 @@ TriBtn.propTypes = {
   content: _propTypes.default.object.isRequired,
   cb: _propTypes.default.func.isRequired,
   children: _propTypes.default.node.isRequired,
-  isClearAllDisabled: _propTypes.default.bool
-};
-TriBtn.defaultProps = {
-  isClearAllDisabled: false
+  isClearAllDisabled: _propTypes.default.bool.isRequired
 };
 var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(TriBtn));

@@ -20,8 +20,6 @@ var _list_ui = require("../../constants/list_ui");
 var _tri_btn = _interopRequireDefault(require("./tri_btn"));
 var _edit_peak = require("../../actions/edit_peak");
 var _extractPeaksEdit = require("../../helpers/extractPeaksEdit");
-var _hplc_ms = require("../../actions/hplc_ms");
-var _list_layout = require("../../constants/list_layout");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, function-paren-newline, no-unused-vars,
 react/function-component-definition, react/require-default-props, max-len,
@@ -38,37 +36,32 @@ const Peak = ({
   isFocusSetRefSt,
   disableSetRefSt,
   isHandleMaxAndMinPeaksSt,
-  cyclicVoltaState,
+  cyclicVotaSt,
   curveSt,
   clearAllPeaksAct,
   feature,
   editPeakSt,
   thresSt,
   shiftSt,
-  layoutSt,
-  clearAllPeaksHplcMsAct
+  layoutSt
 }) => {
   let onSweepPeakAdd = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.PEAK_ADD);
-  let onSweepPeakDelete = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.PEAK_DELETE);
+  let onSweepPeakDELETE = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.PEAK_DELETE);
   let onSweepAnchorShift = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT);
   const {
     curveIdx
   } = curveSt;
   const onClearAll = () => {
-    if (layoutSt === _list_layout.LIST_LAYOUT.LC_MS) {
-      clearAllPeaksHplcMsAct();
-    } else {
-      const dataPeaks = (0, _extractPeaksEdit.extractAutoPeaks)(feature, thresSt, shiftSt, layoutSt);
-      clearAllPeaksAct({
-        curveIdx,
-        dataPeaks
-      });
-    }
+    const dataPeaks = (0, _extractPeaksEdit.extractAutoPeaks)(feature, thresSt, shiftSt, layoutSt);
+    clearAllPeaksAct({
+      curveIdx,
+      dataPeaks
+    });
   };
   if (isHandleMaxAndMinPeaksSt) {
     const {
       spectraList
-    } = cyclicVoltaState;
+    } = cyclicVotaSt;
     const spectra = spectraList[curveIdx];
     if (spectra) {
       const {
@@ -76,10 +69,10 @@ const Peak = ({
       } = spectra;
       if (isWorkMaxPeak) {
         onSweepPeakAdd = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MAX_PEAK, curveIdx);
-        onSweepPeakDelete = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MAX_PEAK, curveIdx);
+        onSweepPeakDELETE = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MAX_PEAK, curveIdx);
       } else {
         onSweepPeakAdd = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MIN_PEAK, curveIdx);
-        onSweepPeakDelete = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MIN_PEAK, curveIdx);
+        onSweepPeakDELETE = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MIN_PEAK, curveIdx);
       }
       onSweepAnchorShift = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_SET_REF, curveIdx);
     }
@@ -112,7 +105,7 @@ const Peak = ({
         children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
           className: (0, _classnames.default)((0, _common.focusStyle)(isFocusRmPeakSt, classes), 'btn-sv-bar-rmpeak'),
           disabled: disableRmPeakSt,
-          onClick: onSweepPeakDelete,
+          onClick: onSweepPeakDELETE,
           children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
             className: (0, _classnames.default)(classes.txt, 'txt-sv-bar-rmpeak'),
             children: "P-"
@@ -160,7 +153,7 @@ const mapStateToProps = (state, props) => (
   isFocusSetRefSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT || state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_SET_REF,
   disableSetRefSt: _cfg.default.btnCmdSetRef(state.layout),
   isHandleMaxAndMinPeaksSt: !_cfg.default.hidePanelCyclicVolta(state.layout),
-  cyclicVoltaState: state.cyclicvolta,
+  cyclicVotaSt: state.cyclicvolta,
   curveSt: state.curve,
   editPeakSt: state.editPeak.present,
   thresSt: state.threshold.list[state.curve.curveIdx],
@@ -169,8 +162,7 @@ const mapStateToProps = (state, props) => (
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   setUiSweepTypeAct: _ui.setUiSweepType,
-  clearAllPeaksAct: _edit_peak.clearAllPeaks,
-  clearAllPeaksHplcMsAct: _hplc_ms.clearAllPeaksHplcMs
+  clearAllPeaksAct: _edit_peak.clearAllPeaks
 }, dispatch);
 Peak.propTypes = {
   classes: _propTypes.default.object.isRequired,
@@ -182,14 +174,13 @@ Peak.propTypes = {
   disableSetRefSt: _propTypes.default.bool.isRequired,
   setUiSweepTypeAct: _propTypes.default.func.isRequired,
   isHandleMaxAndMinPeaksSt: _propTypes.default.bool.isRequired,
-  cyclicVoltaState: _propTypes.default.object.isRequired,
+  cyclicVotaSt: _propTypes.default.object.isRequired,
   curveSt: _propTypes.default.object.isRequired,
   clearAllPeaksAct: _propTypes.default.func.isRequired,
   feature: _propTypes.default.object.isRequired,
   editPeakSt: _propTypes.default.object.isRequired,
   thresSt: _propTypes.default.object.isRequired,
   layoutSt: _propTypes.default.string.isRequired,
-  shiftSt: _propTypes.default.object.isRequired,
-  clearAllPeaksHplcMsAct: _propTypes.default.func.isRequired
+  shiftSt: _propTypes.default.object.isRequired
 };
 var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _withStyles.default)(styles))(Peak);

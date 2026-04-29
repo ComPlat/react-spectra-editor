@@ -50,7 +50,6 @@ class ViewerRect extends _react.default.Component {
       tTrEndPts,
       tSfPeaks,
       isHidden,
-      decimalSt,
       sweepExtentSt,
       isUiAddIntgSt,
       isUiNoBrushSt,
@@ -66,7 +65,6 @@ class ViewerRect extends _react.default.Component {
       filterPeak,
       tTrEndPts,
       tSfPeaks,
-      decimal: decimalSt,
       sweepExtentSt,
       isUiAddIntgSt,
       isUiNoBrushSt
@@ -81,7 +79,6 @@ class ViewerRect extends _react.default.Component {
       tTrEndPts,
       tSfPeaks,
       isHidden,
-      decimalSt,
       sweepExtentSt,
       isUiAddIntgSt,
       isUiNoBrushSt
@@ -94,7 +91,6 @@ class ViewerRect extends _react.default.Component {
       filterPeak,
       tTrEndPts,
       tSfPeaks,
-      decimal: decimalSt,
       sweepExtentSt,
       isUiAddIntgSt,
       isUiNoBrushSt
@@ -123,7 +119,6 @@ class ViewerRect extends _react.default.Component {
 const mapStateToProps = (state, props) => ({
   seed: (0, _chem.Topic2Seed)(state, props),
   peak: (0, _chem.Feature2Peak)(state, props),
-  decimalSt: state.submit.decimal,
   tTrEndPts: (0, _chem.ToThresEndPts)(state, props),
   tSfPeaks: (0, _chem.ToShiftPeaks)(state, props),
   sweepExtentSt: state.ui.sweepExtent,
@@ -139,7 +134,6 @@ const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
 ViewerRect.propTypes = {
   seed: _propTypes.default.array.isRequired,
   peak: _propTypes.default.array.isRequired,
-  decimalSt: _propTypes.default.oneOfType([_propTypes.default.number, _propTypes.default.string]).isRequired,
   cLabel: _propTypes.default.string.isRequired,
   xLabel: _propTypes.default.string.isRequired,
   yLabel: _propTypes.default.string.isRequired,

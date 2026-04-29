@@ -40,13 +40,11 @@ const Viewer = ({
         className: "txt-sv-tp",
         children: "Spectrum Viewer"
       }),
-      children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
-        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
-          className: (0, _classnames.default)((0, _common.focusStyle)(isfocusSpectrumSt, classes), 'btn-sv-bar-spctrum'),
-          onClick: onViewSpectrum,
-          children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_TimelineOutlined.default, {
-            className: classes.icon
-          })
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
+        className: (0, _classnames.default)((0, _common.focusStyle)(isfocusSpectrumSt, classes), 'btn-sv-bar-spctrum'),
+        onClick: onViewSpectrum,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_TimelineOutlined.default, {
+          className: classes.icon
         })
       })
     }), hideCmdAnaViewerSt ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
@@ -54,14 +52,12 @@ const Viewer = ({
         className: "txt-sv-tp",
         children: "Analysis Viewer"
       }),
-      children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
-        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
-          className: (0, _classnames.default)((0, _common.focusStyle)(isfocusAnalysisSt, classes), 'btn-sv-bar-analysis'),
-          disabled: disableCmdAnaViewerSt,
-          onClick: onViewAnalysis,
-          children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_SpellcheckOutlined.default, {
-            className: classes.icon
-          })
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
+        className: (0, _classnames.default)((0, _common.focusStyle)(isfocusAnalysisSt, classes), 'btn-sv-bar-analysis'),
+        disabled: disableCmdAnaViewerSt,
+        onClick: onViewAnalysis,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_SpellcheckOutlined.default, {
+          className: classes.icon
         })
       })
     })]

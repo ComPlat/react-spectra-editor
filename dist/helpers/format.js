@@ -1,9 +1,11 @@
 "use strict";
 
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
+var _jcampconverter = _interopRequireDefault(require("jcampconverter"));
 var _converter = require("./converter");
 var _list_layout = require("../constants/list_layout");
 var _multiplicity_calc = require("./multiplicity_calc");
@@ -23,7 +25,6 @@ const spectraDigit = layout => {
     case _list_layout.LIST_LAYOUT.CDS:
     case _list_layout.LIST_LAYOUT.SEC:
     case _list_layout.LIST_LAYOUT.GC:
-    case _list_layout.LIST_LAYOUT.LC_MS:
     case _list_layout.LIST_LAYOUT.MS:
       return 0;
     case _list_layout.LIST_LAYOUT.C13:
@@ -43,16 +44,6 @@ const fixDigit = (input, precision) => {
   const output = input || 0.0;
   return output.toFixed(precision);
 };
-
-/**
- * Integer 0–20 for toFixed; invalid input uses fallback.
- * Default 3 preserves legacy cursor precision.
- */
-const clampDecimalPlaces = (value, fallback = 3) => {
-  const n = Number(value);
-  if (!Number.isFinite(n)) return fallback;
-  return Math.max(0, Math.min(20, Math.trunc(n)));
-};
 const buildData = entity => {
   if (!entity) return {
     isExist: false
@@ -71,28 +62,6 @@ const toPeakStr = peaks => {
   const arr = peaks.map(p => `${p.x},${p.y}`);
   const str = arr.join('#');
   return str;
-};
-const extractUvvisLcmsPeaks = hplcMsSt => {
-  if (!hplcMsSt?.uvvis) {
-    return '{}';
-  }
-  const {
-    listWaveLength = [],
-    spectraList = []
-  } = hplcMsSt.uvvis;
-  const byWavelength = {};
-  spectraList.forEach((spectrum, idx) => {
-    const wl = listWaveLength[idx];
-    const wlKey = String(Math.round(wl));
-    (spectrum.peaks || []).forEach((p, n) => {
-      if (!byWavelength[wlKey]) byWavelength[wlKey] = [];
-      byWavelength[wlKey].push({
-        x: p.x,
-        y: p.y
-      });
-    });
-  });
-  return JSON.stringify(byWavelength);
 };
 const spectraOps = {
   [_list_layout.LIST_LAYOUT.PLAIN]: {
@@ -178,10 +147,6 @@ const spectraOps = {
   [_list_layout.LIST_LAYOUT.DLS_INTENSITY]: {
     head: 'DLS',
     tail: '.'
-  },
-  [_list_layout.LIST_LAYOUT.LC_MS]: {
-    head: 'HPLC UV/VIS',
-    tail: ''
   }
 };
 const rmRef = (peaks, shift, atIndex = 0) => {
@@ -192,147 +157,6 @@ const rmRef = (peaks, shift, atIndex = 0) => {
   const selectedShift = shifts[atIndex];
   const refValue = selectedShift.ref.value || selectedShift.peak.x;
   return peaks.map(p => (0, _converter.IsSame)(p.x, refValue) ? null : p).filter(r => r != null);
-};
-const isValidLcmsWavelengthLabel = wl => Number.isFinite(wl) && wl > 0;
-const LCMS_INTEGRATION_EXPORT_MODES = ['percent', 'area', 'both'];
-const isLcmsIntegrationExportMode = v => LCMS_INTEGRATION_EXPORT_MODES.includes(v);
-const formatedLCMS = (hplcMsSt, isAscend, decimal, options = {}) => {
-  if (!hplcMsSt?.uvvis) {
-    return '';
-  }
-  const {
-    lcmsIntegrationsExport: modeOpt,
-    includeIntegrationArea = false
-  } = options;
-  let lcmsIntegrationsExport = modeOpt;
-  if (!isLcmsIntegrationExportMode(lcmsIntegrationsExport)) {
-    lcmsIntegrationsExport = hplcMsSt?.lcmsIntegrationsExport;
-  }
-  if (!isLcmsIntegrationExportMode(lcmsIntegrationsExport)) {
-    lcmsIntegrationsExport = includeIntegrationArea ? 'both' : 'percent';
-  }
-  let result = '\n';
-  const sections = [];
-  const parsedDecimal = Number.isFinite(decimal) ? decimal : Number.parseInt(decimal, 10);
-  const resolvedDecimal = Number.isFinite(parsedDecimal) ? parsedDecimal : 3;
-  const {
-    listWaveLength = [],
-    spectraList = []
-  } = hplcMsSt.uvvis || {};
-  const ms = hplcMsSt.ms || {};
-  const tic = hplcMsSt.tic;
-  const threshold = hplcMsSt.threshold;
-  listWaveLength.forEach((wavelength, idx) => {
-    const spectrum = spectraList[idx];
-    if (!spectrum) {
-      return;
-    }
-    const peaks = spectrum.peaks || [];
-    const integrations = spectrum.integrations || [];
-    const stack = integrations?.[0]?.stack;
-    const hasStack = Array.isArray(stack) && stack.length > 0;
-    const hasList = !hasStack && Array.isArray(integrations) && integrations.length > 0;
-    const hasIntegrations = hasStack || hasList;
-    const hasPeaks = peaks.length > 0;
-    if (!hasPeaks && !hasIntegrations) {
-      return;
-    }
-    const lines = [];
-    if (isValidLcmsWavelengthLabel(wavelength)) {
-      lines.push(`Wavelength ${wavelength} nm:`);
-    }
-    if (hasPeaks) {
-      const sortedPeaks = [...peaks].sort((a, b) => b.y - a.y);
-      const maxIntensity = sortedPeaks[0].y || 1;
-      const peakLines = sortedPeaks.map(peak => {
-        const rt = peak.x.toFixed(resolvedDecimal);
-        const percent = (peak.y / maxIntensity * 100).toFixed(1);
-        return `${rt} min (${percent}%)`;
-      });
-      lines.push(`Peaks: ${peakLines.join(', ')}`);
-    }
-    if (hasIntegrations) {
-      const entries = hasStack ? stack : integrations;
-      const refAreaCandidate = hasStack ? integrations?.[0]?.refArea : integrations?.[0]?.refArea ?? integrations?.[0]?.area;
-      const refArea = refAreaCandidate && refAreaCandidate > 0 ? refAreaCandidate : 1;
-      const sortedIntegrations = [...entries].sort((a, b) => a.xL - b.xL);
-      const integrationLines = sortedIntegrations.map(integ => {
-        const rt = integ.xL.toFixed(resolvedDecimal);
-        const area = integ.area || integ.absoluteArea || 0;
-        const percent = (area / refArea * 100).toFixed(1);
-        const areaStr = Number.isFinite(area) ? area.toExponential(3) : String(area);
-        if (lcmsIntegrationsExport === 'area') {
-          return `${rt} min (A=${areaStr})`;
-        }
-        if (lcmsIntegrationsExport === 'both') {
-          return `${rt} min (${percent}%, A=${areaStr})`;
-        }
-        return `${rt} min (${percent}%)`;
-      });
-      lines.push(`Integrations: ${integrationLines.join(', ')}`);
-    }
-    sections.push(lines.join('\n'));
-  });
-  if (sections.length > 0) {
-    result = `\n${sections.join('\n\n')}`;
-  }
-  const polarity = tic?.polarity || 'positive';
-  let polarityKey = 'neutral';
-  if (polarity === 'negative') {
-    polarityKey = 'negative';
-  } else if (polarity === 'positive') {
-    polarityKey = 'positive';
-  }
-  let polarityLabel = '';
-  if (polarity === 'negative') {
-    polarityLabel = '−';
-  } else if (polarity === 'positive') {
-    polarityLabel = '+';
-  }
-  if (tic && ms[polarityKey]) {
-    const pageValues = Array.isArray(ms[polarityKey].pageValues) ? ms[polarityKey].pageValues : [];
-    const peaksByPage = Array.isArray(ms[polarityKey].peaks) ? ms[polarityKey].peaks : [];
-    let currentIndex = -1;
-    if (Number.isFinite(tic.currentPageValue) && pageValues.length > 0) {
-      currentIndex = pageValues.findIndex(value => Number.isFinite(value) && Math.abs(value - tic.currentPageValue) < 1e-6);
-    }
-    if (Array.isArray(tic[polarityKey]?.data?.x)) {
-      const fallbackIndex = tic[polarityKey].data.x.findIndex(x => Math.abs(x - tic.currentPageValue) < 1e-6);
-      if (currentIndex < 0) currentIndex = fallbackIndex;
-    }
-    if (currentIndex >= 0 && peaksByPage[currentIndex]) {
-      const peaks = peaksByPage[currentIndex];
-      const maxIntensity = Math.max(...peaks.map(p => p.y)) || 1;
-      const thresholdValue = threshold?.value != null ? threshold.value : 5;
-      const filtered = peaks.filter(peak => peak.y / maxIntensity * 100 >= thresholdValue);
-      const sortedPeaks = [...filtered].sort((a, b) => {
-        if (isAscend) {
-          return parseFloat(a.x) - parseFloat(b.x);
-        }
-        return parseFloat(b.x) - parseFloat(a.x);
-      });
-      const label = polarityLabel ? `${polarityLabel}ESI` : 'ESI';
-      if (result) {
-        result += '\n\n';
-      }
-      const rtPage = tic?.currentPageValue;
-      const rtDecimal = Math.max(resolvedDecimal, 3);
-      const rtPart = Number.isFinite(rtPage) ? `RT ${fixDigit(rtPage, rtDecimal)} min, ` : '';
-      result += `MS (${label}), ${rtPart}m/z (≥${thresholdValue}%):\n`;
-      const lines = sortedPeaks.map(peak => {
-        const mass = fixDigit(peak.x, resolvedDecimal);
-        const percent = Math.round(peak.y / maxIntensity * 100);
-        return `${mass} (${percent}%)`;
-      });
-      result += `  ${lines.join(', ')}`;
-    } else {
-      if (result) {
-        result += '\n\n';
-      }
-      result += 'MS: No data for current retention time.\n';
-    }
-  }
-  return result;
 };
 const formatedMS = (peaks, maxY, decimal = 2, isAscend = true) => {
   const ascendFunc = (a, b) => parseFloat(a) - parseFloat(b);
@@ -541,8 +365,7 @@ const peaksBody = ({
   integration,
   atIndex = 0,
   waveLength,
-  temperature,
-  hplcMsSt = null
+  temperature
 }) => {
   const result = rmShiftFromPeaks(peaks, shift, atIndex);
   const ascendFunc = (a, b) => parseFloat(a.x) - parseFloat(b.x);
@@ -550,9 +373,6 @@ const peaksBody = ({
   const sortFunc = isAscend ? ascendFunc : descendFunc;
   const ordered = result.sort(sortFunc);
   const maxY = Math.max(...ordered.map(o => o.y));
-  if (layout === _list_layout.LIST_LAYOUT.LC_MS) {
-    return formatedLCMS(hplcMsSt, isAscend, decimal);
-  }
   if (layout === _list_layout.LIST_LAYOUT.MS) {
     return formatedMS(ordered, maxY, decimal, isAscend);
   }
@@ -625,7 +445,6 @@ const isCyclicVoltaLayout = layoutSt => _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMME
 const isCDSLayout = layoutSt => _list_layout.LIST_LAYOUT.CDS === layoutSt;
 const isSECLayout = layoutSt => _list_layout.LIST_LAYOUT.SEC === layoutSt;
 const isGCLayout = layoutSt => _list_layout.LIST_LAYOUT.GC === layoutSt;
-const isLCMsLayout = layoutSt => _list_layout.LIST_LAYOUT.LC_MS === layoutSt;
 const isEmWaveLayout = layoutSt => [_list_layout.LIST_LAYOUT.IR, _list_layout.LIST_LAYOUT.RAMAN, _list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS].indexOf(layoutSt) >= 0;
 const hasMultiCurves = layoutSt => [_list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY, _list_layout.LIST_LAYOUT.SEC, _list_layout.LIST_LAYOUT.GC, _list_layout.LIST_LAYOUT.AIF].indexOf(layoutSt) >= 0;
 const isAIFLayout = layoutSt => _list_layout.LIST_LAYOUT.AIF === layoutSt;
@@ -790,7 +609,6 @@ const inlineNotation = (layout, data, sampleName = '') => {
 };
 const Format = {
   toPeakStr,
-  extractUvvisLcmsPeaks,
   buildData,
   spectraDigit,
   spectraOps,
@@ -820,9 +638,7 @@ const Format = {
   isDLSIntensityLayout,
   isEmWaveLayout,
   isGCLayout,
-  isLCMsLayout,
   fixDigit,
-  clampDecimalPlaces,
   formatPeaksByPrediction,
   formatedMS,
   formatedEm,
@@ -835,7 +651,6 @@ const Format = {
   strNumberFixedDecimal,
   formatedXRD,
   strNumberFixedLength,
-  inlineNotation,
-  formatedLCMS
+  inlineNotation
 };
 var _default = exports.default = Format;

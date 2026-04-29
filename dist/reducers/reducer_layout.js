@@ -14,7 +14,7 @@ const layoutReducer = (state = initialState, action) => {
     case _action_type.LAYOUT.UPDATE:
       return action.payload;
     case _action_type.MANAGER.RESETALL:
-      return action.payload?.operation?.layout || state;
+      return action.payload.operation.layout;
     default:
       return state;
   }

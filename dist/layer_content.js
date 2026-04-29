@@ -17,11 +17,9 @@ var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, default-param-last, react/function-component-definition */
 
 const extractLayout = (forecast, layoutSt) => {
-  const safeForecast = forecast && typeof forecast === 'object' ? forecast : {};
-  const isEmpty = Object.keys(safeForecast).length === 0 && safeForecast.constructor === Object;
+  const isEmpty = Object.keys(forecast).length === 0 && forecast.constructor === Object;
   const isNmr = _format.default.isNmrLayout(layoutSt);
   const isMs = _format.default.isMsLayout(layoutSt);
-  const isLCMs = _format.default.isLCMsLayout(layoutSt);
   const isIr = _format.default.isIrLayout(layoutSt);
   const isUvvis = _format.default.isUvVisLayout(layoutSt) || _format.default.isHplcUvVisLayout(layoutSt);
   const isXRD = _format.default.isXRDLayout(layoutSt);
@@ -32,8 +30,7 @@ const extractLayout = (forecast, layoutSt) => {
     isIr,
     isMs,
     isUvvis,
-    isXRD,
-    isLCMs
+    isXRD
   };
 };
 const Content = ({
@@ -52,8 +49,7 @@ const Content = ({
     isIr,
     isMs,
     isUvvis,
-    isXRD,
-    isLCMs
+    isXRD
   } = extractLayout(forecast, layoutSt);
   if (showForecast) {
     return /*#__PURE__*/(0, _jsxRuntime.jsx)(_forecast_viewer.default, {
@@ -71,16 +67,6 @@ const Content = ({
     });
   }
   if (isMs) {
-    return /*#__PURE__*/(0, _jsxRuntime.jsx)(_index2.default, {
-      topic: topic,
-      cLabel: cLabel,
-      xLabel: xLabel,
-      yLabel: yLabel,
-      feature: feature,
-      isHidden: false
-    });
-  }
-  if (isLCMs) {
     return /*#__PURE__*/(0, _jsxRuntime.jsx)(_index2.default, {
       topic: topic,
       cLabel: cLabel,

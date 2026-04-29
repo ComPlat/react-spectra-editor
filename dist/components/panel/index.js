@@ -9,6 +9,7 @@ var _react = _interopRequireDefault(require("react"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
 var _classnames = _interopRequireDefault(require("classnames"));
 var _reactRedux = require("react-redux");
+var _redux = require("redux");
 var _styles = require("@mui/material/styles");
 var _withStyles = _interopRequireDefault(require("@mui/styles/withStyles"));
 var _info = _interopRequireDefault(require("./info"));
@@ -18,9 +19,8 @@ var _multiplicity = _interopRequireDefault(require("./multiplicity"));
 var _cyclic_voltamery_data = _interopRequireDefault(require("./cyclic_voltamery_data"));
 var _graph_selection = _interopRequireDefault(require("./graph_selection"));
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
-var _format = _interopRequireDefault(require("../../helpers/format"));
 var _jsxRuntime = require("react/jsx-runtime");
-/* eslint-disable react/prop-types, react/require-default-props, max-len */
+/* eslint-disable react/prop-types, react/require-default-props */
 
 const theme = (0, _styles.createTheme)({
   typography: {
@@ -50,7 +50,7 @@ class PanelViewer extends _react.default.Component {
     this.state = {
       expand: 'info'
     };
-    this.onToggleExpand = this.onToggleExpand.bind(this);
+    this.onExapnd = this.onExapnd.bind(this);
     this.handleDescriptionChanged = this.handleDescriptionChanged.bind(this);
   }
   handleDescriptionChanged(content, delta, source, editor) {
@@ -59,7 +59,7 @@ class PanelViewer extends _react.default.Component {
       this.props.onDescriptionChanged(contentChanged); // eslint-disable-line
     }
   }
-  onToggleExpand(input) {
+  onExapnd(input) {
     const {
       expand
     } = this.state;
@@ -87,20 +87,18 @@ class PanelViewer extends _react.default.Component {
       userManualLink,
       subLayoutsInfo,
       exactMass,
-      entities,
       hideCyclicVolta
     } = this.props;
-    const onExpandInfo = () => this.onToggleExpand('info');
-    const onExpandPeak = () => this.onToggleExpand('peak');
-    const onExpandMpy = () => this.onToggleExpand('mpy');
-    const onExpandCompare = () => this.onToggleExpand('compare');
-    const onExpandCyclicVolta = () => this.onToggleExpand('cyclicvolta');
-    const onExpandGraphSelection = () => this.onToggleExpand('graph');
+    const onExapndInfo = () => this.onExapnd('info');
+    const onExapndPeak = () => this.onExapnd('peak');
+    const onExapndMpy = () => this.onExapnd('mpy');
+    const onExapndCompare = () => this.onExapnd('compare');
+    const onExapndCyclicVolta = () => this.onExapnd('cyclicvolta');
+    const onExapndGraphSelection = () => this.onExapnd('graph');
     const {
       listCurves
     } = curveSt;
-    const curveCount = Array.isArray(listCurves) ? listCurves.length : 0;
-    const hideGraphSelection = curveCount <= 1 || _format.default.isLCMsLayout(layoutSt);
+    const hideGraphSelection = listCurves === false || listCurves === undefined;
     return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
       className: (0, _classnames.default)(classes.panels),
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_styles.StyledEngineProvider, {
@@ -111,34 +109,33 @@ class PanelViewer extends _react.default.Component {
             jcampIdx: jcampIdx,
             entityFileNames: entityFileNames,
             expand: expand === 'graph',
-            onExpand: onExpandGraphSelection,
+            onExapnd: onExapndGraphSelection,
             subLayoutsInfo: subLayoutsInfo
           }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_info.default, {
-            entities: entities,
             feature: feature,
             integration: integration,
             editorOnly: editorOnly,
             expand: expand === 'info',
             molSvg: molSvg,
             exactMass: exactMass,
-            onExpand: onExpandInfo,
+            onExapnd: onExapndInfo,
             descriptions: descriptions,
             canChangeDescription: canChangeDescription,
             onDescriptionChanged: this.handleDescriptionChanged
           }), _cfg.default.hidePanelPeak(layoutSt) ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_peaks.default, {
             expand: expand === 'peak',
-            onExapnd: onExpandPeak
+            onExapnd: onExapndPeak
           }), _cfg.default.hidePanelMpy(layoutSt) ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_multiplicity.default, {
             expand: expand === 'mpy',
-            onExapnd: onExpandMpy
-          }), _cfg.default.hidePanelCompare(layoutSt) || curveCount > 1 ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_compare.default, {
+            onExapnd: onExapndMpy
+          }), _cfg.default.hidePanelCompare(layoutSt) || listCurves.length > 1 ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_compare.default, {
             expand: expand === 'compare',
-            onExapnd: onExpandCompare
+            onExapnd: onExapndCompare
           }), _cfg.default.hidePanelCyclicVolta(layoutSt) || hideCyclicVolta ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_cyclic_voltamery_data.default, {
             jcampIdx: jcampIdx,
             feature: feature,
             expand: expand === 'cyclicvolta',
-            onExapnd: onExpandCyclicVolta,
+            onExapnd: onExapndCyclicVolta,
             userManualLink: userManualLink ? userManualLink.cv : undefined
           })]
         })
@@ -152,10 +149,11 @@ const mapStateToProps = (state, _) => (
   layoutSt: state.layout,
   curveSt: state.curve
 });
+const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({}, dispatch);
 PanelViewer.propTypes = {
   classes: _propTypes.default.object.isRequired,
   feature: _propTypes.default.object.isRequired,
-  integration: _propTypes.default.object,
+  integration: _propTypes.default.object.isRequired,
   editorOnly: _propTypes.default.bool.isRequired,
   molSvg: _propTypes.default.string.isRequired,
   descriptions: _propTypes.default.array.isRequired,
@@ -167,12 +165,8 @@ PanelViewer.propTypes = {
   curveSt: _propTypes.default.object.isRequired,
   subLayoutsInfo: _propTypes.default.object,
   exactMass: _propTypes.default.string,
-  hideCyclicVolta: _propTypes.default.bool,
-  entities: _propTypes.default.array
-};
-PanelViewer.defaultProps = {
-  integration: {}
+  hideCyclicVolta: _propTypes.default.bool
 };
 var _default = exports.default = (0, _reactRedux.connect)(
 // eslint-disable-line
-mapStateToProps, null)((0, _withStyles.default)(styles)(PanelViewer)); // eslint-disable-line
+mapStateToProps, mapDispatchToProps)((0, _withStyles.default)(styles)(PanelViewer)); // eslint-disable-line

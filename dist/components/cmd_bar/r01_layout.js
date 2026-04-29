@@ -227,12 +227,6 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
           children: "MS"
         })
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
-        value: _list_layout.LIST_LAYOUT.LC_MS,
-        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
-          className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),
-          children: "LC/MS"
-        })
-      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
         value: _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY,
         children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
           className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-layout'),

@@ -76,20 +76,6 @@ const defaultThreshold = {
   upper: false,
   lower: false
 };
-const LCMS_INTEGRATIONS_EXPORT_MODES = ['percent', 'area', 'both'];
-const isLcmsIntegrationsExportMode = v => LCMS_INTEGRATIONS_EXPORT_MODES.includes(v);
-const resolveLcmsIntegrationsExportForSubmit = (analysis, hplcMsSt) => {
-  if (isLcmsIntegrationsExportMode(analysis?.lcmsIntegrationsExport)) {
-    return analysis.lcmsIntegrationsExport;
-  }
-  if (analysis?.lcmsIncludeIntegrationArea === true) {
-    return 'both';
-  }
-  if (isLcmsIntegrationsExportMode(hplcMsSt?.lcmsIntegrationsExport)) {
-    return hplcMsSt.lcmsIntegrationsExport;
-  }
-  return 'percent';
-};
 const pickFromList = (list, index, fallback = null) => Array.isArray(list) && list[index] !== undefined ? list[index] : fallback;
 const hasBoolean = value => typeof value === 'boolean';
 const resolveOptionalBooleanFlags = analysis => {
@@ -170,36 +156,17 @@ const buildSpectrumPayload = ({
     ...optionalBooleanFlags
   };
 };
-const onClickCb = (operationValue, isAscend, isIntensity, layoutSt, shiftSt, analysis, decimalSt, integrationSt, multiplicitySt, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData, curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt) => () => {
+const onClickCb = (operationValue, isAscend, isIntensity, layoutSt, shiftSt, analysis, decimalSt, integrationSt, multiplicitySt, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData, curveList, editPeakSt, thresList, scanSt, feature) => () => {
   const defaultCurves = feature ? [{
     feature
   }] : [];
-  let curves = Array.isArray(curveList) && curveList.length > 0 ? curveList : defaultCurves;
-  if (layoutSt === 'LC/MS') {
-    curves = curves.filter(c => c.lcmsKind === 'uvvis');
-    if (curves.length === 0) curves = defaultCurves;
-  }
+  const curves = Array.isArray(curveList) && curveList.length > 0 ? curveList : defaultCurves;
   const fallbackIdx = Number.isFinite(curveSt?.curveIdx) ? curveSt.curveIdx : 0;
   const indicesToSend = curves.length > 0 ? curves.map((_, index) => index) : [fallbackIdx];
-  let lcmsGlobalFields = null;
-  if (layoutSt === 'LC/MS') {
-    const lcmsIntegrationsExport = resolveLcmsIntegrationsExportForSubmit(analysis, hplcMsSt);
-    lcmsGlobalFields = {
-      lcms_peaks: (0, _extractPeaksEdit.formatLcmsPeaksForBackend)(hplcMsSt),
-      lcms_integrals: (0, _extractPeaksEdit.formatLcmsIntegralsForBackend)(hplcMsSt),
-      lcms_integrations_export: lcmsIntegrationsExport,
-      lcms_peaks_text: _format.default.formatedLCMS(hplcMsSt, isAscend, decimalSt, {
-        lcmsIntegrationsExport
-      }),
-      lcms_uvvis_wavelength: hplcMsSt?.uvvis?.selectedWaveLength ?? null,
-      lcms_mz_page: hplcMsSt?.tic?.currentPageValue ?? null,
-      lcms_mz_page_data: (0, _extractPeaksEdit.getLcmsMzPageData)(hplcMsSt)
-    };
-  }
   const spectraList = indicesToSend.map(curveIdx => {
     const curve = curves[curveIdx] || {};
     const curveFeature = curve.feature || feature;
-    const spectrumPayload = buildSpectrumPayload({
+    return buildSpectrumPayload({
       feature: curveFeature,
       curveIdx,
       editPeakSt,
@@ -219,20 +186,10 @@ const onClickCb = (operationValue, isAscend, isIntensity, layoutSt, shiftSt, ana
       analysis,
       decimalSt
     });
-    if (lcmsGlobalFields && curve.lcmsKind === 'uvvis') {
-      return {
-        ...spectrumPayload,
-        ...lcmsGlobalFields
-      };
-    }
-    return spectrumPayload;
   });
   const payload = {
     spectra_list: spectraList
   };
-  if (lcmsGlobalFields) {
-    Object.assign(payload, lcmsGlobalFields);
-  }
   if (Number.isFinite(curveSt?.curveIdx)) {
     payload.curveSt = {
       curveIdx: curveSt.curveIdx
@@ -261,8 +218,7 @@ const BtnSubmit = ({
   curveList,
   axesUnitsSt,
   detectorSt,
-  metaSt,
-  hplcMsSt
+  metaSt
 }) => {
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
   const {
@@ -296,7 +252,7 @@ const BtnSubmit = ({
     children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
       className: (0, _classnames.default)('btn-sv-bar-submit'),
       color: "primary",
-      onClick: onClickCb(operation.value, isAscend, isIntensity, layoutSt, shiftSt, forecastSt.predictions, decimalSt, integrationSt, multiplicitySt, waveLengthSt, cyclicvoltaPayload, curveSt, axesUnitsSt, detectorSt, dscMetaData, curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt),
+      onClick: onClickCb(operation.value, isAscend, isIntensity, layoutSt, shiftSt, forecastSt.predictions, decimalSt, integrationSt, multiplicitySt, waveLengthSt, cyclicvoltaPayload, curveSt, axesUnitsSt, detectorSt, dscMetaData, curveList, editPeakSt, thresList, scanSt, feature),
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_PlayCircleOutline.default, {
         className: classes.icon
       })
@@ -321,9 +277,9 @@ const mapStateToProps = (state, props) => (
   curveList: state.curve.listCurves,
   axesUnitsSt: state.axesUnits,
   detectorSt: state.detector,
-  metaSt: state.meta,
-  hplcMsSt: state.hplcMs
+  metaSt: state.meta
 });
+const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({}, dispatch);
 BtnSubmit.propTypes = {
   classes: _propTypes.default.object.isRequired,
   feature: _propTypes.default.object.isRequired,
@@ -345,10 +301,6 @@ BtnSubmit.propTypes = {
   curveList: _propTypes.default.array.isRequired,
   axesUnitsSt: _propTypes.default.object.isRequired,
   detectorSt: _propTypes.default.object.isRequired,
-  metaSt: _propTypes.default.object.isRequired,
-  hplcMsSt: _propTypes.default.object
+  metaSt: _propTypes.default.object.isRequired
 };
-BtnSubmit.defaultProps = {
-  hplcMsSt: {}
-};
-var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, null), (0, _styles.withStyles)(styles))(BtnSubmit);
+var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(BtnSubmit);
