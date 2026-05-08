@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getArea = exports.getAbsoluteArea = exports.calcArea = void 0;
+exports.getLinearBaseline = exports.getIntegrationPoints = exports.getArea = exports.getAbsoluteArea = exports.calcArea = void 0;
 var _calc = require("./calc");
 /* eslint-disable no-mixed-operators */
 
@@ -64,6 +64,21 @@ const calcArea = (d, refArea, refFactor, ignoreRef = false) => {
   }
   return (d.area * refFactor / refArea).toFixed(2);
 };
+exports.calcArea = calcArea;
+const getIntegrationPoints = (xL, xU, data) => {
+  if (!Array.isArray(data)) return [];
+  return data.filter(d => d && Number.isFinite(d.x) && d.x > xL && d.x < xU);
+};
+exports.getIntegrationPoints = getIntegrationPoints;
+const getLinearBaseline = points => {
+  if (!points || points.length < 2) return () => 0;
+  const valueKey = getValueKey(points);
+  if (!valueKey) return () => 0;
+  const first = points[0];
+  const last = points[points.length - 1];
+  const slope = (0, _calc.calcSlope)(first.x, first[valueKey], last.x, last[valueKey]);
+  return pt => first[valueKey] + slope * (pt.x - first.x);
+};
 
 // eslint-disable-line
-exports.calcArea = calcArea;
+exports.getLinearBaseline = getLinearBaseline;

@@ -11,26 +11,17 @@ const TfRescale = (focus) => {
 };
 
 const fetchPt = (event, focus, xt) => {
-  // const rawMouseX = focus.isFirefox // WORKAROUND d3.mouse firefox compatibility
-  //   ? d3.event.offsetX
-  //   : d3.mouse(focus.root.node())[0];
   const rawMouseX = d3.pointer(event, focus.root.node())[0];
   const mouseX = xt.invert(rawMouseX);
   const bisectDate = d3.bisector((d) => +d.x).left;
   const dt = focus.data;
   const ls = dt.length;
-  const sortData = ls > 0 && dt[0].x > dt[ls - 1].x ? dt.reverse() : dt;
+  const sortData = ls > 0 && dt[0].x > dt[ls - 1].x ? [...dt].reverse() : dt;
   const idx = bisectDate(sortData, +mouseX);
-  return sortData[idx];
+  return sortData[Math.min(idx, ls - 1)];
 };
 
 const fetchFreePt = (event, focus, xt, yt) => {
-  // const rawMouseX = focus.isFirefox // WORKAROUND d3.mouse firefox compatibility
-  //   ? d3.event.offsetX
-  //   : d3.mouse(focus.root.node())[0];
-  // const rawMouseY = focus.isFirefox // WORKAROUND d3.mouse firefox compatibility
-  //   ? d3.event.offsetY
-  //   : d3.mouse(focus.root.node())[1];
   const rawMouseX = d3.pointer(event, focus.root.node())[0];
   const rawMouseY = d3.pointer(event, focus.root.node())[1];
   const mouseX = xt.invert(rawMouseX);
@@ -54,6 +45,68 @@ const fetchFreePt = (event, focus, xt, yt) => {
     }
   });
   return selectPoint;
+};
+
+const clearIntegrationPreview = (focus) => {
+  if (!focus || !focus.root) return;
+  focus.root.select('.integration-preview-line').remove();
+};
+
+const drawIntegrationPreview = (focus, firstPoint, nextPoint) => {
+  if (!firstPoint || !nextPoint) return;
+  const { xt, yt } = TfRescale(focus);
+  const preview = focus.root.select('.integration-preview');
+  const line = preview.selectAll('.integration-preview-line').data([{
+    firstPoint,
+    nextPoint,
+  }]);
+
+  line.enter()
+    .append('line')
+    .attr('class', 'integration-preview-line')
+    .attr('stroke', 'red')
+    .attr('stroke-width', 2)
+    .attr('stroke-dasharray', '4,3')
+    .style('pointer-events', 'none')
+    .merge(line)
+    .attr('x1', (d) => xt(d.firstPoint.x))
+    .attr('y1', (d) => yt(d.firstPoint.y))
+    .attr('x2', (d) => xt(d.nextPoint.x))
+    .attr('y2', (d) => yt(d.nextPoint.y));
+};
+
+const getCurvePointFromEvent = (event, focus) => {
+  const { xt, yt } = TfRescale(focus);
+  if (Format.isCyclicVoltaLayout(focus.layout)) {
+    return fetchFreePt(event, focus, xt, yt);
+  }
+  return fetchPt(event, focus, xt);
+};
+
+const cancelIntegrationDraft = (focus) => {
+  Object.assign(focus, { firstIntegrationPoint: null });
+  clearIntegrationPreview(focus);
+  forgetPendingIntegrationDraft();
+};
+
+const updateIntegrationPreview = (event, focus) => {
+  if (!focus.isUiAddIntgSt || !focus.firstIntegrationPoint) return;
+  const pt = getCurvePointFromEvent(event, focus);
+  if (!pt) return;
+  drawIntegrationPreview(focus, focus.firstIntegrationPoint, pt);
+};
+
+const updateIntegrationSplitPreview = (event, focus) => {
+  if (!focus.isUiSplitIntgSt) return;
+
+  const { splitX, target } = getIntegrationSplitTargetFromEvent(event, focus);
+  if (!target) {
+    clearIntegrationSplitPreview(focus);
+    return;
+  }
+
+  const { shift = 0, ignoreRef = false } = focus.integrationSplitTargets || {};
+  drawIntegrationSplitPreview(focus, target, splitX, shift, ignoreRef);
 };
 
 const MouseMove = (event, focus) => {
@@ -128,6 +181,43 @@ const MouseMove = (event, focus) => {
       }
     }
   }
+  updateIntegrationPreview(event, focus);
+  updateIntegrationSplitPreview(event, focus);
+};
+
+const clickIntegrationPoint = (event, focus) => {
+  const pt = getCurvePointFromEvent(event, focus);
+  if (!pt) return;
+
+  const { firstIntegrationPoint, selectUiSweepAct } = focus;
+  if (!firstIntegrationPoint) {
+    // Keep the draft local to D3; the second click emits the existing sweep payload.
+    const draftPoint = {
+      x: pt.x,
+      y: pt.y,
+      jcampIdx: focus.jcampIdx,
+      dataLength: focus.data.length,
+    };
+    Object.assign(focus, { firstIntegrationPoint: draftPoint });
+    setPendingIntegrationDraft({
+      jcampIdx: focus.jcampIdx,
+      dataLength: focus.data.length,
+      cancel: () => cancelIntegrationDraft(focus),
+    });
+    drawIntegrationPreview(focus, draftPoint, draftPoint);
+    return;
+  }
+
+  cancelIntegrationDraft(focus);
+  if (firstIntegrationPoint.x === pt.x) {
+    return;
+  }
+
+  selectUiSweepAct(buildSweepPayloadFromXBounds(
+    focus,
+    firstIntegrationPoint.x,
+    pt.x,
+  ));
 };
 
 const ClickCompass = (event, focus) => {
@@ -166,6 +256,9 @@ const MountCompass = (focus) => {
     .attr('class', 'compass');
   const cursor = root.append('g')
     .attr('class', 'cursor');
+  const preview = root.append('g')
+    .attr('class', 'integration-preview')
+    .attr('clip-path', 'url(#clip)');
   const overlay = root.append('rect')
     .attr('class', 'overlay-focus')
     .attr('width', w)
@@ -193,6 +286,8 @@ const MountCompass = (focus) => {
     .style('text-anchor', 'middle')
     .style('fill', '#D68910');
 
+  preview.selectAll('*').remove();
+
   overlay
     .on('mousemove', (event) => MouseMove(event, focus))
     .on('click', (event) => ClickCompass(event, focus));
@@ -203,4 +298,6 @@ export {
   TfRescale,
   ClickCompass,
   MouseMove,
+  getCurvePointFromEvent,
+  clearIntegrationPreview,
 };

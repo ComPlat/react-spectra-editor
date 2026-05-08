@@ -30,7 +30,7 @@ class ViewerMulti extends React.Component {
     super(props);
 
     const {
-      entities, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
+      entities, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct, splitIntegrationAct,
     } = this.props;
     this.rootKlass = `.${LIST_ROOT_SVG_GRAPH.LINE}`;
     this.containerRef = React.createRef();
@@ -38,7 +38,7 @@ class ViewerMulti extends React.Component {
     this.resizeObserver = null;
 
     this.focus = new MultiFocus({
-      W, H, entities, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
+      W, H, entities, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct, splitIntegrationAct,
     });
 
     this.normChange = this.normChange.bind(this);
@@ -55,7 +55,7 @@ class ViewerMulti extends React.Component {
       entities, curveSt,
       seed, peak, cLabel, xLabel, yLabel,
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt,
-      sweepExtentSt, isUiNoBrushSt,
+      sweepExtentSt, isUiAddIntgSt, isUiSplitIntgSt, isUiNoBrushSt,
       isHidden, cyclicvoltaSt,
       integrationSt, mtplySt, axesUnitsSt,
       uiSt,
@@ -98,6 +98,8 @@ class ViewerMulti extends React.Component {
       editPeakSt,
       layoutSt,
       sweepExtentSt,
+      isUiAddIntgSt,
+      isUiSplitIntgSt,
       isUiNoBrushSt,
       cyclicvoltaSt,
       integrationSt,
@@ -193,7 +195,7 @@ class ViewerMulti extends React.Component {
       curveSt,
       seed, peak, cLabel, feature,
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt,
-      sweepExtentSt, isUiNoBrushSt,
+      sweepExtentSt, isUiAddIntgSt, isUiSplitIntgSt, isUiNoBrushSt,
       isHidden, resetAllAct, cyclicvoltaSt,
       integrationSt, mtplySt, uiSt,
       entities, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
@@ -216,6 +218,7 @@ class ViewerMulti extends React.Component {
       clickUiTargetAct,
       selectUiSweepAct,
       scrollUiWheelAct,
+      splitIntegrationAct,
     });
 
     drawMain(this.rootKlass, size.width, size.height);
@@ -228,6 +231,8 @@ class ViewerMulti extends React.Component {
       editPeakSt,
       layoutSt,
       sweepExtentSt,
+      isUiAddIntgSt,
+      isUiSplitIntgSt,
       isUiNoBrushSt,
       cyclicvoltaSt,
       integrationSt,
@@ -263,6 +268,8 @@ const mapStateToProps = (state, props) => (
     editPeakSt: state.editPeak.present,
     layoutSt: state.layout,
     sweepExtentSt: state.ui.sweepExtent,
+    isUiAddIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
+    isUiSplitIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_SPLIT,
     isUiNoBrushSt: LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
     cyclicvoltaSt: state.cyclicvolta,
     maxminPeakSt: Feature2MaxMinPeak(state, props),
@@ -278,6 +285,7 @@ const mapDispatchToProps = (dispatch) => (
     clickUiTargetAct: clickUiTarget,
     selectUiSweepAct: selectUiSweep,
     scrollUiWheelAct: scrollUiWheel,
+    splitIntegrationAct: splitIntegration,
     addNewCylicVoltaPairPeakAct: addNewCylicVoltaPairPeak,
     addCylicVoltaMaxPeakAct: addCylicVoltaMaxPeak,
     addCylicVoltaMinPeakAct: addCylicVoltaMinPeak,
@@ -300,11 +308,14 @@ ViewerMulti.propTypes = {
   integrationSt: PropTypes.object.isRequired,
   mtplySt: PropTypes.object.isRequired,
   sweepExtentSt: PropTypes.object.isRequired,
+  isUiAddIntgSt: PropTypes.bool.isRequired,
+  isUiSplitIntgSt: PropTypes.bool.isRequired,
   isUiNoBrushSt: PropTypes.bool.isRequired,
   resetAllAct: PropTypes.func.isRequired,
   clickUiTargetAct: PropTypes.func.isRequired,
   selectUiSweepAct: PropTypes.func.isRequired,
   scrollUiWheelAct: PropTypes.func.isRequired,
+  splitIntegrationAct: PropTypes.func.isRequired,
   isHidden: PropTypes.bool,
   cyclicvoltaSt: PropTypes.object.isRequired,
   maxminPeakSt: PropTypes.object,

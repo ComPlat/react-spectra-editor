@@ -12,6 +12,7 @@ var _propTypes = _interopRequireDefault(require("prop-types"));
 var _chem = require("../../helpers/chem");
 var _manager = require("../../actions/manager");
 var _ui = require("../../actions/ui");
+var _integration = require("../../actions/integration");
 var _line_focus = _interopRequireDefault(require("./line_focus"));
 var _draw = require("../common/draw");
 var _list_ui = require("../../constants/list_ui");
@@ -37,7 +38,8 @@ class ViewerLine extends _react.default.Component {
       H,
       clickUiTargetAct,
       selectUiSweepAct,
-      scrollUiWheelAct
+      scrollUiWheelAct,
+      splitIntegrationAct
     });
     this.normChange = this.normChange.bind(this);
   }
@@ -97,6 +99,7 @@ class ViewerLine extends _react.default.Component {
       mtplySt,
       sweepExtentSt,
       isUiAddIntgSt,
+      isUiSplitIntgSt,
       isUiNoBrushSt,
       wavelength,
       uiSt
@@ -156,6 +159,7 @@ class ViewerLine extends _react.default.Component {
       mtplySt,
       sweepExtentSt,
       isUiAddIntgSt,
+      isUiSplitIntgSt,
       isUiNoBrushSt,
       wavelength,
       uiSt
@@ -195,6 +199,7 @@ const mapStateToProps = (state, props) => ({
   mtplySt: state.multiplicity.present,
   sweepExtentSt: state.ui.sweepExtent,
   isUiAddIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
+  isUiSplitIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_SPLIT,
   isUiNoBrushSt: _list_ui.LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
   wavelength: state.wavelength,
   axesUnitsSt: state.axesUnits,
@@ -205,6 +210,7 @@ const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   clickUiTargetAct: _ui.clickUiTarget,
   selectUiSweepAct: _ui.selectUiSweep,
   scrollUiWheelAct: _ui.scrollUiWheel,
+  splitIntegrationAct: _integration.splitIntegration,
   addNewCylicVoltaPairPeakAct: _cyclic_voltammetry.addNewCylicVoltaPairPeak,
   addCylicVoltaMaxPeakAct: _cyclic_voltammetry.addCylicVoltaMaxPeak,
   addCylicVoltaMinPeakAct: _cyclic_voltammetry.addCylicVoltaMinPeak
@@ -227,11 +233,13 @@ ViewerLine.propTypes = {
   mtplySt: _propTypes.default.object.isRequired,
   sweepExtentSt: _propTypes.default.object.isRequired,
   isUiAddIntgSt: _propTypes.default.bool.isRequired,
+  isUiSplitIntgSt: _propTypes.default.bool.isRequired,
   isUiNoBrushSt: _propTypes.default.bool.isRequired,
   resetAllAct: _propTypes.default.func.isRequired,
   clickUiTargetAct: _propTypes.default.func.isRequired,
   selectUiSweepAct: _propTypes.default.func.isRequired,
   scrollUiWheelAct: _propTypes.default.func.isRequired,
+  splitIntegrationAct: _propTypes.default.func.isRequired,
   isHidden: _propTypes.default.bool.isRequired,
   wavelength: _propTypes.default.object.isRequired,
   axesUnitsSt: _propTypes.default.object.isRequired

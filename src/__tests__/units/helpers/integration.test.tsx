@@ -1,4 +1,10 @@
-import { calcArea, getAbsoluteArea, getArea } from "../../../helpers/integration";
+import {
+  calcArea,
+  getAbsoluteArea,
+  getArea,
+  getIntegrationPoints,
+  getLinearBaseline,
+} from "../../../helpers/integration";
 
 describe('Test helper for integration', () => {
   describe('Test get area', () => {
@@ -22,6 +28,30 @@ describe('Test helper for integration', () => {
     it('Have area', () => {
       const area = getAbsoluteArea(0, 3, [{x: 1.5, y: 1}, {x: 2, y: 2}, {x: 2.5, y: 2}])
       expect(area).toEqual(0.5)
+    })
+  })
+
+  describe('Test AUC baseline', () => {
+    it('starts the baseline at the first integration point, not at y=0', () => {
+      const points = getIntegrationPoints(0, 3, [
+        {x: 1, y: 10},
+        {x: 2, y: 12},
+      ]);
+      const baselineY = getLinearBaseline(points);
+
+      expect(baselineY(points[0])).toEqual(points[0].y);
+      expect(baselineY(points[1])).toEqual(points[1].y);
+    })
+
+    it('uses a deterministic linear baseline for interior points', () => {
+      const points = getIntegrationPoints(0, 4, [
+        {x: 1, y: 10},
+        {x: 2, y: 14},
+        {x: 3, y: 12},
+      ]);
+      const baselineY = getLinearBaseline(points);
+
+      expect(baselineY(points[1])).toEqual(11);
     })
   })
 

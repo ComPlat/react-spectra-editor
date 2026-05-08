@@ -65,6 +65,17 @@ const brushed = (focus, xOnly, event, brushedClass = '.d3Svg') => {
       yU: yes[1]
     };
   }
+  const [begPt, endPt] = selection;
+  xes = [begPt[0], endPt[0]].map(scales.x.invert).sort((a, b) => a - b);
+  yes = [begPt[1], endPt[1]].map(scales.y.invert).sort((a, b) => a - b);
+  xExtent = {
+    xL: xes[0],
+    xU: xes[1]
+  };
+  yExtent = {
+    yL: yes[0],
+    yU: yes[1]
+  };
   selectUiSweepAct({
     xExtent,
     yExtent,
@@ -115,13 +126,8 @@ const MountBrush = (focus, isUiAddIntgSt, isUiNoBrushSt, brushedClass = '.d3Svg'
     const target = xOnly ? brushX : brush;
     const klass = xOnly ? 'brushX' : 'brush';
     target.handleSize(10).extent([[0, 0], [w, h]]).on('end', brushedCb);
-    root.append('g').attr('class', klass).on('mousemove', event => (0, _compass.MouseMove)(event, focus)).call(target);
+    root.append('g').attr('class', 'brush').on('mousemove', event => (0, _compass.MouseMove)(event, focus)).call(brush);
   }
   svg.on('wheel', wheeledCb);
 };
-var _default = exports.default = MountBrush; // const resetedCb = () => reseted(main);
-// main.svg.on('dblclick', resetedCb);
-// const reseted = (main) => {
-//   const { selectUiSweepAct } = main;
-//   selectUiSweepAct({ xExtent: false, yExtent: false });
-// };
+var _default = exports.default = MountBrush;

@@ -10,6 +10,7 @@ import {
 } from '../../helpers/chem';
 import { resetAll } from '../../actions/manager';
 import { selectUiSweep, scrollUiWheel, clickUiTarget } from '../../actions/ui';
+import { splitIntegration } from '../../actions/integration';
 import LineFocus from './line_focus';
 import {
   drawMain, drawLabel, drawDisplay, drawDestroy,
@@ -28,7 +29,7 @@ class ViewerLine extends React.Component {
     const { clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct } = props;
     this.rootKlass = `.${LIST_ROOT_SVG_GRAPH.LINE}`;
     this.focus = new LineFocus({
-      W, H, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
+      W, H, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct, splitIntegrationAct,
     });
 
     this.normChange = this.normChange.bind(this);
@@ -72,6 +73,7 @@ class ViewerLine extends React.Component {
       mtplySt,
       sweepExtentSt,
       isUiAddIntgSt,
+      isUiSplitIntgSt,
       isUiNoBrushSt,
       wavelength,
       uiSt,
@@ -115,6 +117,7 @@ class ViewerLine extends React.Component {
       mtplySt,
       sweepExtentSt,
       isUiAddIntgSt,
+      isUiSplitIntgSt,
       isUiNoBrushSt,
       wavelength,
       uiSt,
@@ -156,6 +159,7 @@ const mapStateToProps = (state, props) => (
     mtplySt: state.multiplicity.present,
     sweepExtentSt: state.ui.sweepExtent,
     isUiAddIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
+    isUiSplitIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_SPLIT,
     isUiNoBrushSt: LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
     wavelength: state.wavelength,
     axesUnitsSt: state.axesUnits,
@@ -169,6 +173,7 @@ const mapDispatchToProps = (dispatch) => (
     clickUiTargetAct: clickUiTarget,
     selectUiSweepAct: selectUiSweep,
     scrollUiWheelAct: scrollUiWheel,
+    splitIntegrationAct: splitIntegration,
     addNewCylicVoltaPairPeakAct: addNewCylicVoltaPairPeak,
     addCylicVoltaMaxPeakAct: addCylicVoltaMaxPeak,
     addCylicVoltaMinPeakAct: addCylicVoltaMinPeak,
@@ -196,11 +201,13 @@ ViewerLine.propTypes = {
   mtplySt: PropTypes.object.isRequired,
   sweepExtentSt: PropTypes.object.isRequired,
   isUiAddIntgSt: PropTypes.bool.isRequired,
+  isUiSplitIntgSt: PropTypes.bool.isRequired,
   isUiNoBrushSt: PropTypes.bool.isRequired,
   resetAllAct: PropTypes.func.isRequired,
   clickUiTargetAct: PropTypes.func.isRequired,
   selectUiSweepAct: PropTypes.func.isRequired,
   scrollUiWheelAct: PropTypes.func.isRequired,
+  splitIntegrationAct: PropTypes.func.isRequired,
   isHidden: PropTypes.bool.isRequired,
   wavelength: PropTypes.object.isRequired,
   axesUnitsSt: PropTypes.object.isRequired,

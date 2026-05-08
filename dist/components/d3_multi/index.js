@@ -32,7 +32,8 @@ class ViewerMulti extends _react.default.Component {
       entities,
       clickUiTargetAct,
       selectUiSweepAct,
-      scrollUiWheelAct
+      scrollUiWheelAct,
+      splitIntegrationAct
     } = this.props;
     this.rootKlass = `.${_list_graph.LIST_ROOT_SVG_GRAPH.LINE}`;
     this.containerRef = /*#__PURE__*/_react.default.createRef();
@@ -44,7 +45,8 @@ class ViewerMulti extends _react.default.Component {
       entities,
       clickUiTargetAct,
       selectUiSweepAct,
-      scrollUiWheelAct
+      scrollUiWheelAct,
+      splitIntegrationAct
     });
     this.normChange = this.normChange.bind(this);
     this.handleResize = this.handleResize.bind(this);
@@ -67,6 +69,8 @@ class ViewerMulti extends _react.default.Component {
       editPeakSt,
       layoutSt,
       sweepExtentSt,
+      isUiAddIntgSt,
+      isUiSplitIntgSt,
       isUiNoBrushSt,
       isHidden,
       cyclicvoltaSt,
@@ -95,6 +99,8 @@ class ViewerMulti extends _react.default.Component {
       editPeakSt,
       layoutSt,
       sweepExtentSt,
+      isUiAddIntgSt,
+      isUiSplitIntgSt,
       isUiNoBrushSt,
       cyclicvoltaSt,
       integrationSt,
@@ -216,6 +222,8 @@ class ViewerMulti extends _react.default.Component {
       editPeakSt,
       layoutSt,
       sweepExtentSt,
+      isUiAddIntgSt,
+      isUiSplitIntgSt,
       isUiNoBrushSt,
       isHidden,
       resetAllAct,
@@ -244,7 +252,8 @@ class ViewerMulti extends _react.default.Component {
       entities,
       clickUiTargetAct,
       selectUiSweepAct,
-      scrollUiWheelAct
+      scrollUiWheelAct,
+      splitIntegrationAct
     });
     (0, _draw.drawMain)(this.rootKlass, size.width, size.height);
     this.focus.create({
@@ -256,6 +265,8 @@ class ViewerMulti extends _react.default.Component {
       editPeakSt,
       layoutSt,
       sweepExtentSt,
+      isUiAddIntgSt,
+      isUiSplitIntgSt,
       isUiNoBrushSt,
       cyclicvoltaSt,
       integrationSt,
@@ -290,6 +301,8 @@ const mapStateToProps = (state, props) => ({
   editPeakSt: state.editPeak.present,
   layoutSt: state.layout,
   sweepExtentSt: state.ui.sweepExtent,
+  isUiAddIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
+  isUiSplitIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_SPLIT,
   isUiNoBrushSt: _list_ui.LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
   cyclicvoltaSt: state.cyclicvolta,
   maxminPeakSt: (0, _chem.Feature2MaxMinPeak)(state, props),
@@ -302,6 +315,7 @@ const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   clickUiTargetAct: _ui.clickUiTarget,
   selectUiSweepAct: _ui.selectUiSweep,
   scrollUiWheelAct: _ui.scrollUiWheel,
+  splitIntegrationAct: splitIntegration,
   addNewCylicVoltaPairPeakAct: _cyclic_voltammetry.addNewCylicVoltaPairPeak,
   addCylicVoltaMaxPeakAct: _cyclic_voltammetry.addCylicVoltaMaxPeak,
   addCylicVoltaMinPeakAct: _cyclic_voltammetry.addCylicVoltaMinPeak
@@ -322,11 +336,14 @@ ViewerMulti.propTypes = {
   integrationSt: _propTypes.default.object.isRequired,
   mtplySt: _propTypes.default.object.isRequired,
   sweepExtentSt: _propTypes.default.object.isRequired,
+  isUiAddIntgSt: _propTypes.default.bool.isRequired,
+  isUiSplitIntgSt: _propTypes.default.bool.isRequired,
   isUiNoBrushSt: _propTypes.default.bool.isRequired,
   resetAllAct: _propTypes.default.func.isRequired,
   clickUiTargetAct: _propTypes.default.func.isRequired,
   selectUiSweepAct: _propTypes.default.func.isRequired,
   scrollUiWheelAct: _propTypes.default.func.isRequired,
+  splitIntegrationAct: _propTypes.default.func.isRequired,
   isHidden: _propTypes.default.bool,
   cyclicvoltaSt: _propTypes.default.object.isRequired,
   maxminPeakSt: _propTypes.default.object,

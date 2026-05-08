@@ -1,19 +1,38 @@
 import { UI } from '../constants/action_type';
+import { LIST_UI_SWEEP_TYPE } from '../constants/list_ui';
+import { confirmCancelPendingIntegration } from '../helpers/integration_draft.js'; // eslint-disable-line import/extensions
 
-const setUiViewerType = (payload) => (
-  {
+const keepIntegrationMode = (jcampIdx = 0) => ({
+  type: UI.SWEEP.SET_TYPE,
+  payload: LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
+  jcampIdx,
+});
+
+const setUiViewerType = (payload) => {
+  if (!confirmCancelPendingIntegration()) {
+    return keepIntegrationMode();
+  }
+
+  return {
     type: UI.VIEWER.SET_TYPE,
     payload,
-  }
-);
+  };
+};
 
-const setUiSweepType = (payload, jcampIdx = 0) => (
-  {
+const setUiSweepType = (payload, jcampIdx = 0) => {
+  if (
+    payload !== LIST_UI_SWEEP_TYPE.INTEGRATION_ADD
+    && !confirmCancelPendingIntegration()
+  ) {
+    return keepIntegrationMode(jcampIdx);
+  }
+
+  return {
     type: UI.SWEEP.SET_TYPE,
     payload,
     jcampIdx,
-  }
-);
+  };
+};
 
 const selectUiSweep = (payload) => (
   {

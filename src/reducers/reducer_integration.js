@@ -39,7 +39,7 @@ const addToStack = (state, action) => {
   const { stack, refArea, shift } = selectedIntegration;
   const { xExtent, data } = newData;
   const { xL, xU } = xExtent;
-  if (!xL || !xU || (xU - xL) === 0) { return state; }
+  if (!Number.isFinite(xL) || !Number.isFinite(xU) || (xU - xL) === 0) { return state; }
 
   const area = getArea(xL, xU, data);
   const defaultRefArea = stack.length === 0 ? area : refArea;
@@ -71,14 +71,89 @@ const rmFromStack = (state, action) => {
   const { stack } = selectedIntegration;
 
   let [txL, txU] = [0, 0];
-  if (xL && xU) { // rm click integration
+  if (Number.isFinite(xL) && Number.isFinite(xU)) {
     [txL, txU] = [xL, xU];
-  } else if (xExtent) { // rm click multiplicity
+  } else if (xExtent) {
     [txL, txU] = [xExtent.xL, xExtent.xU];
   } else {
     return state;
   }
   const newStack = stack.filter((k) => k.xL !== txL && k.xU !== txU);
+
+  const newIntegration = Object.assign({}, selectedIntegration, { stack: newStack });
+  const newArrIntegration = [...integrations];
+  newArrIntegration[curveIdx] = newIntegration;
+
+  return Object.assign({}, state, { integrations: newArrIntegration, selectedIdx: curveIdx });
+};
+
+const hasEnoughDataResolution = (xL, xU, data) => {
+  const [lower, upper] = [xL, xU].sort((a, b) => a - b);
+  const points = data.filter((pt) => (
+    pt
+    && Number.isFinite(pt.x)
+    && pt.x >= lower
+    && pt.x <= upper
+  ));
+  if (points.length < 2) return false;
+
+  return points.some((pt) => pt.x !== points[0].x);
+};
+
+const buildSplitStackItem = (xL, xU, data, shift) => {
+  const [lower, upper] = [xL, xU].sort((a, b) => a - b);
+  const area = getArea(lower, upper, data);
+  const absoluteArea = getAbsoluteArea(lower, upper, data);
+
+  return {
+    xL: lower + shift,
+    xU: upper + shift,
+    area,
+    absoluteArea,
+  };
+};
+
+const splitStack = (state, action) => {
+  const {
+    curveIdx, target, splitX, data,
+  } = action.payload;
+
+  if (!Number.isFinite(curveIdx) || !target || !Array.isArray(data)) {
+    return state;
+  }
+
+  const { integrations } = state;
+  const selectedIntegration = integrations[curveIdx];
+  if (!selectedIntegration || selectedIntegration === false) {
+    return state;
+  }
+
+  const { stack, shift } = selectedIntegration;
+  const targetIndex = stack.findIndex((item) => (
+    item.xL === target.xL && item.xU === target.xU
+  ));
+  if (targetIndex < 0 || !Number.isFinite(splitX)) {
+    return state;
+  }
+
+  const original = stack[targetIndex];
+  const [xL, xU] = [original.xL - shift, original.xU - shift].sort((a, b) => a - b);
+  if (!Number.isFinite(xL) || !Number.isFinite(xU) || splitX <= xL || splitX >= xU) {
+    return state;
+  }
+
+  if (!hasEnoughDataResolution(xL, splitX, data) || !hasEnoughDataResolution(splitX, xU, data)) {
+    return state;
+  }
+
+  const leftIntegration = buildSplitStackItem(xL, splitX, data, shift);
+  const rightIntegration = buildSplitStackItem(splitX, xU, data, shift);
+  const newStack = [
+    ...stack.slice(0, targetIndex),
+    leftIntegration,
+    rightIntegration,
+    ...stack.slice(targetIndex + 1),
+  ];
 
   const newIntegration = Object.assign({}, selectedIntegration, { stack: newStack });
   const newArrIntegration = [...integrations];
@@ -159,6 +234,8 @@ const integrationReducer = (state = initialState, action) => {
       return addToStack(state, action);
     case INTEGRATION.RM_ONE:
       return rmFromStack(state, action);
+    case INTEGRATION.SPLIT:
+      return splitStack(state, action);
     case INTEGRATION.SET_REF:
       return setRef(state, action);
     case INTEGRATION.SET_FKR:
@@ -182,5 +259,7 @@ const undoableIntegrationReducer = undoable(
   integrationReducer,
   undoRedoConfig,
 );
+
+export { integrationReducer };
 
 export default undoableIntegrationReducer;

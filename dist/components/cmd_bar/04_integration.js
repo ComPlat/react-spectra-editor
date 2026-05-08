@@ -19,6 +19,7 @@ var _integration = require("../../actions/integration");
 var _hplc_ms = require("../../actions/hplc_ms");
 var _ui = require("../../actions/ui");
 var _list_ui = require("../../constants/list_ui");
+var _integration_draft = require("../../helpers/integration_draft.js");
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 var _tri_btn = _interopRequireDefault(require("./tri_btn"));
 var _common = require("./common");
@@ -29,11 +30,20 @@ var _jsxRuntime = require("react/jsx-runtime");
 react/function-component-definition, react/require-default-props, max-len,
 react/no-unused-prop-types */
 
+// eslint-disable-line import/extensions
+
 const styles = () => Object.assign({
   field: {
     width: 80
   },
-  txtIcon: {}
+  txtIcon: {},
+  cancelBtn: {
+    borderColor: '#d32f2f',
+    color: '#d32f2f',
+    '&:hover': {
+      backgroundColor: '#ffebee'
+    }
+  }
 }, _common.commonStyle);
 const iconSize = '16px';
 const setFactor = (classes, isDisable, integrationSt, setIntegrationFkrAct, curveIdx) => {
@@ -88,6 +98,7 @@ const Integration = ({
   isFocusAddIntgSt,
   isFocusRmIntgSt,
   isFocusSetRefSt,
+  isFocusSplitIntgSt,
   setUiSweepTypeAct,
   setIntegrationFkrAct,
   clearIntegrationAllAct,
@@ -96,12 +107,20 @@ const Integration = ({
   clearIntegrationAllHplcMsAct,
   layoutSt
 }) => {
-  const onSweepIntegtAdd = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD);
-  const onSweepIntegtRm = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_RM);
-  const onSweepIntegtSR = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF);
   const {
     curveIdx
   } = curveSt;
+  const onCancelTool = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN, curveIdx);
+  const onSweepIntegtAdd = () => {
+    if (isFocusAddIntgSt) {
+      (0, _integration_draft.clearPendingIntegrationDraft)();
+      onCancelTool();
+      return;
+    }
+    setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD, curveIdx);
+  };
+  const onSweepIntegtRm = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_RM);
+  const onSweepIntegtSR = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF);
   const onClearAll = () => {
     if (layoutSt === _list_layout.LIST_LAYOUT.LC_MS) {
       clearIntegrationAllHplcMsAct();
@@ -120,15 +139,15 @@ const Integration = ({
       }),
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
         children: /*#__PURE__*/(0, _jsxRuntime.jsxs)(_common.MuButton, {
-          className: (0, _classnames.default)((0, _common.focusStyle)(isFocusAddIntgSt, classes), 'btn-add-inter'),
+          className: (0, _classnames.default)(isFocusAddIntgSt ? classes.cancelBtn : (0, _common.focusStyle)(false, classes), 'btn-add-inter'),
           disabled: isDisableSt,
           onClick: onSweepIntegtAdd,
           children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_react2.default, {
-            path: _js.mdiMathIntegral,
+            path: isFocusAddIntgSt ? _js.mdiClose : _js.mdiMathIntegral,
             size: iconSize,
-            color: iconColor(isFocusAddIntgSt || isDisableSt),
+            color: isFocusAddIntgSt ? '#d32f2f' : iconColor(isDisableSt),
             className: (0, _classnames.default)(classes.iconMdi, 'icon-sv-bar-addint')
-          }), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          }), isFocusAddIntgSt ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
             className: (0, _classnames.default)(classes.txt, classes.txtIcon, 'txt-sv-bar-addint'),
             children: "+"
           })]
@@ -155,7 +174,7 @@ const Integration = ({
           })]
         })
       })
-    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
+    }), ignoreRef ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
       title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
         className: "txt-sv-tp",
         children: "Set Integration Reference"
@@ -171,6 +190,27 @@ const Integration = ({
             color: iconColor(isFocusSetRefSt || isDisableSt),
             className: (0, _classnames.default)(classes.iconMdi, 'icon-sv-bar-refint')
           })
+        })
+      })
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
+      title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        className: "txt-sv-tp",
+        children: "Split Integration"
+      }),
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        children: /*#__PURE__*/(0, _jsxRuntime.jsxs)(_common.MuButton, {
+          className: (0, _classnames.default)(isFocusSplitIntgSt ? classes.cancelBtn : (0, _common.focusStyle)(false, classes), 'btn-split-inter'),
+          disabled: isDisableSt,
+          onClick: onSweepIntegtSplit,
+          children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_react2.default, {
+            path: isFocusSplitIntgSt ? _js.mdiClose : _js.mdiMathIntegral,
+            size: iconSize,
+            color: isFocusSplitIntgSt ? '#d32f2f' : iconColor(isDisableSt),
+            className: (0, _classnames.default)(classes.iconMdi, 'icon-sv-bar-splitint')
+          }), isFocusSplitIntgSt ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+            className: (0, _classnames.default)(classes.txt, classes.txtIcon, 'txt-sv-bar-splitint'),
+            children: "/"
+          })]
         })
       })
     }), !ignoreRef ? setFactor(classes, isDisableSt, integrationSt, setIntegrationFkrAct, curveIdx) : null, /*#__PURE__*/(0, _jsxRuntime.jsxs)(_tri_btn.default, {
@@ -197,6 +237,7 @@ const mapStateToProps = (state, props) => (
   isFocusAddIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
   isFocusRmIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_RM,
   isFocusSetRefSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF,
+  isFocusSplitIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_SPLIT,
   ignoreRef: _format.default.isHplcUvVisLayout(state.layout),
   curveSt: state.curve,
   integrationSt: state.integration.present,
@@ -214,6 +255,7 @@ Integration.propTypes = {
   isFocusAddIntgSt: _propTypes.default.bool.isRequired,
   isFocusRmIntgSt: _propTypes.default.bool.isRequired,
   isFocusSetRefSt: _propTypes.default.bool.isRequired,
+  isFocusSplitIntgSt: _propTypes.default.bool.isRequired,
   ignoreRef: _propTypes.default.bool.isRequired,
   setUiSweepTypeAct: _propTypes.default.func.isRequired,
   setIntegrationFkrAct: _propTypes.default.func.isRequired,

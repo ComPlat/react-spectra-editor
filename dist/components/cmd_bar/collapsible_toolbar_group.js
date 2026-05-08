@@ -69,7 +69,7 @@ const CollapsibleToolbarGroup = ({
     className: className,
     ...rest,
     children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
-      title: expanded ? 'Replier' : 'Déplier',
+      title: expanded ? 'Collapse' : 'Expand',
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
         children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
           className: "btn-sv-bar-group-toggle",

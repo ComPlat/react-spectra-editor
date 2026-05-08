@@ -8,14 +8,18 @@ import {
 } from '../../helpers/mount';
 import MountBrush from '../../helpers/brush';
 import { TfRescale, MountCompass } from '../../helpers/compass';
+import {
+  clearIntegrationSplitPreview,
+  drawIntegrationSplitPreview,
+  getSplitXFromEvent,
+} from '../../helpers/integration_split';
 import { PksEdit } from '../../helpers/converter';
 import { itgIdTag, mpyIdTag } from '../../helpers/focus';
-import { calcArea } from '../../helpers/integration';
+import { calcArea, getIntegrationPoints, getLinearBaseline } from '../../helpers/integration';
 import { calcMpyCenter } from '../../helpers/multiplicity_calc';
 import Format from '../../helpers/format';
 import Cfg from '../../helpers/cfg';
 import { LIST_LAYOUT } from '../../constants/list_layout';
-import { calcSlope } from '../../helpers/calc';
 
 const d3 = require('d3');
 
@@ -40,6 +44,7 @@ class LineFocus {
     this.clickUiTargetAct = clickUiTargetAct;
     this.selectUiSweepAct = selectUiSweepAct;
     this.scrollUiWheelAct = scrollUiWheelAct;
+    this.splitIntegrationAct = splitIntegrationAct;
     this.brush = d3.brush();
     this.brushX = d3.brushX();
 
@@ -65,6 +70,10 @@ class LineFocus {
     this.shouldUpdate = {};
     this.freq = false;
     this.layout = LIST_LAYOUT.H1;
+    this.isUiAddIntgSt = false;
+    this.isUiSplitIntgSt = false;
+    this.integrationSplitTargets = null;
+    this.firstIntegrationPoint = null;
 
     this.getShouldUpdate = this.getShouldUpdate.bind(this);
     this.resetShouldUpdate = this.resetShouldUpdate.bind(this);
@@ -83,6 +92,9 @@ class LineFocus {
     this.drawMtply = this.drawMtply.bind(this);
     this.drawComparisons = this.drawComparisons.bind(this);
     this.onClickTarget = this.onClickTarget.bind(this);
+    this.onClickIntegrationTarget = this.onClickIntegrationTarget.bind(this);
+    this.onIntegrationMouseMove = this.onIntegrationMouseMove.bind(this);
+    this.clearSplitPreview = this.clearSplitPreview.bind(this);
     this.mergedPeaks = this.mergedPeaks.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
 
@@ -241,13 +253,41 @@ class LineFocus {
     this.clickUiTargetAct(data, onPeak);
   }
 
+  clearSplitPreview() {
+    clearIntegrationSplitPreview(this);
+  }
+
+  onIntegrationMouseMove(event, data, shift, ignoreRef) {
+    if (!this.isUiSplitIntgSt) return;
+    const splitX = getSplitXFromEvent(event, this);
+    drawIntegrationSplitPreview(this, data, splitX, shift, ignoreRef);
+  }
+
+  onClickIntegrationTarget(event, data) {
+    if (!this.isUiSplitIntgSt) {
+      this.onClickTarget(event, data);
+      return;
+    }
+
+    event.stopPropagation();
+    event.preventDefault();
+    const splitX = getSplitXFromEvent(event, this);
+    this.clearSplitPreview();
+    this.splitIntegrationAct({
+      curveIdx: this.jcampIdx,
+      target: data,
+      splitX,
+      data: this.data,
+    });
+  }
+
   mergedPeaks(editPeakSt) {
     if (!editPeakSt) return this.dataPks;
     this.dataPks = PksEdit(this.dataPks, editPeakSt);
     return this.dataPks;
   }
 
-  drawAUC(stack) {
+  drawAUC(stack, shift = 0) {
     const { xt, yt } = TfRescale(this);
     const auc = this.tags.aucPath.selectAll('path').data(stack);
     auc.exit()
@@ -256,25 +296,14 @@ class LineFocus {
 
     const integCurve = (border) => {
       const { xL, xU } = border;
-      const ps = this.data.filter((d) => d.x > xL && d.x < xU);
+      const ps = getIntegrationPoints(xL, xU, this.data);
       if (!ps[0]) return null;
 
-      const point1 = ps[0];
-      const point2 = ps[ps.length - 1];
-      const slope = calcSlope(point1.x, point1.y, point2.x, point2.y);
-      let lastDY = point1.y;
+      const baselineY = getLinearBaseline(ps);
 
       return d3.area()
         .x((d) => xt(d.x))
-        .y0((d, index) => {
-          if (index > 0) {
-            const lastD = ps[index - 1];
-            const y = slope * (d.x - lastD.x) + lastDY;
-            lastDY = y;
-            return yt(y);
-          }
-          return yt(0);
-        })
+        .y0((d) => yt(baselineY(d)))
         .y1((d) => yt(d.y))(ps);
     };
 
@@ -303,8 +332,10 @@ class LineFocus {
           .style('fill', 'red');
         d3.select(`#auc${itgIdTag(d)}`)
           .style('fill-opacity', 0.2);
+        this.clearSplitPreview();
       })
-      .on('click', (event, d) => this.onClickTarget(event, d));
+      .on('mousemove', (event, d) => this.onIntegrationMouseMove(event, d, shift, true))
+      .on('click', (event, d) => this.onClickIntegrationTarget(event, d));
   }
 
   drawPeaks(editPeakSt) {
@@ -402,6 +433,9 @@ class LineFocus {
     const isDisable = Cfg.btnCmdIntg(this.layout);
     const ignoreRef = Format.isHplcUvVisLayout(this.layout);
     const itgs = isDisable ? [] : stack;
+    Object.assign(this, {
+      integrationSplitTargets: { stack: itgs, shift, ignoreRef },
+    });
 
     const igbp = this.tags.igbPath.selectAll('path').data(itgs);
     igbp.exit()
@@ -428,7 +462,7 @@ class LineFocus {
     }
 
     if (ignoreRef) {
-      this.drawAUC(stack);
+      this.drawAUC(stack, shift);
     } else {
       // rescale for zoom
       const { xt } = TfRescale(this);
@@ -469,8 +503,10 @@ class LineFocus {
             .attr('stroke', '#228B22');
           d3.select(`#igtp${itgIdTag(d)}`)
             .style('fill', '#228B22');
+          this.clearSplitPreview();
         })
-        .on('click', (event, d) => this.onClickTarget(event, d));
+        .on('mousemove', (event, d) => this.onIntegrationMouseMove(event, d, shift, ignoreRef))
+        .on('click', (event, d) => this.onClickIntegrationTarget(event, d));
 
       const integCurve = (border) => {
         const { xL, xU } = border;
@@ -513,8 +549,10 @@ class LineFocus {
             .attr('stroke', '#228B22');
           d3.select(`#igtp${itgIdTag(d)}`)
             .style('fill', '#228B22');
+          this.clearSplitPreview();
         })
-        .on('click', (event, d) => this.onClickTarget(event, d));
+        .on('mousemove', (event, d) => this.onIntegrationMouseMove(event, d, shift, ignoreRef))
+        .on('click', (event, d) => this.onClickIntegrationTarget(event, d));
 
       igtp.enter()
         .append('text')
@@ -542,8 +580,10 @@ class LineFocus {
             .attr('stroke', '#228B22');
           d3.select(`#igtp${itgIdTag(d)}`)
             .style('fill', '#228B22');
+          this.clearSplitPreview();
         })
-        .on('click', (event, d) => this.onClickTarget(event, d));
+        .on('mousemove', (event, d) => this.onIntegrationMouseMove(event, d, shift, ignoreRef))
+        .on('click', (event, d) => this.onClickIntegrationTarget(event, d));
     }
   }
 
@@ -825,6 +865,8 @@ class LineFocus {
     this.scales = InitScale(this, this.reverseXAxis(layoutSt));
     this.setTip();
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt, wavelength);
+    Object.assign(this, { isUiSplitIntgSt });
+    if (!isUiSplitIntgSt) this.clearSplitPreview();
     MountCompass(this);
 
     this.axis = MountAxis(this);
@@ -862,6 +904,8 @@ class LineFocus {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, this.reverseXAxis(layoutSt));
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt, wavelength);
+    Object.assign(this, { isUiSplitIntgSt });
+    if (!isUiSplitIntgSt) this.clearSplitPreview();
 
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);

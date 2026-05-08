@@ -9,6 +9,7 @@ var _init = require("../../helpers/init");
 var _mount = require("../../helpers/mount");
 var _brush = _interopRequireDefault(require("../../helpers/brush"));
 var _compass = require("../../helpers/compass");
+var _integration_split = require("../../helpers/integration_split");
 var _converter = require("../../helpers/converter");
 var _focus = require("../../helpers/focus");
 var _integration = require("../../helpers/integration");
@@ -16,7 +17,6 @@ var _multiplicity_calc = require("../../helpers/multiplicity_calc");
 var _format = _interopRequireDefault(require("../../helpers/format"));
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 var _list_layout = require("../../constants/list_layout");
-var _calc = require("../../helpers/calc");
 /* eslint-disable prefer-object-spread, no-mixed-operators */
 
 const d3 = require('d3');
@@ -45,6 +45,7 @@ class LineFocus {
     this.clickUiTargetAct = clickUiTargetAct;
     this.selectUiSweepAct = selectUiSweepAct;
     this.scrollUiWheelAct = scrollUiWheelAct;
+    this.splitIntegrationAct = splitIntegrationAct;
     this.brush = d3.brush();
     this.brushX = d3.brushX();
     this.axis = null;
@@ -69,6 +70,10 @@ class LineFocus {
     this.shouldUpdate = {};
     this.freq = false;
     this.layout = _list_layout.LIST_LAYOUT.H1;
+    this.isUiAddIntgSt = false;
+    this.isUiSplitIntgSt = false;
+    this.integrationSplitTargets = null;
+    this.firstIntegrationPoint = null;
     this.getShouldUpdate = this.getShouldUpdate.bind(this);
     this.resetShouldUpdate = this.resetShouldUpdate.bind(this);
     this.setTip = this.setTip.bind(this);
@@ -86,6 +91,9 @@ class LineFocus {
     this.drawMtply = this.drawMtply.bind(this);
     this.drawComparisons = this.drawComparisons.bind(this);
     this.onClickTarget = this.onClickTarget.bind(this);
+    this.onClickIntegrationTarget = this.onClickIntegrationTarget.bind(this);
+    this.onIntegrationMouseMove = this.onIntegrationMouseMove.bind(this);
+    this.clearSplitPreview = this.clearSplitPreview.bind(this);
     this.mergedPeaks = this.mergedPeaks.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
     this.wavelength = null;
@@ -259,12 +267,36 @@ class LineFocus {
     const onPeak = true;
     this.clickUiTargetAct(data, onPeak);
   }
+  clearSplitPreview() {
+    (0, _integration_split.clearIntegrationSplitPreview)(this);
+  }
+  onIntegrationMouseMove(event, data, shift, ignoreRef) {
+    if (!this.isUiSplitIntgSt) return;
+    const splitX = (0, _integration_split.getSplitXFromEvent)(event, this);
+    (0, _integration_split.drawIntegrationSplitPreview)(this, data, splitX, shift, ignoreRef);
+  }
+  onClickIntegrationTarget(event, data) {
+    if (!this.isUiSplitIntgSt) {
+      this.onClickTarget(event, data);
+      return;
+    }
+    event.stopPropagation();
+    event.preventDefault();
+    const splitX = (0, _integration_split.getSplitXFromEvent)(event, this);
+    this.clearSplitPreview();
+    this.splitIntegrationAct({
+      curveIdx: this.jcampIdx,
+      target: data,
+      splitX,
+      data: this.data
+    });
+  }
   mergedPeaks(editPeakSt) {
     if (!editPeakSt) return this.dataPks;
     this.dataPks = (0, _converter.PksEdit)(this.dataPks, editPeakSt);
     return this.dataPks;
   }
-  drawAUC(stack) {
+  drawAUC(stack, shift = 0) {
     const {
       xt,
       yt
@@ -276,21 +308,10 @@ class LineFocus {
         xL,
         xU
       } = border;
-      const ps = this.data.filter(d => d.x > xL && d.x < xU);
+      const ps = (0, _integration.getIntegrationPoints)(xL, xU, this.data);
       if (!ps[0]) return null;
-      const point1 = ps[0];
-      const point2 = ps[ps.length - 1];
-      const slope = (0, _calc.calcSlope)(point1.x, point1.y, point2.x, point2.y);
-      let lastDY = point1.y;
-      return d3.area().x(d => xt(d.x)).y0((d, index) => {
-        if (index > 0) {
-          const lastD = ps[index - 1];
-          const y = slope * (d.x - lastD.x) + lastDY;
-          lastDY = y;
-          return yt(y);
-        }
-        return yt(0);
-      }).y1(d => yt(d.y))(ps);
+      const baselineY = (0, _integration.getLinearBaseline)(ps);
+      return d3.area().x(d => xt(d.x)).y0(d => yt(baselineY(d))).y1(d => yt(d.y))(ps);
     };
     auc.enter().append('path').attr('class', 'auc').attr('fill', 'red').attr('stroke', 'none').attr('fill-opacity', 0.2).attr('stroke-width', 2).merge(auc).attr('d', d => integCurve(d)).attr('id', d => `auc${(0, _focus.itgIdTag)(d)}`).on('mouseover', (event, d) => {
       d3.select(`#auc${(0, _focus.itgIdTag)(d)}`).attr('stroke', 'blue');
@@ -300,7 +321,8 @@ class LineFocus {
       d3.select(`#auc${(0, _focus.itgIdTag)(d)}`).attr('stroke', 'none');
       d3.select(`#auc${(0, _focus.itgIdTag)(d)}`).style('fill', 'red');
       d3.select(`#auc${(0, _focus.itgIdTag)(d)}`).style('fill-opacity', 0.2);
-    }).on('click', (event, d) => this.onClickTarget(event, d));
+      this.clearSplitPreview();
+    }).on('mousemove', (event, d) => this.onIntegrationMouseMove(event, d, shift, true)).on('click', (event, d) => this.onClickIntegrationTarget(event, d));
   }
   drawPeaks(editPeakSt) {
     const {
@@ -380,6 +402,13 @@ class LineFocus {
     const isDisable = _cfg.default.btnCmdIntg(this.layout);
     const ignoreRef = _format.default.isHplcUvVisLayout(this.layout);
     const itgs = isDisable ? [] : stack;
+    Object.assign(this, {
+      integrationSplitTargets: {
+        stack: itgs,
+        shift,
+        ignoreRef
+      }
+    });
     const igbp = this.tags.igbPath.selectAll('path').data(itgs);
     igbp.exit().attr('class', 'exit').remove();
     const igcp = this.tags.igcPath.selectAll('path').data(itgs);
@@ -394,7 +423,7 @@ class LineFocus {
       return;
     }
     if (ignoreRef) {
-      this.drawAUC(stack);
+      this.drawAUC(stack, shift);
     } else {
       // rescale for zoom
       const {
@@ -410,7 +439,8 @@ class LineFocus {
         d3.select(`#igbp${(0, _focus.itgIdTag)(d)}`).attr('stroke', '#228B22');
         d3.select(`#igbc${(0, _focus.itgIdTag)(d)}`).attr('stroke', '#228B22');
         d3.select(`#igtp${(0, _focus.itgIdTag)(d)}`).style('fill', '#228B22');
-      }).on('click', (event, d) => this.onClickTarget(event, d));
+        this.clearSplitPreview();
+      }).on('mousemove', (event, d) => this.onIntegrationMouseMove(event, d, shift, ignoreRef)).on('click', (event, d) => this.onClickIntegrationTarget(event, d));
       const integCurve = border => {
         const {
           xL,
@@ -434,7 +464,8 @@ class LineFocus {
         d3.select(`#igbp${(0, _focus.itgIdTag)(d)}`).attr('stroke', '#228B22');
         d3.select(`#igbc${(0, _focus.itgIdTag)(d)}`).attr('stroke', '#228B22');
         d3.select(`#igtp${(0, _focus.itgIdTag)(d)}`).style('fill', '#228B22');
-      }).on('click', (event, d) => this.onClickTarget(event, d));
+        this.clearSplitPreview();
+      }).on('mousemove', (event, d) => this.onIntegrationMouseMove(event, d, shift, ignoreRef)).on('click', (event, d) => this.onClickIntegrationTarget(event, d));
       igtp.enter().append('text').attr('class', 'igtp').attr('font-family', 'Helvetica').style('font-size', '12px').attr('fill', '#228B22').style('text-anchor', 'middle').merge(igtp).attr('id', d => `igtp${(0, _focus.itgIdTag)(d)}`).text(d => (0, _integration.calcArea)(d, refArea, refFactor, ignoreRef)).attr('transform', d => `translate(${xt((d.xL + d.xU) / 2 - shift)}, ${dh - 12})`).on('mouseover', (event, d) => {
         d3.select(`#igbp${(0, _focus.itgIdTag)(d)}`).attr('stroke', 'blue');
         d3.select(`#igbc${(0, _focus.itgIdTag)(d)}`).attr('stroke', 'blue');
@@ -443,7 +474,8 @@ class LineFocus {
         d3.select(`#igbp${(0, _focus.itgIdTag)(d)}`).attr('stroke', '#228B22');
         d3.select(`#igbc${(0, _focus.itgIdTag)(d)}`).attr('stroke', '#228B22');
         d3.select(`#igtp${(0, _focus.itgIdTag)(d)}`).style('fill', '#228B22');
-      }).on('click', (event, d) => this.onClickTarget(event, d));
+        this.clearSplitPreview();
+      }).on('mousemove', (event, d) => this.onIntegrationMouseMove(event, d, shift, ignoreRef)).on('click', (event, d) => this.onClickIntegrationTarget(event, d));
     }
   }
   drawMtply(mtplySt) {
@@ -630,6 +662,10 @@ class LineFocus {
     this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt));
     this.setTip();
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt, wavelength);
+    Object.assign(this, {
+      isUiSplitIntgSt
+    });
+    if (!isUiSplitIntgSt) this.clearSplitPreview();
     (0, _compass.MountCompass)(this);
     this.axis = (0, _mount.MountAxis)(this);
     this.path = (0, _mount.MountPath)(this, 'steelblue');
@@ -675,6 +711,10 @@ class LineFocus {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt));
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt, wavelength);
+    Object.assign(this, {
+      isUiSplitIntgSt
+    });
+    if (!isUiSplitIntgSt) this.clearSplitPreview();
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);
       this.getShouldUpdate(editPeakSt, integrationSt, mtplySt);

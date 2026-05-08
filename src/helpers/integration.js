@@ -65,4 +65,21 @@ const calcArea = (d, refArea, refFactor, ignoreRef = false) => {
   return (d.area * refFactor / refArea).toFixed(2);
 };
 
-export { getArea, calcArea, getAbsoluteArea };  // eslint-disable-line
+const getIntegrationPoints = (xL, xU, data) => {
+  if (!Array.isArray(data)) return [];
+  return data.filter((d) => d && Number.isFinite(d.x) && d.x > xL && d.x < xU);
+};
+
+const getLinearBaseline = (points) => {
+  if (!points || points.length < 2) return () => 0;
+  const valueKey = getValueKey(points);
+  if (!valueKey) return () => 0;
+  const first = points[0];
+  const last = points[points.length - 1];
+  const slope = calcSlope(first.x, first[valueKey], last.x, last[valueKey]);
+  return (pt) => first[valueKey] + slope * (pt.x - first.x);
+};
+
+export {
+  getArea, calcArea, getAbsoluteArea, getIntegrationPoints, getLinearBaseline,
+};  // eslint-disable-line

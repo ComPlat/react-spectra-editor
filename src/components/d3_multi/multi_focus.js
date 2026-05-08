@@ -11,6 +11,11 @@ import {
 import { PksEdit, PeckersEdit } from '../../helpers/converter';
 import MountBrush from '../../helpers/brush';
 import { TfRescale, MountCompass } from '../../helpers/compass';
+import {
+  clearIntegrationSplitPreview,
+  drawIntegrationSplitPreview,
+  getSplitXFromEvent,
+} from '../../helpers/integration_split';
 import { LIST_LAYOUT } from '../../constants/list_layout';
 import Format from '../../helpers/format';
 import {
@@ -18,9 +23,8 @@ import {
 } from '../../helpers/chem';
 import Cfg from '../../helpers/cfg';
 import { itgIdTag, mpyIdTag } from '../../helpers/focus';
-import { calcArea } from '../../helpers/integration';
+import { calcArea, getIntegrationPoints, getLinearBaseline } from '../../helpers/integration';
 import { calcMpyCenter } from '../../helpers/multiplicity_calc';
-import { calcSlope } from '../../helpers/calc';
 
 const d3 = require('d3');
 
@@ -46,6 +50,7 @@ class MultiFocus {
     this.clickUiTargetAct = clickUiTargetAct;
     this.selectUiSweepAct = selectUiSweepAct;
     this.scrollUiWheelAct = scrollUiWheelAct;
+    this.splitIntegrationAct = splitIntegrationAct;
     this.brush = d3.brush();
     this.brushX = d3.brushX();
 
@@ -73,6 +78,10 @@ class MultiFocus {
     this.shouldUpdate = {};
     // this.freq = false;
     this.layout = LIST_LAYOUT.CYCLIC_VOLTAMMETRY;
+    this.isUiAddIntgSt = false;
+    this.isUiSplitIntgSt = false;
+    this.integrationSplitTargets = null;
+    this.firstIntegrationPoint = null;
 
     this.getShouldUpdate = this.getShouldUpdate.bind(this);
     this.resetShouldUpdate = this.resetShouldUpdate.bind(this);
@@ -91,6 +100,9 @@ class MultiFocus {
     this.drawMtply = this.drawMtply.bind(this);
     this.drawAUC = this.drawAUC.bind(this);
     this.onClickTarget = this.onClickTarget.bind(this);
+    this.onClickIntegrationTarget = this.onClickIntegrationTarget.bind(this);
+    this.onIntegrationMouseMove = this.onIntegrationMouseMove.bind(this);
+    this.clearSplitPreview = this.clearSplitPreview.bind(this);
     this.mergedPeaks = this.mergedPeaks.bind(this);
     this.setDataPecker = this.setDataPecker.bind(this);
     this.drawPeckers = this.drawPeckers.bind(this);
@@ -349,6 +361,34 @@ class MultiFocus {
     }
   }
 
+  clearSplitPreview() {
+    clearIntegrationSplitPreview(this);
+  }
+
+  onIntegrationMouseMove(event, data, shift, ignoreRef) {
+    if (!this.isUiSplitIntgSt) return;
+    const splitX = getSplitXFromEvent(event, this);
+    drawIntegrationSplitPreview(this, data, splitX, shift, ignoreRef);
+  }
+
+  onClickIntegrationTarget(event, data) {
+    if (!this.isUiSplitIntgSt) {
+      this.onClickTarget(event, data);
+      return;
+    }
+
+    event.stopPropagation();
+    event.preventDefault();
+    const splitX = getSplitXFromEvent(event, this);
+    this.clearSplitPreview();
+    this.splitIntegrationAct({
+      curveIdx: this.jcampIdx,
+      target: data,
+      splitX,
+      data: this.data,
+    });
+  }
+
   onClickPecker(event, data) {
     event.stopPropagation();
     event.preventDefault();
@@ -382,7 +422,7 @@ class MultiFocus {
     return this.dataPeckers;
   }
 
-  drawAUC(stack) {
+  drawAUC(stack, shift = 0) {
     const { xt, yt } = TfRescale(this);
     const auc = this.tags.aucPath.selectAll('path').data(stack);
     auc.exit()
@@ -391,25 +431,14 @@ class MultiFocus {
 
     const integCurve = (border) => {
       const { xL, xU } = border;
-      const ps = this.data.filter((d) => d.x > xL && d.x < xU);
+      const ps = getIntegrationPoints(xL, xU, this.data);
       if (!ps[0]) return null;
 
-      const point1 = ps[0];
-      const point2 = ps[ps.length - 1];
-      const slope = calcSlope(point1.x, point1.y, point2.x, point2.y);
-      let lastDY = point1.y;
+      const baselineY = getLinearBaseline(ps);
 
       return d3.area()
         .x((d) => xt(d.x))
-        .y0((d, index) => {
-          if (index > 0) {
-            const lastD = ps[index - 1];
-            const y = slope * (d.x - lastD.x) + lastDY;
-            lastDY = y;
-            return yt(y);
-          }
-          return yt(0);
-        })
+        .y0((d) => yt(baselineY(d)))
         .y1((d) => yt(d.y))(ps);
     };
 
@@ -438,8 +467,10 @@ class MultiFocus {
           .style('fill', 'red');
         d3.select(`#auc${itgIdTag(d)}`)
           .style('fill-opacity', 0.2);
+        this.clearSplitPreview();
       })
-      .on('click', (event, d) => this.onClickTarget(event, d));
+      .on('mousemove', (event, d) => this.onIntegrationMouseMove(event, d, shift, true))
+      .on('click', (event, d) => this.onClickIntegrationTarget(event, d));
   }
 
   drawPeaks(editPeakSt) {
@@ -623,6 +654,9 @@ class MultiFocus {
     const { integrations } = integrationState;
     const selectedIntegration = integrations[this.jcampIdx];
     if (selectedIntegration === false || selectedIntegration === undefined) {
+      Object.assign(this, {
+        integrationSplitTargets: { stack: [], shift: 0, ignoreRef: false },
+      });
       const itgs = [];
       const igbp = this.tags.igbPath.selectAll('path').data(itgs);
       igbp.exit()
@@ -647,6 +681,9 @@ class MultiFocus {
     const isDisable = Cfg.btnCmdIntg(this.layout);
     const ignoreRef = Format.isHplcUvVisLayout(this.layout);
     const itgs = isDisable ? [] : stack;
+    Object.assign(this, {
+      integrationSplitTargets: { stack: itgs, shift, ignoreRef },
+    });
 
     const igbp = this.tags.igbPath.selectAll('path').data(itgs);
     igbp.exit()
@@ -673,7 +710,7 @@ class MultiFocus {
     }
 
     if (ignoreRef) {
-      this.drawAUC(stack);
+      this.drawAUC(stack, shift);
     } else {
       // rescale for zoom
       const { xt } = TfRescale(this);
@@ -714,8 +751,10 @@ class MultiFocus {
             .attr('stroke', '#228B22');
           d3.select(`#igtp${itgIdTag(d)}`)
             .style('fill', '#228B22');
+          this.clearSplitPreview();
         })
-        .on('click', (event, d) => this.onClickTarget(event, d));
+        .on('mousemove', (event, d) => this.onIntegrationMouseMove(event, d, shift, ignoreRef))
+        .on('click', (event, d) => this.onClickIntegrationTarget(event, d));
 
       const integCurve = (border) => {
         const { xL, xU } = border;
@@ -758,8 +797,10 @@ class MultiFocus {
             .attr('stroke', '#228B22');
           d3.select(`#igtp${itgIdTag(d)}`)
             .style('fill', '#228B22');
+          this.clearSplitPreview();
         })
-        .on('click', (event, d) => this.onClickTarget(event, d));
+        .on('mousemove', (event, d) => this.onIntegrationMouseMove(event, d, shift, ignoreRef))
+        .on('click', (event, d) => this.onClickIntegrationTarget(event, d));
 
       igtp.enter()
         .append('text')
@@ -787,8 +828,10 @@ class MultiFocus {
             .attr('stroke', '#228B22');
           d3.select(`#igtp${itgIdTag(d)}`)
             .style('fill', '#228B22');
+          this.clearSplitPreview();
         })
-        .on('click', (event, d) => this.onClickTarget(event, d));
+        .on('mousemove', (event, d) => this.onIntegrationMouseMove(event, d, shift, ignoreRef))
+        .on('click', (event, d) => this.onClickIntegrationTarget(event, d));
     }
   }
 
@@ -1072,7 +1115,7 @@ class MultiFocus {
     curveSt,
     filterSeed, filterPeak, tTrEndPts, tSfPeaks,
     editPeakSt, layoutSt,
-    sweepExtentSt, isUiNoBrushSt,
+    sweepExtentSt, isUiAddIntgSt, isUiSplitIntgSt, isUiNoBrushSt,
     cyclicvoltaSt,
     integrationSt, mtplySt, uiSt,
   }) {
@@ -1090,6 +1133,8 @@ class MultiFocus {
     this.scales = InitScale(this, this.reverseXAxis(layoutSt));
     this.setTip();
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
+    Object.assign(this, { isUiSplitIntgSt });
+    if (!isUiSplitIntgSt) this.clearSplitPreview();
     MountCompass(this);
 
     this.axis = MountAxis(this);
@@ -1113,7 +1158,7 @@ class MultiFocus {
       this.drawInteg(integrationSt);
       this.drawMtply(mtplySt);
     }
-    MountBrush(this, false, isUiNoBrushSt);
+    MountBrush(this, isUiAddIntgSt, isUiNoBrushSt);
     this.resetShouldUpdate(editPeakSt);
   }
 
@@ -1135,6 +1180,8 @@ class MultiFocus {
     this.entities = entities;
 
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
+    Object.assign(this, { isUiSplitIntgSt });
+    if (!isUiSplitIntgSt) this.clearSplitPreview();
 
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);

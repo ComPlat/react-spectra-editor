@@ -12,7 +12,7 @@ import Tooltip from '@mui/material/Tooltip';
 import TextField from '@mui/material/TextField';
 
 import Icon from '@mdi/react';
-import { mdiReflectVertical, mdiMathIntegral } from '@mdi/js';
+import { mdiClose, mdiReflectVertical, mdiMathIntegral } from '@mdi/js';
 
 import {
   clearIntegrationAll, setIntegrationFkr,
@@ -25,6 +25,7 @@ import { setUiSweepType } from '../../actions/ui';
 import {
   LIST_UI_SWEEP_TYPE,
 } from '../../constants/list_ui';
+import { clearPendingIntegrationDraft } from '../../helpers/integration_draft.js'; // eslint-disable-line import/extensions
 import Cfg from '../../helpers/cfg';
 import TriBtn from './tri_btn';
 import { MuButton, commonStyle, focusStyle } from './common';
@@ -38,6 +39,13 @@ const styles = () => (
         width: 80,
       },
       txtIcon: {
+      },
+      cancelBtn: {
+        borderColor: '#d32f2f',
+        color: '#d32f2f',
+        '&:hover': {
+          backgroundColor: '#ffebee',
+        },
       },
     },
     commonStyle,
@@ -97,13 +105,22 @@ const iconColor = (criteria) => (criteria ? '#fff' : '#000');
 const Integration = ({
   classes, ignoreRef,
   isDisableSt, isFocusAddIntgSt, isFocusRmIntgSt, isFocusSetRefSt,
+  isFocusSplitIntgSt,
   setUiSweepTypeAct, setIntegrationFkrAct, clearIntegrationAllAct,
   curveSt, integrationSt, clearIntegrationAllHplcMsAct, layoutSt,
 }) => {
-  const onSweepIntegtAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.INTEGRATION_ADD);
+  const { curveIdx } = curveSt;
+  const onCancelTool = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.ZOOMIN, curveIdx);
+  const onSweepIntegtAdd = () => {
+    if (isFocusAddIntgSt) {
+      clearPendingIntegrationDraft();
+      onCancelTool();
+      return;
+    }
+    setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.INTEGRATION_ADD, curveIdx);
+  };
   const onSweepIntegtRm = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.INTEGRATION_RM);
   const onSweepIntegtSR = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF);
-  const { curveIdx } = curveSt;
   const onClearAll = () => {
     if (layoutSt === LIST_LAYOUT.LC_MS) {
       clearIntegrationAllHplcMsAct();
@@ -119,7 +136,7 @@ const Integration = ({
           <MuButton
             className={
               classNames(
-                focusStyle(isFocusAddIntgSt, classes),
+                isFocusAddIntgSt ? classes.cancelBtn : focusStyle(false, classes),
                 'btn-add-inter',
               )
             }
@@ -127,12 +144,16 @@ const Integration = ({
             onClick={onSweepIntegtAdd}
           >
             <Icon
-              path={mdiMathIntegral}
+              path={isFocusAddIntgSt ? mdiClose : mdiMathIntegral}
               size={iconSize}
-              color={iconColor(isFocusAddIntgSt || isDisableSt)}
+              color={isFocusAddIntgSt ? '#d32f2f' : iconColor(isDisableSt)}
               className={classNames(classes.iconMdi, 'icon-sv-bar-addint')}
             />
-            <span className={classNames(classes.txt, classes.txtIcon, 'txt-sv-bar-addint')}>+</span>
+            {
+              isFocusAddIntgSt
+                ? null
+                : <span className={classNames(classes.txt, classes.txtIcon, 'txt-sv-bar-addint')}>+</span>
+            }
           </MuButton>
         </span>
       </Tooltip>
@@ -158,24 +179,56 @@ const Integration = ({
           </MuButton>
         </span>
       </Tooltip>
-      <Tooltip title={<span className="txt-sv-tp">Set Integration Reference</span>}>
+      {
+        ignoreRef
+          ? null
+          : (
+            <Tooltip title={<span className="txt-sv-tp">Set Integration Reference</span>}>
+              <span>
+                <MuButton
+                  className={
+                    classNames(
+                      focusStyle(isFocusSetRefSt, classes),
+                      'btn-set-inter-ref',
+                    )
+                  }
+                  disabled={isDisableSt}
+                  onClick={onSweepIntegtSR}
+                >
+                  <Icon
+                    path={mdiReflectVertical}
+                    size={iconSize}
+                    color={iconColor(isFocusSetRefSt || isDisableSt)}
+                    className={classNames(classes.iconMdi, 'icon-sv-bar-refint')}
+                  />
+                </MuButton>
+              </span>
+            </Tooltip>
+          )
+      }
+      <Tooltip title={<span className="txt-sv-tp">Split Integration</span>}>
         <span>
           <MuButton
             className={
               classNames(
-                focusStyle(isFocusSetRefSt, classes),
-                'btn-set-inter-ref',
+                isFocusSplitIntgSt ? classes.cancelBtn : focusStyle(false, classes),
+                'btn-split-inter',
               )
             }
             disabled={isDisableSt}
-            onClick={onSweepIntegtSR}
+            onClick={onSweepIntegtSplit}
           >
             <Icon
-              path={mdiReflectVertical}
+              path={isFocusSplitIntgSt ? mdiClose : mdiMathIntegral}
               size={iconSize}
-              color={iconColor(isFocusSetRefSt || isDisableSt)}
-              className={classNames(classes.iconMdi, 'icon-sv-bar-refint')}
+              color={isFocusSplitIntgSt ? '#d32f2f' : iconColor(isDisableSt)}
+              className={classNames(classes.iconMdi, 'icon-sv-bar-splitint')}
             />
+            {
+              isFocusSplitIntgSt
+                ? null
+                : <span className={classNames(classes.txt, classes.txtIcon, 'txt-sv-bar-splitint')}>/</span>
+            }
           </MuButton>
         </span>
       </Tooltip>
@@ -208,6 +261,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     isFocusAddIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
     isFocusRmIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_RM,
     isFocusSetRefSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF,
+    isFocusSplitIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_SPLIT,
     ignoreRef: Format.isHplcUvVisLayout(state.layout),
     curveSt: state.curve,
     integrationSt: state.integration.present,
@@ -230,6 +284,7 @@ Integration.propTypes = {
   isFocusAddIntgSt: PropTypes.bool.isRequired,
   isFocusRmIntgSt: PropTypes.bool.isRequired,
   isFocusSetRefSt: PropTypes.bool.isRequired,
+  isFocusSplitIntgSt: PropTypes.bool.isRequired,
   ignoreRef: PropTypes.bool.isRequired,
   setUiSweepTypeAct: PropTypes.func.isRequired,
   setIntegrationFkrAct: PropTypes.func.isRequired,

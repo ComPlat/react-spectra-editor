@@ -21,8 +21,16 @@ const clearIntegrationAll = (payload) => (
   }
 );
 
+const splitIntegration = (payload) => (
+  {
+    type: INTEGRATION.SPLIT,
+    payload,
+  }
+);
+
 export {
   sweepIntegration,
   setIntegrationFkr,
   clearIntegrationAll,
+  splitIntegration,
 }; // eslint-disable-line
