@@ -1,5 +1,7 @@
 /* eslint-disable prefer-object-spread */
-import { MouseMove } from './compass';
+import { clearIntegrationPreview, MouseMove } from './compass';
+import { clearPendingIntegrationDraft } from './integration_draft.js'; // eslint-disable-line import/extensions
+import { buildSweepPayloadFromXBounds } from './sweep.js'; // eslint-disable-line import/extensions
 import { LIST_UI_SWEEP_TYPE } from '../constants/list_ui';
 
 const d3 = require('d3');
@@ -23,6 +25,18 @@ const brushed = (focus, xOnly, event, brushedClass = '.d3Svg') => {
   let xExtent = { xL: xes[0], xU: xes[1] };
   let yExtent = { yL: yes[0], yU: yes[1] };
   if (xOnly) {
+    if (focus.isUiAddIntgSt) {
+      const payload = buildSweepPayloadFromXBounds(
+        focus,
+        scales.x.invert(selection[0]),
+        scales.x.invert(selection[1]),
+      );
+      selectUiSweepAct(payload);
+      if (brushX) {
+        focus.svg.selectAll('.brushX').call(brushX.move, null);
+      }
+      return;
+    }
     xes = selection.map(scales.x.invert).sort((a, b) => a - b);
     xExtent = { xL: xes[0], xU: xes[1] };
   } else {
@@ -32,11 +46,6 @@ const brushed = (focus, xOnly, event, brushedClass = '.d3Svg') => {
     xExtent = { xL: xes[0], xU: xes[1] };
     yExtent = { yL: yes[0], yU: yes[1] };
   }
-  const [begPt, endPt] = selection;
-  xes = [begPt[0], endPt[0]].map(scales.x.invert).sort((a, b) => a - b);
-  yes = [begPt[1], endPt[1]].map(scales.y.invert).sort((a, b) => a - b);
-  xExtent = { xL: xes[0], xU: xes[1] };
-  yExtent = { yL: yes[0], yU: yes[1] };
   selectUiSweepAct({
     xExtent, yExtent, data, dataPks,
   });
@@ -63,6 +72,17 @@ const MountBrush = (focus, isUiAddIntgSt, isUiNoBrushSt, brushedClass = '.d3Svg'
     root, svg, brush, brushX, w, h, uiSt, graphIndex,
   } = focus;
 
+  Object.assign(focus, { isUiAddIntgSt });
+  const { firstIntegrationPoint, data, jcampIdx } = focus;
+  const isSameIntegrationDraft = firstIntegrationPoint
+    && firstIntegrationPoint.jcampIdx === jcampIdx
+    && firstIntegrationPoint.dataLength === data.length;
+  if (!isUiAddIntgSt || (firstIntegrationPoint && !isSameIntegrationDraft)) {
+    clearPendingIntegrationDraft();
+    Object.assign(focus, { firstIntegrationPoint: null });
+    clearIntegrationPreview(focus);
+  }
+
   if (!root || !svg || typeof svg.selectAll !== 'function') return;
 
   svg.selectAll('.brush, .brushX').remove();
@@ -88,9 +108,9 @@ const MountBrush = (focus, isUiAddIntgSt, isUiNoBrushSt, brushedClass = '.d3Svg'
       .on('end', brushedCb);
 
     root.append('g')
-      .attr('class', 'brush')
+      .attr('class', klass)
       .on('mousemove', (event) => MouseMove(event, focus))
-      .call(brush);
+      .call(target);
   }
 
   svg.on('wheel', wheeledCb);
