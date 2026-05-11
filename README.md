@@ -4,6 +4,7 @@ An editor to View and Edit Chemical Spectra data (NMR, IR, MS, UV, CV and XRD).
 
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/ComPlat/react-spectra-editor)
 ![Testing](https://github.com/ComPlat/react-spectra-editor/actions/workflows/testing.yml/badge.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ### Usage
 

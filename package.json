@@ -6,7 +6,7 @@
     "type": "git",
     "url": "https://github.com/ComPlat/react-spectra-editor"
   },
-  "license": "AGPL-3.0",
+  "license": "MIT",
   "dependencies": {
     "@complat/react-svg-file-zoom-pan": "1.1.4",
     "@emotion/react": "^11.11.1",
