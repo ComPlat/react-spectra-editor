@@ -42,9 +42,12 @@ const createUvvisCurveNoServerIntegrations = () => ({
   ],
 });
 
-const createMzCurve = (polarity: 'positive' | 'negative' | 'neutral') => ({
+const createMzCurve = (polarity: 'positive' | 'negative' | 'neutral', pageValue?: number) => ({
   csCategory: ['mz', polarity],
-  features: [{ data: [{ x: [100, 101], y: [5, 6] }] }],
+  features: [{
+    ...(pageValue !== undefined ? { pageValue } : {}),
+    data: [{ x: [100, 101], y: [5, 6] }],
+  }],
 });
 
 describe('Test redux reducer_hplc_ms', () => {
@@ -107,14 +110,38 @@ describe('Test redux reducer_hplc_ms', () => {
   });
 
   it('keeps previous state when SET_ALL_CURVES does not contain UVVIS', () => {
-    const initial = hplcMsReducer(undefined, { type: '@@INIT' } as any);
-    const action = {
+    const hydrated = hplcMsReducer(undefined, {
       type: CURVE.SET_ALL_CURVES,
-      payload: [createTicCurve('positive')],
-    };
+      payload: [createTicCurve('positive'), createUvvisCurve(), createMzCurve('positive')],
+    } as any);
+    expect(hydrated.uvvis.spectraList.length).toBeGreaterThan(0);
 
-    const next = hplcMsReducer(initial, action as any);
-    expect(next).toBe(initial);
+    const next = hplcMsReducer(hydrated, {
+      type: CURVE.SET_ALL_CURVES,
+      payload: [createMzCurve('negative')],
+    } as any);
+
+    expect(next).toBe(hydrated);
+  });
+
+  it('clears hplc/ms state on HPLC_MS.CLEAR_STATE while preserving export preference', () => {
+    const hydrated = hplcMsReducer(undefined, {
+      type: CURVE.SET_ALL_CURVES,
+      payload: [createTicCurve('positive'), createUvvisCurve(), createMzCurve('positive')],
+      meta: { idDt: 'dataset-A' },
+    } as any);
+    const withExport = hplcMsReducer(hydrated, {
+      type: HPLC_MS.SET_LCMS_INTEGRATIONS_EXPORT,
+      payload: { lcmsIntegrationsExport: 'both' },
+    } as any);
+    expect(withExport.lcmsDatasetKey).toEqual('dataset-A');
+    expect(withExport.uvvis.spectraList.length).toBeGreaterThan(0);
+
+    const cleared = hplcMsReducer(withExport, { type: HPLC_MS.CLEAR_STATE } as any);
+    expect(cleared.lcmsDatasetKey).toEqual(null);
+    expect(cleared.uvvis.spectraList).toEqual([]);
+    expect(cleared.tic.available).toEqual({ positive: false, negative: false, neutral: false });
+    expect(cleared.lcmsIntegrationsExport).toEqual('both');
   });
 
   it('clears integrations and peaks for all UVVIS spectra', () => {
@@ -318,6 +345,36 @@ describe('Test redux reducer_hplc_ms', () => {
 
     expect(reloaded.uvvis.selectedWaveLength).toEqual(220);
     expect(reloaded.uvvis.wavelengthIdx).toEqual(1);
+  });
+
+  it('aligns currentPageValue with the new MZ feature pageValue (cross-polarity case)', () => {
+    const initial = hplcMsReducer(undefined, {
+      type: CURVE.SET_ALL_CURVES,
+      payload: [
+        createTicCurve('positive', [8.58, 8.59], [10, 20]),
+        createTicCurve('negative', [8.575, 8.585], [30, 40]),
+        createUvvisCurve(),
+        createMzCurve('positive', 8.58),
+      ],
+    } as any);
+    expect(initial.tic.polarity).toEqual('positive');
+    expect(initial.tic.currentPageValue).toEqual(8.58);
+
+    const polarityFlipped = hplcMsReducer(
+      { ...initial, tic: { ...initial.tic, polarity: 'negative' } },
+      {
+        type: CURVE.SET_ALL_CURVES,
+        payload: [
+          createTicCurve('positive', [8.58, 8.59], [10, 20]),
+          createTicCurve('negative', [8.575, 8.585], [30, 40]),
+          createUvvisCurve(),
+          createMzCurve('negative', 8.575),
+        ],
+      } as any,
+    );
+
+    expect(polarityFlipped.tic.polarity).toEqual('negative');
+    expect(polarityFlipped.tic.currentPageValue).toEqual(8.575);
   });
 
   it('uvvis undo/redo restores peaks after UPDATE_HPLCMS_PEAKS', () => {

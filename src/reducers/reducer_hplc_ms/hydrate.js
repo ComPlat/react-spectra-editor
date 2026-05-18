@@ -100,9 +100,7 @@ export const updateLcmsData = (state, action) => {
     }
   });
 
-  if (!uvvisCurve || !uvvisCurve.features) {
-    return state;
-  }
+  if (!uvvisCurve || !uvvisCurve.features) return state;
   const { features } = uvvisCurve;
 
   const getPageValue = (fe) => {
@@ -277,12 +275,30 @@ export const updateLcmsData = (state, action) => {
     );
   };
 
+  const rtFromMzFeature = (pol) => {
+    const findIn = (list) => {
+      if (!Array.isArray(list)) return null;
+      for (let i = 0; i < list.length; i += 1) {
+        const v = getFeaturePageValue(list[i]);
+        if (Number.isFinite(v)) return v;
+      }
+      return null;
+    };
+    if (pol === 'negative') return findIn(mzNegFeatures);
+    if (pol === 'neutral') return findIn(mzNeutralFeatures);
+    return findIn(mzPosFeatures);
+  };
+
   const metaRt = readFiniteNumber(meta.lcms_mz_page ?? meta.lcmsMzPage);
   const curveRt = rtHintFromMzCurve(selectedPolarity);
   const uvvisRtHint = readFiniteNumber(
     uvvisCurve?.lcms_mz_page ?? uvvisCurve?.lcmsMzPage
       ?? uvvisCurve?.entity?.lcms_mz_page ?? uvvisCurve?.entity?.lcmsMzPage,
   );
+  const mzFeatureRt = rtFromMzFeature(selectedPolarity)
+    ?? rtFromMzFeature('positive')
+    ?? rtFromMzFeature('negative')
+    ?? rtFromMzFeature('neutral');
 
   const fromHints = pickFirstRtOnAxis(
     [metaRt, uvvisRtHint, curveRt],
@@ -302,6 +318,10 @@ export const updateLcmsData = (state, action) => {
     nextCurrentPageValue = snappedState;
   } else if (snappedPersisted != null) {
     nextCurrentPageValue = snappedPersisted;
+  }
+
+  if (Number.isFinite(mzFeatureRt)) {
+    nextCurrentPageValue = mzFeatureRt;
   }
 
   const sameDataset = nextDatasetKey != null

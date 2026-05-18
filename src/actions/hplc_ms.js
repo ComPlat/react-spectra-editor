@@ -53,3 +53,7 @@ export const clearAllPeaksHplcMs = (payload) => ({
   type: HPLC_MS.CLEAR_ALL_PEAKS_HPLCMS,
   payload,
 });
+
+export const clearHplcMsState = () => ({
+  type: HPLC_MS.CLEAR_STATE,
+});

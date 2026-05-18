@@ -20,11 +20,27 @@ import { getLcMsInfo, isLcMsGroup } from './helpers/extractEntityLCMS';
 import MultiJcampsViewer from './components/multi_jcamps_viewer';
 import HPLCViewer from './components/hplc_viewer';
 import { setAllCurves } from './actions/curve';
+import { clearHplcMsState } from './actions/hplc_ms';
 
 const styles = () => ({
 });
 
 class LayerInit extends React.Component {
+  static entitySignature(e) {
+    if (!e) return 'none';
+    const id = e.idDt ?? e.id ?? e.datasetId;
+    if (id != null && id !== '') return `id:${id}`;
+    const firstFeature = (Array.isArray(e.features) ? e.features[0] : null)
+      || (Array.isArray(e.spectra) ? e.spectra[0] : null)
+      || null;
+    const data0 = firstFeature?.data?.[0];
+    const xs = data0?.x;
+    const xLen = Array.isArray(xs) ? xs.length : 0;
+    const xHead = Array.isArray(xs) && xs.length > 0 ? xs[0] : '';
+    const xTail = Array.isArray(xs) && xs.length > 0 ? xs[xs.length - 1] : '';
+    return `sig:${e.layout || ''}|${e.title || ''}|${xLen}|${xHead}|${xTail}`;
+  }
+
   constructor(props) {
     super(props);
 
@@ -60,8 +76,17 @@ class LayerInit extends React.Component {
   }
 
   normChange(prevProps) {
-    const { entity } = this.props;
+    const { entity, clearHplcMsStateAct } = this.props;
     if (prevProps.entity !== entity) {
+      const prevIsLcms = Format.isLCMsLayout(prevProps.entity?.layout);
+      const nextIsLcms = Format.isLCMsLayout(entity?.layout);
+      if (prevIsLcms || nextIsLcms) {
+        const prevSig = LayerInit.entitySignature(prevProps.entity);
+        const nextSig = LayerInit.entitySignature(entity);
+        if (prevSig !== nextSig) {
+          clearHplcMsStateAct();
+        }
+      }
       this.execReset();
     }
   }
@@ -280,6 +305,7 @@ const mapDispatchToProps = (dispatch) => (
     addOthersAct: addOthers,
     setAllCurvesAct: setAllCurves,
     updateDSCMetaDataAct: updateDSCMetaData,
+    clearHplcMsStateAct: clearHplcMsState,
   }, dispatch)
 );
 
@@ -313,6 +339,7 @@ LayerInit.propTypes = {
   resetDetectorAct: PropTypes.func.isRequired,
   resetMultiplicityAct: PropTypes.func.isRequired,
   updateDSCMetaDataAct: PropTypes.func.isRequired,
+  clearHplcMsStateAct: PropTypes.func.isRequired,
 };
 
 LayerInit.defaultProps = {

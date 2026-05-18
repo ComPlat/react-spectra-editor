@@ -19,7 +19,7 @@ import {
   resetThresholdValue,
 } from './tic';
 
-const initialState = {
+export const initialState = {
   uvvis: {
     listWaveLength: null,
     selectedWaveLength: null,
@@ -64,6 +64,11 @@ const initialState = {
   layout: 'LC/MS',
 };
 
+const clearState = (state) => ({
+  ...initialState,
+  lcmsIntegrationsExport: state?.lcmsIntegrationsExport ?? initialState.lcmsIntegrationsExport,
+});
+
 const hplcMsReducer = (state = initialState, action) => {
   switch (action.type) {
     case HPLC_MS.SET_LCMS_INTEGRATIONS_EXPORT: {
@@ -98,6 +103,8 @@ const hplcMsReducer = (state = initialState, action) => {
       return resetThresholdValue(state);
     case HPLC_MS.CLEAR_ALL_PEAKS_HPLCMS:
       return clearAllPeaksHplcMs(state, action);
+    case HPLC_MS.CLEAR_STATE:
+      return clearState(state);
     default:
       return state;
   }
