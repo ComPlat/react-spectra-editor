@@ -11,11 +11,17 @@ import { TfRescale, MountCompass } from '../../helpers/compass';
 import {
   clearIntegrationSplitPreview,
   drawIntegrationSplitPreview,
+  drawIntegrationVisualSplitLines,
   getSplitXFromEvent,
+  getVisualSplitLineAtX,
+  isAlreadyVisuallySplit,
+  isMergedVisualSplitGroup,
 } from '../../helpers/integration_split';
 import { PksEdit } from '../../helpers/converter';
 import { itgIdTag, mpyIdTag } from '../../helpers/focus';
-import { calcArea, getIntegrationPoints, getLinearBaseline } from '../../helpers/integration';
+import {
+  calcArea, getIntegrationPoints, getLinearBaseline, getVisualSplitGroups,
+} from '../../helpers/integration';
 import { calcMpyCenter } from '../../helpers/multiplicity_calc';
 import Format from '../../helpers/format';
 import Cfg from '../../helpers/cfg';
@@ -27,6 +33,7 @@ class LineFocus {
   constructor(props) {
     const {
       W, H, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct, uiSt,
+      splitIntegrationAct, addVisualSplitLineAct, removeVisualSplitLineAct,
     } = props;
 
     this.jcampIdx = 0;
@@ -45,6 +52,8 @@ class LineFocus {
     this.selectUiSweepAct = selectUiSweepAct;
     this.scrollUiWheelAct = scrollUiWheelAct;
     this.splitIntegrationAct = splitIntegrationAct;
+    this.addVisualSplitLineAct = addVisualSplitLineAct;
+    this.removeVisualSplitLineAct = removeVisualSplitLineAct;
     this.brush = d3.brush();
     this.brushX = d3.brushX();
 
@@ -72,6 +81,7 @@ class LineFocus {
     this.layout = LIST_LAYOUT.H1;
     this.isUiAddIntgSt = false;
     this.isUiSplitIntgSt = false;
+    this.isUiVisualSplitIntgSt = false;
     this.integrationSplitTargets = null;
     this.firstIntegrationPoint = null;
 
@@ -93,8 +103,10 @@ class LineFocus {
     this.drawComparisons = this.drawComparisons.bind(this);
     this.onClickTarget = this.onClickTarget.bind(this);
     this.onClickIntegrationTarget = this.onClickIntegrationTarget.bind(this);
+    this.onClickVisualSplitLine = this.onClickVisualSplitLine.bind(this);
     this.onIntegrationMouseMove = this.onIntegrationMouseMove.bind(this);
     this.clearSplitPreview = this.clearSplitPreview.bind(this);
+    this.drawVisualSplitLines = this.drawVisualSplitLines.bind(this);
     this.mergedPeaks = this.mergedPeaks.bind(this);
     this.isFirefox = typeof InstallTrigger !== 'undefined';
 
@@ -258,13 +270,21 @@ class LineFocus {
   }
 
   onIntegrationMouseMove(event, data, shift, ignoreRef) {
-    if (!this.isUiSplitIntgSt) return;
+    if (!this.isUiSplitIntgSt && !this.isUiVisualSplitIntgSt) return;
+    if (this.isUiVisualSplitIntgSt && isAlreadyVisuallySplit(data)) {
+      this.clearSplitPreview();
+      return;
+    }
+    if (this.isUiSplitIntgSt && isMergedVisualSplitGroup(data)) {
+      this.clearSplitPreview();
+      return;
+    }
     const splitX = getSplitXFromEvent(event, this);
     drawIntegrationSplitPreview(this, data, splitX, shift, ignoreRef);
   }
 
   onClickIntegrationTarget(event, data) {
-    if (!this.isUiSplitIntgSt) {
+    if (!this.isUiSplitIntgSt && !this.isUiVisualSplitIntgSt) {
       this.onClickTarget(event, data);
       return;
     }
@@ -273,12 +293,59 @@ class LineFocus {
     event.preventDefault();
     const splitX = getSplitXFromEvent(event, this);
     this.clearSplitPreview();
+    if (this.isUiVisualSplitIntgSt) {
+      const { stack = [], shift = 0 } = this.integrationSplitTargets || {};
+      const existingSplitX = getVisualSplitLineAtX(this, stack, splitX, shift);
+      if (Number.isFinite(existingSplitX)) {
+        if (typeof this.removeVisualSplitLineAct !== 'function') return;
+        this.removeVisualSplitLineAct({
+          curveIdx: this.jcampIdx,
+          splitX: existingSplitX,
+          data: this.data,
+        });
+        return;
+      }
+      if (isAlreadyVisuallySplit(data)) return;
+      if (typeof this.addVisualSplitLineAct !== 'function') return;
+      this.addVisualSplitLineAct({
+        curveIdx: this.jcampIdx,
+        target: data,
+        splitX,
+        data: this.data,
+      });
+      return;
+    }
+
+    if (isMergedVisualSplitGroup(data)) return;
     this.splitIntegrationAct({
       curveIdx: this.jcampIdx,
       target: data,
       splitX,
       data: this.data,
     });
+  }
+
+  onClickVisualSplitLine(event, splitX) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.clearSplitPreview();
+    if (typeof this.removeVisualSplitLineAct !== 'function') return;
+    this.removeVisualSplitLineAct({
+      curveIdx: this.jcampIdx,
+      splitX,
+      data: this.data,
+    });
+  }
+
+  drawVisualSplitLines(stack, shift, ignoreRef) {
+    drawIntegrationVisualSplitLines(
+      this,
+      stack,
+      shift,
+      ignoreRef,
+      this.isUiVisualSplitIntgSt,
+      this.onClickVisualSplitLine,
+    );
   }
 
   mergedPeaks(editPeakSt) {
@@ -289,14 +356,21 @@ class LineFocus {
 
   drawAUC(stack, shift = 0) {
     const { xt, yt } = TfRescale(this);
-    const auc = this.tags.aucPath.selectAll('path').data(stack);
+    const groups = getVisualSplitGroups(stack).map((group) => ({
+      xL: group.xL,
+      xU: group.xU,
+      isMerged: group.isMerged,
+      groupId: group.groupId,
+      target: group.items[0],
+    }));
+    const auc = this.tags.aucPath.selectAll('path').data(groups);
     auc.exit()
       .attr('class', 'exit')
       .remove();
 
     const integCurve = (border) => {
       const { xL, xU } = border;
-      const ps = getIntegrationPoints(xL, xU, this.data);
+      const ps = getIntegrationPoints(xL - shift, xU - shift, this.data);
       if (!ps[0]) return null;
 
       const baselineY = getLinearBaseline(ps);
@@ -437,11 +511,19 @@ class LineFocus {
       integrationSplitTargets: { stack: itgs, shift, ignoreRef },
     });
 
-    const igbp = this.tags.igbPath.selectAll('path').data(itgs);
+    const igGroups = getVisualSplitGroups(itgs).map((group) => ({
+      xL: group.xL,
+      xU: group.xU,
+      isMerged: group.isMerged,
+      groupId: group.groupId,
+      target: group.items[0],
+    }));
+
+    const igbp = this.tags.igbPath.selectAll('path').data(igGroups);
     igbp.exit()
       .attr('class', 'exit')
       .remove();
-    const igcp = this.tags.igcPath.selectAll('path').data(itgs);
+    const igcp = this.tags.igcPath.selectAll('path').data(igGroups);
     igcp.exit()
       .attr('class', 'exit')
       .remove();
@@ -458,6 +540,7 @@ class LineFocus {
         .attr('class', 'exit')
         .remove();
       auc.merge(auc);
+      this.drawVisualSplitLines([], shift, ignoreRef);
       return;
     }
 
@@ -585,6 +668,7 @@ class LineFocus {
         .on('mousemove', (event, d) => this.onIntegrationMouseMove(event, d, shift, ignoreRef))
         .on('click', (event, d) => this.onClickIntegrationTarget(event, d));
     }
+    this.drawVisualSplitLines(itgs, shift, ignoreRef);
   }
 
   drawMtply(mtplySt) {
@@ -852,7 +936,7 @@ class LineFocus {
   create({
     filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, comparisons,
     editPeakSt, layoutSt, integrationSt, mtplySt,
-    sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
+    sweepExtentSt, isUiAddIntgSt, isUiSplitIntgSt, isUiVisualSplitIntgSt, isUiNoBrushSt,
     wavelength, uiSt,
   }) {
     this.uiSt = uiSt;
@@ -865,8 +949,8 @@ class LineFocus {
     this.scales = InitScale(this, this.reverseXAxis(layoutSt));
     this.setTip();
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt, wavelength);
-    Object.assign(this, { isUiSplitIntgSt });
-    if (!isUiSplitIntgSt) this.clearSplitPreview();
+    Object.assign(this, { isUiSplitIntgSt, isUiVisualSplitIntgSt });
+    if (!isUiSplitIntgSt && !isUiVisualSplitIntgSt) this.clearSplitPreview();
     MountCompass(this);
 
     this.axis = MountAxis(this);
@@ -896,7 +980,7 @@ class LineFocus {
   update({
     filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, comparisons,
     editPeakSt, layoutSt, integrationSt, mtplySt, uiSt,
-    sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
+    sweepExtentSt, isUiAddIntgSt, isUiSplitIntgSt, isUiVisualSplitIntgSt, isUiNoBrushSt,
     wavelength,
   }) {
     this.uiSt = uiSt;
@@ -904,8 +988,8 @@ class LineFocus {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, this.reverseXAxis(layoutSt));
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt, wavelength);
-    Object.assign(this, { isUiSplitIntgSt });
-    if (!isUiSplitIntgSt) this.clearSplitPreview();
+    Object.assign(this, { isUiSplitIntgSt, isUiVisualSplitIntgSt });
+    if (!isUiSplitIntgSt && !isUiVisualSplitIntgSt) this.clearSplitPreview();
 
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);

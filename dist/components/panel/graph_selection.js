@@ -59,14 +59,16 @@ const GraphSelectionPanel = ({
   selectCurveAct,
   toggleShowAllCurveAct
 }) => {
-  const subLayoutValues = subLayoutsInfo ? Object.keys(subLayoutsInfo) : [];
+  let subLayoutValues = [];
+  if (subLayoutsInfo) {
+    subLayoutValues = Object.keys(subLayoutsInfo);
+  }
+  const subLayoutKey = subLayoutValues.join('|');
   const [selectedSubLayout, setSelectedSublayout] = (0, _react.useState)(subLayoutValues[0]);
   const resolvedSelectedSubLayout = subLayoutValues.includes(selectedSubLayout) ? selectedSubLayout : subLayoutValues[0] || false;
   (0, _react.useEffect)(() => {
-    if (resolvedSelectedSubLayout !== selectedSubLayout) {
-      setSelectedSublayout(resolvedSelectedSubLayout);
-    }
-  }, [subLayoutsInfo]);
+    setSelectedSublayout(subLayoutValues[0]);
+  }, [subLayoutKey]);
   if (!curveSt) {
     return /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {});
   }

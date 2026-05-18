@@ -17,6 +17,7 @@ const MountTags = target => {
   const mpyt2Path = target.root.append('g').attr('class', 'mpyt2Path-clip').attr('clip-path', 'url(#clip)');
   const mpypPath = target.root.append('g').attr('class', 'mpypPath-clip').attr('clip-path', 'url(#clip)');
   const aucPath = target.root.append('g').attr('class', 'aucPath-clip').attr('clip-path', 'url(#clip)');
+  const visualSplitPath = target.root.append('g').attr('class', 'integration-visual-splits').attr('clip-path', 'url(#clip)');
   const peckerPath = target.root.append('g').attr('class', 'peckerPath-clip').attr('clip-path', 'url(#clip)');
   return {
     pPath,
@@ -30,6 +31,7 @@ const MountTags = target => {
     mpyt2Path,
     mpypPath,
     aucPath,
+    visualSplitPath,
     peckerPath // eslint-disable-line
   };
 };

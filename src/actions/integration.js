@@ -28,9 +28,25 @@ const splitIntegration = (payload) => (
   }
 );
 
+const addVisualSplitLine = (payload) => (
+  {
+    type: INTEGRATION.ADD_VISUAL_SPLIT,
+    payload,
+  }
+);
+
+const removeVisualSplitLine = (payload) => (
+  {
+    type: INTEGRATION.RM_VISUAL_SPLIT,
+    payload,
+  }
+);
+
 export {
+  addVisualSplitLine,
   sweepIntegration,
   setIntegrationFkr,
   clearIntegrationAll,
+  removeVisualSplitLine,
   splitIntegration,
 }; // eslint-disable-line

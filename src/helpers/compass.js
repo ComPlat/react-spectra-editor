@@ -1,6 +1,18 @@
 import Format from './format';
 import { Convert2DValue } from './chem';
 import { LIST_UI_SWEEP_TYPE } from '../constants/list_ui';
+import { buildSweepPayloadFromXBounds } from './sweep.js'; // eslint-disable-line import/extensions
+import {
+  forgetPendingIntegrationDraft,
+  setPendingIntegrationDraft,
+} from './integration_draft.js'; // eslint-disable-line import/extensions
+import {
+  clearIntegrationSplitPreview,
+  drawIntegrationSplitPreview,
+  getIntegrationSplitTargetFromEvent,
+  getVisualSplitLineAtX,
+  isAlreadyVisuallySplit,
+} from './integration_split';
 
 const d3 = require('d3');
 
@@ -97,10 +109,15 @@ const updateIntegrationPreview = (event, focus) => {
 };
 
 const updateIntegrationSplitPreview = (event, focus) => {
-  if (!focus.isUiSplitIntgSt) return;
+  if (!focus.isUiSplitIntgSt && !focus.isUiVisualSplitIntgSt) return;
 
   const { splitX, target } = getIntegrationSplitTargetFromEvent(event, focus);
   if (!target) {
+    clearIntegrationSplitPreview(focus);
+    return;
+  }
+
+  if (focus.isUiVisualSplitIntgSt && isAlreadyVisuallySplit(target)) {
     clearIntegrationSplitPreview(focus);
     return;
   }
@@ -223,6 +240,50 @@ const clickIntegrationPoint = (event, focus) => {
 const ClickCompass = (event, focus) => {
   event.stopPropagation();
   event.preventDefault();
+  if (focus.isUiAddIntgSt) {
+    clickIntegrationPoint(event, focus);
+    return;
+  }
+  if (focus.isUiSplitIntgSt) {
+    const { splitX, target } = getIntegrationSplitTargetFromEvent(event, focus);
+    if (!target) return;
+
+    clearIntegrationSplitPreview(focus);
+    focus.splitIntegrationAct({
+      curveIdx: focus.jcampIdx,
+      target,
+      splitX,
+      data: focus.data,
+    });
+    return;
+  }
+  if (focus.isUiVisualSplitIntgSt) {
+    const { splitX, target } = getIntegrationSplitTargetFromEvent(event, focus);
+    if (!target) return;
+
+    const { stack = [], shift = 0 } = focus.integrationSplitTargets || {};
+    const existingSplitX = getVisualSplitLineAtX(focus, stack, splitX, shift);
+    clearIntegrationSplitPreview(focus);
+    if (Number.isFinite(existingSplitX)) {
+      if (typeof focus.removeVisualSplitLineAct !== 'function') return;
+      focus.removeVisualSplitLineAct({
+        curveIdx: focus.jcampIdx,
+        splitX: existingSplitX,
+        data: focus.data,
+      });
+      return;
+    }
+    if (isAlreadyVisuallySplit(target)) return;
+    if (typeof focus.addVisualSplitLineAct !== 'function') return;
+    focus.addVisualSplitLineAct({
+      curveIdx: focus.jcampIdx,
+      target,
+      splitX,
+      data: focus.data,
+    });
+    return;
+  }
+
   const { layout, cyclicvoltaSt, jcampIdx } = focus;
   const isPeakGroupSelect = focus.uiSt?.sweepType === LIST_UI_SWEEP_TYPE.PEAK_GROUP_SELECT;
   const isMsGraph = focus.graphIndex === 2;
@@ -230,6 +291,7 @@ const ClickCompass = (event, focus) => {
   const isLcmsTicGraph = Format.isLCMsLayout(layout) && focus.graphIndex === 1;
   if (isPeakGroupSelect && isMsGraph) return;
   if (isPeakGroupSelect && Format.isLCMsLayout(layout) && isUvvisGraph) return;
+
   const { xt, yt } = TfRescale(focus);
   let pt = fetchPt(event, focus, xt);
   if (Format.isCyclicVoltaLayout(layout)) {

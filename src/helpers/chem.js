@@ -764,20 +764,42 @@ const calcIntgRefArea = (spectra, stack) => {
   return { raw2realRatio };
 };
 
+const parseObservedIntegralGroups = (rawValue) => {
+  if (!rawValue) return {};
+  const tokenRegx = /[^A-Za-z0-9._-]/g;
+  const groupsByIdx = {};
+  rawValue.split('\n').forEach((line) => {
+    const cells = line.split(',').map((c) => c.replace(tokenRegx, ''));
+    if (cells.length < 2) return;
+    const idx = parseInt(cells[0], 10);
+    const groupId = cells[1];
+    if (!Number.isInteger(idx) || idx < 0 || !groupId) return;
+    groupsByIdx[idx] = groupId;
+  });
+  return groupsByIdx;
+};
+
 const buildIntegFeature = (jcamp, spectra) => {
-  const { $OBSERVEDINTEGRALS, $OBSERVEDMULTIPLETS } = jcamp.info;
+  const {
+    $OBSERVEDINTEGRALS, $OBSERVEDMULTIPLETS, $OBSERVEDINTEGRALSGROUPS,
+  } = jcamp.info;
   const regx = /[^0-9.,-]/g;
   let stack = [];
   if ($OBSERVEDINTEGRALS) {
     const its = $OBSERVEDINTEGRALS.split('\n').slice(1);
-    const itStack = its.map((t) => {
+    const groupsByIdx = parseObservedIntegralGroups($OBSERVEDINTEGRALSGROUPS);
+    const itStack = its.map((t, idx) => {
       const ts = t.replace(regx, '').split(',');
-      return {
+      const item = {
         xL: parseFloat(ts[0]),
         xU: parseFloat(ts[1]),
         area: parseFloat(ts[2]),
         absoluteArea: parseFloat(ts[3]),
       };
+      const groupId = groupsByIdx[idx];
+      return groupId
+        ? Object.assign({}, item, { visualSplitGroupId: groupId })
+        : item;
     });
     stack = [...stack, ...itStack];
   }
@@ -1069,7 +1091,7 @@ const ExtractJcamp = (source) => {
     source,
     {
       xy: true,
-      keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS|\$CSUPPERTHRESHOLD|\$CSLOWERTHRESHOLD|\$CSCYCLICVOLTAMMETRYDATA|UNITS|SYMBOL|\$CSAUTOMETADATA|\$DETECTOR|MN|MW|D|MP|MELTINGPOINT|TG|\$CSSCANRATE|\$CSSPECTRUMDIRECTION|\$CSWEAREAVALUE|\$CSWEAREAUNIT|\$CSCURRENTMODE|\$CSLCMSMZPAGE|SCAN_MODE|SCANMODE|TYPE|SOFTWARE|DATATYPE)/, // eslint-disable-line
+      keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDINTEGRALSGROUPS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS|\$CSUPPERTHRESHOLD|\$CSLOWERTHRESHOLD|\$CSCYCLICVOLTAMMETRYDATA|UNITS|SYMBOL|\$CSAUTOMETADATA|\$DETECTOR|MN|MW|D|MP|MELTINGPOINT|TG|\$CSSCANRATE|\$CSSPECTRUMDIRECTION|\$CSWEAREAVALUE|\$CSWEAREAUNIT|\$CSCURRENTMODE|\$CSLCMSMZPAGE|SCAN_MODE|SCANMODE|TYPE|SOFTWARE|DATATYPE)/, // eslint-disable-line
     },
   );
   const isChemstation = isChemstationLcms(source, jcamp);
@@ -1234,4 +1256,5 @@ export {
   Feature2MaxMinPeak, convertTopic, Convert2MaxMinPeak,
   GetCyclicVoltaShiftOffset, GetCyclicVoltaPreviousShift,
   convertThresEndPts, buildLcmsMsPageJcamp,
+  buildIntegFeature,
 };

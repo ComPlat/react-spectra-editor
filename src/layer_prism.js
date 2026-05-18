@@ -29,13 +29,20 @@ const getThresholdState = (state) => {
 const LayerPrism = ({
   entity, cLabel, xLabel, yLabel, forecast, operations,
   descriptions, molSvg, editorOnly, exactMass,
-  thresSt, scanSt, uiSt,
+  thresSt, scanSt, uiSt, curveSt, integrationSt,
   canChangeDescription, onDescriptionChanged, entityFileNames, userManualLink,
 }) => {
   const {
-    topic, feature, hasEdit, integration, features,
+    topic, feature, hasEdit, integration: initialIntegration, features,
   } = extractParams(entity, thresSt, scanSt);
   if (!topic) return null;
+
+  const curveIdx = (curveSt && Number.isFinite(curveSt.curveIdx)) ? curveSt.curveIdx : 0;
+  const liveIntegrations = (integrationSt && Array.isArray(integrationSt.integrations))
+    ? integrationSt.integrations
+    : null;
+  const liveIntegration = liveIntegrations ? liveIntegrations[curveIdx] : null;
+  const integration = liveIntegration || initialIntegration;
 
   const { viewer } = uiSt;
   if (viewer === LIST_UI_VIEWER_TYPE.ANALYSIS) {
@@ -116,6 +123,8 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     scanSt: state.scan,
     thresSt: getThresholdState(state),
     uiSt: state.ui,
+    curveSt: state.curve,
+    integrationSt: state.integration.present,
   }
 );
 
@@ -138,6 +147,8 @@ LayerPrism.propTypes = {
   thresSt: PropTypes.object.isRequired,
   scanSt: PropTypes.object.isRequired,
   uiSt: PropTypes.object.isRequired,
+  curveSt: PropTypes.object.isRequired,
+  integrationSt: PropTypes.object.isRequired,
   canChangeDescription: PropTypes.bool.isRequired,
   onDescriptionChanged: PropTypes.func,
   entityFileNames: PropTypes.array,

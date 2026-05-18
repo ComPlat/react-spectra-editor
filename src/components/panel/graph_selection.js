@@ -51,7 +51,11 @@ const GraphSelectionPanel = ({
   entityFileNames, subLayoutsInfo, layoutSt,
   selectCurveAct, toggleShowAllCurveAct,
 }) => {
-  const subLayoutValues = subLayoutsInfo ? Object.keys(subLayoutsInfo) : [];
+  let subLayoutValues = [];
+  if (subLayoutsInfo) {
+    subLayoutValues = Object.keys(subLayoutsInfo);
+  }
+  const subLayoutKey = subLayoutValues.join('|');
 
   const [selectedSubLayout, setSelectedSublayout] = useState(subLayoutValues[0]);
   const resolvedSelectedSubLayout = subLayoutValues.includes(selectedSubLayout)
@@ -59,10 +63,8 @@ const GraphSelectionPanel = ({
     : (subLayoutValues[0] || false);
 
   useEffect(() => {
-    if (resolvedSelectedSubLayout !== selectedSubLayout) {
-      setSelectedSublayout(resolvedSelectedSubLayout);
-    }
-  }, [subLayoutsInfo]);
+    setSelectedSublayout(subLayoutValues[0]);
+  }, [subLayoutKey]);
 
   if (!curveSt) {
     return (<span />);

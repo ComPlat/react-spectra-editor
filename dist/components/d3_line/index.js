@@ -30,7 +30,10 @@ class ViewerLine extends _react.default.Component {
     const {
       clickUiTargetAct,
       selectUiSweepAct,
-      scrollUiWheelAct
+      scrollUiWheelAct,
+      splitIntegrationAct,
+      addVisualSplitLineAct,
+      removeVisualSplitLineAct
     } = props;
     this.rootKlass = `.${_list_graph.LIST_ROOT_SVG_GRAPH.LINE}`;
     this.focus = new _line_focus.default({
@@ -39,9 +42,12 @@ class ViewerLine extends _react.default.Component {
       clickUiTargetAct,
       selectUiSweepAct,
       scrollUiWheelAct,
-      splitIntegrationAct
+      splitIntegrationAct,
+      addVisualSplitLineAct,
+      removeVisualSplitLineAct
     });
     this.normChange = this.normChange.bind(this);
+    this.syncFocusActions = this.syncFocusActions.bind(this);
   }
   componentDidMount() {
     const {
@@ -61,6 +67,8 @@ class ViewerLine extends _react.default.Component {
       mtplySt,
       sweepExtentSt,
       isUiAddIntgSt,
+      isUiSplitIntgSt,
+      isUiVisualSplitIntgSt,
       isUiNoBrushSt,
       isHidden,
       wavelength,
@@ -68,6 +76,7 @@ class ViewerLine extends _react.default.Component {
       resetAllAct,
       uiSt
     } = this.props;
+    this.syncFocusActions();
     (0, _draw.drawDestroy)(this.rootKlass);
     resetAllAct(feature);
     let xxLabel = xLabel;
@@ -100,6 +109,7 @@ class ViewerLine extends _react.default.Component {
       sweepExtentSt,
       isUiAddIntgSt,
       isUiSplitIntgSt,
+      isUiVisualSplitIntgSt,
       isUiNoBrushSt,
       wavelength,
       uiSt
@@ -124,12 +134,15 @@ class ViewerLine extends _react.default.Component {
       mtplySt,
       sweepExtentSt,
       isUiAddIntgSt,
+      isUiSplitIntgSt,
+      isUiVisualSplitIntgSt,
       isUiNoBrushSt,
       isHidden,
       wavelength,
       axesUnitsSt,
       uiSt
     } = this.props;
+    this.syncFocusActions();
     this.normChange(prevProps);
     let xxLabel = xLabel;
     let yyLabel = yLabel;
@@ -160,6 +173,7 @@ class ViewerLine extends _react.default.Component {
       sweepExtentSt,
       isUiAddIntgSt,
       isUiSplitIntgSt,
+      isUiVisualSplitIntgSt,
       isUiNoBrushSt,
       wavelength,
       uiSt
@@ -169,6 +183,25 @@ class ViewerLine extends _react.default.Component {
   }
   componentWillUnmount() {
     (0, _draw.drawDestroy)(this.rootKlass);
+  }
+  syncFocusActions() {
+    if (!this.focus) return;
+    const {
+      clickUiTargetAct,
+      selectUiSweepAct,
+      scrollUiWheelAct,
+      splitIntegrationAct,
+      addVisualSplitLineAct,
+      removeVisualSplitLineAct
+    } = this.props;
+    Object.assign(this.focus, {
+      clickUiTargetAct,
+      selectUiSweepAct,
+      scrollUiWheelAct,
+      splitIntegrationAct,
+      addVisualSplitLineAct,
+      removeVisualSplitLineAct
+    });
   }
   normChange(prevProps) {
     const {
@@ -200,6 +233,7 @@ const mapStateToProps = (state, props) => ({
   sweepExtentSt: state.ui.sweepExtent,
   isUiAddIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
   isUiSplitIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_SPLIT,
+  isUiVisualSplitIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_VISUAL_SPLIT,
   isUiNoBrushSt: _list_ui.LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
   wavelength: state.wavelength,
   axesUnitsSt: state.axesUnits,
@@ -211,6 +245,8 @@ const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   selectUiSweepAct: _ui.selectUiSweep,
   scrollUiWheelAct: _ui.scrollUiWheel,
   splitIntegrationAct: _integration.splitIntegration,
+  addVisualSplitLineAct: _integration.addVisualSplitLine,
+  removeVisualSplitLineAct: _integration.removeVisualSplitLine,
   addNewCylicVoltaPairPeakAct: _cyclic_voltammetry.addNewCylicVoltaPairPeak,
   addCylicVoltaMaxPeakAct: _cyclic_voltammetry.addCylicVoltaMaxPeak,
   addCylicVoltaMinPeakAct: _cyclic_voltammetry.addCylicVoltaMinPeak
@@ -234,12 +270,15 @@ ViewerLine.propTypes = {
   sweepExtentSt: _propTypes.default.object.isRequired,
   isUiAddIntgSt: _propTypes.default.bool.isRequired,
   isUiSplitIntgSt: _propTypes.default.bool.isRequired,
+  isUiVisualSplitIntgSt: _propTypes.default.bool.isRequired,
   isUiNoBrushSt: _propTypes.default.bool.isRequired,
   resetAllAct: _propTypes.default.func.isRequired,
   clickUiTargetAct: _propTypes.default.func.isRequired,
   selectUiSweepAct: _propTypes.default.func.isRequired,
   scrollUiWheelAct: _propTypes.default.func.isRequired,
   splitIntegrationAct: _propTypes.default.func.isRequired,
+  addVisualSplitLineAct: _propTypes.default.func.isRequired,
+  removeVisualSplitLineAct: _propTypes.default.func.isRequired,
   isHidden: _propTypes.default.bool.isRequired,
   wavelength: _propTypes.default.object.isRequired,
   axesUnitsSt: _propTypes.default.object.isRequired

@@ -8,6 +8,13 @@ exports.getCurvePointFromEvent = exports.clearIntegrationPreview = exports.TfRes
 var _format = _interopRequireDefault(require("./format"));
 var _chem = require("./chem");
 var _list_ui = require("../constants/list_ui");
+var _sweep = require("./sweep.js");
+var _integration_draft = require("./integration_draft.js");
+var _integration_split = require("./integration_split");
+// eslint-disable-line import/extensions
+
+// eslint-disable-line import/extensions
+
 const d3 = require('d3');
 const TfRescale = focus => {
   const xt = focus.scales.x;
@@ -84,7 +91,7 @@ const cancelIntegrationDraft = focus => {
     firstIntegrationPoint: null
   });
   clearIntegrationPreview(focus);
-  forgetPendingIntegrationDraft();
+  (0, _integration_draft.forgetPendingIntegrationDraft)();
 };
 const updateIntegrationPreview = (event, focus) => {
   if (!focus.isUiAddIntgSt || !focus.firstIntegrationPoint) return;
@@ -93,20 +100,24 @@ const updateIntegrationPreview = (event, focus) => {
   drawIntegrationPreview(focus, focus.firstIntegrationPoint, pt);
 };
 const updateIntegrationSplitPreview = (event, focus) => {
-  if (!focus.isUiSplitIntgSt) return;
+  if (!focus.isUiSplitIntgSt && !focus.isUiVisualSplitIntgSt) return;
   const {
     splitX,
     target
-  } = getIntegrationSplitTargetFromEvent(event, focus);
+  } = (0, _integration_split.getIntegrationSplitTargetFromEvent)(event, focus);
   if (!target) {
-    clearIntegrationSplitPreview(focus);
+    (0, _integration_split.clearIntegrationSplitPreview)(focus);
+    return;
+  }
+  if (focus.isUiVisualSplitIntgSt && (0, _integration_split.isAlreadyVisuallySplit)(target)) {
+    (0, _integration_split.clearIntegrationSplitPreview)(focus);
     return;
   }
   const {
     shift = 0,
     ignoreRef = false
   } = focus.integrationSplitTargets || {};
-  drawIntegrationSplitPreview(focus, target, splitX, shift, ignoreRef);
+  (0, _integration_split.drawIntegrationSplitPreview)(focus, target, splitX, shift, ignoreRef);
 };
 const MouseMove = (event, focus) => {
   const {
@@ -188,7 +199,7 @@ const clickIntegrationPoint = (event, focus) => {
     Object.assign(focus, {
       firstIntegrationPoint: draftPoint
     });
-    setPendingIntegrationDraft({
+    (0, _integration_draft.setPendingIntegrationDraft)({
       jcampIdx: focus.jcampIdx,
       dataLength: focus.data.length,
       cancel: () => cancelIntegrationDraft(focus)
@@ -200,11 +211,61 @@ const clickIntegrationPoint = (event, focus) => {
   if (firstIntegrationPoint.x === pt.x) {
     return;
   }
-  selectUiSweepAct(buildSweepPayloadFromXBounds(focus, firstIntegrationPoint.x, pt.x));
+  selectUiSweepAct((0, _sweep.buildSweepPayloadFromXBounds)(focus, firstIntegrationPoint.x, pt.x));
 };
 const ClickCompass = (event, focus) => {
   event.stopPropagation();
   event.preventDefault();
+  if (focus.isUiAddIntgSt) {
+    clickIntegrationPoint(event, focus);
+    return;
+  }
+  if (focus.isUiSplitIntgSt) {
+    const {
+      splitX,
+      target
+    } = (0, _integration_split.getIntegrationSplitTargetFromEvent)(event, focus);
+    if (!target) return;
+    (0, _integration_split.clearIntegrationSplitPreview)(focus);
+    focus.splitIntegrationAct({
+      curveIdx: focus.jcampIdx,
+      target,
+      splitX,
+      data: focus.data
+    });
+    return;
+  }
+  if (focus.isUiVisualSplitIntgSt) {
+    const {
+      splitX,
+      target
+    } = (0, _integration_split.getIntegrationSplitTargetFromEvent)(event, focus);
+    if (!target) return;
+    const {
+      stack = [],
+      shift = 0
+    } = focus.integrationSplitTargets || {};
+    const existingSplitX = (0, _integration_split.getVisualSplitLineAtX)(focus, stack, splitX, shift);
+    (0, _integration_split.clearIntegrationSplitPreview)(focus);
+    if (Number.isFinite(existingSplitX)) {
+      if (typeof focus.removeVisualSplitLineAct !== 'function') return;
+      focus.removeVisualSplitLineAct({
+        curveIdx: focus.jcampIdx,
+        splitX: existingSplitX,
+        data: focus.data
+      });
+      return;
+    }
+    if ((0, _integration_split.isAlreadyVisuallySplit)(target)) return;
+    if (typeof focus.addVisualSplitLineAct !== 'function') return;
+    focus.addVisualSplitLineAct({
+      curveIdx: focus.jcampIdx,
+      target,
+      splitX,
+      data: focus.data
+    });
+    return;
+  }
   const {
     layout,
     cyclicvoltaSt,

@@ -105,7 +105,7 @@ const iconColor = (criteria) => (criteria ? '#fff' : '#000');
 const Integration = ({
   classes, ignoreRef,
   isDisableSt, isFocusAddIntgSt, isFocusRmIntgSt, isFocusSetRefSt,
-  isFocusSplitIntgSt,
+  isFocusSplitIntgSt, isFocusVisualSplitIntgSt,
   setUiSweepTypeAct, setIntegrationFkrAct, clearIntegrationAllAct,
   curveSt, integrationSt, clearIntegrationAllHplcMsAct, layoutSt,
 }) => {
@@ -127,6 +127,20 @@ const Integration = ({
     } else {
       clearIntegrationAllAct({ curveIdx });
     }
+  };
+  const onSweepIntegtSplit = () => {
+    if (isFocusSplitIntgSt) {
+      onCancelTool();
+      return;
+    }
+    setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.INTEGRATION_SPLIT, curveIdx);
+  };
+  const onSweepIntegtVisualSplit = () => {
+    if (isFocusVisualSplitIntgSt) {
+      onCancelTool();
+      return;
+    }
+    setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.INTEGRATION_VISUAL_SPLIT, curveIdx);
   };
 
   return (
@@ -232,6 +246,32 @@ const Integration = ({
           </MuButton>
         </span>
       </Tooltip>
+      <Tooltip title={<span className="txt-sv-tp">Visual Split Integration</span>}>
+        <span>
+          <MuButton
+            className={
+              classNames(
+                isFocusVisualSplitIntgSt ? classes.cancelBtn : focusStyle(false, classes),
+                'btn-visual-split-inter',
+              )
+            }
+            disabled={isDisableSt}
+            onClick={onSweepIntegtVisualSplit}
+          >
+            <Icon
+              path={isFocusVisualSplitIntgSt ? mdiClose : mdiMathIntegral}
+              size={iconSize}
+              color={isFocusVisualSplitIntgSt ? '#d32f2f' : iconColor(isDisableSt)}
+              className={classNames(classes.iconMdi, 'icon-sv-bar-visualsplitint')}
+            />
+            {
+              isFocusVisualSplitIntgSt
+                ? null
+                : <span className={classNames(classes.txt, classes.txtIcon, 'txt-sv-bar-visualsplitint')}>|</span>
+            }
+          </MuButton>
+        </span>
+      </Tooltip>
       {
         !ignoreRef
           ? setFactor(
@@ -262,6 +302,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     isFocusRmIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_RM,
     isFocusSetRefSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF,
     isFocusSplitIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_SPLIT,
+    isFocusVisualSplitIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_VISUAL_SPLIT,
     ignoreRef: Format.isHplcUvVisLayout(state.layout),
     curveSt: state.curve,
     integrationSt: state.integration.present,
@@ -285,6 +326,7 @@ Integration.propTypes = {
   isFocusRmIntgSt: PropTypes.bool.isRequired,
   isFocusSetRefSt: PropTypes.bool.isRequired,
   isFocusSplitIntgSt: PropTypes.bool.isRequired,
+  isFocusVisualSplitIntgSt: PropTypes.bool.isRequired,
   ignoreRef: PropTypes.bool.isRequired,
   setUiSweepTypeAct: PropTypes.func.isRequired,
   setIntegrationFkrAct: PropTypes.func.isRequired,
