@@ -259,6 +259,22 @@ class DemoWriteIr extends _react.default.Component {
       descChanged: content
     });
   }
+  componentDidUpdate(_prevProps, prevState) {
+    const {
+      typ
+    } = this.state;
+    const {
+      typ: prevTyp
+    } = prevState;
+    if (typ === 'lcms' && prevTyp !== 'lcms') {
+      const initialRt = getInitialLcmsRetentionTime();
+      this.handleLcmsPageRequest({
+        retentionTime: initialRt,
+        polarity: 'positive',
+        trigger: 'initial_load'
+      });
+    }
+  }
   handleLcmsPageRequest(request) {
     const {
       typ
@@ -301,18 +317,6 @@ class DemoWriteIr extends _react.default.Component {
         lcmsDynamicMultiEntities: isLcms ? buildLcmsStandaloneMultiEntities(initialRt) : null
       });
     };
-  }
-  componentDidUpdate(_prevProps, prevState) {
-    // Standalone demo only: when switching to "LC/MS OpenLab", notify like the ELN would on
-    // first paint so the host can resolve the MS sub-view (see e2e __lcmsDemoRequests).
-    if (this.state.typ === 'lcms' && prevState.typ !== 'lcms') {
-      const initialRt = getInitialLcmsRetentionTime();
-      this.handleLcmsPageRequest({
-        retentionTime: initialRt,
-        polarity: 'positive',
-        trigger: 'initial_load'
-      });
-    }
   }
   loadEntity() {
     const {

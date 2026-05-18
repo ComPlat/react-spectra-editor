@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.initialState = exports.default = void 0;
 var _action_type = require("../../constants/action_type");
 var _utils = require("./utils");
 var _hydrate = require("./hydrate");
@@ -11,7 +11,7 @@ var _uvvis = require("./uvvis");
 var _tic = require("./tic");
 /* eslint-disable default-param-last */
 
-const initialState = {
+const initialState = exports.initialState = {
   uvvis: {
     listWaveLength: null,
     selectedWaveLength: null,
@@ -73,6 +73,10 @@ const initialState = {
   lcmsDatasetKey: null,
   layout: 'LC/MS'
 };
+const clearState = state => ({
+  ...initialState,
+  lcmsIntegrationsExport: state?.lcmsIntegrationsExport ?? initialState.lcmsIntegrationsExport
+});
 const hplcMsReducer = (state = initialState, action) => {
   switch (action.type) {
     case _action_type.HPLC_MS.SET_LCMS_INTEGRATIONS_EXPORT:
@@ -109,6 +113,8 @@ const hplcMsReducer = (state = initialState, action) => {
       return (0, _tic.resetThresholdValue)(state);
     case _action_type.HPLC_MS.CLEAR_ALL_PEAKS_HPLCMS:
       return (0, _uvvis.clearAllPeaksHplcMs)(state, action);
+    case _action_type.HPLC_MS.CLEAR_STATE:
+      return clearState(state);
     default:
       return state;
   }

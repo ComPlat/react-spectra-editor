@@ -21,11 +21,24 @@ var _extractEntityLCMS = require("./helpers/extractEntityLCMS");
 var _multi_jcamps_viewer = _interopRequireDefault(require("./components/multi_jcamps_viewer"));
 var _hplc_viewer = _interopRequireDefault(require("./components/hplc_viewer"));
 var _curve = require("./actions/curve");
+var _hplc_ms = require("./actions/hplc_ms");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, default-param-last */
 
 const styles = () => ({});
 class LayerInit extends _react.default.Component {
+  static entitySignature(e) {
+    if (!e) return 'none';
+    const id = e.idDt ?? e.id ?? e.datasetId;
+    if (id != null && id !== '') return `id:${id}`;
+    const firstFeature = (Array.isArray(e.features) ? e.features[0] : null) || (Array.isArray(e.spectra) ? e.spectra[0] : null) || null;
+    const data0 = firstFeature?.data?.[0];
+    const xs = data0?.x;
+    const xLen = Array.isArray(xs) ? xs.length : 0;
+    const xHead = Array.isArray(xs) && xs.length > 0 ? xs[0] : '';
+    const xTail = Array.isArray(xs) && xs.length > 0 ? xs[xs.length - 1] : '';
+    return `sig:${e.layout || ''}|${e.title || ''}|${xLen}|${xHead}|${xTail}`;
+  }
   constructor(props) {
     super(props);
     this.normChange = this.normChange.bind(this);
@@ -60,9 +73,19 @@ class LayerInit extends _react.default.Component {
   }
   normChange(prevProps) {
     const {
-      entity
+      entity,
+      clearHplcMsStateAct
     } = this.props;
     if (prevProps.entity !== entity) {
+      const prevIsLcms = _format.default.isLCMsLayout(prevProps.entity?.layout);
+      const nextIsLcms = _format.default.isLCMsLayout(entity?.layout);
+      if (prevIsLcms || nextIsLcms) {
+        const prevSig = LayerInit.entitySignature(prevProps.entity);
+        const nextSig = LayerInit.entitySignature(entity);
+        if (prevSig !== nextSig) {
+          clearHplcMsStateAct();
+        }
+      }
       this.execReset();
     }
   }
@@ -292,7 +315,8 @@ const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   updateMetaPeaksAct: _meta.updateMetaPeaks,
   addOthersAct: _jcamp.addOthers,
   setAllCurvesAct: _curve.setAllCurves,
-  updateDSCMetaDataAct: _meta.updateDSCMetaData
+  updateDSCMetaDataAct: _meta.updateDSCMetaData,
+  clearHplcMsStateAct: _hplc_ms.clearHplcMsState
 }, dispatch);
 LayerInit.propTypes = {
   entity: _propTypes.default.object.isRequired,
@@ -327,7 +351,8 @@ LayerInit.propTypes = {
   // eslint-disable-line
   resetDetectorAct: _propTypes.default.func.isRequired,
   resetMultiplicityAct: _propTypes.default.func.isRequired,
-  updateDSCMetaDataAct: _propTypes.default.func.isRequired
+  updateDSCMetaDataAct: _propTypes.default.func.isRequired,
+  clearHplcMsStateAct: _propTypes.default.func.isRequired
 };
 LayerInit.defaultProps = {
   onLcmsPageRequest: null

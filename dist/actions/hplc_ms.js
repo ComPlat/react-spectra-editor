@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.uvvisUndo = exports.uvvisRedo = exports.updateCurrentPageValue = exports.setLcmsIntegrationsExport = exports.selectWavelength = exports.clearIntegrationAllHplcMs = exports.clearAllPeaksHplcMs = exports.changeTic = void 0;
+exports.uvvisUndo = exports.uvvisRedo = exports.updateCurrentPageValue = exports.setLcmsIntegrationsExport = exports.selectWavelength = exports.clearIntegrationAllHplcMs = exports.clearHplcMsState = exports.clearAllPeaksHplcMs = exports.changeTic = void 0;
 var _action_type = require("../constants/action_type");
 const normalizeTicPolarity = value => {
   if (value === 0 || value === '0') return 'positive';
@@ -60,3 +60,7 @@ const clearAllPeaksHplcMs = payload => ({
   payload
 });
 exports.clearAllPeaksHplcMs = clearAllPeaksHplcMs;
+const clearHplcMsState = () => ({
+  type: _action_type.HPLC_MS.CLEAR_STATE
+});
+exports.clearHplcMsState = clearHplcMsState;
