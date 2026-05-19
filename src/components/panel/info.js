@@ -17,6 +17,8 @@ import { withStyles } from '@mui/styles';
 import Format from '../../helpers/format';
 import { updateDSCMetaData } from '../../actions/meta';
 
+const ELECTRON_MASS = 0.000548579909065;
+
 const styles = () => ({
   chip: {
     margin: '1px 0 1px 0',
@@ -128,6 +130,13 @@ const normalizeQuillValue = (val) => {
   if (!val) return '';
   if (val === '<p><br></p>' || val === '<p></p>') return '';
   return val;
+};
+
+const formatMsExactMass = (exactMass) => {
+  const neutralMass = parseFloat(exactMass);
+  if (Number.isNaN(neutralMass)) return null;
+
+  return (neutralMass - ELECTRON_MASS).toFixed(6);
 };
 
 const chemSubStyle = {
@@ -278,6 +287,9 @@ const InfoPanel = ({
   metaSt, updateDSCMetaDataAct,
 }) => {
   if (!feature) return null;
+  const msExactMass = Format.isMsLayout(layoutSt) && exactMass
+    ? formatMsExactMass(exactMass)
+    : null;
   const {
     title, observeFrequency, solventName, secData,
   } = feature;
@@ -361,11 +373,11 @@ const InfoPanel = ({
             : null
         }
         {
-          Format.isMsLayout(layoutSt) && exactMass
+          msExactMass
             ? (
               <div className={classNames(classes.rowRoot, classes.rowOdd)}>
-                <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Exact mass: </span>
-                <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{`${parseFloat(exactMass).toFixed(6)} g/mol`}</span>
+                <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Exact mass (M+): </span>
+                <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{`${msExactMass} g/mol`}</span>
               </div>
             )
             : null
