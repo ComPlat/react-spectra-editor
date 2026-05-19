@@ -39,7 +39,10 @@ const fixDigit = (input, precision) => {
   return output.toFixed(precision);
 };
 
-/** Integer 0–20 for toFixed; invalid input uses fallback (defaults to 3 to preserve legacy precision). */
+/**
+ * Integer 0–20 for toFixed; invalid input uses fallback.
+ * Default 3 preserves legacy cursor precision.
+ */
 const clampDecimalPlaces = (value, fallback = 3) => {
   const n = Number(value);
   if (!Number.isFinite(n)) return fallback;
