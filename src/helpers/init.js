@@ -57,12 +57,32 @@ const tpDiv = (d, digits, yFactor = 1) => (
   `
 );
 
-const peakTipHtml = ({
-  d, layout, yFactor, xDigits,
-}) => {
-  const digits = xDigits != null && xDigits !== ''
+const msPeakTpDiv = (d, relInt, digits) => (
+  `
+  <div
+    class="peak-tp"
+    style="${tpStyle()}"
+  >
+    <span>${FN.fixDigit(d.x, digits)} (${relInt})</span>
+  <div>
+  `
+);
+
+const resolveDigits = (layout, xDigits) => (
+  xDigits != null && xDigits !== ''
     ? FN.clampDecimalPlaces(xDigits, FN.spectraDigit(layout))
-    : FN.spectraDigit(layout);
+    : FN.spectraDigit(layout)
+);
+
+const peakTipHtml = ({
+  d, layout, yFactor, xDigits, msMaxY,
+}) => {
+  const digits = resolveDigits(layout, xDigits);
+  if (FN.isMsLayout(layout) && msMaxY > 0) {
+    const relPct = (100 * d.y) / msMaxY;
+    const rel = parseInt(relPct, 10);
+    return msPeakTpDiv(d, rel, digits);
+  }
   return tpDiv(d, digits, yFactor || 1);
 };
 

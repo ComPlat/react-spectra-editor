@@ -130,6 +130,7 @@ class RectFocus {
     this.updatePathCall(xt, yt);
 
     const yRef = this.tTrEndPts[0].y;
+    const msMaxY = d3.max(this.data, (row) => row.y) || 0;
 
     const bars = this.bars.selectAll('rect')
       .data(this.data);
@@ -154,7 +155,7 @@ class RectFocus {
         d3.select(`#bpt${Math.round(1000 * d.x)}`)
           .style('fill', 'blue');
         const tipParams = {
-          d, layout: this.layout, xDigits: this.decimal,
+          d, layout: this.layout, msMaxY, xDigits: this.decimal,
         };
         this.tip.show(tipParams, event.target);
       })
@@ -164,7 +165,7 @@ class RectFocus {
         d3.select(`#bpt${Math.round(1000 * d.x)}`)
           .style('fill', 'red');
         const tipParams = {
-          d, layout: this.layout, xDigits: this.decimal,
+          d, layout: this.layout, msMaxY, xDigits: this.decimal,
         };
         this.tip.hide(tipParams, event.target);
       });
