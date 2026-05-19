@@ -39,8 +39,8 @@ const fixDigit = (input, precision) => {
   return output.toFixed(precision);
 };
 
-/** Integer 0–20 for toFixed; invalid input uses fallback (e.g. toolbar decimal). */
-const clampDecimalPlaces = (value, fallback = 2) => {
+/** Integer 0–20 for toFixed; invalid input uses fallback (defaults to 3 to preserve legacy precision). */
+const clampDecimalPlaces = (value, fallback = 3) => {
   const n = Number(value);
   if (!Number.isFinite(n)) return fallback;
   return Math.max(0, Math.min(20, Math.trunc(n)));

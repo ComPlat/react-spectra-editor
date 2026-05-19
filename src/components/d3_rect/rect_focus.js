@@ -52,7 +52,7 @@ class RectFocus {
     this.factor = 0.125;
     this.currentExtent = null;
     this.layout = LIST_LAYOUT.MS;
-    this.decimal = 2;
+    this.decimal = 3;
 
     this.setTip = this.setTip.bind(this);
     this.setDataParams = this.setDataParams.bind(this);
