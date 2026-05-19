@@ -57,31 +57,40 @@ const tpDiv = (d, digits, yFactor = 1) => (
   `
 );
 
-const msPeakTpDiv = (d, relInt) => (
+const msPeakTpDiv = (d, relInt, digits) => (
   `
   <div
     class="peak-tp"
     style="${tpStyle()}"
   >
-    <span>${d.x.toFixed(3)} (${relInt})</span>
+    <span>${FN.fixDigit(d.x, digits)} (${relInt})</span>
   <div>
   `
 );
+
+const resolveDigits = (layout, xDigits) => (
+  xDigits != null && xDigits !== ''
+    ? FN.clampDecimalPlaces(xDigits, FN.spectraDigit(layout))
+    : FN.spectraDigit(layout)
+);
+
+const peakTipHtml = ({
+  d, layout, yFactor, xDigits, msMaxY,
+}) => {
+  const digits = resolveDigits(layout, xDigits);
+  if (FN.isMsLayout(layout) && msMaxY > 0) {
+    const relPct = (100 * d.y) / msMaxY;
+    const rel = parseInt(relPct, 10);
+    return msPeakTpDiv(d, rel, digits);
+  }
+  return tpDiv(d, digits, yFactor || 1);
+};
 
 const InitTip = () => {
   d3.select('.peak-tp').remove();
   const tip = d3Tip()
     .attr('class', 'd3-tip')
-    .html(({
-      d, layout, yFactor, msMaxY,
-    }) => {
-      if (FN.isMsLayout(layout) && msMaxY > 0) {
-        const relPct = (100 * d.y) / msMaxY;
-        const rel = parseInt(relPct, 10);
-        return msPeakTpDiv(d, rel);
-      }
-      return tpDiv(d, FN.spectraDigit(layout), yFactor || 1);
-    });
+    .html(peakTipHtml);
   return tip;
 };
 

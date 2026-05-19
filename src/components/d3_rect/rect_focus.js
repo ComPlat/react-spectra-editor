@@ -9,6 +9,7 @@ import {
 import { TfRescale, MountCompass } from '../../helpers/compass';
 import { PksEdit } from '../../helpers/converter';
 import { LIST_LAYOUT } from '../../constants/list_layout';
+import Format from '../../helpers/format';
 
 const d3 = require('d3');
 
@@ -51,6 +52,7 @@ class RectFocus {
     this.factor = 0.125;
     this.currentExtent = null;
     this.layout = LIST_LAYOUT.MS;
+    this.decimal = 3;
 
     this.setTip = this.setTip.bind(this);
     this.setDataParams = this.setDataParams.bind(this);
@@ -69,11 +71,14 @@ class RectFocus {
     this.root.call(this.tip);
   }
 
-  setDataParams(data, peaks, tTrEndPts, tSfPeaks) {
+  setDataParams(data, peaks, tTrEndPts, tSfPeaks, decimal) {
     this.data = [...data];
     this.dataPks = [...peaks];
     this.tTrEndPts = tTrEndPts;
     this.tSfPeaks = tSfPeaks;
+    if (decimal !== undefined) {
+      this.decimal = Format.clampDecimalPlaces(decimal);
+    }
   }
 
   updatePathCall(xt, yt) {
@@ -149,7 +154,9 @@ class RectFocus {
           .attr('stroke-opacity', '1.0');
         d3.select(`#bpt${Math.round(1000 * d.x)}`)
           .style('fill', 'blue');
-        const tipParams = { d, layout: this.layout, msMaxY };
+        const tipParams = {
+          d, layout: this.layout, msMaxY, xDigits: this.decimal,
+        };
         this.tip.show(tipParams, event.target);
       })
       .on('mouseout', (event, d) => {
@@ -157,7 +164,9 @@ class RectFocus {
           .attr('stroke-opacity', '1.0');
         d3.select(`#bpt${Math.round(1000 * d.x)}`)
           .style('fill', 'red');
-        const tipParams = { d, layout: this.layout, msMaxY };
+        const tipParams = {
+          d, layout: this.layout, msMaxY, xDigits: this.decimal,
+        };
         this.tip.hide(tipParams, event.target);
       });
   }
@@ -193,7 +202,7 @@ class RectFocus {
   }
 
   create({
-    filterSeed, filterPeak, tTrEndPts, tSfPeaks,
+    filterSeed, filterPeak, tTrEndPts, tSfPeaks, decimal,
     sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
   }) {
     this.svg = d3.select('.d3Svg');
@@ -202,7 +211,7 @@ class RectFocus {
 
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.setTip();
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, decimal);
     MountCompass(this);
 
     this.axis = MountAxis(this);
@@ -223,11 +232,11 @@ class RectFocus {
   }
 
   update({
-    filterSeed, filterPeak, tTrEndPts, tSfPeaks,
+    filterSeed, filterPeak, tTrEndPts, tSfPeaks, decimal,
     sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
   }) {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, decimal);
 
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);

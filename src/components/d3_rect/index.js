@@ -34,7 +34,7 @@ class ViewerRect extends React.Component {
   componentDidMount() {
     const {
       seed, peak, cLabel, xLabel, yLabel, feature,
-      tTrEndPts, tSfPeaks, isHidden,
+      tTrEndPts, tSfPeaks, isHidden, decimalSt,
       sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
       resetAllAct,
     } = this.props;
@@ -50,6 +50,7 @@ class ViewerRect extends React.Component {
       filterPeak,
       tTrEndPts,
       tSfPeaks,
+      decimal: decimalSt,
       sweepExtentSt,
       isUiAddIntgSt,
       isUiNoBrushSt,
@@ -61,7 +62,7 @@ class ViewerRect extends React.Component {
   componentDidUpdate(prevProps) {
     const {
       seed, peak,
-      tTrEndPts, tSfPeaks, isHidden,
+      tTrEndPts, tSfPeaks, isHidden, decimalSt,
       sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
     } = this.props;
     this.normChange(prevProps);
@@ -74,6 +75,7 @@ class ViewerRect extends React.Component {
       filterPeak,
       tTrEndPts,
       tSfPeaks,
+      decimal: decimalSt,
       sweepExtentSt,
       isUiAddIntgSt,
       isUiNoBrushSt,
@@ -104,6 +106,7 @@ const mapStateToProps = (state, props) => (
   {
     seed: Topic2Seed(state, props),
     peak: Feature2Peak(state, props),
+    decimalSt: state.submit.decimal,
     tTrEndPts: ToThresEndPts(state, props),
     tSfPeaks: ToShiftPeaks(state, props),
     sweepExtentSt: state.ui.sweepExtent,
@@ -124,6 +127,7 @@ const mapDispatchToProps = (dispatch) => (
 ViewerRect.propTypes = {
   seed: PropTypes.array.isRequired,
   peak: PropTypes.array.isRequired,
+  decimalSt: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
   yLabel: PropTypes.string.isRequired,

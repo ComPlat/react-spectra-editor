@@ -106,9 +106,10 @@ const MouseMove = (event, focus) => {
         const maxY = d3.max(focus.data, (row) => row.y) || 0;
         const relPct = maxY > 0 ? (100 * pt.y) / maxY : 0;
         const rel = maxY > 0 ? parseInt(relPct, 10) : 0;
+        const xPrecision = Format.clampDecimalPlaces(focus.decimal);
         focus.root.select('.cursor-txt')
           .attr('transform', `translate(${tx},${10})`)
-          .text(`${pt.x.toFixed(3)} (${rel})`);
+          .text(`${pt.x.toFixed(xPrecision)} (${rel})`);
         focus.root.select('.cursor-txt-hz')
           .text('');
       } else {
