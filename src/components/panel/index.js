@@ -25,7 +25,7 @@ const theme = createTheme({
   },
   palette: {
     background: {
-      default: '#D3D3D3',
+      default: '#fff',
     },
   },
 });
@@ -33,12 +33,76 @@ const theme = createTheme({
 const styles = () => ({
   panels: {
     maxHeight: 'calc(90vh - 220px)', // ROI
-    display: 'table',
+    display: 'block',
     overflowX: 'hidden',
     overflowY: 'auto',
-    margin: '5px 0 0 0',
-    padding: '0 0 0 0',
-    width: '100%',
+    boxSizing: 'border-box',
+    margin: '4px 4px 0 4px',
+    padding: 0,
+    width: 'calc(100% - 8px)',
+    backgroundColor: '#fff',
+    border: '1px solid #e1e5e8',
+    borderRadius: 8,
+    boxShadow: '0 4px 14px rgba(17, 24, 39, 0.05)',
+    overflow: 'hidden auto',
+    fontFamily: 'Helvetica, Arial, sans-serif',
+    '& .MuiAccordion-root': {
+      backgroundColor: '#fff',
+      borderBottom: '1px solid #e6e8eb',
+      boxShadow: 'none',
+    },
+    '& .MuiAccordion-root:last-child': {
+      borderBottom: 'none',
+    },
+    '& .MuiAccordion-root.Mui-expanded': {
+      margin: 0,
+    },
+    '& .MuiAccordionSummary-root': {
+      minHeight: 38,
+      height: 38,
+      padding: '0 12px',
+      background: 'linear-gradient(180deg, #fff 0%, #f8fafc 100%)',
+      color: '#25313b',
+      borderBottom: '1px solid transparent',
+    },
+    '& .MuiAccordionSummary-root.Mui-expanded': {
+      minHeight: 38,
+      height: 38,
+      borderBottom: '1px solid #e1e5e8',
+    },
+    '& .MuiAccordionSummary-content': {
+      margin: 0,
+      alignItems: 'center',
+    },
+    '& .MuiAccordionSummary-content.Mui-expanded': {
+      margin: 0,
+    },
+    '& .MuiAccordionSummary-expandIconWrapper': {
+      color: '#66727c',
+    },
+    '& .txt-panel-header': {
+      width: '100%',
+    },
+    '& .txt-sv-panel-title': {
+      fontSize: '0.72rem',
+      fontWeight: 700,
+      letterSpacing: '0.06em',
+      textTransform: 'uppercase',
+      color: '#25313b',
+    },
+    '& .MuiDivider-root': {
+      display: 'none',
+    },
+    '& .MuiList-root': {
+      padding: '4px 0',
+    },
+    '&::-webkit-scrollbar': {
+      width: 8,
+    },
+    '&::-webkit-scrollbar-thumb': {
+      backgroundColor: '#cbd5df',
+      borderRadius: 8,
+    },
   },
 });
 
@@ -47,7 +111,7 @@ class PanelViewer extends React.Component {
     super(props);
 
     this.state = {
-      expand: 'info',
+      expand: ['info', 'graph'],
     };
 
     this.onExapnd = this.onExapnd.bind(this);
@@ -63,7 +127,9 @@ class PanelViewer extends React.Component {
 
   onExapnd(input) {
     const { expand } = this.state;
-    const nextExpand = input === expand ? '' : input;
+    const nextExpand = expand.includes(input)
+      ? expand.filter((item) => item !== input)
+      : [...expand, input];
     this.setState({ expand: nextExpand });
   }
 
@@ -80,6 +146,7 @@ class PanelViewer extends React.Component {
     const onExapndCompare = () => this.onExapnd('compare');
     const onExapndCyclicVolta = () => this.onExapnd('cyclicvolta');
     const onExapndGraphSelection = () => this.onExapnd('graph');
+    const isExpanded = (name) => expand.includes(name);
 
     const { listCurves } = curveSt;
     const hideGraphSelection = listCurves === false || listCurves === undefined;
@@ -90,12 +157,12 @@ class PanelViewer extends React.Component {
           <ThemeProvider
             theme={theme}
           >
-            { hideGraphSelection ? null : <GraphSelectionPanel jcampIdx={jcampIdx} entityFileNames={entityFileNames} expand={expand === 'graph'} onExapnd={onExapndGraphSelection} subLayoutsInfo={subLayoutsInfo} />}
+            { hideGraphSelection ? null : <GraphSelectionPanel jcampIdx={jcampIdx} entityFileNames={entityFileNames} expand={isExpanded('graph')} onExapnd={onExapndGraphSelection} subLayoutsInfo={subLayoutsInfo} />}
             <InfoPanel
               feature={feature}
               integration={integration}
               editorOnly={editorOnly}
-              expand={expand === 'info'}
+              expand={isExpanded('info')}
               molSvg={molSvg}
               exactMass={exactMass}
               onExapnd={onExapndInfo}
@@ -103,14 +170,14 @@ class PanelViewer extends React.Component {
               canChangeDescription={canChangeDescription}
               onDescriptionChanged={this.handleDescriptionChanged}
             />
-            { Cfg.hidePanelPeak(layoutSt) ? null : <PeakPanel expand={expand === 'peak'} onExapnd={onExapndPeak} /> }
-            { Cfg.hidePanelMpy(layoutSt) ? null : <MultiplicityPanel expand={expand === 'mpy'} onExapnd={onExapndMpy} /> }
-            { (Cfg.hidePanelCompare(layoutSt) || listCurves.length > 1) ? null : <ComparePanel expand={expand === 'compare'} onExapnd={onExapndCompare} /> }
+            { Cfg.hidePanelPeak(layoutSt) ? null : <PeakPanel expand={isExpanded('peak')} onExapnd={onExapndPeak} /> }
+            { Cfg.hidePanelMpy(layoutSt) ? null : <MultiplicityPanel expand={isExpanded('mpy')} onExapnd={onExapndMpy} /> }
+            { (Cfg.hidePanelCompare(layoutSt) || listCurves.length > 1) ? null : <ComparePanel expand={isExpanded('compare')} onExapnd={onExapndCompare} /> }
             { (Cfg.hidePanelCyclicVolta(layoutSt) || hideCyclicVolta) ? null : (
               <CyclicVoltammetryPanel
                 jcampIdx={jcampIdx}
                 feature={feature}
-                expand={expand === 'cyclicvolta'}
+                expand={isExpanded('cyclicvolta')}
                 onExapnd={onExapndCyclicVolta}
                 userManualLink={userManualLink ? userManualLink.cv : undefined}
               />

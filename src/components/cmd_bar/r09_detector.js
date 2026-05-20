@@ -31,9 +31,7 @@ const styles = () => (
 
 const detectorSelect = (classes, detectorSt, curveSt, layoutSt, updateDetectorAct) => {
   if (!Format.isSECLayout(layoutSt)) {
-    return (
-      <i />
-    );
+    return null;
   }
 
   const { curveIdx } = curveSt;
@@ -82,11 +80,14 @@ const detectorSelect = (classes, detectorSt, curveSt, layoutSt, updateDetectorAc
 
 const Detector = ({
   classes, detectorSt, curveSt, layoutSt, updateDetectorAct,
-}) => (
-  <span className={classes.groupRight}>
-    { detectorSelect(classes, detectorSt, curveSt, layoutSt, updateDetectorAct) }
-  </span>
-);
+}) => {
+  if (!Format.isSECLayout(layoutSt)) return null;
+  return (
+    <span className={classes.groupRight}>
+      { detectorSelect(classes, detectorSt, curveSt, layoutSt, updateDetectorAct) }
+    </span>
+  );
+};
 
 const mapStateToProps = (state, _props) => ( // eslint-disable-line
   {

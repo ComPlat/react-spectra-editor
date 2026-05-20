@@ -42,7 +42,7 @@ const styles = () => (
 const iconSize = '16px';
 
 const setFactor = (
-  classes, isDisable, integrationSt, setIntegrationFkrAct, curveIdx,
+  classes, integrationSt, setIntegrationFkrAct, curveIdx,
 ) => {
   const onFactorChanged = (e) => {
     e.target.blur();
@@ -70,7 +70,6 @@ const setFactor = (
   return (
     <TextField
       className={classes.field}
-      disabled={isDisable}
       id="intg-factor-name"
       type="number"
       value={refFactor}
@@ -101,6 +100,10 @@ const Integration = ({
   const { curveIdx } = curveSt;
   const onClearAll = () => clearIntegrationAllAct({ curveIdx });
 
+  if (isDisableSt) {
+    return null;
+  }
+
   return (
     <span className={classes.group}>
       <Tooltip title={<span className="txt-sv-tp">Add Integration</span>}>
@@ -112,13 +115,12 @@ const Integration = ({
                 'btn-add-inter',
               )
             }
-            disabled={isDisableSt}
             onClick={onSweepIntegtAdd}
           >
             <Icon
               path={mdiMathIntegral}
               size={iconSize}
-              color={iconColor(isFocusAddIntgSt || isDisableSt)}
+              color={iconColor(isFocusAddIntgSt)}
               className={classNames(classes.iconMdi, 'icon-sv-bar-addint')}
             />
             <span className={classNames(classes.txt, classes.txtIcon, 'txt-sv-bar-addint')}>+</span>
@@ -134,13 +136,12 @@ const Integration = ({
                 'btn-remove-inter',
               )
             }
-            disabled={isDisableSt}
             onClick={onSweepIntegtRm}
           >
             <Icon
               path={mdiMathIntegral}
               size={iconSize}
-              color={iconColor(isFocusRmIntgSt || isDisableSt)}
+              color={iconColor(isFocusRmIntgSt)}
               className={classNames(classes.iconMdi, 'icon-sv-bar-rmint')}
             />
             <span className={classNames(classes.txt, classes.txtIcon, 'txt-sv-bar-rmint')}>-</span>
@@ -156,13 +157,12 @@ const Integration = ({
                 'btn-set-inter-ref',
               )
             }
-            disabled={isDisableSt}
             onClick={onSweepIntegtSR}
           >
             <Icon
               path={mdiReflectVertical}
               size={iconSize}
-              color={iconColor(isFocusSetRefSt || isDisableSt)}
+              color={iconColor(isFocusSetRefSt)}
               className={classNames(classes.iconMdi, 'icon-sv-bar-refint')}
             />
           </MuButton>
@@ -171,7 +171,7 @@ const Integration = ({
       {
         !ignoreRef
           ? setFactor(
-            classes, isDisableSt, integrationSt, setIntegrationFkrAct, curveIdx,
+            classes, integrationSt, setIntegrationFkrAct, curveIdx,
           )
           : null
       }
@@ -182,7 +182,7 @@ const Integration = ({
         <Icon
           path={mdiMathIntegral}
           size={iconSize}
-          color={iconColor(isDisableSt)}
+          color={iconColor(false)}
           className={classNames(classes.iconMdi, 'icon-sv-bar-rmallint')}
         />
         <span className={classNames(classes.txt, classes.txtIcon, 'txt-sv-bar-rmallint')}>x</span>

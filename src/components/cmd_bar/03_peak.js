@@ -44,6 +44,15 @@ const Peak = ({
     const dataPeaks = extractAutoPeaks(feature, thresSt, shiftSt, layoutSt);
     clearAllPeaksAct({ curveIdx, dataPeaks });
   };
+  const showAddPeak = !disableAddPeakSt;
+  const showRmPeak = !disableRmPeakSt;
+  const showSetRef = !disableSetRefSt;
+  const showClearAll = !disableRmPeakSt;
+
+  if (!showAddPeak && !showRmPeak && !showSetRef && !showClearAll) {
+    return null;
+  }
+
   if (isHandleMaxAndMinPeaksSt) {
     const { spectraList } = cyclicVotaSt;
     const spectra = spectraList[curveIdx];
@@ -62,48 +71,58 @@ const Peak = ({
 
   return (
     <span className={classes.group} data-testid="Peak">
-      <Tooltip title={<span className="txt-sv-tp">Add Peak</span>}>
-        <span>
-          <MuButton
-            className={
-              classNames(
-                focusStyle(isFocusAddPeakSt, classes),
-                'btn-sv-bar-addpeak',
-              )
-            }
-            disabled={disableAddPeakSt}
-            onClick={onSweepPeakAdd}
-          >
-            <span className={classNames(classes.txt, 'txt-sv-bar-addpeak')}>P+</span>
-          </MuButton>
-        </span>
-      </Tooltip>
-      <Tooltip title={<span className="txt-sv-tp">Remove Peak</span>}>
-        <span>
-          <MuButton
-            className={
-              classNames(
-                focusStyle(isFocusRmPeakSt, classes),
-                'btn-sv-bar-rmpeak',
-              )
-            }
-            disabled={disableRmPeakSt}
-            onClick={onSweepPeakDELETE}
-          >
-            <span className={classNames(classes.txt, 'txt-sv-bar-rmpeak')}>P-</span>
-          </MuButton>
-        </span>
-      </Tooltip>
-      <TriBtn
-        content={{ tp: 'Clear All Peaks' }}
-        cb={onClearAll}
-        isClearAllDisabled={disableRmPeakSt}
-      >
-        <span className={classNames(classes.txt, 'txt-sv-bar-rmallpeaks')}>P</span>
-        <span className={classNames(classes.txt, classes.txtIcon, 'txt-sv-bar-rmallpeaks')}>x</span>
-      </TriBtn>
       {
-        !disableSetRefSt ? (
+        showAddPeak ? (
+          <Tooltip title={<span className="txt-sv-tp">Add Peak</span>}>
+            <span>
+              <MuButton
+                className={
+                  classNames(
+                    focusStyle(isFocusAddPeakSt, classes),
+                    'btn-sv-bar-addpeak',
+                  )
+                }
+                onClick={onSweepPeakAdd}
+              >
+                <span className={classNames(classes.txt, 'txt-sv-bar-addpeak')}>P+</span>
+              </MuButton>
+            </span>
+          </Tooltip>
+        ) : null
+      }
+      {
+        showRmPeak ? (
+          <Tooltip title={<span className="txt-sv-tp">Remove Peak</span>}>
+            <span>
+              <MuButton
+                className={
+                  classNames(
+                    focusStyle(isFocusRmPeakSt, classes),
+                    'btn-sv-bar-rmpeak',
+                  )
+                }
+                onClick={onSweepPeakDELETE}
+              >
+                <span className={classNames(classes.txt, 'txt-sv-bar-rmpeak')}>P-</span>
+              </MuButton>
+            </span>
+          </Tooltip>
+        ) : null
+      }
+      {
+        showClearAll ? (
+          <TriBtn
+            content={{ tp: 'Clear All Peaks' }}
+            cb={onClearAll}
+            isClearAllDisabled={false}
+          >
+            <span className={classNames(classes.txt, 'txt-sv-bar-rmallpeaks')}>P</span>
+            <span className={classNames(classes.txt, classes.txtIcon, 'txt-sv-bar-rmallpeaks')}>x</span>
+          </TriBtn>
+        ) : null
+      }
+      {
+        showSetRef ? (
           <Tooltip title={<span className="txt-sv-tp">Set Reference</span>}>
             <span>
               <MuButton
@@ -113,7 +132,6 @@ const Peak = ({
                     'btn-sv-bar-setref',
                   )
                 }
-                disabled={disableSetRefSt}
                 onClick={onSweepAnchorShift}
               >
                 <AddLocationOutlinedIcon className={classes.icon} />

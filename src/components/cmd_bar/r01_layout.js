@@ -17,7 +17,7 @@ import { setShiftRef } from '../../actions/shift';
 import { LIST_LAYOUT } from '../../constants/list_layout';
 import { getListShift } from '../../constants/list_shift';
 import Cfg from '../../helpers/cfg';
-import { commonStyle } from './common';
+import { commonStyle, toolbarSelectMenuProps } from './common';
 import Format from '../../helpers/format';
 
 const styles = () => (
@@ -98,6 +98,7 @@ const shiftSelect = (
         labelId="select-solvent-label"
         label="Solvent"
         onChange={onChange}
+        MenuProps={toolbarSelectMenuProps}
         className={classNames(classes.selectInput, 'input-sv-bar-shift')}
       >
         {listShift.map((ref) => (
@@ -128,6 +129,7 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
         label="Layout"
         value={layoutSt}
         onChange={onChange}
+        MenuProps={toolbarSelectMenuProps}
         className={classNames(classes.selectInput, 'input-sv-bar-layout')}
       >
         <MenuItem value={LIST_LAYOUT.PLAIN}>

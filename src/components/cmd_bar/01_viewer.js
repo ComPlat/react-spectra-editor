@@ -46,7 +46,7 @@ const Viewer = ({
         </MuButton>
       </Tooltip>
       {
-        hideCmdAnaViewerSt
+        (hideCmdAnaViewerSt || disableCmdAnaViewerSt)
           ? null
           : (
             <Tooltip title={<span className="txt-sv-tp">Analysis Viewer</span>}>
@@ -57,7 +57,6 @@ const Viewer = ({
                     'btn-sv-bar-analysis',
                   )
                 }
-                disabled={disableCmdAnaViewerSt}
                 onClick={onViewAnalysis}
               >
                 <SpellcheckOutlinedIcon className={classes.icon} />

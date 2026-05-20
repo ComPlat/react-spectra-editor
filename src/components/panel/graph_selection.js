@@ -17,39 +17,113 @@ import { LIST_LAYOUT } from '../../constants/list_layout';
 
 const styles = () => ({
   panelSummary: {
-    backgroundColor: '#eee',
     height: 22,
   },
   curve: {
     width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+  },
+  curveLabel: {
+    minWidth: 0,
+    flex: '0 1 auto',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 4,
+    overflow: 'hidden',
+  },
+  curveTitle: {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
   line: {
-    height: '2px',
+    width: '100%',
+    height: 3,
     borderWidth: '0',
     margin: '0',
+    borderRadius: 2,
+    opacity: 1,
+  },
+  lineContainer: {
+    flex: '1 1 56px',
+    minWidth: 56,
+    display: 'flex',
+    alignItems: 'center',
   },
   curveDefault: {
     backgroundColor: '#fff',
     fontSize: '0.8em',
+    color: 'rgba(0, 0, 0, 0.87)',
     margin: '0',
-    padding: '10px 2px 2px 10px',
-    maxWidth: '95%',
-    overflowWrap: 'anywhere',
+    padding: '9px 12px 9px 9px',
+    cursor: 'pointer',
+    borderLeft: '3px solid transparent',
+    transition: 'background-color 120ms ease, color 120ms ease, border-color 120ms ease',
+    '&:hover': {
+      backgroundColor: '#f7fbff',
+      borderLeftColor: '#c9d8e5',
+    },
   },
   curveSelected: {
-    backgroundColor: '#2196f3',
+    backgroundColor: '#edf6ff',
     fontSize: '0.8em',
-    color: '#fff',
-    padding: '10px 2px 2px 10px',
-    maxWidth: '95%',
-    overflowWrap: 'anywhere',
+    color: '#0b5cad',
+    fontWeight: 600,
+    padding: '9px 12px 9px 9px',
+    cursor: 'pointer',
+    borderLeft: '3px solid #2196f3',
+    transition: 'background-color 120ms ease, color 120ms ease, border-color 120ms ease',
+    '&:hover': {
+      backgroundColor: '#e4f1ff',
+    },
   },
 });
+
+const fallbackName = (entityFileNames, idx) => {
+  if (entityFileNames && idx < entityFileNames.length) {
+    return entityFileNames[idx];
+  }
+  return '';
+};
+
+const displayName = (spectra, idx, entityFileNames) => (
+  spectra?.title
+  || spectra?.feature?.title
+  || spectra?.spectrum?.title
+  || fallbackName(entityFileNames, idx)
+  || `Spectrum ${idx + 1}`
+);
+
+const renderCurveItem = (classes, item, curveIdx, onChange) => (
+  <ListItem
+    key={item.idx}
+    onClick={() => onChange(item.idx)}
+    className={
+      classNames((item.idx === curveIdx ? classes.curveSelected : classes.curveDefault))  // eslint-disable-line
+    }
+  >
+    <span className={classNames(classes.curve)}>
+      <span className={classNames(classes.curveLabel)}>
+        <i>{ item.name }</i>
+        <span className={classNames(classes.curveTitle)}>{ item.label }</span>
+      </span>
+      <span className={classNames(classes.lineContainer)}>
+        <hr
+          className={classNames(classes.line)}
+          style={{ backgroundColor: item.color }}
+        />
+      </span>
+    </span>
+  </ListItem>
+);
 
 const GraphSelectionPanel = ({
   classes, curveSt,
   entityFileNames, subLayoutsInfo, layoutSt,
-  selectCurveAct, toggleShowAllCurveAct,
+  selectCurveAct, toggleShowAllCurveAct, expand, onExapnd,
 }) => {
   let subLayoutValues = [];
   if (subLayoutsInfo) {
@@ -89,12 +163,11 @@ const GraphSelectionPanel = ({
       itemsSubLayout = subLayout.map((spectra, idx) => {
         const spectraIdx = spectra.curveIdx;
         const { color } = spectra;
-        let filename = '';
-        if (entityFileNames && spectraIdx < entityFileNames.length) {
-          filename = entityFileNames[spectraIdx];
-        }
         return {
-          name: `${idx + 1}.`, idx: spectraIdx, color, filename,
+          name: `${idx + 1}.`,
+          idx: spectraIdx,
+          color,
+          label: displayName(spectra, spectraIdx, entityFileNames),
         };
       });
     } catch (e) {
@@ -104,18 +177,19 @@ const GraphSelectionPanel = ({
 
   const items = listCurves.map((spectra, idx) => {
     const { color } = spectra;
-    let filename = '';
-    if (entityFileNames && idx < entityFileNames.length) {
-      filename = entityFileNames[idx];
-    }
     return {
-      name: `${idx + 1}.`, idx, color, filename,
+      name: `${idx + 1}.`,
+      idx,
+      color,
+      label: displayName(spectra, idx, entityFileNames),
     };
   });
 
   return (
     <Accordion
       data-testid="GraphSelectionPanel"
+      expanded={expand}
+      onChange={onExapnd}
       disableGutters
       sx={{
         '&.MuiAccordion-root.Mui-expanded': { margin: 0 },
@@ -172,28 +246,7 @@ const GraphSelectionPanel = ({
             </Tabs>
             <List>
               {
-                itemsSubLayout.map((item) => (
-                  <ListItem
-                    key={item.idx}
-                    onClick={() => onChange(item.idx)}
-                    className={
-                      classNames((item.idx === curveIdx ? classes.curveSelected : classes.curveDefault))  // eslint-disable-line
-                    }
-                  >
-                    <span className={classNames(classes.curve)}>
-                      <i>{ item.name }</i>
-                      <span style={{ float: 'right', width: '95%' }}>
-                        <hr
-                          className={classNames(classes.line)}
-                          style={{ backgroundColor: item.color }}
-                        />
-                        {
-                          item.filename !== '' ? <span>File: { item.filename }</span> : null  // eslint-disable-line
-                        }
-                      </span>
-                    </span>
-                  </ListItem>
-                ))
+                itemsSubLayout.map((item) => renderCurveItem(classes, item, curveIdx, onChange))
               }
             </List>
           </div>
@@ -201,28 +254,7 @@ const GraphSelectionPanel = ({
           : (
             <List>
               {
-                items.map((item) => (
-                  <ListItem
-                    key={item.idx}
-                    onClick={() => onChange(item.idx)}
-                    className={
-                      classNames((item.idx === curveIdx ? classes.curveSelected : classes.curveDefault))  // eslint-disable-line
-                    }
-                  >
-                    <span className={classNames(classes.curve)}>
-                      <i>{ item.name }</i>
-                      <span style={{ float: 'right', width: '95%' }}>
-                        <hr
-                          className={classNames(classes.line)}
-                          style={{ backgroundColor: item.color }}
-                        />
-                        {
-                          item.filename !== '' ? <span>File: { item.filename }</span> : null  // eslint-disable-line
-                        }
-                      </span>
-                    </span>
-                  </ListItem>
-                ))
+                items.map((item) => renderCurveItem(classes, item, curveIdx, onChange))
               }
             </List>
           )
@@ -253,7 +285,7 @@ GraphSelectionPanel.propTypes = {
   curveSt: PropTypes.object.isRequired,
   selectCurveAct: PropTypes.func.isRequired,
   entityFileNames: PropTypes.array.isRequired,
-  subLayoutsInfo: PropTypes.array,
+  subLayoutsInfo: PropTypes.object,
   toggleShowAllCurveAct: PropTypes.func.isRequired,
 };
 

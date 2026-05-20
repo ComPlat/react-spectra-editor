@@ -7,6 +7,8 @@ import PropTypes from 'prop-types';
 
 import { withStyles } from '@mui/styles';
 import Tooltip from '@mui/material/Tooltip';
+import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 
 import Cfg from '../../helpers/cfg';
 import { MuButton, commonStyle } from './common';
@@ -15,14 +17,53 @@ const styles = () => (
   Object.assign(
     {
       btnYes: {
-        color: 'green',
+        backgroundColor: '#eef8f0',
+        borderColor: '#9ccfa7',
+        color: '#1f7a35',
+        '&:hover': {
+          backgroundColor: '#dff2e3',
+          borderColor: '#6fb980',
+        },
       },
       btnNo: {
-        color: 'red',
+        backgroundColor: '#fff1f0',
+        borderColor: '#efb0aa',
+        color: '#b42318',
+        '&:hover': {
+          backgroundColor: '#ffe3e0',
+          borderColor: '#df8379',
+        },
       },
       btnTxtConfirm: {
-        fontFamily: 'Helvetica',
+        fontFamily: 'Helvetica, Arial, sans-serif',
         fontSize: 12,
+      },
+      confirmWrap: {
+        alignItems: 'center',
+        backgroundColor: '#f8fafc',
+        border: '1px solid #dbe3ea',
+        borderRadius: 7,
+        display: 'inline-flex',
+        gap: 4,
+        height: 30,
+        padding: '0 4px 0 8px',
+      },
+      confirmText: {
+        color: '#25313b',
+        fontFamily: 'Helvetica, Arial, sans-serif',
+        fontSize: 11,
+        fontWeight: 700,
+        letterSpacing: '0.02em',
+        marginRight: 2,
+        whiteSpace: 'nowrap',
+      },
+      confirmBtn: {
+        height: 24,
+        minWidth: 24,
+        width: 24,
+      },
+      confirmIcon: {
+        fontSize: 17,
       },
     },
     commonStyle,
@@ -86,29 +127,36 @@ class TriBtn extends React.Component {
     };
 
     return (
-      <span disabled={Cfg.btnCmdMpy(layoutSt) && Cfg.btnCmdIntg(layoutSt)}>
-        <span className={classNames(classes.txtLabel, 'txt-sv-bar-desc')}>
+      <span
+        className={classes.confirmWrap}
+        disabled={Cfg.btnCmdMpy(layoutSt) && Cfg.btnCmdIntg(layoutSt)}
+      >
+        <span className={classNames(classes.confirmText, 'txt-sv-bar-desc')}>
           Delete ALL?
         </span>
         <MuButton
           className={
             classNames(
+              classes.confirmBtn,
+              classes.btnYes,
               'btn-sv-bar-yes',
             )
           }
           onClick={onExec}
         >
-          <span className={classNames(classes.txt, classes.btnYes, 'txt-sv-bar-yes')}>Y</span>
+          <CheckRoundedIcon className={classNames(classes.confirmIcon, 'txt-sv-bar-yes')} />
         </MuButton>
         <MuButton
           className={
             classNames(
+              classes.confirmBtn,
+              classes.btnNo,
               'btn-sv-bar-no',
             )
           }
           onClick={this.onToggle}
         >
-          <span className={classNames(classes.txt, classes.btnNo, 'txt-sv-bar-no')}>N</span>
+          <CloseRoundedIcon className={classNames(classes.confirmIcon, 'txt-sv-bar-no')} />
         </MuButton>
       </span>
     );

@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
 import {
-  TextField, InputAdornment, Tooltip, FormControl, InputLabel,
+  TextField, InputAdornment, Tooltip,
 } from '@mui/material';
 import { withStyles } from '@mui/styles';
 import CloudDoneOutlinedIcon from '@mui/icons-material/CloudDoneOutlined';
@@ -54,26 +54,28 @@ const setThreshold = (
   };
 
   return (
-    <FormControl variant="outlined">
-      <TextField
-        className={classes.field}
-        id="outlined-name"
-        placeholder="N.A."
-        type="number"
-        value={thresVal || 0.01}
-        margin="none"
-        InputProps={{
-          endAdornment: txtPercent(),
-          className: classNames(classes.txtInput, 'txtfield-sv-bar-input'),
-          inputProps: { min: 0.01 },
-        }}
-        onChange={onChange}
-        onBlur={onBlur}
-        onKeyPress={onEnterPress}
-        variant="outlined"
-      />
-      <InputLabel className={classNames(classes.txtLabelBottomInput)}>Threshold</InputLabel>
-    </FormControl>
+    <TextField
+      className={classes.field}
+      id="outlined-name"
+      label="Threshold"
+      placeholder="N.A."
+      type="number"
+      value={thresVal || 0.01}
+      margin="none"
+      InputLabelProps={{
+        shrink: true,
+        className: classNames(classes.selectLabel, 'select-sv-bar-label'),
+      }}
+      InputProps={{
+        endAdornment: txtPercent(),
+        className: classNames(classes.txtInput, 'txtfield-sv-bar-input'),
+        inputProps: { min: 0.01 },
+      }}
+      onChange={onChange}
+      onBlur={onBlur}
+      onKeyPress={onEnterPress}
+      variant="outlined"
+    />
   );
 };
 

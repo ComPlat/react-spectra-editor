@@ -7,7 +7,9 @@ import PropTypes from 'prop-types';
 
 import withStyles from '@mui/styles/withStyles';
 
-import { commonStyle } from './common';
+import {
+  commonStyle, TOOLBAR_CONTROL_H, TOOLBAR_LABEL_SLOT, TOOLBAR_GROUP_MARGIN_LEFT,
+} from './common';
 import Viewer from './01_viewer';
 import Zoom from './02_zoom';
 import Peak from './03_peak';
@@ -23,12 +25,45 @@ import ChangeAxes from './r08_change_axes';
 import Detector from './r09_detector';
 import CvDensityControls from './r10_cv_density';
 import Format from '../../helpers/format';
+import Cfg from '../../helpers/cfg';
 
 const styles = () => (
   Object.assign(
-    {},
     {
-
+      toolbarTrack: {
+        alignItems: 'flex-end',
+        display: 'flex',
+        flexWrap: 'nowrap',
+        minHeight: TOOLBAR_CONTROL_H + TOOLBAR_LABEL_SLOT,
+        overflowX: 'auto',
+        overflowY: 'visible',
+        width: '100%',
+        '& > .group:empty, & > .groupRight:empty, & > .groupRightMost:empty': {
+          display: 'none',
+        },
+        '& > span:first-child': {
+          marginLeft: 0,
+          paddingLeft: 0,
+          '&::before': {
+            display: 'none',
+          },
+        },
+        '& > .groupRightMost': {
+          marginLeft: TOOLBAR_GROUP_MARGIN_LEFT,
+          paddingLeft: 0,
+        },
+        '&::-webkit-scrollbar': {
+          height: 6,
+        },
+        '&::-webkit-scrollbar-thumb': {
+          backgroundColor: '#cbd5df',
+          borderRadius: 6,
+        },
+      },
+      toolbarSpacer: {
+        flex: '1 1 12px',
+        minWidth: 8,
+      },
     },
     commonStyle,
   )
@@ -38,32 +73,37 @@ const CmdBar = ({
   classes, feature, hasEdit, forecast, operations, editorOnly, jcampIdx, hideThreshold, layoutSt,
 }) => {
   const isCvLayout = Format.isCyclicVoltaLayout(layoutSt);
+  const hideIntegration = isCvLayout || Cfg.btnCmdIntg(layoutSt);
+  const hideMultiplicity = isCvLayout || Cfg.btnCmdMpy(layoutSt);
 
   return (
     <div className={classes.card}>
-      <Viewer editorOnly={editorOnly} />
-      <Zoom />
-      <Peak jcampIdx={jcampIdx} feature={feature} />
-      <Pecker jcampIdx={jcampIdx} />
-      {isCvLayout ? null : <Integration />}
-      {isCvLayout ? null : <Multiplicity />}
-      <UndoRedo />
-      <Submit
-        operations={operations}
-        feature={feature}
-        forecast={forecast}
-        editorOnly={editorOnly}
-        hideSwitch={false}
-        disabled={false}
-      />
-      {
-        hideThreshold ? null : (<Threshold feature={feature} hasEdit={hasEdit} />)
-      }
-      <Layout feature={feature} hasEdit={hasEdit} />
-      <Wavelength />
-      <CvDensityControls />
-      <ChangeAxes />
-      <Detector />
+      <div className={classes.toolbarTrack}>
+        <Viewer editorOnly={editorOnly} />
+        <Zoom />
+        <Peak jcampIdx={jcampIdx} feature={feature} />
+        <Pecker jcampIdx={jcampIdx} />
+        {hideIntegration ? null : <Integration />}
+        {hideMultiplicity ? null : <Multiplicity />}
+        <UndoRedo />
+        <div className={classes.toolbarSpacer} aria-hidden="true" data-toolbar-spacer />
+        {
+          hideThreshold ? null : (<Threshold feature={feature} hasEdit={hasEdit} />)
+        }
+        <Layout feature={feature} hasEdit={hasEdit} />
+        <Wavelength />
+        <CvDensityControls />
+        <ChangeAxes />
+        <Detector />
+        <Submit
+          operations={operations}
+          feature={feature}
+          forecast={forecast}
+          editorOnly={editorOnly}
+          hideSwitch={false}
+          disabled={false}
+        />
+      </div>
     </div>
   );
 };

@@ -25,10 +25,21 @@ import Format from '../helpers/format';
 const styles = () => ({
   root: {
     flexGrow: 1,
+    backgroundColor: '#fff',
+    padding: '4px 4px 6px 0',
+    fontFamily: 'Helvetica, Arial, sans-serif',
   },
   appBar: {
     backgroundColor: '#fff',
     boxShadow: 'none',
+  },
+  contentShell: {
+    marginLeft: 4,
+    padding: 4,
+    backgroundColor: '#fff',
+    border: '1px solid #e6e8eb',
+    borderRadius: 8,
+    boxShadow: '0 4px 14px rgba(17, 24, 39, 0.05)',
   },
   tabLabel: {
     fontSize: '14px',
@@ -58,6 +69,12 @@ const styles = () => ({
   cvPanelBelow: {
     marginTop: 16,
     width: '100%',
+  },
+  viewerCol: {
+    minWidth: 0,
+  },
+  panelCol: {
+    paddingLeft: 6,
   },
 });
 
@@ -105,9 +122,9 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
           operations={operations}
           editorOnly={true}
         />
-        <div className={classNames('react-spectrum-editor', isCyclicVolta && classes.cvEditor)}>
+        <div className={classNames('react-spectrum-editor', classes.contentShell, isCyclicVolta && classes.cvEditor)}>
           <Grid container className={isCyclicVolta ? classes.cvTopRow : undefined}>
-            <Grid item xs={9} className={isCyclicVolta ? classes.cvViewerCol : undefined}>
+            <Grid item xs={9} className={classNames(classes.viewerCol, isCyclicVolta && classes.cvViewerCol)}>
               <div className={isCyclicVolta ? classes.cvViewerWrap : undefined}>
                 <ViewerMulti
                   entities={entities}
@@ -127,12 +144,12 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
                 </div>
               ) : null}
             </Grid>
-            <Grid item xs={3} align="center">
+            <Grid item xs={3} align="center" className={classes.panelCol}>
               <PanelViewer
                 jcampIdx={curveIdx}
                 entityFileNames={entityFileNames}
                 userManualLink={userManualLink}
-                feature={feature}
+                feature={featureForDisplay}
                 molSvg={molSvg}
                 exactMass={exactMass}
                 subLayoutsInfo={seperatedSubLayouts}

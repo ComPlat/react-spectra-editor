@@ -16,9 +16,29 @@ import { LIST_UI_VIEWER_TYPE } from './constants/list_ui';
 import { extractParams } from './helpers/extractParams';
 
 const styles = () => ({
+  root: {
+    backgroundColor: '#fff',
+    padding: '4px 4px 6px 0',
+    fontFamily: 'Helvetica, Arial, sans-serif',
+  },
+  contentShell: {
+    marginLeft: 4,
+    padding: 4,
+    backgroundColor: '#fff',
+    border: '1px solid #e6e8eb',
+    borderRadius: 8,
+    boxShadow: '0 4px 14px rgba(17, 24, 39, 0.05)',
+  },
+  chartColumn: {
+    minWidth: 0,
+  },
+  panelColumn: {
+    paddingLeft: 6,
+  },
 });
 
 const LayerPrism = ({
+  classes,
   entity, cLabel, xLabel, yLabel, forecast, operations,
   descriptions, molSvg, editorOnly, exactMass,
   thresSt, scanSt, uiSt,
@@ -32,7 +52,7 @@ const LayerPrism = ({
   const { viewer } = uiSt;
   if (viewer === LIST_UI_VIEWER_TYPE.ANALYSIS) {
     return (
-      <div>
+      <div className={classes.root}>
         <CmdBar
           feature={feature}
           hasEdit={hasEdit}
@@ -40,9 +60,9 @@ const LayerPrism = ({
           operations={operations}
           editorOnly={editorOnly}
         />
-        <div className="react-spectrum-editor">
+        <div className={`react-spectrum-editor ${classes.contentShell}`}>
           <Grid container>
-            <Grid item xs={12}>
+            <Grid item xs={12} className={classes.chartColumn}>
               <LayerContent
                 topic={topic}
                 feature={feature}
@@ -60,7 +80,7 @@ const LayerPrism = ({
   }
 
   return (
-    <div>
+    <div className={classes.root}>
       <CmdBar
         feature={feature}
         hasEdit={hasEdit}
@@ -68,9 +88,9 @@ const LayerPrism = ({
         operations={operations}
         editorOnly={editorOnly}
       />
-      <div className="react-spectrum-editor">
+      <div className={`react-spectrum-editor ${classes.contentShell}`}>
         <Grid container>
-          <Grid item xs={9}>
+          <Grid item xs={9} className={classes.chartColumn}>
             <LayerContent
               topic={topic}
               feature={feature}
@@ -81,7 +101,7 @@ const LayerPrism = ({
               operations={operations}
             />
           </Grid>
-          <Grid item xs={3} align="center">
+          <Grid item xs={3} align="center" className={classes.panelColumn}>
             <PanelViewer
               feature={feature}
               integration={integration}
@@ -113,6 +133,7 @@ const mapDispatchToProps = (dispatch) => (
 );
 
 LayerPrism.propTypes = {
+  classes: PropTypes.object.isRequired,
   entity: PropTypes.object.isRequired,
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,
