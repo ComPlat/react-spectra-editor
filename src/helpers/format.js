@@ -210,7 +210,7 @@ const formatedLCMS = (hplcMsSt, isAscend, decimal, options = {}) => {
     result = `\n${sections.join('\n\n')}`;
   }
 
-  const polarity = tic?.polarity || (tic?.isNegative ? 'negative' : 'positive');
+  const polarity = tic?.polarity || 'positive';
   let polarityKey = 'neutral';
   if (polarity === 'negative') {
     polarityKey = 'negative';

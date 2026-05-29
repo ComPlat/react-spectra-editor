@@ -180,12 +180,6 @@ const alignMzPolarityWithTic = (ticEntities, mzEntities) => {
   }
 };
 
-export function classify(entity) {
-  const { kind, polarity } = getLcMsInfo(entity);
-  if (kind === 'unknown') return 'unknown';
-  return `${kind}_${polarity}`;
-}
-
 export function splitAndReindexEntities(entities = []) {
   const tic = [];
   const mz = [];

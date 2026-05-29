@@ -1,5 +1,4 @@
 import {
-  classify,
   getLcMsInfo,
   isLcMsGroup,
   splitAndReindexEntities,
@@ -63,16 +62,6 @@ describe('extractEntityLCMS helpers', () => {
         kind: 'unknown',
         polarity: 'neutral',
       });
-    });
-  });
-
-  describe('classify', () => {
-    it('returns unknown label for unknown entities', () => {
-      expect(classify({})).toEqual('unknown');
-    });
-
-    it('returns composite label for known entities', () => {
-      expect(classify({ csCategory: ['uvvis', 'positive'] })).toEqual('uvvis_positive');
     });
   });
 

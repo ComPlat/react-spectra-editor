@@ -5,3 +5,5 @@ export { buildLcmsMsPageJcamp } from './lcmsMsPage';
 export { readLcmsMzPageFromJcampInfo } from './lcmsJcampInfo';
 
 export { parseChemstationPages, isChemstationLcms } from './chemstation';
+
+export { parseFeaturePageValue } from './pageValue';

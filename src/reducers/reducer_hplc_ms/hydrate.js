@@ -15,6 +15,7 @@ import {
   readPersistedLcmsTicHints,
 } from './persistence';
 import { emptyUvvisHistory } from './uvvis';
+import { parseFeaturePageValue } from '../../features/lc-ms/parsing/pageValue';
 
 export const updateLcmsData = (state, action) => {
   const { payload, meta: actionMeta } = action;
@@ -35,27 +36,6 @@ export const updateLcmsData = (state, action) => {
       return Object.values(curve.features).filter((f) => f?.data?.[0]);
     }
     return [];
-  };
-
-  const getFeaturePageValue = (feature) => {
-    const candidates = [feature?.pageValue, feature?.page, feature?.pageSymbol];
-    for (let i = 0; i < candidates.length; i += 1) {
-      const raw = candidates[i];
-      if (raw != null) {
-        if (typeof raw === 'number' && Number.isFinite(raw)) {
-          return raw;
-        }
-        const text = String(raw).split('\n')[0].trim();
-        const match = text.match(/[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?/);
-        if (match) {
-          const value = Number(match[0]);
-          if (Number.isFinite(value)) {
-            return value;
-          }
-        }
-      }
-    }
-    return null;
   };
 
   let ticPosData = { x: [], y: [] };
@@ -229,7 +209,7 @@ export const updateLcmsData = (state, action) => {
           y: yValues[i] || 0,
         })),
       );
-      pageValues.push(getFeaturePageValue(feature));
+      pageValues.push(parseFeaturePageValue(feature));
     });
     return { peaks, pageValues };
   };
@@ -279,7 +259,7 @@ export const updateLcmsData = (state, action) => {
     const findIn = (list) => {
       if (!Array.isArray(list)) return null;
       for (let i = 0; i < list.length; i += 1) {
-        const v = getFeaturePageValue(list[i]);
+        const v = parseFeaturePageValue(list[i]);
         if (Number.isFinite(v)) return v;
       }
       return null;

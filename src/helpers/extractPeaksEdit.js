@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 import { Convert2Peak } from './chem';
+import { PksEdit } from './converter';
 import { FromManualToOffset } from './shift';
 import Format from './format';
 import { calcArea } from './integration';
@@ -22,15 +23,16 @@ const niOffset = (shiftSt, atIndex = 0) => {
 
 const msOffset = () => 0;
 
-function extractPeaksEdit(hplcMsSt) {
-  if (!hplcMsSt || !hplcMsSt.uvvis || !hplcMsSt.uvvis.spectraList) return [];
-  return hplcMsSt.uvvis.spectraList.flatMap((spectrum) => spectrum.peaks || []);
-}
-
 const extractAutoPeaks = (feature, thresSt, shiftSt, layoutSt, atIndex = 0) => {
   const offset = (Format.isMsLayout(layoutSt) || Format.isLCMsLayout(layoutSt)) ? msOffset() : niOffset(shiftSt, atIndex);
   const peaks = Convert2Peak(feature, thresSt.value, offset);
   return peaks;
+};
+
+const extractPeaksEdit = (feature, editPeakSt, thresSt, shiftSt, layoutSt, atIndex = 0) => {
+  if (Format.isLCMsLayout(layoutSt)) return [];
+  const peaks = extractAutoPeaks(feature, thresSt, shiftSt, layoutSt, atIndex);
+  return PksEdit(peaks, editPeakSt);
 };
 
 const getAUCValue = (integrationSt, layoutSt) => {

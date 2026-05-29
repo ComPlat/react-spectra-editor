@@ -36,6 +36,7 @@ import {
 } from '../common/draw';
 import { LIST_UI_SWEEP_TYPE, LIST_NON_BRUSH_TYPES } from '../../constants/list_ui';
 import renderWavelengthSelect from '../../features/lc-ms/ui/wavelengthSelect';
+import { parseFeaturePageValue as parsePageValue } from '../../features/lc-ms/parsing/pageValue';
 import { LIST_ROOT_SVG_GRAPH, LIST_BRUSH_SVG_GRAPH } from '../../constants/list_graph';
 import PeakGroup from '../cmd_bar/08_peak_group';
 import Threshold from '../cmd_bar/r03_threshold';
@@ -45,26 +46,6 @@ import { getLcMsInfo } from '../../helpers/extractEntityLCMS';
 
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.8 / 3); // ROI
-
-const parsePageValue = (feature) => {
-  const candidates = [feature?.pageValue, feature?.page, feature?.pageSymbol];
-  for (let i = 0; i < candidates.length; i += 1) {
-    const raw = candidates[i];
-    if (raw != null) {
-      if (typeof raw === 'number') {
-        if (Number.isFinite(raw)) return raw;
-      } else {
-        const text = String(raw).split('\n')[0].trim();
-        const match = text.match(/[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?/);
-        if (match) {
-          const value = Number(match[0]);
-          if (Number.isFinite(value)) return value;
-        }
-      }
-    }
-  }
-  return null;
-};
 
 const toSeed = (xValues = [], yValues = []) => {
   const maxLength = Math.min(xValues.length, yValues.length);
@@ -85,7 +66,7 @@ export const isLcmsMsPageLoading = (mzEntities = [], hplcMsSt = {}) => {
   )) || mzEntities?.[0];
   if (!pickEntity) return true;
 
-  const { features } = extractParams(pickEntity, 0, 1);
+  const { features } = extractParams(pickEntity, null, null);
   let featuresArr = [];
   if (Array.isArray(features)) {
     featuresArr = features;
@@ -543,7 +524,7 @@ class ViewerLineRect extends React.Component {
     if (!uvvisEntities || !uvvisEntities[0]) {
       return null;
     }
-    const { features } = extractParams(uvvisEntities[0], 0, 1);
+    const { features } = extractParams(uvvisEntities[0], null, null);
     let featuresArr = [];
     if (Array.isArray(features)) {
       featuresArr = features;
@@ -569,7 +550,7 @@ class ViewerLineRect extends React.Component {
     )) || mzEntities?.[0];
     if (!pickEntity || !pickEntity.layout) return null;
 
-    const { features } = extractParams(pickEntity, 0, 1);
+    const { features } = extractParams(pickEntity, null, null);
     let featuresArr = [];
     if (Array.isArray(features)) featuresArr = features;
     else if (features && typeof features === 'object') featuresArr = Object.values(features);
@@ -617,7 +598,7 @@ class ViewerLineRect extends React.Component {
     )) || mzEntities?.[0];
     if (!pickEntity || !pickEntity.layout) return;
 
-    const { features } = extractParams(pickEntity, 0, 1);
+    const { features } = extractParams(pickEntity, null, null);
     let featuresArr = [];
     if (Array.isArray(features)) featuresArr = features;
     else if (features && typeof features === 'object') featuresArr = Object.values(features);
