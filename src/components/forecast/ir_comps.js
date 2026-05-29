@@ -17,18 +17,18 @@ import {
   TxtLabel, StatusIcon, ConfidenceLabel,
 } from './comps';
 import { setIrStatus } from '../../actions/forecast';
-// import SmaToSvg from '../common/chem';
 
 const baseSelectIrStatus = ({
-  sma, status, identity,
+  classes, sma, status, identity,
   setIrStatusAct,
 }) => {
   const theStatus = ['accept', 'reject'].includes(status) ? status : '';
 
   return (
-    <FormControl>
+    <FormControl size="small" className={classes.ownerSelect}>
       <Select
         value={theStatus}
+        displayEmpty
         onChange={(e) => {
           setIrStatusAct({
             predictions: {
@@ -39,13 +39,13 @@ const baseSelectIrStatus = ({
         }}
       >
         <MenuItem value="accept">
-          <CheckCircleOutline style={{ color: '#4caf50' }} />
+          <CheckCircleOutline style={{ color: '#4caf50', fontSize: 18 }} />
         </MenuItem>
         <MenuItem value="reject">
-          <HighlightOff style={{ color: '#e91e63' }} />
+          <HighlightOff style={{ color: '#e91e63', fontSize: 18 }} />
         </MenuItem>
         <MenuItem value="">
-          <span />
+          <span style={{ color: '#a8b0b8', fontSize: 12 }}>—</span>
         </MenuItem>
       </Select>
     </FormControl>
@@ -63,6 +63,7 @@ const bssMapDispatchToProps = (dispatch) => (
 );
 
 baseSelectIrStatus.propTypes = {
+  classes: PropTypes.object.isRequired,
   sma: PropTypes.string.isRequired,
   status: PropTypes.string,
   identity: PropTypes.string.isRequired,
@@ -87,10 +88,10 @@ const IrTableHeader = (classes) => (
       <TableCell align="right">
         {TxtLabel(classes, 'Machine Confidence', 'txt-prd-table-title')}
       </TableCell>
-      <TableCell align="right">
+      <TableCell align="center">
         {TxtLabel(classes, 'Machine', 'txt-prd-table-title')}
       </TableCell>
-      <TableCell align="right">
+      <TableCell align="center">
         {TxtLabel(classes, 'Owner', 'txt-prd-table-title')}
       </TableCell>
     </TableRow>
@@ -98,63 +99,69 @@ const IrTableHeader = (classes) => (
 );
 
 const colorStyles = [
-  { backgroundColor: '#FFFF00' },
-  { backgroundColor: '#87CEFA' },
-  { backgroundColor: '#FFB6C1' },
-  { backgroundColor: '#00FF00' },
-  { backgroundColor: '#E6E6FA' },
-  { backgroundColor: '#FFD700' },
-  { backgroundColor: '#F0FFFF' },
-  { backgroundColor: '#F5F5DC' },
+  { backgroundColor: '#fff9c4' },
+  { backgroundColor: '#e3f2fd' },
+  { backgroundColor: '#fce4ec' },
+  { backgroundColor: '#e8f5e9' },
+  { backgroundColor: '#ede7f6' },
+  { backgroundColor: '#fff3e0' },
+  { backgroundColor: '#e0f7fa' },
+  { backgroundColor: '#f3e5f5' },
 ];
 
 const colorLabel = (classes, idx, extClsName = 'txt-label') => {
   const style = Object.assign(
     {},
     colorStyles[idx % 8],
-    { width: 20, borderRadius: 20, textAlign: 'center' },
+    {
+      borderRadius: 6,
+      display: 'inline-block',
+      minWidth: 24,
+      padding: '2px 6px',
+      textAlign: 'center',
+    },
   );
 
   return (
-    <div
-      style={style}
-    >
-      <span
-        className={classNames(classes.txtLabel, extClsName)}
-      >
+    <div style={style}>
+      <span className={classNames(classes.txtLabel, extClsName)}>
         { idx + 1 }
       </span>
     </div>
   );
 };
 
-const IrTableBodyRow = (classes, idx, fg) => (
-  <TableRow key={`${idx}-${fg.name}`}>
-    <TableCell component="th" scope="row">
-      {colorLabel(classes, idx)}
-    </TableCell>
-    <TableCell align="left">
-      {TxtLabel(classes, fg.sma, 'txt-prd-table-content')}
-    </TableCell>
-    <TableCell align="right">
-      {
-        ConfidenceLabel(
-          classes, fg.confidence, 'txt-prd-table-content',
-        )
-      }
-    </TableCell>
-    <TableCell align="right">
-      {StatusIcon(fg.status)}
-    </TableCell>
-    <TableCell align="right">
-      <SelectIrStatus
-        sma={fg.sma}
-        status={fg.statusOwner}
-        identity="Owner"
-      />
-    </TableCell>
-  </TableRow>
-);
+const IrTableBodyRow = (classes, idx, fg) => {
+  const { statusCell } = classes;
+  return (
+    <TableRow key={`${idx}-${fg.name}`}>
+      <TableCell component="th" scope="row">
+        {colorLabel(classes, idx)}
+      </TableCell>
+      <TableCell align="left">
+        {TxtLabel(classes, fg.sma, 'txt-prd-table-content')}
+      </TableCell>
+      <TableCell align="right">
+        {
+          ConfidenceLabel(
+            classes, fg.confidence, 'txt-prd-table-content',
+          )
+        }
+      </TableCell>
+      <TableCell align="center" className={statusCell}>
+        {StatusIcon(classes, fg.status)}
+      </TableCell>
+      <TableCell align="center">
+        <SelectIrStatus
+          classes={classes}
+          sma={fg.sma}
+          status={fg.statusOwner}
+          identity="Owner"
+        />
+      </TableCell>
+    </TableRow>
+  );
+};
 
 export {
   IrTableHeader, IrTableBodyRow,

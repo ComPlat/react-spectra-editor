@@ -25,10 +25,18 @@ import Format from '../helpers/format';
 const styles = () => ({
   root: {
     flexGrow: 1,
+    backgroundColor: '#fff',
+    padding: '4px 4px 6px 0',
+    fontFamily: 'Helvetica, Arial, sans-serif',
   },
   appBar: {
     backgroundColor: '#fff',
     boxShadow: 'none',
+  },
+  contentShell: {
+    marginLeft: 4,
+    padding: 4,
+    backgroundColor: '#fff',
   },
   tabLabel: {
     fontSize: '14px',
@@ -58,6 +66,12 @@ const styles = () => ({
   cvPanelBelow: {
     marginTop: 16,
     width: '100%',
+  },
+  viewerCol: {
+    minWidth: 0,
+  },
+  panelCol: {
+    paddingLeft: 6,
   },
 });
 
@@ -101,13 +115,23 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
       <div className={classes.root}>
         <CmdBar
           feature={feature}
+          hasEdit={entity.hasEdit}
           operations={operations}
           editorOnly={true}
-          hideThreshold={!Format.isNmrLayout(layoutSt)}
         />
-        <div className={classNames('react-spectrum-editor', isCyclicVolta && classes.cvEditor)}>
+        <div
+          className={classNames(
+            'react-spectrum-editor',
+            classes.contentShell,
+            isCyclicVolta && classes.cvEditor,
+          )}
+        >
           <Grid container className={isCyclicVolta ? classes.cvTopRow : undefined}>
-            <Grid item xs={9} className={isCyclicVolta ? classes.cvViewerCol : undefined}>
+            <Grid
+              item
+              xs={9}
+              className={classNames(classes.viewerCol, isCyclicVolta && classes.cvViewerCol)}
+            >
               <div className={isCyclicVolta ? classes.cvViewerWrap : undefined}>
                 <ViewerMulti
                   entities={entities}
@@ -127,7 +151,7 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
                 </div>
               ) : null}
             </Grid>
-            <Grid item xs={3} align="center">
+            <Grid item xs={3} align="center" className={classes.panelCol}>
               <PanelViewer
                 jcampIdx={curveIdx}
                 entityFileNames={entityFileNames}

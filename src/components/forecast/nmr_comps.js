@@ -18,15 +18,16 @@ import {
 import { setNmrStatus } from '../../actions/forecast';
 
 const baseSelectNmrStatus = ({  // eslint-disable-line
-  idx, atom, status, identity,
+  classes, idx, atom, status, identity,
   setNmrStatusAct,
 }) => {
   const theStatus = ['accept', 'reject'].includes(status) ? status : '';
 
   return (
-    <FormControl>
+    <FormControl size="small" className={classes.ownerSelect}>
       <Select
         value={theStatus}
+        displayEmpty
         onChange={(e) => {
           setNmrStatusAct({
             predictions: {
@@ -37,13 +38,13 @@ const baseSelectNmrStatus = ({  // eslint-disable-line
         }}
       >
         <MenuItem value="accept">
-          <CheckCircleOutline style={{ color: '#4caf50' }} />
+          <CheckCircleOutline style={{ color: '#4caf50', fontSize: 18 }} />
         </MenuItem>
         <MenuItem value="reject">
-          <HighlightOff style={{ color: '#e91e63' }} />
+          <HighlightOff style={{ color: '#e91e63', fontSize: 18 }} />
         </MenuItem>
         <MenuItem value="">
-          <span />
+          <span style={{ color: '#a8b0b8', fontSize: 12 }}>—</span>
         </MenuItem>
       </Select>
     </FormControl>
@@ -61,6 +62,7 @@ const bssMapDispatchToProps = (dispatch) => (
 );
 
 baseSelectNmrStatus.propTypes = {
+  classes: PropTypes.object.isRequired,
   idx: PropTypes.number.isRequired,
   atom: PropTypes.number.isRequired,
   status: PropTypes.string,
@@ -80,7 +82,7 @@ const numFormat = (input) => parseFloat(input).toFixed(2);
 
 const realFormat = (val, status) => {
   if (status === 'missing') {
-    return '- - -';
+    return '—';
   }
   return numFormat(val);
 };
@@ -100,10 +102,10 @@ const NmrTableHeader = (classes) => (
       <TableCell align="right">
         {TxtLabel(classes, 'Diff (ppm)', 'txt-prd-table-title')}
       </TableCell>
-      <TableCell align="right">
+      <TableCell align="center">
         {TxtLabel(classes, 'Machine', 'txt-prd-table-title')}
       </TableCell>
-      <TableCell align="right">
+      <TableCell align="center">
         {TxtLabel(classes, 'Owner', 'txt-prd-table-title')}
       </TableCell>
     </TableRow>
@@ -136,11 +138,12 @@ const NmrTableBodyRow = (classes, row, idx) => (
         )
       }
     </TableCell>
-    <TableCell align="right">
-      {StatusIcon(row.status)}
+    <TableCell align="center" className={classes.statusCell}>
+      {StatusIcon(classes, row.status)}
     </TableCell>
-    <TableCell align="right">
+    <TableCell align="center">
       <SelectNmrStatus
+        classes={classes}
         idx={idx}
         atom={row.atom}
         status={row.statusOwner}
@@ -152,16 +155,14 @@ const NmrTableBodyRow = (classes, row, idx) => (
 
 const SectionReference = (classes) => (
   <div className={classNames(classes.reference)}>
-    <p>
-      <span>NMR prediction source: </span>
-      <a
-        href="https://www.ncbi.nlm.nih.gov/pubmed/15464159"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        nmrshiftdb
-      </a>
-    </p>
+    <span>NMR prediction source: </span>
+    <a
+      href="https://www.ncbi.nlm.nih.gov/pubmed/15464159"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      nmrshiftdb
+    </a>
   </div>
 );
 

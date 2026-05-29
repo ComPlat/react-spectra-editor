@@ -11,11 +11,15 @@ import {
 } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import { LIST_LAYOUT } from '../../constants/list_layout';
-import { commonStyle } from './common';
+import { commonStyle, TOOLBAR_LABEL_SLOT } from './common';
 import { setCyclicVoltaAreaValue, setCyclicVoltaAreaUnit, toggleCyclicVoltaDensity } from '../../actions/cyclic_voltammetry';
 
 const styles = () => ({
   ...commonStyle,
+  group: {
+    ...commonStyle.group,
+    paddingTop: TOOLBAR_LABEL_SLOT,
+  },
   fieldArea: {
     width: 100,
   },
@@ -42,7 +46,7 @@ const CvDensityControls = ({
   classes, layoutSt, areaValue, areaUnit, useCurrentDensity,
   setAreaValueAct, setAreaUnitAct, toggleDensityAct,
 }) => {
-  if (layoutSt !== LIST_LAYOUT.CYCLIC_VOLTAMMETRY) return <i />;
+  if (layoutSt !== LIST_LAYOUT.CYCLIC_VOLTAMMETRY) return null;
 
   const handleAreaChange = (e) => {
     const raw = e.target.value;

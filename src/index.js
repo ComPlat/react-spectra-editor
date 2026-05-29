@@ -2,13 +2,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import {
-  InputBase, Grid, Button,
-} from '@mui/material';
-
-import ReactQuill from 'react-quill';
-
 import { SpectraEditor, FN } from './app';
+import StandaloneLayoutPicker from './components/standalone_layout_picker';
+import StandaloneContentPanel from './components/standalone_content_panel';
 import nmr1HJcamp from './__tests__/fixtures/nmr1h_jcamp';
 import nmr1H2Jcamp from './__tests__/fixtures/nmr1h_2_jcamp';
 import nmr13CDeptJcamp from './__tests__/fixtures/nmr13c_dept_jcamp';
@@ -53,10 +49,11 @@ import { q1H, qIR, q13C } from './__tests__/fixtures/qDescValue';
 import './__tests__/style/svg.css';
 
 const pickSelectedSpectrumFromPayload = (payload) => {
-  const spectraList = payload?.spectra_list;
+  const spectraList = payload && payload.spectra_list;
   if (!Array.isArray(spectraList)) return payload || {};
   if (spectraList.length === 0) return {};
-  const selectedIdx = Number.isFinite(payload?.curveSt?.curveIdx) ? payload.curveSt.curveIdx : 0;
+  const curveIdx = payload && payload.curveSt && payload.curveSt.curveIdx;
+  const selectedIdx = Number.isFinite(curveIdx) ? curveIdx : 0;
   return spectraList[selectedIdx] || spectraList[0] || {};
 };
 
@@ -290,7 +287,7 @@ class DemoWriteIr extends React.Component {
     cyclicvoltaSt, curveSt,
   }) {
     const entity = this.loadEntity();
-    const safeLayout = layout || entity?.layout;
+    const safeLayout = layout || (entity && entity.layout);
     const { features } = entity;
     const { temperature } = entity;
     const { maxY, minY } = Array.isArray(features) ? {} : (features.editPeak || features.autoPeak);
@@ -312,14 +309,14 @@ class DemoWriteIr extends React.Component {
     let desc = this.rmDollarSign(wrapper.head) + body + wrapper.tail;
     if (
       FN.isCyclicVoltaLayout(safeLayout)
-      && cyclicvoltaSt?.spectraList
-      && curveSt?.listCurves
+      && cyclicvoltaSt && cyclicvoltaSt.spectraList
+      && curveSt && curveSt.listCurves
     ) {
       const { spectraList } = cyclicvoltaSt;
       const { curveIdx, listCurves } = curveSt;
       const selectedVolta = spectraList[curveIdx];
       const selectedCurve = listCurves[curveIdx];
-      if (!selectedVolta || !selectedCurve?.feature) return desc;
+      if (!selectedVolta || !selectedCurve || !selectedCurve.feature) return desc;
       const { feature } = selectedCurve;
       const { scanRate } = feature;
       const data = {
@@ -384,7 +381,7 @@ class DemoWriteIr extends React.Component {
         ? `${location} (${type}${atomCount})`
         : `${location} (${type}, ${js}${atomCount})`;
     }).join(', ');
-    const shiftRef = shift?.ref || {};
+    const shiftRef = (shift && shift.ref) || {};
     const { label, value, name } = shiftRef;
     const hasValidShiftRef = !!label && Number.isFinite(value) && typeof name === 'string';
     const solvent = hasValidShiftRef
@@ -422,7 +419,7 @@ class DemoWriteIr extends React.Component {
       integration, multiplicity, waveLength,
     } = pickSelectedSpectrumFromPayload(payload);
     const entity = this.loadEntity();
-    const safeLayout = layout || entity?.layout;
+    const safeLayout = layout || (entity && entity.layout);
     const { features } = entity;
     const { temperature } = entity;
     const { maxY, minY } = Array.isArray(features)
@@ -445,7 +442,7 @@ class DemoWriteIr extends React.Component {
     console.log(analysis);
     console.log(integration);
     console.log(multiplicity);
-    if (shift?.ref?.label) {
+    if (shift && shift.ref && shift.ref.label) {
       const label = this.rmDollarSign(shift.ref.label);
       alert(
         `Peaks: ${body}` + '\n' +
@@ -522,207 +519,11 @@ class DemoWriteIr extends React.Component {
     const others = this.loadOthers();
 
     return (
-      <div style={{ width: Math.round(window.innerWidth * 0.96) }}>
-        <div style={{ margin: '0 0 15px 55px' }}>
-          <Button
-            variant="contained"
-            style={{ margin: '0 10px 0 10px' }}
-            onClick={this.onClick('nmr 1h')}
-          >
-            NMR 1H
-          </Button>
-          <Button
-            variant="contained"
-            style={{ margin: '0 10px 0 10px' }}
-            onClick={this.onClick('nmr 13c')}
-          >
-            NMR 13C
-          </Button>
-          <Button
-            variant="contained"
-            style={{ margin: '0 10px 0 10px' }}
-            onClick={this.onClick('nmr 13c dept')}
-          >
-            NMR 13C DEPT
-          </Button>
-          <Button
-            variant="contained"
-            style={{ margin: '0 10px 0 10px' }}
-            onClick={this.onClick('nmr 19f')}
-          >
-            NMR 19F
-          </Button>
-          <Button
-            variant="contained"
-            style={{ margin: '0 10px 0 10px' }}
-            onClick={this.onClick('nmr 31p')}
-          >
-            NMR 31P
-          </Button>
-          <Button
-            variant="contained"
-            style={{ margin: '0 10px 0 10px' }}
-            onClick={this.onClick('nmr 15n')}
-          >
-            NMR 15N
-          </Button>
-          <Button
-            variant="contained"
-            style={{ margin: '0 10px 0 10px' }}
-            onClick={this.onClick('nmr 29si')}
-          >
-            NMR 29Si
-          </Button>
-          <Button
-            variant="contained"
-            style={{ margin: '0 10px 0 10px' }}
-            onClick={this.onClick('ir')}
-          >
-            IR
-          </Button>
-          <Button
-            variant="contained"
-            style={{ margin: '0 10px 0 10px' }}
-            onClick={this.onClick('raman')}
-          >
-            RAMAN
-          </Button>
-          <Button
-            id='btn-uv-vis'
-            variant="contained"
-            style={{ margin: '0 10px 0 10px' }}
-            onClick={this.onClick('uv/vis')}
-          >
-            UV/VIS
-          </Button>
-          <Button
-            id='btn-hplc'
-            variant="contained"
-            style={{ margin: '0 10px 0 10px' }}
-            onClick={this.onClick('hplc uv/vis')}
-          >
-            HPLC UV/VIS
-          </Button>
-          <Button
-            id='btn-tga'
-            variant="contained"
-            style={{ margin: '0 10px 0 10px' }}
-            onClick={this.onClick('tga')}
-          >
-            TGA
-          </Button>
-          <Button
-            id='btn-dsc'
-            variant="contained"
-            style={{ margin: '0 10px 0 10px' }}
-            onClick={this.onClick('dsc')}
-          >
-            DSC
-          </Button>
-          <Button
-            id='btn-xrd'
-            variant="contained"
-            style={{ margin: '0 10px 0 10px' }}
-            onClick={this.onClick('xrd')}
-          >
-            XRD
-          </Button>
-          <Button
-            id='btn-cv'
-            variant="contained"
-            style={{ margin: '0 10px 0 10px' }}
-            onClick={this.onClick('cyclic volta')}
-          >
-            CV
-          </Button>
-          <Button
-            variant="contained"
-            style={{ margin: '0 10px 0 10px' }}
-            onClick={this.onClick('cds')}
-          >
-            CDS
-          </Button>
-          <Button
-            id='btn-sec'
-            variant="contained"
-            style={{ margin: '0 10px 0 10px' }}
-            onClick={this.onClick('sec')}
-          >
-            SEC
-          </Button>
-          <Button
-            id='btn-sec'
-            variant="contained"
-            style={{ margin: '0 10px 0 10px' }}
-            onClick={this.onClick('gc')}
-          >
-            GC
-          </Button>
-          <Button
-            id='btn-sod'
-            variant="contained"
-            style={{ margin: '0 10px 0 10px' }}
-            onClick={this.onClick('aif')}
-          >
-            SORPTION-DESORPTION
-          </Button>
-          <Button
-            variant="contained"
-            style={{ margin: '0 10px 0 10px' }}
-            onClick={this.onClick('emissions')}
-          >
-            EMISSIONS
-          </Button>
-          <Button
-            variant="contained"
-            style={{ margin: '0 10px 0 10px' }}
-            onClick={this.onClick('dls acf')}
-          >
-            DLS ACF
-          </Button>
-          <Button
-            variant="contained"
-            style={{ margin: '0 10px 0 10px' }}
-            onClick={this.onClick('dls intensity')}
-          >
-            DLS intensity
-          </Button>
-          <Button
-            variant="contained"
-            style={{ margin: '0 10px 0 10px' }}
-            onClick={this.onClick('ms')}
-          >
-            MS
-          </Button>
-          <Button
-            variant="contained"
-            style={{ margin: '0 10px 0 10px' }}
-            onClick={this.onClick('multi')}
-          >
-            Multi NMR
-          </Button>
-          <Button
-            variant="contained"
-            style={{ margin: '0 10px 0 10px' }}
-            onClick={this.onClick('multi ir')}
-          >
-            Multi IR
-          </Button>
-          <Button
-            variant="contained"
-            style={{ margin: '0 10px 0 10px' }}
-            onClick={this.onClick('multi hplc')}
-          >
-            Multi HPLC
-          </Button>
-          <Button
-            variant="contained"
-            style={{ margin: '0 10px 0 10px' }}
-            onClick={this.onClick('multi xrd')}
-          >
-            Multi XRD
-          </Button>
-        </div>
+      <div style={{ width: Math.round(window.innerWidth * 0.96), paddingTop: 8 }}>
+        <StandaloneLayoutPicker
+          selectedTyp={typ}
+          onSelect={this.onClick}
+        />
         <SpectraEditor
           entity={entity}
           multiEntities={multiEntities}
@@ -737,28 +538,10 @@ class DemoWriteIr extends React.Component {
           forecast={forecast}
           operations={operations}
         />
-        <div>
-          <span>Description Changed</span>
-          <ReactQuill
-            className={'card-sv-quill'}
-            value={this.state.descChanged}
-            modules={{ toolbar: false }}
-            readOnly
-          />
-        </div>
-        <Grid container>
-          <Grid item xs={10}>
-            <InputBase
-              style={{ margin: '0 0 0 63px' }}
-              placeholder="Description"
-              multiline
-              fullWidth
-              rows="2"
-              margin="dense"
-              value={desc}
-            />
-          </Grid>
-        </Grid>
+        <StandaloneContentPanel
+          desc={desc}
+          descChanged={this.state.descChanged}
+        />
       </div>
     );
   }

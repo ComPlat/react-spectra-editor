@@ -7,9 +7,10 @@ import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
 
 import {
-  Select, MenuItem, FormControl, InputLabel,
+  Select, MenuItem, FormControl, InputLabel, Menu,
 } from '@mui/material';
 import { withStyles } from '@mui/styles';
+import ArrowDropDownRoundedIcon from '@mui/icons-material/ArrowDropDownRounded';
 
 import {
   toggleIsAscend, toggleIsIntensity,
@@ -17,7 +18,7 @@ import {
 } from '../../actions/submit';
 import BtnSubmit from './r05_submit_btn';
 import BtnPredict from './r06_predict_btn';
-import { commonStyle } from './common';
+import { MuButton, commonStyle } from './common';
 import Format from '../../helpers/format';
 
 const styles = () => (
@@ -34,6 +35,59 @@ const styles = () => (
       },
       fieldOpertaion: {
         width: 120,
+      },
+      splitSubmitWrap: {
+        alignItems: 'flex-end',
+        display: 'inline-flex',
+        margin: '0 0 0 2px',
+        position: 'relative',
+        verticalAlign: 'middle',
+      },
+      splitSubmitLabel: {
+        backgroundColor: '#fff',
+        color: '#66727c',
+        fontFamily: 'Helvetica, Arial, sans-serif',
+        fontSize: 10,
+        left: 8,
+        lineHeight: 1.3,
+        padding: '0 4px',
+        position: 'absolute',
+        top: -6,
+        zIndex: 1,
+      },
+      splitSubmitMain: {
+        borderRadius: '6px 0 0 6px',
+        borderRight: 'none',
+        justifyContent: 'space-between',
+        margin: '0 !important',
+        minWidth: 116,
+        padding: '0 8px',
+        width: 116,
+      },
+      splitSubmitText: {
+        color: '#25313b',
+        display: 'block',
+        fontFamily: 'Helvetica, Arial, sans-serif',
+        fontSize: 12,
+        overflow: 'hidden',
+        textAlign: 'left',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+        width: '100%',
+      },
+      splitSubmitArrow: {
+        borderRadius: '0 6px 6px 0',
+        margin: '0 !important',
+        minWidth: 28,
+        width: 28,
+      },
+      splitMenuItem: {
+        fontFamily: 'Helvetica, Arial, sans-serif',
+        fontSize: 12,
+      },
+      splitSelected: {
+        color: '#0b5cad',
+        fontWeight: 700,
       },
     },
     commonStyle,
@@ -160,46 +214,6 @@ const decimalSelect = (
   );
 };
 
-const operationSelect = (
-  classes, operations, operation, onChangeSelect,
-) => {
-  const options = operations.map((o) => (
-    <MenuItem value={o.name} key={o.name}>
-      <span className={classNames(classes.txtOpt, 'option-sv-bar-operation')}>{o.name}</span>
-    </MenuItem>
-  ));
-
-  const selectedValue = operation.name || operations[0].name;
-
-  return (
-    <FormControl
-      className={classNames(classes.fieldOpertaion)}
-      variant="outlined"
-    >
-      <InputLabel id="select-submit-label" className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
-        Submit
-      </InputLabel>
-      <Select
-        labelId="select-submit-label"
-        label="Submit"
-        value={selectedValue}
-        onChange={onChangeSelect}
-        className={classNames(classes.selectInput, 'input-sv-bar-operation')}
-        // input={
-        //   (
-        //     <OutlinedInput
-        //       className={classNames(classes.selectInput, 'input-sv-bar-operation')}
-        //       labelWidth={50}
-        //     />
-        //   )
-        // }
-      >
-        { options }
-      </Select>
-    </FormControl>
-  );
-};
-
 const selectOperation = (name, operations, updateOperationAct) => {
   let operation = false;
   operations.forEach((o) => {
@@ -210,16 +224,75 @@ const selectOperation = (name, operations, updateOperationAct) => {
   updateOperationAct(operation);
 };
 
+const currentOperation = (operations, operation) => (
+  operations.find((o) => o.name === operation.name) || operations[0]
+);
+
+const SubmitSplitButton = ({
+  classes, operations, operation, feature, isAscend, isIntensity,
+  disabled, updateOperationAct,
+}) => {
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const selectedOperation = currentOperation(operations, operation);
+  const open = Boolean(anchorEl);
+  const onOpen = (event) => setAnchorEl(event.currentTarget);
+  const onClose = () => setAnchorEl(null);
+  const onSelect = (name) => {
+    selectOperation(name, operations, updateOperationAct);
+    onClose();
+  };
+
+  return (
+    <span className={classes.splitSubmitWrap}>
+      <span className={classNames(classes.splitSubmitLabel, 'select-sv-bar-label')}>
+        Submit
+      </span>
+      <MuButton
+        className={classes.splitSubmitMain}
+        onClick={onOpen}
+        disabled={operations.length < 2}
+      >
+        <span className={classNames(classes.splitSubmitText, 'txt-sv-bar-submit')}>
+          {selectedOperation.name}
+        </span>
+        <ArrowDropDownRoundedIcon className={classes.icon} />
+      </MuButton>
+      <BtnSubmit
+        className={classes.splitSubmitArrow}
+        feature={feature}
+        isAscend={isAscend}
+        isIntensity={isIntensity}
+        operation={selectedOperation}
+        disabled={disabled}
+      />
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={onClose}
+      >
+        {operations.map((o) => (
+          <MenuItem
+            key={o.name}
+            onClick={() => onSelect(o.name)}
+            className={classNames(
+              classes.splitMenuItem,
+              o.name === selectedOperation.name && classes.splitSelected,
+            )}
+          >
+            {o.name}
+          </MenuItem>
+        ))}
+      </Menu>
+    </span>
+  );
+};
+
 const Submit = ({
   operations, classes, feature, forecast, editorOnly, hideSwitch, disabled,
   isAscendSt, isIntensitySt, operationSt, decimalSt, isEmWaveSt,
   toggleIsAscendAct, toggleIsIntensityAct,
   updateOperationAct, updateDecimalAct,
 }) => {
-  const onChangeSelect = (e) => (
-    selectOperation(e.target.value, operations, updateOperationAct)
-  );
-
   if (!operations || operations.length === 0) return null;
 
   return (
@@ -249,17 +322,15 @@ const Submit = ({
             />
           )
       }
-      {
-        operationSelect(
-          classes, operations, operationSt, onChangeSelect,
-        )
-      }
-      <BtnSubmit
+      <SubmitSplitButton
+        classes={classes}
+        operations={operations}
+        operation={operationSt}
         feature={feature}
         isAscend={isAscendSt}
         isIntensity={isIntensitySt}
-        operation={operationSt}
         disabled={disabled}
+        updateOperationAct={updateOperationAct}
       />
     </span>
   );
@@ -301,6 +372,17 @@ Submit.propTypes = {
   toggleIsIntensityAct: PropTypes.func.isRequired,
   updateOperationAct: PropTypes.func.isRequired,
   updateDecimalAct: PropTypes.func.isRequired,
+};
+
+SubmitSplitButton.propTypes = {
+  classes: PropTypes.object.isRequired,
+  operations: PropTypes.array.isRequired,
+  operation: PropTypes.object.isRequired,
+  feature: PropTypes.object.isRequired,
+  isAscend: PropTypes.bool.isRequired,
+  isIntensity: PropTypes.bool.isRequired,
+  disabled: PropTypes.bool.isRequired,
+  updateOperationAct: PropTypes.func.isRequired,
 };
 
 export default compose(

@@ -1,14 +1,8 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import CircularProgress from '@mui/material/CircularProgress';
 import ErrorOutline from '@mui/icons-material/ErrorOutline';
-
-const styleLoading = {
-  alignItems: 'center',
-  display: 'flex',
-  height: '100%',
-  justifyContent: 'center',
-};
 
 class SectionLoading extends React.Component {
   constructor(props) {
@@ -24,18 +18,21 @@ class SectionLoading extends React.Component {
   }
 
   renderLoading() {
+    const { classes } = this.props;
     return (
-      <div style={styleLoading}>
-        <CircularProgress style={{ color: 'blue', fontSize: 50 }} />
+      <div className={classes.loadingWrap}>
+        <CircularProgress size={36} style={{ color: '#2196f3' }} />
+        <p className={classes.messageSubText}>Loading structure...</p>
       </div>
     );
   }
 
   renderNotFound() {
+    const { classes } = this.props;
     return (
-      <div style={styleLoading}>
-        <ErrorOutline style={{ color: '#ffc107', fontSize: 50, margin: 20 }} />
-        <h3>Structure Not Found</h3>
+      <div className={classes.loadingWrap}>
+        <ErrorOutline style={{ color: '#ffc107', fontSize: 36 }} />
+        <p className={classes.messageText}>Structure not found</p>
       </div>
     );
   }
@@ -50,5 +47,9 @@ class SectionLoading extends React.Component {
     );
   }
 }
+
+SectionLoading.propTypes = {
+  classes: PropTypes.object.isRequired,
+};
 
 export default SectionLoading;

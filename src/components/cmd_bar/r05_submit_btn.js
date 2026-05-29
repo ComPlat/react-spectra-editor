@@ -150,6 +150,7 @@ const buildSpectrumPayload = ({
   return {
     peaks: peaksEdit,
     layout: layoutSt,
+    xUnit: xLabel,
     shift,
     scan,
     thres,
@@ -207,7 +208,10 @@ const onClickCb = (
         decimalSt,
       });
     });
+    const selectedIdx = Number.isFinite(curveSt?.curveIdx) ? curveSt.curveIdx : 0;
+    const selectedSpectrumPayload = spectraList[selectedIdx] || spectraList[0] || {};
     const payload = {
+      ...selectedSpectrumPayload,
       spectra_list: spectraList,
     };
     if (Number.isFinite(curveSt?.curveIdx)) {
@@ -222,7 +226,7 @@ const BtnSubmit = ({
   editPeakSt, thresList, layoutSt, shiftSt, scanSt, forecastSt,
   decimalSt, integrationSt, multiplicitySt,
   waveLengthSt, cyclicvoltaSt, curveSt, curveList, axesUnitsSt, detectorSt,
-  metaSt,
+  metaSt, disabled, className, children,
 }) => {
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
   const { dscMetaData } = metaSt;
@@ -251,14 +255,16 @@ const BtnSubmit = ({
   if (!operation) return null;
 
   return (
-    <Tooltip title={<span className="txt-sv-tp">Submit</span>}>
+    <Tooltip title={<span className="txt-sv-tp">{operation.name || 'Submit'}</span>}>
       <MuButton
         className={
           classNames(
             'btn-sv-bar-submit',
+            className,
           )
         }
         color="primary"
+        disabled={disabled}
         onClick={onClickCb(
           operation.value, isAscend, isIntensity,
           layoutSt, shiftSt, forecastSt.predictions, decimalSt,
@@ -267,7 +273,7 @@ const BtnSubmit = ({
           curveList, editPeakSt, thresList, scanSt, feature,
         )}
       >
-        <PlayCircleOutlineIcon className={classes.icon} />
+        {children || <PlayCircleOutlineIcon className={classes.icon} />}
       </MuButton>
     </Tooltip>
   );
@@ -326,6 +332,9 @@ BtnSubmit.propTypes = {
   axesUnitsSt: PropTypes.object.isRequired,
   detectorSt: PropTypes.object.isRequired,
   metaSt: PropTypes.object.isRequired,
+  disabled: PropTypes.bool,
+  className: PropTypes.string,
+  children: PropTypes.node,
 };
 
 export default compose(

@@ -315,6 +315,12 @@ class LineFocus {
     mpp.exit()
       .attr('class', 'exit')
       .remove();
+    const clearPeakLabels = () => {
+      const bpTxt = this.tags.bpTxt.selectAll('text').data([]);
+      bpTxt.exit()
+        .attr('class', 'exit')
+        .remove();
+    };
 
     const linePath = [
       { x: -0.5, y: 10 },
@@ -375,6 +381,8 @@ class LineFocus {
         .text((d) => d.x.toFixed(2))
         .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(d.y) - 25})`)
         .on('click', (event, d) => this.onClickTarget(event, d));
+    } else {
+      clearPeakLabels();
     }
   }
 
@@ -384,8 +392,35 @@ class LineFocus {
     } = this.shouldUpdate;
     if (sameXY && sameLySt && sameItSt && sameData) return;
 
+    const clearIntegralPaths = () => {
+      const empty = [];
+      const igbp = this.tags.igbPath.selectAll('path').data(empty);
+      igbp.exit()
+        .attr('class', 'exit')
+        .remove();
+      const igcp = this.tags.igcPath.selectAll('path').data(empty);
+      igcp.exit()
+        .attr('class', 'exit')
+        .remove();
+      const igtp = this.tags.igtPath.selectAll('text').data(empty);
+      igtp.exit()
+        .attr('class', 'exit')
+        .remove();
+    };
+    const clearAUC = () => {
+      const auc = this.tags.aucPath.selectAll('path').data([]);
+      auc.exit()
+        .attr('class', 'exit')
+        .remove();
+    };
+
     const { selectedIdx, integrations } = integationSt;
     const selectedIntegration = integrations[selectedIdx];
+    if (selectedIntegration === false || selectedIntegration === undefined) {
+      clearIntegralPaths();
+      clearAUC();
+      return;
+    }
 
     const {
       stack, refArea, refFactor, shift,
@@ -410,18 +445,16 @@ class LineFocus {
       .remove();
 
     if (itgs.length === 0 || isDisable) {
-      // remove drawn area under curve
-      const auc = this.tags.aucPath.selectAll('path').data(stack);
-      auc.exit()
-        .attr('class', 'exit')
-        .remove();
-      auc.merge(auc);
+      clearIntegralPaths();
+      clearAUC();
       return;
     }
 
     if (ignoreRef) {
+      clearIntegralPaths();
       this.drawAUC(stack);
     } else {
+      clearAUC();
       // rescale for zoom
       const { xt } = TfRescale(this);
 

@@ -124,9 +124,7 @@ const axisY = (classes, layoutSt, axesUnitsSt, updateYAxisAct, curveSt) => {
 
 const showSelect = (classes, layoutSt, curveSt, axesUnitsSt, updateXAxisAct, updateYAxisAct) => {
   if (!listLayoutToShow.includes(layoutSt)) {
-    return (
-      <i />
-    );
+    return null;
   }
 
   return (
@@ -141,7 +139,7 @@ const ChangeAxes = ({
   classes, layoutSt, curveSt, axesUnitsSt, updateXAxisAct, updateYAxisAct,
 }) => {
   const { curveIdx } = curveSt;
-  const axes = axesUnitsSt?.axes || [];
+  const axes = (axesUnitsSt && axesUnitsSt.axes) || [];
 
   useEffect(() => {
     if (layoutSt !== LIST_LAYOUT.CYCLIC_VOLTAMMETRY) return;
@@ -150,6 +148,8 @@ const ChangeAxes = ({
       updateYAxisAct({ value: '', curveIndex: curveIdx });
     }
   }, [layoutSt, axes, curveIdx, updateYAxisAct]);
+
+  if (!listLayoutToShow.includes(layoutSt)) return null;
 
   return (
     <span className={classes.groupRight} data-testid="ChangeAxes">

@@ -50,13 +50,23 @@ const styles = () => (
 
 const MuPredictButton = withStyles({
   root: {
-    border: '1px solid #ccc',
-    borderRadius: 4,
-    fontFamily: 'Helvetica',
+    backgroundColor: '#fff',
+    border: '1px solid #d6dce2',
+    borderRadius: 6,
+    boxShadow: '0 1px 2px rgba(17, 24, 39, 0.06)',
+    color: '#25313b',
+    fontFamily: 'Helvetica, Arial, sans-serif',
     fontSize: 20,
     height: 30,
     lineHeight: '20px',
+    minWidth: 30,
     padding: 0,
+    textTransform: 'none',
+    '&:hover': {
+      backgroundColor: '#f7fafc',
+      borderColor: '#aeb8c2',
+      boxShadow: '0 2px 5px rgba(17, 24, 39, 0.1)',
+    },
   },
 })(Button);
 
