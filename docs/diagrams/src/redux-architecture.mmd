@@ -1,0 +1,41 @@
+flowchart LR
+  subgraph actions [Action Namespaces]
+    InteractionActions["UI and Manager"]
+    DomainActions["Edit, Integration,<br/>Multiplicity, Curve"]
+    IntegrationActions["Forecast, Submit,<br/>JCAMP"]
+  end
+
+  subgraph orchestration [Saga Orchestration]
+    RootSaga["Root saga"]
+    SagaModules["Manager, UI,<br/>metadata, multi-entity"]
+  end
+
+  subgraph store [Redux Store]
+    DisplayState["Display and navigation"]
+    EditingState["Undoable editing"]
+    CurveState["Multi-curve and CV"]
+    HostState["Host integration state"]
+  end
+
+  subgraph history [Undoable History]
+    Undoable["editPeak, integration,<br/>multiplicity history"]
+  end
+
+  InteractionActions --> RootSaga
+  DomainActions --> RootSaga
+  IntegrationActions --> HostState
+  RootSaga --> SagaModules
+  SagaModules --> DisplayState
+  SagaModules --> EditingState
+  SagaModules --> CurveState
+  EditingState --> Undoable
+
+  classDef actionStyle fill:#ffedd5,stroke:#f97316,color:#7c2d12,stroke-width:1.5px
+  classDef sagaStyle fill:#fef3c7,stroke:#d97706,color:#78350f,stroke-width:1.5px
+  classDef stateStyle fill:#ede9fe,stroke:#7c3aed,color:#3b0764,stroke-width:1.5px
+  classDef undoStyle fill:#f3e8ff,stroke:#9333ea,color:#581c87,stroke-width:1.5px
+
+  class InteractionActions,DomainActions,IntegrationActions actionStyle
+  class RootSaga,SagaModules sagaStyle
+  class DisplayState,EditingState,CurveState,HostState stateStyle
+  class Undoable undoStyle

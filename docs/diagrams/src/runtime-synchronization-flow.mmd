@@ -1,0 +1,27 @@
+sequenceDiagram
+  autonumber
+
+  box rgb(219, 234, 254) Host and Initialization
+    participant Host as Host Props
+    participant LayerInit as LayerInit
+  end
+
+  box rgb(237, 233, 254) State Orchestration
+    participant Runtime as Redux and Sagas
+  end
+
+  box rgb(220, 252, 231) Rendering
+    participant Viewers as Viewer Wrappers
+    participant Focus as D3 Focus Classes
+  end
+
+  Host->>LayerInit: entity, multiEntities, operations, forecast, others
+  LayerInit->>Runtime: reset common, layout, operation, comparison state
+  LayerInit->>Runtime: initialize curves, CV, integration, multiplicity
+  Runtime->>Viewers: selector outputs, active feature, overlay state
+  Viewers->>Runtime: resetAll(feature)
+  Runtime->>Viewers: reset shift and synchronize edit state
+  Viewers->>Focus: create SVG scene and D3 layers
+  Focus->>Runtime: user interactions as UI actions
+  Runtime->>Viewers: updated peaks, integrations, CV, zoom state
+  Viewers->>Focus: update paths, axes, clips, overlays

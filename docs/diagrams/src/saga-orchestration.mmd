@@ -1,0 +1,41 @@
+flowchart LR
+  subgraph sources [Runtime Action Sources]
+    InitSource["LayerInit"]
+    InteractionSource["D3 viewers<br/>command bar<br/>panels"]
+  end
+
+  subgraph actions [Action Flow]
+    ManagerCurveActions["Manager and curve actions"]
+    UiActions["UI interaction actions"]
+  end
+
+  subgraph sagas [Saga Modules]
+    ManagerSaga["manager + multi-entity sagas"]
+    UiSaga["UI + edit + multiplicity sagas"]
+    MetaSaga["metadata saga"]
+  end
+
+  subgraph reducers [Reducer Synchronization]
+    ResetState["Reset and initialization state"]
+    EditingState["Editing and overlay state"]
+    MetaState["Metadata state"]
+  end
+
+  InitSource --> ManagerCurveActions
+  InteractionSource --> UiActions
+  ManagerCurveActions --> ManagerSaga
+  ManagerCurveActions --> MetaSaga
+  UiActions --> UiSaga
+  ManagerSaga --> ResetState
+  UiSaga --> EditingState
+  MetaSaga --> MetaState
+
+  classDef sourceStyle fill:#dbeafe,stroke:#2563eb,color:#1e3a8a,stroke-width:1.5px
+  classDef actionStyle fill:#ffedd5,stroke:#f97316,color:#7c2d12,stroke-width:1.5px
+  classDef sagaStyle fill:#fef3c7,stroke:#d97706,color:#78350f,stroke-width:1.5px
+  classDef stateStyle fill:#ede9fe,stroke:#7c3aed,color:#3b0764,stroke-width:1.5px
+
+  class InitSource,InteractionSource sourceStyle
+  class ManagerCurveActions,UiActions actionStyle
+  class ManagerSaga,UiSaga,MetaSaga sagaStyle
+  class ResetState,EditingState,MetaState stateStyle

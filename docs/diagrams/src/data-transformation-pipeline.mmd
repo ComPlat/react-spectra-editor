@@ -1,0 +1,51 @@
+flowchart LR
+  subgraph host [Host Input]
+    direction TB
+    EntityInput["entity"]
+    MultiInput["multiEntities"]
+  end
+
+  subgraph ingestion [Ingestion]
+    direction TB
+    JcampParsing["ExtractJcamp"]
+    RuntimeInit["LayerInit"]
+    ParamSelection["extractParams"]
+  end
+
+  subgraph model [Internal Spectrum Model]
+    direction TB
+    TopicFeature["topic + feature"]
+    CurveModel["curve.listCurves"]
+  end
+
+  subgraph selectors [Selector Derivation]
+    direction TB
+    RenderSelectors["seed + peaks"]
+    OverlaySelectors["thresholds, shifts,<br/>frequency, comparisons"]
+  end
+
+  subgraph rendering [Viewer Inputs]
+    ViewerInputs["Viewer-ready D3 inputs"]
+  end
+
+  EntityInput --> RuntimeInit
+  EntityInput --> ParamSelection
+  MultiInput --> RuntimeInit
+  JcampParsing --> EntityInput
+  RuntimeInit --> CurveModel
+  ParamSelection --> TopicFeature
+  CurveModel --> TopicFeature
+  TopicFeature --> RenderSelectors
+  TopicFeature --> OverlaySelectors
+  RenderSelectors --> ViewerInputs
+  OverlaySelectors --> ViewerInputs
+
+  classDef hostStyle fill:#dbeafe,stroke:#2563eb,color:#1e3a8a,stroke-width:1.5px
+  classDef helperStyle fill:#f3f4f6,stroke:#6b7280,color:#374151,stroke-width:1.5px
+  classDef stateStyle fill:#ede9fe,stroke:#7c3aed,color:#3b0764,stroke-width:1.5px
+  classDef renderStyle fill:#dcfce7,stroke:#16a34a,color:#14532d,stroke-width:1.5px
+
+  class EntityInput,MultiInput hostStyle
+  class JcampParsing,RuntimeInit,ParamSelection helperStyle
+  class TopicFeature,CurveModel,RenderSelectors,OverlaySelectors stateStyle
+  class ViewerInputs renderStyle

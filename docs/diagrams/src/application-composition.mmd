@@ -1,0 +1,30 @@
+flowchart LR
+  subgraph entry [Public Entry]
+    SpectraEditor["SpectraEditor"]
+  end
+
+  subgraph init [Initialization]
+    LayerInit["LayerInit"]
+  end
+
+  subgraph workspace [Workspace Selection]
+    WorkspaceBranch["LayerPrism<br/>or MultiJcampsViewer"]
+  end
+
+  subgraph shell [Shared Editor Shell]
+    EditorShell["CmdBar + LayerContent + PanelViewer"]
+  end
+
+  SpectraEditor --> LayerInit
+  LayerInit --> WorkspaceBranch
+  WorkspaceBranch --> EditorShell
+
+  classDef entryStyle fill:#ede9fe,stroke:#7c3aed,color:#3b0764,stroke-width:1.5px
+  classDef initStyle fill:#f3e8ff,stroke:#9333ea,color:#581c87,stroke-width:1.5px
+  classDef workspaceStyle fill:#dbeafe,stroke:#2563eb,color:#1e3a8a,stroke-width:1.5px
+  classDef shellStyle fill:#fef3c7,stroke:#d97706,color:#78350f,stroke-width:1.5px
+
+  class SpectraEditor entryStyle
+  class LayerInit initStyle
+  class WorkspaceBranch workspaceStyle
+  class EditorShell shellStyle
