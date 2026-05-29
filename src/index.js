@@ -236,6 +236,64 @@ const getInitialLcmsRetentionTime = () => {
   return Array.isArray(ticX) && Number.isFinite(ticX[0]) ? ticX[0] : null;
 };
 
+const selectClosestChemstationMzFeature = (retentionTime) => {
+  const allFeatures = getCurveFeatures(hplcMsMzChemstationEntity);
+  if (allFeatures.length === 0) return null;
+  if (!Number.isFinite(retentionTime)) return allFeatures[0];
+  return allFeatures.reduce((best, feature) => {
+    const bestRt = parseNumericPage(best);
+    const currentRt = parseNumericPage(feature);
+    if (!Number.isFinite(bestRt)) return feature;
+    if (!Number.isFinite(currentRt)) return best;
+    return Math.abs(currentRt - retentionTime) < Math.abs(bestRt - retentionTime) ? feature : best;
+  }, allFeatures[0]);
+};
+
+const buildChemstationStandaloneMultiEntities = (retentionTime) => {
+  const allFeatures = getCurveFeatures(hplcMsMzChemstationEntity);
+  const selectedFeature = selectClosestChemstationMzFeature(retentionTime);
+  const featureIdx = selectedFeature != null && allFeatures.indexOf(selectedFeature) >= 0
+    ? allFeatures.indexOf(selectedFeature)
+    : 0;
+
+  const msCurve = cloneData(hplcMsMzChemstationEntity);
+  const spectrArr = Array.isArray(msCurve.spectra) ? msCurve.spectra : [];
+  const safeIdx = Math.min(featureIdx, Math.max(allFeatures.length - 1, 0));
+  msCurve.features = [cloneData(allFeatures[safeIdx])];
+  msCurve.spectra = spectrArr[safeIdx]
+    ? [cloneData(spectrArr[safeIdx])]
+    : [cloneData(allFeatures[safeIdx])];
+
+  const ticXs = hplcMsTicChemstationEntity?.features?.[0]?.data?.[0]?.x || [];
+  const rtNum = Number.isFinite(retentionTime)
+    ? retentionTime
+    : parseNumericPage(msCurve.features[0]);
+  const snapped = Array.isArray(ticXs) && ticXs.length > 0 && Number.isFinite(rtNum)
+    ? snapRtToAxis(rtNum, ticXs)
+    : null;
+  if (snapped != null && Number.isFinite(snapped)) {
+    msCurve.features[0].pageValue = snapped;
+    msCurve.features[0].page = String(snapped);
+    msCurve.features[0].pageSymbol = String(snapped);
+    if (msCurve.spectra[0]) {
+      msCurve.spectra[0].pageValue = snapped;
+      msCurve.spectra[0].page = String(snapped);
+      msCurve.spectra[0].pageSymbol = String(snapped);
+    }
+  }
+
+  return [
+    cloneData(hplcMsTicChemstationEntity),
+    msCurve,
+    cloneData(hplcMsUvvisChemstationEntity),
+  ];
+};
+
+const getInitialChemstationRetentionTime = () => {
+  const ticX = hplcMsTicChemstationEntity?.features?.[0]?.data?.[0]?.x;
+  return Array.isArray(ticX) && Number.isFinite(ticX[0]) ? ticX[0] : null;
+};
+
 class DemoWriteIr extends React.Component {
   constructor(props) {
     super(props);
@@ -248,6 +306,7 @@ class DemoWriteIr extends React.Component {
       showOthers: false,
       descChanged: '',
       lcmsDynamicMultiEntities: null,
+      lcmsChemstationDynamicMultiEntities: null,
     };
 
     this.onClick = this.onClick.bind(this);
@@ -288,11 +347,19 @@ class DemoWriteIr extends React.Component {
         trigger: 'initial_load',
       });
     }
+    if (typ === 'lcms chemstation' && prevTyp !== 'lcms chemstation') {
+      const initialRt = getInitialChemstationRetentionTime();
+      this.handleLcmsPageRequest({
+        retentionTime: initialRt,
+        polarity: 'positive',
+        trigger: 'initial_load',
+      });
+    }
   }
 
   handleLcmsPageRequest(request) {
     const { typ } = this.state;
-    if (typ !== 'lcms') return;
+    if (typ !== 'lcms' && typ !== 'lcms chemstation') return;
     const retentionTime = request?.retentionTime;
     const polarity = request?.polarity;
     const trigger = request?.trigger || 'unknown';
@@ -313,6 +380,14 @@ class DemoWriteIr extends React.Component {
     }
     setTimeout(() => {
       if (requestId !== this.lcmsRequestCounter) return;
+      if (typ === 'lcms chemstation') {
+        this.setState({
+          lcmsChemstationDynamicMultiEntities: buildChemstationStandaloneMultiEntities(
+            retentionTime,
+          ),
+        });
+        return;
+      }
       this.setState({
         lcmsDynamicMultiEntities: buildLcmsStandaloneMultiEntities(retentionTime, polarity),
       });
@@ -322,7 +397,9 @@ class DemoWriteIr extends React.Component {
   onClick(typ) {
     return () => {
       const isLcms = typ === 'lcms';
+      const isChemstation = typ === 'lcms chemstation';
       const initialRt = getInitialLcmsRetentionTime();
+      const initialChemstationRt = getInitialChemstationRetentionTime();
       this.setState({
         typ,
         desc: '',
@@ -330,6 +407,9 @@ class DemoWriteIr extends React.Component {
         molecule: '',
         lcmsDynamicMultiEntities: isLcms
           ? buildLcmsStandaloneMultiEntities(initialRt)
+          : null,
+        lcmsChemstationDynamicMultiEntities: isChemstation
+          ? buildChemstationStandaloneMultiEntities(initialChemstationRt)
           : null,
       });
     };
@@ -394,7 +474,13 @@ class DemoWriteIr extends React.Component {
   }
 
   loadMultiEntities() {
-    const { typ, lcmsDynamicMultiEntities } = this.state;
+    const {
+      typ,
+      lcmsDynamicMultiEntities,
+      lcmsChemstationDynamicMultiEntities,
+    } = this.state;
+    const chemstationMultiEntities = lcmsChemstationDynamicMultiEntities
+      || buildChemstationStandaloneMultiEntities(getInitialChemstationRetentionTime());
     switch (typ) {
       case 'cyclic volta':
         return [cyclicVoltaEntity1, cyclicVoltaEntity2, cyclicVoltaEntity3];
@@ -416,9 +502,7 @@ class DemoWriteIr extends React.Component {
         return lcmsDynamicMultiEntities
           || buildLcmsStandaloneMultiEntities(getInitialLcmsRetentionTime());
       case 'lcms chemstation':
-        return [
-          hplcMsTicChemstationEntity, hplcMsMzChemstationEntity, hplcMsUvvisChemstationEntity,
-        ];
+        return chemstationMultiEntities;
       default:
         return [];
     }
