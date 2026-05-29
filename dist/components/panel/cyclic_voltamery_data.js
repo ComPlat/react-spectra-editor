@@ -36,14 +36,16 @@ const HEADER_HEIGHT_PX = 24;
 const EXPANDED_HEIGHT = HEADER_HEIGHT_PX + MAX_VISIBLE_ROWS * ROW_HEIGHT_PX;
 const styles = () => ({
   panel: {
-    backgroundColor: '#f7f7f7',
-    border: '1px solid #e6e6e6',
+    backgroundColor: '#fff',
+    border: '1px solid #e1e5e8',
     borderRadius: 8,
+    boxShadow: '0 4px 14px rgba(17, 24, 39, 0.05)',
     overflow: 'hidden'
   },
   panelHeader: {
-    backgroundColor: '#eee',
-    padding: '4px 8px',
+    background: 'linear-gradient(180deg, #fff 0%, #f8fafc 100%)',
+    borderBottom: '1px solid #e1e5e8',
+    padding: '5px 8px',
     display: 'flex',
     alignItems: 'center'
   },
@@ -67,7 +69,7 @@ const styles = () => ({
     fontSize: '11px !important'
   },
   tableWrap: {
-    padding: '3px 6px 5px',
+    padding: '4px 6px 6px',
     height: 'auto',
     maxHeight: EXPANDED_HEIGHT,
     overflowY: 'auto',
@@ -80,16 +82,17 @@ const styles = () => ({
     overflow: 'hidden'
   },
   tableHeadRow: {
-    backgroundColor: '#f5f5f5'
+    backgroundColor: '#f8fafc'
   },
   tableHeadCell: {
     fontWeight: 600,
-    color: '#333',
+    color: '#25313b',
     fontSize: '11px !important'
   },
   tableBodyRow: {
+    borderBottom: '1px solid #edf0f2',
     '&:nth-of-type(even)': {
-      backgroundColor: '#fafafa'
+      backgroundColor: '#fbfcfd'
     }
   },
   td: {
@@ -102,12 +105,13 @@ const styles = () => ({
     fontSize: '13px !important'
   },
   btnRemove: {
-    color: 'red'
+    color: '#b42318'
   },
   btnAddRow: {
-    color: 'green'
+    color: '#2f7d32'
   },
   tTxt: {
+    color: '#3f4952',
     padding: '5px 2px',
     lineHeight: 1.2,
     verticalAlign: 'top',
@@ -122,7 +126,7 @@ const styles = () => ({
     fontSize: '14px !important'
   },
   rowRoot: {
-    border: '1px solid #e6e6e6',
+    border: '1px solid #edf0f2',
     borderRadius: 6,
     minHeight: 40,
     lineHeight: 1.4,
@@ -135,12 +139,12 @@ const styles = () => ({
     whiteSpace: 'normal'
   },
   rowEven: {
-    backgroundColor: '#fafafa',
+    backgroundColor: '#fbfcfd',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap'
   },
   cvModeWarning: {
-    color: 'red',
+    color: '#b42318',
     marginLeft: 12
   }
 });
@@ -171,7 +175,7 @@ const CyclicVoltammetryPanel = ({
     const baseY = feature && feature.yUnit ? String(feature.yUnit) : 'A';
     const isMilli = /mA/i.test(baseY);
     const useDensity = cyclicVotaSt && cyclicVotaSt.useCurrentDensity;
-    const rawArea = (cyclicVotaSt && cyclicVotaSt.areaValue === '' ? 1.0 : cyclicVotaSt?.areaValue) || 1.0;
+    const rawArea = (cyclicVotaSt && cyclicVotaSt.areaValue === '' ? 1.0 : cyclicVotaSt && cyclicVotaSt.areaValue) || 1.0;
     const areaUnit = cyclicVotaSt && cyclicVotaSt.areaUnit ? cyclicVotaSt.areaUnit : 'cm²';
     const safeArea = rawArea > 0 ? rawArea : 1.0;
     let val = y;

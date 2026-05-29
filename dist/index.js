@@ -3,9 +3,9 @@
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 var _react = _interopRequireDefault(require("react"));
 var _reactDom = _interopRequireDefault(require("react-dom"));
-var _material = require("@mui/material");
-var _reactQuill = _interopRequireDefault(require("react-quill"));
 var _app = require("./app");
+var _standalone_layout_picker = _interopRequireDefault(require("./components/standalone_layout_picker"));
+var _standalone_content_panel = _interopRequireDefault(require("./components/standalone_content_panel"));
 var _nmr1h_jcamp = _interopRequireDefault(require("./__tests__/fixtures/nmr1h_jcamp"));
 var _nmr1h_2_jcamp = _interopRequireDefault(require("./__tests__/fixtures/nmr1h_2_jcamp"));
 var _nmr13c_dept_jcamp = _interopRequireDefault(require("./__tests__/fixtures/nmr13c_dept_jcamp"));
@@ -52,10 +52,11 @@ var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, default-param-last, no-nested-ternary */
 
 const pickSelectedSpectrumFromPayload = payload => {
-  const spectraList = payload?.spectra_list;
+  const spectraList = payload && payload.spectra_list;
   if (!Array.isArray(spectraList)) return payload || {};
   if (spectraList.length === 0) return {};
-  const selectedIdx = Number.isFinite(payload?.curveSt?.curveIdx) ? payload.curveSt.curveIdx : 0;
+  const curveIdx = payload && payload.curveSt && payload.curveSt.curveIdx;
+  const selectedIdx = Number.isFinite(curveIdx) ? curveIdx : 0;
   return spectraList[selectedIdx] || spectraList[0] || {};
 };
 const normalizeShiftForFormatting = shift => {
@@ -298,7 +299,7 @@ class DemoWriteIr extends _react.default.Component {
     curveSt
   }) {
     const entity = this.loadEntity();
-    const safeLayout = layout || entity?.layout;
+    const safeLayout = layout || entity && entity.layout;
     const {
       features
     } = entity;
@@ -328,7 +329,7 @@ class DemoWriteIr extends _react.default.Component {
     });
     const wrapper = _app.FN.peaksWrapper(safeLayout, shiftForFormatting);
     let desc = this.rmDollarSign(wrapper.head) + body + wrapper.tail;
-    if (_app.FN.isCyclicVoltaLayout(safeLayout) && cyclicvoltaSt?.spectraList && curveSt?.listCurves) {
+    if (_app.FN.isCyclicVoltaLayout(safeLayout) && cyclicvoltaSt && cyclicvoltaSt.spectraList && curveSt && curveSt.listCurves) {
       const {
         spectraList
       } = cyclicvoltaSt;
@@ -338,7 +339,7 @@ class DemoWriteIr extends _react.default.Component {
       } = curveSt;
       const selectedVolta = spectraList[curveIdx];
       const selectedCurve = listCurves[curveIdx];
-      if (!selectedVolta || !selectedCurve?.feature) return desc;
+      if (!selectedVolta || !selectedCurve || !selectedCurve.feature) return desc;
       const {
         feature
       } = selectedCurve;
@@ -423,7 +424,7 @@ class DemoWriteIr extends _react.default.Component {
       const location = type === 'm' ? `${m.mxA}–${m.mxB}` : `${c.toFixed(decimal)}`;
       return m.js.length === 0 ? `${location} (${type}${atomCount})` : `${location} (${type}, ${js}${atomCount})`;
     }).join(', ');
-    const shiftRef = shift?.ref || {};
+    const shiftRef = shift && shift.ref || {};
     const {
       label,
       value,
@@ -499,7 +500,7 @@ class DemoWriteIr extends _react.default.Component {
       waveLength
     } = pickSelectedSpectrumFromPayload(payload);
     const entity = this.loadEntity();
-    const safeLayout = layout || entity?.layout;
+    const safeLayout = layout || entity && entity.layout;
     const {
       features
     } = entity;
@@ -530,7 +531,7 @@ class DemoWriteIr extends _react.default.Component {
     console.log(analysis);
     console.log(integration);
     console.log(multiplicity);
-    if (shift?.ref?.label) {
+    if (shift && shift.ref && shift.ref.label) {
       const label = this.rmDollarSign(shift.ref.label);
       alert(`Peaks: ${body}` + '\n' + '- - - - - - - - - - -' + '\n' + `Shift solvent = ${label}, ${shift.ref.value}ppm` + '\n');
     } else {
@@ -622,209 +623,9 @@ class DemoWriteIr extends _react.default.Component {
       style: {
         width: Math.round(window.innerWidth * 0.96)
       },
-      children: [/*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
-        style: {
-          margin: '0 0 15px 55px'
-        },
-        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
-          variant: "contained",
-          style: {
-            margin: '0 10px 0 10px'
-          },
-          onClick: this.onClick('nmr 1h'),
-          children: "NMR 1H"
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
-          variant: "contained",
-          style: {
-            margin: '0 10px 0 10px'
-          },
-          onClick: this.onClick('nmr 13c'),
-          children: "NMR 13C"
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
-          variant: "contained",
-          style: {
-            margin: '0 10px 0 10px'
-          },
-          onClick: this.onClick('nmr 13c dept'),
-          children: "NMR 13C DEPT"
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
-          variant: "contained",
-          style: {
-            margin: '0 10px 0 10px'
-          },
-          onClick: this.onClick('nmr 19f'),
-          children: "NMR 19F"
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
-          variant: "contained",
-          style: {
-            margin: '0 10px 0 10px'
-          },
-          onClick: this.onClick('nmr 31p'),
-          children: "NMR 31P"
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
-          variant: "contained",
-          style: {
-            margin: '0 10px 0 10px'
-          },
-          onClick: this.onClick('nmr 15n'),
-          children: "NMR 15N"
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
-          variant: "contained",
-          style: {
-            margin: '0 10px 0 10px'
-          },
-          onClick: this.onClick('nmr 29si'),
-          children: "NMR 29Si"
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
-          variant: "contained",
-          style: {
-            margin: '0 10px 0 10px'
-          },
-          onClick: this.onClick('ir'),
-          children: "IR"
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
-          variant: "contained",
-          style: {
-            margin: '0 10px 0 10px'
-          },
-          onClick: this.onClick('raman'),
-          children: "RAMAN"
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
-          id: "btn-uv-vis",
-          variant: "contained",
-          style: {
-            margin: '0 10px 0 10px'
-          },
-          onClick: this.onClick('uv/vis'),
-          children: "UV/VIS"
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
-          id: "btn-hplc",
-          variant: "contained",
-          style: {
-            margin: '0 10px 0 10px'
-          },
-          onClick: this.onClick('hplc uv/vis'),
-          children: "HPLC UV/VIS"
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
-          id: "btn-tga",
-          variant: "contained",
-          style: {
-            margin: '0 10px 0 10px'
-          },
-          onClick: this.onClick('tga'),
-          children: "TGA"
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
-          id: "btn-dsc",
-          variant: "contained",
-          style: {
-            margin: '0 10px 0 10px'
-          },
-          onClick: this.onClick('dsc'),
-          children: "DSC"
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
-          id: "btn-xrd",
-          variant: "contained",
-          style: {
-            margin: '0 10px 0 10px'
-          },
-          onClick: this.onClick('xrd'),
-          children: "XRD"
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
-          id: "btn-cv",
-          variant: "contained",
-          style: {
-            margin: '0 10px 0 10px'
-          },
-          onClick: this.onClick('cyclic volta'),
-          children: "CV"
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
-          variant: "contained",
-          style: {
-            margin: '0 10px 0 10px'
-          },
-          onClick: this.onClick('cds'),
-          children: "CDS"
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
-          id: "btn-sec",
-          variant: "contained",
-          style: {
-            margin: '0 10px 0 10px'
-          },
-          onClick: this.onClick('sec'),
-          children: "SEC"
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
-          id: "btn-sec",
-          variant: "contained",
-          style: {
-            margin: '0 10px 0 10px'
-          },
-          onClick: this.onClick('gc'),
-          children: "GC"
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
-          id: "btn-sod",
-          variant: "contained",
-          style: {
-            margin: '0 10px 0 10px'
-          },
-          onClick: this.onClick('aif'),
-          children: "SORPTION-DESORPTION"
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
-          variant: "contained",
-          style: {
-            margin: '0 10px 0 10px'
-          },
-          onClick: this.onClick('emissions'),
-          children: "EMISSIONS"
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
-          variant: "contained",
-          style: {
-            margin: '0 10px 0 10px'
-          },
-          onClick: this.onClick('dls acf'),
-          children: "DLS ACF"
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
-          variant: "contained",
-          style: {
-            margin: '0 10px 0 10px'
-          },
-          onClick: this.onClick('dls intensity'),
-          children: "DLS intensity"
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
-          variant: "contained",
-          style: {
-            margin: '0 10px 0 10px'
-          },
-          onClick: this.onClick('ms'),
-          children: "MS"
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
-          variant: "contained",
-          style: {
-            margin: '0 10px 0 10px'
-          },
-          onClick: this.onClick('multi'),
-          children: "Multi NMR"
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
-          variant: "contained",
-          style: {
-            margin: '0 10px 0 10px'
-          },
-          onClick: this.onClick('multi ir'),
-          children: "Multi IR"
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
-          variant: "contained",
-          style: {
-            margin: '0 10px 0 10px'
-          },
-          onClick: this.onClick('multi hplc'),
-          children: "Multi HPLC"
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
-          variant: "contained",
-          style: {
-            margin: '0 10px 0 10px'
-          },
-          onClick: this.onClick('multi xrd'),
-          children: "Multi XRD"
-        })]
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_standalone_layout_picker.default, {
+        selectedTyp: typ,
+        onSelect: this.onClick
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_app.SpectraEditor, {
         entity: entity,
         multiEntities: multiEntities,
@@ -840,34 +641,9 @@ class DemoWriteIr extends _react.default.Component {
         },
         forecast: forecast,
         operations: operations
-      }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
-        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
-          children: "Description Changed"
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_reactQuill.default, {
-          className: 'card-sv-quill',
-          value: this.state.descChanged,
-          modules: {
-            toolbar: false
-          },
-          readOnly: true
-        })]
-      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Grid, {
-        container: true,
-        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Grid, {
-          item: true,
-          xs: 10,
-          children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputBase, {
-            style: {
-              margin: '0 0 0 63px'
-            },
-            placeholder: "Description",
-            multiline: true,
-            fullWidth: true,
-            rows: "2",
-            margin: "dense",
-            value: desc
-          })
-        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_standalone_content_panel.default, {
+        desc: desc,
+        descChanged: this.state.descChanged
       })]
     });
   }

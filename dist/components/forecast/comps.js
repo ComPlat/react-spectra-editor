@@ -18,28 +18,31 @@ var _CloudOff = _interopRequireDefault(require("@mui/icons-material/CloudOff"));
 var _section_loading = _interopRequireDefault(require("./section_loading"));
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable react/function-component-definition, react/destructuring-assignment,
-max-len */
+max-len, react/prop-types */
 
-const titleStyle = {
-  backgroundColor: '#f5f5f5',
-  border: '2px solid #e3e3e3',
-  borderRadius: '10px',
-  lineHeight: '200px',
-  marginBottom: 10,
-  marginTop: 10,
-  marginLeft: 40,
-  textAlign: 'center',
-  width: '70%'
-};
-const txtStyle = {
-  lineHeight: '20px'
-};
 const TxtLabel = (classes, label, extClsName = 'txt-label') => /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
   className: (0, _classnames.default)(classes.txtLabel, extClsName),
   children: label
 });
 exports.TxtLabel = TxtLabel;
-const StatusIcon = status => {
+const statusBadgeClass = (classes, status) => {
+  switch (status) {
+    case 'accept':
+      return classes.statusAccept;
+    case 'warning':
+      return classes.statusWarning;
+    case 'reject':
+      return classes.statusReject;
+    case 'missing':
+      return classes.statusMissing;
+    case 'unknown':
+      return classes.statusUnknown;
+    default:
+      return classes.statusUnknown;
+  }
+};
+const StatusIcon = (classes, status) => {
+  const badgeCls = (0, _classnames.default)(classes.statusBadge, statusBadgeClass(classes, status));
   switch (status) {
     case 'accept':
       return /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tooltip, {
@@ -48,10 +51,14 @@ const StatusIcon = status => {
           children: "Accept"
         }),
         placement: "left",
-        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_CheckCircleOutline.default, {
-          style: {
-            color: '#4caf50'
-          }
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: badgeCls,
+          children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_CheckCircleOutline.default, {
+            style: {
+              color: '#4caf50',
+              fontSize: 18
+            }
+          })
         })
       });
     case 'warning':
@@ -61,10 +68,14 @@ const StatusIcon = status => {
           children: "Warning"
         }),
         placement: "left",
-        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_ErrorOutline.default, {
-          style: {
-            color: '#ffc107'
-          }
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: badgeCls,
+          children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_ErrorOutline.default, {
+            style: {
+              color: '#ffc107',
+              fontSize: 18
+            }
+          })
         })
       });
     case 'reject':
@@ -74,10 +85,14 @@ const StatusIcon = status => {
           children: "Reject"
         }),
         placement: "left",
-        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_HighlightOff.default, {
-          style: {
-            color: '#e91e63'
-          }
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: badgeCls,
+          children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_HighlightOff.default, {
+            style: {
+              color: '#e91e63',
+              fontSize: 18
+            }
+          })
         })
       });
     case 'missing':
@@ -87,10 +102,14 @@ const StatusIcon = status => {
           children: "Missing"
         }),
         placement: "left",
-        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_HelpOutline.default, {
-          style: {
-            color: '#5d4037'
-          }
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: badgeCls,
+          children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_HelpOutline.default, {
+            style: {
+              color: '#795548',
+              fontSize: 18
+            }
+          })
         })
       });
     case 'unknown':
@@ -100,10 +119,14 @@ const StatusIcon = status => {
           children: "Not Support"
         }),
         placement: "left",
-        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_Help.default, {
-          style: {
-            color: '#5d4037'
-          }
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: badgeCls,
+          children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_Help.default, {
+            style: {
+              color: '#66727c',
+              fontSize: 18
+            }
+          })
         })
       });
     default:
@@ -124,112 +147,119 @@ const ConfidenceLabel = (classes, confidence, extClsName = 'txt-label') => {
 exports.ConfidenceLabel = ConfidenceLabel;
 const sectionInput = (classes, molecule, inputFuncCb) => {
   if (!inputFuncCb) return null;
-  return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-    className: (0, _classnames.default)(classes.inputRoot),
-    children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Grid, {
-      container: true,
-      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Grid, {
-        item: true,
-        xs: 6,
-        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TextField, {
-          fullWidth: true,
-          label: TxtLabel(classes, 'Molfile', 'txt-mol-label'),
-          margin: "normal",
-          multiline: true,
-          onChange: inputFuncCb,
-          rows: "2",
-          variant: "outlined",
-          value: molecule
-        })
-      })
-    })
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+    className: (0, _classnames.default)(classes.inputSection),
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+      className: classes.sectionHeader,
+      children: "Molfile"
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TextField, {
+      fullWidth: true,
+      className: classes.molField,
+      margin: "dense",
+      multiline: true,
+      onChange: inputFuncCb,
+      placeholder: "Paste or edit molfile...",
+      rows: 3,
+      variant: "outlined",
+      value: molecule
+    })]
   });
 };
 exports.sectionInput = sectionInput;
-const SectionRunning = () => /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-  style: titleStyle,
-  children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("h2", {
-    style: txtStyle,
-    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.CircularProgress, {
-      style: {
-        color: 'blue',
-        fontSize: 50
-      }
-    }), /*#__PURE__*/(0, _jsxRuntime.jsx)("br", {}), /*#__PURE__*/(0, _jsxRuntime.jsx)("br", {}), /*#__PURE__*/(0, _jsxRuntime.jsx)("p", {
-      children: "The server is making predictions..."
-    })]
-  })
+const SectionRunning = ({
+  classes
+}) => /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+  className: classes.messageBox,
+  children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.CircularProgress, {
+    size: 40,
+    style: {
+      color: '#2196f3'
+    }
+  }), /*#__PURE__*/(0, _jsxRuntime.jsx)("p", {
+    className: classes.messageText,
+    children: "The server is making predictions..."
+  })]
 });
-const SectionMissMatch = () => /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-  style: titleStyle,
-  children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("h2", {
-    style: txtStyle,
-    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_ErrorOutline.default, {
-      style: {
-        color: 'red',
-        fontSize: 50
-      }
-    }), /*#__PURE__*/(0, _jsxRuntime.jsx)("p", {
-      className: "txt-predict-fail",
-      children: "Peak & Element count mismatch!"
-    }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("p", {
-      className: "txt-predict-fail",
-      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("sup", {
-        children: "1"
-      }), "H multiplicity count should not be more than the proton group count. Multiplicity must be assigned manulally before predictions."]
-    }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("p", {
-      className: "txt-predict-fail",
-      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("sup", {
-        children: "13"
-      }), "C peak count should not be more than the carbon count, and solvent peaks should be excluded."]
-    })]
-  })
+const SectionMissMatch = ({
+  classes
+}) => /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+  className: classes.messageBox,
+  children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_ErrorOutline.default, {
+    style: {
+      color: '#e91e63',
+      fontSize: 40
+    }
+  }), /*#__PURE__*/(0, _jsxRuntime.jsx)("p", {
+    className: classes.messageText,
+    children: "Peak & element count mismatch!"
+  }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("p", {
+    className: classes.messageSubText,
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("sup", {
+      children: "1"
+    }), "H multiplicity count should not be more than the proton group count. Multiplicity must be assigned manually before predictions."]
+  }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("p", {
+    className: classes.messageSubText,
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("sup", {
+      children: "13"
+    }), "C peak count should not be more than the carbon count, and solvent peaks should be excluded."]
+  })]
 });
-const SectionNoService = () => /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-  style: titleStyle,
-  children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("h2", {
-    style: txtStyle,
-    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_CloudOff.default, {
-      style: {
-        color: 'red',
-        fontSize: 50
-      }
-    }), /*#__PURE__*/(0, _jsxRuntime.jsx)("p", {
-      children: "Service is not available."
-    }), /*#__PURE__*/(0, _jsxRuntime.jsx)("p", {
-      children: "Please try it again later."
-    })]
-  })
+const SectionNoService = ({
+  classes
+}) => /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+  className: classes.messageBox,
+  children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_CloudOff.default, {
+    style: {
+      color: '#e91e63',
+      fontSize: 40
+    }
+  }), /*#__PURE__*/(0, _jsxRuntime.jsx)("p", {
+    className: classes.messageText,
+    children: "Service is not available."
+  }), /*#__PURE__*/(0, _jsxRuntime.jsx)("p", {
+    className: classes.messageSubText,
+    children: "Please try again later."
+  })]
 });
-const SectionUnknown = () => /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-  style: titleStyle,
-  children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("h2", {
-    style: txtStyle,
-    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_HelpOutline.default, {
-      style: {
-        color: 'purple',
-        fontSize: 50
-      }
-    }), /*#__PURE__*/(0, _jsxRuntime.jsx)("p", {
-      children: "Unknown state."
-    })]
-  })
+const SectionUnknown = ({
+  classes
+}) => /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+  className: classes.messageBox,
+  children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_HelpOutline.default, {
+    style: {
+      color: '#66727c',
+      fontSize: 40
+    }
+  }), /*#__PURE__*/(0, _jsxRuntime.jsx)("p", {
+    className: classes.messageText,
+    children: "Unknown state."
+  })]
 });
-const notToRenderAnalysis = pds => {
-  if (pds.running) return /*#__PURE__*/(0, _jsxRuntime.jsx)(SectionRunning, {});
+const notToRenderAnalysis = (pds, classes) => {
+  if (pds.running) return /*#__PURE__*/(0, _jsxRuntime.jsx)(SectionRunning, {
+    classes: classes
+  });
   if (!pds.outline || !pds.outline.code) return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {});
-  if (pds.outline.code >= 500) return /*#__PURE__*/(0, _jsxRuntime.jsx)(SectionNoService, {});
-  if (pds.outline.code === 400) return /*#__PURE__*/(0, _jsxRuntime.jsx)(SectionMissMatch, {});
-  if (pds.outline.code >= 300) return /*#__PURE__*/(0, _jsxRuntime.jsx)(SectionUnknown, {});
+  if (pds.outline.code >= 500) return /*#__PURE__*/(0, _jsxRuntime.jsx)(SectionNoService, {
+    classes: classes
+  });
+  if (pds.outline.code === 400) return /*#__PURE__*/(0, _jsxRuntime.jsx)(SectionMissMatch, {
+    classes: classes
+  });
+  if (pds.outline.code >= 300) return /*#__PURE__*/(0, _jsxRuntime.jsx)(SectionUnknown, {
+    classes: classes
+  });
   return false;
 };
 exports.notToRenderAnalysis = notToRenderAnalysis;
 const sectionSvg = (classes, predictions) => {
-  const renderMsg = notToRenderAnalysis(predictions);
+  const renderMsg = notToRenderAnalysis(predictions, classes);
   if (renderMsg) return null;
   if (!predictions.output) return null;
   const targetSvg = predictions.output.result[0].svgs[0];
-  if (!targetSvg) return /*#__PURE__*/(0, _jsxRuntime.jsx)(_section_loading.default, {});
+  if (!targetSvg) return /*#__PURE__*/(0, _jsxRuntime.jsx)(_section_loading.default, {
+    classes: classes
+  });
   return /*#__PURE__*/(0, _jsxRuntime.jsx)(_reactSvgFileZoomPan.default, {
     svg: targetSvg,
     duration: 300,

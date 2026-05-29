@@ -77,9 +77,6 @@ const commonStyle = {
     padding: `${TOOLBAR_PAD}px 6px`,
     width: 'calc(100% - 8px)',
     backgroundColor: '#fff',
-    border: '1px solid #e1e5e8',
-    borderRadius: 8,
-    boxShadow: '0 3px 12px rgba(17, 24, 39, 0.06)',
     '& .MuiFormControl-root, & .MuiTextField-root': {
       flex: '0 0 auto',
       margin: '0 2px 0 0',

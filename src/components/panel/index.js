@@ -41,15 +41,15 @@ const styles = () => ({
     padding: 0,
     width: 'calc(100% - 8px)',
     backgroundColor: '#fff',
-    border: '1px solid #e1e5e8',
-    borderRadius: 8,
-    boxShadow: '0 4px 14px rgba(17, 24, 39, 0.05)',
     overflow: 'hidden auto',
     fontFamily: 'Helvetica, Arial, sans-serif',
     '& .MuiAccordion-root': {
       backgroundColor: '#fff',
-      borderBottom: '1px solid #e6e8eb',
+      borderBottom: '1px solid #e3e9ef',
       boxShadow: 'none',
+      '&:before': {
+        display: 'none',
+      },
     },
     '& .MuiAccordion-root:last-child': {
       borderBottom: 'none',
@@ -58,17 +58,16 @@ const styles = () => ({
       margin: 0,
     },
     '& .MuiAccordionSummary-root': {
-      minHeight: 38,
-      height: 38,
+      minHeight: 34,
+      height: 34,
       padding: '0 12px',
-      background: 'linear-gradient(180deg, #fff 0%, #f8fafc 100%)',
-      color: '#25313b',
-      borderBottom: '1px solid transparent',
+      backgroundColor: '#e8eef3',
+      color: '#3d5163',
     },
     '& .MuiAccordionSummary-root.Mui-expanded': {
-      minHeight: 38,
-      height: 38,
-      borderBottom: '1px solid #e1e5e8',
+      minHeight: 34,
+      height: 34,
+      backgroundColor: '#e8eef3',
     },
     '& .MuiAccordionSummary-content': {
       margin: 0,
@@ -78,7 +77,7 @@ const styles = () => ({
       margin: 0,
     },
     '& .MuiAccordionSummary-expandIconWrapper': {
-      color: '#66727c',
+      color: '#6b8194',
     },
     '& .txt-panel-header': {
       width: '100%',
@@ -88,7 +87,7 @@ const styles = () => ({
       fontWeight: 700,
       letterSpacing: '0.06em',
       textTransform: 'uppercase',
-      color: '#25313b',
+      color: '#3d5163',
     },
     '& .MuiDivider-root': {
       display: 'none',

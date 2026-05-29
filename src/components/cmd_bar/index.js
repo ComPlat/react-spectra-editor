@@ -36,7 +36,9 @@ const styles = () => (
         flexWrap: 'nowrap',
         minHeight: TOOLBAR_CONTROL_H + TOOLBAR_LABEL_SLOT,
         overflowX: 'auto',
-        overflowY: 'visible',
+        overflowY: 'hidden',
+        paddingBottom: 8,
+        paddingRight: 6,
         width: '100%',
         '& > .group:empty, & > .groupRight:empty, & > .groupRightMost:empty': {
           display: 'none',
@@ -54,6 +56,12 @@ const styles = () => (
         },
         '&::-webkit-scrollbar': {
           height: 6,
+        },
+        '&::-webkit-scrollbar:vertical': {
+          width: 0,
+        },
+        '&::-webkit-scrollbar-corner': {
+          backgroundColor: 'transparent',
         },
         '&::-webkit-scrollbar-thumb': {
           backgroundColor: '#cbd5df',

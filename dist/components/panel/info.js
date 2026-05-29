@@ -21,29 +21,32 @@ var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable no-mixed-operators, react/function-component-definition,
 react/require-default-props, max-len */
 
+const ELECTRON_MASS = 0.000548579909065;
 const styles = () => ({
   chip: {
     margin: '1px 0 1px 0'
   },
   panel: {
-    backgroundColor: '#eee',
-    display: 'table-row'
+    backgroundColor: '#fff',
+    display: 'block'
   },
   panelSummary: {
-    backgroundColor: '#eee',
     height: 32
   },
   subSectionHeader: {
-    backgroundColor: '#eee',
-    height: 32,
-    lineHeight: '32px',
-    paddingLeft: 10,
+    backgroundColor: '#f8fafc',
+    height: 30,
+    lineHeight: '30px',
+    paddingLeft: 14,
     textAlign: 'left',
-    fontWeight: 'bold',
-    fontSize: '0.8rem',
-    fontFamily: 'Helvetica',
-    borderTop: '1px solid #dcdcdc',
-    color: 'rgba(0, 0, 0, 0.87)'
+    fontWeight: 700,
+    fontSize: '0.68rem',
+    fontFamily: 'Helvetica, Arial, sans-serif',
+    letterSpacing: '0.06em',
+    textTransform: 'uppercase',
+    borderTop: '1px solid #e6e8eb',
+    borderBottom: '1px solid #edf0f2',
+    color: '#66727c'
   },
   panelDetail: {
     backgroundColor: '#fff',
@@ -55,11 +58,12 @@ const styles = () => ({
     width: 'auto'
   },
   rowRoot: {
-    border: '1px solid #eee',
-    height: 36,
-    lineHeight: '36px',
-    overflow: 'hidden',
-    paddingLeft: 24,
+    border: 'none',
+    borderBottom: '1px solid #edf0f2',
+    minHeight: 36,
+    lineHeight: '22px',
+    overflow: 'visible',
+    padding: '8px 14px',
     textAlign: 'left'
   },
   rowOdd: {
@@ -68,41 +72,52 @@ const styles = () => ({
     whiteSpace: 'nowrap'
   },
   rowEven: {
-    backgroundColor: '#fafafa',
+    backgroundColor: '#fbfcfd',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap'
   },
   rowOddSim: {
     backgroundColor: '#fff',
-    height: 108,
-    lineHeight: '24px',
-    overflowY: 'hidden',
+    height: 'auto',
+    minHeight: 36,
+    lineHeight: '22px',
+    overflow: 'visible',
     overflowWrap: 'word-break'
   },
+  simPlaceholder: {
+    color: 'rgba(0, 0, 0, 0.54)',
+    fontStyle: 'italic'
+  },
   tHead: {
-    fontWeight: 'bold',
-    float: 'left',
-    fontSize: '0.8rem',
-    fontFamily: 'Helvetica'
+    fontWeight: 700,
+    float: 'none',
+    fontSize: '0.76rem',
+    fontFamily: 'Helvetica, Arial, sans-serif',
+    color: '#25313b'
   },
   tTxt: {
-    fontSize: '0.8rem',
-    fontFamily: 'Helvetica',
-    marginRight: 3
+    fontSize: '0.78rem',
+    fontFamily: 'Helvetica, Arial, sans-serif',
+    marginRight: 3,
+    color: '#3f4952'
   },
   quill: {
-    fontSize: '0.8rem',
-    fontFamily: 'Helvetica',
+    fontSize: '0.78rem',
+    fontFamily: 'Helvetica, Arial, sans-serif',
     textAlign: 'left'
   },
   quillContainer: {
-    margin: '10px 10px',
+    margin: 12,
     backgroundColor: '#fff',
+    border: '1px solid #e6e8eb',
+    borderRadius: 6,
     '& .ql-container': {
       border: 'none'
     },
     '& .ql-editor': {
-      minHeight: '60px'
+      minHeight: '60px',
+      padding: '10px 12px',
+      lineHeight: 1.45
     },
     '& .ql-editor.ql-blank::before': {
       fontStyle: 'normal',
@@ -111,11 +126,20 @@ const styles = () => ({
   }
 });
 const simTitle = () => 'Simulated signals from NMRshiftDB';
-const simContent = nmrSimPeaks => nmrSimPeaks && nmrSimPeaks.sort((a, b) => a - b).join(', ');
+const simContent = nmrSimPeaks => {
+  if (!Array.isArray(nmrSimPeaks) || nmrSimPeaks.length === 0) return '';
+  return [...nmrSimPeaks].sort((a, b) => a - b).join(', ');
+};
+const simPlaceholder = () => 'No simulated signals available.';
 const normalizeQuillValue = val => {
   if (!val) return '';
   if (val === '<p><br></p>' || val === '<p></p>') return '';
   return val;
+};
+const formatMsExactMass = exactMass => {
+  const neutralMass = parseFloat(exactMass);
+  if (Number.isNaN(neutralMass)) return null;
+  return (neutralMass - ELECTRON_MASS).toFixed(6);
 };
 const chemSubStyle = {
   fontSize: '0.85em',
@@ -325,6 +349,7 @@ const InfoPanel = ({
   updateDSCMetaDataAct
 }) => {
   if (!feature) return null;
+  const msExactMass = _format.default.isMsLayout(layoutSt) && exactMass ? formatMsExactMass(exactMass) : null;
   const {
     title,
     observeFrequency,
@@ -363,6 +388,7 @@ const InfoPanel = ({
   if (integration) {
     originStack = integration.originStack; // eslint-disable-line
   }
+  const simulatedSignals = simContent(simulationSt.nmrSimPeaks);
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Accordion, {
     "data-testid": "PanelInfo",
     expanded: expand,
@@ -419,14 +445,14 @@ const InfoPanel = ({
           className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
           children: renderReadableSubscript(showSolvName)
         })]
-      }) : null, _format.default.isMsLayout(layoutSt) && exactMass ? /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+      }) : null, msExactMass ? /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
         className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd),
         children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
           className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt'),
-          children: "Exact mass: "
+          children: "Exact mass (M+): "
         }), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
           className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
-          children: `${parseFloat(exactMass).toFixed(6)} g/mol`
+          children: `${msExactMass} g/mol`
         })]
       }) : null, /*#__PURE__*/(0, _jsxRuntime.jsx)(SECData, {
         classes: classes,
@@ -475,8 +501,8 @@ const InfoPanel = ({
         }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
           className: (0, _classnames.default)(classes.rowRoot, classes.rowOddSim),
           children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
-            className: (0, _classnames.default)(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt'),
-            children: simContent(simulationSt.nmrSimPeaks)
+            className: (0, _classnames.default)(classes.tTxt, classes.tTxtSim, !simulatedSignals && classes.simPlaceholder, 'txt-sv-panel-txt'),
+            children: simulatedSignals || simPlaceholder()
           })
         })]
       }) : null]

@@ -58,6 +58,13 @@ const Peak = ({
       dataPeaks
     });
   };
+  const showAddPeak = !disableAddPeakSt;
+  const showRmPeak = !disableRmPeakSt;
+  const showSetRef = !disableSetRefSt;
+  const showClearAll = !disableRmPeakSt;
+  if (!showAddPeak && !showRmPeak && !showSetRef && !showClearAll) {
+    return null;
+  }
   if (isHandleMaxAndMinPeaksSt) {
     const {
       spectraList
@@ -80,7 +87,7 @@ const Peak = ({
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
     className: classes.group,
     "data-testid": "Peak",
-    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
+    children: [showAddPeak ? /*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
       title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
         className: "txt-sv-tp",
         children: "Add Peak"
@@ -88,7 +95,6 @@ const Peak = ({
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
         children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
           className: (0, _classnames.default)((0, _common.focusStyle)(isFocusAddPeakSt, classes), 'btn-sv-bar-addpeak'),
-          disabled: disableAddPeakSt,
           onClick: onSweepPeakAdd,
           children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
             className: (0, _classnames.default)(classes.txt, 'txt-sv-bar-addpeak'),
@@ -96,7 +102,7 @@ const Peak = ({
           })
         })
       })
-    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
+    }) : null, showRmPeak ? /*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
       title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
         className: "txt-sv-tp",
         children: "Remove Peak"
@@ -104,7 +110,6 @@ const Peak = ({
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
         children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
           className: (0, _classnames.default)((0, _common.focusStyle)(isFocusRmPeakSt, classes), 'btn-sv-bar-rmpeak'),
-          disabled: disableRmPeakSt,
           onClick: onSweepPeakDELETE,
           children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
             className: (0, _classnames.default)(classes.txt, 'txt-sv-bar-rmpeak'),
@@ -112,12 +117,12 @@ const Peak = ({
           })
         })
       })
-    }), /*#__PURE__*/(0, _jsxRuntime.jsxs)(_tri_btn.default, {
+    }) : null, showClearAll ? /*#__PURE__*/(0, _jsxRuntime.jsxs)(_tri_btn.default, {
       content: {
         tp: 'Clear All Peaks'
       },
       cb: onClearAll,
-      isClearAllDisabled: disableRmPeakSt,
+      isClearAllDisabled: false,
       children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
         className: (0, _classnames.default)(classes.txt, 'txt-sv-bar-rmallpeaks'),
         children: "P"
@@ -125,7 +130,7 @@ const Peak = ({
         className: (0, _classnames.default)(classes.txt, classes.txtIcon, 'txt-sv-bar-rmallpeaks'),
         children: "x"
       })]
-    }), !disableSetRefSt ? /*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
+    }) : null, showSetRef ? /*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
       title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
         className: "txt-sv-tp",
         children: "Set Reference"
@@ -133,7 +138,6 @@ const Peak = ({
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
         children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
           className: (0, _classnames.default)((0, _common.focusStyle)(isFocusSetRefSt, classes), 'btn-sv-bar-setref'),
-          disabled: disableSetRefSt,
           onClick: onSweepAnchorShift,
           children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_AddLocationOutlined.default, {
             className: classes.icon

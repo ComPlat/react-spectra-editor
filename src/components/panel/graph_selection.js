@@ -90,9 +90,9 @@ const fallbackName = (entityFileNames, idx) => {
 };
 
 const displayName = (spectra, idx, entityFileNames) => (
-  spectra?.title
-  || spectra?.feature?.title
-  || spectra?.spectrum?.title
+  (spectra && spectra.title)
+  || (spectra && spectra.feature && spectra.feature.title)
+  || (spectra && spectra.spectrum && spectra.spectrum.title)
   || fallbackName(entityFileNames, idx)
   || `Spectrum ${idx + 1}`
 );

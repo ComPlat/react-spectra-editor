@@ -165,7 +165,11 @@ const CyclicVoltammetryPanel = ({
     const isMilli = /mA/i.test(baseY);
     const useDensity = cyclicVotaSt && cyclicVotaSt.useCurrentDensity;
 
-    const rawArea = (cyclicVotaSt && cyclicVotaSt.areaValue === '' ? 1.0 : cyclicVotaSt?.areaValue) || 1.0;
+    const rawArea = (
+      cyclicVotaSt && cyclicVotaSt.areaValue === ''
+        ? 1.0
+        : (cyclicVotaSt && cyclicVotaSt.areaValue)
+    ) || 1.0;
     const areaUnit = (cyclicVotaSt && cyclicVotaSt.areaUnit) ? cyclicVotaSt.areaUnit : 'cm²';
     const safeArea = rawArea > 0 ? rawArea : 1.0;
 

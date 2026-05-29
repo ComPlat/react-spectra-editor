@@ -27,11 +27,19 @@ prefer-object-spread */
 
 const styles = () => ({
   root: {
-    flexGrow: 1
+    flexGrow: 1,
+    backgroundColor: '#fff',
+    padding: '4px 4px 6px 0',
+    fontFamily: 'Helvetica, Arial, sans-serif'
   },
   appBar: {
     backgroundColor: '#fff',
     boxShadow: 'none'
+  },
+  contentShell: {
+    marginLeft: 4,
+    padding: 4,
+    backgroundColor: '#fff'
   },
   tabLabel: {
     fontSize: '14px'
@@ -61,6 +69,12 @@ const styles = () => ({
   cvPanelBelow: {
     marginTop: 16,
     width: '100%'
+  },
+  viewerCol: {
+    minWidth: 0
+  },
+  panelCol: {
+    paddingLeft: 6
   }
 });
 const seperatingSubLayout = (entities, featureCondition, layoutSt) => {
@@ -123,14 +137,14 @@ class MultiJcampsViewer extends _react.default.Component {
         operations: operations,
         editorOnly: true
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-        className: (0, _classnames.default)('react-spectrum-editor', isCyclicVolta && classes.cvEditor),
+        className: (0, _classnames.default)('react-spectrum-editor', classes.contentShell, isCyclicVolta && classes.cvEditor),
         children: /*#__PURE__*/(0, _jsxRuntime.jsxs)(_Grid.default, {
           container: true,
           className: isCyclicVolta ? classes.cvTopRow : undefined,
           children: [/*#__PURE__*/(0, _jsxRuntime.jsxs)(_Grid.default, {
             item: true,
             xs: 9,
-            className: isCyclicVolta ? classes.cvViewerCol : undefined,
+            className: (0, _classnames.default)(classes.viewerCol, isCyclicVolta && classes.cvViewerCol),
             children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
               className: isCyclicVolta ? classes.cvViewerWrap : undefined,
               children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_index3.default, {
@@ -152,6 +166,7 @@ class MultiJcampsViewer extends _react.default.Component {
             item: true,
             xs: 3,
             align: "center",
+            className: classes.panelCol,
             children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_index.default, {
               jcampIdx: curveIdx,
               entityFileNames: entityFileNames,

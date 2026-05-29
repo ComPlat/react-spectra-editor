@@ -30,7 +30,7 @@ const styles = () => Object.assign({
 }, _common.commonStyle);
 const wavelengthSelect = (classes, waveLengthSt, layoutSt, updateWaveLengthAct) => {
   if (!_format.default.isXRDLayout(layoutSt)) {
-    return /*#__PURE__*/(0, _jsxRuntime.jsx)("i", {});
+    return null;
   }
   const onChange = e => updateWaveLengthAct(e.target.value);
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
@@ -64,10 +64,13 @@ const Wavelength = ({
   waveLengthSt,
   layoutSt,
   updateWaveLengthAct
-}) => /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
-  className: classes.groupRight,
-  children: wavelengthSelect(classes, waveLengthSt, layoutSt, updateWaveLengthAct)
-});
+}) => {
+  if (!_format.default.isXRDLayout(layoutSt)) return null;
+  return /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+    className: classes.groupRight,
+    children: wavelengthSelect(classes, waveLengthSt, layoutSt, updateWaveLengthAct)
+  });
+};
 const mapStateToProps = (state, props) => (
 // eslint-disable-line
 {

@@ -6,15 +6,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 var _react = _interopRequireDefault(require("react"));
+var _propTypes = _interopRequireDefault(require("prop-types"));
 var _CircularProgress = _interopRequireDefault(require("@mui/material/CircularProgress"));
 var _ErrorOutline = _interopRequireDefault(require("@mui/icons-material/ErrorOutline"));
 var _jsxRuntime = require("react/jsx-runtime");
-const styleLoading = {
-  alignItems: 'center',
-  display: 'flex',
-  height: '100%',
-  justifyContent: 'center'
-};
 class SectionLoading extends _react.default.Component {
   constructor(props) {
     super(props);
@@ -28,27 +23,36 @@ class SectionLoading extends _react.default.Component {
     }), 5000);
   }
   renderLoading() {
-    return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-      style: styleLoading,
-      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_CircularProgress.default, {
+    const {
+      classes
+    } = this.props;
+    return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+      className: classes.loadingWrap,
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_CircularProgress.default, {
+        size: 36,
         style: {
-          color: 'blue',
-          fontSize: 50
+          color: '#2196f3'
         }
-      })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)("p", {
+        className: classes.messageSubText,
+        children: "Loading structure..."
+      })]
     });
   }
   renderNotFound() {
+    const {
+      classes
+    } = this.props;
     return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
-      style: styleLoading,
+      className: classes.loadingWrap,
       children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_ErrorOutline.default, {
         style: {
           color: '#ffc107',
-          fontSize: 50,
-          margin: 20
+          fontSize: 36
         }
-      }), /*#__PURE__*/(0, _jsxRuntime.jsx)("h3", {
-        children: "Structure Not Found"
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)("p", {
+        className: classes.messageText,
+        children: "Structure not found"
       })]
     });
   }
@@ -59,4 +63,7 @@ class SectionLoading extends _react.default.Component {
     return loading ? this.renderLoading() : this.renderNotFound();
   }
 }
+SectionLoading.propTypes = {
+  classes: _propTypes.default.object.isRequired
+};
 var _default = exports.default = SectionLoading;

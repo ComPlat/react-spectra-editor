@@ -37,9 +37,6 @@ const styles = () => ({
     marginLeft: 4,
     padding: 4,
     backgroundColor: '#fff',
-    border: '1px solid #e6e8eb',
-    borderRadius: 8,
-    boxShadow: '0 4px 14px rgba(17, 24, 39, 0.05)',
   },
   tabLabel: {
     fontSize: '14px',
@@ -122,9 +119,19 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
           operations={operations}
           editorOnly={true}
         />
-        <div className={classNames('react-spectrum-editor', classes.contentShell, isCyclicVolta && classes.cvEditor)}>
+        <div
+          className={classNames(
+            'react-spectrum-editor',
+            classes.contentShell,
+            isCyclicVolta && classes.cvEditor,
+          )}
+        >
           <Grid container className={isCyclicVolta ? classes.cvTopRow : undefined}>
-            <Grid item xs={9} className={classNames(classes.viewerCol, isCyclicVolta && classes.cvViewerCol)}>
+            <Grid
+              item
+              xs={9}
+              className={classNames(classes.viewerCol, isCyclicVolta && classes.cvViewerCol)}
+            >
               <div className={isCyclicVolta ? classes.cvViewerWrap : undefined}>
                 <ViewerMulti
                   entities={entities}
@@ -149,7 +156,7 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
                 jcampIdx={curveIdx}
                 entityFileNames={entityFileNames}
                 userManualLink={userManualLink}
-                feature={featureForDisplay}
+                feature={feature}
                 molSvg={molSvg}
                 exactMass={exactMass}
                 subLayoutsInfo={seperatedSubLayouts}

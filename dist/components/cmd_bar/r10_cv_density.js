@@ -21,6 +21,10 @@ react/jsx-boolean-value */
 
 const styles = () => ({
   ..._common.commonStyle,
+  group: {
+    ..._common.commonStyle.group,
+    paddingTop: _common.TOOLBAR_LABEL_SLOT
+  },
   fieldArea: {
     width: 100
   },
@@ -51,7 +55,7 @@ const CvDensityControls = ({
   setAreaUnitAct,
   toggleDensityAct
 }) => {
-  if (layoutSt !== _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY) return /*#__PURE__*/(0, _jsxRuntime.jsx)("i", {});
+  if (layoutSt !== _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY) return null;
   const handleAreaChange = e => {
     const raw = e.target.value;
     if (raw === '') {

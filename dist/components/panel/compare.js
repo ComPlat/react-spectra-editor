@@ -23,13 +23,12 @@ var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable function-paren-newline, react/jsx-props-no-spreading,
 react/function-component-definition */
 
-const styles = theme => ({
+const styles = () => ({
   panel: {
-    backgroundColor: '#eee',
-    display: 'table-row'
+    backgroundColor: '#fff',
+    display: 'block'
   },
   panelSummary: {
-    backgroundColor: '#eee',
     height: 32
   },
   txtBadge: {},
@@ -43,41 +42,44 @@ const styles = theme => ({
     width: '100%'
   },
   tTxt: {
+    color: '#3f4952',
+    fontSize: '0.78rem',
     padding: 0
   },
   tTxtHide: {
-    color: '#D5D8DC'
+    color: '#b4bdc6'
   },
   tRow: {
     height: 28,
+    borderBottom: '1px solid #edf0f2',
     '&:nth-of-type(even)': {
-      backgroundColor: theme.palette ? theme.palette.background.default : '#d3d3d3'
+      backgroundColor: '#fbfcfd'
     }
   },
   rmBtn: {
-    color: 'red',
+    color: '#b42318',
     padding: '0 5px 0 5px',
     '&:hover': {
       borderRadius: 12,
-      backgroundColor: 'red',
+      backgroundColor: '#b42318',
       color: 'white'
     }
   },
   showBtn: {
-    color: 'steelblue',
+    color: '#1976d2',
     padding: '0 5px 0 5px',
     '&:hover': {
       borderRadius: 12,
-      backgroundColor: 'steelblue',
+      backgroundColor: '#1976d2',
       color: 'white'
     }
   },
   hideBtn: {
-    color: 'gray',
+    color: '#66727c',
     padding: '0 5px 0 5px',
     '&:hover': {
       borderRadius: 12,
-      backgroundColor: 'gray',
+      backgroundColor: '#66727c',
       color: 'white'
     }
   },
@@ -85,9 +87,9 @@ const styles = theme => ({
     textAlign: 'center !important'
   },
   baseDD: {
-    backgroundColor: 'white',
-    border: '1px dashed black',
-    borderRadius: 5,
+    backgroundColor: '#fff',
+    border: '1px dashed #aeb8c2',
+    borderRadius: 6,
     height: 26,
     lineHeight: '26px',
     margin: '7px 0 7px 0',
@@ -96,12 +98,12 @@ const styles = theme => ({
     width: '90%'
   },
   enableDD: {
-    border: '2px dashed #000',
-    color: '#000'
+    border: '2px dashed #25313b',
+    color: '#25313b'
   },
   disableDD: {
-    border: '2px dashed #aaa',
-    color: '#aaa'
+    border: '2px dashed #b4bdc6',
+    color: '#a8b0b8'
   },
   tpCard: {},
   tpMoreTxt: {

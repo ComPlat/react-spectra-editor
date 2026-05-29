@@ -55,13 +55,33 @@ const tpDiv = (d, digits, yFactor = 1) => `
     <span> y: ${d3.format('.2~e')(d.y * (yFactor || 1))}</span>
   <div>
   `;
+const msPeakTpDiv = (d, relInt, digits) => `
+  <div
+    class="peak-tp"
+    style="${tpStyle()}"
+  >
+    <span>${_format.default.fixDigit(d.x, digits)} (${relInt})</span>
+  <div>
+  `;
+const resolveDigits = (layout, xDigits) => xDigits != null && xDigits !== '' ? _format.default.clampDecimalPlaces(xDigits, _format.default.spectraDigit(layout)) : _format.default.spectraDigit(layout);
+const peakTipHtml = ({
+  d,
+  layout,
+  yFactor,
+  xDigits,
+  msMaxY
+}) => {
+  const digits = resolveDigits(layout, xDigits);
+  if (_format.default.isMsLayout(layout) && msMaxY > 0) {
+    const relPct = 100 * d.y / msMaxY;
+    const rel = parseInt(relPct, 10);
+    return msPeakTpDiv(d, rel, digits);
+  }
+  return tpDiv(d, digits, yFactor || 1);
+};
 const InitTip = () => {
   d3.select('.peak-tp').remove();
-  const tip = (0, _d3Tip.default)().attr('class', 'd3-tip').html(({
-    d,
-    layout,
-    yFactor
-  }) => tpDiv(d, _format.default.spectraDigit(layout), yFactor || 1));
+  const tip = (0, _d3Tip.default)().attr('class', 'd3-tip').html(peakTipHtml);
   return tip;
 };
 exports.InitTip = InitTip;

@@ -131,7 +131,7 @@ const axisY = (classes, layoutSt, axesUnitsSt, updateYAxisAct, curveSt) => {
 };
 const showSelect = (classes, layoutSt, curveSt, axesUnitsSt, updateXAxisAct, updateYAxisAct) => {
   if (!listLayoutToShow.includes(layoutSt)) {
-    return /*#__PURE__*/(0, _jsxRuntime.jsx)("i", {});
+    return null;
   }
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
     children: [axisX(classes, layoutSt, axesUnitsSt, updateXAxisAct, curveSt), axisY(classes, layoutSt, axesUnitsSt, updateYAxisAct, curveSt)]
@@ -148,7 +148,7 @@ const ChangeAxes = ({
   const {
     curveIdx
   } = curveSt;
-  const axes = axesUnitsSt?.axes || [];
+  const axes = axesUnitsSt && axesUnitsSt.axes || [];
   (0, _react.useEffect)(() => {
     if (layoutSt !== _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY) return;
     const selectedAxes = axes[curveIdx] || {
@@ -161,6 +161,7 @@ const ChangeAxes = ({
       });
     }
   }, [layoutSt, axes, curveIdx, updateYAxisAct]);
+  if (!listLayoutToShow.includes(layoutSt)) return null;
   return /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
     className: classes.groupRight,
     "data-testid": "ChangeAxes",

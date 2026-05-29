@@ -25,9 +25,6 @@ const styles = () => ({
     marginLeft: 4,
     padding: 4,
     backgroundColor: '#fff',
-    border: '1px solid #e6e8eb',
-    borderRadius: 8,
-    boxShadow: '0 4px 14px rgba(17, 24, 39, 0.05)',
   },
   chartColumn: {
     minWidth: 0,

@@ -6,7 +6,7 @@ import { bindActionCreators, compose } from 'redux';
 
 import { withStyles } from '@mui/styles';
 import {
-  Table, TableBody, Paper, Grid,
+  Table, TableBody, Grid,
 } from '@mui/material';
 
 import {
@@ -14,50 +14,14 @@ import {
   notToRenderAnalysis,
 } from './comps';
 import { IrTableHeader, IrTableBodyRow } from './ir_comps';
+import forecastSharedStyles from './styles';
 
 const Styles = () => ({
-  root: {
-    overflowX: 'hidden',
-    overflowY: 'auto',
-  },
-  container: {
-    minHeight: '400px',
-  },
-  svgRoot: {
-    margin: '10px 40px 0px 40px',
-    height: 'calc(70vh)',
-    overflowY: 'hidden',
-  },
-  tableRoot: {
-    margin: '10px 40px 0px 40px',
-    maxHeight: 'calc(70vh)',
-    overflowY: 'scroll',
-  },
-  title: {
-    textAlign: 'left',
-  },
-  btn: {
-    marginLeft: 40,
-  },
-  reference: {
-    borderTop: '1px solid #cfd8dc',
-    margin: '10px 40px 0px 40px',
-    padding: 5,
-  },
-  inputRoot: {
-    margin: '10px 40px 0px 40px',
-  },
-  txtLabel: {
-    fontSize: '12px',
-  },
-  submit: {
-    margin: '0 0 0 30px',
-    width: 300,
-  },
+  ...forecastSharedStyles(),
 });
 
 const sectionTable = (classes, pds) => {
-  const renderMsg = notToRenderAnalysis(pds);
+  const renderMsg = notToRenderAnalysis(pds, classes);
   if (renderMsg) return renderMsg;
 
   if (!pds.output.result || !pds.output.result[0]) return null;
@@ -65,18 +29,16 @@ const sectionTable = (classes, pds) => {
   const { fgs } = pds.output.result[0];
   if (!fgs) return null;
   return (
-    <Paper className={classes.tableRoot}>
-      <Table className={classes.table} size="small">
-        { IrTableHeader(classes) }
-        <TableBody>
-          {
-            fgs.sort((a, b) => b.confidence - a.confidence).map((fg, idx) => (
-              IrTableBodyRow(classes, idx, fg)
-            ))
-          }
-        </TableBody>
-      </Table>
-    </Paper>
+    <Table className={classes.table} size="small" stickyHeader>
+      { IrTableHeader(classes) }
+      <TableBody>
+        {
+          fgs.sort((a, b) => b.confidence - a.confidence).map((fg, idx) => (
+            IrTableBodyRow(classes, idx, fg)
+          ))
+        }
+      </TableBody>
+    </Table>
   );
 };
 
@@ -84,14 +46,18 @@ const IrViewer = ({ // eslint-disable-line
   classes, molecule, inputCb, forecastSt,
 }) => (
   <div className={classNames(classes.root, 'card-forecast-viewer')}>
-    <Grid className={classNames(classes.container)} container>
-      <Grid item xs={4}>
-        <Paper className={classes.svgRoot}>
+    <Grid container spacing={2} className={classes.analysisGrid}>
+      <Grid item xs={12} md={4} className={classes.structureCol}>
+        <div className={classes.sectionHeader}>Structure</div>
+        <div className={classes.structureFrame}>
           { sectionSvg(classes, forecastSt.predictions) }
-        </Paper>
+        </div>
       </Grid>
-      <Grid item xs={8}>
-        { sectionTable(classes, forecastSt.predictions) }
+      <Grid item xs={12} md={8} className={classes.tableCol}>
+        <div className={classes.sectionHeader}>Functional groups</div>
+        <div className={classes.tableFrame}>
+          { sectionTable(classes, forecastSt.predictions) }
+        </div>
       </Grid>
     </Grid>
     { sectionInput(classes, molecule, inputCb) }

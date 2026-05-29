@@ -20,16 +20,15 @@ var _format = _interopRequireDefault(require("../../helpers/format"));
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable react/function-component-definition, no-unused-vars */
 
-const styles = theme => ({
+const styles = () => ({
   chip: {
     margin: '1px 0 1px 0'
   },
   panel: {
-    backgroundColor: '#eee',
-    display: 'table-row'
+    backgroundColor: '#fff',
+    display: 'block'
   },
   panelSummary: {
-    backgroundColor: '#eee',
     height: 32
   },
   txtBadge: {},
@@ -43,35 +42,46 @@ const styles = theme => ({
     width: '100%'
   },
   tRowHeadPos: {
-    backgroundColor: '#999',
+    backgroundColor: '#5f6b76',
     height: 32
   },
   tRowHeadNeg: {
-    backgroundColor: '#999',
+    backgroundColor: '#5f6b76',
     height: 32
   },
   tTxtHead: {
     color: 'white',
-    padding: '5px 5px 5px 5px'
+    padding: '5px 5px 5px 5px',
+    fontSize: '0.72rem',
+    fontWeight: 700,
+    letterSpacing: '0.04em',
+    textTransform: 'uppercase'
   },
   tTxtHeadXY: {
     color: 'white',
-    padding: '4px 0 4px 90px'
+    padding: '4px 0 4px 90px',
+    fontSize: '0.72rem',
+    fontWeight: 700,
+    letterSpacing: '0.04em',
+    textTransform: 'uppercase'
   },
   tTxt: {
-    padding: '4px 0 4px 0'
+    color: '#3f4952',
+    fontSize: '0.78rem',
+    padding: '5px 0'
   },
   tRow: {
     height: 28,
+    borderBottom: '1px solid #edf0f2',
     '&:nth-of-type(even)': {
-      backgroundColor: theme.palette ? theme.palette.background.default : '#d3d3d3'
+      backgroundColor: '#fbfcfd'
     }
   },
   rmBtn: {
-    color: 'red',
+    color: '#b42318',
     '&:hover': {
       borderRadius: 12,
-      backgroundColor: 'red',
+      backgroundColor: '#b42318',
       color: 'white'
     }
   }

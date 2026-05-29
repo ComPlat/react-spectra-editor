@@ -12,6 +12,7 @@ var _reactRedux = require("react-redux");
 var _redux = require("redux");
 var _material = require("@mui/material");
 var _styles = require("@mui/styles");
+var _ArrowDropDownRounded = _interopRequireDefault(require("@mui/icons-material/ArrowDropDownRounded"));
 var _submit = require("../../actions/submit");
 var _r05_submit_btn = _interopRequireDefault(require("./r05_submit_btn"));
 var _r06_predict_btn = _interopRequireDefault(require("./r06_predict_btn"));
@@ -33,6 +34,59 @@ const styles = () => Object.assign({
   },
   fieldOpertaion: {
     width: 120
+  },
+  splitSubmitWrap: {
+    alignItems: 'flex-end',
+    display: 'inline-flex',
+    margin: '0 0 0 2px',
+    position: 'relative',
+    verticalAlign: 'middle'
+  },
+  splitSubmitLabel: {
+    backgroundColor: '#fff',
+    color: '#66727c',
+    fontFamily: 'Helvetica, Arial, sans-serif',
+    fontSize: 10,
+    left: 8,
+    lineHeight: 1.3,
+    padding: '0 4px',
+    position: 'absolute',
+    top: -6,
+    zIndex: 1
+  },
+  splitSubmitMain: {
+    borderRadius: '6px 0 0 6px',
+    borderRight: 'none',
+    justifyContent: 'space-between',
+    margin: '0 !important',
+    minWidth: 116,
+    padding: '0 8px',
+    width: 116
+  },
+  splitSubmitText: {
+    color: '#25313b',
+    display: 'block',
+    fontFamily: 'Helvetica, Arial, sans-serif',
+    fontSize: 12,
+    overflow: 'hidden',
+    textAlign: 'left',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    width: '100%'
+  },
+  splitSubmitArrow: {
+    borderRadius: '0 6px 6px 0',
+    margin: '0 !important',
+    minWidth: 28,
+    width: 28
+  },
+  splitMenuItem: {
+    fontFamily: 'Helvetica, Arial, sans-serif',
+    fontSize: 12
+  },
+  splitSelected: {
+    color: '#0b5cad',
+    fontWeight: 700
   }
 }, _common.commonStyle);
 const ascendSelect = (classes, hideSwitch, isAscendSt, toggleIsAscendAct) => {
@@ -142,41 +196,6 @@ const decimalSelect = (classes, hideSwitch, decimalSt, updateDecimalAct) => {
     })]
   });
 };
-const operationSelect = (classes, operations, operation, onChangeSelect) => {
-  const options = operations.map(o => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
-    value: o.name,
-    children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
-      className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-operation'),
-      children: o.name
-    })
-  }, o.name));
-  const selectedValue = operation.name || operations[0].name;
-  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
-    className: (0, _classnames.default)(classes.fieldOpertaion),
-    variant: "outlined",
-    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputLabel, {
-      id: "select-submit-label",
-      className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label'),
-      children: "Submit"
-    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Select, {
-      labelId: "select-submit-label",
-      label: "Submit",
-      value: selectedValue,
-      onChange: onChangeSelect,
-      className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-operation')
-      // input={
-      //   (
-      //     <OutlinedInput
-      //       className={classNames(classes.selectInput, 'input-sv-bar-operation')}
-      //       labelWidth={50}
-      //     />
-      //   )
-      // }
-      ,
-      children: options
-    })]
-  });
-};
 const selectOperation = (name, operations, updateOperationAct) => {
   let operation = false;
   operations.forEach(o => {
@@ -185,6 +204,60 @@ const selectOperation = (name, operations, updateOperationAct) => {
     }
   });
   updateOperationAct(operation);
+};
+const currentOperation = (operations, operation) => operations.find(o => o.name === operation.name) || operations[0];
+const SubmitSplitButton = ({
+  classes,
+  operations,
+  operation,
+  feature,
+  isAscend,
+  isIntensity,
+  disabled,
+  updateOperationAct
+}) => {
+  const [anchorEl, setAnchorEl] = _react.default.useState(null);
+  const selectedOperation = currentOperation(operations, operation);
+  const open = Boolean(anchorEl);
+  const onOpen = event => setAnchorEl(event.currentTarget);
+  const onClose = () => setAnchorEl(null);
+  const onSelect = name => {
+    selectOperation(name, operations, updateOperationAct);
+    onClose();
+  };
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+    className: classes.splitSubmitWrap,
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+      className: (0, _classnames.default)(classes.splitSubmitLabel, 'select-sv-bar-label'),
+      children: "Submit"
+    }), /*#__PURE__*/(0, _jsxRuntime.jsxs)(_common.MuButton, {
+      className: classes.splitSubmitMain,
+      onClick: onOpen,
+      disabled: operations.length < 2,
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        className: (0, _classnames.default)(classes.splitSubmitText, 'txt-sv-bar-submit'),
+        children: selectedOperation.name
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_ArrowDropDownRounded.default, {
+        className: classes.icon
+      })]
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r05_submit_btn.default, {
+      className: classes.splitSubmitArrow,
+      feature: feature,
+      isAscend: isAscend,
+      isIntensity: isIntensity,
+      operation: selectedOperation,
+      disabled: disabled
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Menu, {
+      anchorEl: anchorEl,
+      open: open,
+      onClose: onClose,
+      children: operations.map(o => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        onClick: () => onSelect(o.name),
+        className: (0, _classnames.default)(classes.splitMenuItem, o.name === selectedOperation.name && classes.splitSelected),
+        children: o.name
+      }, o.name))
+    })]
+  });
 };
 const Submit = ({
   operations,
@@ -204,19 +277,21 @@ const Submit = ({
   updateOperationAct,
   updateDecimalAct
 }) => {
-  const onChangeSelect = e => selectOperation(e.target.value, operations, updateOperationAct);
   if (!operations || operations.length === 0) return null;
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
     className: classes.groupRightMost,
     children: [ascendSelect(classes, hideSwitch, isAscendSt, toggleIsAscendAct), intensitySelect(classes, hideSwitch || !isEmWaveSt, isIntensitySt, toggleIsIntensityAct), decimalSelect(classes, hideSwitch, decimalSt, updateDecimalAct), editorOnly ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_r06_predict_btn.default, {
       feature: feature,
       forecast: forecast
-    }), operationSelect(classes, operations, operationSt, onChangeSelect), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r05_submit_btn.default, {
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(SubmitSplitButton, {
+      classes: classes,
+      operations: operations,
+      operation: operationSt,
       feature: feature,
       isAscend: isAscendSt,
       isIntensity: isIntensitySt,
-      operation: operationSt,
-      disabled: disabled
+      disabled: disabled,
+      updateOperationAct: updateOperationAct
     })]
   });
 };
@@ -252,5 +327,15 @@ Submit.propTypes = {
   toggleIsIntensityAct: _propTypes.default.func.isRequired,
   updateOperationAct: _propTypes.default.func.isRequired,
   updateDecimalAct: _propTypes.default.func.isRequired
+};
+SubmitSplitButton.propTypes = {
+  classes: _propTypes.default.object.isRequired,
+  operations: _propTypes.default.array.isRequired,
+  operation: _propTypes.default.object.isRequired,
+  feature: _propTypes.default.object.isRequired,
+  isAscend: _propTypes.default.bool.isRequired,
+  isIntensity: _propTypes.default.bool.isRequired,
+  disabled: _propTypes.default.bool.isRequired,
+  updateOperationAct: _propTypes.default.func.isRequired
 };
 var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(Submit);

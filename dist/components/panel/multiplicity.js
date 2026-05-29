@@ -23,13 +23,12 @@ var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable function-paren-newline,
 function-call-argument-newline, react/function-component-definition */
 
-const styles = theme => ({
+const styles = () => ({
   panel: {
-    backgroundColor: '#eee',
-    display: 'table-row'
+    backgroundColor: '#fff',
+    display: 'block'
   },
   panelSummary: {
-    backgroundColor: '#eee',
     height: 32
   },
   txtBadge: {},
@@ -52,34 +51,48 @@ const styles = theme => ({
   },
   tTxtHead: {
     color: 'white',
-    padding: '4px 0 4px 5px'
+    padding: '4px 0 4px 5px',
+    fontSize: '0.72rem',
+    fontWeight: 700,
+    letterSpacing: '0.04em',
+    textTransform: 'uppercase'
   },
   tTxtHeadXY: {
     color: 'white',
-    padding: '4px 0 4px 90px'
+    padding: '4px 0 4px 90px',
+    fontSize: '0.72rem',
+    fontWeight: 700,
+    letterSpacing: '0.04em',
+    textTransform: 'uppercase'
   },
   tTxt: {
+    color: '#3f4952',
+    fontSize: '0.78rem',
     padding: 0
   },
   tRow: {
     height: 28,
+    borderBottom: '1px solid #edf0f2',
     '&:nth-of-type(even)': {
-      backgroundColor: theme.palette ? theme.palette.background.default : '#d3d3d3'
+      backgroundColor: '#fbfcfd'
     }
   },
   rmBtn: {
-    color: 'red',
+    color: '#b42318',
     '&:hover': {
       borderRadius: 12,
-      backgroundColor: 'red',
+      backgroundColor: '#b42318',
       color: 'white'
     }
   },
   moCard: {
-    textAlign: 'left'
+    textAlign: 'left',
+    border: '1px solid #edf0f2',
+    borderRadius: 6,
+    overflow: 'hidden'
   },
   moCardHead: {
-    backgroundColor: '#999',
+    backgroundColor: '#5f6b76',
     color: 'white'
   },
   moExtId: {
@@ -92,12 +105,12 @@ const styles = theme => ({
   moExtTxt: {
     margin: '0 5px 0 5x',
     fontSize: '0.8rem',
-    fontFamily: 'Helvetica'
+    fontFamily: 'Helvetica, Arial, sans-serif'
   },
   moSelect: {
     margin: '0 5x 0 5px',
     fontSize: '0.8rem',
-    fontFamily: 'Helvetica'
+    fontFamily: 'Helvetica, Arial, sans-serif'
   },
   moCBox: {
     marginLeft: 24,

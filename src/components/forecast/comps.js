@@ -1,5 +1,5 @@
 /* eslint-disable react/function-component-definition, react/destructuring-assignment,
-max-len */
+max-len, react/prop-types */
 import React from 'react';
 import classNames from 'classnames';
 import SvgFileZoomPan from '@complat/react-svg-file-zoom-pan';
@@ -10,27 +10,11 @@ import HighlightOff from '@mui/icons-material/HighlightOff';
 import HelpOutline from '@mui/icons-material/HelpOutline';
 import Help from '@mui/icons-material/Help';
 import {
-  Grid, Tooltip, TextField, CircularProgress,
+  Tooltip, TextField, CircularProgress,
 } from '@mui/material';
 import CloudOff from '@mui/icons-material/CloudOff';
 
 import SectionLoading from './section_loading';
-
-const titleStyle = {
-  backgroundColor: '#f5f5f5',
-  border: '2px solid #e3e3e3',
-  borderRadius: '10px',
-  lineHeight: '200px',
-  marginBottom: 10,
-  marginTop: 10,
-  marginLeft: 40,
-  textAlign: 'center',
-  width: '70%',
-};
-
-const txtStyle = {
-  lineHeight: '20px',
-};
 
 const TxtLabel = (classes, label, extClsName = 'txt-label') => (
   <span
@@ -40,51 +24,65 @@ const TxtLabel = (classes, label, extClsName = 'txt-label') => (
   </span>
 );
 
-const StatusIcon = (status) => {
+const statusBadgeClass = (classes, status) => {
+  switch (status) {
+    case 'accept':
+      return classes.statusAccept;
+    case 'warning':
+      return classes.statusWarning;
+    case 'reject':
+      return classes.statusReject;
+    case 'missing':
+      return classes.statusMissing;
+    case 'unknown':
+      return classes.statusUnknown;
+    default:
+      return classes.statusUnknown;
+  }
+};
+
+const StatusIcon = (classes, status) => {
+  const badgeCls = classNames(classes.statusBadge, statusBadgeClass(classes, status));
+
   switch (status) {
     case 'accept':
       return (
-        <Tooltip
-          title={<span className="txt-sv-tp">Accept</span>}
-          placement="left"
-        >
-          <CheckCircleOutline style={{ color: '#4caf50' }} />
+        <Tooltip title={<span className="txt-sv-tp">Accept</span>} placement="left">
+          <span className={badgeCls}>
+            <CheckCircleOutline style={{ color: '#4caf50', fontSize: 18 }} />
+          </span>
         </Tooltip>
       );
     case 'warning':
       return (
-        <Tooltip
-          title={<span className="txt-sv-tp">Warning</span>}
-          placement="left"
-        >
-          <ErrorOutline style={{ color: '#ffc107' }} />
+        <Tooltip title={<span className="txt-sv-tp">Warning</span>} placement="left">
+          <span className={badgeCls}>
+            <ErrorOutline style={{ color: '#ffc107', fontSize: 18 }} />
+          </span>
         </Tooltip>
       );
     case 'reject':
       return (
-        <Tooltip
-          title={<span className="txt-sv-tp">Reject</span>}
-          placement="left"
-        >
-          <HighlightOff style={{ color: '#e91e63' }} />
+        <Tooltip title={<span className="txt-sv-tp">Reject</span>} placement="left">
+          <span className={badgeCls}>
+            <HighlightOff style={{ color: '#e91e63', fontSize: 18 }} />
+          </span>
         </Tooltip>
       );
     case 'missing':
       return (
-        <Tooltip
-          title={<span className="txt-sv-tp">Missing</span>}
-          placement="left"
-        >
-          <HelpOutline style={{ color: '#5d4037' }} />
+        <Tooltip title={<span className="txt-sv-tp">Missing</span>} placement="left">
+          <span className={badgeCls}>
+            <HelpOutline style={{ color: '#795548', fontSize: 18 }} />
+          </span>
         </Tooltip>
       );
     case 'unknown':
       return (
-        <Tooltip
-          title={<span className="txt-sv-tp">Not Support</span>}
-          placement="left"
-        >
-          <Help style={{ color: '#5d4037' }} />
+        <Tooltip title={<span className="txt-sv-tp">Not Support</span>} placement="left">
+          <span className={badgeCls}>
+            <Help style={{ color: '#66727c', fontSize: 18 }} />
+          </span>
         </Tooltip>
       );
     default:
@@ -111,91 +109,79 @@ const sectionInput = (classes, molecule, inputFuncCb) => {
   if (!inputFuncCb) return null;
 
   return (
-    <div
-      className={classNames(classes.inputRoot)}
-    >
-      <Grid container>
-        <Grid item xs={6}>
-          <TextField
-            fullWidth
-            label={TxtLabel(classes, 'Molfile', 'txt-mol-label')}
-            margin="normal"
-            multiline
-            onChange={inputFuncCb}
-            rows="2"
-            variant="outlined"
-            value={molecule}
-          />
-        </Grid>
-      </Grid>
+    <div className={classNames(classes.inputSection)}>
+      <div className={classes.sectionHeader}>Molfile</div>
+      <TextField
+        fullWidth
+        className={classes.molField}
+        margin="dense"
+        multiline
+        onChange={inputFuncCb}
+        placeholder="Paste or edit molfile..."
+        rows={3}
+        variant="outlined"
+        value={molecule}
+      />
     </div>
   );
 };
 
-const SectionRunning = () => (
-  <div style={titleStyle}>
-    <h2 style={txtStyle}>
-      <CircularProgress style={{ color: 'blue', fontSize: 50 }} />
-      <br />
-      <br />
-      <p>The server is making predictions...</p>
-    </h2>
+const SectionRunning = ({ classes }) => (
+  <div className={classes.messageBox}>
+    <CircularProgress size={40} style={{ color: '#2196f3' }} />
+    <p className={classes.messageText}>The server is making predictions...</p>
   </div>
 );
 
-const SectionMissMatch = () => (
-  <div style={titleStyle}>
-    <h2 style={txtStyle}>
-      <ErrorOutline style={{ color: 'red', fontSize: 50 }} />
-      <p className="txt-predict-fail">Peak & Element count mismatch!</p>
-      <p className="txt-predict-fail">
-        <sup>1</sup>
-        H multiplicity count should not be more than the proton group count. Multiplicity must be assigned manulally before predictions.
-      </p>
-      <p className="txt-predict-fail">
-        <sup>13</sup>
-        C peak count should not be more than the carbon count, and solvent peaks should be excluded.
-      </p>
-    </h2>
+const SectionMissMatch = ({ classes }) => (
+  <div className={classes.messageBox}>
+    <ErrorOutline style={{ color: '#e91e63', fontSize: 40 }} />
+    <p className={classes.messageText}>Peak &amp; element count mismatch!</p>
+    <p className={classes.messageSubText}>
+      <sup>1</sup>
+      H multiplicity count should not be more than the proton group count.
+      Multiplicity must be assigned manually before predictions.
+    </p>
+    <p className={classes.messageSubText}>
+      <sup>13</sup>
+      C peak count should not be more than the carbon count,
+      and solvent peaks should be excluded.
+    </p>
   </div>
 );
 
-const SectionNoService = () => (
-  <div style={titleStyle}>
-    <h2 style={txtStyle}>
-      <CloudOff style={{ color: 'red', fontSize: 50 }} />
-      <p>Service is not available.</p>
-      <p>Please try it again later.</p>
-    </h2>
+const SectionNoService = ({ classes }) => (
+  <div className={classes.messageBox}>
+    <CloudOff style={{ color: '#e91e63', fontSize: 40 }} />
+    <p className={classes.messageText}>Service is not available.</p>
+    <p className={classes.messageSubText}>Please try again later.</p>
   </div>
 );
 
-const SectionUnknown = () => (
-  <div style={titleStyle}>
-    <h2 style={txtStyle}>
-      <HelpOutline style={{ color: 'purple', fontSize: 50 }} />
-      <p>Unknown state.</p>
-    </h2>
+const SectionUnknown = ({ classes }) => (
+  <div className={classes.messageBox}>
+    <HelpOutline style={{ color: '#66727c', fontSize: 40 }} />
+    <p className={classes.messageText}>Unknown state.</p>
   </div>
 );
 
-const notToRenderAnalysis = (pds) => {
-  if (pds.running) return <SectionRunning />;
+const notToRenderAnalysis = (pds, classes) => {
+  if (pds.running) return <SectionRunning classes={classes} />;
   if (!pds.outline || !pds.outline.code) return <div />;
 
-  if (pds.outline.code >= 500) return <SectionNoService />;
-  if (pds.outline.code === 400) return <SectionMissMatch />;
-  if (pds.outline.code >= 300) return <SectionUnknown />;
+  if (pds.outline.code >= 500) return <SectionNoService classes={classes} />;
+  if (pds.outline.code === 400) return <SectionMissMatch classes={classes} />;
+  if (pds.outline.code >= 300) return <SectionUnknown classes={classes} />;
   return false;
 };
 
 const sectionSvg = (classes, predictions) => {
-  const renderMsg = notToRenderAnalysis(predictions);
+  const renderMsg = notToRenderAnalysis(predictions, classes);
   if (renderMsg) return null;
 
   if (!predictions.output) return null;
   const targetSvg = predictions.output.result[0].svgs[0];
-  if (!targetSvg) return <SectionLoading />;
+  if (!targetSvg) return <SectionLoading classes={classes} />;
   return (
     <SvgFileZoomPan
       svg={targetSvg}

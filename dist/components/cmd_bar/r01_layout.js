@@ -74,7 +74,7 @@ const shiftSelect = (classes, layoutSt, setShiftRefAct, shiftSt, curveSt) => {
   } = shiftSt;
   const selectedShift = shifts[curveIdx] || {};
   const listShift = (0, _list_shift.getListShift)(layoutSt) || [];
-  const shiftRefName = selectedShift?.ref?.name || '';
+  const shiftRefName = selectedShift.ref && selectedShift.ref.name || '';
   const isInList = listShift.some(r => r.name === shiftRefName);
   const selectValue = isInList ? shiftRefName : '';
   const onChange = e => {
@@ -99,6 +99,7 @@ const shiftSelect = (classes, layoutSt, setShiftRefAct, shiftSt, curveSt) => {
       labelId: "select-solvent-label",
       label: "Solvent",
       onChange: onChange,
+      MenuProps: _common.toolbarSelectMenuProps,
       className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-shift'),
       children: listShift.map(ref => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
         value: ref.name,
@@ -123,6 +124,7 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
       label: "Layout",
       value: layoutSt,
       onChange: onChange,
+      MenuProps: _common.toolbarSelectMenuProps,
       className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-layout'),
       children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
         value: _list_layout.LIST_LAYOUT.PLAIN,
@@ -281,14 +283,16 @@ const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
 const PLACEHOLDER = '- - -';
 const norm = s => (s || '').toString().toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '');
 function solventKeyOf(feature) {
-  const r = feature?.metadata?.solventName ?? feature?.metadata?.solvent ?? feature?.meta?.solventName ?? feature?.meta?.solvent ?? feature?.solventName ?? feature?.solvent ?? null;
-  const a = feature?.metadata?.solvent_label ?? feature?.metadata?.solventLabel ?? null;
+  const metadata = feature && feature.metadata;
+  const meta = feature && feature.meta;
+  const r = metadata && metadata.solventName || metadata && metadata.solvent || meta && meta.solventName || meta && meta.solvent || feature && feature.solventName || feature && feature.solvent || null;
+  const a = metadata && metadata.solvent_label || metadata && metadata.solventLabel || null;
   const raw = r && r !== PLACEHOLDER ? r : null;
   const alt = a && a !== PLACEHOLDER ? a : null;
   return norm(raw || alt || '');
 }
 function pickBestRef(list, key) {
-  if (!key || !list?.length) return null;
+  if (!key || !list || !list.length) return null;
   const scored = [];
   list.forEach(r => {
     const nLabel = norm(r.label);
@@ -313,16 +317,18 @@ function pickBestRef(list, key) {
     const vals = cand.map(c => typeof c.value === 'number' ? c.value : null).filter(v => v != null).sort((a, b) => a - b);
     if (vals.length) {
       const m = vals[Math.floor(vals.length / 2)];
-      cand = cand.slice().sort((a, b) => Math.abs((a.value ?? m) - m) - Math.abs((b.value ?? m) - m));
+      cand = cand.slice().sort((a, b) => Math.abs((a.value != null ? a.value : m) - m) - Math.abs((b.value != null ? b.value : m) - m));
     }
     if (cand.length > 1) {
-      cand.sort((a, b) => (a.name?.length || 0) - (b.name?.length || 0));
+      cand.sort((a, b) => (a.name && a.name.length || 0) - (b.name && b.name.length || 0));
     }
   }
   return cand[0] || null;
 }
 function isRefUnset(shiftSt, curveIdx, list) {
-  const name = shiftSt?.shifts?.[curveIdx]?.ref?.name || '';
+  const shifts = shiftSt && shiftSt.shifts;
+  const shift = shifts && shifts[curveIdx];
+  const name = shift && shift.ref && shift.ref.name || '';
   if (!name || name === PLACEHOLDER) return true;
   return !(list || []).some(r => r.name === name);
 }

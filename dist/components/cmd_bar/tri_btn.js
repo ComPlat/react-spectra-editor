@@ -12,6 +12,8 @@ var _classnames = _interopRequireDefault(require("classnames"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
 var _styles = require("@mui/styles");
 var _Tooltip = _interopRequireDefault(require("@mui/material/Tooltip"));
+var _CheckRounded = _interopRequireDefault(require("@mui/icons-material/CheckRounded"));
+var _CloseRounded = _interopRequireDefault(require("@mui/icons-material/CloseRounded"));
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 var _common = require("./common");
 var _jsxRuntime = require("react/jsx-runtime");
@@ -19,14 +21,53 @@ var _jsxRuntime = require("react/jsx-runtime");
 
 const styles = () => Object.assign({
   btnYes: {
-    color: 'green'
+    backgroundColor: '#eef8f0',
+    borderColor: '#9ccfa7',
+    color: '#1f7a35',
+    '&:hover': {
+      backgroundColor: '#dff2e3',
+      borderColor: '#6fb980'
+    }
   },
   btnNo: {
-    color: 'red'
+    backgroundColor: '#fff1f0',
+    borderColor: '#efb0aa',
+    color: '#b42318',
+    '&:hover': {
+      backgroundColor: '#ffe3e0',
+      borderColor: '#df8379'
+    }
   },
   btnTxtConfirm: {
-    fontFamily: 'Helvetica',
+    fontFamily: 'Helvetica, Arial, sans-serif',
     fontSize: 12
+  },
+  confirmWrap: {
+    alignItems: 'center',
+    backgroundColor: '#f8fafc',
+    border: '1px solid #dbe3ea',
+    borderRadius: 7,
+    display: 'inline-flex',
+    gap: 4,
+    height: 30,
+    padding: '0 4px 0 8px'
+  },
+  confirmText: {
+    color: '#25313b',
+    fontFamily: 'Helvetica, Arial, sans-serif',
+    fontSize: 11,
+    fontWeight: 700,
+    letterSpacing: '0.02em',
+    marginRight: 2,
+    whiteSpace: 'nowrap'
+  },
+  confirmBtn: {
+    height: 24,
+    minWidth: 24,
+    width: 24
+  },
+  confirmIcon: {
+    fontSize: 17
   }
 }, _common.commonStyle);
 class TriBtn extends _react.default.Component {
@@ -86,23 +127,22 @@ class TriBtn extends _react.default.Component {
       this.onToggle(e);
     };
     return /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+      className: classes.confirmWrap,
       disabled: _cfg.default.btnCmdMpy(layoutSt) && _cfg.default.btnCmdIntg(layoutSt),
       children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
-        className: (0, _classnames.default)(classes.txtLabel, 'txt-sv-bar-desc'),
+        className: (0, _classnames.default)(classes.confirmText, 'txt-sv-bar-desc'),
         children: "Delete ALL?"
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
-        className: (0, _classnames.default)('btn-sv-bar-yes'),
+        className: (0, _classnames.default)(classes.confirmBtn, classes.btnYes, 'btn-sv-bar-yes'),
         onClick: onExec,
-        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
-          className: (0, _classnames.default)(classes.txt, classes.btnYes, 'txt-sv-bar-yes'),
-          children: "Y"
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_CheckRounded.default, {
+          className: (0, _classnames.default)(classes.confirmIcon, 'txt-sv-bar-yes')
         })
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
-        className: (0, _classnames.default)('btn-sv-bar-no'),
+        className: (0, _classnames.default)(classes.confirmBtn, classes.btnNo, 'btn-sv-bar-no'),
         onClick: this.onToggle,
-        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
-          className: (0, _classnames.default)(classes.txt, classes.btnNo, 'txt-sv-bar-no'),
-          children: "N"
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_CloseRounded.default, {
+          className: (0, _classnames.default)(classes.confirmIcon, 'txt-sv-bar-no')
         })
       })]
     });

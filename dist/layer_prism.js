@@ -21,8 +21,26 @@ var _jsxRuntime = require("react/jsx-runtime");
 react/function-component-definition, react/require-default-props
 */
 
-const styles = () => ({});
+const styles = () => ({
+  root: {
+    backgroundColor: '#fff',
+    padding: '4px 4px 6px 0',
+    fontFamily: 'Helvetica, Arial, sans-serif'
+  },
+  contentShell: {
+    marginLeft: 4,
+    padding: 4,
+    backgroundColor: '#fff'
+  },
+  chartColumn: {
+    minWidth: 0
+  },
+  panelColumn: {
+    paddingLeft: 6
+  }
+});
 const LayerPrism = ({
+  classes,
   entity,
   cLabel,
   xLabel,
@@ -51,6 +69,7 @@ const LayerPrism = ({
   } = uiSt;
   if (viewer === _list_ui.LIST_UI_VIEWER_TYPE.ANALYSIS) {
     return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+      className: classes.root,
       children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_index2.default, {
         feature: feature,
         hasEdit: hasEdit,
@@ -58,12 +77,13 @@ const LayerPrism = ({
         operations: operations,
         editorOnly: editorOnly
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-        className: "react-spectrum-editor",
+        className: `react-spectrum-editor ${classes.contentShell}`,
         children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
           container: true,
           children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
             item: true,
             xs: 12,
+            className: classes.chartColumn,
             children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_layer_content.default, {
               topic: topic,
               feature: feature,
@@ -79,6 +99,7 @@ const LayerPrism = ({
     });
   }
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+    className: classes.root,
     children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_index2.default, {
       feature: feature,
       hasEdit: hasEdit,
@@ -86,12 +107,13 @@ const LayerPrism = ({
       operations: operations,
       editorOnly: editorOnly
     }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-      className: "react-spectrum-editor",
+      className: `react-spectrum-editor ${classes.contentShell}`,
       children: /*#__PURE__*/(0, _jsxRuntime.jsxs)(_Grid.default, {
         container: true,
         children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
           item: true,
           xs: 9,
+          className: classes.chartColumn,
           children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_layer_content.default, {
             topic: topic,
             feature: feature,
@@ -105,6 +127,7 @@ const LayerPrism = ({
           item: true,
           xs: 3,
           align: "center",
+          className: classes.panelColumn,
           children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_index.default, {
             feature: feature,
             integration: integration,
@@ -129,6 +152,7 @@ const mapStateToProps = (state, props) => (
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({}, dispatch);
 LayerPrism.propTypes = {
+  classes: _propTypes.default.object.isRequired,
   entity: _propTypes.default.object.isRequired,
   cLabel: _propTypes.default.string.isRequired,
   xLabel: _propTypes.default.string.isRequired,

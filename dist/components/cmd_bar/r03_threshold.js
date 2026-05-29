@@ -55,30 +55,29 @@ const setThreshold = (classes, thresVal, updateThresholdValueAct, curveSt) => {
       });
     }
   };
-  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
-    variant: "outlined",
-    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TextField, {
-      className: classes.field,
-      id: "outlined-name",
-      placeholder: "N.A.",
-      type: "number",
-      value: thresVal || 0.01,
-      margin: "none",
-      InputProps: {
-        endAdornment: txtPercent(),
-        className: (0, _classnames.default)(classes.txtInput, 'txtfield-sv-bar-input'),
-        inputProps: {
-          min: 0.01
-        }
-      },
-      onChange: onChange,
-      onBlur: onBlur,
-      onKeyPress: onEnterPress,
-      variant: "outlined"
-    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputLabel, {
-      className: (0, _classnames.default)(classes.txtLabelBottomInput),
-      children: "Threshold"
-    })]
+  return /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TextField, {
+    className: classes.field,
+    id: "outlined-name",
+    label: "Threshold",
+    placeholder: "N.A.",
+    type: "number",
+    value: thresVal || 0.01,
+    margin: "none",
+    InputLabelProps: {
+      shrink: true,
+      className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label')
+    },
+    InputProps: {
+      endAdornment: txtPercent(),
+      className: (0, _classnames.default)(classes.txtInput, 'txtfield-sv-bar-input'),
+      inputProps: {
+        min: 0.01
+      }
+    },
+    onChange: onChange,
+    onBlur: onBlur,
+    onKeyPress: onEnterPress,
+    variant: "outlined"
   });
 };
 const restoreIcon = (classes, hasEdit, isEdit) => hasEdit && isEdit ? /*#__PURE__*/(0, _jsxRuntime.jsx)(_HowToRegOutlined.default, {

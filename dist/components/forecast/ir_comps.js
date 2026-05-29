@@ -19,8 +19,8 @@ var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable react/function-component-definition, function-paren-newline,
 prefer-object-spread */
 
-// import SmaToSvg from '../common/chem';
 const baseSelectIrStatus = ({
+  classes,
   sma,
   status,
   identity,
@@ -28,8 +28,11 @@ const baseSelectIrStatus = ({
 }) => {
   const theStatus = ['accept', 'reject'].includes(status) ? status : '';
   return /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.FormControl, {
+    size: "small",
+    className: classes.ownerSelect,
     children: /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Select, {
       value: theStatus,
+      displayEmpty: true,
       onChange: e => {
         setIrStatusAct({
           predictions: {
@@ -44,19 +47,27 @@ const baseSelectIrStatus = ({
         value: "accept",
         children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_CheckCircleOutline.default, {
           style: {
-            color: '#4caf50'
+            color: '#4caf50',
+            fontSize: 18
           }
         })
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
         value: "reject",
         children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_HighlightOff.default, {
           style: {
-            color: '#e91e63'
+            color: '#e91e63',
+            fontSize: 18
           }
         })
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
         value: "",
-        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {})
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          style: {
+            color: '#a8b0b8',
+            fontSize: 12
+          },
+          children: "\u2014"
+        })
       })]
     })
   });
@@ -68,6 +79,7 @@ const bssMapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   setIrStatusAct: _forecast.setIrStatus
 }, dispatch);
 baseSelectIrStatus.propTypes = {
+  classes: _propTypes.default.object.isRequired,
   sma: _propTypes.default.string.isRequired,
   status: _propTypes.default.string,
   identity: _propTypes.default.string.isRequired,
@@ -86,36 +98,38 @@ const IrTableHeader = classes => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tab
       align: "right",
       children: (0, _comps.TxtLabel)(classes, 'Machine Confidence', 'txt-prd-table-title')
     }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
-      align: "right",
+      align: "center",
       children: (0, _comps.TxtLabel)(classes, 'Machine', 'txt-prd-table-title')
     }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
-      align: "right",
+      align: "center",
       children: (0, _comps.TxtLabel)(classes, 'Owner', 'txt-prd-table-title')
     })]
   })
 });
 exports.IrTableHeader = IrTableHeader;
 const colorStyles = [{
-  backgroundColor: '#FFFF00'
+  backgroundColor: '#fff9c4'
 }, {
-  backgroundColor: '#87CEFA'
+  backgroundColor: '#e3f2fd'
 }, {
-  backgroundColor: '#FFB6C1'
+  backgroundColor: '#fce4ec'
 }, {
-  backgroundColor: '#00FF00'
+  backgroundColor: '#e8f5e9'
 }, {
-  backgroundColor: '#E6E6FA'
+  backgroundColor: '#ede7f6'
 }, {
-  backgroundColor: '#FFD700'
+  backgroundColor: '#fff3e0'
 }, {
-  backgroundColor: '#F0FFFF'
+  backgroundColor: '#e0f7fa'
 }, {
-  backgroundColor: '#F5F5DC'
+  backgroundColor: '#f3e5f5'
 }];
 const colorLabel = (classes, idx, extClsName = 'txt-label') => {
   const style = Object.assign({}, colorStyles[idx % 8], {
-    width: 20,
-    borderRadius: 20,
+    borderRadius: 6,
+    display: 'inline-block',
+    minWidth: 24,
+    padding: '2px 6px',
     textAlign: 'center'
   });
   return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
@@ -126,27 +140,34 @@ const colorLabel = (classes, idx, extClsName = 'txt-label') => {
     })
   });
 };
-const IrTableBodyRow = (classes, idx, fg) => /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.TableRow, {
-  children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
-    component: "th",
-    scope: "row",
-    children: colorLabel(classes, idx)
-  }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
-    align: "left",
-    children: (0, _comps.TxtLabel)(classes, fg.sma, 'txt-prd-table-content')
-  }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
-    align: "right",
-    children: (0, _comps.ConfidenceLabel)(classes, fg.confidence, 'txt-prd-table-content')
-  }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
-    align: "right",
-    children: (0, _comps.StatusIcon)(fg.status)
-  }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
-    align: "right",
-    children: /*#__PURE__*/(0, _jsxRuntime.jsx)(SelectIrStatus, {
-      sma: fg.sma,
-      status: fg.statusOwner,
-      identity: "Owner"
-    })
-  })]
-}, `${idx}-${fg.name}`);
+const IrTableBodyRow = (classes, idx, fg) => {
+  const {
+    statusCell
+  } = classes;
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.TableRow, {
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+      component: "th",
+      scope: "row",
+      children: colorLabel(classes, idx)
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+      align: "left",
+      children: (0, _comps.TxtLabel)(classes, fg.sma, 'txt-prd-table-content')
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+      align: "right",
+      children: (0, _comps.ConfidenceLabel)(classes, fg.confidence, 'txt-prd-table-content')
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+      align: "center",
+      className: statusCell,
+      children: (0, _comps.StatusIcon)(classes, fg.status)
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TableCell, {
+      align: "center",
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(SelectIrStatus, {
+        classes: classes,
+        sma: fg.sma,
+        status: fg.statusOwner,
+        identity: "Owner"
+      })
+    })]
+  }, `${idx}-${fg.name}`);
+};
 exports.IrTableBodyRow = IrTableBodyRow;
