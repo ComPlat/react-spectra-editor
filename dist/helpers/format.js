@@ -344,25 +344,26 @@ const formatHplcAucPanel = (integration, feature) => {
     return `${formatHplcRetentionTime(e.rt)}, AUC=${areaVal} (${percent}%)`;
   }).join(', ');
 };
-const formatedHplcUvVis = (peaks, decimal = 2, integration, feature) => {
+const formatedHplcUvVis = (peaks, decimal = 2, integration, feature, isAscend = false) => {
   let stack = [];
   if (integration) {
     stack = integration.stack;
   }
-  let ordered = {};
+  let bestByX = {};
   peaks.forEach(p => {
     const x = Number(p.x);
-    const better = !ordered[x] || p.y > ordered[x];
+    const better = bestByX[x] === undefined || p.y > bestByX[x];
     if (better) {
-      ordered = Object.assign({}, ordered, {
+      bestByX = Object.assign({}, bestByX, {
         [x]: p.y
       });
     }
   });
-  ordered = Object.keys(ordered).map(k => ({
+  const sortFunc = isAscend ? (a, b) => a.x - b.x : (a, b) => b.x - a.x;
+  const ordered = Object.keys(bestByX).map(k => ({
     x: parseFloat(k),
-    y: ordered[k]
-  }));
+    y: bestByX[k]
+  })).sort(sortFunc);
   const arrResult = [];
   ordered.forEach(o => {
     const rt = formatHplcRetentionTime(o.x);
@@ -448,7 +449,7 @@ const peaksBody = ({
     return formatedUvVis(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
   if (layout === _list_layout.LIST_LAYOUT.HPLC_UVVIS) {
-    return formatedHplcUvVis(ordered, decimal, integration, feature);
+    return formatedHplcUvVis(ordered, decimal, integration, feature, isAscend);
   }
   if (layout === _list_layout.LIST_LAYOUT.EMISSIONS) {
     return formatedEmissions(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);

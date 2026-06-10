@@ -29,10 +29,8 @@ const Multiplicity = ({
   isFocusAddMpySt,
   disableAddMpySt,
   isFocusRmMpySt,
-  disableRmMpySt,
   isFocusAddPeakSt,
   isFocusRmPeakSt,
-  disableMpyPeakSt,
   setUiSweepTypeAct,
   clearMpyAllAct,
   curveSt

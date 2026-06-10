@@ -349,6 +349,12 @@ const mapDispatchToProps = (dispatch) => (
   }, dispatch)
 );
 
+LayerInit.defaultProps = {
+  multiEntities: undefined,
+  curveIdx: undefined,
+  sweepExtent: undefined,
+};
+
 LayerInit.propTypes = {
   entity: PropTypes.object.isRequired,
   multiEntities: PropTypes.array, // eslint-disable-line

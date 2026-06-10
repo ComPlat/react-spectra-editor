@@ -32,6 +32,7 @@ const buildBaseState = (overrides = {}) => ({
   detector: {},
   meta: { dscMetaData: {} },
   hplcMs: {},
+  ui: { sweepExtent: { xExtent: false, yExtent: false } },
   ...overrides,
 });
 

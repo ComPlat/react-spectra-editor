@@ -58,9 +58,13 @@ class LayerInit extends _react.default.Component {
     this.updateMultiEntities(true);
   }
   componentDidUpdate(prevProps) {
+    const {
+      multiEntities,
+      entity
+    } = this.props;
     this.normChange(prevProps);
     this.updateOthers();
-    if (prevProps.multiEntities !== this.props.multiEntities || prevProps.entity !== this.props.entity) {
+    if (prevProps.multiEntities !== multiEntities || prevProps.entity !== entity) {
       this.updateMultiEntities(false);
     }
   }
@@ -260,6 +264,11 @@ const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   updateDSCMetaDataAct: _meta.updateDSCMetaData,
   restoreSweepExtentAct: _ui.restoreSweepExtent
 }, dispatch);
+LayerInit.defaultProps = {
+  multiEntities: undefined,
+  curveIdx: undefined,
+  sweepExtent: undefined
+};
 LayerInit.propTypes = {
   entity: _propTypes.default.object.isRequired,
   multiEntities: _propTypes.default.array,
