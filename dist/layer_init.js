@@ -403,6 +403,11 @@ const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   clearHplcMsStateAct: _hplc_ms.clearHplcMsState,
   restoreSweepExtentAct: _ui.restoreSweepExtent
 }, dispatch);
+LayerInit.defaultProps = {
+  multiEntities: undefined,
+  curveIdx: undefined,
+  sweepExtent: undefined
+};
 LayerInit.propTypes = {
   entity: _propTypes.default.object.isRequired,
   layoutSt: _propTypes.default.string.isRequired,

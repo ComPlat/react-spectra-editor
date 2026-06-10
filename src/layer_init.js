@@ -391,6 +391,12 @@ const mapDispatchToProps = (dispatch) => (
   }, dispatch)
 );
 
+LayerInit.defaultProps = {
+  multiEntities: undefined,
+  curveIdx: undefined,
+  sweepExtent: undefined,
+};
+
 LayerInit.propTypes = {
   entity: PropTypes.object.isRequired,
   layoutSt: PropTypes.string.isRequired,

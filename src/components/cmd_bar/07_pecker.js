@@ -103,63 +103,63 @@ const Pecker = ({
 
   return (
     <span className={classes.group} data-testid="Pecker">
-        <Tooltip title={<span className="txt-sv-tp">Add Pecker</span>}>
-          <span>
-            <MuButton
-              className={
-                classNames(
-                  focusStyle(isFocusAddPeckerSt, classes),
-                  'btn-sv-bar-addpecker',
-                )
-              }
-              onClick={onSweepPeckerAdd}
-            >
-              <span className={classNames(classes.txt, 'txt-sv-bar-addpeak')}>
-                I
-                <sub>λ0</sub>
-                +
-              </span>
-            </MuButton>
-          </span>
-        </Tooltip>
-        <Tooltip title={<span className="txt-sv-tp">Remove Pecker</span>}>
-          <span>
-            <MuButton
-              className={
-                classNames(
-                  focusStyle(isFocusRmPeckerSt, classes),
-                  'btn-sv-bar-rmpecker',
-                )
-              }
-              onClick={onSweepPeckerDELETE}
-            >
-              <span className={classNames(classes.txt, 'txt-sv-bar-rmpeak')}>
-                I
-                <sub>λ0</sub>
-                -
-              </span>
-            </MuButton>
-          </span>
-        </Tooltip>
-        {
-          setRef(classes, cyclicVotaSt, curveIdx, setCylicVoltaRefFactorAct)
-        }
-        <Tooltip title={<span className="txt-sv-tp">{hasRefPeaks ? 'Set Reference' : 'Set Shift'}</span>}>
-          <span>
-            <MuButton
-              className={
-                classNames(
-                  focusStyle(isFocusSetRefSt, classes),
-                  'btn-sv-bar-setref',
-                )
-              }
-              onClick={onConfirmSetRef}
-            >
-              <AddLocationOutlinedIcon className={classes.icon} />
-            </MuButton>
-          </span>
-        </Tooltip>
-      </span>
+      <Tooltip title={<span className="txt-sv-tp">Add Pecker</span>}>
+        <span>
+          <MuButton
+            className={
+              classNames(
+                focusStyle(isFocusAddPeckerSt, classes),
+                'btn-sv-bar-addpecker',
+              )
+            }
+            onClick={onSweepPeckerAdd}
+          >
+            <span className={classNames(classes.txt, 'txt-sv-bar-addpeak')}>
+              I
+              <sub>λ0</sub>
+              +
+            </span>
+          </MuButton>
+        </span>
+      </Tooltip>
+      <Tooltip title={<span className="txt-sv-tp">Remove Pecker</span>}>
+        <span>
+          <MuButton
+            className={
+              classNames(
+                focusStyle(isFocusRmPeckerSt, classes),
+                'btn-sv-bar-rmpecker',
+              )
+            }
+            onClick={onSweepPeckerDELETE}
+          >
+            <span className={classNames(classes.txt, 'txt-sv-bar-rmpeak')}>
+              I
+              <sub>λ0</sub>
+              -
+            </span>
+          </MuButton>
+        </span>
+      </Tooltip>
+      {
+        setRef(classes, cyclicVotaSt, curveIdx, setCylicVoltaRefFactorAct)
+      }
+      <Tooltip title={<span className="txt-sv-tp">{hasRefPeaks ? 'Set Reference' : 'Set Shift'}</span>}>
+        <span>
+          <MuButton
+            className={
+              classNames(
+                focusStyle(isFocusSetRefSt, classes),
+                'btn-sv-bar-setref',
+              )
+            }
+            onClick={onConfirmSetRef}
+          >
+            <AddLocationOutlinedIcon className={classes.icon} />
+          </MuButton>
+        </span>
+      </Tooltip>
+    </span>
   );
 };
 

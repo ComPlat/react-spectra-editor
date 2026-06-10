@@ -388,6 +388,7 @@ BtnSubmit.propTypes = {
   detectorSt: PropTypes.object.isRequired,
   metaSt: PropTypes.object.isRequired,
   hplcMsSt: PropTypes.object,
+  sweepExtentSt: PropTypes.object,
   disabled: PropTypes.bool,
   className: PropTypes.string,
   children: PropTypes.node,
