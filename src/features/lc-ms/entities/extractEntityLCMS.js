@@ -142,6 +142,10 @@ export function getLcMsInfo(entity = {}) {
     kind = 'tic';
   }
 
+  if (entity.lcmsPolarity) {
+    polarity = entity.lcmsPolarity;
+  }
+
   return { kind: kind || 'unknown', polarity };
 }
 
