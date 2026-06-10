@@ -172,6 +172,7 @@ const buildSpectrumPayload = ({
   return {
     peaks: peaksEdit,
     layout: layoutSt,
+    xUnit: xLabel,
     shift,
     scan,
     thres,
@@ -255,7 +256,10 @@ const onClickCb = (
       }
       return spectrumPayload;
     });
+    const selectedIdx = Number.isFinite(curveSt?.curveIdx) ? curveSt.curveIdx : 0;
+    const selectedSpectrumPayload = spectraList[selectedIdx] || spectraList[0] || {};
     const payload = {
+      ...selectedSpectrumPayload,
       spectra_list: spectraList,
     };
     if (lcmsGlobalFields) {
@@ -275,6 +279,7 @@ const BtnSubmit = ({
   waveLengthSt, cyclicvoltaSt, curveSt, curveList, axesUnitsSt, detectorSt,
   metaSt,
   hplcMsSt,
+  disabled, className, children,
 }) => {
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
   const { dscMetaData } = metaSt;
@@ -303,14 +308,16 @@ const BtnSubmit = ({
   if (!operation) return null;
 
   return (
-    <Tooltip title={<span className="txt-sv-tp">Submit</span>}>
+    <Tooltip title={<span className="txt-sv-tp">{operation.name || 'Submit'}</span>}>
       <MuButton
         className={
           classNames(
             'btn-sv-bar-submit',
+            className,
           )
         }
         color="primary"
+        disabled={disabled}
         onClick={onClickCb(
           operation.value, isAscend, isIntensity,
           layoutSt, shiftSt, forecastSt.predictions, decimalSt,
@@ -319,7 +326,7 @@ const BtnSubmit = ({
           curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt,
         )}
       >
-        <PlayCircleOutlineIcon className={classes.icon} />
+        {children || <PlayCircleOutlineIcon className={classes.icon} />}
       </MuButton>
     </Tooltip>
   );
@@ -375,6 +382,9 @@ BtnSubmit.propTypes = {
   detectorSt: PropTypes.object.isRequired,
   metaSt: PropTypes.object.isRequired,
   hplcMsSt: PropTypes.object,
+  disabled: PropTypes.bool,
+  className: PropTypes.string,
+  children: PropTypes.node,
 };
 
 BtnSubmit.defaultProps = {
