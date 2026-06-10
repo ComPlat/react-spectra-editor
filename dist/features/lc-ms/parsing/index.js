@@ -27,6 +27,12 @@ Object.defineProperty(exports, "parseChemstationPages", {
     return _chemstation.parseChemstationPages;
   }
 });
+Object.defineProperty(exports, "parseFeaturePageValue", {
+  enumerable: true,
+  get: function get() {
+    return _pageValue.parseFeaturePageValue;
+  }
+});
 Object.defineProperty(exports, "readLcmsMzPageFromJcampInfo", {
   enumerable: true,
   get: function get() {
@@ -37,3 +43,4 @@ var _lcmsCategory = require("./lcmsCategory");
 var _lcmsMsPage = require("./lcmsMsPage");
 var _lcmsJcampInfo = require("./lcmsJcampInfo");
 var _chemstation = require("./chemstation");
+var _pageValue = require("./pageValue");

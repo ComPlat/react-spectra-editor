@@ -1,4 +1,5 @@
 import { isLcmsMsPageLoading } from '../../../components/d3_line_rect/index';
+import { pickTicIndex } from '../../../components/d3_line_rect/multi_focus';
 
 describe('isLcmsMsPageLoading', () => {
   const buildMzEntity = (polarity, pageValues) => ({
@@ -36,6 +37,22 @@ describe('isLcmsMsPageLoading', () => {
       buildMzEntity('positive', [1.2]),
       buildMzEntity('negative', [2.5]),
     ], state)).toEqual(false);
+  });
+
+  it('prefers persisted polarity over default curveIdx when reopening the editor', () => {
+    const ticEntities = [
+      { lcmsPolarity: 'positive' },
+      { lcmsPolarity: 'negative' },
+    ];
+    expect(pickTicIndex(ticEntities, 0, 'negative')).toEqual(1);
+  });
+
+  it('falls back to curveIdx when polarity is unavailable', () => {
+    const ticEntities = [
+      { lcmsPolarity: 'positive' },
+      { lcmsPolarity: 'negative' },
+    ];
+    expect(pickTicIndex(ticEntities, 1, null)).toEqual(1);
   });
 
   it('returns true when no MS page has been received yet', () => {

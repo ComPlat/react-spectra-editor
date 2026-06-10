@@ -4,7 +4,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.pickTicIndex = exports.default = void 0;
 var _init = require("../../helpers/init");
 var _mount = require("../../helpers/mount");
 var _brush = _interopRequireDefault(require("../../helpers/brush"));
@@ -20,13 +20,16 @@ no-unneeded-ternary, arrow-body-style, max-len */
 const d3 = require('d3');
 const pickTicIndex = (ticEntities, curveIdx, polarity) => {
   if (!Array.isArray(ticEntities) || ticEntities.length === 0) return 0;
+  if (polarity) {
+    const idxByPolarity = ticEntities.findIndex(ent => (0, _extractEntityLCMS.getLcMsInfo)(ent).polarity === polarity);
+    if (idxByPolarity >= 0) return idxByPolarity;
+  }
   if (Number.isInteger(curveIdx) && curveIdx >= 0 && curveIdx < ticEntities.length) {
     return curveIdx;
   }
-  if (!polarity) return 0;
-  const idx = ticEntities.findIndex(ent => (0, _extractEntityLCMS.getLcMsInfo)(ent).polarity === polarity);
-  return idx >= 0 ? idx : 0;
+  return 0;
 };
+exports.pickTicIndex = pickTicIndex;
 class MultiFocus {
   constructor(props) {
     const {

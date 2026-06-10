@@ -30,6 +30,7 @@ var _calc = require("../../helpers/calc");
 var _draw = require("../common/draw");
 var _list_ui = require("../../constants/list_ui");
 var _wavelengthSelect = _interopRequireDefault(require("../../features/lc-ms/ui/wavelengthSelect"));
+var _pageValue = require("../../features/lc-ms/parsing/pageValue");
 var _list_graph = require("../../constants/list_graph");
 var _peak_group = _interopRequireDefault(require("../cmd_bar/08_peak_group"));
 var _r03_threshold = _interopRequireDefault(require("../cmd_bar/r03_threshold"));
@@ -42,25 +43,6 @@ var _jsxRuntime = require("react/jsx-runtime");
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.8 / 3); // ROI
 
-const parsePageValue = feature => {
-  const candidates = [feature?.pageValue, feature?.page, feature?.pageSymbol];
-  for (let i = 0; i < candidates.length; i += 1) {
-    const raw = candidates[i];
-    if (raw != null) {
-      if (typeof raw === 'number') {
-        if (Number.isFinite(raw)) return raw;
-      } else {
-        const text = String(raw).split('\n')[0].trim();
-        const match = text.match(/[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?/);
-        if (match) {
-          const value = Number(match[0]);
-          if (Number.isFinite(value)) return value;
-        }
-      }
-    }
-  }
-  return null;
-};
 const toSeed = (xValues = [], yValues = []) => {
   const maxLength = Math.min(xValues.length, yValues.length);
   const seed = new Array(maxLength);
@@ -80,7 +62,7 @@ const isLcmsMsPageLoading = (mzEntities = [], hplcMsSt = {}) => {
   if (!pickEntity) return true;
   const {
     features
-  } = (0, _extractParams.extractParams)(pickEntity, 0, 1);
+  } = (0, _extractParams.extractParams)(pickEntity, null, null);
   let featuresArr = [];
   if (Array.isArray(features)) {
     featuresArr = features;
@@ -88,7 +70,7 @@ const isLcmsMsPageLoading = (mzEntities = [], hplcMsSt = {}) => {
     featuresArr = Object.values(features);
   }
   if (featuresArr.length === 0) return true;
-  const pageValues = featuresArr.map(feature => parsePageValue(feature)).filter(value => Number.isFinite(value));
+  const pageValues = featuresArr.map(feature => (0, _pageValue.parseFeaturePageValue)(feature)).filter(value => Number.isFinite(value));
   if (pageValues.length === 0) return true;
   return !pageValues.some(value => Math.abs(value - currentPageValue) < 1e-5);
 };
@@ -495,7 +477,7 @@ class ViewerLineRect extends _react.default.Component {
       const {
         data
       } = subViewFeature;
-      const pageValue = parsePageValue(subViewFeature);
+      const pageValue = (0, _pageValue.parseFeaturePageValue)(subViewFeature);
       const labelValue = Number.isFinite(pageValue) ? pageValue : subViewFeature?.pageValue ?? subViewFeature?.page ?? null;
       const currentData = data[0];
       const {
@@ -554,7 +536,7 @@ class ViewerLineRect extends _react.default.Component {
     }
     const {
       features
-    } = (0, _extractParams.extractParams)(uvvisEntities[0], 0, 1);
+    } = (0, _extractParams.extractParams)(uvvisEntities[0], null, null);
     let featuresArr = [];
     if (Array.isArray(features)) {
       featuresArr = features;
@@ -588,14 +570,14 @@ class ViewerLineRect extends _react.default.Component {
     if (!pickEntity || !pickEntity.layout) return null;
     const {
       features
-    } = (0, _extractParams.extractParams)(pickEntity, 0, 1);
+    } = (0, _extractParams.extractParams)(pickEntity, null, null);
     let featuresArr = [];
     if (Array.isArray(features)) featuresArr = features;else if (features && typeof features === 'object') featuresArr = Object.values(features);
     if (featuresArr.length === 0) return null;
     const {
       subViewerAt
     } = uiSt;
-    const pageValues = featuresArr.map(fe => parsePageValue(fe)).filter(val => Number.isFinite(val));
+    const pageValues = featuresArr.map(fe => (0, _pageValue.parseFeaturePageValue)(fe)).filter(val => Number.isFinite(val));
     if (pageValues.length === 0) return featuresArr[0];
     let requestedPageValue;
     if (subViewerAt != null && Number.isFinite(subViewerAt.x)) {
@@ -607,7 +589,7 @@ class ViewerLineRect extends _react.default.Component {
     }
     const closestPage = (0, _calc.findClosest)(pageValues, requestedPageValue);
     const selectFeature = featuresArr.find(fe => {
-      const value = parsePageValue(fe);
+      const value = (0, _pageValue.parseFeaturePageValue)(fe);
       return Number.isFinite(value) && Math.abs(value - closestPage) < 1e-9;
     });
     return selectFeature || featuresArr[0];
@@ -632,15 +614,15 @@ class ViewerLineRect extends _react.default.Component {
     if (!pickEntity || !pickEntity.layout) return;
     const {
       features
-    } = (0, _extractParams.extractParams)(pickEntity, 0, 1);
+    } = (0, _extractParams.extractParams)(pickEntity, null, null);
     let featuresArr = [];
     if (Array.isArray(features)) featuresArr = features;else if (features && typeof features === 'object') featuresArr = Object.values(features);
-    const pageValues = featuresArr.map(fe => parsePageValue(fe)).filter(val => Number.isFinite(val));
+    const pageValues = featuresArr.map(fe => (0, _pageValue.parseFeaturePageValue)(fe)).filter(val => Number.isFinite(val));
     const requestedRt = subViewerAt.x;
     const matchesLoadedScan = pageValues.some(pv => Math.abs(pv - requestedRt) < 1e-5);
     const needsRemoteFetch = !matchesLoadedScan;
     const exactFeature = featuresArr.find(fe => {
-      const value = parsePageValue(fe);
+      const value = (0, _pageValue.parseFeaturePageValue)(fe);
       return Number.isFinite(value) && Math.abs(value - requestedRt) < 1e-9;
     });
     const requestRetentionTime = exactFeature?.pageSymbol ?? exactFeature?.page ?? exactFeature?.pageValue ?? requestedRt;

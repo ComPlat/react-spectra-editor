@@ -19,14 +19,16 @@ import { getLcMsInfo } from '../../helpers/extractEntityLCMS';
 
 const d3 = require('d3');
 
-const pickTicIndex = (ticEntities, curveIdx, polarity) => {
+export const pickTicIndex = (ticEntities, curveIdx, polarity) => {
   if (!Array.isArray(ticEntities) || ticEntities.length === 0) return 0;
+  if (polarity) {
+    const idxByPolarity = ticEntities.findIndex((ent) => getLcMsInfo(ent).polarity === polarity);
+    if (idxByPolarity >= 0) return idxByPolarity;
+  }
   if (Number.isInteger(curveIdx) && curveIdx >= 0 && curveIdx < ticEntities.length) {
     return curveIdx;
   }
-  if (!polarity) return 0;
-  const idx = ticEntities.findIndex((ent) => getLcMsInfo(ent).polarity === polarity);
-  return idx >= 0 ? idx : 0;
+  return 0;
 };
 
 class MultiFocus {

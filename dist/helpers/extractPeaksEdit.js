@@ -4,8 +4,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.extractAutoPeaks = exports.extractAreaUnderCurve = void 0;
-exports.extractPeaksEdit = extractPeaksEdit;
+exports.extractPeaksEdit = exports.extractAutoPeaks = exports.extractAreaUnderCurve = void 0;
 Object.defineProperty(exports, "formatLcmsIntegralsForBackend", {
   enumerable: true,
   get: function get() {
@@ -25,6 +24,7 @@ Object.defineProperty(exports, "getLcmsMzPageData", {
   }
 });
 var _chem = require("./chem");
+var _converter = require("./converter");
 var _shift = require("./shift");
 var _format = _interopRequireDefault(require("./format"));
 var _integration = require("./integration");
@@ -47,16 +47,18 @@ const niOffset = (shiftSt, atIndex = 0) => {
   return offset;
 };
 const msOffset = () => 0;
-function extractPeaksEdit(hplcMsSt) {
-  if (!hplcMsSt || !hplcMsSt.uvvis || !hplcMsSt.uvvis.spectraList) return [];
-  return hplcMsSt.uvvis.spectraList.flatMap(spectrum => spectrum.peaks || []);
-}
 const extractAutoPeaks = (feature, thresSt, shiftSt, layoutSt, atIndex = 0) => {
   const offset = _format.default.isMsLayout(layoutSt) || _format.default.isLCMsLayout(layoutSt) ? msOffset() : niOffset(shiftSt, atIndex);
   const peaks = (0, _chem.Convert2Peak)(feature, thresSt.value, offset);
   return peaks;
 };
 exports.extractAutoPeaks = extractAutoPeaks;
+const extractPeaksEdit = (feature, editPeakSt, thresSt, shiftSt, layoutSt, atIndex = 0) => {
+  if (_format.default.isLCMsLayout(layoutSt)) return [];
+  const peaks = extractAutoPeaks(feature, thresSt, shiftSt, layoutSt, atIndex);
+  return (0, _converter.PksEdit)(peaks, editPeakSt);
+};
+exports.extractPeaksEdit = extractPeaksEdit;
 const getAUCValue = (integrationSt, layoutSt) => {
   const {
     refArea,

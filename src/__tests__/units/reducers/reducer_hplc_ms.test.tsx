@@ -347,6 +347,32 @@ describe('Test redux reducer_hplc_ms', () => {
     expect(reloaded.uvvis.wavelengthIdx).toEqual(1);
   });
 
+  it('keeps user-selected TIC polarity when SET_ALL_CURVES reloads the same dataset', () => {
+    const payload = [
+      createTicCurve('positive', [1, 2, 3], [10, 20, 30]),
+      createTicCurve('negative', [1, 2, 3], [10, 20, 30]),
+      createUvvisCurve(),
+      createMzCurve('negative', 2),
+    ];
+    let state = hplcMsReducer(undefined, {
+      type: CURVE.SET_ALL_CURVES,
+      payload,
+      meta: { idDt: 'eln-dataset' },
+    } as any);
+    state = hplcMsReducer(state, {
+      type: HPLC_MS.SELECT_TIC_CURVE,
+      payload: { polarity: 'negative' },
+    } as any);
+    expect(state.tic.polarity).toEqual('negative');
+
+    const reloaded = hplcMsReducer(state, {
+      type: CURVE.SET_ALL_CURVES,
+      payload,
+      meta: { idDt: 'eln-dataset', lcmsPolarity: 'positive' },
+    } as any);
+    expect(reloaded.tic.polarity).toEqual('negative');
+  });
+
   it('aligns currentPageValue with the new MZ feature pageValue (cross-polarity case)', () => {
     const initial = hplcMsReducer(undefined, {
       type: CURVE.SET_ALL_CURVES,

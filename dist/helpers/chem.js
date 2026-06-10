@@ -537,13 +537,24 @@ const extrSpectraMs = (jcamp, layout) => {
     const container = jcamp?.info?.$OBSERVEDINTEGRALS ?? null;
     const jcampUnitsField = String(jcamp?.info?.UNITS || '').toUpperCase();
     const jcampUnitsIndicatesMinutes = jcampUnitsField.includes('MINUTE');
+    const jcampUnitsIndicatesSeconds = jcampUnitsField.includes('SECOND');
+    const getMaxAbsX = data => {
+      const xs = data?.[0]?.x;
+      if (!Array.isArray(xs) || xs.length === 0) return 0;
+      return xs.reduce((max, value) => {
+        const abs = Math.abs(Number(value));
+        return Number.isFinite(abs) && abs > max ? abs : max;
+      }, 0);
+    };
     uvvisSpectra.forEach(({
       spectrum
     }, pairIdx) => {
       const xUnitUpper = String(spectrum?.xUnit || '').toUpperCase();
       const isExplicitMinutes = xUnitUpper.includes('MINUTE') || jcampUnitsIndicatesMinutes;
+      const isExplicitSeconds = xUnitUpper.includes('SECOND') || jcampUnitsIndicatesSeconds;
       const isTimeAxis = xUnitUpper.includes('TIME') || xUnitUpper.includes('SECOND');
-      const needsSecToMin = isTimeAxis && !isExplicitMinutes;
+      const dataLooksLikeSeconds = getMaxAbsX(spectrum?.data) > 60;
+      const needsSecToMin = isTimeAxis && !isExplicitMinutes && (isExplicitSeconds || dataLooksLikeSeconds);
       const scaleX = value => needsSecToMin ? value / 60 : value;
       const pageKey = spectrum.pageValue ?? spectrum.page;
       const peakTable = peakTablesByPage.get(pageKey);

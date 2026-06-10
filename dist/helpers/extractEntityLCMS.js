@@ -3,12 +3,6 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-Object.defineProperty(exports, "classify", {
-  enumerable: true,
-  get: function get() {
-    return _extractEntityLCMS.classify;
-  }
-});
 Object.defineProperty(exports, "getLcMsInfo", {
   enumerable: true,
   get: function get() {

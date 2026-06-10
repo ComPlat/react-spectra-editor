@@ -76,11 +76,14 @@ class LayerInit extends React.Component {
   }
 
   normChange(prevProps) {
-    const { entity, clearHplcMsStateAct } = this.props;
+    const { entity, multiEntities, clearHplcMsStateAct } = this.props;
     if (prevProps.entity !== entity) {
       const prevIsLcms = Format.isLCMsLayout(prevProps.entity?.layout);
       const nextIsLcms = Format.isLCMsLayout(entity?.layout);
-      if (prevIsLcms || nextIsLcms) {
+      const lcmsSessionActive = prevIsLcms && nextIsLcms
+        && Array.isArray(multiEntities)
+        && isLcMsGroup(multiEntities);
+      if ((prevIsLcms || nextIsLcms) && !lcmsSessionActive) {
         const prevSig = LayerInit.entitySignature(prevProps.entity);
         const nextSig = LayerInit.entitySignature(entity);
         if (prevSig !== nextSig) {
@@ -146,14 +149,23 @@ class LayerInit extends React.Component {
     const { multiEntities, setAllCurvesAct, entity } = this.props;
     if (!entity || !entity.layout) return;
     const lcmsCurveMeta = () => {
-      const idDt = entity?.idDt ?? entity?.id ?? entity?.datasetId ?? null;
-      const lcmsUvvisWavelength = entity?.lcms_uvvis_wavelength ?? entity?.lcmsUvvisWavelength;
       const uvvisFromMulti = Array.isArray(multiEntities)
         ? multiEntities.find((e) => getLcMsInfo(e).kind === 'uvvis')
         : null;
+      const mzFromMulti = Array.isArray(multiEntities)
+        ? multiEntities.find((e) => getLcMsInfo(e).kind === 'mz')
+        : null;
+      const idDt = uvvisFromMulti?.idDt ?? uvvisFromMulti?.id ?? uvvisFromMulti?.datasetId
+        ?? entity?.idDt ?? entity?.id ?? entity?.datasetId ?? null;
+      const lcmsUvvisWavelength = entity?.lcms_uvvis_wavelength ?? entity?.lcmsUvvisWavelength
+        ?? uvvisFromMulti?.lcms_uvvis_wavelength ?? uvvisFromMulti?.lcmsUvvisWavelength;
       const lcmsMzPage = entity?.lcms_mz_page ?? entity?.lcmsMzPage
+        ?? mzFromMulti?.lcms_mz_page ?? mzFromMulti?.lcmsMzPage
         ?? uvvisFromMulti?.lcms_mz_page ?? uvvisFromMulti?.lcmsMzPage;
-      const lcmsPolarity = entity?.lcms_polarity ?? entity?.lcmsPolarity ?? entity?.ticPolarity;
+      const mzInfo = mzFromMulti ? getLcMsInfo(mzFromMulti) : null;
+      const lcmsPolarity = entity?.lcms_polarity ?? entity?.lcmsPolarity ?? entity?.ticPolarity
+        ?? mzFromMulti?.lcms_polarity ?? mzFromMulti?.lcmsPolarity
+        ?? (mzInfo?.kind === 'mz' ? mzInfo.polarity : null);
       const out = {};
       if (idDt != null) out.idDt = idDt;
       if (lcmsUvvisWavelength != null && lcmsUvvisWavelength !== '') {

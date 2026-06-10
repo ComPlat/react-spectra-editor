@@ -8,6 +8,7 @@ var _extractEntityLCMS = require("../../helpers/extractEntityLCMS");
 var _utils = require("./utils");
 var _persistence = require("./persistence");
 var _uvvis = require("./uvvis");
+var _pageValue = require("../../features/lc-ms/parsing/pageValue");
 /* eslint-disable prefer-object-spread, import/prefer-default-export */
 
 const updateLcmsData = (state, action) => {
@@ -31,26 +32,6 @@ const updateLcmsData = (state, action) => {
       return Object.values(curve.features).filter(f => f?.data?.[0]);
     }
     return [];
-  };
-  const getFeaturePageValue = feature => {
-    const candidates = [feature?.pageValue, feature?.page, feature?.pageSymbol];
-    for (let i = 0; i < candidates.length; i += 1) {
-      const raw = candidates[i];
-      if (raw != null) {
-        if (typeof raw === 'number' && Number.isFinite(raw)) {
-          return raw;
-        }
-        const text = String(raw).split('\n')[0].trim();
-        const match = text.match(/[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?/);
-        if (match) {
-          const value = Number(match[0]);
-          if (Number.isFinite(value)) {
-            return value;
-          }
-        }
-      }
-    }
-    return null;
   };
   let ticPosData = {
     x: [],
@@ -213,7 +194,7 @@ const updateLcmsData = (state, action) => {
         x,
         y: yValues[i] || 0
       })));
-      pageValues.push(getFeaturePageValue(feature));
+      pageValues.push((0, _pageValue.parseFeaturePageValue)(feature));
     });
     return {
       peaks,
@@ -230,7 +211,8 @@ const updateLcmsData = (state, action) => {
   const readMetaPolarity = () => (0, _utils.normalizeHintPolarity)(meta.lcmsPolarity ?? meta.lcms_polarity ?? meta.ticPolarity);
   const metaPol = readMetaPolarity();
   const persistedTicHints = (0, _persistence.readPersistedLcmsTicHints)(nextDatasetKey);
-  const selectedPolarity = (0, _utils.pickFirstAvailablePolarity)(available, [metaPol, (0, _utils.normalizeHintPolarity)(persistedTicHints?.polarity), state.tic?.polarity]) || fallbackPolarity;
+  const polarityCandidates = sameDatasetScope ? [(0, _utils.normalizeHintPolarity)(state.tic?.polarity), (0, _utils.normalizeHintPolarity)(persistedTicHints?.polarity), metaPol] : [metaPol, (0, _utils.normalizeHintPolarity)(persistedTicHints?.polarity), (0, _utils.normalizeHintPolarity)(state.tic?.polarity)];
+  const selectedPolarity = (0, _utils.pickFirstAvailablePolarity)(available, polarityCandidates) || fallbackPolarity;
   const ticXsFor = pol => {
     if (pol === 'negative') return ticNegData?.x;
     if (pol === 'neutral') return ticNeutralData?.x;
@@ -249,7 +231,7 @@ const updateLcmsData = (state, action) => {
     const findIn = list => {
       if (!Array.isArray(list)) return null;
       for (let i = 0; i < list.length; i += 1) {
-        const v = getFeaturePageValue(list[i]);
+        const v = (0, _pageValue.parseFeaturePageValue)(list[i]);
         if (Number.isFinite(v)) return v;
       }
       return null;

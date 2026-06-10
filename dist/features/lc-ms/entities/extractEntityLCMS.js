@@ -3,7 +3,6 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.classify = classify;
 exports.default = void 0;
 exports.getLcMsInfo = getLcMsInfo;
 exports.isLcMsGroup = void 0;
@@ -124,14 +123,6 @@ const alignMzPolarityWithTic = (ticEntities, mzEntities) => {
     }
   }
 };
-function classify(entity) {
-  const {
-    kind,
-    polarity
-  } = getLcMsInfo(entity);
-  if (kind === 'unknown') return 'unknown';
-  return `${kind}_${polarity}`;
-}
 function splitAndReindexEntities(entities = []) {
   const tic = [];
   const mz = [];

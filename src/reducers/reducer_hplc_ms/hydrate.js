@@ -228,13 +228,20 @@ export const updateLcmsData = (state, action) => {
   const metaPol = readMetaPolarity();
   const persistedTicHints = readPersistedLcmsTicHints(nextDatasetKey);
 
-  const selectedPolarity = pickFirstAvailablePolarity(
-    available,
-    [
+  const polarityCandidates = sameDatasetScope
+    ? [
+      normalizeHintPolarity(state.tic?.polarity),
+      normalizeHintPolarity(persistedTicHints?.polarity),
+      metaPol,
+    ]
+    : [
       metaPol,
       normalizeHintPolarity(persistedTicHints?.polarity),
-      state.tic?.polarity,
-    ],
+      normalizeHintPolarity(state.tic?.polarity),
+    ];
+  const selectedPolarity = pickFirstAvailablePolarity(
+    available,
+    polarityCandidates,
   ) || fallbackPolarity;
 
   const ticXsFor = (pol) => {

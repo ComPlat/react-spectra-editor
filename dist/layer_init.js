@@ -74,12 +74,14 @@ class LayerInit extends _react.default.Component {
   normChange(prevProps) {
     const {
       entity,
+      multiEntities,
       clearHplcMsStateAct
     } = this.props;
     if (prevProps.entity !== entity) {
       const prevIsLcms = _format.default.isLCMsLayout(prevProps.entity?.layout);
       const nextIsLcms = _format.default.isLCMsLayout(entity?.layout);
-      if (prevIsLcms || nextIsLcms) {
+      const lcmsSessionActive = prevIsLcms && nextIsLcms && Array.isArray(multiEntities) && (0, _extractEntityLCMS.isLcMsGroup)(multiEntities);
+      if ((prevIsLcms || nextIsLcms) && !lcmsSessionActive) {
         const prevSig = LayerInit.entitySignature(prevProps.entity);
         const nextSig = LayerInit.entitySignature(entity);
         if (prevSig !== nextSig) {
@@ -171,11 +173,13 @@ class LayerInit extends _react.default.Component {
     } = this.props;
     if (!entity || !entity.layout) return;
     const lcmsCurveMeta = () => {
-      const idDt = entity?.idDt ?? entity?.id ?? entity?.datasetId ?? null;
-      const lcmsUvvisWavelength = entity?.lcms_uvvis_wavelength ?? entity?.lcmsUvvisWavelength;
       const uvvisFromMulti = Array.isArray(multiEntities) ? multiEntities.find(e => (0, _extractEntityLCMS.getLcMsInfo)(e).kind === 'uvvis') : null;
-      const lcmsMzPage = entity?.lcms_mz_page ?? entity?.lcmsMzPage ?? uvvisFromMulti?.lcms_mz_page ?? uvvisFromMulti?.lcmsMzPage;
-      const lcmsPolarity = entity?.lcms_polarity ?? entity?.lcmsPolarity ?? entity?.ticPolarity;
+      const mzFromMulti = Array.isArray(multiEntities) ? multiEntities.find(e => (0, _extractEntityLCMS.getLcMsInfo)(e).kind === 'mz') : null;
+      const idDt = uvvisFromMulti?.idDt ?? uvvisFromMulti?.id ?? uvvisFromMulti?.datasetId ?? entity?.idDt ?? entity?.id ?? entity?.datasetId ?? null;
+      const lcmsUvvisWavelength = entity?.lcms_uvvis_wavelength ?? entity?.lcmsUvvisWavelength ?? uvvisFromMulti?.lcms_uvvis_wavelength ?? uvvisFromMulti?.lcmsUvvisWavelength;
+      const lcmsMzPage = entity?.lcms_mz_page ?? entity?.lcmsMzPage ?? mzFromMulti?.lcms_mz_page ?? mzFromMulti?.lcmsMzPage ?? uvvisFromMulti?.lcms_mz_page ?? uvvisFromMulti?.lcmsMzPage;
+      const mzInfo = mzFromMulti ? (0, _extractEntityLCMS.getLcMsInfo)(mzFromMulti) : null;
+      const lcmsPolarity = entity?.lcms_polarity ?? entity?.lcmsPolarity ?? entity?.ticPolarity ?? mzFromMulti?.lcms_polarity ?? mzFromMulti?.lcmsPolarity ?? (mzInfo?.kind === 'mz' ? mzInfo.polarity : null);
       const out = {};
       if (idDt != null) out.idDt = idDt;
       if (lcmsUvvisWavelength != null && lcmsUvvisWavelength !== '') {
