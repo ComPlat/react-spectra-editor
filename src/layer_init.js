@@ -25,6 +25,12 @@ import HPLCViewer from './components/hplc_viewer';
 import { setAllCurves } from './actions/curve';
 import { clearHplcMsState } from './actions/hplc_ms';
 import { LIST_LAYOUT } from './constants/list_layout';
+import { restoreSweepExtent } from './actions/ui';
+
+const hasActiveZoom = (sweepExtent) => {
+  if (!sweepExtent) return false;
+  return !!(sweepExtent.xExtent || sweepExtent.yExtent);
+};
 
 const styles = () => ({
 });
@@ -49,6 +55,15 @@ class LayerInit extends React.Component {
   constructor(props) {
     super(props);
 
+    const { sweepExtent, restoreSweepExtentAct } = props;
+    if (hasActiveZoom(sweepExtent)) {
+      restoreSweepExtentAct(sweepExtent);
+    } else {
+      // Clear any zoom left in the shared store by a previously opened
+      // spectrum, so it cannot block the RESETALL/layout sync on mount.
+      restoreSweepExtentAct({ xExtent: false, yExtent: false });
+    }
+
     this.normChange = this.normChange.bind(this);
     this.execReset = this.execReset.bind(this);
     this.initReducer = this.initReducer.bind(this);
@@ -60,7 +75,7 @@ class LayerInit extends React.Component {
     this.execReset();
     this.initReducer();
     this.updateOthers();
-    this.updateMultiEntities();
+    this.updateMultiEntities(true);
   }
 
   componentDidUpdate(prevProps) {
@@ -79,7 +94,7 @@ class LayerInit extends React.Component {
     if (multiEntitiesSignature(prevProps.multiEntities)
       !== multiEntitiesSignature(multiEntities)
       || entityChanged) {
-      this.updateMultiEntities();
+      this.updateMultiEntities(false);
     }
   }
 
@@ -132,7 +147,6 @@ class LayerInit extends React.Component {
     const keepInvertY = prevEntity && sameDataset && requestsInvertedY(prevEntity) === invertY;
     if (!keepInvertY) seedInvertYAct(invertY);
     if (Format.isMsLayout(layout)) {
-      // const { autoPeak, editPeak } = features; // TBD
       const autoPeak = features.autoPeak || features[0];
       const editPeak = features.editPeak || features[0];
       const baseFeat = editPeak || autoPeak;
@@ -163,7 +177,8 @@ class LayerInit extends React.Component {
         integration, multiplicity, simulation,
       });
       updateDSCMetaDataAct(undefined);
-    } else {
+    }
+    if (!Format.isNmrLayout(layout) && !Format.isPlainLayout(layout)) {
       resetMultiplicityAct();
     }
   }
@@ -182,7 +197,15 @@ class LayerInit extends React.Component {
     }
   }
 
-  updateMultiEntities() {
+  buildSetAllCurvesPayload(entities, isInitial) {
+    const { curveIdx } = this.props;
+    if (isInitial && Number.isFinite(curveIdx)) {
+      return { entities, curveIdx };
+    }
+    return entities;
+  }
+
+  updateMultiEntities(isInitial = false) {
     const { multiEntities, setAllCurvesAct, entity } = this.props;
     if (!entity) return;
     const lcmsCurveMeta = () => {
@@ -219,23 +242,29 @@ class LayerInit extends React.Component {
     const isMultiSpectra = Array.isArray(multiEntities) && multiEntities.length > 1;
     if (isMultiSpectra) {
       const meta = Format.isLCMsLayout(entity.layout) ? lcmsCurveMeta() : undefined;
-      setAllCurvesAct(reconcileLcMsTimeAxes(multiEntities), meta);
+      setAllCurvesAct(
+        this.buildSetAllCurvesPayload(reconcileLcMsTimeAxes(multiEntities), isInitial),
+        meta,
+      );
       return;
     }
 
     if (Format.isLCMsLayout(entity.layout)) {
-      const payload = (Array.isArray(multiEntities) && multiEntities.length > 0)
+      const entities = (Array.isArray(multiEntities) && multiEntities.length > 0)
         ? multiEntities
         : [entity];
-      setAllCurvesAct(reconcileLcMsTimeAxes(payload), lcmsCurveMeta());
+      setAllCurvesAct(
+        this.buildSetAllCurvesPayload(reconcileLcMsTimeAxes(entities), isInitial),
+        lcmsCurveMeta(),
+      );
       return;
     }
 
     if (Format.isCyclicVoltaLayout(entity.layout)) {
-      const payload = (Array.isArray(multiEntities) && multiEntities.length > 0)
+      const entities = (Array.isArray(multiEntities) && multiEntities.length > 0)
         ? multiEntities
         : [entity];
-      setAllCurvesAct(payload);
+      setAllCurvesAct(this.buildSetAllCurvesPayload(entities, isInitial));
       return;
     }
 
@@ -358,6 +387,7 @@ const mapDispatchToProps = (dispatch) => (
     setAllCurvesAct: setAllCurves,
     updateDSCMetaDataAct: updateDSCMetaData,
     clearHplcMsStateAct: clearHplcMsState,
+    restoreSweepExtentAct: restoreSweepExtent,
   }, dispatch)
 );
 
@@ -365,7 +395,10 @@ LayerInit.propTypes = {
   entity: PropTypes.object.isRequired,
   layoutSt: PropTypes.string.isRequired,
   multiEntities: PropTypes.array, // eslint-disable-line
+  curveIdx: PropTypes.number,
+  sweepExtent: PropTypes.object,
   entityFileNames: PropTypes.array, // eslint-disable-line
+  restoreSweepExtentAct: PropTypes.func.isRequired,
   others: PropTypes.object.isRequired,
   cLabel: PropTypes.string.isRequired,
   xLabel: PropTypes.string.isRequired,

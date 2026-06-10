@@ -5,7 +5,8 @@ max-len */
 import Jcampconverter from 'jcampconverter';
 import { createSelector } from 'reselect';
 
-import { FromManualToOffset } from './shift';
+import { shiftOffsetAtIndex } from './shift';
+import Cfg from './cfg';
 import Format from './format';
 import { LIST_LAYOUT } from '../constants/list_layout';
 import { getArea } from './integration';
@@ -48,15 +49,7 @@ const getShiftOffset = (state, _) => { // eslint-disable-line
     return GetCyclicVoltaShiftOffset(cyclicvolta, curveIdx);
   }
 
-  const { shift } = state;
-  const { shifts } = shift;
-  const selectedShift = shifts[curveIdx];
-  if (!selectedShift) {
-    return 0.0;
-  }
-
-  const { ref, peak } = selectedShift;
-  return FromManualToOffset(ref, peak);
+  return shiftOffsetAtIndex(state.shift, curveIdx);
 };
 
 const calcXYK = (xs, ys, maxY, offset) => {

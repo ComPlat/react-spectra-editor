@@ -164,6 +164,8 @@ const thresholdReducer = (state = initialState, action) => {
   switch (action.type) {
     case CURVE.SET_ALL_CURVES:
       return setListThreshold(state, action);
+    case CURVE.SELECT_WORKING_CURVE:
+      return Object.assign({}, state, { selectedIdx: action.payload });
     case THRESHOLD.UPDATE_VALUE:
       return setThresHoldValue(state, action);
     case THRESHOLD.UPDATE_UPPER_VALUE:

@@ -26,9 +26,14 @@ var _hplc_viewer = _interopRequireDefault(require("./components/hplc_viewer"));
 var _curve = require("./actions/curve");
 var _hplc_ms = require("./actions/hplc_ms");
 var _list_layout = require("./constants/list_layout");
+var _ui = require("./actions/ui");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, default-param-last */
 
+const hasActiveZoom = sweepExtent => {
+  if (!sweepExtent) return false;
+  return !!(sweepExtent.xExtent || sweepExtent.yExtent);
+};
 const styles = () => ({});
 const isUnrecognized = entity => !entity?.layout || _format.default.isPlainLayout(entity.layout);
 const datasetIdOf = entity => entity?.idDt ?? entity?.id ?? entity?.datasetId;
@@ -49,6 +54,20 @@ const requestsInvertedY = entity => {
 class LayerInit extends _react.default.Component {
   constructor(props) {
     super(props);
+    const {
+      sweepExtent,
+      restoreSweepExtentAct
+    } = props;
+    if (hasActiveZoom(sweepExtent)) {
+      restoreSweepExtentAct(sweepExtent);
+    } else {
+      // Clear any zoom left in the shared store by a previously opened
+      // spectrum, so it cannot block the RESETALL/layout sync on mount.
+      restoreSweepExtentAct({
+        xExtent: false,
+        yExtent: false
+      });
+    }
     this.normChange = this.normChange.bind(this);
     this.execReset = this.execReset.bind(this);
     this.initReducer = this.initReducer.bind(this);
@@ -59,7 +78,7 @@ class LayerInit extends _react.default.Component {
     this.execReset();
     this.initReducer();
     this.updateOthers();
-    this.updateMultiEntities();
+    this.updateMultiEntities(true);
   }
   componentDidUpdate(prevProps) {
     const {
@@ -77,7 +96,7 @@ class LayerInit extends _react.default.Component {
       this.updateOthers();
     }
     if ((0, _entity_signature.multiEntitiesSignature)(prevProps.multiEntities) !== (0, _entity_signature.multiEntitiesSignature)(multiEntities) || entityChanged) {
-      this.updateMultiEntities();
+      this.updateMultiEntities(false);
     }
   }
   normChange(prevProps, entityChanged) {
@@ -142,7 +161,6 @@ class LayerInit extends _react.default.Component {
     const keepInvertY = prevEntity && sameDataset && requestsInvertedY(prevEntity) === invertY;
     if (!keepInvertY) seedInvertYAct(invertY);
     if (_format.default.isMsLayout(layout)) {
-      // const { autoPeak, editPeak } = features; // TBD
       const autoPeak = features.autoPeak || features[0];
       const editPeak = features.editPeak || features[0];
       const baseFeat = editPeak || autoPeak;
@@ -189,7 +207,8 @@ class LayerInit extends _react.default.Component {
         simulation
       });
       updateDSCMetaDataAct(undefined);
-    } else {
+    }
+    if (!_format.default.isNmrLayout(layout) && !_format.default.isPlainLayout(layout)) {
       resetMultiplicityAct();
     }
   }
@@ -211,7 +230,19 @@ class LayerInit extends _react.default.Component {
       addOthersAct(others);
     }
   }
-  updateMultiEntities() {
+  buildSetAllCurvesPayload(entities, isInitial) {
+    const {
+      curveIdx
+    } = this.props;
+    if (isInitial && Number.isFinite(curveIdx)) {
+      return {
+        entities,
+        curveIdx
+      };
+    }
+    return entities;
+  }
+  updateMultiEntities(isInitial = false) {
     const {
       multiEntities,
       setAllCurvesAct,
@@ -242,17 +273,17 @@ class LayerInit extends _react.default.Component {
     const isMultiSpectra = Array.isArray(multiEntities) && multiEntities.length > 1;
     if (isMultiSpectra) {
       const meta = _format.default.isLCMsLayout(entity.layout) ? lcmsCurveMeta() : undefined;
-      setAllCurvesAct((0, _timeAxis.reconcileLcMsTimeAxes)(multiEntities), meta);
+      setAllCurvesAct(this.buildSetAllCurvesPayload((0, _timeAxis.reconcileLcMsTimeAxes)(multiEntities), isInitial), meta);
       return;
     }
     if (_format.default.isLCMsLayout(entity.layout)) {
-      const payload = Array.isArray(multiEntities) && multiEntities.length > 0 ? multiEntities : [entity];
-      setAllCurvesAct((0, _timeAxis.reconcileLcMsTimeAxes)(payload), lcmsCurveMeta());
+      const entities = Array.isArray(multiEntities) && multiEntities.length > 0 ? multiEntities : [entity];
+      setAllCurvesAct(this.buildSetAllCurvesPayload((0, _timeAxis.reconcileLcMsTimeAxes)(entities), isInitial), lcmsCurveMeta());
       return;
     }
     if (_format.default.isCyclicVoltaLayout(entity.layout)) {
-      const payload = Array.isArray(multiEntities) && multiEntities.length > 0 ? multiEntities : [entity];
-      setAllCurvesAct(payload);
+      const entities = Array.isArray(multiEntities) && multiEntities.length > 0 ? multiEntities : [entity];
+      setAllCurvesAct(this.buildSetAllCurvesPayload(entities, isInitial));
       return;
     }
     setAllCurvesAct(false);
@@ -369,15 +400,19 @@ const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   addOthersAct: _jcamp.addOthers,
   setAllCurvesAct: _curve.setAllCurves,
   updateDSCMetaDataAct: _meta.updateDSCMetaData,
-  clearHplcMsStateAct: _hplc_ms.clearHplcMsState
+  clearHplcMsStateAct: _hplc_ms.clearHplcMsState,
+  restoreSweepExtentAct: _ui.restoreSweepExtent
 }, dispatch);
 LayerInit.propTypes = {
   entity: _propTypes.default.object.isRequired,
   layoutSt: _propTypes.default.string.isRequired,
   multiEntities: _propTypes.default.array,
   // eslint-disable-line
+  curveIdx: _propTypes.default.number,
+  sweepExtent: _propTypes.default.object,
   entityFileNames: _propTypes.default.array,
   // eslint-disable-line
+  restoreSweepExtentAct: _propTypes.default.func.isRequired,
   others: _propTypes.default.object.isRequired,
   cLabel: _propTypes.default.string.isRequired,
   xLabel: _propTypes.default.string.isRequired,

@@ -188,6 +188,7 @@ const buildSpectrumPayload = ({
     axesUnitsSt,
     detectorSt,
     dscMetaData,
+    feature,
     ...optionalBooleanFlags,
   };
 };
@@ -197,7 +198,7 @@ const onClickCb = (
   layoutSt, shiftSt, analysis, decimalSt,
   integrationSt, multiplicitySt, waveLengthSt,
   cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData,
-  curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt,
+  curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt, sweepExtentSt,
 ) => (
   () => {
     const defaultCurves = feature ? [{ feature }] : [];
@@ -268,6 +269,9 @@ const onClickCb = (
     if (Number.isFinite(curveSt?.curveIdx)) {
       payload.curveSt = { curveIdx: curveSt.curveIdx };
     }
+    if (sweepExtentSt?.xExtent || sweepExtentSt?.yExtent) {
+      payload.sweepExtent = sweepExtentSt;
+    }
     operationValue(payload);
   }
 );
@@ -279,6 +283,7 @@ const BtnSubmit = ({
   waveLengthSt, cyclicvoltaSt, curveSt, curveList, axesUnitsSt, detectorSt,
   metaSt,
   hplcMsSt,
+  sweepExtentSt,
   disabled, className, children,
 }) => {
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
@@ -323,7 +328,7 @@ const BtnSubmit = ({
           layoutSt, shiftSt, forecastSt.predictions, decimalSt,
           integrationSt, multiplicitySt, waveLengthSt,
           cyclicvoltaPayload, curveSt, axesUnitsSt, detectorSt, dscMetaData,
-          curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt,
+          curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt, sweepExtentSt,
         )}
       >
         {children || <PlayCircleOutlineIcon className={classes.icon} />}
@@ -351,6 +356,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     detectorSt: state.detector,
     metaSt: state.meta,
     hplcMsSt: state.hplcMs,
+    sweepExtentSt: state.ui.sweepExtent,
   }
 );
 
