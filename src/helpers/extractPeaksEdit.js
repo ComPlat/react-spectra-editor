@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import { Convert2Peak } from './chem';
 import { PksEdit } from './converter';
-import { FromManualToOffset } from './shift';
+import { shiftOffsetAtIndex } from './shift';
 import Format from './format';
 import { calcArea } from './integration';
 import {
@@ -10,21 +10,8 @@ import {
   getLcmsMzPageData,
 } from '../features/lc-ms/submit';
 
-const niOffset = (shiftSt, atIndex = 0) => {
-  const { shifts } = shiftSt;
-  const selectedShift = shifts[atIndex];
-  if (!selectedShift) {
-    return 0;
-  }
-  const { ref, peak } = selectedShift;
-  const offset = FromManualToOffset(ref, peak);
-  return offset;
-};
-
-const msOffset = () => 0;
-
 const extractAutoPeaks = (feature, thresSt, shiftSt, layoutSt, atIndex = 0) => {
-  const offset = (Format.isMsLayout(layoutSt) || Format.isLCMsLayout(layoutSt)) ? msOffset() : niOffset(shiftSt, atIndex);
+  const offset = (Format.isMsLayout(layoutSt) || Format.isLCMsLayout(layoutSt)) ? 0 : shiftOffsetAtIndex(shiftSt, atIndex);
   const peaks = Convert2Peak(feature, thresSt.value, offset);
   return peaks;
 };

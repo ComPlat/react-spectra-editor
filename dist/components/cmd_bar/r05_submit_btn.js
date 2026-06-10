@@ -167,10 +167,11 @@ const buildSpectrumPayload = ({
     axesUnitsSt,
     detectorSt,
     dscMetaData,
+    feature,
     ...optionalBooleanFlags
   };
 };
-const onClickCb = (operationValue, isAscend, isIntensity, layoutSt, shiftSt, analysis, decimalSt, integrationSt, multiplicitySt, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData, curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt) => () => {
+const onClickCb = (operationValue, isAscend, isIntensity, layoutSt, shiftSt, analysis, decimalSt, integrationSt, multiplicitySt, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData, curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt, sweepExtentSt) => () => {
   const defaultCurves = feature ? [{
     feature
   }] : [];
@@ -241,6 +242,9 @@ const onClickCb = (operationValue, isAscend, isIntensity, layoutSt, shiftSt, ana
       curveIdx: curveSt.curveIdx
     };
   }
+  if (sweepExtentSt?.xExtent || sweepExtentSt?.yExtent) {
+    payload.sweepExtent = sweepExtentSt;
+  }
   operationValue(payload);
 };
 const BtnSubmit = ({
@@ -266,6 +270,7 @@ const BtnSubmit = ({
   detectorSt,
   metaSt,
   hplcMsSt,
+  sweepExtentSt,
   disabled,
   className,
   children
@@ -303,7 +308,7 @@ const BtnSubmit = ({
       className: (0, _classnames.default)('btn-sv-bar-submit', className),
       color: "primary",
       disabled: disabled,
-      onClick: onClickCb(operation.value, isAscend, isIntensity, layoutSt, shiftSt, forecastSt.predictions, decimalSt, integrationSt, multiplicitySt, waveLengthSt, cyclicvoltaPayload, curveSt, axesUnitsSt, detectorSt, dscMetaData, curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt),
+      onClick: onClickCb(operation.value, isAscend, isIntensity, layoutSt, shiftSt, forecastSt.predictions, decimalSt, integrationSt, multiplicitySt, waveLengthSt, cyclicvoltaPayload, curveSt, axesUnitsSt, detectorSt, dscMetaData, curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt, sweepExtentSt),
       children: children || /*#__PURE__*/(0, _jsxRuntime.jsx)(_PlayCircleOutline.default, {
         className: classes.icon
       })
@@ -329,7 +334,8 @@ const mapStateToProps = (state, props) => (
   axesUnitsSt: state.axesUnits,
   detectorSt: state.detector,
   metaSt: state.meta,
-  hplcMsSt: state.hplcMs
+  hplcMsSt: state.hplcMs,
+  sweepExtentSt: state.ui.sweepExtent
 });
 BtnSubmit.propTypes = {
   classes: _propTypes.default.object.isRequired,

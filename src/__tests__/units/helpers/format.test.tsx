@@ -139,7 +139,60 @@ describe('Test format helper', () => {
       it('Get peaks for HPLC layout', () => {
         params.layout = LIST_LAYOUT.HPLC_UVVIS
         const body = Format.peaksBody(params)
-        expect(body).toEqual('2.0 (2.00), 1.0 (1.00)')
+        expect(body).toEqual('2.00 min (2.00), 1.00 min (1.00)')
+      })
+
+      it('Get peaks for HPLC layout with integration', () => {
+        params.layout = LIST_LAYOUT.HPLC_UVVIS
+        params.integration = {
+          stack: [
+            { xL: 1.5, xU: 2.5, absoluteArea: 1234.5678 },
+            { xL: 0.5, xU: 1.5, absoluteArea: 987.6543 },
+          ],
+        }
+        const body = Format.peaksBody(params)
+        expect(body).toEqual(
+          '2.00 min (2.00, AUC=1234.57), 1.00 min (1.00, AUC=987.65)',
+        )
+      })
+
+      it('Does not assign AUC to peaks inside integration but not at apex', () => {
+        params.layout = LIST_LAYOUT.HPLC_UVVIS
+        params.isAscend = true
+        params.peaks = [
+          { x: 16.99, y: 319.83 },
+          { x: 14.05, y: 401.21 },
+          { x: 13.71, y: -0.77 },
+        ]
+        params.integration = {
+          stack: [
+            { xL: 13.5, xU: 14.5, absoluteArea: 31467.89 },
+            { xL: 16.5, xU: 17.5, absoluteArea: 31447.95 },
+          ],
+        }
+        const body = Format.peaksBody(params)
+        expect(body).toEqual(
+          '13.71 min (-0.77), 14.05 min (401.21, AUC=31467.89), 16.99 min (319.83, AUC=31447.95)',
+        )
+      })
+
+      it('Format HPLC AUC panel with retention time', () => {
+        const integration = {
+          stack: [
+            { xL: 12.5, xU: 13.5, absoluteArea: 1000 },
+            { xL: 15.5, xU: 16.5, absoluteArea: 2000 },
+          ],
+        }
+        const feature = {
+          data: [{
+            x: [12, 13, 14, 15, 16, 17],
+            y: [10, 50, 20, 15, 40, 10],
+          }],
+        }
+        const panel = Format.formatHplcAucPanel(integration, feature)
+        expect(panel).toEqual(
+          '13.00 min, AUC=1000.00 (33.33%), 16.00 min, AUC=2000.00 (66.67%)',
+        )
       })
 
       it('Get peaks for Emission layout', () => {

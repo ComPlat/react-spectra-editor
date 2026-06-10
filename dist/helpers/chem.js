@@ -15,6 +15,7 @@ exports.convertTopic = exports.convertThresEndPts = void 0;
 var _jcampconverter = _interopRequireDefault(require("jcampconverter"));
 var _reselect = require("reselect");
 var _shift = require("./shift");
+var _cfg = _interopRequireDefault(require("./cfg"));
 var _format = _interopRequireDefault(require("./format"));
 var _list_layout = require("../constants/list_layout");
 var _integration = require("./integration");
@@ -63,21 +64,7 @@ const getShiftOffset = (state, _) => {
   if (layout === _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY && cyclicvolta) {
     return GetCyclicVoltaShiftOffset(cyclicvolta, curveIdx);
   }
-  const {
-    shift
-  } = state;
-  const {
-    shifts
-  } = shift;
-  const selectedShift = shifts[curveIdx];
-  if (!selectedShift) {
-    return 0.0;
-  }
-  const {
-    ref,
-    peak
-  } = selectedShift;
-  return (0, _shift.FromManualToOffset)(ref, peak);
+  return (0, _shift.shiftOffsetAtIndex)(state.shift, curveIdx);
 };
 const calcXYK = (xs, ys, maxY, offset) => {
   const sp = [];

@@ -35,7 +35,7 @@ const spectraDigit = (layout) => {
 };
 
 const fixDigit = (input, precision) => {
-  const output = input || 0.0;
+  const output = Number(input) || 0.0;
   return output.toFixed(precision);
 };
 
@@ -425,8 +425,86 @@ const formatedDLSIntensity = (
   return ordered.map((o) => `${o.x} nm (${o.y} %)`).join(', ');
 };
 
+const HPLC_RT_DECIMAL = 2;
+const HPLC_VALUE_DECIMAL = 2;
+const HPLC_RT_UNIT = 'min';
+
+const formatHplcRetentionTime = (rt) => (
+  `${fixDigit(rt, HPLC_RT_DECIMAL)} ${HPLC_RT_UNIT}`
+);
+
+const formatHplcAuc = (area) => fixDigit(area, HPLC_VALUE_DECIMAL);
+
+const findHplcPeakRetentionTime = (feature, xL, xU) => {
+  if (!feature?.data?.[0]) {
+    return (xL + xU) / 2;
+  }
+  const { x, y } = feature.data[0];
+  let maxY = -Infinity;
+  let rt = (xL + xU) / 2;
+  for (let i = 0; i < x.length; i += 1) {
+    if (x[i] >= xL && x[i] <= xU && y[i] > maxY) {
+      maxY = y[i];
+      rt = x[i];
+    }
+  }
+  return rt;
+};
+
+const isSameHplcRt = (a, b) => (
+  fixDigit(a, HPLC_RT_DECIMAL) === fixDigit(b, HPLC_RT_DECIMAL)
+);
+
+const integrationApexRt = (inte, feature, peaks) => {
+  if (feature?.data?.[0]) {
+    return findHplcPeakRetentionTime(feature, inte.xL, inte.xU);
+  }
+  if (!Array.isArray(peaks)) return null;
+  const peaksInRange = peaks.filter((p) => p.x >= inte.xL && p.x <= inte.xU);
+  if (peaksInRange.length === 0) return null;
+  return peaksInRange.reduce(
+    (best, p) => (p.y > best.y ? p : best),
+    peaksInRange[0],
+  ).x;
+};
+
+const findIntegrationForPeak = (peakX, stack, peaks, feature) => {
+  if (!Array.isArray(stack)) return null;
+  const x = parseFloat(peakX);
+  return stack.find((s) => {
+    if (s.xL > x || x > s.xU) return false;
+    const apexRt = integrationApexRt(s, feature, peaks);
+    return apexRt != null && isSameHplcRt(x, apexRt);
+  }) || null;
+};
+
+const formatHplcAucPanel = (integration, feature) => {
+  if (!integration) return '';
+  const stackIntegration = integration.stack;
+  if (!Array.isArray(stackIntegration)) return '';
+
+  const entries = stackIntegration
+    .filter((inte) => inte.absoluteArea)
+    .map((inte) => ({
+      rt: findHplcPeakRetentionTime(feature, inte.xL, inte.xU),
+      area: inte.absoluteArea,
+    }));
+
+  if (entries.length === 0) return '';
+
+  const sumVal = entries.reduce((sum, e) => sum + e.area, 0);
+
+  return entries
+    .map((e) => {
+      const areaVal = formatHplcAuc(e.area);
+      const percent = fixDigit((e.area * 100) / sumVal, HPLC_VALUE_DECIMAL);
+      return `${formatHplcRetentionTime(e.rt)}, AUC=${areaVal} (${percent}%)`;
+    })
+    .join(', ');
+};
+
 const formatedHplcUvVis = (
-  peaks, decimal = 2, integration,
+  peaks, decimal = 2, integration, feature,
 ) => {
   let stack = [];
   if (integration) {
@@ -436,7 +514,7 @@ const formatedHplcUvVis = (
   let ordered = {};
 
   peaks.forEach((p) => {
-    const x = fixDigit(p.x, decimal);
+    const x = Number(p.x);
     const better = !ordered[x] || (p.y > ordered[x]);
     if (better) {
       ordered = Object.assign({}, ordered, { [x]: p.y });
@@ -444,18 +522,16 @@ const formatedHplcUvVis = (
   });
 
   ordered = Object.keys(ordered)
-    .map((k) => ({ x: k, y: ordered[k] }));
+    .map((k) => ({ x: parseFloat(k), y: ordered[k] }));
 
   const arrResult = [];
   ordered.forEach((o) => {
-    let pStr = `${o.x} (${o.y.toFixed(2)})`;
-    if (stack) {
-      stack.forEach((s) => {
-        if (s.xL <= o.x && s.xU >= o.x) {
-          pStr = `${o.x} (${o.y.toFixed(2)}, AUC=${s.absoluteArea})`;
-        }
-      });
-    }
+    const rt = formatHplcRetentionTime(o.x);
+    const yVal = o.y.toFixed(HPLC_VALUE_DECIMAL);
+    const inte = findIntegrationForPeak(o.x, stack, peaks, feature);
+    const pStr = inte?.absoluteArea
+      ? `${rt} (${yVal}, AUC=${formatHplcAuc(inte.absoluteArea)})`
+      : `${rt} (${yVal})`;
     arrResult.push(pStr);
   });
 
@@ -508,7 +584,7 @@ const rmShiftFromPeaks = (peaks, shift, atIndex = 0) => {
 const peaksBody = ({
   peaks, layout, decimal, shift, isAscend,
   isIntensity = false, boundary = {},
-  integration, atIndex = 0, waveLength, temperature, hplcMsSt = null,
+  integration, atIndex = 0, waveLength, temperature, hplcMsSt = null, feature,
 }) => {
   const result = rmShiftFromPeaks(peaks, shift, atIndex);
 
@@ -531,7 +607,7 @@ const peaksBody = ({
     return formatedUvVis(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
   }
   if (layout === LIST_LAYOUT.HPLC_UVVIS) {
-    return formatedHplcUvVis(ordered, decimal, integration);
+    return formatedHplcUvVis(ordered, decimal, integration, feature);
   }
   if (layout === LIST_LAYOUT.EMISSIONS) {
     return formatedEmissions(ordered, maxY, decimal, isAscend, isIntensity, boundary, false);
@@ -793,6 +869,8 @@ const Format = {
   strNumberFixedLength,
   inlineNotation,
   formatedLCMS,
+  formatHplcAucPanel,
+  formatedHplcUvVis,
 };
 
 export default Format;

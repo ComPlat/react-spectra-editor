@@ -15,6 +15,7 @@ var _integration_split = require("../../helpers/integration_split");
 var _list_layout = require("../../constants/list_layout");
 var _format = _interopRequireDefault(require("../../helpers/format"));
 var _chem = require("../../helpers/chem");
+var _shift = require("../../helpers/shift");
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 var _focus = require("../../helpers/focus");
 var _integration = require("../../helpers/integration");
@@ -207,7 +208,7 @@ class MultiFocus {
   transformYValue(y) {
     return y * this.yTransformFactor;
   }
-  setDataParams(filterSeed, peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt, jcampIdx = 0) {
+  setDataParams(filterSeed, peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt, shiftSt, jcampIdx = 0) {
     this.data = [];
     this.otherLineData = [];
     let filterSubLayoutValue = null;
@@ -219,7 +220,7 @@ class MultiFocus {
         feature,
         color
       } = entry;
-      const offset = (0, _chem.GetCyclicVoltaPreviousShift)(cyclicvoltaSt, jcampIdx);
+      const offset = _format.default.isCyclicVoltaLayout(layout) ? (0, _chem.GetCyclicVoltaPreviousShift)(cyclicvoltaSt, idx) : (0, _shift.shiftOffsetAtIndex)(shiftSt, idx);
       let currData = (0, _chem.convertTopic)(topic, layout, feature, offset);
       if (idx === jcampIdx) {
         if (!_format.default.isCyclicVoltaLayout(layout)) {
@@ -735,36 +736,12 @@ class MultiFocus {
       multiplicities
     } = mtplySt;
     const selectedMulti = multiplicities[this.jcampIdx];
-    if (selectedMulti === false || selectedMulti === undefined) {
-      const mpys = [];
-      const mpyb = this.tags.mpybPath.selectAll('path').data(mpys);
-      mpyb.exit().attr('class', 'exit').remove();
-      const mpyt1 = this.tags.mpyt1Path.selectAll('text').data(mpys);
-      mpyt1.exit().attr('class', 'exit').remove();
-      const mpyt2 = this.tags.mpyt2Path.selectAll('text').data(mpys);
-      mpyt2.exit().attr('class', 'exit').remove();
-      let mPeaks = mpys.map(m => {
-        const {
-          peaks,
-          xExtent
-        } = m;
-        return peaks.map(p => Object.assign({}, p, {
-          xExtent
-        }));
-      });
-      mPeaks = [].concat(...mPeaks);
-      const mpyp = this.tags.mpypPath.selectAll('path').data(mPeaks);
-      mpyp.exit().attr('class', 'exit').remove();
-      return;
-    }
-    const {
-      stack = [],
-      smExtext = false,
-      shift = 0
-    } = selectedMulti || {};
-    const hasValidExtent = extent => extent && Number.isFinite(extent.xL) && Number.isFinite(extent.xU);
-    const mpys = stack.filter(m => hasValidExtent(m?.xExtent));
     const isDisable = _cfg.default.btnCmdMpy(this.layout);
+    const hasMpy = !isDisable && selectedMulti?.stack?.length > 0;
+    const mpys = hasMpy ? selectedMulti.stack : [];
+    const smExtext = hasMpy ? selectedMulti.smExtext : false;
+    const shift = hasMpy ? selectedMulti.shift : 0;
+    const hasValidExtent = extent => extent && Number.isFinite(extent.xL) && Number.isFinite(extent.xU);
     if (mpys.length === 0 || isDisable) return;
     const activeExtent = hasValidExtent(smExtext) ? smExtext : mpys[0].xExtent;
     // rescale for zoom
@@ -907,6 +884,7 @@ class MultiFocus {
     isUiVisualSplitIntgSt,
     isUiNoBrushSt,
     cyclicvoltaSt,
+    shiftSt,
     integrationSt,
     mtplySt,
     uiSt
@@ -925,7 +903,7 @@ class MultiFocus {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt));
     this.setTip();
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, shiftSt, jcampIdx);
     Object.assign(this, {
       isUiSplitIntgSt,
       isUiVisualSplitIntgSt
@@ -970,6 +948,7 @@ class MultiFocus {
     isUiVisualSplitIntgSt,
     isUiNoBrushSt,
     cyclicvoltaSt,
+    shiftSt,
     integrationSt,
     mtplySt,
     uiSt
@@ -985,7 +964,7 @@ class MultiFocus {
     const jcampIdx = curveIdx;
     this.isShowAllCurves = isShowAllCurve;
     this.entities = entities;
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, shiftSt, jcampIdx);
     Object.assign(this, {
       isUiSplitIntgSt,
       isUiVisualSplitIntgSt

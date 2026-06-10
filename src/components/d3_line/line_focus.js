@@ -588,16 +588,16 @@ class LineFocus {
     const { selectedIdx, multiplicities = [] } = mtplySt || {};
     const selectedMulti = multiplicities[selectedIdx] || {};
 
-    const {
-      stack = [], smExtext = false, shift = 0,
-    } = selectedMulti;
+    const isDisable = Cfg.btnCmdMpy(this.layout);
+    const hasMpy = !isDisable && selectedMulti?.stack?.length > 0;
+    const mpys = hasMpy ? selectedMulti.stack : [];
+    const smExtext = hasMpy ? selectedMulti.smExtext : false;
+    const shift = hasMpy ? selectedMulti.shift : 0;
     const hasValidExtent = (extent) => (
       extent
       && Number.isFinite(extent.xL)
       && Number.isFinite(extent.xU)
     );
-    const mpys = stack.filter((m) => hasValidExtent(m?.xExtent));
-    const isDisable = Cfg.btnCmdMpy(this.layout);
     if (mpys.length === 0 || isDisable) return;
     const activeExtent = hasValidExtent(smExtext) ? smExtext : mpys[0].xExtent;
     // rescale for zoom

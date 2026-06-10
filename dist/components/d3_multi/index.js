@@ -31,6 +31,12 @@ const buildResetPayload = (feature, curveSt) => ({
   ...feature,
   curveIdx: curveSt.curveIdx
 });
+const hasActiveZoom = sweepExtentSt => {
+  if (!sweepExtentSt) return false;
+  return !!(sweepExtentSt.xExtent || sweepExtentSt.yExtent);
+};
+const canSkipReset = (sweepExtentSt, layoutSt, feature) => hasActiveZoom(sweepExtentSt) && layoutSt === feature?.operation?.layout;
+const isSameMultiComparison = (oldEntities, newEntities) => Array.isArray(oldEntities) && Array.isArray(newEntities) && oldEntities.length > 0 && oldEntities.length === newEntities.length;
 class ViewerMulti extends _react.default.Component {
   constructor(props) {
     super(props);
@@ -86,6 +92,7 @@ class ViewerMulti extends _react.default.Component {
       isUiNoBrushSt,
       isHidden,
       cyclicvoltaSt,
+      shiftSt,
       integrationSt,
       mtplySt,
       axesUnitsSt,
@@ -117,6 +124,7 @@ class ViewerMulti extends _react.default.Component {
       isUiVisualSplitIntgSt,
       isUiNoBrushSt,
       cyclicvoltaSt,
+      shiftSt,
       integrationSt,
       mtplySt,
       uiSt
@@ -240,7 +248,7 @@ class ViewerMulti extends _react.default.Component {
       curveSt
     } = this.props;
     const oldEntities = prevProps.entities;
-    if (oldEntities !== entities) {
+    if (oldEntities !== entities && !isSameMultiComparison(oldEntities, entities)) {
       resetAllAct(buildResetPayload(feature, curveSt));
     }
   }
@@ -285,6 +293,7 @@ class ViewerMulti extends _react.default.Component {
       isHidden,
       resetAllAct,
       cyclicvoltaSt,
+      shiftSt,
       integrationSt,
       mtplySt,
       uiSt
@@ -292,7 +301,7 @@ class ViewerMulti extends _react.default.Component {
     const size = this.getTargetSize(layoutSt);
     this.currentSize = size;
     (0, _draw.drawDestroy)(this.rootKlass);
-    if (shouldReset) {
+    if (shouldReset && !canSkipReset(sweepExtentSt, layoutSt, feature)) {
       resetAllAct(buildResetPayload(feature, curveSt));
     }
     const {
@@ -316,6 +325,7 @@ class ViewerMulti extends _react.default.Component {
       isUiVisualSplitIntgSt,
       isUiNoBrushSt,
       cyclicvoltaSt,
+      shiftSt,
       integrationSt,
       mtplySt,
       uiSt
@@ -353,6 +363,7 @@ const mapStateToProps = (state, props) => ({
   isUiVisualSplitIntgSt: _cfg.default.showIntegSplitTools(state.layout) && state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_VISUAL_SPLIT,
   isUiNoBrushSt: _list_ui.LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
   cyclicvoltaSt: state.cyclicvolta,
+  shiftSt: state.shift,
   maxminPeakSt: (0, _chem.Feature2MaxMinPeak)(state, props),
   integrationSt: state.integration.present,
   mtplySt: state.multiplicity.present,
@@ -399,6 +410,7 @@ ViewerMulti.propTypes = {
   removeVisualSplitLineAct: _propTypes.default.func.isRequired,
   isHidden: _propTypes.default.bool,
   cyclicvoltaSt: _propTypes.default.object.isRequired,
+  shiftSt: _propTypes.default.object.isRequired,
   maxminPeakSt: _propTypes.default.object,
   addNewCylicVoltaPairPeakAct: _propTypes.default.func.isRequired,
   addCylicVoltaMaxPeakAct: _propTypes.default.func.isRequired,
