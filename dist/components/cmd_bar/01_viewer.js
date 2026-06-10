@@ -49,19 +49,16 @@ const Viewer = ({
           })
         })
       })
-    }), hideCmdAnaViewerSt ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
+    }), hideCmdAnaViewerSt || disableCmdAnaViewerSt ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
       title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
         className: "txt-sv-tp",
         children: "Analysis Viewer"
       }),
-      children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
-        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
-          className: (0, _classnames.default)((0, _common.focusStyle)(isfocusAnalysisSt, classes), 'btn-sv-bar-analysis'),
-          disabled: disableCmdAnaViewerSt,
-          onClick: onViewAnalysis,
-          children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_SpellcheckOutlined.default, {
-            className: classes.icon
-          })
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
+        className: (0, _classnames.default)((0, _common.focusStyle)(isfocusAnalysisSt, classes), 'btn-sv-bar-analysis'),
+        onClick: onViewAnalysis,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_SpellcheckOutlined.default, {
+          className: classes.icon
         })
       })
     })]

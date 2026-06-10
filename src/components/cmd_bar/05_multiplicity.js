@@ -38,6 +38,10 @@ const Multiplicity = ({
   const { curveIdx } = curveSt;
   const onClearAll = () => clearMpyAllAct({ curveIdx });
 
+  if (disableAddMpySt) {
+    return null;
+  }
+
   return (
     <span className={classes.group}>
       <Tooltip title={<span className="txt-sv-tp">Add Multiplicity</span>}>
@@ -49,7 +53,6 @@ const Multiplicity = ({
                 'btn-sv-bar-addmpy',
               )
             }
-            disabled={disableAddMpySt}
             onClick={onSweepMutAdd}
           >
             <span className={classNames(classes.txt, 'txt-sv-bar-addmpy')}>J+</span>
@@ -65,7 +68,6 @@ const Multiplicity = ({
                 'btn-sv-bar-rmmpy',
               )
             }
-            disabled={disableRmMpySt}
             onClick={onOneMutAdd}
           >
             <span className={classNames(classes.txt, 'txt-sv-bar-rmmpy')}>J-</span>
@@ -81,7 +83,6 @@ const Multiplicity = ({
                 'btn-sv-bar-addpeakmpy',
               )
             }
-            disabled={disableMpyPeakSt}
             onClick={onPeakMutAdd}
           >
             <span className={classNames(classes.txt, 'txt-sv-bar-addpeakmpy')}>JP+</span>
@@ -97,25 +98,19 @@ const Multiplicity = ({
                 'btn-sv-bar-rmpeakmpy',
               )
             }
-            disabled={disableMpyPeakSt}
             onClick={onPeakMutRm}
           >
             <span className={classNames(classes.txt, 'txt-sv-bar-rmpeakmpy')}>JP-</span>
           </MuButton>
         </span>
       </Tooltip>
-      {
-        disableAddMpySt ? null
-          :  // eslint-disable-line
-          (
-            <TriBtn
-              content={{ tp: 'Clear All Multiplicity' }}
-              cb={onClearAll}
-            >
-              <span className={classNames(classes.txt, 'txt-sv-bar-rmallmpy')}>Jx</span>
-            </TriBtn>
-          )
-      }
+      <TriBtn
+        content={{ tp: 'Clear All Multiplicity' }}
+        cb={onClearAll}
+        isClearAllDisabled={false}
+      >
+        <span className={classNames(classes.txt, 'txt-sv-bar-rmallmpy')}>Jx</span>
+      </TriBtn>
     </span>
   );
 };
