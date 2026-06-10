@@ -154,10 +154,11 @@ const buildSpectrumPayload = ({
     axesUnitsSt,
     detectorSt,
     dscMetaData,
+    feature,
     ...optionalBooleanFlags
   };
 };
-const onClickCb = (operationValue, isAscend, isIntensity, layoutSt, shiftSt, analysis, decimalSt, integrationSt, multiplicitySt, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData, curveList, editPeakSt, thresList, scanSt, feature) => () => {
+const onClickCb = (operationValue, isAscend, isIntensity, layoutSt, shiftSt, analysis, decimalSt, integrationSt, multiplicitySt, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData, curveList, editPeakSt, thresList, scanSt, feature, sweepExtentSt) => () => {
   const defaultCurves = feature ? [{
     feature
   }] : [];
@@ -199,6 +200,9 @@ const onClickCb = (operationValue, isAscend, isIntensity, layoutSt, shiftSt, ana
       curveIdx: curveSt.curveIdx
     };
   }
+  if (sweepExtentSt?.xExtent || sweepExtentSt?.yExtent) {
+    payload.sweepExtent = sweepExtentSt;
+  }
   operationValue(payload);
 };
 const BtnSubmit = ({
@@ -223,6 +227,7 @@ const BtnSubmit = ({
   axesUnitsSt,
   detectorSt,
   metaSt,
+  sweepExtentSt,
   disabled,
   className,
   children
@@ -260,7 +265,7 @@ const BtnSubmit = ({
       className: (0, _classnames.default)('btn-sv-bar-submit', className),
       color: "primary",
       disabled: disabled,
-      onClick: onClickCb(operation.value, isAscend, isIntensity, layoutSt, shiftSt, forecastSt.predictions, decimalSt, integrationSt, multiplicitySt, waveLengthSt, cyclicvoltaPayload, curveSt, axesUnitsSt, detectorSt, dscMetaData, curveList, editPeakSt, thresList, scanSt, feature),
+      onClick: onClickCb(operation.value, isAscend, isIntensity, layoutSt, shiftSt, forecastSt.predictions, decimalSt, integrationSt, multiplicitySt, waveLengthSt, cyclicvoltaPayload, curveSt, axesUnitsSt, detectorSt, dscMetaData, curveList, editPeakSt, thresList, scanSt, feature, sweepExtentSt),
       children: children || /*#__PURE__*/(0, _jsxRuntime.jsx)(_PlayCircleOutline.default, {
         className: classes.icon
       })
@@ -285,7 +290,8 @@ const mapStateToProps = (state, props) => (
   curveList: state.curve.listCurves,
   axesUnitsSt: state.axesUnits,
   detectorSt: state.detector,
-  metaSt: state.meta
+  metaSt: state.meta,
+  sweepExtentSt: state.ui.sweepExtent
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({}, dispatch);
 BtnSubmit.propTypes = {

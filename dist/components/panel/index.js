@@ -99,7 +99,7 @@ class PanelViewer extends _react.default.Component {
     const {
       listCurves
     } = curveSt;
-    const hideGraphSelection = listCurves === false || listCurves === undefined;
+    const hideGraphSelection = !Array.isArray(listCurves);
     return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
       className: (0, _classnames.default)(classes.panels),
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_styles.StyledEngineProvider, {
@@ -129,7 +129,7 @@ class PanelViewer extends _react.default.Component {
           }), _cfg.default.hidePanelMpy(layoutSt) ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_multiplicity.default, {
             expand: isExpanded('mpy'),
             onExapnd: onExapndMpy
-          }), _cfg.default.hidePanelCompare(layoutSt) || listCurves.length > 1 ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_compare.default, {
+          }), _cfg.default.hidePanelCompare(layoutSt) || !listCurves || listCurves.length > 1 ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_compare.default, {
             expand: isExpanded('compare'),
             onExapnd: onExapndCompare
           }), _cfg.default.hidePanelCyclicVolta(layoutSt) || hideCyclicVolta ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_cyclic_voltamery_data.default, {

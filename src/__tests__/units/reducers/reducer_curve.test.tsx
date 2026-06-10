@@ -58,6 +58,24 @@ describe('Test redux curve reducer', () => {
     expect(maxminPeak).toBeNull()
   })
 
+  it('Preserves the selected curve index when reloading all curves', () => {
+    action.type = CURVE.SET_ALL_CURVES
+    const entity = ExtractJcamp(nmr1HJcamp)
+    curveState = { listCurves: [], curveIdx: 2 }
+    action.payload = [ entity, entity, entity ]
+    const { curveIdx } = curveReducer(curveState, action)
+    expect(curveIdx).toEqual(2)
+  })
+
+  it('Uses an explicit curve index when provided', () => {
+    action.type = CURVE.SET_ALL_CURVES
+    const entity = ExtractJcamp(nmr1HJcamp)
+    curveState = { listCurves: [], curveIdx: 0 }
+    action.payload = { entities: [ entity, entity, entity ], curveIdx: 1 }
+    const { curveIdx } = curveReducer(curveState, action)
+    expect(curveIdx).toEqual(1)
+  })
+
   it('Toggle show all curves', () => {
     action.type = CURVE.SET_SHOULD_SHOW_ALL_CURVES
     action.payload = true

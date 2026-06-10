@@ -13,6 +13,7 @@ var _compass = require("../../helpers/compass");
 var _list_layout = require("../../constants/list_layout");
 var _format = _interopRequireDefault(require("../../helpers/format"));
 var _chem = require("../../helpers/chem");
+var _shift = require("../../helpers/shift");
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 var _focus = require("../../helpers/focus");
 var _integration = require("../../helpers/integration");
@@ -190,7 +191,7 @@ class MultiFocus {
   transformYValue(y) {
     return y * this.yTransformFactor;
   }
-  setDataParams(filterSeed, peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt, jcampIdx = 0) {
+  setDataParams(filterSeed, peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt, shiftSt, jcampIdx = 0) {
     this.data = [];
     this.otherLineData = [];
     let filterSubLayoutValue = null;
@@ -202,7 +203,7 @@ class MultiFocus {
         feature,
         color
       } = entry;
-      const offset = (0, _chem.GetCyclicVoltaPreviousShift)(cyclicvoltaSt, jcampIdx);
+      const offset = _format.default.isCyclicVoltaLayout(layout) ? (0, _chem.GetCyclicVoltaPreviousShift)(cyclicvoltaSt, idx) : (0, _shift.shiftOffsetAtIndex)(shiftSt, idx);
       let currData = (0, _chem.convertTopic)(topic, layout, feature, offset);
       if (idx === jcampIdx) {
         if (!_format.default.isCyclicVoltaLayout(layout)) {
@@ -720,36 +721,11 @@ class MultiFocus {
       multiplicities
     } = mtplySt;
     const selectedMulti = multiplicities[this.jcampIdx];
-    if (selectedMulti === false || selectedMulti === undefined) {
-      const mpys = [];
-      const mpyb = this.tags.mpybPath.selectAll('path').data(mpys);
-      mpyb.exit().attr('class', 'exit').remove();
-      const mpyt1 = this.tags.mpyt1Path.selectAll('text').data(mpys);
-      mpyt1.exit().attr('class', 'exit').remove();
-      const mpyt2 = this.tags.mpyt2Path.selectAll('text').data(mpys);
-      mpyt2.exit().attr('class', 'exit').remove();
-      let mPeaks = mpys.map(m => {
-        const {
-          peaks,
-          xExtent
-        } = m;
-        return peaks.map(p => Object.assign({}, p, {
-          xExtent
-        }));
-      });
-      mPeaks = [].concat(...mPeaks);
-      const mpyp = this.tags.mpypPath.selectAll('path').data(mPeaks);
-      mpyp.exit().attr('class', 'exit').remove();
-      return;
-    }
-    const {
-      stack,
-      smExtext,
-      shift
-    } = selectedMulti;
-    const mpys = stack;
     const isDisable = _cfg.default.btnCmdMpy(this.layout);
-    if (mpys === 0 || isDisable) return;
+    const hasMpy = !isDisable && selectedMulti?.stack?.length > 0;
+    const mpys = hasMpy ? selectedMulti.stack : [];
+    const smExtext = hasMpy ? selectedMulti.smExtext : false;
+    const shift = hasMpy ? selectedMulti.shift : 0;
     // rescale for zoom
     const {
       xt
@@ -886,6 +862,7 @@ class MultiFocus {
     sweepExtentSt,
     isUiNoBrushSt,
     cyclicvoltaSt,
+    shiftSt,
     integationSt,
     mtplySt
   }) {
@@ -901,7 +878,7 @@ class MultiFocus {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt));
     this.setTip();
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, shiftSt, jcampIdx);
     (0, _compass.MountCompass)(this);
     this.axis = (0, _mount.MountAxis)(this);
     this.path = (0, _mount.MountPath)(this, this.pathColor);
@@ -938,6 +915,7 @@ class MultiFocus {
     sweepExtentSt,
     isUiNoBrushSt,
     cyclicvoltaSt,
+    shiftSt,
     integationSt,
     mtplySt
   }) {
@@ -950,7 +928,7 @@ class MultiFocus {
     const jcampIdx = curveIdx;
     this.isShowAllCurves = isShowAllCurve;
     this.entities = entities;
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, shiftSt, jcampIdx);
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);
       this.getShouldUpdate(editPeakSt);

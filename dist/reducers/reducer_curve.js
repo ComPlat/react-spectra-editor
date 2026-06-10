@@ -16,12 +16,41 @@ const initialState = {
   curveIdx: 0,
   isShowAllCurve: false
 };
+const normalizeSetAllCurvesPayload = payload => {
+  if (Array.isArray(payload)) {
+    return {
+      entities: payload,
+      curveIdx: undefined
+    };
+  }
+  if (payload && Array.isArray(payload.entities)) {
+    return {
+      entities: payload.entities,
+      curveIdx: payload.curveIdx
+    };
+  }
+  return {
+    entities: null,
+    curveIdx: undefined
+  };
+};
+const resolveCurveIdx = (entitiesLength, state, explicitIdx) => {
+  if (Number.isFinite(explicitIdx)) {
+    const maxIdx = Math.max(0, entitiesLength - 1);
+    return Math.min(Math.max(0, explicitIdx), maxIdx);
+  }
+  if (state.curveIdx >= 0 && state.curveIdx < entitiesLength) {
+    return state.curveIdx;
+  }
+  return 0;
+};
 const setAllCurves = (state, action) => {
   const {
-    payload
-  } = action;
-  if (payload) {
-    const entities = payload.map((entity, idx) => {
+    entities,
+    curveIdx: explicitIdx
+  } = normalizeSetAllCurvesPayload(action.payload);
+  if (entities) {
+    const listCurves = entities.map((entity, idx) => {
       const {
         topic,
         feature,
@@ -31,7 +60,6 @@ const setAllCurves = (state, action) => {
       } = (0, _extractParams.extractParams)(entity, {
         isEdit: true
       });
-      // const layout = entity.layout;
       const {
         layout
       } = entity;
@@ -49,14 +77,15 @@ const setAllCurves = (state, action) => {
         curveIdx: idx
       };
     });
+    const curveIdx = resolveCurveIdx(entities.length, state, explicitIdx);
     return Object.assign({}, state, {
-      curveIdx: 0,
-      listCurves: entities
+      curveIdx,
+      listCurves
     });
   }
   return Object.assign({}, state, {
     curveIdx: 0,
-    listCurves: payload
+    listCurves: entities
   });
 };
 const curveReducer = (state = initialState, action) => {

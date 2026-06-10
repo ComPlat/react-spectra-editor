@@ -55,21 +55,7 @@ const getShiftOffset = (state, _) => {
   if (layout === _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY && cyclicvolta) {
     return GetCyclicVoltaShiftOffset(cyclicvolta, curveIdx);
   }
-  const {
-    shift
-  } = state;
-  const {
-    shifts
-  } = shift;
-  const selectedShift = shifts[curveIdx];
-  if (!selectedShift) {
-    return 0.0;
-  }
-  const {
-    ref,
-    peak
-  } = selectedShift;
-  return (0, _shift.FromManualToOffset)(ref, peak);
+  return (0, _shift.shiftOffsetAtIndex)(state.shift, curveIdx);
 };
 const calcXYK = (xs, ys, maxY, offset) => {
   const sp = [];

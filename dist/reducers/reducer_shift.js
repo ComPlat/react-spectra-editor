@@ -71,9 +71,7 @@ const resetShift = (state, action) => {
     curveIdx,
     numberOfCurve
   } = curvesInfo;
-  const {
-    shifts
-  } = state;
+  const shifts = [...state.shifts];
   let selectedShift = shifts[curveIdx];
   if (selectedShift === false || selectedShift === undefined) {
     selectedShift = defaultEmptyShift;
@@ -237,7 +235,11 @@ const shiftReducer = (state = initialState, action) => {
       return updateShift(initialState, action);
     case _action_type.MANAGER.RESETSHIFT:
       // case MANAGER.RESETALL:
-      return resetShift(initialState, action);
+      return resetShift(state, action);
+    case _action_type.CURVE.SELECT_WORKING_CURVE:
+      return Object.assign({}, state, {
+        selectedIdx: action.payload
+      });
     default:
       return state;
   }

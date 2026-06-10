@@ -110,7 +110,7 @@ class PanelViewer extends React.Component {
             />
             { Cfg.hidePanelPeak(layoutSt) ? null : <PeakPanel expand={isExpanded('peak')} onExapnd={onExpandPeak} /> }
             { Cfg.hidePanelMpy(layoutSt) ? null : <MultiplicityPanel expand={isExpanded('mpy')} onExapnd={onExpandMpy} /> }
-            { (Cfg.hidePanelCompare(layoutSt) || listCurves.length > 1) ? null : <ComparePanel expand={isExpanded('compare')} onExapnd={onExpandCompare} /> }
+            { (Cfg.hidePanelCompare(layoutSt) || !listCurves || listCurves.length > 1) ? null : <ComparePanel expand={isExpanded('compare')} onExapnd={onExpandCompare} /> }
             { (Cfg.hidePanelCyclicVolta(layoutSt) || hideCyclicVolta) ? null : (
               <CyclicVoltammetryPanel
                 jcampIdx={jcampIdx}

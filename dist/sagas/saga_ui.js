@@ -165,19 +165,21 @@ function* clickUiTarget(action) {
     payload,
     onPeak,
     voltammetryPeakIdx,
-    onPecker
+    onPecker,
+    jcampIdx
   } = action;
   const uiSweepType = yield (0, _effects.select)(getUiSweepType);
   const curveSt = yield (0, _effects.select)(getCurveSt);
   const {
     curveIdx
   } = curveSt;
+  const targetCurveIdx = Number.isFinite(jcampIdx) ? jcampIdx : curveIdx;
   if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.PEAK_ADD && !onPeak) {
     yield (0, _effects.put)({
       type: _action_type.EDITPEAK.ADD_POSITIVE,
       payload: {
         dataToAdd: payload,
-        curveIdx
+        curveIdx: targetCurveIdx
       }
     });
   } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.PEAK_DELETE && onPeak) {
@@ -185,7 +187,7 @@ function* clickUiTarget(action) {
       type: _action_type.EDITPEAK.ADD_NEGATIVE,
       payload: {
         dataToAdd: payload,
-        curveIdx
+        curveIdx: targetCurveIdx
       }
     });
   } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT && onPeak) {
@@ -193,7 +195,7 @@ function* clickUiTarget(action) {
       type: _action_type.SHIFT.SET_PEAK,
       payload: {
         dataToSet: payload,
-        curveIdx
+        curveIdx: targetCurveIdx
       }
     });
   } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_RM && onPeak) {
@@ -201,7 +203,7 @@ function* clickUiTarget(action) {
       type: _action_type.INTEGRATION.RM_ONE,
       payload: {
         dataToRemove: payload,
-        curveIdx
+        curveIdx: targetCurveIdx
       }
     });
   } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_RM && onPeak) {
@@ -209,7 +211,7 @@ function* clickUiTarget(action) {
       type: _action_type.INTEGRATION.RM_ONE,
       payload: {
         dataToRemove: payload,
-        curveIdx
+        curveIdx: targetCurveIdx
       }
     });
   } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF && onPeak) {
@@ -217,7 +219,7 @@ function* clickUiTarget(action) {
       type: _action_type.INTEGRATION.SET_REF,
       payload: {
         refData: payload,
-        curveIdx
+        curveIdx: targetCurveIdx
       }
     });
   } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_CLICK && onPeak) {
@@ -231,7 +233,7 @@ function* clickUiTarget(action) {
         type: _action_type.MULTIPLICITY.ONE_CLICK_BY_UI,
         payload: {
           payloadData: xExtent,
-          curveIdx
+          curveIdx: targetCurveIdx
         }
       });
     } else if (xL && xU) {
@@ -242,7 +244,7 @@ function* clickUiTarget(action) {
             xL,
             xU
           },
-          curveIdx
+          curveIdx: targetCurveIdx
         }
       });
     }
@@ -262,7 +264,7 @@ function* clickUiTarget(action) {
       payload: {
         peak: payload,
         index: voltammetryPeakIdx,
-        jcampIdx: curveIdx
+        jcampIdx: targetCurveIdx
       }
     });
   } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MAX_PEAK && onPeak) {
@@ -270,7 +272,7 @@ function* clickUiTarget(action) {
       type: _action_type.CYCLIC_VOLTA_METRY.REMOVE_MAX_PEAK,
       payload: {
         index: voltammetryPeakIdx,
-        jcampIdx: curveIdx
+        jcampIdx: targetCurveIdx
       }
     });
   } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_MIN_PEAK && !onPeak) {
@@ -279,7 +281,7 @@ function* clickUiTarget(action) {
       payload: {
         peak: payload,
         index: voltammetryPeakIdx,
-        jcampIdx: curveIdx
+        jcampIdx: targetCurveIdx
       }
     });
   } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_MIN_PEAK && onPeak) {
@@ -287,7 +289,7 @@ function* clickUiTarget(action) {
       type: _action_type.CYCLIC_VOLTA_METRY.REMOVE_MIN_PEAK,
       payload: {
         index: voltammetryPeakIdx,
-        jcampIdx: curveIdx
+        jcampIdx: targetCurveIdx
       }
     });
   } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_ADD_PECKER && !onPecker) {
@@ -296,7 +298,7 @@ function* clickUiTarget(action) {
       payload: {
         peak: payload,
         index: voltammetryPeakIdx,
-        jcampIdx: curveIdx
+        jcampIdx: targetCurveIdx
       }
     });
   } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_RM_PECKER && onPecker) {
@@ -304,7 +306,7 @@ function* clickUiTarget(action) {
       type: _action_type.CYCLIC_VOLTA_METRY.REMOVE_PECKER,
       payload: {
         index: voltammetryPeakIdx,
-        jcampIdx: curveIdx
+        jcampIdx: targetCurveIdx
       }
     });
   } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.CYCLIC_VOLTA_SET_REF && onPeak) {
@@ -312,7 +314,7 @@ function* clickUiTarget(action) {
       type: _action_type.CYCLIC_VOLTA_METRY.SET_REF,
       payload: {
         index: voltammetryPeakIdx,
-        jcampIdx: curveIdx
+        jcampIdx: targetCurveIdx
       }
     });
   }

@@ -28,6 +28,12 @@ const buildResetPayload = (feature, curveSt) => ({
   ...feature,
   curveIdx: curveSt.curveIdx
 });
+const hasActiveZoom = sweepExtentSt => {
+  if (!sweepExtentSt) return false;
+  return !!(sweepExtentSt.xExtent || sweepExtentSt.yExtent);
+};
+const canSkipReset = (sweepExtentSt, layoutSt, feature) => hasActiveZoom(sweepExtentSt) && layoutSt === feature?.operation?.layout;
+const isSameMultiComparison = (oldEntities, newEntities) => Array.isArray(oldEntities) && Array.isArray(newEntities) && oldEntities.length > 0 && oldEntities.length === newEntities.length;
 class ViewerMulti extends _react.default.Component {
   constructor(props) {
     super(props);
@@ -72,12 +78,15 @@ class ViewerMulti extends _react.default.Component {
       isHidden,
       resetAllAct,
       cyclicvoltaSt,
+      shiftSt,
       integationSt,
       mtplySt,
       axesUnitsSt
     } = this.props;
     (0, _draw.drawDestroy)(this.rootKlass);
-    resetAllAct(buildResetPayload(feature, curveSt));
+    if (!canSkipReset(sweepExtentSt, layoutSt, feature)) {
+      resetAllAct(buildResetPayload(feature, curveSt));
+    }
     let xxLabel = xLabel;
     let yyLabel = yLabel;
     if (axesUnitsSt) {
@@ -120,6 +129,7 @@ class ViewerMulti extends _react.default.Component {
       sweepExtentSt,
       isUiNoBrushSt,
       cyclicvoltaSt,
+      shiftSt,
       integationSt,
       mtplySt
     });
@@ -144,6 +154,7 @@ class ViewerMulti extends _react.default.Component {
       isUiNoBrushSt,
       isHidden,
       cyclicvoltaSt,
+      shiftSt,
       integationSt,
       mtplySt,
       axesUnitsSt
@@ -194,6 +205,7 @@ class ViewerMulti extends _react.default.Component {
       sweepExtentSt,
       isUiNoBrushSt,
       cyclicvoltaSt,
+      shiftSt,
       integationSt,
       mtplySt
     });
@@ -259,7 +271,7 @@ class ViewerMulti extends _react.default.Component {
       curveSt
     } = this.props;
     const oldEntities = prevProps.entities;
-    if (oldEntities !== entities) {
+    if (oldEntities !== entities && !isSameMultiComparison(oldEntities, entities)) {
       resetAllAct(buildResetPayload(feature, curveSt));
     }
   }
@@ -281,6 +293,7 @@ class ViewerMulti extends _react.default.Component {
       isHidden,
       resetAllAct,
       cyclicvoltaSt,
+      shiftSt,
       integationSt,
       mtplySt,
       axesUnitsSt,
@@ -292,7 +305,7 @@ class ViewerMulti extends _react.default.Component {
     const size = this.getTargetSize(layoutSt);
     this.currentSize = size;
     (0, _draw.drawDestroy)(this.rootKlass);
-    if (shouldReset) {
+    if (shouldReset && !canSkipReset(sweepExtentSt, layoutSt, feature)) {
       resetAllAct(buildResetPayload(feature, curveSt));
     }
     let xxLabel = xLabel;
@@ -340,6 +353,7 @@ class ViewerMulti extends _react.default.Component {
       sweepExtentSt,
       isUiNoBrushSt,
       cyclicvoltaSt,
+      shiftSt,
       integationSt,
       mtplySt
     });
@@ -372,6 +386,7 @@ const mapStateToProps = (state, props) => ({
   sweepExtentSt: state.ui.sweepExtent,
   isUiNoBrushSt: _list_ui.LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
   cyclicvoltaSt: state.cyclicvolta,
+  shiftSt: state.shift,
   maxminPeakSt: (0, _chem.Feature2MaxMinPeak)(state, props),
   integationSt: state.integration.present,
   mtplySt: state.multiplicity.present,
@@ -408,6 +423,7 @@ ViewerMulti.propTypes = {
   scrollUiWheelAct: _propTypes.default.func.isRequired,
   isHidden: _propTypes.default.bool,
   cyclicvoltaSt: _propTypes.default.object.isRequired,
+  shiftSt: _propTypes.default.object.isRequired,
   maxminPeakSt: _propTypes.default.object,
   addNewCylicVoltaPairPeakAct: _propTypes.default.func.isRequired,
   addCylicVoltaMaxPeakAct: _propTypes.default.func.isRequired,

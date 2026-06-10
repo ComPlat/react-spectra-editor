@@ -479,14 +479,11 @@ class LineFocus {
       multiplicities
     } = mtplySt;
     const selectedMulti = multiplicities[selectedIdx];
-    const {
-      stack,
-      smExtext,
-      shift
-    } = selectedMulti;
-    const mpys = stack;
     const isDisable = _cfg.default.btnCmdMpy(this.layout);
-    if (mpys === 0 || isDisable) return;
+    const hasMpy = !isDisable && selectedMulti?.stack?.length > 0;
+    const mpys = hasMpy ? selectedMulti.stack : [];
+    const smExtext = hasMpy ? selectedMulti.smExtext : false;
+    const shift = hasMpy ? selectedMulti.shift : 0;
     // rescale for zoom
     const {
       xt

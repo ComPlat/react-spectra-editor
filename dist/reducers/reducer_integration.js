@@ -4,7 +4,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.integrationReducer = exports.default = void 0;
 var _reduxUndo = _interopRequireDefault(require("redux-undo"));
 var _action_type = require("../constants/action_type");
 var _integration = require("../helpers/integration");
@@ -170,18 +170,25 @@ const setFkr = (state, action) => {
 };
 const setShift = (state, action) => {
   const {
-    selectedIdx,
     integrations
   } = state;
-  const selectedIntegration = integrations[selectedIdx];
-  const shift = action.payload.prevOffset;
+  const {
+    prevOffset,
+    curveIdx
+  } = action.payload;
+  const targetIdx = Number.isFinite(curveIdx) ? curveIdx : state.selectedIdx;
+  let selectedIntegration = integrations[targetIdx];
+  if (selectedIntegration === false || selectedIntegration === undefined) {
+    selectedIntegration = defaultEmptyIntegration;
+  }
   const newIntegration = Object.assign({}, selectedIntegration, {
-    shift
+    shift: prevOffset
   });
   const newArrIntegration = [...integrations];
-  newArrIntegration[selectedIdx] = newIntegration;
+  newArrIntegration[targetIdx] = newIntegration;
   return Object.assign({}, state, {
-    integrations: newArrIntegration
+    integrations: newArrIntegration,
+    selectedIdx: targetIdx
   });
 };
 const resetAll = (state, action) => {
@@ -224,11 +231,16 @@ const integrationReducer = (state = initialState, action) => {
       return clearAll(state, action);
     case _action_type.EDITPEAK.SHIFT:
       return setShift(state, action);
+    case _action_type.CURVE.SELECT_WORKING_CURVE:
+      return Object.assign({}, state, {
+        selectedIdx: action.payload
+      });
     case _action_type.MANAGER.RESETALL:
       return state;
     default:
       return _undo_redo_config.undoRedoActions.indexOf(action.type) >= 0 ? Object.assign({}, state) : state;
   }
 };
+exports.integrationReducer = integrationReducer;
 const undoableIntegrationReducer = (0, _reduxUndo.default)(integrationReducer, _undo_redo_config.undoRedoConfig);
 var _default = exports.default = undoableIntegrationReducer;

@@ -24,6 +24,7 @@ import Format from '../../helpers/format';
 import {
   GetCyclicVoltaPreviousShift, convertTopic,
 } from '../../helpers/chem';
+import { shiftOffsetAtIndex } from '../../helpers/shift';
 import Cfg from '../../helpers/cfg';
 import { itgIdTag, mpyIdTag } from '../../helpers/focus';
 import {
@@ -201,7 +202,7 @@ class MultiFocus {
     return y * this.yTransformFactor;
   }
 
-  setDataParams(filterSeed, peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt, jcampIdx = 0) {
+  setDataParams(filterSeed, peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt, shiftSt, jcampIdx = 0) {
     this.data = [];
     this.otherLineData = [];
     let filterSubLayoutValue = null;
@@ -211,7 +212,9 @@ class MultiFocus {
 
     this.entities.forEach((entry, idx) => {
       const { topic, feature, color } = entry;
-      const offset = GetCyclicVoltaPreviousShift(cyclicvoltaSt, jcampIdx);
+      const offset = Format.isCyclicVoltaLayout(layout)
+        ? GetCyclicVoltaPreviousShift(cyclicvoltaSt, idx)
+        : shiftOffsetAtIndex(shiftSt, idx);
       let currData = convertTopic(topic, layout, feature, offset);
       if (idx === jcampIdx) {
         if (!Format.isCyclicVoltaLayout(layout)) {
@@ -819,42 +822,16 @@ class MultiFocus {
     const { multiplicities } = mtplySt;
     const selectedMulti = multiplicities[this.jcampIdx];
 
-    if (selectedMulti === false || selectedMulti === undefined) {
-      const mpys = [];
-      const mpyb = this.tags.mpybPath.selectAll('path').data(mpys);
-      mpyb.exit()
-        .attr('class', 'exit')
-        .remove();
-      const mpyt1 = this.tags.mpyt1Path.selectAll('text').data(mpys);
-      mpyt1.exit()
-        .attr('class', 'exit')
-        .remove();
-      const mpyt2 = this.tags.mpyt2Path.selectAll('text').data(mpys);
-      mpyt2.exit()
-        .attr('class', 'exit')
-        .remove();
-      let mPeaks = mpys.map((m) => {
-        const { peaks, xExtent } = m;
-        return peaks.map((p) => Object.assign({}, p, { xExtent }));
-      });
-      mPeaks = [].concat(...mPeaks);
-      const mpyp = this.tags.mpypPath.selectAll('path').data(mPeaks);
-      mpyp.exit()
-        .attr('class', 'exit')
-        .remove();
-      return;
-    }
-
-    const {
-      stack = [], smExtext = false, shift = 0,
-    } = selectedMulti || {};
+    const isDisable = Cfg.btnCmdMpy(this.layout);
+    const hasMpy = !isDisable && selectedMulti?.stack?.length > 0;
+    const mpys = hasMpy ? selectedMulti.stack : [];
+    const smExtext = hasMpy ? selectedMulti.smExtext : false;
+    const shift = hasMpy ? selectedMulti.shift : 0;
     const hasValidExtent = (extent) => (
       extent
       && Number.isFinite(extent.xL)
       && Number.isFinite(extent.xU)
     );
-    const mpys = stack.filter((m) => hasValidExtent(m?.xExtent));
-    const isDisable = Cfg.btnCmdMpy(this.layout);
     if (mpys.length === 0 || isDisable) return;
     const activeExtent = hasValidExtent(smExtext) ? smExtext : mpys[0].xExtent;
     // rescale for zoom
@@ -1093,7 +1070,7 @@ class MultiFocus {
     filterSeed, filterPeak, tTrEndPts, tSfPeaks,
     editPeakSt, layoutSt,
     sweepExtentSt, isUiAddIntgSt, isUiSplitIntgSt, isUiVisualSplitIntgSt, isUiNoBrushSt,
-    cyclicvoltaSt,
+    cyclicvoltaSt, shiftSt,
     integrationSt, mtplySt, uiSt,
   }) {
     this.uiSt = uiSt;
@@ -1109,7 +1086,7 @@ class MultiFocus {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, this.reverseXAxis(layoutSt));
     this.setTip();
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, shiftSt, jcampIdx);
     Object.assign(this, { isUiSplitIntgSt, isUiVisualSplitIntgSt });
     if (!isUiSplitIntgSt && !isUiVisualSplitIntgSt) this.clearSplitPreview();
     MountCompass(this);
@@ -1143,7 +1120,7 @@ class MultiFocus {
     entities, curveSt,
     filterSeed, filterPeak, tTrEndPts, tSfPeaks,
     editPeakSt, layoutSt,
-    sweepExtentSt, isUiAddIntgSt, isUiSplitIntgSt, isUiVisualSplitIntgSt, isUiNoBrushSt, cyclicvoltaSt,
+    sweepExtentSt, isUiAddIntgSt, isUiSplitIntgSt, isUiVisualSplitIntgSt, isUiNoBrushSt, cyclicvoltaSt, shiftSt,
     integrationSt, mtplySt, uiSt,
   }) {
     this.uiSt = uiSt;
@@ -1156,7 +1133,7 @@ class MultiFocus {
     this.isShowAllCurves = isShowAllCurve;
     this.entities = entities;
 
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, shiftSt, jcampIdx);
     Object.assign(this, { isUiSplitIntgSt, isUiVisualSplitIntgSt });
     if (!isUiSplitIntgSt && !isUiVisualSplitIntgSt) this.clearSplitPreview();
 

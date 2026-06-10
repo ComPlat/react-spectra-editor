@@ -10,31 +10,15 @@ var _chem = require("./chem");
 var _shift = require("./shift");
 var _format = _interopRequireDefault(require("./format"));
 var _integration = require("./integration");
-const niOffset = (shiftSt, atIndex = 0) => {
-  const {
-    shifts
-  } = shiftSt;
-  const selectedShift = shifts[atIndex];
-  if (!selectedShift) {
-    return 0;
-  }
-  const {
-    ref,
-    peak
-  } = selectedShift;
-  const offset = (0, _shift.FromManualToOffset)(ref, peak);
-  return offset;
-};
-const msOffset = () => 0;
 const extractPeaksEdit = (feature, editPeakSt, thresSt, shiftSt, layoutSt, atIndex = 0) => {
-  const offset = _format.default.isMsLayout(layoutSt) ? msOffset() : niOffset(shiftSt, atIndex);
+  const offset = _format.default.isMsLayout(layoutSt) ? 0 : (0, _shift.shiftOffsetAtIndex)(shiftSt, atIndex);
   const peaks = (0, _chem.Convert2Peak)(feature, thresSt.value, offset);
   const peaksEdit = (0, _converter.PksEdit)(peaks, editPeakSt);
   return peaksEdit;
 };
 exports.extractPeaksEdit = extractPeaksEdit;
 const extractAutoPeaks = (feature, thresSt, shiftSt, layoutSt, atIndex = 0) => {
-  const offset = _format.default.isMsLayout(layoutSt) ? msOffset() : niOffset(shiftSt, atIndex);
+  const offset = _format.default.isMsLayout(layoutSt) ? 0 : (0, _shift.shiftOffsetAtIndex)(shiftSt, atIndex);
   const peaks = (0, _chem.Convert2Peak)(feature, thresSt.value, offset);
   return peaks;
 };

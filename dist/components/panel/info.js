@@ -21,6 +21,7 @@ var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable no-mixed-operators, react/function-component-definition,
 react/require-default-props, max-len */
 
+const ELECTRON_MASS = 0.000548579909065;
 const styles = () => ({
   chip: {
     margin: '1px 0 1px 0'
@@ -74,10 +75,15 @@ const styles = () => ({
   },
   rowOddSim: {
     backgroundColor: '#fff',
-    height: 108,
+    height: 'auto',
+    minHeight: 36,
     lineHeight: '24px',
-    overflowY: 'hidden',
+    overflow: 'visible',
     overflowWrap: 'word-break'
+  },
+  simPlaceholder: {
+    color: 'rgba(0, 0, 0, 0.54)',
+    fontStyle: 'italic'
   },
   tHead: {
     fontWeight: 'bold',
@@ -111,11 +117,20 @@ const styles = () => ({
   }
 });
 const simTitle = () => 'Simulated signals from NMRshiftDB';
-const simContent = nmrSimPeaks => nmrSimPeaks && nmrSimPeaks.sort((a, b) => a - b).join(', ');
+const simContent = nmrSimPeaks => {
+  if (!Array.isArray(nmrSimPeaks) || nmrSimPeaks.length === 0) return '';
+  return [...nmrSimPeaks].sort((a, b) => a - b).join(', ');
+};
+const simPlaceholder = () => 'No simulated signals available.';
 const normalizeQuillValue = val => {
   if (!val) return '';
   if (val === '<p><br></p>' || val === '<p></p>') return '';
   return val;
+};
+const formatMsExactMass = exactMass => {
+  const neutralMass = parseFloat(exactMass);
+  if (Number.isNaN(neutralMass)) return null;
+  return (neutralMass - ELECTRON_MASS).toFixed(6);
 };
 const chemSubStyle = {
   fontSize: '0.85em',
@@ -149,31 +164,6 @@ const renderReadableSubscript = (txt = '') => {
 const handleDescriptionChanged = (content, delta, source, editor, onDescriptionChanged) => {
   if (!onDescriptionChanged) return;
   onDescriptionChanged(normalizeQuillValue(content), delta, source, editor);
-};
-const aucValue = integration => {
-  if (!integration) {
-    return '';
-  }
-  const values = [];
-  const stackIntegration = integration.stack;
-  if (Array.isArray(stackIntegration)) {
-    let sumVal = 0.0;
-    stackIntegration.forEach(inte => {
-      if (inte.absoluteArea) {
-        sumVal += inte.absoluteArea;
-      }
-    });
-    sumVal = sumVal.toFixed(2);
-    stackIntegration.forEach(inte => {
-      if (inte.absoluteArea) {
-        const areaVal = inte.absoluteArea.toFixed(2);
-        const percent = (areaVal * 100 / sumVal).toFixed(2);
-        const valStr = areaVal + " (" + percent + "%)"; // eslint-disable-line
-        values.push(valStr);
-      }
-    });
-  }
-  return values.join(', ');
 };
 const SECData = ({
   classes,
@@ -325,6 +315,7 @@ const InfoPanel = ({
   updateDSCMetaDataAct
 }) => {
   if (!feature) return null;
+  const msExactMass = _format.default.isMsLayout(layoutSt) && exactMass ? formatMsExactMass(exactMass) : null;
   const {
     title,
     observeFrequency,
@@ -363,6 +354,7 @@ const InfoPanel = ({
   if (integration) {
     originStack = integration.originStack; // eslint-disable-line
   }
+  const simulatedSignals = simContent(simulationSt.nmrSimPeaks);
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Accordion, {
     "data-testid": "PanelInfo",
     expanded: expand,
@@ -419,14 +411,14 @@ const InfoPanel = ({
           className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
           children: renderReadableSubscript(showSolvName)
         })]
-      }) : null, _format.default.isMsLayout(layoutSt) && exactMass ? /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+      }) : null, msExactMass ? /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
         className: (0, _classnames.default)(classes.rowRoot, classes.rowOdd),
         children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
           className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt'),
-          children: "Exact mass: "
+          children: "Exact mass (M+): "
         }), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
           className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
-          children: `${parseFloat(exactMass).toFixed(6)} g/mol`
+          children: `${msExactMass} g/mol`
         })]
       }) : null, /*#__PURE__*/(0, _jsxRuntime.jsx)(SECData, {
         classes: classes,
@@ -444,7 +436,7 @@ const InfoPanel = ({
           children: "Area under curve (AUC):"
         }), /*#__PURE__*/(0, _jsxRuntime.jsx)("br", {}), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
           className: (0, _classnames.default)(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt'),
-          children: aucValue(integration)
+          children: _format.default.formatHplcAucPanel(integration, feature)
         })]
       }) : null, /*#__PURE__*/(0, _jsxRuntime.jsx)(DSCData, {
         classes: classes,
@@ -475,8 +467,8 @@ const InfoPanel = ({
         }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
           className: (0, _classnames.default)(classes.rowRoot, classes.rowOddSim),
           children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
-            className: (0, _classnames.default)(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt'),
-            children: simContent(simulationSt.nmrSimPeaks)
+            className: (0, _classnames.default)(classes.tTxt, classes.tTxtSim, !simulatedSignals && classes.simPlaceholder, 'txt-sv-panel-txt'),
+            children: simulatedSignals || simPlaceholder()
           })
         })]
       }) : null]

@@ -48,6 +48,13 @@ const scrollUiWheel = (payload) => (
   }
 );
 
+const restoreSweepExtent = (payload) => (
+  {
+    type: UI.SWEEP.SELECT_ZOOMIN,
+    payload,
+  }
+);
+
 const clickUiTarget = (
   payload,
   onPeak,
@@ -75,6 +82,7 @@ export {
   setUiSweepType,
   selectUiSweep,
   scrollUiWheel,
+  restoreSweepExtent,
   clickUiTarget,
   displaySubViewerAt,
 };

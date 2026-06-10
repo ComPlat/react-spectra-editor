@@ -25,29 +25,37 @@ const styles = () => ({
     backgroundColor: '#eee',
     height: 22
   },
-  curve: {
-    width: '100%'
-  },
-  line: {
-    height: '2px',
-    borderWidth: '0',
-    margin: '0'
+  curveItem: {
+    display: 'flex',
+    alignItems: 'center',
+    width: '100%',
+    fontSize: '0.8em',
+    padding: '6px 8px',
+    margin: 0,
+    cursor: 'pointer'
   },
   curveDefault: {
-    backgroundColor: '#fff',
-    fontSize: '0.8em',
-    margin: '0',
-    padding: '10px 2px 2px 10px',
-    maxWidth: '95%',
-    overflowWrap: 'anywhere'
+    backgroundColor: '#fff'
   },
   curveSelected: {
-    backgroundColor: '#2196f3',
-    fontSize: '0.8em',
-    color: '#fff',
-    padding: '10px 2px 2px 10px',
-    maxWidth: '95%',
+    backgroundColor: '#e0e0e0'
+  },
+  curveIndex: {
+    flexShrink: 0,
+    marginRight: '4px',
+    fontStyle: 'italic'
+  },
+  curveLabel: {
+    flexShrink: 0,
+    marginRight: '8px',
     overflowWrap: 'anywhere'
+  },
+  colorBar: {
+    flex: 1,
+    height: '6px',
+    borderRadius: '1px',
+    minWidth: '24px',
+    alignSelf: 'center'
   }
 });
 const fallbackName = (entityFileNames, idx) => {
@@ -57,30 +65,22 @@ const fallbackName = (entityFileNames, idx) => {
   return '';
 };
 const displayName = (spectra, idx, entityFileNames) => spectra?.title || spectra?.feature?.title || spectra?.spectrum?.title || fallbackName(entityFileNames, idx) || `Spectrum ${idx + 1}`;
-const renderCurveItem = (classes, item, curveIdx, onChange) => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.ListItem, {
+const renderCurveItem = (classes, item, curveIdx, onChange) => /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.ListItem, {
+  disablePadding: true,
   onClick: () => onChange(item.idx),
-  className: (0, _classnames.default)(item.idx === curveIdx ? classes.curveSelected : classes.curveDefault) // eslint-disable-line
-  ,
-  children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
-    className: (0, _classnames.default)(classes.curve),
-    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("i", {
-      children: item.name
-    }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
-      style: {
-        float: 'right',
-        width: '95%'
-      },
-      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("hr", {
-        className: (0, _classnames.default)(classes.line),
-        style: {
-          backgroundColor: item.color
-        }
-      }), item.label !== '' ? /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
-        children: item.label
-      }) : null // eslint-disable-line
-      ]
-    })]
-  })
+  className: (0, _classnames.default)(classes.curveItem, item.idx === curveIdx ? classes.curveSelected : classes.curveDefault),
+  children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+    className: classes.curveIndex,
+    children: item.name
+  }), item.label !== '' ? /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+    className: classes.curveLabel,
+    children: item.label
+  }) : null, /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+    className: classes.colorBar,
+    style: {
+      backgroundColor: item.color
+    }
+  })]
 }, item.idx);
 const GraphSelectionPanel = ({
   classes,
@@ -124,7 +124,7 @@ const GraphSelectionPanel = ({
   let itemsSubLayout = [];
   if (selectedSubLayout && subLayoutValues.length > 1) {
     const subLayout = subLayoutsInfo[selectedSubLayout];
-    try {
+    if (subLayout) {
       itemsSubLayout = subLayout.map((spectra, idx) => {
         const spectraIdx = spectra.curveIdx;
         const {
@@ -137,8 +137,6 @@ const GraphSelectionPanel = ({
           label: displayName(spectra, spectraIdx, entityFileNames)
         };
       });
-    } catch (e) {
-      console.log(e); //eslint-disable-line
     }
   }
   const items = listCurves.map((spectra, idx) => {

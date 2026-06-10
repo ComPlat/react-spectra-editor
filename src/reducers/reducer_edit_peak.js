@@ -1,6 +1,6 @@
 /* eslint-disable prefer-object-spread, default-param-last */
 import undoable from 'redux-undo';
-import { EDITPEAK, MANAGER } from '../constants/action_type';
+import { EDITPEAK, MANAGER, CURVE } from '../constants/action_type';
 
 import { undoRedoConfig, undoRedoActions } from './undo_redo_config';
 import { almostEqual } from '../helpers/calc';
@@ -170,6 +170,8 @@ const editPeakReducer = (state = initialState, action) => {
       return processShift(state, action);
     case EDITPEAK.CLEAR_ALL:
       return clearAllPeaks(state, action);
+    case CURVE.SELECT_WORKING_CURVE:
+      return Object.assign({}, state, { selectedIdx: action.payload });
     case MANAGER.RESETALL:
       return {
         selectedIdx: 0,
