@@ -17,6 +17,8 @@ import { withStyles } from '@mui/styles';
 import Format from '../../helpers/format';
 import { updateDSCMetaData } from '../../actions/meta';
 
+const ELECTRON_MASS = 0.000548579909065;
+
 const styles = () => ({
   chip: {
     margin: '1px 0 1px 0',
@@ -69,10 +71,15 @@ const styles = () => ({
   },
   rowOddSim: {
     backgroundColor: '#fff',
-    height: 108,
+    height: 'auto',
+    minHeight: 36,
     lineHeight: '24px',
-    overflowY: 'hidden',
+    overflow: 'visible',
     overflowWrap: 'word-break',
+  },
+  simPlaceholder: {
+    color: 'rgba(0, 0, 0, 0.54)',
+    fontStyle: 'italic',
   },
   tHead: {
     fontWeight: 'bold',
@@ -110,14 +117,26 @@ const simTitle = () => (
   'Simulated signals from NMRshiftDB'
 );
 
-const simContent = (nmrSimPeaks) => (
-  nmrSimPeaks && nmrSimPeaks.sort((a, b) => a - b).join(', ')
+const simContent = (nmrSimPeaks) => {
+  if (!Array.isArray(nmrSimPeaks) || nmrSimPeaks.length === 0) return '';
+  return [...nmrSimPeaks].sort((a, b) => a - b).join(', ');
+};
+
+const simPlaceholder = () => (
+  'No simulated signals available.'
 );
 
 const normalizeQuillValue = (val) => {
   if (!val) return '';
   if (val === '<p><br></p>' || val === '<p></p>') return '';
   return val;
+};
+
+const formatMsExactMass = (exactMass) => {
+  const neutralMass = parseFloat(exactMass);
+  if (Number.isNaN(neutralMass)) return null;
+
+  return (neutralMass - ELECTRON_MASS).toFixed(6);
 };
 
 const chemSubStyle = {
@@ -297,6 +316,9 @@ const InfoPanel = ({
   metaSt, updateDSCMetaDataAct, hplcMsSt, entities,
 }) => {
   if (!feature) return null;
+  const msExactMass = Format.isMsLayout(layoutSt) && exactMass
+    ? formatMsExactMass(exactMass)
+    : null;
   const {
     title, observeFrequency, solventName, secData,
   } = feature;
@@ -336,6 +358,7 @@ const InfoPanel = ({
   if (integration) {
     originStack = integration.originStack;  // eslint-disable-line
   }
+  const simulatedSignals = simContent(simulationSt.nmrSimPeaks);
 
   return (
     <Accordion
@@ -386,11 +409,11 @@ const InfoPanel = ({
             : null
         }
         {
-          Format.isMsLayout(layoutSt) && exactMass
+          msExactMass
             ? (
               <div className={classNames(classes.rowRoot, classes.rowOdd)}>
-                <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Exact mass: </span>
-                <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{`${parseFloat(exactMass).toFixed(6)} g/mol`}</span>
+                <span className={classNames(classes.tTxt, classes.tHead, 'txt-sv-panel-txt')}>Exact mass (M+): </span>
+                <span className={classNames(classes.tTxt, 'txt-sv-panel-txt')}>{`${msExactMass} g/mol`}</span>
               </div>
             )
             : null
@@ -449,8 +472,15 @@ const InfoPanel = ({
                   { simTitle() }
                 </div>
                 <div className={classNames(classes.rowRoot, classes.rowOddSim)}>
-                  <span className={classNames(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt')}>
-                    { simContent(simulationSt.nmrSimPeaks) }
+                  <span
+                    className={classNames(
+                      classes.tTxt,
+                      classes.tTxtSim,
+                      !simulatedSignals && classes.simPlaceholder,
+                      'txt-sv-panel-txt',
+                    )}
+                  >
+                    { simulatedSignals || simPlaceholder() }
                   </span>
                 </div>
               </>

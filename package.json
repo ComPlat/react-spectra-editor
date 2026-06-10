@@ -1,12 +1,12 @@
 {
   "name": "@complat/react-spectra-editor",
-  "version": "1.7.0",
+  "version": "1.7.2",
   "description": "An editor to View and Edit Chemical Spectra data (NMR, IR, MS, CV, UIVIS, XRD, GC, and DSC).",
   "repository": {
     "type": "git",
     "url": "https://github.com/ComPlat/react-spectra-editor"
   },
-  "license": "AGPL-3.0",
+  "license": "MIT",
   "dependencies": {
     "@complat/react-svg-file-zoom-pan": "1.1.5",
     "@emotion/react": "^11.11.1",
