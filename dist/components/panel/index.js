@@ -145,7 +145,7 @@ class PanelViewer extends _react.default.Component {
           }), _cfg.default.hidePanelMpy(layoutSt) ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_multiplicity.default, {
             expand: isExpanded('mpy'),
             onExapnd: onExpandMpy
-          }), _cfg.default.hidePanelCompare(layoutSt) || listCurves.length > 1 ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_compare.default, {
+          }), _cfg.default.hidePanelCompare(layoutSt) || !listCurves || listCurves.length > 1 ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_compare.default, {
             expand: isExpanded('compare'),
             onExapnd: onExpandCompare
           }), _cfg.default.hidePanelCyclicVolta(layoutSt) || hideCyclicVolta ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_cyclic_voltamery_data.default, {

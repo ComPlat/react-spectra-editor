@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.VirtalPts = exports.RealPts = exports.FromManualToOffset = exports.CalcResidualX = void 0;
+exports.shiftOffsetAtIndex = exports.VirtalPts = exports.RealPts = exports.FromManualToOffset = exports.CalcResidualX = void 0;
 var _list_shift = require("../constants/list_shift");
 /* eslint-disable prefer-object-spread, default-param-last */
 
@@ -33,3 +33,14 @@ const RealPts = (pts, resX) => pts.map(pt => Object.assign({
   y: pt.y
 }));
 exports.RealPts = RealPts;
+const shiftOffsetAtIndex = (shiftSt, atIndex = 0) => {
+  if (!shiftSt || !shiftSt.shifts) return 0;
+  const selectedShift = shiftSt.shifts[atIndex];
+  if (!selectedShift) return 0;
+  const {
+    ref,
+    peak
+  } = selectedShift;
+  return FromManualToOffset(ref, peak);
+};
+exports.shiftOffsetAtIndex = shiftOffsetAtIndex;

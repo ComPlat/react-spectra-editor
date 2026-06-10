@@ -24,6 +24,7 @@ import Format from '../../helpers/format';
 import {
   GetCyclicVoltaPreviousShift, convertTopic,
 } from '../../helpers/chem';
+import { shiftOffsetAtIndex } from '../../helpers/shift';
 import Cfg from '../../helpers/cfg';
 import { itgIdTag, mpyIdTag } from '../../helpers/focus';
 import {
@@ -201,7 +202,7 @@ class MultiFocus {
     return y * this.yTransformFactor;
   }
 
-  setDataParams(filterSeed, peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt, jcampIdx = 0) {
+  setDataParams(filterSeed, peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt, shiftSt, jcampIdx = 0) {
     this.data = [];
     this.otherLineData = [];
     let filterSubLayoutValue = null;
@@ -211,7 +212,9 @@ class MultiFocus {
 
     this.entities.forEach((entry, idx) => {
       const { topic, feature, color } = entry;
-      const offset = GetCyclicVoltaPreviousShift(cyclicvoltaSt, jcampIdx);
+      const offset = Format.isCyclicVoltaLayout(layout)
+        ? GetCyclicVoltaPreviousShift(cyclicvoltaSt, idx)
+        : shiftOffsetAtIndex(shiftSt, idx);
       let currData = convertTopic(topic, layout, feature, offset);
       if (idx === jcampIdx) {
         if (!Format.isCyclicVoltaLayout(layout)) {
@@ -827,21 +830,17 @@ class MultiFocus {
     const { multiplicities } = mtplySt;
     const selectedMulti = multiplicities[this.jcampIdx];
 
-    if (selectedMulti === false || selectedMulti === undefined) {
-      this.clearMtply();
-      return;
-    }
-
-    const {
-      stack = [], smExtext = false, shift = 0,
-    } = selectedMulti || {};
+    const isDisable = Cfg.btnCmdMpy(this.layout);
+    const hasMpy = !isDisable && selectedMulti?.stack?.length > 0;
+    const stack = hasMpy ? selectedMulti.stack : [];
+    const smExtext = hasMpy ? selectedMulti.smExtext : false;
+    const shift = hasMpy ? selectedMulti.shift : 0;
     const hasValidExtent = (extent) => (
       extent
       && Number.isFinite(extent.xL)
       && Number.isFinite(extent.xU)
     );
     const mpys = stack.filter((m) => hasValidExtent(m?.xExtent));
-    const isDisable = Cfg.btnCmdMpy(this.layout);
     if (mpys.length === 0 || isDisable) {
       this.clearMtply();
       return;
@@ -1083,7 +1082,7 @@ class MultiFocus {
     filterSeed, filterPeak, tTrEndPts, tSfPeaks,
     editPeakSt, layoutSt,
     sweepExtentSt, isUiAddIntgSt, isUiSplitIntgSt, isUiVisualSplitIntgSt, isUiNoBrushSt,
-    cyclicvoltaSt,
+    cyclicvoltaSt, shiftSt,
     integrationSt, mtplySt, uiSt,
   }) {
     this.uiSt = uiSt;
@@ -1099,7 +1098,7 @@ class MultiFocus {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, this.reverseXAxis(layoutSt));
     this.setTip();
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, shiftSt, jcampIdx);
     Object.assign(this, { isUiSplitIntgSt, isUiVisualSplitIntgSt });
     if (!isUiSplitIntgSt && !isUiVisualSplitIntgSt) this.clearSplitPreview();
     MountCompass(this);
@@ -1133,7 +1132,7 @@ class MultiFocus {
     entities, curveSt,
     filterSeed, filterPeak, tTrEndPts, tSfPeaks,
     editPeakSt, layoutSt,
-    sweepExtentSt, isUiAddIntgSt, isUiSplitIntgSt, isUiVisualSplitIntgSt, isUiNoBrushSt, cyclicvoltaSt,
+    sweepExtentSt, isUiAddIntgSt, isUiSplitIntgSt, isUiVisualSplitIntgSt, isUiNoBrushSt, cyclicvoltaSt, shiftSt,
     integrationSt, mtplySt, uiSt,
   }) {
     this.uiSt = uiSt;
@@ -1146,7 +1145,7 @@ class MultiFocus {
     this.isShowAllCurves = isShowAllCurve;
     this.entities = entities;
 
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, shiftSt, jcampIdx);
     Object.assign(this, { isUiSplitIntgSt, isUiVisualSplitIntgSt });
     if (!isUiSplitIntgSt && !isUiVisualSplitIntgSt) this.clearSplitPreview();
 

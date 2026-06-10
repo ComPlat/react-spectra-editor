@@ -1,6 +1,6 @@
 /* eslint-disable prefer-object-spread, default-param-last */
 import {
-  SHIFT, EDITPEAK, MANAGER, LAYOUT,
+  SHIFT, EDITPEAK, MANAGER, LAYOUT, CURVE,
 } from '../constants/action_type';
 import { getListShift, LIST_SHIFT_1H } from '../constants/list_shift';
 import { CalcResidualX, RealPts } from '../helpers/shift';
@@ -68,7 +68,7 @@ const resetShift = (state, action) => {
   const { curvesInfo } = payload;
   const { isMultiCurve, curveIdx, numberOfCurve } = curvesInfo;
 
-  const { shifts } = state;
+  const shifts = [...state.shifts];
   let selectedShift = shifts[curveIdx];
   if (selectedShift === false || selectedShift === undefined) {
     selectedShift = defaultEmptyShift;
@@ -238,7 +238,9 @@ const shiftReducer = (state = initialState, action) => {
     case LAYOUT.UPDATE:
       return updateShift(initialState, action);
     case MANAGER.RESETSHIFT: // case MANAGER.RESETALL:
-      return resetShift(initialState, action);
+      return resetShift(state, action);
+    case CURVE.SELECT_WORKING_CURVE:
+      return Object.assign({}, state, { selectedIdx: action.payload });
     default:
       return state;
   }

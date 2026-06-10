@@ -40,6 +40,14 @@ const RealPts = (pts, resX) => (
   )
 );
 
+const shiftOffsetAtIndex = (shiftSt, atIndex = 0) => {
+  if (!shiftSt || !shiftSt.shifts) return 0;
+  const selectedShift = shiftSt.shifts[atIndex];
+  if (!selectedShift) return 0;
+  const { ref, peak } = selectedShift;
+  return FromManualToOffset(ref, peak);
+};
+
 export {
-  FromManualToOffset, CalcResidualX, VirtalPts, RealPts,
+  FromManualToOffset, CalcResidualX, VirtalPts, RealPts, shiftOffsetAtIndex,
 };
