@@ -222,14 +222,13 @@ const GraphSelectionPanel = ({
               }
             </List>
           </div>
+        ) : (
+          <List>
+            {
+              items.map((item) => renderCurveItem(classes, item, curveIdx, onChange))
+            }
+          </List>
         )
-          : (
-            <List>
-              {
-                items.map((item) => renderCurveItem(classes, item, curveIdx, onChange))
-              }
-            </List>
-          )
       }
     </Accordion>
   );

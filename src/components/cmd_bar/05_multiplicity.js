@@ -27,8 +27,8 @@ const styles = () => (
 );
 
 const Multiplicity = ({
-  classes, isFocusAddMpySt, disableAddMpySt, isFocusRmMpySt, disableRmMpySt,
-  isFocusAddPeakSt, isFocusRmPeakSt, disableMpyPeakSt,
+  classes, isFocusAddMpySt, disableAddMpySt, isFocusRmMpySt,
+  isFocusAddPeakSt, isFocusRmPeakSt,
   setUiSweepTypeAct, clearMpyAllAct, curveSt,
 }) => {
   const onSweepMutAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD);
