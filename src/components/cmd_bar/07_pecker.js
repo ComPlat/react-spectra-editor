@@ -97,9 +97,12 @@ const Pecker = ({
     hasRefPeaks = hasRefPeak;
   }
 
+  if (Cfg.hidePanelCyclicVolta(layoutSt)) {
+    return null;
+  }
+
   return (
-    (!Cfg.hidePanelCyclicVolta(layoutSt)) ? (
-      <span data-testid="Pecker">
+    <span className={classes.group} data-testid="Pecker">
         <Tooltip title={<span className="txt-sv-tp">Add Pecker</span>}>
           <span>
             <MuButton
@@ -157,8 +160,6 @@ const Pecker = ({
           </span>
         </Tooltip>
       </span>
-    )
-      : (<span />)
   );
 };
 

@@ -149,6 +149,7 @@ const buildSpectrumPayload = ({
   return {
     peaks: peaksEdit,
     layout: layoutSt,
+    xUnit: xLabel,
     shift,
     scan,
     thres,
@@ -226,7 +227,10 @@ const onClickCb = (operationValue, isAscend, isIntensity, layoutSt, shiftSt, ana
     }
     return spectrumPayload;
   });
+  const selectedIdx = Number.isFinite(curveSt?.curveIdx) ? curveSt.curveIdx : 0;
+  const selectedSpectrumPayload = spectraList[selectedIdx] || spectraList[0] || {};
   const payload = {
+    ...selectedSpectrumPayload,
     spectra_list: spectraList
   };
   if (lcmsGlobalFields) {
@@ -261,7 +265,10 @@ const BtnSubmit = ({
   axesUnitsSt,
   detectorSt,
   metaSt,
-  hplcMsSt
+  hplcMsSt,
+  disabled,
+  className,
+  children
 }) => {
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
   const {
@@ -290,13 +297,14 @@ const BtnSubmit = ({
   return /*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
     title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
       className: "txt-sv-tp",
-      children: "Submit"
+      children: operation.name || 'Submit'
     }),
     children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
-      className: (0, _classnames.default)('btn-sv-bar-submit'),
+      className: (0, _classnames.default)('btn-sv-bar-submit', className),
       color: "primary",
+      disabled: disabled,
       onClick: onClickCb(operation.value, isAscend, isIntensity, layoutSt, shiftSt, forecastSt.predictions, decimalSt, integrationSt, multiplicitySt, waveLengthSt, cyclicvoltaPayload, curveSt, axesUnitsSt, detectorSt, dscMetaData, curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt),
-      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_PlayCircleOutline.default, {
+      children: children || /*#__PURE__*/(0, _jsxRuntime.jsx)(_PlayCircleOutline.default, {
         className: classes.icon
       })
     })
@@ -345,7 +353,10 @@ BtnSubmit.propTypes = {
   axesUnitsSt: _propTypes.default.object.isRequired,
   detectorSt: _propTypes.default.object.isRequired,
   metaSt: _propTypes.default.object.isRequired,
-  hplcMsSt: _propTypes.default.object
+  hplcMsSt: _propTypes.default.object,
+  disabled: _propTypes.default.bool,
+  className: _propTypes.default.string,
+  children: _propTypes.default.node
 };
 BtnSubmit.defaultProps = {
   hplcMsSt: {}
