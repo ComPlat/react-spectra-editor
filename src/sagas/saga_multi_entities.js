@@ -140,14 +140,15 @@ function* setInitShifts() {
     if (feature) {
       yield put({
         type: MANAGER.RESETSHIFT,
-        payload: Object.assign({}, feature, {
+        payload: {
+          ...feature,
           layout: layoutSt,
           curvesInfo: {
             isMultiCurve: true,
             curveIdx: index,
             numberOfCurve,
           },
-        }),
+        },
       });
     }
   }
