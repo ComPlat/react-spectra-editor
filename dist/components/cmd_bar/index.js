@@ -26,6 +26,7 @@ var _r08_change_axes = _interopRequireDefault(require("./r08_change_axes"));
 var _r09_detector = _interopRequireDefault(require("./r09_detector"));
 var _r10_cv_density = _interopRequireDefault(require("./r10_cv_density"));
 var _format = _interopRequireDefault(require("../../helpers/format"));
+var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, function-paren-newline,
 react/function-component-definition, react/require-default-props */
@@ -43,6 +44,8 @@ const CmdBar = ({
   layoutSt
 }) => {
   const isCvLayout = _format.default.isCyclicVoltaLayout(layoutSt);
+  const hideIntegration = isCvLayout || _cfg.default.btnCmdIntg(layoutSt);
+  const hideMultiplicity = isCvLayout || _cfg.default.btnCmdMpy(layoutSt);
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
     className: classes.card,
     children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_viewer.default, {
@@ -52,7 +55,7 @@ const CmdBar = ({
       feature: feature
     }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_pecker.default, {
       jcampIdx: jcampIdx
-    }), isCvLayout ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_integration.default, {}), isCvLayout ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_multiplicity.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_undo_redo.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r04_submit.default, {
+    }), hideIntegration ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_integration.default, {}), hideMultiplicity ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_multiplicity.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_undo_redo.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r04_submit.default, {
       operations: operations,
       feature: feature,
       forecast: forecast,

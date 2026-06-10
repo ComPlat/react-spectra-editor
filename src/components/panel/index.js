@@ -47,7 +47,7 @@ class PanelViewer extends React.Component {
     super(props);
 
     this.state = {
-      expand: 'info',
+      expand: ['info', 'graph'],
     };
 
     this.onToggleExpand = this.onToggleExpand.bind(this);
@@ -63,7 +63,9 @@ class PanelViewer extends React.Component {
 
   onToggleExpand(input) {
     const { expand } = this.state;
-    const nextExpand = input === expand ? '' : input;
+    const nextExpand = expand.includes(input)
+      ? expand.filter((item) => item !== input)
+      : [...expand, input];
     this.setState({ expand: nextExpand });
   }
 
@@ -81,6 +83,7 @@ class PanelViewer extends React.Component {
     const onExpandCompare = () => this.onToggleExpand('compare');
     const onExpandCyclicVolta = () => this.onToggleExpand('cyclicvolta');
     const onExpandGraphSelection = () => this.onToggleExpand('graph');
+    const isExpanded = (name) => expand.includes(name);
     const { listCurves } = curveSt;
     const curveCount = Array.isArray(listCurves) ? listCurves.length : 0;
     const hideGraphSelection = curveCount <= 1 || Format.isLCMsLayout(layoutSt);
@@ -91,13 +94,13 @@ class PanelViewer extends React.Component {
           <ThemeProvider
             theme={theme}
           >
-            { hideGraphSelection ? null : <GraphSelectionPanel jcampIdx={jcampIdx} entityFileNames={entityFileNames} expand={expand === 'graph'} onExpand={onExpandGraphSelection} subLayoutsInfo={subLayoutsInfo} />}
+            { hideGraphSelection ? null : <GraphSelectionPanel jcampIdx={jcampIdx} entityFileNames={entityFileNames} expand={isExpanded('graph')} onExapnd={onExpandGraphSelection} subLayoutsInfo={subLayoutsInfo} />}
             <InfoPanel
               entities={entities}
               feature={feature}
               integration={integration}
               editorOnly={editorOnly}
-              expand={expand === 'info'}
+              expand={isExpanded('info')}
               molSvg={molSvg}
               exactMass={exactMass}
               onExpand={onExpandInfo}
@@ -105,14 +108,14 @@ class PanelViewer extends React.Component {
               canChangeDescription={canChangeDescription}
               onDescriptionChanged={this.handleDescriptionChanged}
             />
-            { Cfg.hidePanelPeak(layoutSt) ? null : <PeakPanel expand={expand === 'peak'} onExapnd={onExpandPeak} /> }
-            { Cfg.hidePanelMpy(layoutSt) ? null : <MultiplicityPanel expand={expand === 'mpy'} onExapnd={onExpandMpy} /> }
-            { (Cfg.hidePanelCompare(layoutSt) || curveCount > 1) ? null : <ComparePanel expand={expand === 'compare'} onExapnd={onExpandCompare} /> }
+            { Cfg.hidePanelPeak(layoutSt) ? null : <PeakPanel expand={isExpanded('peak')} onExapnd={onExpandPeak} /> }
+            { Cfg.hidePanelMpy(layoutSt) ? null : <MultiplicityPanel expand={isExpanded('mpy')} onExapnd={onExpandMpy} /> }
+            { (Cfg.hidePanelCompare(layoutSt) || listCurves.length > 1) ? null : <ComparePanel expand={isExpanded('compare')} onExapnd={onExpandCompare} /> }
             { (Cfg.hidePanelCyclicVolta(layoutSt) || hideCyclicVolta) ? null : (
               <CyclicVoltammetryPanel
                 jcampIdx={jcampIdx}
                 feature={feature}
-                expand={expand === 'cyclicvolta'}
+                expand={isExpanded('cyclicvolta')}
                 onExapnd={onExpandCyclicVolta}
                 userManualLink={userManualLink ? userManualLink.cv : undefined}
               />

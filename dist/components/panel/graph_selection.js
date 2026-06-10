@@ -50,6 +50,38 @@ const styles = () => ({
     overflowWrap: 'anywhere'
   }
 });
+const fallbackName = (entityFileNames, idx) => {
+  if (entityFileNames && idx < entityFileNames.length) {
+    return entityFileNames[idx];
+  }
+  return '';
+};
+const displayName = (spectra, idx, entityFileNames) => spectra?.title || spectra?.feature?.title || spectra?.spectrum?.title || fallbackName(entityFileNames, idx) || `Spectrum ${idx + 1}`;
+const renderCurveItem = (classes, item, curveIdx, onChange) => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.ListItem, {
+  onClick: () => onChange(item.idx),
+  className: (0, _classnames.default)(item.idx === curveIdx ? classes.curveSelected : classes.curveDefault) // eslint-disable-line
+  ,
+  children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+    className: (0, _classnames.default)(classes.curve),
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("i", {
+      children: item.name
+    }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+      style: {
+        float: 'right',
+        width: '95%'
+      },
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("hr", {
+        className: (0, _classnames.default)(classes.line),
+        style: {
+          backgroundColor: item.color
+        }
+      }), item.label !== '' ? /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        children: item.label
+      }) : null // eslint-disable-line
+      ]
+    })]
+  })
+}, item.idx);
 const GraphSelectionPanel = ({
   classes,
   curveSt,
@@ -57,7 +89,9 @@ const GraphSelectionPanel = ({
   subLayoutsInfo,
   layoutSt,
   selectCurveAct,
-  toggleShowAllCurveAct
+  toggleShowAllCurveAct,
+  expand,
+  onExapnd
 }) => {
   let subLayoutValues = [];
   if (subLayoutsInfo) {
@@ -96,15 +130,11 @@ const GraphSelectionPanel = ({
         const {
           color
         } = spectra;
-        let filename = '';
-        if (entityFileNames && spectraIdx < entityFileNames.length) {
-          filename = entityFileNames[spectraIdx];
-        }
         return {
           name: `${idx + 1}.`,
           idx: spectraIdx,
           color,
-          filename
+          label: displayName(spectra, spectraIdx, entityFileNames)
         };
       });
     } catch (e) {
@@ -115,19 +145,17 @@ const GraphSelectionPanel = ({
     const {
       color
     } = spectra;
-    let filename = '';
-    if (entityFileNames && idx < entityFileNames.length) {
-      filename = entityFileNames[idx];
-    }
     return {
       name: `${idx + 1}.`,
       idx,
       color,
-      filename
+      label: displayName(spectra, idx, entityFileNames)
     };
   });
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Accordion, {
     "data-testid": "GraphSelectionPanel",
+    expanded: expand,
+    onChange: onExapnd,
     disableGutters: true,
     sx: {
       '&.MuiAccordion-root.Mui-expanded': {
@@ -181,58 +209,10 @@ const GraphSelectionPanel = ({
           }, i);
         })
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.List, {
-        children: itemsSubLayout.map(item => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.ListItem, {
-          onClick: () => onChange(item.idx),
-          className: (0, _classnames.default)(item.idx === curveIdx ? classes.curveSelected : classes.curveDefault) // eslint-disable-line
-          ,
-          children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
-            className: (0, _classnames.default)(classes.curve),
-            children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("i", {
-              children: item.name
-            }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
-              style: {
-                float: 'right',
-                width: '95%'
-              },
-              children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("hr", {
-                className: (0, _classnames.default)(classes.line),
-                style: {
-                  backgroundColor: item.color
-                }
-              }), item.filename !== '' ? /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
-                children: ["File: ", item.filename]
-              }) : null // eslint-disable-line
-              ]
-            })]
-          })
-        }, item.idx))
+        children: itemsSubLayout.map(item => renderCurveItem(classes, item, curveIdx, onChange))
       })]
     }) : /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.List, {
-      children: items.map(item => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.ListItem, {
-        onClick: () => onChange(item.idx),
-        className: (0, _classnames.default)(item.idx === curveIdx ? classes.curveSelected : classes.curveDefault) // eslint-disable-line
-        ,
-        children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
-          className: (0, _classnames.default)(classes.curve),
-          children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("i", {
-            children: item.name
-          }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
-            style: {
-              float: 'right',
-              width: '95%'
-            },
-            children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("hr", {
-              className: (0, _classnames.default)(classes.line),
-              style: {
-                backgroundColor: item.color
-              }
-            }), item.filename !== '' ? /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
-              children: ["File: ", item.filename]
-            }) : null // eslint-disable-line
-            ]
-          })]
-        })
-      }, item.idx))
+      children: items.map(item => renderCurveItem(classes, item, curveIdx, onChange))
     })]
   });
 };
@@ -254,7 +234,7 @@ GraphSelectionPanel.propTypes = {
   curveSt: _propTypes.default.object.isRequired,
   selectCurveAct: _propTypes.default.func.isRequired,
   entityFileNames: _propTypes.default.array.isRequired,
-  subLayoutsInfo: _propTypes.default.array,
+  subLayoutsInfo: _propTypes.default.object,
   toggleShowAllCurveAct: _propTypes.default.func.isRequired
 };
 var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(GraphSelectionPanel));

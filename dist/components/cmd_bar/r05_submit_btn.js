@@ -136,6 +136,7 @@ const buildSpectrumPayload = ({
   return {
     peaks: peaksEdit,
     layout: layoutSt,
+    xUnit: xLabel,
     shift,
     scan,
     thres,
@@ -187,7 +188,10 @@ const onClickCb = (operationValue, isAscend, isIntensity, layoutSt, shiftSt, ana
       decimalSt
     });
   });
+  const selectedIdx = Number.isFinite(curveSt?.curveIdx) ? curveSt.curveIdx : 0;
+  const selectedSpectrumPayload = spectraList[selectedIdx] || spectraList[0] || {};
   const payload = {
+    ...selectedSpectrumPayload,
     spectra_list: spectraList
   };
   if (Number.isFinite(curveSt?.curveIdx)) {
@@ -218,7 +222,10 @@ const BtnSubmit = ({
   curveList,
   axesUnitsSt,
   detectorSt,
-  metaSt
+  metaSt,
+  disabled,
+  className,
+  children
 }) => {
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
   const {
@@ -247,13 +254,14 @@ const BtnSubmit = ({
   return /*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
     title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
       className: "txt-sv-tp",
-      children: "Submit"
+      children: operation.name || 'Submit'
     }),
     children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
-      className: (0, _classnames.default)('btn-sv-bar-submit'),
+      className: (0, _classnames.default)('btn-sv-bar-submit', className),
       color: "primary",
+      disabled: disabled,
       onClick: onClickCb(operation.value, isAscend, isIntensity, layoutSt, shiftSt, forecastSt.predictions, decimalSt, integrationSt, multiplicitySt, waveLengthSt, cyclicvoltaPayload, curveSt, axesUnitsSt, detectorSt, dscMetaData, curveList, editPeakSt, thresList, scanSt, feature),
-      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_PlayCircleOutline.default, {
+      children: children || /*#__PURE__*/(0, _jsxRuntime.jsx)(_PlayCircleOutline.default, {
         className: classes.icon
       })
     })
@@ -301,6 +309,9 @@ BtnSubmit.propTypes = {
   curveList: _propTypes.default.array.isRequired,
   axesUnitsSt: _propTypes.default.object.isRequired,
   detectorSt: _propTypes.default.object.isRequired,
-  metaSt: _propTypes.default.object.isRequired
+  metaSt: _propTypes.default.object.isRequired,
+  disabled: _propTypes.default.bool,
+  className: _propTypes.default.string,
+  children: _propTypes.default.node
 };
 var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(BtnSubmit);

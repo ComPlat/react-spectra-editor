@@ -34,7 +34,7 @@ const styles = () => Object.assign({
   txtIcon: {}
 }, _common.commonStyle);
 const iconSize = '16px';
-const setFactor = (classes, isDisable, integrationSt, setIntegrationFkrAct, curveIdx) => {
+const setFactor = (classes, integrationSt, setIntegrationFkrAct, curveIdx) => {
   const onFactorChanged = e => {
     e.target.blur();
     setIntegrationFkrAct({
@@ -60,7 +60,6 @@ const setFactor = (classes, isDisable, integrationSt, setIntegrationFkrAct, curv
   }
   return /*#__PURE__*/(0, _jsxRuntime.jsx)(_TextField.default, {
     className: classes.field,
-    disabled: isDisable,
     id: "intg-factor-name",
     type: "number",
     value: refFactor,
@@ -101,6 +100,9 @@ const Integration = ({
   const onClearAll = () => clearIntegrationAllAct({
     curveIdx
   });
+  if (isDisableSt) {
+    return null;
+  }
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
     className: classes.group,
     children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
@@ -111,12 +113,11 @@ const Integration = ({
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
         children: /*#__PURE__*/(0, _jsxRuntime.jsxs)(_common.MuButton, {
           className: (0, _classnames.default)((0, _common.focusStyle)(isFocusAddIntgSt, classes), 'btn-add-inter'),
-          disabled: isDisableSt,
           onClick: onSweepIntegtAdd,
           children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_react2.default, {
             path: _js.mdiMathIntegral,
             size: iconSize,
-            color: iconColor(isFocusAddIntgSt || isDisableSt),
+            color: iconColor(isFocusAddIntgSt),
             className: (0, _classnames.default)(classes.iconMdi, 'icon-sv-bar-addint')
           }), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
             className: (0, _classnames.default)(classes.txt, classes.txtIcon, 'txt-sv-bar-addint'),
@@ -132,12 +133,11 @@ const Integration = ({
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
         children: /*#__PURE__*/(0, _jsxRuntime.jsxs)(_common.MuButton, {
           className: (0, _classnames.default)((0, _common.focusStyle)(isFocusRmIntgSt, classes), 'btn-remove-inter'),
-          disabled: isDisableSt,
           onClick: onSweepIntegtRm,
           children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_react2.default, {
             path: _js.mdiMathIntegral,
             size: iconSize,
-            color: iconColor(isFocusRmIntgSt || isDisableSt),
+            color: iconColor(isFocusRmIntgSt),
             className: (0, _classnames.default)(classes.iconMdi, 'icon-sv-bar-rmint')
           }), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
             className: (0, _classnames.default)(classes.txt, classes.txtIcon, 'txt-sv-bar-rmint'),
@@ -153,17 +153,16 @@ const Integration = ({
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
         children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
           className: (0, _classnames.default)((0, _common.focusStyle)(isFocusSetRefSt, classes), 'btn-set-inter-ref'),
-          disabled: isDisableSt,
           onClick: onSweepIntegtSR,
           children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_react2.default, {
             path: _js.mdiReflectVertical,
             size: iconSize,
-            color: iconColor(isFocusSetRefSt || isDisableSt),
+            color: iconColor(isFocusSetRefSt),
             className: (0, _classnames.default)(classes.iconMdi, 'icon-sv-bar-refint')
           })
         })
       })
-    }), !ignoreRef ? setFactor(classes, isDisableSt, integrationSt, setIntegrationFkrAct, curveIdx) : null, /*#__PURE__*/(0, _jsxRuntime.jsxs)(_tri_btn.default, {
+    }), !ignoreRef ? setFactor(classes, integrationSt, setIntegrationFkrAct, curveIdx) : null, /*#__PURE__*/(0, _jsxRuntime.jsxs)(_tri_btn.default, {
       content: {
         tp: 'Clear All Integration'
       },
@@ -171,7 +170,7 @@ const Integration = ({
       children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_react2.default, {
         path: _js.mdiMathIntegral,
         size: iconSize,
-        color: iconColor(isDisableSt),
+        color: iconColor(false),
         className: (0, _classnames.default)(classes.iconMdi, 'icon-sv-bar-rmallint')
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
         className: (0, _classnames.default)(classes.txt, classes.txtIcon, 'txt-sv-bar-rmallint'),

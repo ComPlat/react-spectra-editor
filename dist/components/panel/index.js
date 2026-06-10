@@ -48,7 +48,7 @@ class PanelViewer extends _react.default.Component {
   constructor(props) {
     super(props);
     this.state = {
-      expand: 'info'
+      expand: ['info', 'graph']
     };
     this.onExapnd = this.onExapnd.bind(this);
     this.handleDescriptionChanged = this.handleDescriptionChanged.bind(this);
@@ -63,7 +63,7 @@ class PanelViewer extends _react.default.Component {
     const {
       expand
     } = this.state;
-    const nextExpand = input === expand ? '' : input;
+    const nextExpand = expand.includes(input) ? expand.filter(item => item !== input) : [...expand, input];
     this.setState({
       expand: nextExpand
     });
@@ -95,6 +95,7 @@ class PanelViewer extends _react.default.Component {
     const onExapndCompare = () => this.onExapnd('compare');
     const onExapndCyclicVolta = () => this.onExapnd('cyclicvolta');
     const onExapndGraphSelection = () => this.onExapnd('graph');
+    const isExpanded = name => expand.includes(name);
     const {
       listCurves
     } = curveSt;
@@ -108,14 +109,14 @@ class PanelViewer extends _react.default.Component {
           children: [hideGraphSelection ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_graph_selection.default, {
             jcampIdx: jcampIdx,
             entityFileNames: entityFileNames,
-            expand: expand === 'graph',
+            expand: isExpanded('graph'),
             onExapnd: onExapndGraphSelection,
             subLayoutsInfo: subLayoutsInfo
           }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_info.default, {
             feature: feature,
             integration: integration,
             editorOnly: editorOnly,
-            expand: expand === 'info',
+            expand: isExpanded('info'),
             molSvg: molSvg,
             exactMass: exactMass,
             onExapnd: onExapndInfo,
@@ -123,18 +124,18 @@ class PanelViewer extends _react.default.Component {
             canChangeDescription: canChangeDescription,
             onDescriptionChanged: this.handleDescriptionChanged
           }), _cfg.default.hidePanelPeak(layoutSt) ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_peaks.default, {
-            expand: expand === 'peak',
+            expand: isExpanded('peak'),
             onExapnd: onExapndPeak
           }), _cfg.default.hidePanelMpy(layoutSt) ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_multiplicity.default, {
-            expand: expand === 'mpy',
+            expand: isExpanded('mpy'),
             onExapnd: onExapndMpy
           }), _cfg.default.hidePanelCompare(layoutSt) || listCurves.length > 1 ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_compare.default, {
-            expand: expand === 'compare',
+            expand: isExpanded('compare'),
             onExapnd: onExapndCompare
           }), _cfg.default.hidePanelCyclicVolta(layoutSt) || hideCyclicVolta ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_cyclic_voltamery_data.default, {
             jcampIdx: jcampIdx,
             feature: feature,
-            expand: expand === 'cyclicvolta',
+            expand: isExpanded('cyclicvolta'),
             onExapnd: onExapndCyclicVolta,
             userManualLink: userManualLink ? userManualLink.cv : undefined
           })]
