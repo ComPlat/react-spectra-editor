@@ -6,7 +6,6 @@ import {
 } from '../constants/action_type';
 
 import { LIST_LAYOUT } from '../constants/list_layout';
-import Format from '../helpers/format';
 
 const getLayoutSt = (state) => state.layout;
 const getCurveSt = (state) => state.curve;
