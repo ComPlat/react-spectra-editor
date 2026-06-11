@@ -50,15 +50,20 @@ const restoreSweepExtent = payload => ({
   payload
 });
 exports.restoreSweepExtent = restoreSweepExtent;
-const clickUiTarget = (payload, onPeak, voltammetryPeakIdx = 0, jcampIdx = 0, onPecker = false, sourceHint = null) => ({
-  type: _action_type.UI.CLICK_TARGET,
-  payload,
-  onPeak,
-  voltammetryPeakIdx,
-  jcampIdx,
-  onPecker,
-  sourceHint
-});
+const clickUiTarget = (payload, onPeak, voltammetryPeakIdx, jcampIdx, onPecker, sourceHint) => {
+  const action = {
+    type: _action_type.UI.CLICK_TARGET,
+    payload,
+    onPeak,
+    voltammetryPeakIdx: voltammetryPeakIdx ?? 0,
+    onPecker: onPecker ?? false,
+    sourceHint: sourceHint ?? null
+  };
+  if (Number.isFinite(jcampIdx)) {
+    action.jcampIdx = jcampIdx;
+  }
+  return action;
+};
 exports.clickUiTarget = clickUiTarget;
 const displaySubViewerAt = payload => ({
   type: _action_type.UI.SUB_VIEWER.DISPLAY_VIEWER_AT,

@@ -155,8 +155,12 @@ const buildSpectrumPayload = ({
   const scan = Convert2Scan(feature, scanSt);
   const thres = Convert2Thres(feature, threshold);
   const shift = shiftEntryAtIndex(shiftSt, curveIdx);
-  const integration = listEntryAtIndex(integrationSt?.integrations, curveIdx, emptyIntegration);
-  const multiplicity = listEntryAtIndex(multiplicitySt?.multiplicities, curveIdx, emptyMultiplicity);
+  const integration = listEntryAtIndex(
+    integrationSt?.integrations, curveIdx, emptyIntegration,
+  );
+  const multiplicity = listEntryAtIndex(
+    multiplicitySt?.multiplicities, curveIdx, emptyMultiplicity,
+  );
   const { xLabel, yLabel } = resolveAxisLabels(
     feature?.xUnit,
     feature?.yUnit,
