@@ -111,11 +111,16 @@ const spectraOps = {
   [LIST_LAYOUT.LC_MS]: { head: 'HPLC UV/VIS', tail: '' },
 };
 
+const shiftAnchorX = (selectedShift) => {
+  if (!selectedShift) return null;
+  const x = selectedShift.ref?.value ?? selectedShift.peak?.x;
+  return x == null ? null : x;
+};
+
 const rmRef = (peaks, shift, atIndex = 0) => {
-  if (!shift) return peaks;
-  const { shifts } = shift;
-  const selectedShift = shifts[atIndex];
-  const refValue = selectedShift.ref.value || selectedShift.peak.x;
+  if (!shift?.shifts) return peaks;
+  const refValue = shiftAnchorX(shift.shifts[atIndex]);
+  if (refValue == null) return peaks;
   return peaks.map(
     (p) => (IsSame(p.x, refValue) ? null : p),
   ).filter((r) => r != null);
@@ -568,13 +573,9 @@ const formatedXRD = (
 
 const rmShiftFromPeaks = (peaks, shift, atIndex = 0) => {
   const peaksXY = ToXY(peaks);
-  const { shifts } = shift;
-  const selectedShift = shifts[atIndex];
-  if (!selectedShift) {
-    return peaks;
-  }
-  // const digit = spectraDigit(layout);
-  const rmShiftX = selectedShift.ref.value || selectedShift.peak.x;
+  if (!shift?.shifts) return peaks;
+  const rmShiftX = shiftAnchorX(shift.shifts[atIndex]);
+  if (rmShiftX == null) return peaks;
   const result = peaksXY.map((p) => {
     const srcX = parseFloat(p[0]);
     const x = IsSame(srcX, rmShiftX) ? null : srcX;
@@ -636,9 +637,8 @@ const peaksBody = ({
 
 const peaksWrapper = (layout, shift, atIndex = 0) => {
   let solvTxt = '';
-  const { shifts } = shift;
-  const selectedShift = shifts[atIndex];
-  if (selectedShift.ref.label) {
+  const selectedShift = shift?.shifts ? shift.shifts[atIndex] : shift;
+  if (selectedShift?.ref?.label) {
     solvTxt = ` (${selectedShift.ref.label})`;
   }
 
