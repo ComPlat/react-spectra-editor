@@ -11,6 +11,7 @@ import ReactQuill from 'react-quill';
 import { SpectraEditor, FN, store } from './app';
 import { getLcMsInfo } from './helpers/extractEntityLCMS';
 import { snapRtToAxis } from './reducers/reducer_hplc_ms/utils';
+import { normalizeShiftForFormatting } from './helpers/shift';
 import nmr1HJcamp from './__tests__/fixtures/nmr1h_jcamp';
 import nmr1H2Jcamp from './__tests__/fixtures/nmr1h_2_jcamp';
 import nmr13CDeptJcamp from './__tests__/fixtures/nmr13c_dept_jcamp';
@@ -68,14 +69,6 @@ const pickSelectedSpectrumFromPayload = (payload) => {
   if (spectraList.length === 0) return {};
   const selectedIdx = Number.isFinite(payload?.curveSt?.curveIdx) ? payload.curveSt.curveIdx : 0;
   return spectraList[selectedIdx] || spectraList[0] || {};
-};
-
-const normalizeShiftForFormatting = (shift) => {
-  if (shift && Array.isArray(shift.shifts)) return shift;
-  return {
-    selectedIdx: 0,
-    shifts: [shift || { ref: {}, peak: false, enable: true }],
-  };
 };
 
 const nmr1HEntity = FN.ExtractJcamp(nmr1HJcamp);

@@ -170,10 +170,6 @@ function* setCyclicVoltametryRef(action) {
   });
 }
 function* setInitShifts() {
-  const layoutSt = yield (0, _effects.select)(getLayoutSt);
-  if (!_format.default.isNmrLayout(layoutSt)) {
-    return;
-  }
   const curveSt = yield (0, _effects.select)(getCurveSt);
   const {
     listCurves
@@ -181,6 +177,7 @@ function* setInitShifts() {
   if (!listCurves || listCurves.length <= 1) {
     return;
   }
+  const layoutSt = yield (0, _effects.select)(getLayoutSt);
   const numberOfCurve = listCurves.length;
   for (let index = 0; index < listCurves.length; index += 1) {
     const {
