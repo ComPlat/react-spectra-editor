@@ -31,12 +31,17 @@ const restoreSweepExtent = payload => ({
   payload
 });
 exports.restoreSweepExtent = restoreSweepExtent;
-const clickUiTarget = (payload, onPeak, voltammetryPeakIdx = 0, jcampIdx = 0, onPecker = false) => ({
-  type: _action_type.UI.CLICK_TARGET,
-  payload,
-  onPeak,
-  voltammetryPeakIdx,
-  jcampIdx,
-  onPecker
-});
+const clickUiTarget = (payload, onPeak, voltammetryPeakIdx = 0, jcampIdx, onPecker = false) => {
+  const action = {
+    type: _action_type.UI.CLICK_TARGET,
+    payload,
+    onPeak,
+    voltammetryPeakIdx,
+    onPecker
+  };
+  if (Number.isFinite(jcampIdx)) {
+    action.jcampIdx = jcampIdx;
+  }
+  return action;
+};
 exports.clickUiTarget = clickUiTarget;

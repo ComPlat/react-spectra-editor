@@ -22,6 +22,7 @@ import {
   getLcmsMzPageData,
 } from '../../helpers/extractPeaksEdit';
 import Format from '../../helpers/format';
+import { shiftEntryAtIndex, listEntryAtIndex } from '../../helpers/shift';
 
 const styles = () => (
   Object.assign(
@@ -97,9 +98,20 @@ const resolveLcmsIntegrationsExportForSubmit = (analysis, hplcMsSt) => {
   return 'percent';
 };
 
-const pickFromList = (list, index, fallback = null) => (
-  Array.isArray(list) && list[index] !== undefined ? list[index] : fallback
-);
+const emptyIntegration = {
+  stack: [],
+  refArea: 1,
+  refFactor: 1,
+  shift: 0,
+  edited: false,
+};
+
+const emptyMultiplicity = {
+  stack: [],
+  shift: 0,
+  smExtext: false,
+  edited: false,
+};
 
 const hasBoolean = (value) => typeof value === 'boolean';
 
@@ -142,9 +154,9 @@ const buildSpectrumPayload = ({
   );
   const scan = Convert2Scan(feature, scanSt);
   const thres = Convert2Thres(feature, threshold);
-  const shift = pickFromList(shiftSt?.shifts, curveIdx, shiftSt);
-  const integration = pickFromList(integrationSt?.integrations, curveIdx, integrationSt);
-  const multiplicity = pickFromList(multiplicitySt?.multiplicities, curveIdx, multiplicitySt);
+  const shift = shiftEntryAtIndex(shiftSt, curveIdx);
+  const integration = listEntryAtIndex(integrationSt?.integrations, curveIdx, emptyIntegration);
+  const multiplicity = listEntryAtIndex(multiplicitySt?.multiplicities, curveIdx, emptyMultiplicity);
   const { xLabel, yLabel } = resolveAxisLabels(
     feature?.xUnit,
     feature?.yUnit,

@@ -330,6 +330,12 @@ describe('Test format helper', () => {
         const removedPeaks = Format.rmRef(peaks, shift)
         expect(removedPeaks).toEqual([{x: 2.04, y: 2}])
       })
+
+      it('Returns peaks unchanged when shift index is missing', () => {
+        const shift = { shifts: [{ ref: LIST_SHIFT_1H[1] }] }
+        const removedPeaks = Format.rmRef(peaks, shift, 1)
+        expect(removedPeaks).toEqual(peaks)
+      })
     })
   })
 

@@ -145,7 +145,7 @@ const ClickCompass = (event, focus) => {
       focus.clickUiTargetAct(pt, onPeak);
     }
   } else {
-    focus.clickUiTargetAct(pt, false);
+    focus.clickUiTargetAct(pt, false, 0, focus.jcampIdx);
   }
 };
 exports.ClickCompass = ClickCompass;

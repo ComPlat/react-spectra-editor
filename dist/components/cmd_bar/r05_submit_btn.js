@@ -17,6 +17,7 @@ var _chem = require("../../helpers/chem");
 var _common = require("./common");
 var _extractPeaksEdit = require("../../helpers/extractPeaksEdit");
 var _format = _interopRequireDefault(require("../../helpers/format"));
+var _shift = require("../../helpers/shift");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, function-paren-newline,
 react/function-component-definition, function-call-argument-newline,
@@ -76,7 +77,19 @@ const defaultThreshold = {
   upper: false,
   lower: false
 };
-const pickFromList = (list, index, fallback = null) => Array.isArray(list) && list[index] !== undefined ? list[index] : fallback;
+const emptyIntegration = {
+  stack: [],
+  refArea: 1,
+  refFactor: 1,
+  shift: 0,
+  edited: false
+};
+const emptyMultiplicity = {
+  stack: [],
+  shift: 0,
+  smExtext: false,
+  edited: false
+};
 const hasBoolean = value => typeof value === 'boolean';
 const resolveOptionalBooleanFlags = analysis => {
   const flags = {};
@@ -111,9 +124,9 @@ const buildSpectrumPayload = ({
   const peaksEdit = (0, _extractPeaksEdit.extractPeaksEdit)(feature, editPeakAtIndex, threshold, shiftSt, layoutSt, curveIdx);
   const scan = (0, _chem.Convert2Scan)(feature, scanSt);
   const thres = (0, _chem.Convert2Thres)(feature, threshold);
-  const shift = pickFromList(shiftSt?.shifts, curveIdx, shiftSt);
-  const integration = pickFromList(integrationSt?.integrations, curveIdx, integrationSt);
-  const multiplicity = pickFromList(multiplicitySt?.multiplicities, curveIdx, multiplicitySt);
+  const shift = (0, _shift.shiftEntryAtIndex)(shiftSt, curveIdx);
+  const integration = (0, _shift.listEntryAtIndex)(integrationSt?.integrations, curveIdx, emptyIntegration);
+  const multiplicity = (0, _shift.listEntryAtIndex)(multiplicitySt?.multiplicities, curveIdx, emptyMultiplicity);
   const {
     xLabel,
     yLabel
