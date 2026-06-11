@@ -123,17 +123,13 @@ function* setCyclicVoltametryRef(action) { // eslint-disable-line
 }
 
 function* setInitShifts() {
-  const layoutSt = yield select(getLayoutSt);
-  if (!Format.isNmrLayout(layoutSt)) {
-    return;
-  }
-
   const curveSt = yield select(getCurveSt);
   const { listCurves } = curveSt;
   if (!listCurves || listCurves.length <= 1) {
     return;
   }
 
+  const layoutSt = yield select(getLayoutSt);
   const numberOfCurve = listCurves.length;
   for (let index = 0; index < listCurves.length; index += 1) {
     const { feature } = listCurves[index];

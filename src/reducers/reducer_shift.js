@@ -3,7 +3,7 @@ import {
   SHIFT, EDITPEAK, MANAGER, LAYOUT, CURVE,
 } from '../constants/action_type';
 import { getListShift, LIST_SHIFT_1H } from '../constants/list_shift';
-import { CalcResidualX, RealPts } from '../helpers/shift';
+import { CalcResidualX, RealPts, defaultEmptyShift } from '../helpers/shift';
 
 const shiftNone = LIST_SHIFT_1H[0];
 const normalizeShiftName = (input) => (
@@ -29,12 +29,6 @@ const initialState = {
       enable: true,
     },
   ],
-};
-
-const defaultEmptyShift = {
-  ref: shiftNone,
-  peak: false,
-  enable: true,
 };
 
 const resetRef = (payload) => {
