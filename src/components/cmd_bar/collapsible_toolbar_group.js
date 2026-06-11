@@ -42,9 +42,7 @@ const styles = () => ({
   },
 });
 
-const countItems = (children) => (
-  React.Children.toArray(children).filter((child) => child != null && child !== false).length
-);
+const countItems = (children) => React.Children.toArray(children).length;
 
 const CollapsibleToolbarGroup = ({
   classes, className, children, collapseThreshold, ...rest
