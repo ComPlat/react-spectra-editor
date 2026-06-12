@@ -36,10 +36,17 @@ const confirmCancelPendingIntegration = () => {
   return shouldCancel;
 };
 
+const isDraftForCurve = (jcampIdx, dataLength) => {
+  if (!pendingIntegrationDraft) return false;
+  return pendingIntegrationDraft.jcampIdx === jcampIdx
+    && pendingIntegrationDraft.dataLength === dataLength;
+};
+
 export {
   clearPendingIntegrationDraft,
   confirmCancelPendingIntegration,
   forgetPendingIntegrationDraft,
   hasPendingIntegrationDraft,
+  isDraftForCurve,
   setPendingIntegrationDraft,
 };

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.setPendingIntegrationDraft = exports.hasPendingIntegrationDraft = exports.forgetPendingIntegrationDraft = exports.confirmCancelPendingIntegration = exports.clearPendingIntegrationDraft = void 0;
+exports.setPendingIntegrationDraft = exports.isDraftForCurve = exports.hasPendingIntegrationDraft = exports.forgetPendingIntegrationDraft = exports.confirmCancelPendingIntegration = exports.clearPendingIntegrationDraft = void 0;
 let pendingIntegrationDraft = null;
 const cancelMessage = 'You are currently creating an integration. Are you sure you want to cancel it?';
 const hasPendingIntegrationDraft = () => !!pendingIntegrationDraft;
@@ -36,3 +36,8 @@ const confirmCancelPendingIntegration = () => {
   return shouldCancel;
 };
 exports.confirmCancelPendingIntegration = confirmCancelPendingIntegration;
+const isDraftForCurve = (jcampIdx, dataLength) => {
+  if (!pendingIntegrationDraft) return false;
+  return pendingIntegrationDraft.jcampIdx === jcampIdx && pendingIntegrationDraft.dataLength === dataLength;
+};
+exports.isDraftForCurve = isDraftForCurve;

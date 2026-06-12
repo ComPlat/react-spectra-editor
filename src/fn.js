@@ -4,6 +4,7 @@ import { ExtractJcamp, buildLcmsMsPageJcamp } from './helpers/chem';
 import { ToXY } from './helpers/converter';
 import { calcMpyCenter } from './helpers/multiplicity_calc';
 import { carbonFeatures } from './helpers/carbonFeatures';
+import { serializeIntegrationRecords } from './helpers/integration_jcamp';
 import { LIST_LAYOUT } from './constants/list_layout';
 
 const FN = Object.assign(
@@ -16,6 +17,7 @@ const FN = Object.assign(
     LIST_LAYOUT,
     CalcMpyCenter: calcMpyCenter,
     CarbonFeatures: carbonFeatures,
+    serializeIntegrationRecords,
   },
 );
 

@@ -103,7 +103,7 @@ const setFactor = (
 const iconColor = (criteria) => (criteria ? '#fff' : '#000');
 
 const Integration = ({
-  classes, ignoreRef,
+  classes, ignoreRef, showIntegSplitToolsSt,
   isDisableSt, isFocusAddIntgSt, isFocusRmIntgSt, isFocusSetRefSt,
   isFocusSplitIntgSt, isFocusVisualSplitIntgSt,
   setUiSweepTypeAct, setIntegrationFkrAct, clearIntegrationAllAct,
@@ -220,58 +220,66 @@ const Integration = ({
             </Tooltip>
           )
       }
-      <Tooltip title={<span className="txt-sv-tp">Split Integration</span>}>
-        <span>
-          <MuButton
-            className={
-              classNames(
-                isFocusSplitIntgSt ? classes.cancelBtn : focusStyle(false, classes),
-                'btn-split-inter',
-              )
-            }
-            disabled={isDisableSt}
-            onClick={onSweepIntegtSplit}
-          >
-            <Icon
-              path={isFocusSplitIntgSt ? mdiClose : mdiMathIntegral}
-              size={iconSize}
-              color={isFocusSplitIntgSt ? '#d32f2f' : iconColor(isDisableSt)}
-              className={classNames(classes.iconMdi, 'icon-sv-bar-splitint')}
-            />
-            {
-              isFocusSplitIntgSt
-                ? null
-                : <span className={classNames(classes.txt, classes.txtIcon, 'txt-sv-bar-splitint')}>/</span>
-            }
-          </MuButton>
-        </span>
-      </Tooltip>
-      <Tooltip title={<span className="txt-sv-tp">Visual Split Integration</span>}>
-        <span>
-          <MuButton
-            className={
-              classNames(
-                isFocusVisualSplitIntgSt ? classes.cancelBtn : focusStyle(false, classes),
-                'btn-visual-split-inter',
-              )
-            }
-            disabled={isDisableSt}
-            onClick={onSweepIntegtVisualSplit}
-          >
-            <Icon
-              path={isFocusVisualSplitIntgSt ? mdiClose : mdiMathIntegral}
-              size={iconSize}
-              color={isFocusVisualSplitIntgSt ? '#d32f2f' : iconColor(isDisableSt)}
-              className={classNames(classes.iconMdi, 'icon-sv-bar-visualsplitint')}
-            />
-            {
-              isFocusVisualSplitIntgSt
-                ? null
-                : <span className={classNames(classes.txt, classes.txtIcon, 'txt-sv-bar-visualsplitint')}>|</span>
-            }
-          </MuButton>
-        </span>
-      </Tooltip>
+      {
+        showIntegSplitToolsSt
+          ? (
+            <>
+              <Tooltip title={<span className="txt-sv-tp">Split Integration</span>}>
+                <span>
+                  <MuButton
+                    className={
+                      classNames(
+                        isFocusSplitIntgSt ? classes.cancelBtn : focusStyle(false, classes),
+                        'btn-split-inter',
+                      )
+                    }
+                    disabled={isDisableSt}
+                    onClick={onSweepIntegtSplit}
+                  >
+                    <Icon
+                      path={isFocusSplitIntgSt ? mdiClose : mdiMathIntegral}
+                      size={iconSize}
+                      color={isFocusSplitIntgSt ? '#d32f2f' : iconColor(isDisableSt)}
+                      className={classNames(classes.iconMdi, 'icon-sv-bar-splitint')}
+                    />
+                    {
+                      isFocusSplitIntgSt
+                        ? null
+                        : <span className={classNames(classes.txt, classes.txtIcon, 'txt-sv-bar-splitint')}>/</span>
+                    }
+                  </MuButton>
+                </span>
+              </Tooltip>
+              <Tooltip title={<span className="txt-sv-tp">Visual Split Integration</span>}>
+                <span>
+                  <MuButton
+                    className={
+                      classNames(
+                        isFocusVisualSplitIntgSt ? classes.cancelBtn : focusStyle(false, classes),
+                        'btn-visual-split-inter',
+                      )
+                    }
+                    disabled={isDisableSt}
+                    onClick={onSweepIntegtVisualSplit}
+                  >
+                    <Icon
+                      path={isFocusVisualSplitIntgSt ? mdiClose : mdiMathIntegral}
+                      size={iconSize}
+                      color={isFocusVisualSplitIntgSt ? '#d32f2f' : iconColor(isDisableSt)}
+                      className={classNames(classes.iconMdi, 'icon-sv-bar-visualsplitint')}
+                    />
+                    {
+                      isFocusVisualSplitIntgSt
+                        ? null
+                        : <span className={classNames(classes.txt, classes.txtIcon, 'txt-sv-bar-visualsplitint')}>|</span>
+                    }
+                  </MuButton>
+                </span>
+              </Tooltip>
+            </>
+          )
+          : null
+      }
       {
         !ignoreRef
           ? setFactor(
@@ -304,6 +312,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     isFocusSplitIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_SPLIT,
     isFocusVisualSplitIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_VISUAL_SPLIT,
     ignoreRef: Format.isHplcUvVisLayout(state.layout),
+    showIntegSplitToolsSt: Cfg.showIntegSplitTools(state.layout),
     curveSt: state.curve,
     integrationSt: state.integration.present,
     layoutSt: state.layout,
@@ -328,6 +337,7 @@ Integration.propTypes = {
   isFocusSplitIntgSt: PropTypes.bool.isRequired,
   isFocusVisualSplitIntgSt: PropTypes.bool.isRequired,
   ignoreRef: PropTypes.bool.isRequired,
+  showIntegSplitToolsSt: PropTypes.bool.isRequired,
   setUiSweepTypeAct: PropTypes.func.isRequired,
   setIntegrationFkrAct: PropTypes.func.isRequired,
   clearIntegrationAllAct: PropTypes.func.isRequired,

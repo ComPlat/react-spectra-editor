@@ -9,8 +9,10 @@ const d3 = require('d3');
 
 const SPLIT_PREVIEW_CLASS = 'integration-split-preview-line';
 const VISUAL_SPLIT_CLASS = 'integration-visual-split-line';
+const VISUAL_SPLIT_STROKE = 'red';
+const VISUAL_SPLIT_HOVER_STROKE = 'blue';
 const VISUAL_SPLIT_HIT_TOLERANCE_PX = 6;
-const NMR_SPLIT_PREVIEW_EXTENT = { y1: 38, y2: 55 };
+const FIXED_SPLIT_PREVIEW_EXTENT = { y1: 38, y2: 55 };
 
 const getIntegrationBounds = (target, shift = 0) => (
   [target.xL - shift, target.xU - shift].sort((a, b) => a - b)
@@ -127,7 +129,7 @@ const resolveSplitPreviewExtent = (focus, target, splitX, shift, ignoreRef) => {
   if (!Number.isFinite(splitX) || splitX <= xL || splitX >= xU) return null;
 
   if (!ignoreRef) {
-    return NMR_SPLIT_PREVIEW_EXTENT;
+    return FIXED_SPLIT_PREVIEW_EXTENT;
   }
 
   const [contextXL, contextXU] = resolveBaselineContextBounds(focus, target, shift);
@@ -208,23 +210,53 @@ const drawIntegrationVisualSplitLines = (
     .attr('class', 'exit')
     .remove();
 
-  lines.enter()
+  const merged = lines.enter()
     .append('line')
     .attr('class', VISUAL_SPLIT_CLASS)
-    .attr('stroke', 'red')
+    .merge(lines);
+
+  merged
+    .attr('stroke', VISUAL_SPLIT_STROKE)
     .attr('stroke-width', 2)
-    .merge(lines)
     .attr('x1', (d) => xt(d.splitX))
     .attr('x2', (d) => xt(d.splitX))
     .attr('y1', (d) => d.y1)
     .attr('y2', (d) => d.y2)
     .style('pointer-events', isInteractive ? 'stroke' : 'none')
-    .on('click', isInteractive && onClickLine
-      ? (event, d) => onClickLine(event, d.splitX)
-      : null);
+    .style('cursor', isInteractive ? 'pointer' : null);
+
+  if (isInteractive && onClickLine) {
+    merged
+      .on('click', (event, d) => onClickLine(event, d.splitX))
+      .on('mouseover', function onVisualSplitLineOver() {
+        d3.select(this).attr('stroke', VISUAL_SPLIT_HOVER_STROKE);
+      })
+      .on('mouseout', function onVisualSplitLineOut() {
+        d3.select(this).attr('stroke', VISUAL_SPLIT_STROKE);
+      });
+  } else {
+    merged
+      .on('click', null)
+      .on('mouseover', null)
+      .on('mouseout', null);
+  }
 };
 
+const resolveSplitTarget = (focus, data, splitX) => {
+  if (!data) return null;
+  if (Number.isFinite(splitX)) {
+    const stackTarget = getIntegrationSplitTarget(focus, splitX);
+    if (stackTarget) return stackTarget;
+  }
+  if (data.target) return data.target;
+  if (data.isMerged) return null;
+  return data;
+};
+
+const NMR_SPLIT_PREVIEW_EXTENT = FIXED_SPLIT_PREVIEW_EXTENT;
+
 export {
+  FIXED_SPLIT_PREVIEW_EXTENT,
   NMR_SPLIT_PREVIEW_EXTENT,
   clearIntegrationSplitPreview,
   drawIntegrationSplitPreview,
@@ -239,4 +271,5 @@ export {
   isAlreadyVisuallySplit,
   isMergedVisualSplitGroup,
   resolveSplitPreviewExtent,
+  resolveSplitTarget,
 };

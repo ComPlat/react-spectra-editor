@@ -9,6 +9,7 @@ var _init = require("../../helpers/init");
 var _mount = require("../../helpers/mount");
 var _brush = _interopRequireDefault(require("../../helpers/brush"));
 var _compass = require("../../helpers/compass");
+var _integration_focus = require("../../helpers/integration_focus");
 var _integration_split = require("../../helpers/integration_split");
 var _converter = require("../../helpers/converter");
 var _focus = require("../../helpers/focus");
@@ -98,7 +99,6 @@ class LineFocus {
     this.drawComparisons = this.drawComparisons.bind(this);
     this.onClickTarget = this.onClickTarget.bind(this);
     this.onClickIntegrationTarget = this.onClickIntegrationTarget.bind(this);
-    this.onClickVisualSplitLine = this.onClickVisualSplitLine.bind(this);
     this.onIntegrationMouseMove = this.onIntegrationMouseMove.bind(this);
     this.clearSplitPreview = this.clearSplitPreview.bind(this);
     this.drawVisualSplitLines = this.drawVisualSplitLines.bind(this);
@@ -279,113 +279,23 @@ class LineFocus {
     (0, _integration_split.clearIntegrationSplitPreview)(this);
   }
   onIntegrationMouseMove(event, data, shift, ignoreRef) {
-    if (!this.isUiSplitIntgSt && !this.isUiVisualSplitIntgSt) return;
-    if (this.isUiVisualSplitIntgSt && (0, _integration_split.isAlreadyVisuallySplit)(data)) {
-      this.clearSplitPreview();
-      return;
-    }
-    if (this.isUiSplitIntgSt && (0, _integration_split.isMergedVisualSplitGroup)(data)) {
-      this.clearSplitPreview();
-      return;
-    }
-    const splitX = (0, _integration_split.getSplitXFromEvent)(event, this);
-    (0, _integration_split.drawIntegrationSplitPreview)(this, data, splitX, shift, ignoreRef);
+    (0, _integration_focus.handleIntegrationMouseMove)(this, event, data, shift, ignoreRef);
   }
   onClickIntegrationTarget(event, data) {
-    if (!this.isUiSplitIntgSt && !this.isUiVisualSplitIntgSt) {
-      this.onClickTarget(event, data);
-      return;
-    }
-    event.stopPropagation();
-    event.preventDefault();
-    const splitX = (0, _integration_split.getSplitXFromEvent)(event, this);
-    this.clearSplitPreview();
-    if (this.isUiVisualSplitIntgSt) {
-      const {
-        stack = [],
-        shift = 0
-      } = this.integrationSplitTargets || {};
-      const existingSplitX = (0, _integration_split.getVisualSplitLineAtX)(this, stack, splitX, shift);
-      if (Number.isFinite(existingSplitX)) {
-        if (typeof this.removeVisualSplitLineAct !== 'function') return;
-        this.removeVisualSplitLineAct({
-          curveIdx: this.jcampIdx,
-          splitX: existingSplitX,
-          data: this.data
-        });
-        return;
-      }
-      if ((0, _integration_split.isAlreadyVisuallySplit)(data)) return;
-      if (typeof this.addVisualSplitLineAct !== 'function') return;
-      this.addVisualSplitLineAct({
-        curveIdx: this.jcampIdx,
-        target: data,
-        splitX,
-        data: this.data
-      });
-      return;
-    }
-    if ((0, _integration_split.isMergedVisualSplitGroup)(data)) return;
-    this.splitIntegrationAct({
-      curveIdx: this.jcampIdx,
-      target: data,
-      splitX,
-      data: this.data
-    });
-  }
-  onClickVisualSplitLine(event, splitX) {
-    event.stopPropagation();
-    event.preventDefault();
-    this.clearSplitPreview();
-    if (typeof this.removeVisualSplitLineAct !== 'function') return;
-    this.removeVisualSplitLineAct({
-      curveIdx: this.jcampIdx,
-      splitX,
-      data: this.data
+    (0, _integration_focus.handleIntegrationClick)(this, event, data, (clickEvent, clickData) => {
+      this.onClickTarget(clickEvent, clickData);
     });
   }
   drawVisualSplitLines(stack, shift, ignoreRef) {
-    (0, _integration_split.drawIntegrationVisualSplitLines)(this, stack, shift, ignoreRef, this.isUiVisualSplitIntgSt, this.onClickVisualSplitLine);
+    (0, _integration_focus.drawVisualSplitLinesForFocus)(this, stack, shift, ignoreRef);
+  }
+  drawAUC(stack, shift = 0) {
+    (0, _integration_focus.drawIntegrationAUC)(this, stack, shift);
   }
   mergedPeaks(editPeakSt) {
     if (!editPeakSt) return this.dataPks;
     this.dataPks = (0, _converter.PksEdit)(this.dataPks, editPeakSt);
     return this.dataPks;
-  }
-  drawAUC(stack, shift = 0) {
-    const {
-      xt,
-      yt
-    } = (0, _compass.TfRescale)(this);
-    const groups = (0, _integration.getVisualSplitGroups)(stack).map(group => ({
-      xL: group.xL,
-      xU: group.xU,
-      isMerged: group.isMerged,
-      groupId: group.groupId,
-      target: group.items[0]
-    }));
-    const auc = this.tags.aucPath.selectAll('path').data(groups);
-    auc.exit().attr('class', 'exit').remove();
-    const integCurve = border => {
-      const {
-        xL,
-        xU
-      } = border;
-      const ps = (0, _integration.getIntegrationPoints)(xL - shift, xU - shift, this.data);
-      if (!ps[0]) return null;
-      const baselineY = (0, _integration.getLinearBaseline)(ps);
-      return d3.area().x(d => xt(d.x)).y0(d => yt(baselineY(d))).y1(d => yt(d.y))(ps);
-    };
-    auc.enter().append('path').attr('class', 'auc').attr('fill', 'red').attr('stroke', 'none').attr('fill-opacity', 0.2).attr('stroke-width', 2).merge(auc).attr('d', d => integCurve(d)).attr('id', d => `auc${(0, _focus.itgIdTag)(d)}`).on('mouseover', (event, d) => {
-      d3.select(`#auc${(0, _focus.itgIdTag)(d)}`).attr('stroke', 'blue');
-      d3.select(`#auc${(0, _focus.itgIdTag)(d)}`).attr('stroke', 'blue');
-      d3.select(`#auc${(0, _focus.itgIdTag)(d)}`).style('fill', 'blue');
-    }).on('mouseout', (event, d) => {
-      d3.select(`#auc${(0, _focus.itgIdTag)(d)}`).attr('stroke', 'none');
-      d3.select(`#auc${(0, _focus.itgIdTag)(d)}`).style('fill', 'red');
-      d3.select(`#auc${(0, _focus.itgIdTag)(d)}`).style('fill-opacity', 0.2);
-      this.clearSplitPreview();
-    }).on('mousemove', (event, d) => this.onIntegrationMouseMove(event, d, shift, true)).on('click', (event, d) => this.onClickIntegrationTarget(event, d));
   }
   drawPeaks(editPeakSt) {
     const {
@@ -465,6 +375,10 @@ class LineFocus {
     const isDisable = _cfg.default.btnCmdIntg(this.layout);
     const ignoreRef = _format.default.isHplcUvVisLayout(this.layout);
     const itgs = isDisable ? [] : stack;
+    const {
+      showIntegSplit,
+      igBarData
+    } = (0, _integration_focus.buildIntegrationBarData)(this.layout, itgs);
     Object.assign(this, {
       integrationSplitTargets: {
         stack: itgs,
@@ -472,16 +386,9 @@ class LineFocus {
         ignoreRef
       }
     });
-    const igGroups = (0, _integration.getVisualSplitGroups)(itgs).map(group => ({
-      xL: group.xL,
-      xU: group.xU,
-      isMerged: group.isMerged,
-      groupId: group.groupId,
-      target: group.items[0]
-    }));
-    const igbp = this.tags.igbPath.selectAll('path').data(igGroups);
+    const igbp = this.tags.igbPath.selectAll('path').data(igBarData);
     igbp.exit().attr('class', 'exit').remove();
-    const igcp = this.tags.igcPath.selectAll('path').data(igGroups);
+    const igcp = this.tags.igcPath.selectAll('path').data(igBarData);
     igcp.exit().attr('class', 'exit').remove();
     const igtp = this.tags.igtPath.selectAll('text').data(itgs);
     igtp.exit().attr('class', 'exit').remove();
@@ -490,7 +397,7 @@ class LineFocus {
       const auc = this.tags.aucPath.selectAll('path').data(stack);
       auc.exit().attr('class', 'exit').remove();
       auc.merge(auc);
-      this.drawVisualSplitLines([], shift, ignoreRef);
+      this.drawVisualSplitLines(showIntegSplit ? itgs : [], shift, ignoreRef);
       return;
     }
     if (ignoreRef) {
@@ -510,8 +417,8 @@ class LineFocus {
         d3.select(`#igbp${(0, _focus.itgIdTag)(d)}`).attr('stroke', '#228B22');
         d3.select(`#igbc${(0, _focus.itgIdTag)(d)}`).attr('stroke', '#228B22');
         d3.select(`#igtp${(0, _focus.itgIdTag)(d)}`).style('fill', '#228B22');
-        this.clearSplitPreview();
-      }).on('mousemove', (event, d) => this.onIntegrationMouseMove(event, d, shift, ignoreRef)).on('click', (event, d) => this.onClickIntegrationTarget(event, d));
+        if (showIntegSplit) this.clearSplitPreview();
+      }).on('mousemove', showIntegSplit ? (event, d) => this.onIntegrationMouseMove(event, d, shift, ignoreRef) : null).on('click', (event, d) => this.onClickIntegrationTarget(event, d));
       const integCurve = border => {
         const {
           xL,
@@ -535,8 +442,8 @@ class LineFocus {
         d3.select(`#igbp${(0, _focus.itgIdTag)(d)}`).attr('stroke', '#228B22');
         d3.select(`#igbc${(0, _focus.itgIdTag)(d)}`).attr('stroke', '#228B22');
         d3.select(`#igtp${(0, _focus.itgIdTag)(d)}`).style('fill', '#228B22');
-        this.clearSplitPreview();
-      }).on('mousemove', (event, d) => this.onIntegrationMouseMove(event, d, shift, ignoreRef)).on('click', (event, d) => this.onClickIntegrationTarget(event, d));
+        if (showIntegSplit) this.clearSplitPreview();
+      }).on('mousemove', showIntegSplit ? (event, d) => this.onIntegrationMouseMove(event, d, shift, ignoreRef) : null).on('click', (event, d) => this.onClickIntegrationTarget(event, d));
       igtp.enter().append('text').attr('class', 'igtp').attr('font-family', 'Helvetica').style('font-size', '12px').attr('fill', '#228B22').style('text-anchor', 'middle').merge(igtp).attr('id', d => `igtp${(0, _focus.itgIdTag)(d)}`).text(d => (0, _integration.calcArea)(d, refArea, refFactor, ignoreRef)).attr('transform', d => `translate(${xt((d.xL + d.xU) / 2 - shift)}, ${dh - 12})`).on('mouseover', (event, d) => {
         d3.select(`#igbp${(0, _focus.itgIdTag)(d)}`).attr('stroke', 'blue');
         d3.select(`#igbc${(0, _focus.itgIdTag)(d)}`).attr('stroke', 'blue');
@@ -545,10 +452,10 @@ class LineFocus {
         d3.select(`#igbp${(0, _focus.itgIdTag)(d)}`).attr('stroke', '#228B22');
         d3.select(`#igbc${(0, _focus.itgIdTag)(d)}`).attr('stroke', '#228B22');
         d3.select(`#igtp${(0, _focus.itgIdTag)(d)}`).style('fill', '#228B22');
-        this.clearSplitPreview();
-      }).on('mousemove', (event, d) => this.onIntegrationMouseMove(event, d, shift, ignoreRef)).on('click', (event, d) => this.onClickIntegrationTarget(event, d));
+        if (showIntegSplit) this.clearSplitPreview();
+      }).on('mousemove', showIntegSplit ? (event, d) => this.onIntegrationMouseMove(event, d, shift, ignoreRef) : null).on('click', (event, d) => this.onClickIntegrationTarget(event, d));
     }
-    this.drawVisualSplitLines(itgs, shift, ignoreRef);
+    this.drawVisualSplitLines(showIntegSplit ? itgs : [], shift, ignoreRef);
   }
   drawMtply(mtplySt) {
     const {

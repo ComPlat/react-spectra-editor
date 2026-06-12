@@ -192,8 +192,10 @@ const mapStateToProps = (state, props) => (
     mtplySt: state.multiplicity.present,
     sweepExtentSt: state.ui.sweepExtent,
     isUiAddIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
-    isUiSplitIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_SPLIT,
-    isUiVisualSplitIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_VISUAL_SPLIT,
+    isUiSplitIntgSt: Cfg.showIntegSplitTools(state.layout)
+      && state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_SPLIT,
+    isUiVisualSplitIntgSt: Cfg.showIntegSplitTools(state.layout)
+      && state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_VISUAL_SPLIT,
     isUiNoBrushSt: LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
     wavelength: state.wavelength,
     axesUnitsSt: state.axesUnits,

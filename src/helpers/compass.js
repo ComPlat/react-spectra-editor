@@ -1,6 +1,7 @@
 import Format from './format';
 import { Convert2DValue } from './chem';
 import { LIST_UI_SWEEP_TYPE } from '../constants/list_ui';
+import Cfg from './cfg';
 import { buildSweepPayloadFromXBounds } from './sweep.js'; // eslint-disable-line import/extensions
 import {
   forgetPendingIntegrationDraft,
@@ -103,6 +104,7 @@ const cancelIntegrationDraft = (focus) => {
 
 const updateIntegrationPreview = (event, focus) => {
   if (!focus.isUiAddIntgSt || !focus.firstIntegrationPoint) return;
+  if (!Cfg.showIntegSplitTools(focus.layout)) return;
   const pt = getCurvePointFromEvent(event, focus);
   if (!pt) return;
   drawIntegrationPreview(focus, focus.firstIntegrationPoint, pt);
@@ -240,7 +242,7 @@ const clickIntegrationPoint = (event, focus) => {
 const ClickCompass = (event, focus) => {
   event.stopPropagation();
   event.preventDefault();
-  if (focus.isUiAddIntgSt) {
+  if (focus.isUiAddIntgSt && Cfg.showIntegSplitTools(focus.layout)) {
     clickIntegrationPoint(event, focus);
     return;
   }

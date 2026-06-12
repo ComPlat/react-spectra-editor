@@ -11,6 +11,7 @@ var _redux = require("redux");
 var _propTypes = _interopRequireDefault(require("prop-types"));
 var _chem = require("../../helpers/chem");
 var _format = _interopRequireDefault(require("../../helpers/format"));
+var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 var _manager = require("../../actions/manager");
 var _ui = require("../../actions/ui");
 var _integration = require("../../actions/integration");
@@ -58,9 +59,8 @@ class ViewerMulti extends _react.default.Component {
     this.syncFocusActions = this.syncFocusActions.bind(this);
   }
   componentDidMount() {
-    this.syncFocusActions();
-    this.renderChart(this.props, true);
     this.setupResizeObserver();
+    this.mountChart(this.props, true);
   }
   componentDidUpdate(prevProps) {
     const {
@@ -133,7 +133,7 @@ class ViewerMulti extends _react.default.Component {
     const size = this.getContainerSize();
     if (!size) return;
     if (!this.currentSize || size.width !== this.currentSize.width || size.height !== this.currentSize.height) {
-      this.renderChart(this.props, false);
+      this.mountChart(this.props, false);
     }
   }
   getContainerSize() {
@@ -239,7 +239,29 @@ class ViewerMulti extends _react.default.Component {
       resetAllAct(feature);
     }
   }
-  renderChart(props, shouldReset) {
+  createMultiFocus(size, props) {
+    const {
+      entities,
+      clickUiTargetAct,
+      selectUiSweepAct,
+      scrollUiWheelAct,
+      splitIntegrationAct,
+      addVisualSplitLineAct,
+      removeVisualSplitLineAct
+    } = props;
+    return new _multi_focus.default({
+      W: size.width,
+      H: size.height,
+      entities,
+      clickUiTargetAct,
+      selectUiSweepAct,
+      scrollUiWheelAct,
+      splitIntegrationAct,
+      addVisualSplitLineAct,
+      removeVisualSplitLineAct
+    });
+  }
+  mountChart(props, shouldReset = false) {
     const {
       curveSt,
       seed,
@@ -253,6 +275,7 @@ class ViewerMulti extends _react.default.Component {
       sweepExtentSt,
       isUiAddIntgSt,
       isUiSplitIntgSt,
+      isUiVisualSplitIntgSt,
       isUiNoBrushSt,
       isHidden,
       resetAllAct,
@@ -275,15 +298,8 @@ class ViewerMulti extends _react.default.Component {
       xxLabel,
       yyLabel
     } = this.resolveAxisLabels(props);
-    this.focus = new _multi_focus.default({
-      W: size.width,
-      H: size.height,
-      entities,
-      clickUiTargetAct,
-      selectUiSweepAct,
-      scrollUiWheelAct,
-      splitIntegrationAct
-    });
+    this.focus = this.createMultiFocus(size, props);
+    this.syncFocusActions();
     (0, _draw.drawMain)(this.rootKlass, size.width, size.height);
     this.focus.create({
       curveSt,
@@ -296,6 +312,7 @@ class ViewerMulti extends _react.default.Component {
       sweepExtentSt,
       isUiAddIntgSt,
       isUiSplitIntgSt,
+      isUiVisualSplitIntgSt,
       isUiNoBrushSt,
       cyclicvoltaSt,
       integrationSt,
@@ -331,8 +348,8 @@ const mapStateToProps = (state, props) => ({
   layoutSt: state.layout,
   sweepExtentSt: state.ui.sweepExtent,
   isUiAddIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
-  isUiSplitIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_SPLIT,
-  isUiVisualSplitIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_VISUAL_SPLIT,
+  isUiSplitIntgSt: _cfg.default.showIntegSplitTools(state.layout) && state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_SPLIT,
+  isUiVisualSplitIntgSt: _cfg.default.showIntegSplitTools(state.layout) && state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_VISUAL_SPLIT,
   isUiNoBrushSt: _list_ui.LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
   cyclicvoltaSt: state.cyclicvolta,
   maxminPeakSt: (0, _chem.Feature2MaxMinPeak)(state, props),

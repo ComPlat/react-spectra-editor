@@ -3,13 +3,15 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.resolveSplitPreviewExtent = exports.isMergedVisualSplitGroup = exports.isAlreadyVisuallySplit = exports.interpolateY = exports.getVisualSplitLines = exports.getVisualSplitLineAtX = exports.getSplitXFromEvent = exports.getIntegrationSplitTargetFromEvent = exports.getIntegrationSplitTarget = exports.getIntegrationBounds = exports.drawIntegrationVisualSplitLines = exports.drawIntegrationSplitPreview = exports.clearIntegrationSplitPreview = exports.NMR_SPLIT_PREVIEW_EXTENT = void 0;
+exports.resolveSplitTarget = exports.resolveSplitPreviewExtent = exports.isMergedVisualSplitGroup = exports.isAlreadyVisuallySplit = exports.interpolateY = exports.getVisualSplitLines = exports.getVisualSplitLineAtX = exports.getSplitXFromEvent = exports.getIntegrationSplitTargetFromEvent = exports.getIntegrationSplitTarget = exports.getIntegrationBounds = exports.drawIntegrationVisualSplitLines = exports.drawIntegrationSplitPreview = exports.clearIntegrationSplitPreview = exports.NMR_SPLIT_PREVIEW_EXTENT = exports.FIXED_SPLIT_PREVIEW_EXTENT = void 0;
 var _integration = require("./integration");
 const d3 = require('d3');
 const SPLIT_PREVIEW_CLASS = 'integration-split-preview-line';
 const VISUAL_SPLIT_CLASS = 'integration-visual-split-line';
+const VISUAL_SPLIT_STROKE = 'red';
+const VISUAL_SPLIT_HOVER_STROKE = 'blue';
 const VISUAL_SPLIT_HIT_TOLERANCE_PX = 6;
-const NMR_SPLIT_PREVIEW_EXTENT = exports.NMR_SPLIT_PREVIEW_EXTENT = {
+const FIXED_SPLIT_PREVIEW_EXTENT = exports.FIXED_SPLIT_PREVIEW_EXTENT = {
   y1: 38,
   y2: 55
 };
@@ -118,7 +120,7 @@ const resolveSplitPreviewExtent = (focus, target, splitX, shift, ignoreRef) => {
   const [xL, xU] = getIntegrationBounds(target, shift);
   if (!Number.isFinite(splitX) || splitX <= xL || splitX >= xU) return null;
   if (!ignoreRef) {
-    return NMR_SPLIT_PREVIEW_EXTENT;
+    return FIXED_SPLIT_PREVIEW_EXTENT;
   }
   const [contextXL, contextXU] = resolveBaselineContextBounds(focus, target, shift);
   const points = (0, _integration.getIntegrationPoints)(contextXL, contextXU, focus.data);
@@ -173,6 +175,28 @@ const drawIntegrationVisualSplitLines = (focus, stack = [], shift = 0, ignoreRef
   const xt = focus.scales.x;
   const lines = focus.tags.visualSplitPath.selectAll(`line.${VISUAL_SPLIT_CLASS}`).data(splitLines, d => d.key);
   lines.exit().attr('class', 'exit').remove();
-  lines.enter().append('line').attr('class', VISUAL_SPLIT_CLASS).attr('stroke', 'red').attr('stroke-width', 2).merge(lines).attr('x1', d => xt(d.splitX)).attr('x2', d => xt(d.splitX)).attr('y1', d => d.y1).attr('y2', d => d.y2).style('pointer-events', isInteractive ? 'stroke' : 'none').on('click', isInteractive && onClickLine ? (event, d) => onClickLine(event, d.splitX) : null);
+  const merged = lines.enter().append('line').attr('class', VISUAL_SPLIT_CLASS).merge(lines);
+  merged.attr('stroke', VISUAL_SPLIT_STROKE).attr('stroke-width', 2).attr('x1', d => xt(d.splitX)).attr('x2', d => xt(d.splitX)).attr('y1', d => d.y1).attr('y2', d => d.y2).style('pointer-events', isInteractive ? 'stroke' : 'none').style('cursor', isInteractive ? 'pointer' : null);
+  if (isInteractive && onClickLine) {
+    merged.on('click', (event, d) => onClickLine(event, d.splitX)).on('mouseover', function onVisualSplitLineOver() {
+      d3.select(this).attr('stroke', VISUAL_SPLIT_HOVER_STROKE);
+    }).on('mouseout', function onVisualSplitLineOut() {
+      d3.select(this).attr('stroke', VISUAL_SPLIT_STROKE);
+    });
+  } else {
+    merged.on('click', null).on('mouseover', null).on('mouseout', null);
+  }
 };
 exports.drawIntegrationVisualSplitLines = drawIntegrationVisualSplitLines;
+const resolveSplitTarget = (focus, data, splitX) => {
+  if (!data) return null;
+  if (Number.isFinite(splitX)) {
+    const stackTarget = getIntegrationSplitTarget(focus, splitX);
+    if (stackTarget) return stackTarget;
+  }
+  if (data.target) return data.target;
+  if (data.isMerged) return null;
+  return data;
+};
+exports.resolveSplitTarget = resolveSplitTarget;
+const NMR_SPLIT_PREVIEW_EXTENT = exports.NMR_SPLIT_PREVIEW_EXTENT = FIXED_SPLIT_PREVIEW_EXTENT;

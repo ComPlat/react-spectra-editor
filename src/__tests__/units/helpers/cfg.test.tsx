@@ -360,4 +360,22 @@ describe('Test Config helper', () => {
       })
     })
   })
+
+  describe('Integration split tools gate', () => {
+    it('enables split tools only for HPLC UV/VIS', () => {
+      expect(Config.showIntegSplitTools(LIST_LAYOUT.HPLC_UVVIS)).toBe(true);
+    });
+
+    it('disables split tools for NMR and other layouts', () => {
+      [
+        LIST_LAYOUT.H1,
+        LIST_LAYOUT.C13,
+        LIST_LAYOUT.MS,
+        LIST_LAYOUT.IR,
+        LIST_LAYOUT.CYCLIC_VOLTAMMETRY,
+      ].forEach((layout) => {
+        expect(Config.showIntegSplitTools(layout)).toBe(false);
+      });
+    });
+  });
 })

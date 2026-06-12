@@ -1,5 +1,6 @@
 "use strict";
 
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -8,6 +9,7 @@ var _compass = require("./compass");
 var _integration_draft = require("./integration_draft.js");
 var _sweep = require("./sweep.js");
 var _list_ui = require("../constants/list_ui");
+var _cfg = _interopRequireDefault(require("./cfg"));
 /* eslint-disable prefer-object-spread */
 
 // eslint-disable-line import/extensions
@@ -28,6 +30,7 @@ const wheeled = (focus, event) => {
     brushClass
   }));
 };
+const usesTwoClickIntegAdd = (focus, isUiAddIntgSt) => isUiAddIntgSt && _cfg.default.showIntegSplitTools(focus.layout);
 const brushed = (focus, xOnly, event, brushedClass = '.d3Svg') => {
   const {
     selectUiSweepAct,
@@ -115,6 +118,7 @@ const MountBrush = (focus, isUiAddIntgSt, isUiNoBrushSt, brushedClass = '.d3Svg'
   Object.assign(focus, {
     isUiAddIntgSt
   });
+  const twoClickIntegAdd = usesTwoClickIntegAdd(focus, isUiAddIntgSt);
   const {
     firstIntegrationPoint,
     data,
@@ -135,15 +139,15 @@ const MountBrush = (focus, isUiAddIntgSt, isUiNoBrushSt, brushedClass = '.d3Svg'
   const isIntegrationAdd = uiSt?.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD;
   const isMultiplicitySweepAdd = uiSt?.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD;
   const isZoomIn = isZoomInSubview || isZoomInGlobal;
-  if (!(graphIndex === 0 && isIntegrationAdd) && !isZoomIn && !isMultiplicitySweepAdd) return;
+  if (graphIndex !== undefined && !(graphIndex === 0 && isIntegrationAdd) && !isZoomIn && !isMultiplicitySweepAdd) return;
   const isXAxisOnly = focus?.xOnlyBrush === true;
   const xOnly = isUiAddIntgSt || isXAxisOnly && !isZoomIn;
   const brushedCb = event => brushed(focus, xOnly, event, brushedClass);
   const wheeledCb = event => wheeled(focus, event);
-  if (isUiNoBrushSt) {
-    const target = xOnly ? brushX : brush;
-    const klass = xOnly ? 'brushX' : 'brush';
+  if (isUiNoBrushSt && !twoClickIntegAdd) {
+    const target = isUiAddIntgSt ? brushX : brush;
     target.handleSize(10).extent([[0, 0], [w, h]]).on('end', brushedCb);
+    const klass = isUiAddIntgSt ? 'brushX' : 'brush';
     root.append('g').attr('class', klass).on('mousemove', event => (0, _compass.MouseMove)(event, focus)).call(target);
   }
   svg.on('wheel', wheeledCb);

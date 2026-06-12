@@ -1,5 +1,6 @@
 import {
   NMR_SPLIT_PREVIEW_EXTENT,
+  drawIntegrationVisualSplitLines,
   getIntegrationBounds,
   getIntegrationSplitTarget,
   getVisualSplitLineAtX,
@@ -8,6 +9,7 @@ import {
   isAlreadyVisuallySplit,
   isMergedVisualSplitGroup,
   resolveSplitPreviewExtent,
+  resolveSplitTarget,
 } from "../../../helpers/integration_split";
 
 describe('Test helper for integration split preview', () => {
@@ -189,5 +191,80 @@ describe('Test helper for integration split preview', () => {
     expect(targetOnly).not.toBeNull();
     expect(fullData).not.toBeNull();
     expect(targetOnly).not.toEqual(fullData);
+  });
+
+  it('resolveSplitTarget maps merged group clicks to stack items at splitX', () => {
+    const focus = {
+      integrationSplitTargets: {
+        stack: [
+          { xL: 0, xU: 4, area: 2 },
+          { xL: 4, xU: 10, area: 3, visualSplitGroupId: 'g1' },
+        ],
+        shift: 0,
+      },
+    };
+    const mergedGroup = {
+      xL: 0,
+      xU: 10,
+      isMerged: true,
+      groupId: 'g1',
+      target: { xL: 0, xU: 4, area: 2 },
+    };
+
+    expect(resolveSplitTarget(focus, mergedGroup, 2)).toEqual({ xL: 0, xU: 4, area: 2 });
+    expect(resolveSplitTarget(focus, mergedGroup, 6)).toEqual({
+      xL: 4, xU: 10, area: 3, visualSplitGroupId: 'g1',
+    });
+    expect(resolveSplitTarget(focus, mergedGroup, 6)).toEqual({
+      xL: 4, xU: 10, area: 3, visualSplitGroupId: 'g1',
+    });
+    expect(resolveSplitTarget(focus, { xL: 1, xU: 5 }, 7)).toEqual({ xL: 4, xU: 10, area: 3, visualSplitGroupId: 'g1' });
+  });
+
+  it('drawIntegrationVisualSplitLines applies hover stroke and click handler when interactive', () => {
+    const chain = () => {
+      const link: any = {};
+      ['attr', 'style', 'on', 'merge', 'append', 'remove'].forEach((method) => {
+        link[method] = jest.fn(() => link);
+      });
+      return link;
+    };
+    const mergedSelection = chain();
+    const focus: any = {
+      scales: { x: (value: number) => value * 10, y: (value: number) => value },
+      data: [
+        { x: 0, y: 0 },
+        { x: 3, y: 4 },
+        { x: 6, y: 0 },
+      ],
+      tags: {
+        visualSplitPath: {
+          selectAll: () => ({
+            data: () => ({
+              exit: () => ({ attr: () => ({ remove: () => {} }) }),
+              enter: () => ({
+                append: () => ({
+                  attr: () => ({
+                    merge: () => mergedSelection,
+                  }),
+                }),
+              }),
+            }),
+          }),
+        },
+      },
+    };
+    const stack = [
+      { xL: 0, xU: 3, visualSplitGroupId: 'g1' },
+      { xL: 3, xU: 6, visualSplitGroupId: 'g1' },
+    ];
+    const onClickLine = jest.fn();
+
+    drawIntegrationVisualSplitLines(focus, stack, 0, true, true, onClickLine);
+
+    expect(mergedSelection.style).toHaveBeenCalledWith('pointer-events', 'stroke');
+    expect(mergedSelection.on).toHaveBeenCalledWith('click', expect.any(Function));
+    expect(mergedSelection.on).toHaveBeenCalledWith('mouseover', expect.any(Function));
+    expect(mergedSelection.on).toHaveBeenCalledWith('mouseout', expect.any(Function));
   });
 });

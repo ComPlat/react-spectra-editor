@@ -8,6 +8,7 @@ exports.getCurvePointFromEvent = exports.clearIntegrationPreview = exports.TfRes
 var _format = _interopRequireDefault(require("./format"));
 var _chem = require("./chem");
 var _list_ui = require("../constants/list_ui");
+var _cfg = _interopRequireDefault(require("./cfg"));
 var _sweep = require("./sweep.js");
 var _integration_draft = require("./integration_draft.js");
 var _integration_split = require("./integration_split");
@@ -95,6 +96,7 @@ const cancelIntegrationDraft = focus => {
 };
 const updateIntegrationPreview = (event, focus) => {
   if (!focus.isUiAddIntgSt || !focus.firstIntegrationPoint) return;
+  if (!_cfg.default.showIntegSplitTools(focus.layout)) return;
   const pt = getCurvePointFromEvent(event, focus);
   if (!pt) return;
   drawIntegrationPreview(focus, focus.firstIntegrationPoint, pt);
@@ -216,7 +218,7 @@ const clickIntegrationPoint = (event, focus) => {
 const ClickCompass = (event, focus) => {
   event.stopPropagation();
   event.preventDefault();
-  if (focus.isUiAddIntgSt) {
+  if (focus.isUiAddIntgSt && _cfg.default.showIntegSplitTools(focus.layout)) {
     clickIntegrationPoint(event, focus);
     return;
   }
