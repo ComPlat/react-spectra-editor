@@ -136,7 +136,6 @@ class MultiFocus {
     this.root.selectAll('.tic-legend').remove();
 
     const entries = this.getTicLegendEntries(ticEntities, hplcMsSt);
-    if (entries.length === 0) return;
     if (entries.length <= 1) return;
 
     const lineLength = 14;

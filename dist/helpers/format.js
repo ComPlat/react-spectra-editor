@@ -43,6 +43,16 @@ const fixDigit = (input, precision) => {
   const output = input || 0.0;
   return output.toFixed(precision);
 };
+
+/**
+ * Integer 0–20 for toFixed; invalid input uses fallback.
+ * Default 3 preserves legacy cursor precision.
+ */
+const clampDecimalPlaces = (value, fallback = 3) => {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.max(0, Math.min(20, Math.trunc(n)));
+};
 const buildData = entity => {
   if (!entity) return {
     isExist: false
@@ -812,6 +822,7 @@ const Format = {
   isGCLayout,
   isLCMsLayout,
   fixDigit,
+  clampDecimalPlaces,
   formatPeaksByPrediction,
   formatedMS,
   formatedEm,

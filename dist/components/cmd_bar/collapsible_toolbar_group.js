@@ -47,7 +47,7 @@ const styles = () => ({
     transform: 'rotate(90deg)'
   }
 });
-const countItems = children => _react.default.Children.toArray(children).filter(child => child != null && child !== false).length;
+const countItems = children => _react.default.Children.toArray(children).length;
 const CollapsibleToolbarGroup = ({
   classes,
   className,

@@ -87,6 +87,9 @@ function getLcMsInfo(entity = {}) {
   if (!kind && (xUnit.includes('TIME') || xUnit.includes('MINUTE')) && (yUnit.includes('INTENSITY') || yUnit.includes('COUNT'))) {
     kind = 'tic';
   }
+  if (entity.lcmsPolarity) {
+    polarity = entity.lcmsPolarity;
+  }
   return {
     kind: kind || 'unknown',
     polarity

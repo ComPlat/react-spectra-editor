@@ -312,7 +312,7 @@ DSCData.propTypes = {
 const InfoPanel = ({
   classes, expand, feature, integration, editorOnly, molSvg, descriptions,
   layoutSt, simulationSt, shiftSt, curveSt, exactMass,
-  onExapnd, onExpand, canChangeDescription, onDescriptionChanged, detectorSt,
+  onExpand, canChangeDescription, onDescriptionChanged, detectorSt,
   metaSt, updateDSCMetaDataAct, hplcMsSt, entities,
 }) => {
   if (!feature) return null;
@@ -364,7 +364,7 @@ const InfoPanel = ({
     <Accordion
       data-testid="PanelInfo"
       expanded={expand}
-      onChange={onExpand || onExapnd}
+      onChange={onExpand}
       disableGutters
       sx={{
         '&.MuiAccordion-root.Mui-expanded': { margin: 0 },
@@ -552,7 +552,6 @@ InfoPanel.propTypes = {
   shiftSt: PropTypes.object.isRequired,
   curveSt: PropTypes.object.isRequired,
   onExpand: PropTypes.func,
-  onExapnd: PropTypes.func,
   canChangeDescription: PropTypes.bool.isRequired,
   onDescriptionChanged: PropTypes.func,
   exactMass: PropTypes.string,

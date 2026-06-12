@@ -100,6 +100,13 @@ const MouseMove = (event, focus) => {
         focus.root.select('.cursor-txt-hz').attr('transform', `translate(${tx},${ty - 30})`).text(`2Theta: ${pt.x.toExponential(2)}, d-value: ${dValue}`);
       } else if (_format.default.isTGALayout(layout) || _format.default.isDSCLayout(layout)) {
         focus.root.select('.cursor-txt').attr('transform', `translate(${tx},${10})`).text(`X: ${pt.x.toFixed(3)}, Y: ${pt.y.toFixed(3)}`);
+      } else if (_format.default.isMsLayout(layout)) {
+        const maxY = d3.max(focus.data, row => row.y) || 0;
+        const relPct = maxY > 0 ? 100 * pt.y / maxY : 0;
+        const rel = maxY > 0 ? parseInt(relPct, 10) : 0;
+        const xPrecision = _format.default.clampDecimalPlaces(focus.decimal);
+        focus.root.select('.cursor-txt').attr('transform', `translate(${tx},${10})`).text(`${pt.x.toFixed(xPrecision)} (${rel})`);
+        focus.root.select('.cursor-txt-hz').text('');
       } else {
         focus.root.select('.cursor-txt').attr('transform', `translate(${tx},${10})`).text(pt.x.toFixed(3));
         if (freq) {

@@ -512,10 +512,10 @@ class ViewerLineRect extends React.Component {
   }
 
   normChange(prevProps) {
-    const { feature } = this.props;
+    const { feature, resetAllAct } = this.props;
     const oldFeature = prevProps.feature;
     if (oldFeature !== feature) {
-      // resetAllAct(feature);
+      resetAllAct(feature);
     }
   }
 

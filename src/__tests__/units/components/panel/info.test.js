@@ -67,7 +67,7 @@ describe("<InfoPanel />", () => {
     const renderer = 
       <AppWrapper store={store}>
         <ThemeProvider theme={theme}>
-          <InfoPanel expand={false} onExapnd={() => {}} {...baseProps} />
+          <InfoPanel expand={false} onExpand={() => {}} {...baseProps} />
         </ThemeProvider>
       </AppWrapper>
     ;
@@ -102,7 +102,7 @@ describe("<InfoPanel />", () => {
         <ThemeProvider theme={theme}>
           <InfoPanel
             expand
-            onExapnd={() => {}}
+            onExpand={() => {}}
             feature={feature}
             exactMass="121.0653"
           />

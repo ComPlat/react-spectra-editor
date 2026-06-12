@@ -61,7 +61,7 @@ const CollapsibleToolbarGroup = ({
 
   return (
     <span className={className} {...rest}>
-      <Tooltip title={expanded ? 'Replier' : 'Déplier'}>
+      <Tooltip title={expanded ? 'Collapse' : 'Expand'}>
         <span>
           <MuButton
             className="btn-sv-bar-group-toggle"
