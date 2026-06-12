@@ -301,7 +301,6 @@ class ViewerLineRect extends React.Component {
       W, H, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct, graphIndex: 2, uiSt,
     });
 
-    this.normChange = this.normChange.bind(this);
     this.extractSubView = this.extractSubView.bind(this);
     this.notifyHostOnSubViewerChange = this.notifyHostOnSubViewerChange.bind(this);
     this.extractUvvisView = this.extractUvvisView.bind(this);
@@ -385,7 +384,6 @@ class ViewerLineRect extends React.Component {
       isHidden, uiSt, hplcMsSt, integrationSt,
       editPeakSt,
     } = this.props;
-    this.normChange(prevProps);
     const { zoom } = uiSt;
     const { sweepExtent } = zoom || {};
     if (!Array.isArray(sweepExtent)) return;
@@ -509,14 +507,6 @@ class ViewerLineRect extends React.Component {
   handleUvvisRedo() {
     const { uvvisRedoAct } = this.props;
     uvvisRedoAct();
-  }
-
-  normChange(prevProps) {
-    const { feature, resetAllAct } = this.props;
-    const oldFeature = prevProps.feature;
-    if (oldFeature !== feature) {
-      resetAllAct(feature);
-    }
   }
 
   extractUvvisView() {
