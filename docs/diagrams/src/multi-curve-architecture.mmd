@@ -1,0 +1,41 @@
+flowchart LR
+  subgraph input [Curve Input]
+    MultiEntities["multiEntities"]
+  end
+
+  subgraph orchestration [Curve Initialization]
+    direction TB
+    SetAllCurves["setAllCurves"]
+    CurveExtraction["extractParams<br/>max/min peak extraction"]
+    MultiSaga["saga_multi_entities"]
+  end
+
+  subgraph state [Indexed Curve State]
+    direction TB
+    CurveState["curve.listCurves<br/>curveIdx"]
+    PerCurveState["thresholds, integrations,<br/>multiplicities, CV peaks"]
+  end
+
+  subgraph rendering [Multi-Curve Rendering]
+    direction TB
+    ViewerMulti["ViewerMulti"]
+    MultiFocus["MultiFocus<br/>active curve + overlays"]
+  end
+
+  MultiEntities --> SetAllCurves
+  SetAllCurves --> CurveExtraction
+  CurveExtraction --> CurveState
+  CurveState --> MultiSaga
+  MultiSaga --> PerCurveState
+  PerCurveState --> ViewerMulti
+  ViewerMulti --> MultiFocus
+
+  classDef hostStyle fill:#dbeafe,stroke:#2563eb,color:#1e3a8a,stroke-width:1.5px
+  classDef stateStyle fill:#ede9fe,stroke:#7c3aed,color:#3b0764,stroke-width:1.5px
+  classDef workflowStyle fill:#ffedd5,stroke:#f97316,color:#7c2d12,stroke-width:1.5px
+  classDef renderStyle fill:#dcfce7,stroke:#16a34a,color:#14532d,stroke-width:1.5px
+
+  class MultiEntities hostStyle
+  class CurveState,PerCurveState stateStyle
+  class SetAllCurves,CurveExtraction,MultiSaga workflowStyle
+  class ViewerMulti,MultiFocus renderStyle

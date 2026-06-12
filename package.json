@@ -48,7 +48,8 @@
     "eject": "react-scripts eject",
     "storybook": "start-storybook -p 3001 -c .storybook",
     "buildbook": "build-storybook -c .storybook -o .out",
-    "e2e": "cypress open"
+    "e2e": "cypress open",
+    "docs:diagrams": "bash docs/diagrams/generate.sh"
   },
   "peerDependencies": {
     "react": "^17.0.2",

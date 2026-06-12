@@ -39,6 +39,10 @@ $ yarn start
 
 [demo & step-by-step manual](https://github.com/ComPlat/react-spectra-editor/blob/master/DEMO_MANUAL.md)
 
+### Documentation
+
+- [Developer documentation](docs/README.md): architecture and diagrams
+
 ### Testing
 #### Unit test
 ```

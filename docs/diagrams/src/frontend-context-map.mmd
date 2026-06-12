@@ -1,0 +1,31 @@
+flowchart LR
+  subgraph hostInput [Host Input Boundary]
+    HostData["Host application<br/>data and workflow context"]
+  end
+
+  subgraph editorBoundary [react-spectra-editor Package]
+    SpectraEditor["SpectraEditor"]
+    EditorRuntime["Redux and Saga<br/>runtime orchestration"]
+    RenderingLayer["Rendering Layer"]
+  end
+
+  subgraph hostOutput [Host Output Boundary]
+    CallbackOutputs["Submit, forecast,<br/>and comparison callbacks"]
+    HostServices["Host services<br/>and persistence"]
+  end
+
+  HostData -->|"props"| SpectraEditor
+  SpectraEditor --> EditorRuntime
+  EditorRuntime --> RenderingLayer
+  EditorRuntime --> CallbackOutputs
+  CallbackOutputs --> HostServices
+
+  classDef host fill:#dbeafe,stroke:#2563eb,color:#1e3a8a,stroke-width:1.5px
+  classDef frontend fill:#ede9fe,stroke:#7c3aed,color:#3b0764,stroke-width:1.5px
+  classDef rendering fill:#dcfce7,stroke:#16a34a,color:#14532d,stroke-width:1.5px
+  classDef output fill:#ffedd5,stroke:#f97316,color:#7c2d12,stroke-width:1.5px
+
+  class HostData,HostServices host
+  class SpectraEditor,EditorRuntime frontend
+  class RenderingLayer rendering
+  class CallbackOutputs output

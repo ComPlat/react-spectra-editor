@@ -1,0 +1,31 @@
+flowchart LR
+  subgraph selection [Rendering Selection]
+    LayerContent["LayerContent"]
+    Decision["Layout and forecast decision"]
+  end
+
+  subgraph branches [Rendering Branches]
+    StandardBranch["Line spectra"]
+    MsBranch["MS bars"]
+    ForecastBranch["Forecast analysis"]
+    MultiBranch["Multi-spectrum and CV"]
+  end
+
+  subgraph d3Rendering [D3 Rendering Layer]
+    D3Layer["Viewer wrappers<br/>and focus classes"]
+  end
+
+  LayerContent --> Decision
+  Decision --> StandardBranch
+  Decision --> MsBranch
+  Decision --> ForecastBranch
+  Decision --> MultiBranch
+  branches --> D3Layer
+
+  classDef selectionStyle fill:#ede9fe,stroke:#7c3aed,color:#3b0764,stroke-width:1.5px
+  classDef branchStyle fill:#dbeafe,stroke:#2563eb,color:#1e3a8a,stroke-width:1.5px
+  classDef renderingStyle fill:#dcfce7,stroke:#16a34a,color:#14532d,stroke-width:1.5px
+
+  class LayerContent,Decision selectionStyle
+  class StandardBranch,MsBranch,ForecastBranch,MultiBranch branchStyle
+  class D3Layer renderingStyle

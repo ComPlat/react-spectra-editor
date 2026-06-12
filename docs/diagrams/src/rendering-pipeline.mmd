@@ -1,0 +1,39 @@
+flowchart LR
+  subgraph state [Redux-Derived Inputs]
+    direction TB
+    Selectors["Topic2Seed<br/>Feature2Peak<br/>comparison selectors"]
+    RenderInputs["seed, peaks,<br/>thresholds, overlays"]
+  end
+
+  subgraph react [React Ownership]
+    direction TB
+    LayerContent["LayerContent"]
+    ViewerWrappers["Viewer wrappers<br/>Line / Rect / Multi"]
+  end
+
+  subgraph d3 [D3 Ownership]
+    direction TB
+    FocusLayer["Focus classes<br/>LineFocus / RectFocus / MultiFocus"]
+    SvgLayers["SVG layers<br/>paths, axes, clips, overlays"]
+  end
+
+  subgraph helpers [D3 Helper Systems]
+    Helpers["draw, mount,<br/>brush, compass, init"]
+  end
+
+  Selectors --> RenderInputs
+  RenderInputs --> LayerContent
+  LayerContent --> ViewerWrappers
+  ViewerWrappers --> FocusLayer
+  FocusLayer --> Helpers
+  Helpers --> SvgLayers
+
+  classDef reactStyle fill:#dbeafe,stroke:#2563eb,color:#1e3a8a,stroke-width:1.5px
+  classDef stateStyle fill:#ede9fe,stroke:#7c3aed,color:#3b0764,stroke-width:1.5px
+  classDef renderStyle fill:#dcfce7,stroke:#16a34a,color:#14532d,stroke-width:1.5px
+  classDef helperStyle fill:#f3f4f6,stroke:#6b7280,color:#374151,stroke-width:1.5px
+
+  class LayerContent,ViewerWrappers reactStyle
+  class Selectors,RenderInputs stateStyle
+  class FocusLayer,SvgLayers renderStyle
+  class Helpers helperStyle
