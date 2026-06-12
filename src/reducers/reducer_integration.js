@@ -266,9 +266,8 @@ const splitStack = (state, action) => {
     return state;
   }
 
-  const [leftIntegration, rightIntegration] = buildSplitParts(
-    original, xL, splitX, xU, shift, data, stack,
-  );
+  const splitParts = buildSplitParts(original, xL, splitX, xU, shift, data, stack);
+  const [leftIntegration, rightIntegration] = splitParts;
 
   const newStack = dropOrphanVisualSplitGroupIds([
     ...stack.slice(0, targetIndex),

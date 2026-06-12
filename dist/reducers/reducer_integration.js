@@ -242,7 +242,8 @@ const splitStack = (state, action) => {
   if (!hasEnoughDataResolution(xL, splitX, data) || !hasEnoughDataResolution(splitX, xU, data)) {
     return state;
   }
-  const [leftIntegration, rightIntegration] = buildSplitParts(original, xL, splitX, xU, shift, data, stack);
+  const splitParts = buildSplitParts(original, xL, splitX, xU, shift, data, stack);
+  const [leftIntegration, rightIntegration] = splitParts;
   const newStack = dropOrphanVisualSplitGroupIds([...stack.slice(0, targetIndex), leftIntegration, rightIntegration, ...stack.slice(targetIndex + 1)]);
   const newIntegration = Object.assign({}, selectedIntegration, {
     stack: newStack

@@ -1,5 +1,4 @@
 import {
-  calcArea,
   getIntegrationPoints,
   getLinearBaseline,
   getVisualSplitGroups,

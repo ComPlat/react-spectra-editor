@@ -282,11 +282,7 @@ class ViewerMulti extends _react.default.Component {
       cyclicvoltaSt,
       integrationSt,
       mtplySt,
-      uiSt,
-      entities,
-      clickUiTargetAct,
-      selectUiSweepAct,
-      scrollUiWheelAct
+      uiSt
     } = props;
     const size = this.getTargetSize(layoutSt);
     this.currentSize = size;

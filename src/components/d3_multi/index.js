@@ -248,7 +248,6 @@ class ViewerMulti extends React.Component {
       sweepExtentSt, isUiAddIntgSt, isUiSplitIntgSt, isUiVisualSplitIntgSt, isUiNoBrushSt,
       isHidden, resetAllAct, cyclicvoltaSt,
       integrationSt, mtplySt, uiSt,
-      entities, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
     } = props;
 
     const size = this.getTargetSize(layoutSt);
