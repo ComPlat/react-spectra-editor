@@ -32,15 +32,6 @@ describe('Test redux actions for curve', () => {
       expect(type).toEqual(CURVE.SET_ALL_CURVES)
       expect(payload).toEqual(listCurves)
     })
-
-    it('Set all curves with optional meta (LC-MS hints)', () => {
-      const listCurves = [{ curve: 1 }]
-      const meta = { idDt: '42', lcmsUvvisWavelength: 254 }
-      const action = setAllCurves(listCurves, meta)
-      expect(action.type).toEqual(CURVE.SET_ALL_CURVES)
-      expect(action.payload).toEqual(listCurves)
-      expect(action.meta).toEqual(meta)
-    })
   })
 
   describe('Test should display all curves', () => {

@@ -5,7 +5,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
-import { compose } from 'redux';
+import { bindActionCreators, compose } from 'redux';
 
 import Tooltip from '@mui/material/Tooltip';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
@@ -15,12 +15,7 @@ import {
   Convert2Scan, Convert2Thres,
 } from '../../helpers/chem';
 import { MuButton, commonStyle } from './common';
-import {
-  extractPeaksEdit,
-  formatLcmsPeaksForBackend,
-  formatLcmsIntegralsForBackend,
-  getLcmsMzPageData,
-} from '../../helpers/extractPeaksEdit';
+import { extractPeaksEdit } from '../../helpers/extractPeaksEdit';
 import Format from '../../helpers/format';
 
 const styles = () => (
@@ -34,10 +29,7 @@ const getAxesSelection = (axesUnitsSt, curveIdx) => {
   const axes = axesUnitsSt?.axes;
   if (!Array.isArray(axes) || axes.length === 0) return { xUnit: '', yUnit: '' };
   const idx = Number.isFinite(curveIdx) ? curveIdx : 0;
-  return axes[idx] || axes[0] || {
-    xUnit: '',
-    yUnit: '',
-  };
+  return axes[idx] || axes[0] || { xUnit: '', yUnit: '' };
 };
 
 const resolveAxisLabels = (xLabel, yLabel, axesUnitsSt, curveIdx) => {
@@ -81,22 +73,6 @@ const defaultThreshold = {
   value: false,
   upper: false,
   lower: false,
-};
-
-const LCMS_INTEGRATIONS_EXPORT_MODES = ['percent', 'area', 'both'];
-const isLcmsIntegrationsExportMode = (v) => LCMS_INTEGRATIONS_EXPORT_MODES.includes(v);
-
-const resolveLcmsIntegrationsExportForSubmit = (analysis, hplcMsSt) => {
-  if (isLcmsIntegrationsExportMode(analysis?.lcmsIntegrationsExport)) {
-    return analysis.lcmsIntegrationsExport;
-  }
-  if (analysis?.lcmsIncludeIntegrationArea === true) {
-    return 'both';
-  }
-  if (isLcmsIntegrationsExportMode(hplcMsSt?.lcmsIntegrationsExport)) {
-    return hplcMsSt.lcmsIntegrationsExport;
-  }
-  return 'percent';
 };
 
 const pickFromList = (list, index, fallback = null) => (
@@ -198,41 +174,19 @@ const onClickCb = (
   layoutSt, shiftSt, analysis, decimalSt,
   integrationSt, multiplicitySt, waveLengthSt,
   cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData,
-  curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt,
+  curveList, editPeakSt, thresList, scanSt, feature,
 ) => (
   () => {
     const defaultCurves = feature ? [{ feature }] : [];
-    let curves = Array.isArray(curveList) && curveList.length > 0 ? curveList : defaultCurves;
-    if (layoutSt === 'LC/MS') {
-      curves = curves.filter((c) => c.lcmsKind === 'uvvis');
-      if (curves.length === 0) curves = defaultCurves;
-    }
+    const curves = Array.isArray(curveList) && curveList.length > 0 ? curveList : defaultCurves;
     const fallbackIdx = Number.isFinite(curveSt?.curveIdx) ? curveSt.curveIdx : 0;
     const indicesToSend = curves.length > 0
       ? curves.map((_, index) => index)
       : [fallbackIdx];
-    let lcmsGlobalFields = null;
-    if (layoutSt === 'LC/MS') {
-      const lcmsIntegrationsExport = resolveLcmsIntegrationsExportForSubmit(
-        analysis,
-        hplcMsSt,
-      );
-      lcmsGlobalFields = {
-        lcms_peaks: formatLcmsPeaksForBackend(hplcMsSt),
-        lcms_integrals: formatLcmsIntegralsForBackend(hplcMsSt),
-        lcms_integrations_export: lcmsIntegrationsExport,
-        lcms_peaks_text: Format.formatedLCMS(hplcMsSt, isAscend, decimalSt, {
-          lcmsIntegrationsExport,
-        }),
-        lcms_uvvis_wavelength: hplcMsSt?.uvvis?.selectedWaveLength ?? null,
-        lcms_mz_page: hplcMsSt?.tic?.currentPageValue ?? null,
-        lcms_mz_page_data: getLcmsMzPageData(hplcMsSt),
-      };
-    }
     const spectraList = indicesToSend.map((curveIdx) => {
       const curve = curves[curveIdx] || {};
       const curveFeature = curve.feature || feature;
-      const spectrumPayload = buildSpectrumPayload({
+      return buildSpectrumPayload({
         feature: curveFeature,
         curveIdx,
         editPeakSt,
@@ -252,17 +206,10 @@ const onClickCb = (
         analysis,
         decimalSt,
       });
-      if (lcmsGlobalFields && curve.lcmsKind === 'uvvis') {
-        return { ...spectrumPayload, ...lcmsGlobalFields };
-      }
-      return spectrumPayload;
     });
     const payload = {
       spectra_list: spectraList,
     };
-    if (lcmsGlobalFields) {
-      Object.assign(payload, lcmsGlobalFields);
-    }
     if (Number.isFinite(curveSt?.curveIdx)) {
       payload.curveSt = { curveIdx: curveSt.curveIdx };
     }
@@ -276,7 +223,6 @@ const BtnSubmit = ({
   decimalSt, integrationSt, multiplicitySt,
   waveLengthSt, cyclicvoltaSt, curveSt, curveList, axesUnitsSt, detectorSt,
   metaSt,
-  hplcMsSt,
 }) => {
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
   const { dscMetaData } = metaSt;
@@ -318,7 +264,7 @@ const BtnSubmit = ({
           layoutSt, shiftSt, forecastSt.predictions, decimalSt,
           integrationSt, multiplicitySt, waveLengthSt,
           cyclicvoltaPayload, curveSt, axesUnitsSt, detectorSt, dscMetaData,
-          curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt,
+          curveList, editPeakSt, thresList, scanSt, feature,
         )}
       >
         <PlayCircleOutlineIcon className={classes.icon} />
@@ -345,8 +291,12 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     axesUnitsSt: state.axesUnits,
     detectorSt: state.detector,
     metaSt: state.meta,
-    hplcMsSt: state.hplcMs,
   }
+);
+
+const mapDispatchToProps = (dispatch) => (
+  bindActionCreators({
+  }, dispatch)
 );
 
 BtnSubmit.propTypes = {
@@ -376,14 +326,9 @@ BtnSubmit.propTypes = {
   axesUnitsSt: PropTypes.object.isRequired,
   detectorSt: PropTypes.object.isRequired,
   metaSt: PropTypes.object.isRequired,
-  hplcMsSt: PropTypes.object,
-};
-
-BtnSubmit.defaultProps = {
-  hplcMsSt: {},
 };
 
 export default compose(
-  connect(mapStateToProps, null),
+  connect(mapStateToProps, mapDispatchToProps),
   withStyles(styles),
 )(BtnSubmit);

@@ -22,7 +22,7 @@ const d3 = require('d3');
 class LineFocus {
   constructor(props) {
     const {
-      W, H, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct, uiSt,
+      W, H, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
     } = props;
 
     this.jcampIdx = 0;
@@ -33,8 +33,6 @@ class LineFocus {
       l: 60,
       r: 5,
     };
-    this.uiSt = uiSt;
-    this.graphIndex = uiSt?.zoom?.graphIndex;
     this.w = W - this.margin.l - this.margin.r;
     this.h = H - this.margin.t - this.margin.b;
     this.clickUiTargetAct = clickUiTargetAct;
@@ -102,13 +100,7 @@ class LineFocus {
     const sameMySt = prevMySt === nextMySt;
     const sameTePt = prevTePt === this.tTrEndPts.length;
     const sameDtPk = prevDtPk === this.dataPks.length;
-    const sameSfPk = prevSfPk === this.tSfPeaks
-      || (
-        Array.isArray(prevSfPk)
-        && Array.isArray(this.tSfPeaks)
-        && prevSfPk.length === this.tSfPeaks.length
-        && prevSfPk.every((peak, idx) => peak === this.tSfPeaks[idx])
-      );
+    const sameSfPk = JSON.stringify(prevSfPk) === JSON.stringify(this.tSfPeaks);
     const sameData = prevData === this.data.length;
     const sameRef = prevEpSt.prevOffset === nextEpSt.prevOffset;
     this.shouldUpdate = Object.assign(
@@ -386,13 +378,13 @@ class LineFocus {
     }
   }
 
-  drawInteg(integrationState) {
+  drawInteg(integationSt) {
     const {
       sameXY, sameLySt, sameItSt, sameData,
     } = this.shouldUpdate;
     if (sameXY && sameLySt && sameItSt && sameData) return;
 
-    const { selectedIdx, integrations } = integrationState;
+    const { selectedIdx, integrations } = integationSt;
     const selectedIntegration = integrations[selectedIdx];
 
     const {
@@ -551,21 +543,13 @@ class LineFocus {
     const { sameXY, sameLySt, sameMySt } = this.shouldUpdate;
     if (sameXY && sameLySt && sameMySt) return;
 
-    const { selectedIdx, multiplicities = [] } = mtplySt || {};
-    const selectedMulti = multiplicities[selectedIdx] || {};
+    const { selectedIdx, multiplicities } = mtplySt;
+    const selectedMulti = multiplicities[selectedIdx];
 
-    const {
-      stack = [], smExtext = false, shift = 0,
-    } = selectedMulti;
-    const hasValidExtent = (extent) => (
-      extent
-      && Number.isFinite(extent.xL)
-      && Number.isFinite(extent.xU)
-    );
-    const mpys = stack.filter((m) => hasValidExtent(m?.xExtent));
+    const { stack, smExtext, shift } = selectedMulti;
+    const mpys = stack;
     const isDisable = Cfg.btnCmdMpy(this.layout);
-    if (mpys.length === 0 || isDisable) return;
-    const activeExtent = hasValidExtent(smExtext) ? smExtext : mpys[0].xExtent;
+    if (mpys === 0 || isDisable) return;
     // rescale for zoom
     const { xt } = TfRescale(this);
 
@@ -583,10 +567,7 @@ class LineFocus {
       .remove();
     let mPeaks = mpys.map((m) => {
       const { peaks, xExtent } = m;
-      const safePeaks = Array.isArray(peaks) ? peaks : [];
-      return safePeaks
-        .filter((p) => Number.isFinite(p?.x) && Number.isFinite(p?.y))
-        .map((p) => Object.assign({}, p, { xExtent }));
+      return peaks.map((p) => Object.assign({}, p, { xExtent }));
     });
     mPeaks = [].concat(...mPeaks);
     const mpyp = this.tags.mpypPath.selectAll('path').data(mPeaks);
@@ -609,7 +590,7 @@ class LineFocus {
 
     const mpyColor = (d) => {
       const { xL, xU } = d.xExtent;
-      return (activeExtent.xL === xL && activeExtent.xU === xU) ? 'purple' : '#DA70D6';
+      return (smExtext.xL === xL && smExtext.xU === xU) ? 'purple' : '#DA70D6';
     };
 
     mpyb.enter()
@@ -811,12 +792,10 @@ class LineFocus {
 
   create({
     filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, comparisons,
-    editPeakSt, layoutSt, integrationSt, mtplySt,
+    editPeakSt, layoutSt, integationSt, mtplySt,
     sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
-    wavelength, uiSt,
+    wavelength,
   }) {
-    this.uiSt = uiSt;
-    this.graphIndex = uiSt?.zoom?.graphIndex;
     this.svg = d3.select('.d3Svg');
     MountMainFrame(this, 'focus');
     MountClip(this);
@@ -843,40 +822,38 @@ class LineFocus {
       this.drawGrid();
       this.drawRef();
       this.drawPeaks(editPeakSt);
-      this.drawInteg(integrationSt);
+      this.drawInteg(integationSt);
       this.drawMtply(mtplySt);
       this.drawComparisons(comparisons);
     }
     MountBrush(this, isUiAddIntgSt, isUiNoBrushSt);
-    this.resetShouldUpdate(editPeakSt, integrationSt, mtplySt);
+    this.resetShouldUpdate(editPeakSt, integationSt, mtplySt);
   }
 
   update({
     filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, comparisons,
-    editPeakSt, layoutSt, integrationSt, mtplySt, uiSt,
+    editPeakSt, layoutSt, integationSt, mtplySt,
     sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
     wavelength,
   }) {
-    this.uiSt = uiSt;
-    this.graphIndex = uiSt?.zoom?.graphIndex;
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, this.reverseXAxis(layoutSt));
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt, wavelength);
 
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);
-      this.getShouldUpdate(editPeakSt, integrationSt, mtplySt);
+      this.getShouldUpdate(editPeakSt, integationSt, mtplySt);
       this.drawLine();
       this.drawThres();
       this.drawGrid();
       this.drawRef();
       this.drawPeaks(editPeakSt);
-      this.drawInteg(integrationSt);
+      this.drawInteg(integationSt);
       this.drawMtply(mtplySt);
       this.drawComparisons(comparisons);
     }
     MountBrush(this, isUiAddIntgSt, isUiNoBrushSt);
-    this.resetShouldUpdate(editPeakSt, integrationSt, mtplySt);
+    this.resetShouldUpdate(editPeakSt, integationSt, mtplySt);
   }
 }
 

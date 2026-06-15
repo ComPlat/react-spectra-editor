@@ -22,7 +22,6 @@ const LIST_LAYOUT = {
   DLS_INTENSITY: 'DLS intensity',
   DSC: 'DIFFERENTIAL SCANNING CALORIMETRY',
   GC: 'GAS CHROMATOGRAPHY',
-  LC_MS: 'LC/MS',
 };
 
 export {

@@ -17,10 +17,6 @@ import { mdiReflectVertical, mdiMathIntegral } from '@mdi/js';
 import {
   clearIntegrationAll, setIntegrationFkr,
 } from '../../actions/integration';
-import {
-  clearIntegrationAllHplcMs,
-} from '../../actions/hplc_ms';
-
 import { setUiSweepType } from '../../actions/ui';
 import {
   LIST_UI_SWEEP_TYPE,
@@ -29,7 +25,6 @@ import Cfg from '../../helpers/cfg';
 import TriBtn from './tri_btn';
 import { MuButton, commonStyle, focusStyle } from './common';
 import Format from '../../helpers/format';
-import { LIST_LAYOUT } from '../../constants/list_layout';
 
 const styles = () => (
   Object.assign(
@@ -98,19 +93,13 @@ const Integration = ({
   classes, ignoreRef,
   isDisableSt, isFocusAddIntgSt, isFocusRmIntgSt, isFocusSetRefSt,
   setUiSweepTypeAct, setIntegrationFkrAct, clearIntegrationAllAct,
-  curveSt, integrationSt, clearIntegrationAllHplcMsAct, layoutSt,
+  curveSt, integrationSt,
 }) => {
   const onSweepIntegtAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.INTEGRATION_ADD);
   const onSweepIntegtRm = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.INTEGRATION_RM);
   const onSweepIntegtSR = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.INTEGRATION_SET_REF);
   const { curveIdx } = curveSt;
-  const onClearAll = () => {
-    if (layoutSt === LIST_LAYOUT.LC_MS) {
-      clearIntegrationAllHplcMsAct();
-    } else {
-      clearIntegrationAllAct({ curveIdx });
-    }
-  };
+  const onClearAll = () => clearIntegrationAllAct({ curveIdx });
 
   return (
     <span className={classes.group}>
@@ -211,7 +200,6 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     ignoreRef: Format.isHplcUvVisLayout(state.layout),
     curveSt: state.curve,
     integrationSt: state.integration.present,
-    layoutSt: state.layout,
   }
 );
 
@@ -220,7 +208,6 @@ const mapDispatchToProps = (dispatch) => (
     setUiSweepTypeAct: setUiSweepType,
     setIntegrationFkrAct: setIntegrationFkr,
     clearIntegrationAllAct: clearIntegrationAll,
-    clearIntegrationAllHplcMsAct: clearIntegrationAllHplcMs,
   }, dispatch)
 );
 
@@ -234,10 +221,8 @@ Integration.propTypes = {
   setUiSweepTypeAct: PropTypes.func.isRequired,
   setIntegrationFkrAct: PropTypes.func.isRequired,
   clearIntegrationAllAct: PropTypes.func.isRequired,
-  clearIntegrationAllHplcMsAct: PropTypes.func.isRequired,
   curveSt: PropTypes.object.isRequired,
   integrationSt: PropTypes.object.isRequired,
-  layoutSt: PropTypes.string.isRequired,
 };
 
 export default connect(

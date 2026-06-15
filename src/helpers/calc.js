@@ -7,8 +7,6 @@ const calcSlope = (x1, y1, x2, y2) => {
   return ((y2 - y1) / (x2 - x1));
 };
 
-const findClosest = (arr, target) => arr.reduce((prev, curr) => Math.abs(curr - target) < Math.abs(prev - target) ? curr : prev); // eslint-disable-line
-
 export {
-  almostEqual, calcSlope, findClosest,  // eslint-disable-line
+  almostEqual, calcSlope,  // eslint-disable-line
 };

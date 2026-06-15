@@ -2,7 +2,7 @@
 react/function-component-definition, react/require-default-props */
 import React from 'react';
 import { connect } from 'react-redux';
-import { compose } from 'redux';
+import { bindActionCreators, compose } from 'redux';
 import PropTypes from 'prop-types';
 
 import withStyles from '@mui/styles/withStyles';
@@ -28,53 +28,26 @@ const styles = () => (
   Object.assign(
     {},
     {
-      cardFlex: {
-        display: 'flex',
-        flexWrap: 'wrap',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        columnGap: 8,
-        rowGap: 4,
-      },
-      lcMsToolbarLeft: {
-        display: 'flex',
-        flexWrap: 'wrap',
-        alignItems: 'center',
-        columnGap: 4,
-        rowGap: 4,
-        flex: '1 1 auto',
-        minWidth: 0,
-      },
-      lcMsToolbarRight: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-        flex: '0 1 auto',
-        minWidth: 0,
-      },
-      lcMsToolbarRightCluster: {
-        display: 'flex',
-        flexWrap: 'wrap',
-        alignItems: 'center',
-        columnGap: 8,
-        rowGap: 4,
-      },
+
     },
     commonStyle,
   )
 );
 
 const CmdBar = ({
-  classes, feature, hasEdit, forecast, operations, editorOnly, jcampIdx, hideThreshold,
-  hideMainEditTools,
-  layoutSt,
-  prependLcMsToolbar,
+  classes, feature, hasEdit, forecast, operations, editorOnly, jcampIdx, hideThreshold, layoutSt,
 }) => {
   const isCvLayout = Format.isCyclicVoltaLayout(layoutSt);
 
-  const rightCluster = (
-    <>
-      <Layout feature={feature} hasEdit={hasEdit} />
+  return (
+    <div className={classes.card}>
+      <Viewer editorOnly={editorOnly} />
+      <Zoom />
+      <Peak jcampIdx={jcampIdx} feature={feature} />
+      <Pecker jcampIdx={jcampIdx} />
+      {isCvLayout ? null : <Integration />}
+      {isCvLayout ? null : <Multiplicity />}
+      <UndoRedo />
       <Submit
         operations={operations}
         feature={feature}
@@ -86,44 +59,11 @@ const CmdBar = ({
       {
         hideThreshold ? null : (<Threshold feature={feature} hasEdit={hasEdit} />)
       }
+      <Layout feature={feature} hasEdit={hasEdit} />
       <Wavelength />
       <CvDensityControls />
       <ChangeAxes />
       <Detector />
-    </>
-  );
-
-  if (prependLcMsToolbar) {
-    return (
-      <div className={`${classes.card} ${classes.cardFlex}`}>
-        <div className={classes.lcMsToolbarLeft}>
-          { prependLcMsToolbar }
-        </div>
-        <div className={classes.lcMsToolbarRight}>
-          <div className={classes.lcMsToolbarRightCluster}>
-            { rightCluster }
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className={classes.card}>
-      {
-        hideMainEditTools ? null : (
-          <>
-            <Viewer editorOnly={editorOnly} />
-            <Zoom />
-            <Peak jcampIdx={jcampIdx} feature={feature} />
-            <Pecker jcampIdx={jcampIdx} />
-            {isCvLayout ? null : <Integration />}
-            {isCvLayout ? null : <Multiplicity />}
-            <UndoRedo />
-          </>
-        )
-      }
-      { rightCluster }
     </div>
   );
 };
@@ -132,6 +72,11 @@ const mapStateToProps = (state, _) => ( // eslint-disable-line
   {
     layoutSt: state.layout,
   }
+);
+
+const mapDispatchToProps = (dispatch) => (
+  bindActionCreators({
+  }, dispatch)
 );
 
 CmdBar.propTypes = {
@@ -144,15 +89,9 @@ CmdBar.propTypes = {
   layoutSt: PropTypes.string.isRequired,
   jcampIdx: PropTypes.any,
   hideThreshold: PropTypes.bool,
-  hideMainEditTools: PropTypes.bool,
-  prependLcMsToolbar: PropTypes.node,
-};
-
-CmdBar.defaultProps = {
-  prependLcMsToolbar: null,
 };
 
 export default compose(
-  connect(mapStateToProps, null),
+  connect(mapStateToProps, mapDispatchToProps),
   withStyles(styles),
 )(CmdBar);

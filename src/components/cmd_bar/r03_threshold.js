@@ -15,7 +15,6 @@ import HowToRegOutlinedIcon from '@mui/icons-material/HowToRegOutlined';
 import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
 
 import Cfg from '../../helpers/cfg';
-import Format from '../../helpers/format';
 import {
   updateThresholdValue, resetThresholdValue, toggleThresholdIsEdit,
 } from '../../actions/threshold';
@@ -90,18 +89,10 @@ const restoreTp = (hasEdit, isEdit) => (
 
 const Threshold = ({
   classes, feature, hasEdit,
-  hideThresSt, thresValSt, isEditSt, curveSt, hplcMsSt, layoutSt,
+  hideThresSt, thresValSt, isEditSt, curveSt,
   updateThresholdValueAct, resetThresholdValueAct, toggleThresholdIsEditAct,
 }) => {
-  const isLcMs = Format.isLCMsLayout(layoutSt);
-  let thresVal;
-  if (isLcMs) {
-    thresVal = hplcMsSt?.threshold?.value != null
-      ? hplcMsSt.threshold.value
-      : (feature?.thresRef ?? thresValSt ?? 5);
-  } else {
-    thresVal = thresValSt || (feature ? feature.thresRef : hplcMsSt?.threshold?.value);
-  }
+  const thresVal = thresValSt || feature.thresRef;
 
   return (
     <span className={classes.groupRight}>
@@ -152,8 +143,6 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     isEditSt: state.threshold.list[state.curve.curveIdx].isEdit,
     thresValSt: parseFloat(state.threshold.list[state.curve.curveIdx].value) || 0,
     curveSt: state.curve,
-    hplcMsSt: state.hplcMs,
-    layoutSt: state.layout,
   }
 );
 
@@ -176,12 +165,6 @@ Threshold.propTypes = {
   updateThresholdValueAct: PropTypes.func.isRequired,
   resetThresholdValueAct: PropTypes.func.isRequired,
   toggleThresholdIsEditAct: PropTypes.func.isRequired,
-  hplcMsSt: PropTypes.object.isRequired,
-  layoutSt: PropTypes.string,
-};
-
-Threshold.defaultProps = {
-  layoutSt: undefined,
 };
 
 export default connect(

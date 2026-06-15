@@ -7,11 +7,10 @@ const selectCurve = (payload) => (
   }
 );
 
-const setAllCurves = (payload, meta) => (
+const setAllCurves = (payload) => (
   {
     type: CURVE.SET_ALL_CURVES,
     payload,
-    ...(meta && typeof meta === 'object' ? { meta } : {}),
   }
 );
 

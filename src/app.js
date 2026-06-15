@@ -22,12 +22,7 @@ const store = compose(
   applyMiddleware(...middlewares),
 )(createStore)(reducers);
 
-try {
-  sagaMiddleware.run(sagas);
-} catch (error) {
-  // Keep startup failure visible without crashing silently.
-  console.error('[SpectraEditor] Failed to start sagas', error); // eslint-disable-line no-console
-}
+sagaMiddleware.run(sagas);
 
 // - - - helper - - -
 const ensureQuillDelta = (descs) => {
@@ -36,16 +31,11 @@ const ensureQuillDelta = (descs) => {
 };
 
 // - - - React - - -
-// LC/MS: when `onLcmsPageRequest` is set, the host (e.g. ELN) must reload `multiEntities`
-// with MS data for the requested RT/polarity. Triggers include `user_click`, `initial`,
-// and `tic_polarity` (TIC polarity dropdown). The standalone demo in `src/index.js`
-// implements a local mock via `buildLcmsStandaloneMultiEntities`.
 const SpectraEditor = ({
   entity, others, cLabel, xLabel, yLabel,
   operations, forecast, molSvg, editorOnly, descriptions, exactMass,
   canChangeDescription, onDescriptionChanged,
   multiEntities, multiMolSvgs, entityFileNames, userManualLink,
-  onLcmsPageRequest,
 }) => (
   <Provider store={store}>
     <StyledEngineProvider injectFirst>
@@ -67,7 +57,6 @@ const SpectraEditor = ({
         exactMass={exactMass}
         canChangeDescription={canChangeDescription}
         onDescriptionChanged={onDescriptionChanged}
-        onLcmsPageRequest={onLcmsPageRequest}
       />
     </StyledEngineProvider>
   </Provider>
@@ -92,15 +81,14 @@ SpectraEditor.propTypes = {
   editorOnly: PropTypes.bool,
   canChangeDescription: PropTypes.bool,
   onDescriptionChanged: PropTypes.func,
-  onLcmsPageRequest: PropTypes.func,
   userManualLink: PropTypes.object,
   exactMass: PropTypes.string,
 };
 
 SpectraEditor.defaultProps = {
   others: { others: [], addOthersCb: false },
-  multiEntities: [],
-  entityFileNames: [],
+  multiEntities: false,
+  entityFileNames: false,
   cLabel: '',
   xLabel: '',
   yLabel: '',
@@ -113,9 +101,8 @@ SpectraEditor.defaultProps = {
   editorOnly: false,
   canChangeDescription: false,
   userManualLink: {},
-  onLcmsPageRequest: null,
 };
 
 export {
-  SpectraEditor, FN, store,
+  SpectraEditor, FN,
 };

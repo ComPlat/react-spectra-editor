@@ -39,7 +39,7 @@ describe('Test redux curve reducer', () => {
   it('Set all curves without payload', () => {
     action.type = CURVE.SET_ALL_CURVES
     const { listCurves } = curveReducer(curveState, action)
-    expect(listCurves).toEqual([])
+    expect(listCurves).toEqual(null)
   })
 
   it('Set all curves', () => {

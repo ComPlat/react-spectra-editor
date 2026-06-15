@@ -19,15 +19,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const MuButton = React.forwardRef((props, ref) => {
+const MuButton = (props) => {
   const classes = useStyles();
   const { className, ...other } = props;
   return (
-    <Button ref={ref} className={classNames(classes.muiBtn, className)} {...other} />
+    <Button className={classNames(classes.muiBtn, className)} {...other} />
   );
-});
-
-MuButton.displayName = 'MuButton';
+};
 
 const commonStyle = {
   card: {

@@ -18,22 +18,14 @@ import { extractParams } from './helpers/extractParams';
 const styles = () => ({
 });
 
-const getThresholdState = (state) => {
-  const curveIdx = state?.curve?.curveIdx;
-  const thresholdList = state?.threshold?.list;
-  if (!Array.isArray(thresholdList)) return {};
-  if (!Number.isInteger(curveIdx)) return thresholdList[0] || {};
-  return thresholdList[curveIdx] || thresholdList[0] || {};
-};
-
 const LayerPrism = ({
   entity, cLabel, xLabel, yLabel, forecast, operations,
   descriptions, molSvg, editorOnly, exactMass,
   thresSt, scanSt, uiSt,
-  canChangeDescription, onDescriptionChanged, entityFileNames, userManualLink,
+  canChangeDescription, onDescriptionChanged,
 }) => {
   const {
-    topic, feature, hasEdit, integration, features,
+    topic, feature, hasEdit, integration,
   } = extractParams(entity, thresSt, scanSt);
   if (!topic) return null;
 
@@ -54,7 +46,6 @@ const LayerPrism = ({
               <LayerContent
                 topic={topic}
                 feature={feature}
-                features={features || []}
                 cLabel={cLabel}
                 xLabel={xLabel}
                 yLabel={yLabel}
@@ -83,7 +74,6 @@ const LayerPrism = ({
             <LayerContent
               topic={topic}
               feature={feature}
-              features={features || []}
               cLabel={cLabel}
               xLabel={xLabel}
               yLabel={yLabel}
@@ -98,8 +88,6 @@ const LayerPrism = ({
               editorOnly={editorOnly}
               molSvg={molSvg}
               exactMass={exactMass}
-              entityFileNames={entityFileNames}
-              userManualLink={userManualLink}
               descriptions={descriptions}
               canChangeDescription={canChangeDescription}
               onDescriptionChanged={onDescriptionChanged}
@@ -114,7 +102,7 @@ const LayerPrism = ({
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     scanSt: state.scan,
-    thresSt: getThresholdState(state),
+    thresSt: state.threshold.list[state.curve.curveIdx],
     uiSt: state.ui,
   }
 );
@@ -140,8 +128,6 @@ LayerPrism.propTypes = {
   uiSt: PropTypes.object.isRequired,
   canChangeDescription: PropTypes.bool.isRequired,
   onDescriptionChanged: PropTypes.func,
-  entityFileNames: PropTypes.array,
-  userManualLink: PropTypes.object,
 };
 
 export default connect( // eslint-disable-line

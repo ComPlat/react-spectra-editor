@@ -44,19 +44,17 @@ const btnRestore = (
   classes, hasEdit, isEdit, toggleEditAct,
 ) => (
   <Tooltip title={<span className="txt-sv-tp">{restoreTp(hasEdit, isEdit)}</span>}>
-    <span>
-      <MuButton
-        className={
-          classNames(
-            'btn-sv-bar-scanrst',
-          )
-        }
-        disabled={!hasEdit}
-        onClick={toggleEditAct}
-      >
-        { restoreIcon(classes, hasEdit, isEdit) }
-      </MuButton>
-    </span>
+    <MuButton
+      className={
+        classNames(
+          'btn-sv-bar-scanrst',
+        )
+      }
+      disabled={!hasEdit}
+      onClick={toggleEditAct}
+    >
+      { restoreIcon(classes, hasEdit, isEdit) }
+    </MuButton>
   </Tooltip>
 );
 
@@ -64,19 +62,17 @@ const btnRrfresh = (
   classes, disabled, refreshAct,
 ) => (
   <Tooltip title={<span className="txt-sv-tp">Refresh Scan</span>}>
-    <span>
-      <MuButton
-        className={
-          classNames(
-            'btn-sv-bar-scanrfs',
-          )
-        }
-        disabled={disabled}
-        onClick={refreshAct}
-      >
-        <RefreshOutlinedIcon className={classes.icon} />
-      </MuButton>
-    </span>
+    <MuButton
+      className={
+        classNames(
+          'btn-sv-bar-scanrfs',
+        )
+      }
+      disabled={disabled}
+      onClick={refreshAct}
+    >
+      <RefreshOutlinedIcon className={classes.icon} />
+    </MuButton>
   </Tooltip>
 );
 

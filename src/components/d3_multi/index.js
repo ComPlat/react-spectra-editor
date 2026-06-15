@@ -13,7 +13,6 @@ import Format from '../../helpers/format';
 import { resetAll } from '../../actions/manager';
 import { selectUiSweep, scrollUiWheel, clickUiTarget } from '../../actions/ui';
 import { LIST_NON_BRUSH_TYPES } from '../../constants/list_ui';
-import { LIST_ROOT_SVG_GRAPH } from '../../constants/list_graph';
 import { addNewCylicVoltaPairPeak, addCylicVoltaMaxPeak, addCylicVoltaMinPeak } from '../../actions/cyclic_voltammetry';
 
 import MultiFocus from './multi_focus';
@@ -32,7 +31,7 @@ class ViewerMulti extends React.Component {
     const {
       entities, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
     } = this.props;
-    this.rootKlass = `.${LIST_ROOT_SVG_GRAPH.LINE}`;
+    this.rootKlass = '.d3Line';
     this.containerRef = React.createRef();
     this.currentSize = null;
     this.resizeObserver = null;
@@ -48,6 +47,60 @@ class ViewerMulti extends React.Component {
   componentDidMount() {
     this.renderChart(this.props, true);
     this.setupResizeObserver();
+    const {
+      curveSt,
+      seed, peak, cLabel, xLabel, yLabel, feature,
+      tTrEndPts, tSfPeaks, editPeakSt, layoutSt,
+      sweepExtentSt, isUiNoBrushSt,
+      isHidden, resetAllAct, cyclicvoltaSt,
+      integationSt, mtplySt, axesUnitsSt,
+    } = this.props;
+
+    drawDestroy(this.rootKlass);
+    resetAllAct(feature);
+
+    let xxLabel = xLabel;
+    let yyLabel = yLabel;
+
+    if (axesUnitsSt) {
+      const { curveIdx } = curveSt;
+      const { axes } = axesUnitsSt;
+      let selectedAxes = axes[curveIdx];
+      if (!selectedAxes) {
+        selectedAxes = { xUnit: '', yUnit: '' };
+      }
+      const { xUnit, yUnit } = selectedAxes;
+      xxLabel = xUnit === '' ? xLabel : xUnit;
+      yyLabel = yUnit === '' ? yLabel : yUnit;
+    }
+
+    if (cyclicvoltaSt && cyclicvoltaSt.useCurrentDensity) {
+      const areaUnit = cyclicvoltaSt.areaUnit || 'cm²';
+      const baseUnit = /mA/i.test(String(yyLabel)) ? 'mA' : 'A';
+      yyLabel = `Current density in ${baseUnit}/${areaUnit}`;
+    }
+
+    const filterSeed = seed;
+    const filterPeak = peak;
+
+    drawMain(this.rootKlass, W, H);
+    this.focus.create({
+      curveSt,
+      filterSeed,
+      filterPeak,
+      tTrEndPts,
+      tSfPeaks,
+      editPeakSt,
+      layoutSt,
+      sweepExtentSt,
+      isUiNoBrushSt,
+      cyclicvoltaSt,
+      integationSt,
+      mtplySt,
+    });
+    drawLabel(this.rootKlass, cLabel, xxLabel, yyLabel);
+    drawDisplay(this.rootKlass, isHidden);
+    drawArrowOnCurve(this.rootKlass, isHidden);
   }
 
   componentDidUpdate(prevProps) {
@@ -57,42 +110,42 @@ class ViewerMulti extends React.Component {
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt,
       sweepExtentSt, isUiNoBrushSt,
       isHidden, cyclicvoltaSt,
-      integrationSt, mtplySt, axesUnitsSt,
-      uiSt,
+      integationSt, mtplySt, axesUnitsSt,
     } = this.props;
     this.normChange(prevProps);
+
+    let xxLabel = xLabel;
+    let yyLabel = yLabel;
+
+    if (axesUnitsSt) {
+      const { curveIdx } = curveSt;
+      const { axes } = axesUnitsSt;
+      let selectedAxes = axes[curveIdx];
+      if (!selectedAxes) {
+        selectedAxes = { xUnit: '', yUnit: '' };
+      }
+      const { xUnit, yUnit } = selectedAxes;
+      xxLabel = xUnit === '' ? xLabel : xUnit;
+      yyLabel = yUnit === '' ? yLabel : yUnit;
+    }
+    if (cyclicvoltaSt && cyclicvoltaSt.useCurrentDensity) {
+      const areaUnit = cyclicvoltaSt.areaUnit || 'cm²';
+      const baseUnit = /mA/i.test(String(yyLabel)) ? 'mA' : 'A';
+      yyLabel = `Current density in ${baseUnit}/${areaUnit}`;
+    }
+
+    const filterSeed = seed;
+    const filterPeak = peak;
 
     if (Format.isCyclicVoltaLayout(layoutSt)) {
       this.handleResize();
     }
-    const hasRelevantChange = prevProps.entities !== entities
-      || prevProps.curveSt !== curveSt
-      || prevProps.seed !== seed
-      || prevProps.peak !== peak
-      || prevProps.tTrEndPts !== tTrEndPts
-      || prevProps.tSfPeaks !== tSfPeaks
-      || prevProps.editPeakSt !== editPeakSt
-      || prevProps.layoutSt !== layoutSt
-      || prevProps.sweepExtentSt !== sweepExtentSt
-      || prevProps.isUiNoBrushSt !== isUiNoBrushSt
-      || prevProps.isHidden !== isHidden
-      || prevProps.cyclicvoltaSt !== cyclicvoltaSt
-      || prevProps.integrationSt !== integrationSt
-      || prevProps.mtplySt !== mtplySt
-      || prevProps.axesUnitsSt !== axesUnitsSt
-      || prevProps.uiSt !== uiSt
-      || prevProps.cLabel !== cLabel
-      || prevProps.xLabel !== xLabel
-      || prevProps.yLabel !== yLabel;
-    if (!hasRelevantChange) return;
-
-    const { xxLabel, yyLabel } = this.resolveAxisLabels(this.props);
 
     this.focus.update({
       entities,
       curveSt,
-      filterSeed: seed,
-      filterPeak: peak,
+      filterSeed,
+      filterPeak,
       tTrEndPts,
       tSfPeaks,
       editPeakSt,
@@ -100,13 +153,12 @@ class ViewerMulti extends React.Component {
       sweepExtentSt,
       isUiNoBrushSt,
       cyclicvoltaSt,
-      integrationSt,
+      integationSt,
       mtplySt,
-      uiSt,
     });
     drawLabel(this.rootKlass, cLabel, xxLabel, yyLabel);
     drawDisplay(this.rootKlass, isHidden);
-    drawArrowOnCurve(this.rootKlass, isHidden || !Format.isAIFLayout(layoutSt));
+    drawArrowOnCurve(this.rootKlass, isHidden);
   }
 
   componentWillUnmount() {
@@ -156,30 +208,6 @@ class ViewerMulti extends React.Component {
     }
   }
 
-  resolveAxisLabels(props) {
-    const {
-      curveSt, xLabel, yLabel, axesUnitsSt, cyclicvoltaSt,
-    } = props;
-    let xxLabel = xLabel;
-    let yyLabel = yLabel;
-
-    if (axesUnitsSt) {
-      const { curveIdx } = curveSt;
-      const { axes } = axesUnitsSt;
-      const selectedAxes = axes[curveIdx] || { xUnit: '', yUnit: '' };
-      const { xUnit, yUnit } = selectedAxes;
-      xxLabel = xUnit === '' ? xLabel : xUnit;
-      yyLabel = yUnit === '' ? yLabel : yUnit;
-    }
-
-    if (cyclicvoltaSt && cyclicvoltaSt.useCurrentDensity) {
-      const areaUnit = cyclicvoltaSt.areaUnit || 'cm²';
-      const baseUnit = /mA/i.test(String(yyLabel)) ? 'mA' : 'A';
-      yyLabel = `Current density in ${baseUnit}/${areaUnit}`;
-    }
-    return { xxLabel, yyLabel };
-  }
-
   normChange(prevProps) {
     const { feature, resetAllAct, entities } = this.props;
     const oldEntities = prevProps.entities;
@@ -191,11 +219,11 @@ class ViewerMulti extends React.Component {
   renderChart(props, shouldReset) {
     const {
       curveSt,
-      seed, peak, cLabel, feature,
+      seed, peak, cLabel, xLabel, yLabel, feature,
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt,
       sweepExtentSt, isUiNoBrushSt,
       isHidden, resetAllAct, cyclicvoltaSt,
-      integrationSt, mtplySt, uiSt,
+      integationSt, mtplySt, axesUnitsSt,
       entities, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
     } = props;
 
@@ -207,7 +235,23 @@ class ViewerMulti extends React.Component {
       resetAllAct(feature);
     }
 
-    const { xxLabel, yyLabel } = this.resolveAxisLabels(props);
+    let xxLabel = xLabel;
+    let yyLabel = yLabel;
+
+    if (axesUnitsSt) {
+      const { curveIdx } = curveSt;
+      const { axes } = axesUnitsSt;
+      let selectedAxes = axes[curveIdx];
+      if (!selectedAxes) {
+        selectedAxes = { xUnit: '', yUnit: '' };
+      }
+      const { xUnit, yUnit } = selectedAxes;
+      xxLabel = xUnit === '' ? xLabel : xUnit;
+      yyLabel = yUnit === '' ? yLabel : yUnit;
+    }
+
+    const filterSeed = seed;
+    const filterPeak = peak;
 
     this.focus = new MultiFocus({
       W: size.width,
@@ -221,8 +265,8 @@ class ViewerMulti extends React.Component {
     drawMain(this.rootKlass, size.width, size.height);
     this.focus.create({
       curveSt,
-      filterSeed: seed,
-      filterPeak: peak,
+      filterSeed,
+      filterPeak,
       tTrEndPts,
       tSfPeaks,
       editPeakSt,
@@ -230,13 +274,12 @@ class ViewerMulti extends React.Component {
       sweepExtentSt,
       isUiNoBrushSt,
       cyclicvoltaSt,
-      integrationSt,
+      integationSt,
       mtplySt,
-      uiSt,
     });
     drawLabel(this.rootKlass, cLabel, xxLabel, yyLabel);
     drawDisplay(this.rootKlass, isHidden);
-    drawArrowOnCurve(this.rootKlass, isHidden || !Format.isAIFLayout(layoutSt));
+    drawArrowOnCurve(this.rootKlass, isHidden);
   }
 
   render() {
@@ -244,7 +287,7 @@ class ViewerMulti extends React.Component {
     const isCyclicVolta = Format.isCyclicVoltaLayout(layoutSt);
     return (
       <div
-        className={LIST_ROOT_SVG_GRAPH.LINE}
+        className="d3Line"
         ref={this.containerRef}
         style={isCyclicVolta ? { height: '100%' } : undefined}
       />
@@ -255,7 +298,6 @@ class ViewerMulti extends React.Component {
 const mapStateToProps = (state, props) => (
   {
     curveSt: state.curve,
-    uiSt: state.ui,
     seed: Topic2Seed(state, props),
     peak: Feature2Peak(state, props),
     tTrEndPts: ToThresEndPts(state, props),
@@ -266,7 +308,7 @@ const mapStateToProps = (state, props) => (
     isUiNoBrushSt: LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
     cyclicvoltaSt: state.cyclicvolta,
     maxminPeakSt: Feature2MaxMinPeak(state, props),
-    integrationSt: state.integration.present,
+    integationSt: state.integration.present,
     mtplySt: state.multiplicity.present,
     axesUnitsSt: state.axesUnits,
   }
@@ -286,7 +328,6 @@ const mapDispatchToProps = (dispatch) => (
 
 ViewerMulti.propTypes = {
   curveSt: PropTypes.object.isRequired,
-  uiSt: PropTypes.object.isRequired,
   entities: PropTypes.array.isRequired,
   seed: PropTypes.array.isRequired,
   peak: PropTypes.array.isRequired,
@@ -297,7 +338,7 @@ ViewerMulti.propTypes = {
   tSfPeaks: PropTypes.array.isRequired,
   editPeakSt: PropTypes.object.isRequired,
   layoutSt: PropTypes.string.isRequired,
-  integrationSt: PropTypes.object.isRequired,
+  integationSt: PropTypes.object.isRequired,
   mtplySt: PropTypes.object.isRequired,
   sweepExtentSt: PropTypes.object.isRequired,
   isUiNoBrushSt: PropTypes.bool.isRequired,
