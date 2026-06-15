@@ -10,16 +10,18 @@ import ForecastViewer from './components/forecast_viewer';
 import Format from './helpers/format';
 
 const extractLayout = (forecast, layoutSt) => {
-  const isEmpty = Object.keys(forecast).length === 0
-    && forecast.constructor === Object;
+  const safeForecast = forecast && typeof forecast === 'object' ? forecast : {};
+  const isEmpty = Object.keys(safeForecast).length === 0
+    && safeForecast.constructor === Object;
   const isNmr = Format.isNmrLayout(layoutSt);
   const isMs = Format.isMsLayout(layoutSt);
+  const isLCMs = Format.isLCMsLayout(layoutSt);
   const isIr = Format.isIrLayout(layoutSt);
   const isUvvis = Format.isUvVisLayout(layoutSt) || Format.isHplcUvVisLayout(layoutSt);
   const isXRD = Format.isXRDLayout(layoutSt);
   const showForecast = !isEmpty && (isNmr || isIr || isUvvis || isXRD);
   return {
-    showForecast, isNmr, isIr, isMs, isUvvis, isXRD,
+    showForecast, isNmr, isIr, isMs, isUvvis, isXRD, isLCMs,
   };
 };
 
@@ -27,7 +29,7 @@ const Content = ({
   topic, feature, cLabel, xLabel, yLabel, forecast, operations, layoutSt,
 }) => {
   const {
-    showForecast, isNmr, isIr, isMs, isUvvis, isXRD,
+    showForecast, isNmr, isIr, isMs, isUvvis, isXRD, isLCMs,
   } = extractLayout(forecast, layoutSt);
 
   if (showForecast) {
@@ -49,6 +51,19 @@ const Content = ({
   }
 
   if (isMs) {
+    return (
+      <ViewerRect
+        topic={topic}
+        cLabel={cLabel}
+        xLabel={xLabel}
+        yLabel={yLabel}
+        feature={feature}
+        isHidden={false}
+      />
+    );
+  }
+
+  if (isLCMs) {
     return (
       <ViewerRect
         topic={topic}

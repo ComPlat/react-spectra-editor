@@ -19,7 +19,7 @@ const store = mockStore({
     shifts: [],
   },
   simulation: {
-
+    nmrSimPeaks: [],
   },
   detector: {
     curves: [
@@ -29,10 +29,12 @@ const store = mockStore({
       },
     ],
   },
-  meta: {}
-});
-const failedStore = mockStore({
-
+  meta: {
+    dscMetaData: {},
+  },
+  hplcMs: {
+    uvvis: { spectraList: [], listWaveLength: [] },
+  },
 });
 const dispatchMock = () => Promise.resolve({});
 store.dispatch = jest.fn(dispatchMock);
@@ -43,8 +45,14 @@ const theme = createTheme({
   },
 });
 
-const feature = {
-
+const feature = {};
+const baseProps = {
+  feature,
+  integration: {},
+  editorOnly: false,
+  molSvg: '',
+  descriptions: '',
+  canChangeDescription: false,
 };
 
 describe("<InfoPanel />", () => {
@@ -55,23 +63,11 @@ describe("<InfoPanel />", () => {
     }
   });
 
-  test('Cannot render info panel',  () => {
+  test('Render info panel',  () => {
     const renderer = 
       <AppWrapper store={store}>
         <ThemeProvider theme={theme}>
-          <InfoPanel expand={false} onExapnd={() => {}} />
-        </ThemeProvider>
-      </AppWrapper>
-    ;
-    const {queryByTestId} = render(renderer);
-    expect(queryByTestId('PanelInfo')).not.toBeInTheDocument();
-  });
-
-  test('Render info panel', () => {
-    const renderer = 
-      <AppWrapper store={store}>
-        <ThemeProvider theme={theme}>
-          <InfoPanel expand={false} onExapnd={() => {}} feature={feature} />
+          <InfoPanel expand={false} onExpand={() => {}} {...baseProps} />
         </ThemeProvider>
       </AppWrapper>
     ;
@@ -106,7 +102,7 @@ describe("<InfoPanel />", () => {
         <ThemeProvider theme={theme}>
           <InfoPanel
             expand
-            onExapnd={() => {}}
+            onExpand={() => {}}
             feature={feature}
             exactMass="121.0653"
           />

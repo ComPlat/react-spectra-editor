@@ -1,20 +1,20 @@
 /* eslint-disable prefer-object-spread */
-
 import { MouseMove } from './compass';
+import { LIST_UI_SWEEP_TYPE } from '../constants/list_ui';
 
 const d3 = require('d3');
 
 const wheeled = (focus, event) => {
-  const { currentExtent, scrollUiWheelAct } = focus;
+  const { currentExtent, scrollUiWheelAct, brushClass } = focus;
   // WORKAROUND: firefox wheel compatibilty
   const wheelEvent = focus.isFirefox ? -event.deltaY : event.wheelDelta;  // eslint-disable-line
   const direction = wheelEvent > 0;
-  scrollUiWheelAct(Object.assign({}, currentExtent, { direction }));
+  scrollUiWheelAct(Object.assign({}, currentExtent, { direction, brushClass }));
 };
 
-const brushed = (focus, isUiAddIntgSt, event) => {
+const brushed = (focus, xOnly, event, brushedClass = '.d3Svg') => {
   const {
-    selectUiSweepAct, data, dataPks, brush, w, h, scales,
+    selectUiSweepAct, data, dataPks, brush, brushX, w, h, scales,
   } = focus;
   const selection = event.selection && event.selection.reverse();
   if (!selection) return;
@@ -22,7 +22,7 @@ const brushed = (focus, isUiAddIntgSt, event) => {
   let yes = [h, 0].map(scales.y.invert).sort((a, b) => a - b);
   let xExtent = { xL: xes[0], xU: xes[1] };
   let yExtent = { yL: yes[0], yU: yes[1] };
-  if (isUiAddIntgSt) {
+  if (xOnly) {
     xes = selection.map(scales.x.invert).sort((a, b) => a - b);
     xExtent = { xL: xes[0], xU: xes[1] };
   } else {
@@ -35,27 +35,53 @@ const brushed = (focus, isUiAddIntgSt, event) => {
   selectUiSweepAct({
     xExtent, yExtent, data, dataPks,
   });
-  d3.select('.d3Svg').selectAll('.brush').call(brush.move, null);
+  let svgSel = null;
+  if (focus?.svg && typeof focus.svg.selectAll === 'function') {
+    svgSel = focus.svg;
+  } else if (typeof brushedClass === 'string') {
+    svgSel = d3.select(brushedClass);
+  }
+  if (svgSel && typeof svgSel.selectAll === 'function' && !svgSel.empty()) {
+    const brushSelection = xOnly ? svgSel.selectAll('.brushX') : svgSel.selectAll('.brush');
+    if (!brushSelection.empty()) {
+      if (xOnly && brushX) {
+        brushSelection.call(brushX.move, null);
+      } else if (brush) {
+        brushSelection.call(brush.move, null);
+      }
+    }
+  }
 };
 
-const MountBrush = (focus, isUiAddIntgSt, isUiNoBrushSt) => {
+const MountBrush = (focus, isUiAddIntgSt, isUiNoBrushSt, brushedClass = '.d3Svg') => {
   const {
-    root, svg, brush, brushX, w, h,
+    root, svg, brush, brushX, w, h, uiSt, graphIndex,
   } = focus;
-  svg.selectAll('.brush').remove();
-  svg.selectAll('.brushX').remove();
 
-  const brushedCb = (event) => brushed(focus, isUiAddIntgSt, event);
+  if (!root || !svg || typeof svg.selectAll !== 'function') return;
+
+  svg.selectAll('.brush, .brushX').remove();
+
+  const isZoomInSubview = uiSt?.zoom?.sweepTypes?.[graphIndex] === LIST_UI_SWEEP_TYPE.ZOOMIN;
+  const isZoomInGlobal = uiSt?.sweepType === LIST_UI_SWEEP_TYPE.ZOOMIN;
+  const isIntegrationAdd = uiSt?.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD;
+  const isMultiplicitySweepAdd = uiSt?.sweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD;
+  const isZoomIn = isZoomInSubview || isZoomInGlobal;
+
+  if (!(graphIndex === 0 && isIntegrationAdd) && !isZoomIn && !isMultiplicitySweepAdd) return;
+
+  const isXAxisOnly = focus?.xOnlyBrush === true;
+  const xOnly = isUiAddIntgSt || (isXAxisOnly && !isZoomIn);
+  const brushedCb = (event) => brushed(focus, xOnly, event, brushedClass);
   const wheeledCb = (event) => wheeled(focus, event);
 
   if (isUiNoBrushSt) {
-    const target = isUiAddIntgSt ? brushX : brush;
+    const target = xOnly ? brushX : brush;
+    const klass = xOnly ? 'brushX' : 'brush';
     target.handleSize(10)
       .extent([[0, 0], [w, h]])
       .on('end', brushedCb);
 
-    // append brush components
-    const klass = isUiAddIntgSt ? 'brushX' : 'brush';
     root.append('g')
       .attr('class', klass)
       .on('mousemove', (event) => MouseMove(event, focus))

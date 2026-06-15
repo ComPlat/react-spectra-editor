@@ -10,7 +10,7 @@ import {
   FormControl, InputLabel, Select, MenuItem,
 } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import { updateWaveLength } from '../../actions/wavelength';
+import { updateWaveLength as updateWavelength } from '../../actions/wavelength';
 import Format from '../../helpers/format';
 import { commonStyle } from './common';
 import { LIST_WAVE_LENGTH } from '../../constants/list_wavelength';
@@ -29,14 +29,14 @@ const styles = () => (
   )
 );
 
-const wavelengthSelect = (classes, waveLengthSt, layoutSt, updateWaveLengthAct) => {
+const wavelengthSelect = (classes, waveLengthSt, layoutSt, updateWavelengthAct) => {
   if (!Format.isXRDLayout(layoutSt)) {
     return (
       <i />
     );
   }
 
-  const onChange = (e) => updateWaveLengthAct(e.target.value);
+  const onChange = (e) => updateWavelengthAct(e.target.value);
 
   return (
     <FormControl
@@ -44,7 +44,7 @@ const wavelengthSelect = (classes, waveLengthSt, layoutSt, updateWaveLengthAct) 
       variant="outlined"
     >
       <InputLabel id="select-wavelength-label" className={classNames(classes.selectLabel, 'select-sv-bar-label')}>
-        Wavelength
+        Wavelength (nm)
       </InputLabel>
       <Select
         labelId="select-wavelength-label"
@@ -54,9 +54,10 @@ const wavelengthSelect = (classes, waveLengthSt, layoutSt, updateWaveLengthAct) 
         className={classNames(classes.selectInput, 'input-sv-bar-layout')}
       >
         {
-          LIST_WAVE_LENGTH.map(item => { // eslint-disable-line
+          LIST_WAVE_LENGTH.map((item, idx) => { // eslint-disable-line
+            const itemKey = `${item.label}-${item.value}-${item.unit}-${idx}`;
             return (
-              <MenuItem value={item}>
+              <MenuItem value={item} key={itemKey}>
                 <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>
                   {item.label} ({item.value} {item.unit})
                 </span>
@@ -70,10 +71,10 @@ const wavelengthSelect = (classes, waveLengthSt, layoutSt, updateWaveLengthAct) 
 };
 
 const Wavelength = ({
-  classes, waveLengthSt, layoutSt, updateWaveLengthAct,
+  classes, waveLengthSt, layoutSt, updateWavelengthAct,
 }) => (
   <span className={classes.groupRight}>
-    { wavelengthSelect(classes, waveLengthSt, layoutSt, updateWaveLengthAct) }
+    { wavelengthSelect(classes, waveLengthSt, layoutSt, updateWavelengthAct) }
   </span>
 );
 
@@ -86,7 +87,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
 
 const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
-    updateWaveLengthAct: updateWaveLength,
+    updateWavelengthAct: updateWavelength,
   }, dispatch)
 );
 
@@ -94,7 +95,7 @@ Wavelength.propTypes = {
   classes: PropTypes.object.isRequired,
   layoutSt: PropTypes.string.isRequired,
   waveLengthSt: PropTypes.object.isRequired,
-  updateWaveLengthAct: PropTypes.func.isRequired,
+  updateWavelengthAct: PropTypes.func.isRequired,
 };
 
 export default connect(

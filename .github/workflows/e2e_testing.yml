@@ -10,6 +10,6 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v6
         with:
-          build: npm run build
-          start: npm start
+          build: npm run --max_old_space_size=12288 build
+          start: npm --max_old_space_size=12288 start
           browser: chrome

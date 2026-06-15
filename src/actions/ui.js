@@ -29,16 +29,27 @@ const scrollUiWheel = (payload) => (
   }
 );
 
-const clickUiTarget = (payload, onPeak, voltammetryPeakIdx = 0, jcampIdx = 0, onPecker = false) => (
-  {
-    type: UI.CLICK_TARGET,
-    payload,
-    onPeak,
-    voltammetryPeakIdx,
-    jcampIdx,
-    onPecker,
-  }
-);
+const clickUiTarget = (
+  payload,
+  onPeak,
+  voltammetryPeakIdx = 0,
+  jcampIdx = 0,
+  onPecker = false,
+  sourceHint = null,
+) => ({
+  type: UI.CLICK_TARGET,
+  payload,
+  onPeak,
+  voltammetryPeakIdx,
+  jcampIdx,
+  onPecker,
+  sourceHint,
+});
+
+const displaySubViewerAt = (payload) => ({
+  type: UI.SUB_VIEWER.DISPLAY_VIEWER_AT,
+  payload: payload == null ? { x: null, y: null } : payload,
+});
 
 export {
   setUiViewerType,
@@ -46,4 +57,5 @@ export {
   selectUiSweep,
   scrollUiWheel,
   clickUiTarget,
+  displaySubViewerAt,
 };

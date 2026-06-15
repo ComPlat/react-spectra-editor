@@ -144,25 +144,25 @@ const styles = () => ({
 });
 
 const CyclicVoltammetryPanel = ({
-  classes, cyclicVotaSt, feature,
+  classes, cyclicVoltaState, feature,
   addNewPairPeakAct, setWorkWithMaxPeakAct, selectPairPeakAct, removePairPeakAct,
   selectRefPeaksAct, sweepTypeSt, setUiSweepTypeAct, jcampIdx, userManualLink,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const { spectraList } = cyclicVotaSt;
+  const { spectraList } = cyclicVoltaState;
   const spectra = spectraList[jcampIdx];
   let list = [];
   if (spectra !== undefined) {
     list = spectra.list;
   }
 
-  const formatCurrent = (y, feature, cyclicVotaSt) => {
+  const formatCurrent = (y, feature, cyclicVoltaState) => {
     const baseY = feature && feature.yUnit ? String(feature.yUnit) : 'A';
     const isMilli = /mA/i.test(baseY);
-    const useDensity = cyclicVotaSt && cyclicVotaSt.useCurrentDensity;
+    const useDensity = cyclicVoltaState && cyclicVoltaState.useCurrentDensity;
 
-    const rawArea = (cyclicVotaSt && cyclicVotaSt.areaValue === '' ? 1.0 : cyclicVotaSt?.areaValue) || 1.0;
-    const areaUnit = (cyclicVotaSt && cyclicVotaSt.areaUnit) ? cyclicVotaSt.areaUnit : 'cm²';
+    const rawArea = (cyclicVoltaState && cyclicVoltaState.areaValue === '' ? 1.0 : cyclicVoltaState?.areaValue) || 1.0;
+    const areaUnit = (cyclicVoltaState && cyclicVoltaState.areaUnit) ? cyclicVoltaState.areaUnit : 'cm²';
     const safeArea = rawArea > 0 ? rawArea : 1.0;
 
     let val = y;
@@ -216,9 +216,9 @@ const CyclicVoltammetryPanel = ({
   const rows = list.map((o, idx) => (
     {
       idx,
-      max: o.max ? `E: ${Format.strNumberFixedLength(parseFloat(o.max.x), 3)} V,\nI: ${formatCurrent(o.max.y, feature, cyclicVotaSt)}` : 'nd',
-      min: o.min ? `E: ${Format.strNumberFixedLength(parseFloat(o.min.x), 3)} V,\nI: ${formatCurrent(o.min.y, feature, cyclicVotaSt)}` : 'nd',
-      pecker: o.pecker ? `${formatCurrent(o.pecker.y, feature, cyclicVotaSt)}` : 'nd',
+      max: o.max ? `E: ${Format.strNumberFixedLength(parseFloat(o.max.x), 3)} V,\nI: ${formatCurrent(o.max.y, feature, cyclicVoltaState)}` : 'nd',
+      min: o.min ? `E: ${Format.strNumberFixedLength(parseFloat(o.min.x), 3)} V,\nI: ${formatCurrent(o.min.y, feature, cyclicVoltaState)}` : 'nd',
+      pecker: o.pecker ? `${formatCurrent(o.pecker.y, feature, cyclicVoltaState)}` : 'nd',
       delta: `${getDelta(o)} mV`,
       ratio: getRatio(feature, o),
       e12: (typeof o.e12 === 'number') ? `${Format.strNumberFixedLength(o.e12, 3)} V` : 'nd',
@@ -251,7 +251,7 @@ const CyclicVoltammetryPanel = ({
           </span>
           {' - '}
           <span>
-            Mode: {cyclicVotaSt.useCurrentDensity ? 'Current Density' : 'Current'}
+            Mode: {cyclicVoltaState.useCurrentDensity ? 'Current Density' : 'Current'}
           </span>
           <span className={classes.cvModeWarning}>
             WE-ECSA must be set when switching to Current Density.
@@ -460,7 +460,7 @@ https://doi.org/10.1021/ac60242a030</i>
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
-    cyclicVotaSt: state.cyclicvolta,
+    cyclicVoltaState: state.cyclicvolta,
     sweepTypeSt: state.ui.sweepType,
   }
 );
@@ -479,7 +479,7 @@ const mapDispatchToProps = (dispatch) => (
 CyclicVoltammetryPanel.propTypes = {
   classes: PropTypes.object.isRequired,
   feature: PropTypes.object.isRequired,
-  cyclicVotaSt: PropTypes.object.isRequired,
+  cyclicVoltaState: PropTypes.object.isRequired,
   addNewPairPeakAct: PropTypes.func.isRequired,
   setWorkWithMaxPeakAct: PropTypes.func.isRequired,
   selectPairPeakAct: PropTypes.func.isRequired,

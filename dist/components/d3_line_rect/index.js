@@ -1,0 +1,850 @@
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.isLcmsMsPageLoading = exports.default = void 0;
+var _react = _interopRequireDefault(require("react"));
+var _reactRedux = require("react-redux");
+var _redux = require("redux");
+var _propTypes = _interopRequireDefault(require("prop-types"));
+var _classnames = _interopRequireDefault(require("classnames"));
+var _withStyles = _interopRequireDefault(require("@mui/styles/withStyles"));
+var _material = require("@mui/material");
+var _ZoomInOutlined = _interopRequireDefault(require("@mui/icons-material/ZoomInOutlined"));
+var _FindReplaceOutlined = _interopRequireDefault(require("@mui/icons-material/FindReplaceOutlined"));
+var _Undo = _interopRequireDefault(require("@mui/icons-material/Undo"));
+var _Redo = _interopRequireDefault(require("@mui/icons-material/Redo"));
+var _common = require("../cmd_bar/common");
+var _chem = require("../../helpers/chem");
+var _manager = require("../../actions/manager");
+var _ui = require("../../actions/ui");
+var _hplc_ms = require("../../actions/hplc_ms");
+var _curve = require("../../actions/curve");
+var _rect_focus = _interopRequireDefault(require("./rect_focus"));
+var _multi_focus = _interopRequireDefault(require("./multi_focus"));
+var _line_focus = _interopRequireDefault(require("./line_focus"));
+var _extractParams = require("../../helpers/extractParams");
+var _calc = require("../../helpers/calc");
+var _draw = require("../common/draw");
+var _list_ui = require("../../constants/list_ui");
+var _wavelengthSelect = _interopRequireDefault(require("../../features/lc-ms/ui/wavelengthSelect"));
+var _pageValue = require("../../features/lc-ms/parsing/pageValue");
+var _list_graph = require("../../constants/list_graph");
+var _peak_group = _interopRequireDefault(require("../cmd_bar/08_peak_group"));
+var _r03_threshold = _interopRequireDefault(require("../cmd_bar/r03_threshold"));
+var _integration = _interopRequireDefault(require("../cmd_bar/04_integration"));
+var _peak = _interopRequireDefault(require("../cmd_bar/03_peak"));
+var _extractEntityLCMS = require("../../helpers/extractEntityLCMS");
+var _jsxRuntime = require("react/jsx-runtime");
+/* eslint-disable no-mixed-operators, prefer-object-spread, react/function-component-definition */
+
+const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
+const H = Math.round(window.innerHeight * 0.90 * 0.8 / 3); // ROI
+
+const toSeed = (xValues = [], yValues = []) => {
+  const maxLength = Math.min(xValues.length, yValues.length);
+  const seed = new Array(maxLength);
+  for (let index = 0; index < maxLength; index += 1) {
+    seed[index] = {
+      x: xValues[index],
+      y: yValues[index]
+    };
+  }
+  return seed;
+};
+const isLcmsMsPageLoading = (mzEntities = [], hplcMsSt = {}) => {
+  const currentPageValue = hplcMsSt?.tic?.currentPageValue;
+  if (!Number.isFinite(currentPageValue)) return false;
+  const polarity = hplcMsSt?.tic?.polarity;
+  const pickEntity = mzEntities?.find(ent => (0, _extractEntityLCMS.getLcMsInfo)(ent).polarity === polarity) || mzEntities?.[0];
+  if (!pickEntity) return true;
+  const {
+    features
+  } = (0, _extractParams.extractParams)(pickEntity, null, null);
+  let featuresArr = [];
+  if (Array.isArray(features)) {
+    featuresArr = features;
+  } else if (features && typeof features === 'object') {
+    featuresArr = Object.values(features);
+  }
+  if (featuresArr.length === 0) return true;
+  const pageValues = featuresArr.map(feature => (0, _pageValue.parseFeaturePageValue)(feature)).filter(value => Number.isFinite(value));
+  if (pageValues.length === 0) return true;
+  return !pageValues.some(value => Math.abs(value - currentPageValue) < 1e-5);
+};
+exports.isLcmsMsPageLoading = isLcmsMsPageLoading;
+const styles = () => Object.assign({}, {
+  lcMsStackRoot: {
+    margin: '0 0 5px 52px'
+  },
+  lcMsToolbarRow: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    columnGap: 8,
+    rowGap: 4
+  },
+  lcMsToolbarLeft: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    columnGap: 4,
+    rowGap: 4,
+    flex: '1 1 auto',
+    minWidth: 0
+  },
+  lcMsToolbarRight: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    columnGap: 8,
+    rowGap: 4,
+    flex: '0 1 auto'
+  },
+  lcMsGraphPanel: {
+    position: 'relative'
+  },
+  lcMsLoadingOverlay: {
+    position: 'absolute',
+    inset: 0,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.72)',
+    pointerEvents: 'none',
+    zIndex: 2
+  },
+  lcMsLoadingIndicator: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    borderRadius: '50%',
+    backgroundColor: 'rgba(255, 255, 255, 0.92)',
+    boxShadow: '0 1px 4px rgba(0, 0, 0, 0.18)'
+  }
+}, _common.commonStyle);
+const zoomView = (classes, graphIndex, uiSt, zoomInAct) => {
+  const onSweepZoomIn = () => {
+    const payload = {
+      graphIndex,
+      sweepType: _list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN
+    };
+    zoomInAct(payload);
+  };
+  const onSweepZoomReset = () => {
+    const resetPayload = {
+      graphIndex,
+      sweepType: _list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET
+    };
+    zoomInAct(resetPayload);
+    // Re-enable zoom brush immediately after reset for LC/MS flow.
+    zoomInAct({
+      graphIndex,
+      sweepType: _list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN
+    });
+  };
+  const {
+    zoom
+  } = uiSt;
+  const {
+    sweepTypes
+  } = zoom;
+  const isZoomFocus = sweepTypes[graphIndex] === _list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN;
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+    className: classes.group,
+    "data-testid": "Zoom",
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tooltip, {
+      title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        className: "txt-sv-tp",
+        children: "Zoom In"
+      }),
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
+        className: (0, _classnames.default)((0, _common.focusStyle)(isZoomFocus, classes), 'btn-sv-bar-zoomin'),
+        onClick: onSweepZoomIn,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_ZoomInOutlined.default, {
+          className: (0, _classnames.default)(classes.icon, classes.iconWp)
+        })
+      })
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tooltip, {
+      title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        className: "txt-sv-tp",
+        children: "Reset Zoom"
+      }),
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
+        className: (0, _classnames.default)('btn-sv-bar-zoomreset'),
+        onClick: onSweepZoomReset,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_FindReplaceOutlined.default, {
+          className: classes.icon
+        })
+      })
+    })]
+  });
+};
+const wavelengthSelect = (classes, hplcMsSt, updateWavelengthAct) => (0, _wavelengthSelect.default)(classes, hplcMsSt, updateWavelengthAct);
+const countAvailableTicPolarities = hplcMsSt => {
+  const a = hplcMsSt?.tic?.available;
+  if (!a || typeof a !== 'object') return 0;
+  return ['positive', 'negative', 'neutral'].filter(k => a[k]).length;
+};
+const ticSelect = (classes, hplcMsSt, handleTicChanged) => {
+  const {
+    tic = {}
+  } = hplcMsSt || {};
+  const {
+    polarity,
+    available
+  } = tic;
+  const listTIC = [{
+    name: 'PLUS',
+    value: 'positive',
+    enabled: available?.positive
+  }, {
+    name: 'MINUS',
+    value: 'negative',
+    enabled: available?.negative
+  }, {
+    name: 'NEUTRAL',
+    value: 'neutral',
+    enabled: available?.neutral
+  }];
+  const filtered = listTIC.filter(d => d.enabled);
+  if (filtered.length <= 1) {
+    return null;
+  }
+  const listOptions = filtered;
+  const options = listOptions.map(d => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+    value: d.value,
+    children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+      className: (0, _classnames.default)(classes.txtOpt, 'option-sv-bar-decimal'),
+      children: d.name
+    })
+  }, d.value));
+  const onTicChange = event => {
+    handleTicChanged(event);
+  };
+  const optionValues = listOptions.map(d => d.value);
+  const resolvedPolarity = optionValues.includes(polarity) ? polarity : optionValues[0];
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
+    className: (0, _classnames.default)(classes.fieldDecimal),
+    variant: "outlined",
+    style: {
+      width: '110px'
+    },
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputLabel, {
+      id: "select-decimal-label",
+      className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label'),
+      children: "TIC"
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Select, {
+      labelId: "select-decimal-label",
+      label: "Decimal",
+      value: resolvedPolarity,
+      onChange: onTicChange,
+      className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-decimal'),
+      children: options
+    })]
+  });
+};
+class ViewerLineRect extends _react.default.Component {
+  constructor(props) {
+    super(props);
+    const {
+      clickUiTargetAct,
+      selectUiSweepAct,
+      scrollUiWheelAct,
+      ticEntities,
+      uvvisEntities,
+      uiSt
+    } = props;
+    this.rootKlassLine = `.${_list_graph.LIST_ROOT_SVG_GRAPH.LINE}`;
+    this.lineFocus = new _line_focus.default({
+      W,
+      H,
+      uvvisEntities,
+      clickUiTargetAct,
+      selectUiSweepAct,
+      scrollUiWheelAct,
+      graphIndex: 0,
+      uiSt
+    });
+    this.rootKlassMulti = `.${_list_graph.LIST_ROOT_SVG_GRAPH.MULTI}`;
+    this.multiFocus = new _multi_focus.default({
+      W,
+      H,
+      ticEntities,
+      clickUiTargetAct,
+      selectUiSweepAct,
+      scrollUiWheelAct,
+      graphIndex: 1,
+      uiSt
+    });
+    this.rootKlassRect = `.${_list_graph.LIST_ROOT_SVG_GRAPH.RECT}`;
+    this.rectFocus = new _rect_focus.default({
+      W,
+      H,
+      clickUiTargetAct,
+      selectUiSweepAct,
+      scrollUiWheelAct,
+      graphIndex: 2,
+      uiSt
+    });
+    this.normChange = this.normChange.bind(this);
+    this.extractSubView = this.extractSubView.bind(this);
+    this.notifyHostOnSubViewerChange = this.notifyHostOnSubViewerChange.bind(this);
+    this.extractUvvisView = this.extractUvvisView.bind(this);
+    this.handleUvvisUndo = this.handleUvvisUndo.bind(this);
+    this.handleUvvisRedo = this.handleUvvisRedo.bind(this);
+  }
+  componentDidMount() {
+    const {
+      curveSt,
+      feature,
+      ticEntities,
+      hplcMsSt,
+      tTrEndPts,
+      layoutSt,
+      isUiAddIntgSt,
+      isUiNoBrushSt,
+      integrationSt,
+      isHidden,
+      resetAllAct,
+      uiSt,
+      editPeakSt
+    } = this.props;
+    (0, _draw.drawDestroy)(this.rootKlassMulti);
+    (0, _draw.drawDestroy)(this.rootKlassLine);
+    (0, _draw.drawDestroy)(this.rootKlassRect);
+    resetAllAct(feature);
+    const {
+      zoom
+    } = uiSt;
+    const {
+      sweepExtent
+    } = zoom;
+    const uvvisViewFeature = this.extractUvvisView();
+    let uvvisSeed = [];
+    if (uvvisViewFeature?.data?.[0]) {
+      const currentData = uvvisViewFeature.data[0];
+      const {
+        x,
+        y
+      } = currentData;
+      uvvisSeed = toSeed(x, y);
+    }
+    (0, _draw.drawMain)(this.rootKlassLine, W, H, _list_graph.LIST_BRUSH_SVG_GRAPH.LINE);
+    this.lineFocus.create({
+      filterSeed: uvvisSeed,
+      filterPeak: [],
+      tTrEndPts,
+      layoutSt,
+      isUiNoBrushSt: true,
+      sweepExtentSt: sweepExtent[0],
+      integrationSt,
+      isUiAddIntgSt,
+      editPeakSt,
+      hplcMsSt
+    });
+    (0, _draw.drawLabel)(this.rootKlassLine, null, 'Minutes', 'Intensity');
+    (0, _draw.drawDisplay)(this.rootKlassLine, false);
+    (0, _draw.drawMain)(this.rootKlassMulti, W, H, _list_graph.LIST_BRUSH_SVG_GRAPH.MULTI);
+    this.multiFocus.create({
+      ticEntities,
+      curveSt,
+      hplcMsSt,
+      tTrEndPts,
+      layoutSt,
+      sweepExtentSt: sweepExtent[1],
+      isUiAddIntgSt,
+      isUiNoBrushSt
+    });
+    (0, _draw.drawLabel)(this.rootKlassMulti, null, 'Minutes', 'Intensity');
+    (0, _draw.drawDisplay)(this.rootKlassMulti, isHidden);
+    (0, _draw.drawMain)(this.rootKlassRect, W, H, _list_graph.LIST_BRUSH_SVG_GRAPH.RECT);
+    this.rectFocus.create({
+      filterSeed: [],
+      filterPeak: [],
+      tTrEndPts,
+      layoutSt,
+      isUiNoBrushSt: true,
+      sweepExtentSt: sweepExtent[2]
+    });
+    (0, _draw.drawLabel)(this.rootKlassRect, null, 'm/z', 'Intensity');
+    (0, _draw.drawDisplay)(this.rootKlassRect, false);
+  }
+  componentDidUpdate(prevProps) {
+    const {
+      ticEntities,
+      curveSt,
+      tTrEndPts,
+      layoutSt,
+      isUiAddIntgSt,
+      isUiNoBrushSt,
+      isHidden,
+      uiSt,
+      hplcMsSt,
+      integrationSt,
+      editPeakSt
+    } = this.props;
+    this.normChange(prevProps);
+    const {
+      zoom
+    } = uiSt;
+    const {
+      sweepExtent
+    } = zoom || {};
+    if (!Array.isArray(sweepExtent)) return;
+    const uvvisViewFeature = this.extractUvvisView();
+    if (uvvisViewFeature) {
+      const hasLineSvg = !!document.querySelector(`${this.rootKlassLine} .${_list_graph.LIST_BRUSH_SVG_GRAPH.LINE}`);
+      if (!hasLineSvg) {
+        (0, _draw.drawMain)(this.rootKlassLine, W, H, _list_graph.LIST_BRUSH_SVG_GRAPH.LINE);
+      }
+      const {
+        data
+      } = uvvisViewFeature;
+      const currentData = data[0];
+      const {
+        x,
+        y
+      } = currentData;
+      const uvvisSeed = toSeed(x, y);
+      if (this.lineFocus) {
+        this.lineFocus.update({
+          filterSeed: uvvisSeed,
+          filterPeak: [],
+          tTrEndPts,
+          isUiNoBrushSt: true,
+          isUiAddIntgSt,
+          sweepExtentSt: sweepExtent[0],
+          uiSt,
+          layoutSt,
+          integrationSt,
+          hplcMsSt,
+          editPeakSt
+        });
+      }
+      (0, _draw.drawLabel)(this.rootKlassLine, null, 'Minutes', 'Intensity');
+      (0, _draw.drawDisplay)(this.rootKlassLine, false);
+    }
+    if (this.multiFocus) {
+      const hasMultiSvg = !!document.querySelector(`${this.rootKlassMulti} .${_list_graph.LIST_BRUSH_SVG_GRAPH.MULTI}`);
+      if (!hasMultiSvg) {
+        (0, _draw.drawMain)(this.rootKlassMulti, W, H, _list_graph.LIST_BRUSH_SVG_GRAPH.MULTI);
+      }
+      this.multiFocus.update({
+        curveSt,
+        ticEntities,
+        hplcMsSt,
+        tTrEndPts,
+        layoutSt,
+        sweepExtentSt: sweepExtent[1],
+        isUiAddIntgSt,
+        isUiNoBrushSt,
+        uiSt,
+        editPeakSt
+      });
+    }
+    const {
+      polarity
+    } = hplcMsSt.tic;
+    const ticPolarityCount = countAvailableTicPolarities(hplcMsSt);
+    let ticLabel = null;
+    if (ticPolarityCount > 1) {
+      ticLabel = 'NEUTRAL';
+      if (polarity === 'negative') {
+        ticLabel = 'MINUS';
+      } else if (polarity === 'positive') {
+        ticLabel = 'PLUS';
+      }
+    }
+    (0, _draw.drawLabel)(this.rootKlassMulti, ticLabel, 'Minutes', 'Intensity');
+    (0, _draw.drawDisplay)(this.rootKlassMulti, isHidden);
+    this.notifyHostOnSubViewerChange(prevProps);
+    const subViewFeature = this.extractSubView();
+    if (subViewFeature) {
+      const hasRectSvg = !!document.querySelector(`${this.rootKlassRect} .${_list_graph.LIST_BRUSH_SVG_GRAPH.RECT}`);
+      if (!hasRectSvg) {
+        (0, _draw.drawMain)(this.rootKlassRect, W, H, _list_graph.LIST_BRUSH_SVG_GRAPH.RECT);
+      }
+      const {
+        threshold
+      } = hplcMsSt;
+      const curTrEndPts = (0, _chem.convertThresEndPts)(subViewFeature, threshold.value);
+      const {
+        data
+      } = subViewFeature;
+      const pageValue = (0, _pageValue.parseFeaturePageValue)(subViewFeature);
+      const labelValue = Number.isFinite(pageValue) ? pageValue : subViewFeature?.pageValue ?? subViewFeature?.page ?? null;
+      const currentData = data[0];
+      const {
+        x,
+        y
+      } = currentData;
+      const subSeed = toSeed(x, y);
+      if (this.rectFocus) {
+        this.rectFocus.update({
+          filterSeed: subSeed,
+          filterPeak: [],
+          tTrEndPts: curTrEndPts,
+          layoutSt,
+          isUiNoBrushSt: true,
+          sweepExtentSt: sweepExtent[2],
+          uiSt
+        });
+      }
+      (0, _draw.drawLabel)(this.rootKlassRect, labelValue != null ? `${labelValue} min` : null, 'm/z', 'Intensity');
+      (0, _draw.drawDisplay)(this.rootKlassRect, false);
+    }
+  }
+  componentWillUnmount() {
+    (0, _draw.drawDestroy)(this.rootKlassLine);
+    (0, _draw.drawDestroy)(this.rootKlassMulti);
+    (0, _draw.drawDestroy)(this.rootKlassRect);
+  }
+  handleUvvisUndo() {
+    const {
+      uvvisUndoAct
+    } = this.props;
+    uvvisUndoAct();
+  }
+  handleUvvisRedo() {
+    const {
+      uvvisRedoAct
+    } = this.props;
+    uvvisRedoAct();
+  }
+  normChange(prevProps) {
+    const {
+      feature
+    } = this.props;
+    const oldFeature = prevProps.feature;
+    if (oldFeature !== feature) {
+      // resetAllAct(feature);
+    }
+  }
+  extractUvvisView() {
+    const {
+      uvvisEntities,
+      hplcMsSt
+    } = this.props;
+    if (!uvvisEntities || !uvvisEntities[0]) {
+      return null;
+    }
+    const {
+      features
+    } = (0, _extractParams.extractParams)(uvvisEntities[0], null, null);
+    let featuresArr = [];
+    if (Array.isArray(features)) {
+      featuresArr = features;
+    } else if (features && typeof features === 'object') {
+      featuresArr = Object.values(features);
+    }
+    if (featuresArr.length === 0) {
+      return null;
+    }
+    const {
+      uvvis
+    } = hplcMsSt;
+    const {
+      wavelengthIdx
+    } = uvvis;
+    if (wavelengthIdx < 0 || wavelengthIdx >= featuresArr.length) {
+      return null;
+    }
+    return featuresArr[wavelengthIdx];
+  }
+  extractSubView() {
+    const {
+      uiSt,
+      mzEntities,
+      hplcMsSt
+    } = this.props;
+    const {
+      polarity
+    } = hplcMsSt.tic;
+    const pickEntity = mzEntities?.find(ent => (0, _extractEntityLCMS.getLcMsInfo)(ent).polarity === polarity) || mzEntities?.[0];
+    if (!pickEntity || !pickEntity.layout) return null;
+    const {
+      features
+    } = (0, _extractParams.extractParams)(pickEntity, null, null);
+    let featuresArr = [];
+    if (Array.isArray(features)) featuresArr = features;else if (features && typeof features === 'object') featuresArr = Object.values(features);
+    if (featuresArr.length === 0) return null;
+    const {
+      subViewerAt
+    } = uiSt;
+    const pageValues = featuresArr.map(fe => (0, _pageValue.parseFeaturePageValue)(fe)).filter(val => Number.isFinite(val));
+    if (pageValues.length === 0) return featuresArr[0];
+    let requestedPageValue;
+    if (subViewerAt != null && Number.isFinite(subViewerAt.x)) {
+      requestedPageValue = subViewerAt.x;
+    } else if (Number.isFinite(hplcMsSt.tic.currentPageValue)) {
+      requestedPageValue = hplcMsSt.tic.currentPageValue;
+    } else {
+      requestedPageValue = pageValues[Math.floor(pageValues.length / 2)];
+    }
+    const closestPage = (0, _calc.findClosest)(pageValues, requestedPageValue);
+    const selectFeature = featuresArr.find(fe => {
+      const value = (0, _pageValue.parseFeaturePageValue)(fe);
+      return Number.isFinite(value) && Math.abs(value - closestPage) < 1e-9;
+    });
+    return selectFeature || featuresArr[0];
+  }
+  notifyHostOnSubViewerChange(prevProps) {
+    const {
+      uiSt,
+      hplcMsSt,
+      mzEntities,
+      onLcmsPageRequest,
+      updateCurrentPageValueAct
+    } = this.props;
+    const subViewerAt = uiSt?.subViewerAt;
+    if (!subViewerAt || !Number.isFinite(subViewerAt.x)) return;
+    const prevSubViewerAt = prevProps?.uiSt?.subViewerAt;
+    const sameClickAsBefore = prevSubViewerAt && Number.isFinite(prevSubViewerAt.x) && Math.abs(subViewerAt.x - prevSubViewerAt.x) < 1e-9 && Math.abs((subViewerAt.y ?? 0) - (prevSubViewerAt.y ?? 0)) < 1e-9;
+    if (sameClickAsBefore) return;
+    const {
+      polarity
+    } = hplcMsSt.tic;
+    const pickEntity = mzEntities?.find(ent => (0, _extractEntityLCMS.getLcMsInfo)(ent).polarity === polarity) || mzEntities?.[0];
+    if (!pickEntity || !pickEntity.layout) return;
+    const {
+      features
+    } = (0, _extractParams.extractParams)(pickEntity, null, null);
+    let featuresArr = [];
+    if (Array.isArray(features)) featuresArr = features;else if (features && typeof features === 'object') featuresArr = Object.values(features);
+    const pageValues = featuresArr.map(fe => (0, _pageValue.parseFeaturePageValue)(fe)).filter(val => Number.isFinite(val));
+    const requestedRt = subViewerAt.x;
+    const matchesLoadedScan = pageValues.some(pv => Math.abs(pv - requestedRt) < 1e-5);
+    const needsRemoteFetch = !matchesLoadedScan;
+    const exactFeature = featuresArr.find(fe => {
+      const value = (0, _pageValue.parseFeaturePageValue)(fe);
+      return Number.isFinite(value) && Math.abs(value - requestedRt) < 1e-9;
+    });
+    const requestRetentionTime = exactFeature?.pageSymbol ?? exactFeature?.page ?? exactFeature?.pageValue ?? requestedRt;
+    const persistedRt = needsRemoteFetch ? requestedRt : (0, _calc.findClosest)(pageValues, requestedRt);
+    const prevPersistedRt = hplcMsSt.tic.currentPageValue;
+    if (!Number.isFinite(prevPersistedRt) || Math.abs(persistedRt - prevPersistedRt) > 1e-5) {
+      updateCurrentPageValueAct(persistedRt);
+    }
+    if (needsRemoteFetch && typeof onLcmsPageRequest === 'function') {
+      onLcmsPageRequest({
+        retentionTime: requestRetentionTime,
+        polarity,
+        trigger: 'user_click'
+      });
+    }
+  }
+  render() {
+    const {
+      classes,
+      hplcMsSt,
+      selectWavelengthAct,
+      updateTicAct,
+      selectCurveAct,
+      feature,
+      zoomInAct,
+      uiSt,
+      ticEntities,
+      mzEntities,
+      omitUvvisToolbarRow,
+      onLcmsPageRequest
+    } = this.props;
+    const resolvedFeature = feature || {};
+    const hasEdit = !!resolvedFeature?.data?.[0]?.x?.length;
+    const isMsLoading = isLcmsMsPageLoading(mzEntities, hplcMsSt);
+    const handleTicChanged = event => {
+      const selectedPolarity = event.target.value;
+      updateTicAct({
+        polarity: selectedPolarity
+      });
+      const targetEntity = ticEntities?.find(ent => (0, _extractEntityLCMS.getLcMsInfo)(ent).polarity === selectedPolarity);
+      if (targetEntity?.curveIdx !== undefined) {
+        selectCurveAct(targetEntity.curveIdx);
+      }
+      const rt = hplcMsSt?.tic?.currentPageValue;
+      // Always notify the host on polarity change so it can fetch the mz page for the
+      // other trace. If RT is not set yet, pass undefined — ELN resolves initial RT.
+      if (typeof onLcmsPageRequest === 'function') {
+        onLcmsPageRequest({
+          retentionTime: Number.isFinite(rt) ? rt : undefined,
+          polarity: selectedPolarity,
+          trigger: 'tic_polarity'
+        });
+      }
+    };
+    const handleWavelengthChange = event => {
+      selectWavelengthAct(event);
+    };
+    return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+      className: classes.lcMsStackRoot,
+      children: [omitUvvisToolbarRow ? null : /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+        className: classes.lcMsToolbarRow,
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+          className: classes.lcMsToolbarLeft,
+          children: [zoomView(classes, 0, uiSt, zoomInAct), wavelengthSelect(classes, hplcMsSt, handleWavelengthChange), /*#__PURE__*/(0, _jsxRuntime.jsx)(_integration.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_peak.default, {
+            feature: resolvedFeature
+          }), (() => {
+            const hist = hplcMsSt?.uvvisEditHistory || {
+              past: [],
+              future: []
+            };
+            const canUndo = hist.past && hist.past.length > 0;
+            const canRedo = hist.future && hist.future.length > 0;
+            return /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+              className: classes.group,
+              style: {
+                display: 'inline-flex',
+                alignItems: 'center'
+              },
+              children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tooltip, {
+                title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+                  className: "txt-sv-tp",
+                  children: "Undo"
+                }),
+                children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
+                  className: "btn-sv-bar-uvvis-undo",
+                  disabled: !canUndo,
+                  onClick: this.handleUvvisUndo,
+                  children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_Undo.default, {
+                    className: classes.icon
+                  })
+                })
+              }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tooltip, {
+                title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+                  className: "txt-sv-tp",
+                  children: "Redo"
+                }),
+                children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
+                  className: "btn-sv-bar-uvvis-redo",
+                  disabled: !canRedo,
+                  onClick: this.handleUvvisRedo,
+                  children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_Redo.default, {
+                    className: classes.icon
+                  })
+                })
+              })]
+            });
+          })()]
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+          className: classes.lcMsToolbarRight
+        })]
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+        className: _list_graph.LIST_ROOT_SVG_GRAPH.LINE
+      }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+        className: classes.lcMsToolbarRow,
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+          className: classes.lcMsToolbarLeft,
+          children: [zoomView(classes, 1, uiSt, zoomInAct), ticSelect(classes, hplcMsSt, handleTicChanged), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+            style: {
+              display: 'inline-flex'
+            },
+            children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_peak_group.default, {
+              feature: resolvedFeature,
+              graphIndex: 1
+            })
+          })]
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+          className: classes.lcMsToolbarRight
+        })]
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+        className: _list_graph.LIST_ROOT_SVG_GRAPH.MULTI
+      }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+        className: classes.lcMsToolbarRow,
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+          className: classes.lcMsToolbarLeft,
+          children: zoomView(classes, 2, uiSt, zoomInAct)
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+          className: classes.lcMsToolbarRight,
+          children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_r03_threshold.default, {
+            feature: resolvedFeature,
+            hasEdit: hasEdit
+          })
+        })]
+      }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+        className: classes.lcMsGraphPanel,
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+          className: _list_graph.LIST_ROOT_SVG_GRAPH.RECT
+        }), isMsLoading ? /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+          className: classes.lcMsLoadingOverlay,
+          "data-testid": "lcms-ms-loading",
+          "aria-label": "Loading MS spectrum",
+          children: /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+            className: classes.lcMsLoadingIndicator,
+            children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.CircularProgress, {
+              size: 28
+            })
+          })
+        }) : null]
+      })]
+    });
+  }
+}
+const mapStateToProps = (state, props) => ({
+  curveSt: state.curve,
+  tTrEndPts: (0, _chem.ToThresEndPts)(state, props),
+  isUiAddIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
+  isUiNoBrushSt: _list_ui.LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
+  uiSt: state.ui,
+  layoutSt: state.layout,
+  hplcMsSt: state.hplcMs,
+  editPeakSt: state.editPeak.present,
+  integrationSt: state.integration.present,
+  sweepExtentSt: state.ui.sweepExtent
+});
+const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
+  resetAllAct: _manager.resetAll,
+  clickUiTargetAct: _ui.clickUiTarget,
+  selectUiSweepAct: _ui.selectUiSweep,
+  scrollUiWheelAct: _ui.scrollUiWheel,
+  selectWavelengthAct: _hplc_ms.selectWavelength,
+  updateTicAct: _hplc_ms.changeTic,
+  selectCurveAct: _curve.selectCurve,
+  zoomInAct: _ui.setUiSweepType,
+  updateCurrentPageValueAct: _hplc_ms.updateCurrentPageValue,
+  uvvisUndoAct: _hplc_ms.uvvisUndo,
+  uvvisRedoAct: _hplc_ms.uvvisRedo
+}, dispatch);
+ViewerLineRect.propTypes = {
+  classes: _propTypes.default.object.isRequired,
+  uiSt: _propTypes.default.object.isRequired,
+  curveSt: _propTypes.default.object.isRequired,
+  ticEntities: _propTypes.default.array.isRequired,
+  uvvisEntities: _propTypes.default.array.isRequired,
+  mzEntities: _propTypes.default.array.isRequired,
+  layoutSt: _propTypes.default.string.isRequired,
+  integrationSt: _propTypes.default.object.isRequired,
+  feature: _propTypes.default.object,
+  tTrEndPts: _propTypes.default.array.isRequired,
+  isUiAddIntgSt: _propTypes.default.bool.isRequired,
+  isUiNoBrushSt: _propTypes.default.bool.isRequired,
+  resetAllAct: _propTypes.default.func.isRequired,
+  clickUiTargetAct: _propTypes.default.func.isRequired,
+  selectUiSweepAct: _propTypes.default.func.isRequired,
+  scrollUiWheelAct: _propTypes.default.func.isRequired,
+  isHidden: _propTypes.default.bool,
+  hplcMsSt: _propTypes.default.object.isRequired,
+  selectWavelengthAct: _propTypes.default.func.isRequired,
+  updateTicAct: _propTypes.default.func.isRequired,
+  selectCurveAct: _propTypes.default.func.isRequired,
+  zoomInAct: _propTypes.default.func.isRequired,
+  editPeakSt: _propTypes.default.object.isRequired,
+  updateCurrentPageValueAct: _propTypes.default.func.isRequired,
+  uvvisUndoAct: _propTypes.default.func.isRequired,
+  uvvisRedoAct: _propTypes.default.func.isRequired,
+  omitUvvisToolbarRow: _propTypes.default.bool,
+  onLcmsPageRequest: _propTypes.default.func
+};
+ViewerLineRect.defaultProps = {
+  feature: {},
+  isHidden: false,
+  omitUvvisToolbarRow: false,
+  onLcmsPageRequest: null
+};
+
+// export default connect(mapStateToProps, mapDispatchToProps)(ViewerLineRect);
+var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _withStyles.default)(styles))(ViewerLineRect);

@@ -1,13 +1,23 @@
 import { put, takeEvery, select } from 'redux-saga/effects';
 
 import {
-  UI, EDITPEAK, SHIFT, INTEGRATION, MULTIPLICITY, CYCLIC_VOLTA_METRY,
+  UI, EDITPEAK, SHIFT, INTEGRATION, MULTIPLICITY, CYCLIC_VOLTA_METRY, HPLC_MS,
 } from '../constants/action_type';
 import { LIST_UI_SWEEP_TYPE } from '../constants/list_ui';
 import { LIST_LAYOUT } from '../constants/list_layout';
+import { LIST_BRUSH_SVG_GRAPH } from '../constants/list_graph';
+import {
+  lcmsHandleSelectZoomIn,
+  lcmsHandleSelectZoomReset,
+  lcmsHandleIntegrationAdd,
+  lcmsHandlePeakDelete,
+  lcmsHandleIntegrationRm,
+} from './saga_lcms_ui';
 
-const getUiSt = (state) => state.ui;
-const getCurveSt = (state) => state.curve;
+const getUiState = (state) => state.ui;
+const getCurveState = (state) => state.curve;
+const getHplcMsState = (state) => state.hplcMs;
+const getSubViewZoomActionType = () => UI.SWEEP.SELECT_ZOOMIN_SUBVIEW || UI.SWEEP.SELECT_ZOOMIN;
 
 const calcPeaks = (payload) => {
   const { xExtent, yExtent, dataPks } = payload;
@@ -18,36 +28,57 @@ const calcPeaks = (payload) => {
   return peaks;
 };
 
+const getLayoutState = (state) => state.layout;
+
 function* selectUiSweep(action) {
-  const uiSt = yield select(getUiSt);
+  const uiState = yield select(getUiState);
+  const { sweepType, zoom } = uiState;
   const { payload } = action;
 
-  const curveSt = yield select(getCurveSt);
-  const { curveIdx } = curveSt;
+  const curveState = yield select(getCurveState);
+  const { curveIdx } = curveState;
 
-  switch (uiSt.sweepType) {
+  const hplcMsState = yield select(getHplcMsState);
+  const { uvvis } = hplcMsState;
+  const layoutState = yield select(getLayoutState);
+
+  switch (sweepType) {
     case LIST_UI_SWEEP_TYPE.ZOOMIN:
-      yield put({
-        type: UI.SWEEP.SELECT_ZOOMIN,
-        payload,
-      });
+      if (layoutState === LIST_LAYOUT.LC_MS && uvvis.listWaveLength) {
+        yield* lcmsHandleSelectZoomIn({ payload, zoom });
+      } else {
+        yield put({
+          type: UI.SWEEP.SELECT_ZOOMIN,
+          payload,
+        });
+      }
       break;
     case LIST_UI_SWEEP_TYPE.ZOOMRESET:
-      yield put({
-        type: UI.SWEEP.SELECT_ZOOMRESET,
-        payload,
-      });
+      if (layoutState === LIST_LAYOUT.LC_MS
+        && (payload?.graphIndex === 0 || payload?.graphIndex === 1)) {
+        yield* lcmsHandleSelectZoomReset();
+      } else {
+        yield put({
+          type: UI.SWEEP.SELECT_ZOOMRESET,
+          payload,
+        });
+      }
       break;
-    case LIST_UI_SWEEP_TYPE.INTEGRATION_ADD:
-      yield put({
-        type: UI.SWEEP.SELECT_INTEGRATION,
-        payload: { newData: payload, curveIdx },
-      });
+    case LIST_UI_SWEEP_TYPE.INTEGRATION_ADD: {
+      if (uvvis.selectedWaveLength && layoutState === LIST_LAYOUT.LC_MS) {
+        yield* lcmsHandleIntegrationAdd({ uvvis, payload });
+      } else {
+        yield put({
+          type: UI.SWEEP.SELECT_INTEGRATION,
+          payload: { newData: payload, curveIdx },
+        });
+      }
       break;
-    case LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD:
+    }
+    case LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD: {
       const peaks = calcPeaks(payload); // eslint-disable-line
       if (peaks.length === 0) { break; }
-      const newPayload = Object.assign({}, payload, { peaks }); // eslint-disable-line
+      const newPayload = { ...payload, peaks }; // eslint-disable-line
 
       yield put({
         type: UI.SWEEP.SELECT_INTEGRATION,
@@ -58,25 +89,27 @@ function* selectUiSweep(action) {
         payload: { newData: newPayload, curveIdx },
       });
       break;
+    }
     default:
       break;
   }
   return null;
 }
 
-const getLayoutSt = (state) => state.layout;
-
 function* scrollUiWheel(action) {
-  const layoutSt = yield select(getLayoutSt);
+  const layoutState = yield select(getLayoutState);
   const { payload } = action;
-  const { xExtent, yExtent, direction } = payload;
+  if (!payload?.xExtent || !payload?.yExtent) return;
+  const {
+    xExtent, yExtent, direction, brushClass,
+  } = payload;
   const { yL, yU } = yExtent;
   const [yeL, yeU] = [yL + (yU - yL) * 0.1, yU - (yU - yL) * 0.1];
   const scale = direction ? 0.8 : 1.25;
   let nextExtent = { xExtent: false, yExtent: false };
   let [nyeL, nyeU, h, nytL, nytU] = [0, 1, 1, 0, 1];
 
-  switch (layoutSt) {
+  switch (layoutState) {
     case LIST_LAYOUT.IR:
     case LIST_LAYOUT.RAMAN:
       [nyeL, nyeU] = [yeL + (yeU - yeL) * (1 - scale), yeU];
@@ -102,43 +135,100 @@ function* scrollUiWheel(action) {
       nextExtent = { xExtent, yExtent: { yL: nytL, yU: nytU } };
       break;
   }
-  yield put({
-    type: UI.SWEEP.SELECT_ZOOMIN,
-    payload: nextExtent,
-  });
+  if (brushClass === `.${LIST_BRUSH_SVG_GRAPH.RECT}`) {
+    yield put({
+      type: getSubViewZoomActionType(),
+      payload: nextExtent,
+    });
+  } else {
+    yield put({
+      type: UI.SWEEP.SELECT_ZOOMIN,
+      payload: nextExtent,
+    });
+  }
 }
 
 const getUiSweepType = (state) => state.ui.sweepType;
 
+export const shouldDisplayLcmsSubViewerAt = ({
+  isLcmsLayout,
+  payload,
+  sourceHint,
+  uiSweepType,
+}) => (
+  isLcmsLayout
+  && sourceHint === 'lcms_tic'
+  && Number.isFinite(payload?.x)
+  && [
+    LIST_UI_SWEEP_TYPE.ZOOMIN,
+    LIST_UI_SWEEP_TYPE.ZOOMRESET,
+    LIST_UI_SWEEP_TYPE.PEAK_GROUP_SELECT,
+  ].includes(uiSweepType)
+);
+
 function* clickUiTarget(action) {
   const {
-    payload, onPeak, voltammetryPeakIdx, onPecker,
+    payload, onPeak, voltammetryPeakIdx, onPecker, sourceHint,
   } = action;
   const uiSweepType = yield select(getUiSweepType);
 
-  const curveSt = yield select(getCurveSt);
-  const { curveIdx } = curveSt;
+  const curveState = yield select(getCurveState);
+  const { curveIdx } = curveState;
+
+  const hplcMsState = yield select(getHplcMsState);
+  const { uvvis } = hplcMsState;
+  const isLcmsLayout = (yield select(getLayoutState)) === LIST_LAYOUT.LC_MS;
+
+  if (shouldDisplayLcmsSubViewerAt({
+    isLcmsLayout,
+    payload,
+    sourceHint,
+    uiSweepType,
+  })) {
+    yield put({
+      type: UI.SUB_VIEWER.DISPLAY_VIEWER_AT,
+      payload,
+    });
+    return;
+  }
 
   if (uiSweepType === LIST_UI_SWEEP_TYPE.PEAK_ADD && !onPeak) {
+    const spectrumId = hplcMsState?.uvvis?.selectedWaveLength;
+    if (isLcmsLayout && spectrumId == null) return;
+    const currentPeaks = hplcMsState?.uvvis?.currentSpectrum?.peaks || [];
+
+    const updatedPeaks = [...currentPeaks, payload];
+
     yield put({
-      type: EDITPEAK.ADD_POSITIVE,
-      payload: { dataToAdd: payload, curveIdx },
+      type: HPLC_MS.UPDATE_HPLCMS_PEAKS,
+      payload: {
+        spectrumId,
+        peaks: updatedPeaks,
+      },
     });
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.PEAK_DELETE && onPeak) {
-    yield put({
-      type: EDITPEAK.ADD_NEGATIVE,
-      payload: { dataToAdd: payload, curveIdx },
-    });
+    if (isLcmsLayout && uvvis.selectedWaveLength) {
+      yield* lcmsHandlePeakDelete({ uvvis, payload });
+    } else {
+      yield put({
+        type: EDITPEAK.ADD_NEGATIVE,
+        payload: { dataToAdd: payload, curveIdx },
+      });
+    }
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT && onPeak) {
     yield put({
       type: SHIFT.SET_PEAK,
       payload: { dataToSet: payload, curveIdx },
     });
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_RM && onPeak) {
-    yield put({
-      type: INTEGRATION.RM_ONE,
-      payload: { dataToRemove: payload, curveIdx },
-    });
+    if (uvvis.selectedWaveLength && isLcmsLayout) {
+      yield* lcmsHandleIntegrationRm({ uvvis, payload });
+    } else {
+      yield put({
+        type: INTEGRATION.RM_ONE,
+        payload: { dataToRemove: payload, curveIdx },
+      });
+    }
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_RM && onPeak) {
     yield put({
       type: INTEGRATION.RM_ONE,
@@ -206,6 +296,11 @@ function* clickUiTarget(action) {
     yield put({
       type: CYCLIC_VOLTA_METRY.SET_REF,
       payload: { index: voltammetryPeakIdx, jcampIdx: curveIdx },
+    });
+  } else if (uiSweepType === LIST_UI_SWEEP_TYPE.PEAK_GROUP_SELECT) {
+    yield put({
+      type: UI.SUB_VIEWER.DISPLAY_VIEWER_AT,
+      payload,
     });
   }
 }

@@ -51,16 +51,18 @@ const GraphSelectionPanel = ({
   entityFileNames, subLayoutsInfo, layoutSt,
   selectCurveAct, toggleShowAllCurveAct,
 }) => {
-  let subLayoutValues = [];
-  if (subLayoutsInfo) {
-    subLayoutValues = Object.keys(subLayoutsInfo);
-  }
+  const subLayoutValues = subLayoutsInfo ? Object.keys(subLayoutsInfo) : [];
 
   const [selectedSubLayout, setSelectedSublayout] = useState(subLayoutValues[0]);
+  const resolvedSelectedSubLayout = subLayoutValues.includes(selectedSubLayout)
+    ? selectedSubLayout
+    : (subLayoutValues[0] || false);
 
   useEffect(() => {
-    setSelectedSublayout(subLayoutValues[0]);
-  }, subLayoutValues);
+    if (resolvedSelectedSubLayout !== selectedSubLayout) {
+      setSelectedSublayout(resolvedSelectedSubLayout);
+    }
+  }, [subLayoutsInfo]);
 
   if (!curveSt) {
     return (<span />);
@@ -84,22 +86,18 @@ const GraphSelectionPanel = ({
 
   let itemsSubLayout = [];
   if (selectedSubLayout && subLayoutValues.length > 1) {
-    const subLayout = subLayoutsInfo[selectedSubLayout];
-    try {
-      itemsSubLayout = subLayout.map((spectra, idx) => {
-        const spectraIdx = spectra.curveIdx;
-        const { color } = spectra;
-        let filename = '';
-        if (entityFileNames && spectraIdx < entityFileNames.length) {
-          filename = entityFileNames[spectraIdx];
-        }
-        return {
-          name: `${idx + 1}.`, idx: spectraIdx, color, filename,
-        };
-      });
-    } catch (e) {
-      console.log(e); //eslint-disable-line
-    }
+    const subLayout = subLayoutsInfo?.[resolvedSelectedSubLayout];
+    itemsSubLayout = Array.isArray(subLayout) ? subLayout.map((spectra, idx) => {
+      const spectraIdx = spectra.curveIdx;
+      const { color } = spectra;
+      let filename = '';
+      if (entityFileNames && spectraIdx < entityFileNames.length) {
+        filename = entityFileNames[spectraIdx];
+      }
+      return {
+        name: `${idx + 1}.`, idx: spectraIdx, color, filename,
+      };
+    }) : [];
   }
 
   const items = listCurves.map((spectra, idx) => {
@@ -128,7 +126,7 @@ const GraphSelectionPanel = ({
       >
         <Typography className="txt-panel-header">
           <span className={classNames(classes.txtBadge, 'txt-sv-panel-title')}>
-            Graph selection
+            Graph selections
           </span>
         </Typography>
       </AccordionSummary>
@@ -146,9 +144,9 @@ const GraphSelectionPanel = ({
       {
         (subLayoutValues && subLayoutValues.length > 1) ? (
           <div>
-            <Tabs value={selectedSubLayout} onChange={onChangeTabSubLayout}>
+            <Tabs value={resolvedSelectedSubLayout} onChange={onChangeTabSubLayout}>
               {
-                subLayoutValues.map((subLayout, i) => {
+                subLayoutValues.map((subLayout) => {
                   let subLayoutName = '';
                   switch (subLayout.toUpperCase()) {
                     case 'G/MOL':
@@ -166,7 +164,7 @@ const GraphSelectionPanel = ({
                     default:
                       break;
                   }
-                  return (<Tab key={i} value={subLayout} label={subLayoutName} />);
+                  return (<Tab key={subLayout} value={subLayout} label={subLayoutName} />);
                 })
               }
             </Tabs>
@@ -247,14 +245,19 @@ const mapDispatchToProps = (dispatch) => (
 
 GraphSelectionPanel.propTypes = {
   classes: PropTypes.object.isRequired,
-  expand: PropTypes.bool.isRequired,
+  expand: PropTypes.bool,
   layoutSt: PropTypes.string.isRequired,
-  onExapnd: PropTypes.func.isRequired,
+  onExapnd: PropTypes.func,
+  onExpand: PropTypes.func,
   curveSt: PropTypes.object.isRequired,
   selectCurveAct: PropTypes.func.isRequired,
-  entityFileNames: PropTypes.array.isRequired,
-  subLayoutsInfo: PropTypes.array,
+  entityFileNames: PropTypes.array,
+  subLayoutsInfo: PropTypes.object,
   toggleShowAllCurveAct: PropTypes.func.isRequired,
+};
+
+GraphSelectionPanel.defaultProps = {
+  entityFileNames: [],
 };
 
 export default connect(

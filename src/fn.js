@@ -1,6 +1,6 @@
 /* eslint-disable prefer-object-spread */
 import Format from './helpers/format';
-import { ExtractJcamp } from './helpers/chem';
+import { ExtractJcamp, buildLcmsMsPageJcamp } from './helpers/chem';
 import { ToXY } from './helpers/converter';
 import { calcMpyCenter } from './helpers/multiplicity_calc';
 import { carbonFeatures } from './helpers/carbonFeatures';
@@ -11,6 +11,7 @@ const FN = Object.assign(
   Format,
   {
     ExtractJcamp,
+    buildLcmsMsPageJcamp,
     ToXY,
     LIST_LAYOUT,
     CalcMpyCenter: calcMpyCenter,

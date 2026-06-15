@@ -63,12 +63,15 @@ const detectorSelect = (classes, detectorSt, curveSt, layoutSt, updateDetectorAc
         onChange={onChange}
         className={classNames(classes.selectInput, 'input-sv-bar-layout')}
       >
-        <MenuItem value="">
+        <MenuItem value="" key="detector-empty">
           <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')} />
         </MenuItem>
         {
-          LIST_DETECTORS.map((item) => (
-            <MenuItem value={item}>
+          LIST_DETECTORS.map((item, idx) => (
+            <MenuItem
+              value={item}
+              key={item?.name || item?.id || `detector-${idx}`}
+            >
               <span className={classNames(classes.txtOpt, 'option-sv-bar-layout')}>
                 {item.name}
               </span>

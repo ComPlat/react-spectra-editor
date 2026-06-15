@@ -1,8 +1,14 @@
-import { PksEdit } from './converter';
+/* eslint-disable max-len */
 import { Convert2Peak } from './chem';
+import { PksEdit } from './converter';
 import { FromManualToOffset } from './shift';
 import Format from './format';
 import { calcArea } from './integration';
+import {
+  formatLcmsPeaksForBackend,
+  formatLcmsIntegralsForBackend,
+  getLcmsMzPageData,
+} from '../features/lc-ms/submit';
 
 const niOffset = (shiftSt, atIndex = 0) => {
   const { shifts } = shiftSt;
@@ -17,17 +23,16 @@ const niOffset = (shiftSt, atIndex = 0) => {
 
 const msOffset = () => 0;
 
-const extractPeaksEdit = (feature, editPeakSt, thresSt, shiftSt, layoutSt, atIndex = 0) => {
-  const offset = Format.isMsLayout(layoutSt) ? msOffset() : niOffset(shiftSt, atIndex);
-  const peaks = Convert2Peak(feature, thresSt.value, offset);
-  const peaksEdit = PksEdit(peaks, editPeakSt);
-  return peaksEdit;
-};
-
 const extractAutoPeaks = (feature, thresSt, shiftSt, layoutSt, atIndex = 0) => {
-  const offset = Format.isMsLayout(layoutSt) ? msOffset() : niOffset(shiftSt, atIndex);
+  const offset = (Format.isMsLayout(layoutSt) || Format.isLCMsLayout(layoutSt)) ? msOffset() : niOffset(shiftSt, atIndex);
   const peaks = Convert2Peak(feature, thresSt.value, offset);
   return peaks;
+};
+
+const extractPeaksEdit = (feature, editPeakSt, thresSt, shiftSt, layoutSt, atIndex = 0) => {
+  if (Format.isLCMsLayout(layoutSt)) return [];
+  const peaks = extractAutoPeaks(feature, thresSt, shiftSt, layoutSt, atIndex);
+  return PksEdit(peaks, editPeakSt);
 };
 
 const getAUCValue = (integrationSt, layoutSt) => {
@@ -58,4 +63,4 @@ const extractAreaUnderCurve = (allIntegrationSt, presentIntegrationSt, layoutSt)
   return null;
 };
 
-export { extractPeaksEdit, extractAreaUnderCurve, extractAutoPeaks }; // eslint-disable-line
+export { extractPeaksEdit, extractAreaUnderCurve, extractAutoPeaks, formatLcmsPeaksForBackend, formatLcmsIntegralsForBackend, getLcmsMzPageData }; // eslint-disable-line

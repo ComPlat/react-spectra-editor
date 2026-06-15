@@ -4,9 +4,13 @@ import { fireEvent, render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 import BtnSubmit from '../../../../components/cmd_bar/r05_submit_btn';
+import Format from '../../../../helpers/format';
 
 jest.mock('../../../../helpers/extractPeaksEdit', () => ({
-  extractPeaksEdit: jest.fn(() => [{ x: 1, y: 2 }]),
+  extractPeaksEdit: () => [{ x: 1, y: 2 }],
+  formatLcmsPeaksForBackend: () => [{ peakMock: true }],
+  formatLcmsIntegralsForBackend: () => [{ integralMock: true }],
+  getLcmsMzPageData: () => ({ mzPageDataMock: true }),
 }));
 
 const mockStore = configureStore([]);
@@ -27,6 +31,7 @@ const buildBaseState = (overrides = {}) => ({
   axesUnits: { axes: [{ xUnit: '', yUnit: '' }] },
   detector: {},
   meta: { dscMetaData: {} },
+  hplcMs: {},
   ...overrides,
 });
 
@@ -108,5 +113,77 @@ describe('<BtnSubmit payload contract />', () => {
     const noFlagsPayload = noFlagsCb.mock.calls[0][0];
     expect(noFlagsPayload.spectra_list[0]).not.toHaveProperty('keepPred');
     expect(noFlagsPayload.spectra_list[0]).not.toHaveProperty('simulatenmr');
+  });
+
+  describe('layout LC/MS', () => {
+    const uvvisFeature = { xUnit: 'min', yUnit: 'mAU', scanAutoTarget: 1, thresRef: 3 };
+    let formatedLcmsSpy;
+
+    beforeEach(() => {
+      formatedLcmsSpy = jest.spyOn(Format, 'formatedLCMS').mockReturnValue('lcms_head_text');
+    });
+
+    afterEach(() => {
+      formatedLcmsSpy.mockRestore();
+    });
+
+    it('replicates lcms_* onto each UVVIS entry in spectra_list', () => {
+      const operationValue = jest.fn();
+      const state = buildBaseState({
+        layout: 'LC/MS',
+        curve: {
+          curveIdx: 0,
+          listCurves: [
+            { lcmsKind: 'uvvis', feature: { ...uvvisFeature, scanAutoTarget: 1 } },
+            { lcmsKind: 'uvvis', feature: { ...uvvisFeature, scanAutoTarget: 2 } },
+          ],
+        },
+        hplcMs: {
+          uvvis: { selectedWaveLength: 220 },
+          tic: { currentPageValue: 1.25 },
+        },
+      });
+
+      renderBtnSubmit(state, operationValue);
+
+      const payload = operationValue.mock.calls[0][0];
+      expect(payload.spectra_list).toHaveLength(2);
+      payload.spectra_list.forEach((entry) => {
+        expect(entry.lcms_peaks).toEqual([{ peakMock: true }]);
+        expect(entry.lcms_integrals).toEqual([{ integralMock: true }]);
+        expect(entry.lcms_integrations_export).toBe('percent');
+        expect(entry.lcms_peaks_text).toBe('lcms_head_text');
+        expect(entry.lcms_uvvis_wavelength).toBe(220);
+        expect(entry.lcms_mz_page).toBe(1.25);
+        expect(entry.lcms_mz_page_data).toEqual({ mzPageDataMock: true });
+      });
+      expect(payload.lcms_peaks).toEqual([{ peakMock: true }]);
+      expect(formatedLcmsSpy).toHaveBeenCalled();
+    });
+
+    it('with no UVVIS in listCurves (fallback to feature), no lcms_* on the spectrum item', () => {
+      const operationValue = jest.fn();
+      const state = buildBaseState({
+        layout: 'LC/MS',
+        curve: {
+          curveIdx: 0,
+          listCurves: [{ lcmsKind: 'tic', feature: uvvisFeature }],
+        },
+        hplcMs: {
+          uvvis: { selectedWaveLength: 210 },
+          tic: { currentPageValue: 0.5 },
+        },
+      });
+
+      renderBtnSubmit(state, operationValue);
+
+      const payload = operationValue.mock.calls[0][0];
+      expect(payload.spectra_list).toHaveLength(1);
+      const entry = payload.spectra_list[0];
+      expect(entry).not.toHaveProperty('lcms_peaks');
+      expect(entry).not.toHaveProperty('lcms_integrals');
+      expect(entry).not.toHaveProperty('lcms_peaks_text');
+      expect(payload.lcms_peaks).toEqual([{ peakMock: true }]);
+    });
   });
 });

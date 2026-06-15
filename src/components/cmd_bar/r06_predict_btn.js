@@ -95,7 +95,7 @@ const onClickReady = (
   };
 };
 
-const onClicUnknown = (
+const onClickUnknown = (
   feature, forecast, peaksEdit, layoutSt, scan, shiftSt, thres,
   analysis, integrationSt, multiplicitySt, curveSt,
 ) => {
@@ -208,7 +208,7 @@ const BtnPredict = ({
 
   const oriPeaksEdit = extractPeaksEdit(feature, editPeakSt, thresSt, shiftSt, layoutSt);
   const peaksEdit = Format.rmShiftFromPeaks(oriPeaksEdit, shiftSt);
-  const scan = Convert2Scan(feature, scanSt);
+  const scan = Format.isMsLayout(layoutSt) ? Convert2Scan(feature, scanSt) : 0;
   const thres = Convert2Thres(feature, thresSt);
   const simuCount = simulationSt.nmrSimPeaks.length;
   const uniqCount = [...new Set(simulationSt.nmrSimPeaks)].length;
@@ -224,7 +224,7 @@ const BtnPredict = ({
   }
 
   if (is13Cor1H && simuCount === 0) {
-    const onClickUnknownCb = onClicUnknown(
+    const onClickUnknownCb = onClickUnknown(
       feature, forecast, peaksEdit, layoutSt, scan, shiftSt, thres,
       forecast.predictions, integrationSt, multiplicitySt, curveSt,
     );
@@ -277,7 +277,7 @@ BtnPredict.propTypes = {
   feature: PropTypes.object.isRequired,
   forecast: PropTypes.object.isRequired,
   layoutSt: PropTypes.string.isRequired,
-  simulationSt: PropTypes.array.isRequired,
+  simulationSt: PropTypes.object.isRequired,
   editPeakSt: PropTypes.object.isRequired,
   scanSt: PropTypes.object.isRequired,
   shiftSt: PropTypes.object.isRequired,
