@@ -19,6 +19,7 @@ import {
 } from '../common/draw';
 import { LIST_UI_SWEEP_TYPE, LIST_NON_BRUSH_TYPES } from '../../constants/list_ui';
 import { LIST_ROOT_SVG_GRAPH } from '../../constants/list_graph';
+import Cfg from '../../helpers/cfg';
 import { addNewCylicVoltaPairPeak, addCylicVoltaMaxPeak, addCylicVoltaMinPeak } from '../../actions/cyclic_voltammetry';
 
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
