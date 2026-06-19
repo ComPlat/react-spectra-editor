@@ -37,7 +37,7 @@ const addToStack = (state, action) => {
 
   const { integrations } = state;
   let selectedIntegration = integrations[curveIdx];
-  if (selectedIntegration === false || selectedIntegration === undefined) {
+  if (!selectedIntegration) {
     selectedIntegration = defaultEmptyIntegration;
   }
 
@@ -246,7 +246,7 @@ const splitStack = (state, action) => {
 
   const { integrations } = state;
   const selectedIntegration = integrations[curveIdx];
-  if (!selectedIntegration || selectedIntegration === false) {
+  if (!selectedIntegration) {
     return state;
   }
 
@@ -294,7 +294,7 @@ const addVisualSplitLine = (state, action) => {
 
   const { integrations } = state;
   const selectedIntegration = integrations[curveIdx];
-  if (!selectedIntegration || selectedIntegration === false) {
+  if (!selectedIntegration) {
     return state;
   }
 
@@ -355,7 +355,7 @@ const removeVisualSplitLine = (state, action) => {
 
   const { integrations } = state;
   const selectedIntegration = integrations[curveIdx];
-  if (!selectedIntegration || selectedIntegration === false) {
+  if (!selectedIntegration) {
     return state;
   }
 
