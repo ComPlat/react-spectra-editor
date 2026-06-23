@@ -3,6 +3,7 @@ import {
   ToFrequency, Convert2Scan, Convert2Thres, GetComparisons, Convert2DValue,
   GetCyclicVoltaRatio, GetCyclicVoltaPeakSeparate, convertTopic,
   Convert2MaxMinPeak, Feature2MaxMinPeak, GetCyclicVoltaShiftOffset, GetCyclicVoltaPreviousShift,
+  buildIntegFeature,
 } from "../../../helpers/chem";
 import nmr1HJcamp from "../../fixtures/nmr1h_jcamp";
 import aifJcamp1 from "../../fixtures/aif_jcamp_1";
@@ -516,6 +517,82 @@ describe('Test for chem helper', () => {
     it('When it does not have ref value', () => {
       const offset = GetCyclicVoltaShiftOffset(voltaData, 2)
       expect(offset).toEqual(0.0)
+    })
+  })
+
+  describe('Test build integration feature with persistent visualSplitGroupId', () => {
+    const linearSpectra = [{ data: [{ x: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], y: [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0] }] }]
+    const buildJcamp = (records: Record<string, string>) => ({
+      info: { ...records },
+      spectra: [{}],
+    })
+
+    it('returns integrations without groupId for legacy JCAMPs', () => {
+      const jcamp: any = buildJcamp({
+        $OBSERVEDINTEGRALS: '\n0, 10, 5, 5',
+      })
+      const feature = buildIntegFeature(jcamp, linearSpectra)
+      expect(feature.stack).toHaveLength(1)
+      expect(feature.stack[0]).toMatchObject({ xL: 0, xU: 10 })
+      expect(feature.stack[0].visualSplitGroupId).toBeUndefined()
+    })
+
+    it('attaches a visualSplitGroupId from the JCAMP record', () => {
+      const jcamp: any = buildJcamp({
+        $OBSERVEDINTEGRALS: '\n0, 4, 2, 2\n4, 10, 3, 3',
+        $OBSERVEDINTEGRALSGROUPS: '\n0, vsg-abc-1\n1, vsg-abc-1',
+      })
+      const feature = buildIntegFeature(jcamp, linearSpectra)
+      expect(feature.stack[0].visualSplitGroupId).toBe('vsg-abc-1')
+      expect(feature.stack[1].visualSplitGroupId).toBe('vsg-abc-1')
+    })
+
+    it('preserves alphanumeric and dash characters in the groupId token', () => {
+      const jcamp: any = buildJcamp({
+        $OBSERVEDINTEGRALS: '\n0, 10, 5, 5',
+        $OBSERVEDINTEGRALSGROUPS: '\n0, vsg-token_42-XYZ',
+      })
+      const feature = buildIntegFeature(jcamp, linearSpectra)
+      expect(feature.stack[0].visualSplitGroupId).toBe('vsg-token_42-XYZ')
+    })
+
+    it('ignores groupId rows pointing to non existing integrations', () => {
+      const jcamp: any = buildJcamp({
+        $OBSERVEDINTEGRALS: '\n0, 10, 5, 5',
+        $OBSERVEDINTEGRALSGROUPS: '\n5, vsg-orphan',
+      })
+      const feature = buildIntegFeature(jcamp, linearSpectra)
+      expect(feature.stack[0].visualSplitGroupId).toBeUndefined()
+    })
+
+    it('keeps the groupId after the area normalisation pass', () => {
+      const jcamp: any = buildJcamp({
+        $OBSERVEDINTEGRALS: '\n0, 10, 5, 5',
+        $OBSERVEDINTEGRALSGROUPS: '\n0, vsg-abc',
+      })
+      const feature = buildIntegFeature(jcamp, linearSpectra)
+      expect(feature.stack[0].visualSplitGroupId).toBe('vsg-abc')
+      expect(feature.stack[0].area).toBeDefined()
+    })
+
+    it('parses GROUPS records that have no leading newline (header-less convention)', () => {
+      const jcamp: any = buildJcamp({
+        $OBSERVEDINTEGRALS: '\n0, 4, 2, 2\n4, 10, 3, 3',
+        $OBSERVEDINTEGRALSGROUPS: '0, vsg-headerless\n1, vsg-headerless',
+      })
+      const feature = buildIntegFeature(jcamp, linearSpectra)
+      expect(feature.stack[0].visualSplitGroupId).toBe('vsg-headerless')
+      expect(feature.stack[1].visualSplitGroupId).toBe('vsg-headerless')
+    })
+
+    it('ignores an arbitrary header line and still maps all valid rows', () => {
+      const jcamp: any = buildJcamp({
+        $OBSERVEDINTEGRALS: '\n0, 4, 2, 2\n4, 10, 3, 3',
+        $OBSERVEDINTEGRALSGROUPS: ' (X Y)\n0, vsg-hdr\n1, vsg-hdr',
+      })
+      const feature = buildIntegFeature(jcamp, linearSpectra)
+      expect(feature.stack[0].visualSplitGroupId).toBe('vsg-hdr')
+      expect(feature.stack[1].visualSplitGroupId).toBe('vsg-hdr')
     })
   })
 

@@ -34,11 +34,14 @@ const MountTags = (target) => {
   const aucPath = target.root.append('g')
     .attr('class', 'aucPath-clip')
     .attr('clip-path', 'url(#clip)');
+  const visualSplitPath = target.root.append('g')
+    .attr('class', 'integration-visual-splits')
+    .attr('clip-path', 'url(#clip)');
   const peckerPath = target.root.append('g')
     .attr('class', 'peckerPath-clip')
     .attr('clip-path', 'url(#clip)');
   return {
-    pPath, bpPath, bpTxt, igbPath, igcPath, igtPath, mpybPath, mpyt1Path, mpyt2Path, mpypPath, aucPath, peckerPath, // eslint-disable-line
+    pPath, bpPath, bpTxt, igbPath, igcPath, igtPath, mpybPath, mpyt1Path, mpyt2Path, mpypPath, aucPath, visualSplitPath, peckerPath, // eslint-disable-line
   };
 };
 

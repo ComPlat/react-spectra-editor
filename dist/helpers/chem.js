@@ -4,7 +4,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Topic2Seed = exports.ToThresEndPts = exports.ToShiftPeaks = exports.ToFrequency = exports.GetCyclicVoltaShiftOffset = exports.GetCyclicVoltaRatio = exports.GetCyclicVoltaPreviousShift = exports.GetCyclicVoltaPeakSeparate = exports.GetComparisons = exports.Feature2Peak = exports.Feature2MaxMinPeak = exports.ExtractJcamp = exports.Convert2Thres = exports.Convert2Scan = exports.Convert2Peak = exports.Convert2MaxMinPeak = exports.Convert2DValue = void 0;
+exports.buildIntegFeature = exports.Topic2Seed = exports.ToThresEndPts = exports.ToShiftPeaks = exports.ToFrequency = exports.GetCyclicVoltaShiftOffset = exports.GetCyclicVoltaRatio = exports.GetCyclicVoltaPreviousShift = exports.GetCyclicVoltaPeakSeparate = exports.GetComparisons = exports.Feature2Peak = exports.Feature2MaxMinPeak = exports.ExtractJcamp = exports.Convert2Thres = exports.Convert2Scan = exports.Convert2Peak = exports.Convert2MaxMinPeak = exports.Convert2DValue = void 0;
 Object.defineProperty(exports, "buildLcmsMsPageJcamp", {
   enumerable: true,
   get: function get() {
@@ -795,23 +795,43 @@ const calcIntgRefArea = (spectra, stack) => {
     raw2realRatio
   };
 };
+const parseObservedIntegralGroups = rawValue => {
+  if (!rawValue) return {};
+  const tokenRegx = /[^A-Za-z0-9._-]/g;
+  const groupsByIdx = {};
+  rawValue.split('\n').forEach(line => {
+    const cells = line.split(',').map(c => c.replace(tokenRegx, ''));
+    if (cells.length < 2) return;
+    const idx = parseInt(cells[0], 10);
+    const groupId = cells[1];
+    if (!Number.isInteger(idx) || idx < 0 || !groupId) return;
+    groupsByIdx[idx] = groupId;
+  });
+  return groupsByIdx;
+};
 const buildIntegFeature = (jcamp, spectra) => {
   const {
     $OBSERVEDINTEGRALS,
-    $OBSERVEDMULTIPLETS
+    $OBSERVEDMULTIPLETS,
+    $OBSERVEDINTEGRALSGROUPS
   } = jcamp.info;
   const regx = /[^0-9.,-]/g;
   let stack = [];
   if ($OBSERVEDINTEGRALS) {
     const its = $OBSERVEDINTEGRALS.split('\n').slice(1);
-    const itStack = its.map(t => {
+    const groupsByIdx = parseObservedIntegralGroups($OBSERVEDINTEGRALSGROUPS);
+    const itStack = its.map((t, idx) => {
       const ts = t.replace(regx, '').split(',');
-      return {
+      const item = {
         xL: parseFloat(ts[0]),
         xU: parseFloat(ts[1]),
         area: parseFloat(ts[2]),
         absoluteArea: parseFloat(ts[3])
       };
+      const groupId = groupsByIdx[idx];
+      return groupId ? Object.assign({}, item, {
+        visualSplitGroupId: groupId
+      }) : item;
     });
     stack = [...stack, ...itStack];
   }
@@ -850,7 +870,7 @@ const range = (head, tail, length) => {
   );
 };
 */
-
+exports.buildIntegFeature = buildIntegFeature;
 const buildSimFeature = jcamp => {
   const {
     $CSSIMULATIONPEAKS
@@ -1119,7 +1139,7 @@ const ensureSpectrumData = (spectrum, source) => {
 const ExtractJcamp = source => {
   const jcamp = _jcampconverter.default.convert(source, {
     xy: true,
-    keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS|\$CSUPPERTHRESHOLD|\$CSLOWERTHRESHOLD|\$CSCYCLICVOLTAMMETRYDATA|UNITS|SYMBOL|\$CSAUTOMETADATA|\$DETECTOR|MN|MW|D|MP|MELTINGPOINT|TG|\$CSSCANRATE|\$CSSPECTRUMDIRECTION|\$CSWEAREAVALUE|\$CSWEAREAUNIT|\$CSCURRENTMODE|\$CSLCMSMZPAGE|SCAN_MODE|SCANMODE|TYPE|SOFTWARE|DATATYPE)/ // eslint-disable-line
+    keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDINTEGRALSGROUPS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS|\$CSUPPERTHRESHOLD|\$CSLOWERTHRESHOLD|\$CSCYCLICVOLTAMMETRYDATA|UNITS|SYMBOL|\$CSAUTOMETADATA|\$DETECTOR|MN|MW|D|MP|MELTINGPOINT|TG|\$CSSCANRATE|\$CSSPECTRUMDIRECTION|\$CSWEAREAVALUE|\$CSWEAREAUNIT|\$CSCURRENTMODE|\$CSLCMSMZPAGE|SCAN_MODE|SCANMODE|TYPE|SOFTWARE|DATATYPE)/ // eslint-disable-line
   });
   const isChemstation = (0, _parsing.isChemstationLcms)(source, jcamp);
   const parsedPages = (0, _parsing.parseChemstationPages)(source, jcamp);

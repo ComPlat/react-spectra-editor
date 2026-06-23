@@ -1,5 +1,10 @@
 import {
-  clearIntegrationAll, setIntegrationFkr, sweepIntegration,
+  addVisualSplitLine,
+  clearIntegrationAll,
+  removeVisualSplitLine,
+  setIntegrationFkr,
+  splitIntegration,
+  sweepIntegration,
 } from "../../../actions/integration";
 import { INTEGRATION } from "../../../constants/action_type";
 
@@ -21,6 +26,24 @@ describe('Test redux action for integrations', () => {
   it('Clear all integration', () => {
     const { type, payload } = clearIntegrationAll(payloadToBeSent)
     expect(type).toEqual(INTEGRATION.CLEAR_ALL)
+    expect(payload).toEqual(payloadToBeSent)
+  })
+
+  it('Split integration', () => {
+    const { type, payload } = splitIntegration(payloadToBeSent)
+    expect(type).toEqual(INTEGRATION.SPLIT)
+    expect(payload).toEqual(payloadToBeSent)
+  })
+
+  it('Add visual split line', () => {
+    const { type, payload } = addVisualSplitLine(payloadToBeSent)
+    expect(type).toEqual(INTEGRATION.ADD_VISUAL_SPLIT)
+    expect(payload).toEqual(payloadToBeSent)
+  })
+
+  it('Remove visual split line', () => {
+    const { type, payload } = removeVisualSplitLine(payloadToBeSent)
+    expect(type).toEqual(INTEGRATION.RM_VISUAL_SPLIT)
     expect(payload).toEqual(payloadToBeSent)
   })
 })

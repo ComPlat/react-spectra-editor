@@ -348,7 +348,6 @@ const InfoPanel = ({
   shiftSt,
   curveSt,
   exactMass,
-  onExapnd,
   onExpand,
   canChangeDescription,
   onDescriptionChanged,
@@ -405,7 +404,7 @@ const InfoPanel = ({
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Accordion, {
     "data-testid": "PanelInfo",
     expanded: expand,
-    onChange: onExpand || onExapnd,
+    onChange: onExpand,
     disableGutters: true,
     sx: {
       '&.MuiAccordion-root.Mui-expanded': {
@@ -567,7 +566,6 @@ InfoPanel.propTypes = {
   shiftSt: _propTypes.default.object.isRequired,
   curveSt: _propTypes.default.object.isRequired,
   onExpand: _propTypes.default.func,
-  onExapnd: _propTypes.default.func,
   canChangeDescription: _propTypes.default.bool.isRequired,
   onDescriptionChanged: _propTypes.default.func,
   exactMass: _propTypes.default.string,

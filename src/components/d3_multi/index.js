@@ -10,9 +10,13 @@ import {
   Feature2MaxMinPeak,
 } from '../../helpers/chem';
 import Format from '../../helpers/format';
+import Cfg from '../../helpers/cfg';
 import { resetAll } from '../../actions/manager';
 import { selectUiSweep, scrollUiWheel, clickUiTarget } from '../../actions/ui';
-import { LIST_NON_BRUSH_TYPES } from '../../constants/list_ui';
+import {
+  addVisualSplitLine, removeVisualSplitLine, splitIntegration,
+} from '../../actions/integration';
+import { LIST_UI_SWEEP_TYPE, LIST_NON_BRUSH_TYPES } from '../../constants/list_ui';
 import { LIST_ROOT_SVG_GRAPH } from '../../constants/list_graph';
 import { addNewCylicVoltaPairPeak, addCylicVoltaMaxPeak, addCylicVoltaMinPeak } from '../../actions/cyclic_voltammetry';
 
@@ -30,7 +34,8 @@ class ViewerMulti extends React.Component {
     super(props);
 
     const {
-      entities, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
+      entities, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct, splitIntegrationAct,
+      addVisualSplitLineAct, removeVisualSplitLineAct,
     } = this.props;
     this.rootKlass = `.${LIST_ROOT_SVG_GRAPH.LINE}`;
     this.containerRef = React.createRef();
@@ -38,16 +43,25 @@ class ViewerMulti extends React.Component {
     this.resizeObserver = null;
 
     this.focus = new MultiFocus({
-      W, H, entities, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
+      W,
+      H,
+      entities,
+      clickUiTargetAct,
+      selectUiSweepAct,
+      scrollUiWheelAct,
+      splitIntegrationAct,
+      addVisualSplitLineAct,
+      removeVisualSplitLineAct,
     });
 
     this.normChange = this.normChange.bind(this);
     this.handleResize = this.handleResize.bind(this);
+    this.syncFocusActions = this.syncFocusActions.bind(this);
   }
 
   componentDidMount() {
-    this.renderChart(this.props, true);
     this.setupResizeObserver();
+    this.mountChart(this.props, true);
   }
 
   componentDidUpdate(prevProps) {
@@ -55,11 +69,12 @@ class ViewerMulti extends React.Component {
       entities, curveSt,
       seed, peak, cLabel, xLabel, yLabel,
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt,
-      sweepExtentSt, isUiNoBrushSt,
+      sweepExtentSt, isUiAddIntgSt, isUiSplitIntgSt, isUiVisualSplitIntgSt, isUiNoBrushSt,
       isHidden, cyclicvoltaSt,
       integrationSt, mtplySt, axesUnitsSt,
       uiSt,
     } = this.props;
+    this.syncFocusActions();
     this.normChange(prevProps);
 
     if (Format.isCyclicVoltaLayout(layoutSt)) {
@@ -98,6 +113,9 @@ class ViewerMulti extends React.Component {
       editPeakSt,
       layoutSt,
       sweepExtentSt,
+      isUiAddIntgSt,
+      isUiSplitIntgSt,
+      isUiVisualSplitIntgSt,
       isUiNoBrushSt,
       cyclicvoltaSt,
       integrationSt,
@@ -122,7 +140,7 @@ class ViewerMulti extends React.Component {
     if (!this.currentSize
       || size.width !== this.currentSize.width
       || size.height !== this.currentSize.height) {
-      this.renderChart(this.props, false);
+      this.mountChart(this.props, false);
     }
   }
 
@@ -147,6 +165,22 @@ class ViewerMulti extends React.Component {
     if (!this.containerRef.current || this.resizeObserver) return;
     this.resizeObserver = new ResizeObserver(this.handleResize);
     this.resizeObserver.observe(this.containerRef.current);
+  }
+
+  syncFocusActions() {
+    if (!this.focus) return;
+    const {
+      clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
+      splitIntegrationAct, addVisualSplitLineAct, removeVisualSplitLineAct,
+    } = this.props;
+    Object.assign(this.focus, {
+      clickUiTargetAct,
+      selectUiSweepAct,
+      scrollUiWheelAct,
+      splitIntegrationAct,
+      addVisualSplitLineAct,
+      removeVisualSplitLineAct,
+    });
   }
 
   teardownResizeObserver() {
@@ -188,15 +222,32 @@ class ViewerMulti extends React.Component {
     }
   }
 
-  renderChart(props, shouldReset) {
+  createMultiFocus(size, props) {
+    const {
+      entities, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
+      splitIntegrationAct, addVisualSplitLineAct, removeVisualSplitLineAct,
+    } = props;
+    return new MultiFocus({
+      W: size.width,
+      H: size.height,
+      entities,
+      clickUiTargetAct,
+      selectUiSweepAct,
+      scrollUiWheelAct,
+      splitIntegrationAct,
+      addVisualSplitLineAct,
+      removeVisualSplitLineAct,
+    });
+  }
+
+  mountChart(props, shouldReset = false) {
     const {
       curveSt,
       seed, peak, cLabel, feature,
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt,
-      sweepExtentSt, isUiNoBrushSt,
+      sweepExtentSt, isUiAddIntgSt, isUiSplitIntgSt, isUiVisualSplitIntgSt, isUiNoBrushSt,
       isHidden, resetAllAct, cyclicvoltaSt,
       integrationSt, mtplySt, uiSt,
-      entities, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
     } = props;
 
     const size = this.getTargetSize(layoutSt);
@@ -209,14 +260,8 @@ class ViewerMulti extends React.Component {
 
     const { xxLabel, yyLabel } = this.resolveAxisLabels(props);
 
-    this.focus = new MultiFocus({
-      W: size.width,
-      H: size.height,
-      entities,
-      clickUiTargetAct,
-      selectUiSweepAct,
-      scrollUiWheelAct,
-    });
+    this.focus = this.createMultiFocus(size, props);
+    this.syncFocusActions();
 
     drawMain(this.rootKlass, size.width, size.height);
     this.focus.create({
@@ -228,6 +273,9 @@ class ViewerMulti extends React.Component {
       editPeakSt,
       layoutSt,
       sweepExtentSt,
+      isUiAddIntgSt,
+      isUiSplitIntgSt,
+      isUiVisualSplitIntgSt,
       isUiNoBrushSt,
       cyclicvoltaSt,
       integrationSt,
@@ -263,6 +311,11 @@ const mapStateToProps = (state, props) => (
     editPeakSt: state.editPeak.present,
     layoutSt: state.layout,
     sweepExtentSt: state.ui.sweepExtent,
+    isUiAddIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
+    isUiSplitIntgSt: Cfg.showIntegSplitTools(state.layout)
+      && state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_SPLIT,
+    isUiVisualSplitIntgSt: Cfg.showIntegSplitTools(state.layout)
+      && state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_VISUAL_SPLIT,
     isUiNoBrushSt: LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
     cyclicvoltaSt: state.cyclicvolta,
     maxminPeakSt: Feature2MaxMinPeak(state, props),
@@ -278,6 +331,9 @@ const mapDispatchToProps = (dispatch) => (
     clickUiTargetAct: clickUiTarget,
     selectUiSweepAct: selectUiSweep,
     scrollUiWheelAct: scrollUiWheel,
+    splitIntegrationAct: splitIntegration,
+    addVisualSplitLineAct: addVisualSplitLine,
+    removeVisualSplitLineAct: removeVisualSplitLine,
     addNewCylicVoltaPairPeakAct: addNewCylicVoltaPairPeak,
     addCylicVoltaMaxPeakAct: addCylicVoltaMaxPeak,
     addCylicVoltaMinPeakAct: addCylicVoltaMinPeak,
@@ -300,11 +356,17 @@ ViewerMulti.propTypes = {
   integrationSt: PropTypes.object.isRequired,
   mtplySt: PropTypes.object.isRequired,
   sweepExtentSt: PropTypes.object.isRequired,
+  isUiAddIntgSt: PropTypes.bool.isRequired,
+  isUiSplitIntgSt: PropTypes.bool.isRequired,
+  isUiVisualSplitIntgSt: PropTypes.bool.isRequired,
   isUiNoBrushSt: PropTypes.bool.isRequired,
   resetAllAct: PropTypes.func.isRequired,
   clickUiTargetAct: PropTypes.func.isRequired,
   selectUiSweepAct: PropTypes.func.isRequired,
   scrollUiWheelAct: PropTypes.func.isRequired,
+  splitIntegrationAct: PropTypes.func.isRequired,
+  addVisualSplitLineAct: PropTypes.func.isRequired,
+  removeVisualSplitLineAct: PropTypes.func.isRequired,
   isHidden: PropTypes.bool,
   cyclicvoltaSt: PropTypes.object.isRequired,
   maxminPeakSt: PropTypes.object,

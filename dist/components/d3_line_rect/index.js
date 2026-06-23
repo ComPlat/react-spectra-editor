@@ -292,7 +292,6 @@ class ViewerLineRect extends _react.default.Component {
       graphIndex: 2,
       uiSt
     });
-    this.normChange = this.normChange.bind(this);
     this.extractSubView = this.extractSubView.bind(this);
     this.notifyHostOnSubViewerChange = this.notifyHostOnSubViewerChange.bind(this);
     this.extractUvvisView = this.extractUvvisView.bind(this);
@@ -389,7 +388,6 @@ class ViewerLineRect extends _react.default.Component {
       integrationSt,
       editPeakSt
     } = this.props;
-    this.normChange(prevProps);
     const {
       zoom
     } = uiSt;
@@ -516,15 +514,6 @@ class ViewerLineRect extends _react.default.Component {
       uvvisRedoAct
     } = this.props;
     uvvisRedoAct();
-  }
-  normChange(prevProps) {
-    const {
-      feature
-    } = this.props;
-    const oldFeature = prevProps.feature;
-    if (oldFeature !== feature) {
-      // resetAllAct(feature);
-    }
   }
   extractUvvisView() {
     const {

@@ -9,7 +9,7 @@ import scanReducer from './reducer_scan';
 import forecastReducer from './reducer_forecast';
 import uiReducer from './reducer_ui';
 import submitReducer from './reducer_submit';
-import integrationReducer from './reducer_integration';
+import undoableIntegrationReducer from './reducer_integration';
 import multiplicityReducer from './reducer_multiplicity';
 import simulationReducer from './reducer_simulation';
 import metaReducer from './reducer_meta';
@@ -32,7 +32,7 @@ const rootReducer = combineReducers({
   forecast: forecastReducer,
   ui: uiReducer,
   submit: submitReducer,
-  integration: integrationReducer,
+  integration: undoableIntegrationReducer,
   multiplicity: multiplicityReducer,
   simulation: simulationReducer,
   meta: metaReducer,

@@ -10,12 +10,16 @@ import {
 } from '../../helpers/chem';
 import { resetAll } from '../../actions/manager';
 import { selectUiSweep, scrollUiWheel, clickUiTarget } from '../../actions/ui';
+import {
+  addVisualSplitLine, removeVisualSplitLine, splitIntegration,
+} from '../../actions/integration';
 import LineFocus from './line_focus';
 import {
   drawMain, drawLabel, drawDisplay, drawDestroy,
 } from '../common/draw';
 import { LIST_UI_SWEEP_TYPE, LIST_NON_BRUSH_TYPES } from '../../constants/list_ui';
 import { LIST_ROOT_SVG_GRAPH } from '../../constants/list_graph';
+import Cfg from '../../helpers/cfg';
 import { addNewCylicVoltaPairPeak, addCylicVoltaMaxPeak, addCylicVoltaMinPeak } from '../../actions/cyclic_voltammetry';
 
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
@@ -25,23 +29,35 @@ class ViewerLine extends React.Component {
   constructor(props) {
     super(props);
 
-    const { clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct } = props;
+    const {
+      clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct, splitIntegrationAct,
+      addVisualSplitLineAct, removeVisualSplitLineAct,
+    } = props;
     this.rootKlass = `.${LIST_ROOT_SVG_GRAPH.LINE}`;
     this.focus = new LineFocus({
-      W, H, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
+      W,
+      H,
+      clickUiTargetAct,
+      selectUiSweepAct,
+      scrollUiWheelAct,
+      splitIntegrationAct,
+      addVisualSplitLineAct,
+      removeVisualSplitLineAct,
     });
 
     this.normChange = this.normChange.bind(this);
+    this.syncFocusActions = this.syncFocusActions.bind(this);
   }
 
   componentDidMount() {
     const {
       seed, peak, cLabel, xLabel, yLabel, feature, freq, comparisons,
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt, integrationSt, mtplySt,
-      sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
+      sweepExtentSt, isUiAddIntgSt, isUiSplitIntgSt, isUiVisualSplitIntgSt, isUiNoBrushSt,
       isHidden, wavelength, axesUnitsSt,
       resetAllAct, uiSt,
     } = this.props;
+    this.syncFocusActions();
     drawDestroy(this.rootKlass);
     resetAllAct(feature);
 
@@ -72,6 +88,8 @@ class ViewerLine extends React.Component {
       mtplySt,
       sweepExtentSt,
       isUiAddIntgSt,
+      isUiSplitIntgSt,
+      isUiVisualSplitIntgSt,
       isUiNoBrushSt,
       wavelength,
       uiSt,
@@ -84,9 +102,10 @@ class ViewerLine extends React.Component {
     const {
       seed, peak, cLabel, xLabel, yLabel, freq, comparisons,
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt, integrationSt, mtplySt,
-      sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
+      sweepExtentSt, isUiAddIntgSt, isUiSplitIntgSt, isUiVisualSplitIntgSt, isUiNoBrushSt,
       isHidden, wavelength, axesUnitsSt, uiSt,
     } = this.props;
+    this.syncFocusActions();
     this.normChange(prevProps);
 
     let xxLabel = xLabel;
@@ -115,6 +134,8 @@ class ViewerLine extends React.Component {
       mtplySt,
       sweepExtentSt,
       isUiAddIntgSt,
+      isUiSplitIntgSt,
+      isUiVisualSplitIntgSt,
       isUiNoBrushSt,
       wavelength,
       uiSt,
@@ -125,6 +146,22 @@ class ViewerLine extends React.Component {
 
   componentWillUnmount() {
     drawDestroy(this.rootKlass);
+  }
+
+  syncFocusActions() {
+    if (!this.focus) return;
+    const {
+      clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
+      splitIntegrationAct, addVisualSplitLineAct, removeVisualSplitLineAct,
+    } = this.props;
+    Object.assign(this.focus, {
+      clickUiTargetAct,
+      selectUiSweepAct,
+      scrollUiWheelAct,
+      splitIntegrationAct,
+      addVisualSplitLineAct,
+      removeVisualSplitLineAct,
+    });
   }
 
   normChange(prevProps) {
@@ -156,6 +193,10 @@ const mapStateToProps = (state, props) => (
     mtplySt: state.multiplicity.present,
     sweepExtentSt: state.ui.sweepExtent,
     isUiAddIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
+    isUiSplitIntgSt: Cfg.showIntegSplitTools(state.layout)
+      && state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_SPLIT,
+    isUiVisualSplitIntgSt: Cfg.showIntegSplitTools(state.layout)
+      && state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_VISUAL_SPLIT,
     isUiNoBrushSt: LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
     wavelength: state.wavelength,
     axesUnitsSt: state.axesUnits,
@@ -169,6 +210,9 @@ const mapDispatchToProps = (dispatch) => (
     clickUiTargetAct: clickUiTarget,
     selectUiSweepAct: selectUiSweep,
     scrollUiWheelAct: scrollUiWheel,
+    splitIntegrationAct: splitIntegration,
+    addVisualSplitLineAct: addVisualSplitLine,
+    removeVisualSplitLineAct: removeVisualSplitLine,
     addNewCylicVoltaPairPeakAct: addNewCylicVoltaPairPeak,
     addCylicVoltaMaxPeakAct: addCylicVoltaMaxPeak,
     addCylicVoltaMinPeakAct: addCylicVoltaMinPeak,
@@ -196,11 +240,16 @@ ViewerLine.propTypes = {
   mtplySt: PropTypes.object.isRequired,
   sweepExtentSt: PropTypes.object.isRequired,
   isUiAddIntgSt: PropTypes.bool.isRequired,
+  isUiSplitIntgSt: PropTypes.bool.isRequired,
+  isUiVisualSplitIntgSt: PropTypes.bool.isRequired,
   isUiNoBrushSt: PropTypes.bool.isRequired,
   resetAllAct: PropTypes.func.isRequired,
   clickUiTargetAct: PropTypes.func.isRequired,
   selectUiSweepAct: PropTypes.func.isRequired,
   scrollUiWheelAct: PropTypes.func.isRequired,
+  splitIntegrationAct: PropTypes.func.isRequired,
+  addVisualSplitLineAct: PropTypes.func.isRequired,
+  removeVisualSplitLineAct: PropTypes.func.isRequired,
   isHidden: PropTypes.bool.isRequired,
   wavelength: PropTypes.object.isRequired,
   axesUnitsSt: PropTypes.object.isRequired,

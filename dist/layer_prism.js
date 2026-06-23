@@ -43,6 +43,8 @@ const LayerPrism = ({
   thresSt,
   scanSt,
   uiSt,
+  curveSt,
+  integrationSt,
   canChangeDescription,
   onDescriptionChanged,
   entityFileNames,
@@ -52,10 +54,14 @@ const LayerPrism = ({
     topic,
     feature,
     hasEdit,
-    integration,
+    integration: initialIntegration,
     features
   } = (0, _extractParams.extractParams)(entity, thresSt, scanSt);
   if (!topic) return null;
+  const curveIdx = curveSt && Number.isFinite(curveSt.curveIdx) ? curveSt.curveIdx : 0;
+  const liveIntegrations = integrationSt && Array.isArray(integrationSt.integrations) ? integrationSt.integrations : null;
+  const liveIntegration = liveIntegrations ? liveIntegrations[curveIdx] : null;
+  const integration = liveIntegration || initialIntegration;
   const {
     viewer
   } = uiSt;
@@ -139,7 +145,9 @@ const mapStateToProps = (state, props) => (
 {
   scanSt: state.scan,
   thresSt: getThresholdState(state),
-  uiSt: state.ui
+  uiSt: state.ui,
+  curveSt: state.curve,
+  integrationSt: state.integration.present
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({}, dispatch);
 LayerPrism.propTypes = {
@@ -156,6 +164,8 @@ LayerPrism.propTypes = {
   thresSt: _propTypes.default.object.isRequired,
   scanSt: _propTypes.default.object.isRequired,
   uiSt: _propTypes.default.object.isRequired,
+  curveSt: _propTypes.default.object.isRequired,
+  integrationSt: _propTypes.default.object.isRequired,
   canChangeDescription: _propTypes.default.bool.isRequired,
   onDescriptionChanged: _propTypes.default.func,
   entityFileNames: _propTypes.default.array,

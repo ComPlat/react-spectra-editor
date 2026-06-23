@@ -1,12 +1,19 @@
 "use strict";
 
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
 var _compass = require("./compass");
+var _integration_draft = require("./integration_draft.js");
+var _sweep = require("./sweep.js");
 var _list_ui = require("../constants/list_ui");
+var _cfg = _interopRequireDefault(require("./cfg"));
 /* eslint-disable prefer-object-spread */
+
+// eslint-disable-line import/extensions
+// eslint-disable-line import/extensions
 
 const d3 = require('d3');
 const wheeled = (focus, event) => {
@@ -23,6 +30,7 @@ const wheeled = (focus, event) => {
     brushClass
   }));
 };
+const usesTwoClickIntegAdd = (focus, isUiAddIntgSt) => isUiAddIntgSt && _cfg.default.showIntegSplitTools(focus.layout);
 const brushed = (focus, xOnly, event, brushedClass = '.d3Svg') => {
   const {
     selectUiSweepAct,
@@ -47,6 +55,14 @@ const brushed = (focus, xOnly, event, brushedClass = '.d3Svg') => {
     yU: yes[1]
   };
   if (xOnly) {
+    if (focus.isUiAddIntgSt) {
+      const payload = (0, _sweep.buildSweepPayloadFromXBounds)(focus, scales.x.invert(selection[0]), scales.x.invert(selection[1]));
+      selectUiSweepAct(payload);
+      if (brushX) {
+        focus.svg.selectAll('.brushX').call(brushX.move, null);
+      }
+      return;
+    }
     xes = selection.map(scales.x.invert).sort((a, b) => a - b);
     xExtent = {
       xL: xes[0],
@@ -99,6 +115,23 @@ const MountBrush = (focus, isUiAddIntgSt, isUiNoBrushSt, brushedClass = '.d3Svg'
     uiSt,
     graphIndex
   } = focus;
+  Object.assign(focus, {
+    isUiAddIntgSt
+  });
+  const twoClickIntegAdd = usesTwoClickIntegAdd(focus, isUiAddIntgSt);
+  const {
+    firstIntegrationPoint,
+    data,
+    jcampIdx
+  } = focus;
+  const isSameIntegrationDraft = firstIntegrationPoint && firstIntegrationPoint.jcampIdx === jcampIdx && firstIntegrationPoint.dataLength === data.length;
+  if (!isUiAddIntgSt || firstIntegrationPoint && !isSameIntegrationDraft) {
+    (0, _integration_draft.clearPendingIntegrationDraft)();
+    Object.assign(focus, {
+      firstIntegrationPoint: null
+    });
+    (0, _compass.clearIntegrationPreview)(focus);
+  }
   if (!root || !svg || typeof svg.selectAll !== 'function') return;
   svg.selectAll('.brush, .brushX').remove();
   const isZoomInSubview = uiSt?.zoom?.sweepTypes?.[graphIndex] === _list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN;
@@ -106,22 +139,17 @@ const MountBrush = (focus, isUiAddIntgSt, isUiNoBrushSt, brushedClass = '.d3Svg'
   const isIntegrationAdd = uiSt?.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD;
   const isMultiplicitySweepAdd = uiSt?.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD;
   const isZoomIn = isZoomInSubview || isZoomInGlobal;
-  if (!(graphIndex === 0 && isIntegrationAdd) && !isZoomIn && !isMultiplicitySweepAdd) return;
+  if (graphIndex !== undefined && !(graphIndex === 0 && isIntegrationAdd) && !isZoomIn && !isMultiplicitySweepAdd) return;
   const isXAxisOnly = focus?.xOnlyBrush === true;
   const xOnly = isUiAddIntgSt || isXAxisOnly && !isZoomIn;
   const brushedCb = event => brushed(focus, xOnly, event, brushedClass);
   const wheeledCb = event => wheeled(focus, event);
-  if (isUiNoBrushSt) {
-    const target = xOnly ? brushX : brush;
-    const klass = xOnly ? 'brushX' : 'brush';
+  if (isUiNoBrushSt && !twoClickIntegAdd) {
+    const target = isUiAddIntgSt ? brushX : brush;
     target.handleSize(10).extent([[0, 0], [w, h]]).on('end', brushedCb);
+    const klass = isUiAddIntgSt ? 'brushX' : 'brush';
     root.append('g').attr('class', klass).on('mousemove', event => (0, _compass.MouseMove)(event, focus)).call(target);
   }
   svg.on('wheel', wheeledCb);
 };
-var _default = exports.default = MountBrush; // const resetedCb = () => reseted(main);
-// main.svg.on('dblclick', resetedCb);
-// const reseted = (main) => {
-//   const { selectUiSweepAct } = main;
-//   selectUiSweepAct({ xExtent: false, yExtent: false });
-// };
+var _default = exports.default = MountBrush;

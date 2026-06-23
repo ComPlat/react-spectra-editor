@@ -13,6 +13,7 @@ const btnCmdRmPeak = layoutSt => _format.default.isMsLayout(layoutSt);
 const btnCmdSetRef = layoutSt => !_format.default.isNmrLayout(layoutSt);
 const btnCmdIntg = layoutSt => !(_format.default.isNmrLayout(layoutSt) || _format.default.isHplcUvVisLayout(layoutSt) || _format.default.isLCMsLayout(layoutSt)); // eslint-disable-line
 
+const showIntegSplitTools = layoutSt => _format.default.isHplcUvVisLayout(layoutSt);
 const btnCmdMpy = layoutSt => !_format.default.isNmrLayout(layoutSt);
 const btnCmdMpyPeak = (layoutSt, mpySt, curveIdx = 0) => {
   const {
@@ -49,6 +50,7 @@ const Config = {
   btnCmdRmPeak,
   btnCmdSetRef,
   btnCmdIntg,
+  showIntegSplitTools,
   btnCmdMpy,
   btnCmdMpyPeak,
   hideCmdThres,

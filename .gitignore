@@ -26,3 +26,5 @@ yarn-error.log*
 
 #/dist
 /dist/__tests__
+rebuild.sh
+CLAUDE.md

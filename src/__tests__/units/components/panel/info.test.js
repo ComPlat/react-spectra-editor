@@ -78,8 +78,8 @@ describe("<InfoPanel />", () => {
   test('Render M+ exact mass for MS layout', () => {
     const msStore = mockStore({
       curve: {
-        listCurves: [{feature: {}}],
-        curveIdx: 0
+        listCurves: [{ feature: {} }],
+        curveIdx: 0,
       },
       layout: LIST_LAYOUT.MS,
       shift: {
@@ -94,10 +94,10 @@ describe("<InfoPanel />", () => {
           },
         ],
       },
-      meta: {}
+      meta: {},
     });
 
-    const renderer =
+    const renderer = (
       <AppWrapper store={msStore}>
         <ThemeProvider theme={theme}>
           <InfoPanel
@@ -108,7 +108,7 @@ describe("<InfoPanel />", () => {
           />
         </ThemeProvider>
       </AppWrapper>
-    ;
+    );
 
     render(renderer);
 
