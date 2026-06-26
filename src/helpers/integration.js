@@ -1,14 +1,6 @@
 /* eslint-disable no-mixed-operators */
 import { calcSlope } from './calc';
 
-const getValueKey = (data) => {
-  if (!Array.isArray(data) || data.length === 0) return null;
-  const sample = data[0];
-  if ('k' in sample) return 'k';
-  if ('y' in sample) return 'y';
-  return null;
-};
-
 const getArea = (xL, xU, data) => {
   if (!Array.isArray(data) || data.length === 0) return NaN;
 
