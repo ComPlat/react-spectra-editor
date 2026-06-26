@@ -155,7 +155,7 @@ const getThreshold = (state) => (
 
 const Convert2Peak = (feature, threshold, offset, upThreshold = false, lowThreshold = false) => {
   if (feature?.operation?.layout === 'LC/MS') {
-    if (feature.peaks) {
+    if (feature.peaks?.length) {
       return feature.peaks.map((p) => ({
         x: p.x - (offset || 0),
         y: p.y,
