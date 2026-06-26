@@ -31,11 +31,6 @@ const getArea = (xL, xU, data) => {
 };
 
 const getAbsoluteArea = (xL, xU, data) => {
-  const valueKey = getValueKey(data);
-  if (!valueKey) {
-    return NaN;
-  }
-
   const ps = data.filter((d) => d.x > xL && d.x < xU);
   if (ps.length < 2) return 0;
 
@@ -43,8 +38,8 @@ const getAbsoluteArea = (xL, xU, data) => {
   const point1 = ps[0];
   const point2 = ps[ps.length - 1];
 
-  const slope = calcSlope(point1.x, point1[valueKey], point2.x, point2[valueKey]);
-  let lastY = point1[valueKey];
+  const slope = calcSlope(point1.x, point1.y, point2.x, point2.y);
+  let lastY = point1.y;
 
   for (let i = 1; i < ps.length; i += 1) {
     const pt = ps[i];
@@ -52,7 +47,7 @@ const getAbsoluteArea = (xL, xU, data) => {
     const expectedY = slope * (pt.x - lastPt.x) + lastY;
     lastY = expectedY;
 
-    const delta = Math.abs(pt[valueKey] - expectedY);
+    const delta = Math.abs(pt.y - expectedY);
     area += delta;
   }
 
