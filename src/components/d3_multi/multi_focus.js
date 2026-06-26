@@ -167,9 +167,6 @@ class MultiFocus {
       if (/mA/i.test(baseY)) {
         factor *= 1000.0;
       }
-      if (areaUnit === 'mm²') {
-        factor /= 100.0;
-      }
     }
     return factor;
   }
