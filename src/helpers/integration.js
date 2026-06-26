@@ -10,9 +10,13 @@ const getValueKey = (data) => {
 };
 
 const getArea = (xL, xU, data) => {
-  const valueKey = getValueKey(data);
-  if (!valueKey) {
-    return NaN;
+  if (!Array.isArray(data) || data.length === 0) return NaN;
+
+  if ('k' in data[0]) {
+    // k is the cumulative integral; area over [xL,xU] = k(xU) - k(xL)
+    const inRange = data.filter((p) => p.x >= xL && p.x <= xU);
+    if (inRange.length < 2) return 0;
+    return inRange[inRange.length - 1].k - inRange[0].k;
   }
 
   let area = 0;
@@ -20,9 +24,7 @@ const getArea = (xL, xU, data) => {
     const prev = data[i - 1];
     const curr = data[i];
     if (prev.x >= xL && curr.x <= xU) {
-      const deltaX = curr.x - prev.x;
-      const avgY = (prev[valueKey] + curr[valueKey]) / 2;
-      area += deltaX * avgY;
+      area += (curr.x - prev.x) * (prev.y + curr.y) / 2;
     }
   }
   return area;
