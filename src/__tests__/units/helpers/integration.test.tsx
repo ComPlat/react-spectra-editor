@@ -8,7 +8,7 @@ describe('Test helper for integration', () => {
     })
 
     it('Have area', () => {
-      const area = getArea(0, 1, [{x: 0, k: 2}, {x: 1, k: 0}])
+      const area = getArea(0, 1, [{x: 0, k: 0}, {x: 1, k: 1}])
       expect(area).toEqual(1.0)
     })
   })
