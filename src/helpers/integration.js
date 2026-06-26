@@ -23,6 +23,7 @@ const getArea = (xL, xU, data) => {
 };
 
 const getAbsoluteArea = (xL, xU, data) => {
+  if (!Array.isArray(data)) return 0;
   const ps = data.filter((d) => d.x > xL && d.x < xU);
   if (ps.length < 2) return 0;
 

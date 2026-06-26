@@ -143,7 +143,7 @@ describe('PR #232 review — blocking findings B1–B7', () => {
   // (ViewerLineRect is not exported, so we reproduce the two access forms
   //  verbatim from the source against the feature shape extractUvvisView can return.)
   describe('B6 — UV-Vis viewer update-path data[0] access', () => {
-    const featureWithoutData = {}; // a feature object lacking `data`
+    const featureWithoutData: any = {}; // a feature object lacking `data`
     const mountStyleGuard = () => {
       if (featureWithoutData?.data?.[0]) {            // componentDidMount form
         const { x, y } = featureWithoutData.data[0];
@@ -152,10 +152,12 @@ describe('PR #232 review — blocking findings B1–B7', () => {
       return 'guarded';
     };
     const updateStyleAccess = () => {
-      const { data } = featureWithoutData;            // componentDidUpdate form
-      const currentData = data[0];
-      const { x, y } = currentData;
-      return [x, y];
+      if (featureWithoutData?.data?.[0]) {            // componentDidUpdate form (fixed)
+        const currentData = featureWithoutData.data[0];
+        const { x, y } = currentData;
+        return [x, y];
+      }
+      return 'guarded';
     };
     it('the update path must not throw where the mount path is safe', () => {
       expect(mountStyleGuard).not.toThrow();
