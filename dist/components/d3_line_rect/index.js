@@ -396,15 +396,12 @@ class ViewerLineRect extends _react.default.Component {
     } = zoom || {};
     if (!Array.isArray(sweepExtent)) return;
     const uvvisViewFeature = this.extractUvvisView();
-    if (uvvisViewFeature) {
+    if (uvvisViewFeature?.data?.[0]) {
       const hasLineSvg = !!document.querySelector(`${this.rootKlassLine} .${_list_graph.LIST_BRUSH_SVG_GRAPH.LINE}`);
       if (!hasLineSvg) {
         (0, _draw.drawMain)(this.rootKlassLine, W, H, _list_graph.LIST_BRUSH_SVG_GRAPH.LINE);
       }
-      const {
-        data
-      } = uvvisViewFeature;
-      const currentData = data[0];
+      const currentData = uvvisViewFeature.data[0];
       const {
         x,
         y

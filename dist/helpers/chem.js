@@ -174,6 +174,12 @@ const ToFrequency = exports.ToFrequency = (0, _reselect.createSelector)(getLayou
 const getThreshold = state => state.threshold ? state.threshold.list[state.curve.curveIdx].value * 1.0 : false;
 const Convert2Peak = (feature, threshold, offset, upThreshold = false, lowThreshold = false) => {
   if (feature?.operation?.layout === 'LC/MS') {
+    if (feature.peaks?.length) {
+      return feature.peaks.map(p => ({
+        x: p.x - (offset || 0),
+        y: p.y
+      }));
+    }
     const data = feature.data[0];
     if (!data) return [];
     const {
@@ -209,12 +215,6 @@ const Convert2Peak = (feature, threshold, offset, upThreshold = false, lowThresh
   const {
     layout
   } = operation;
-  if (_format.default.isLCMsLayout(layout) && feature.peaks) {
-    return feature.peaks.map(p => ({
-      x: p.x - (offset || 0),
-      y: p.y
-    }));
-  }
   if ((_format.default.isCyclicVoltaLayout(layout) || _format.default.isCDSLayout(layout)) && (upperThres || lowerThres)) {
     let upperThresVal = upThreshold || upperThres;
     if (!upperThresVal) {
