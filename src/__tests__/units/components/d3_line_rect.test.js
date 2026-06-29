@@ -1,5 +1,6 @@
 import { isLcmsMsPageLoading } from '../../../components/d3_line_rect/index';
 import { pickTicIndex } from '../../../components/d3_line_rect/multi_focus';
+import RectFocus from '../../../components/d3_line_rect/rect_focus';
 
 describe('isLcmsMsPageLoading', () => {
   const buildMzEntity = (polarity, pageValues) => ({
@@ -64,5 +65,21 @@ describe('isLcmsMsPageLoading', () => {
     };
 
     expect(isLcmsMsPageLoading([], state)).toEqual(true);
+  });
+});
+
+// Review finding B7 (#232): drawBar reads tTrEndPts[0].y. Clearing the
+// threshold makes convertThresEndPts return [] (see chem.test.tsx) while the
+// MS bars are still present, so drawBar must guard the empty endpoint list
+// instead of crashing.
+describe('RectFocus.drawBar with an empty threshold-endpoint list (B7)', () => {
+  it('does not crash when tTrEndPts is empty but bars exist', () => {
+    const rf = Object.create(RectFocus.prototype);
+    rf.bars = {}; // truthy → passes the `if (!this.bars)` guard
+    rf.scales = { x: (v) => v, y: (v) => v }; // TfRescale reads focus.scales.{x,y}
+    rf.updatePathCall = () => {}; // stub out the d3 path update
+    rf.data = [{ x: 1, y: 2 }]; // bars present
+    rf.tTrEndPts = []; // cleared threshold → empty endpoints
+    expect(() => rf.drawBar()).not.toThrow();
   });
 });

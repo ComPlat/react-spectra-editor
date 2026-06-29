@@ -258,6 +258,33 @@ describe('saga_ui — clickUiTarget LCMS branches', () => {
     expect(value).toBeUndefined();
   });
 
+  // Review finding B1 (#232): on a NON-LCMS layout, PEAK_ADD must still add a
+  // positive edit-peak (EDITPEAK.ADD_POSITIVE). The LCMS-only path must not
+  // swallow peak-add for NMR/IR/MS layouts.
+  it('PEAK_ADD on a non-LCMS layout dispatches EDITPEAK.ADD_POSITIVE', () => {
+    const action = {
+      type: UI.CLICK_TARGET,
+      payload: { x: 5, y: 10 },
+      sourceHint: null,
+      onPeak: false,
+      onPecker: false,
+      voltammetryPeakIdx: 0,
+    } as any;
+    const iter = clickUiTarget(action);
+
+    const { value } = drainSelects(iter, [
+      LIST_UI_SWEEP_TYPE.PEAK_ADD,
+      { curveIdx: 0 },
+      { uvvis: { selectedWaveLength: null, currentSpectrum: { peaks: [] } } },
+      LIST_LAYOUT.H1, // a normal NMR layout — not LC/MS
+    ]);
+
+    expect(value).toEqual(put({
+      type: EDITPEAK.ADD_POSITIVE,
+      payload: { dataToAdd: action.payload, curveIdx: 0 },
+    }));
+  });
+
   it('PEAK_DELETE on LCMS uses REMOVE_HPLCMS_PEAK for the selected wavelength', () => {
     const action = {
       type: UI.CLICK_TARGET,

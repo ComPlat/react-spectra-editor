@@ -193,19 +193,24 @@ function* clickUiTarget(action) {
   }
 
   if (uiSweepType === LIST_UI_SWEEP_TYPE.PEAK_ADD && !onPeak) {
-    const spectrumId = hplcMsState?.uvvis?.selectedWaveLength;
-    if (isLcmsLayout && spectrumId == null) return;
-    const currentPeaks = hplcMsState?.uvvis?.currentSpectrum?.peaks || [];
-
-    const updatedPeaks = [...currentPeaks, payload];
-
-    yield put({
-      type: HPLC_MS.UPDATE_HPLCMS_PEAKS,
-      payload: {
-        spectrumId,
-        peaks: updatedPeaks,
-      },
-    });
+    if (isLcmsLayout) {
+      const spectrumId = hplcMsState?.uvvis?.selectedWaveLength;
+      if (spectrumId == null) return;
+      const currentPeaks = hplcMsState?.uvvis?.currentSpectrum?.peaks || [];
+      const updatedPeaks = [...currentPeaks, payload];
+      yield put({
+        type: HPLC_MS.UPDATE_HPLCMS_PEAKS,
+        payload: {
+          spectrumId,
+          peaks: updatedPeaks,
+        },
+      });
+    } else {
+      yield put({
+        type: EDITPEAK.ADD_POSITIVE,
+        payload: { dataToAdd: payload, curveIdx },
+      });
+    }
   } else if (uiSweepType === LIST_UI_SWEEP_TYPE.PEAK_DELETE && onPeak) {
     if (isLcmsLayout && uvvis.selectedWaveLength) {
       yield* lcmsHandlePeakDelete({ uvvis, payload });

@@ -183,14 +183,12 @@ class MultiFocus {
       const rawArea = (cyclicvoltaSt.areaValue === '' ? 1.0 : cyclicvoltaSt.areaValue) || 1.0;
       const areaUnit = cyclicvoltaSt.areaUnit || 'cm²';
       const safeArea = rawArea > 0 ? rawArea : 1.0;
+      // areaInCm2 already converts mm² → cm², so factor is A/cm². Do NOT divide by 100 again.
       const areaInCm2 = areaUnit === 'mm²' ? (safeArea / 100.0) : safeArea;
       factor = 1.0 / areaInCm2;
       const baseY = feature && feature.yUnit ? String(feature.yUnit) : 'A';
       if (/mA/i.test(baseY)) {
         factor *= 1000.0;
-      }
-      if (areaUnit === 'mm²') {
-        factor /= 100.0;
       }
     }
     return factor;

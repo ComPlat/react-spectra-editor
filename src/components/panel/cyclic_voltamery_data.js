@@ -164,13 +164,14 @@ const CyclicVoltammetryPanel = ({
     const rawArea = (cyclicVoltaState && cyclicVoltaState.areaValue === '' ? 1.0 : cyclicVoltaState?.areaValue) || 1.0;
     const areaUnit = (cyclicVoltaState && cyclicVoltaState.areaUnit) ? cyclicVoltaState.areaUnit : 'cm²';
     const safeArea = rawArea > 0 ? rawArea : 1.0;
+    const areaInCm2 = areaUnit === 'mm²' ? safeArea / 100.0 : safeArea;
 
     let val = y;
     let unit = isMilli ? 'mA' : 'A';
 
     if (useDensity) {
-      val = y / safeArea;
-      unit = `${unit}/${areaUnit}`;
+      val = y / areaInCm2;
+      unit = `${unit}/cm²`;
     }
 
     if (isMilli) {

@@ -3,7 +3,7 @@ import {
   ToFrequency, Convert2Scan, Convert2Thres, GetComparisons, Convert2DValue,
   GetCyclicVoltaRatio, GetCyclicVoltaPeakSeparate, convertTopic,
   Convert2MaxMinPeak, Feature2MaxMinPeak, GetCyclicVoltaShiftOffset, GetCyclicVoltaPreviousShift,
-  buildIntegFeature,
+  buildIntegFeature, convertThresEndPts,
 } from "../../../helpers/chem";
 import nmr1HJcamp from "../../fixtures/nmr1h_jcamp";
 import aifJcamp1 from "../../fixtures/aif_jcamp_1";
@@ -193,6 +193,29 @@ describe('Test for chem helper', () => {
       const offset = 0
       const peaks = Convert2Peak(feature, threshold, offset)
       expect(peaks).toEqual([{x: 2, y: 2}, {x: -2, y: -2}])
+    })
+
+    // Review finding B4 (#232): for an LC/MS feature carrying edited/stored
+    // peaks, Convert2Peak must return those peaks with the offset applied,
+    // rather than recomputing them from the raw data and dropping the offset.
+    it('honours stored LC/MS peaks and applies the offset', () => {
+      const feature = {
+        operation: { layout: 'LC/MS' },
+        data: [{ x: [10, 11, 12], y: [1, 5, 1] }],
+        peaks: [{ x: 5, y: 100 }], // user-edited / stored peaks
+      }
+      const peaks = Convert2Peak(feature, 0, 2)
+      expect(peaks).toEqual([{ x: 3, y: 100 }])
+    })
+  })
+
+  // Review finding B7 (#232) precondition: clearing the threshold input yields
+  // an empty endpoint list (the state that made drawBar crash — the drawBar
+  // guard itself is covered in components/d3_line_rect.test.js).
+  describe('convertThresEndPts', () => {
+    it('returns [] when the threshold is cleared', () => {
+      const feature = { maxY: 100, maxX: 10, minX: 0, data: [{ x: [1, 2], y: [3, 4] }] }
+      expect(convertThresEndPts(feature, '')).toEqual([])
     })
   })
 
