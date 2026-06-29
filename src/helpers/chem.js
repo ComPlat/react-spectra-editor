@@ -155,6 +155,13 @@ const getThreshold = (state) => (
 
 const Convert2Peak = (feature, threshold, offset, upThreshold = false, lowThreshold = false) => {
   if (feature?.operation?.layout === 'LC/MS') {
+    if (feature.peaks?.length) {
+      return feature.peaks.map((p) => ({
+        x: p.x - (offset || 0),
+        y: p.y,
+      }));
+    }
+
     const data = feature.data[0];
     if (!data) return [];
 
@@ -183,13 +190,6 @@ const Convert2Peak = (feature, threshold, offset, upThreshold = false, lowThresh
     maxY, peakUp, thresRef, minY, upperThres, lowerThres, operation,
   } = feature;
   const { layout } = operation;
-
-  if (Format.isLCMsLayout(layout) && feature.peaks) {
-    return feature.peaks.map((p) => ({
-      x: p.x - (offset || 0),
-      y: p.y,
-    }));
-  }
 
   if ((Format.isCyclicVoltaLayout(layout) || Format.isCDSLayout(layout))
   && (upperThres || lowerThres)) {

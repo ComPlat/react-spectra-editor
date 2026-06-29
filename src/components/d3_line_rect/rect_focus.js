@@ -140,6 +140,7 @@ class RectFocus {
     const { xt, yt } = TfRescale(this);
     this.updatePathCall(xt, yt);
 
+    if (!this.tTrEndPts.length) return;
     const yRef = this.tTrEndPts[0].y;
     const bars = this.bars.selectAll('rect')
       .data(this.data);

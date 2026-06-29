@@ -3,7 +3,7 @@ import { Provider } from 'react-redux';
 import { fireEvent, render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-import BtnSubmit from '../../../../components/cmd_bar/r05_submit_btn';
+import BtnSubmit, { computeCvYScaleFactor } from '../../../../components/cmd_bar/r05_submit_btn';
 import Format from '../../../../helpers/format';
 
 jest.mock('../../../../helpers/extractPeaksEdit', () => ({
@@ -184,6 +184,41 @@ describe('<BtnSubmit payload contract />', () => {
       expect(entry).not.toHaveProperty('lcms_integrals');
       expect(entry).not.toHaveProperty('lcms_peaks_text');
       expect(payload.lcms_peaks).toEqual([{ peakMock: true }]);
+    });
+  });
+
+  // Regression for review finding RR-1 (B5 remainder): the CV current-density factor
+  // used on submit/export must match the chart (multi_focus.computeYTransformFactor)
+  // and panel — i.e. one conversion to A/cm², not a double /100 for mm².
+  describe('computeCvYScaleFactor — CV current-density factor (RR-1 / B5)', () => {
+    const feature = { yUnit: 'A' };
+
+    it('returns 1.0 when current density is off', () => {
+      expect(computeCvYScaleFactor(feature, { useCurrentDensity: false })).toEqual(1.0);
+    });
+
+    it('treats 100 mm² the same as 1 cm² (no double /100)', () => {
+      const fMm2 = computeCvYScaleFactor(feature, {
+        useCurrentDensity: true, areaValue: 100, areaUnit: 'mm²',
+      });
+      const fCm2 = computeCvYScaleFactor(feature, {
+        useCurrentDensity: true, areaValue: 1, areaUnit: 'cm²',
+      });
+      expect(fMm2).toBeCloseTo(fCm2);
+      expect(fMm2).toBeCloseTo(1.0); // pre-fix this was 0.01 (100x too small)
+    });
+
+    it('gives A/cm² for a mm² area (factor = 100 / area_mm²)', () => {
+      // 50 mm² == 0.5 cm² → factor 1/0.5 = 2
+      expect(computeCvYScaleFactor(feature, {
+        useCurrentDensity: true, areaValue: 50, areaUnit: 'mm²',
+      })).toBeCloseTo(2.0);
+    });
+
+    it('scales by 1000 for mA while keeping the area conversion', () => {
+      expect(computeCvYScaleFactor({ yUnit: 'mA' }, {
+        useCurrentDensity: true, areaValue: 100, areaUnit: 'mm²',
+      })).toBeCloseTo(1000.0);
     });
   });
 });
