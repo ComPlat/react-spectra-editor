@@ -37,11 +37,13 @@ const btnRestore = (classes, hasEdit, isEdit, toggleEditAct) => /*#__PURE__*/(0,
     className: "txt-sv-tp",
     children: restoreTp(hasEdit, isEdit)
   }),
-  children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
-    className: (0, _classnames.default)('btn-sv-bar-scanrst'),
-    disabled: !hasEdit,
-    onClick: toggleEditAct,
-    children: restoreIcon(classes, hasEdit, isEdit)
+  children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+    children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
+      className: (0, _classnames.default)('btn-sv-bar-scanrst'),
+      disabled: !hasEdit,
+      onClick: toggleEditAct,
+      children: restoreIcon(classes, hasEdit, isEdit)
+    })
   })
 });
 const btnRrfresh = (classes, disabled, refreshAct) => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tooltip, {
@@ -49,12 +51,14 @@ const btnRrfresh = (classes, disabled, refreshAct) => /*#__PURE__*/(0, _jsxRunti
     className: "txt-sv-tp",
     children: "Refresh Scan"
   }),
-  children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
-    className: (0, _classnames.default)('btn-sv-bar-scanrfs'),
-    disabled: disabled,
-    onClick: refreshAct,
-    children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_RefreshOutlined.default, {
-      className: classes.icon
+  children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+    children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
+      className: (0, _classnames.default)('btn-sv-bar-scanrfs'),
+      disabled: disabled,
+      onClick: refreshAct,
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_RefreshOutlined.default, {
+        className: classes.icon
+      })
     })
   })
 });

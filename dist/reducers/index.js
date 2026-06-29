@@ -26,6 +26,7 @@ var _reducer_voltammetry = _interopRequireDefault(require("./reducer_voltammetry
 var _reducer_curve = _interopRequireDefault(require("./reducer_curve"));
 var _reducer_axes = _interopRequireDefault(require("./reducer_axes"));
 var _reducer_detector = _interopRequireDefault(require("./reducer_detector"));
+var _reducer_hplc_ms = _interopRequireDefault(require("./reducer_hplc_ms"));
 const rootReducer = (0, _redux.combineReducers)({
   threshold: _reducer_threshold.default,
   editPeak: _reducer_edit_peak.default,
@@ -46,6 +47,7 @@ const rootReducer = (0, _redux.combineReducers)({
   cyclicvolta: _reducer_voltammetry.default,
   curve: _reducer_curve.default,
   axesUnits: _reducer_axes.default,
-  detector: _reducer_detector.default
+  detector: _reducer_detector.default,
+  hplcMs: _reducer_hplc_ms.default
 });
 var _default = exports.default = rootReducer;

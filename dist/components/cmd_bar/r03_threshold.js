@@ -16,6 +16,7 @@ var _CloudDoneOutlined = _interopRequireDefault(require("@mui/icons-material/Clo
 var _HowToRegOutlined = _interopRequireDefault(require("@mui/icons-material/HowToRegOutlined"));
 var _RefreshOutlined = _interopRequireDefault(require("@mui/icons-material/RefreshOutlined"));
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
+var _format = _interopRequireDefault(require("../../helpers/format"));
 var _threshold = require("../../actions/threshold");
 var _common = require("./common");
 var _jsxRuntime = require("react/jsx-runtime");
@@ -95,11 +96,19 @@ const Threshold = ({
   thresValSt,
   isEditSt,
   curveSt,
+  hplcMsSt,
+  layoutSt,
   updateThresholdValueAct,
   resetThresholdValueAct,
   toggleThresholdIsEditAct
 }) => {
-  const thresVal = thresValSt || feature.thresRef;
+  const isLcMs = _format.default.isLCMsLayout(layoutSt);
+  let thresVal;
+  if (isLcMs) {
+    thresVal = hplcMsSt?.threshold?.value != null ? hplcMsSt.threshold.value : feature?.thresRef ?? thresValSt ?? 5;
+  } else {
+    thresVal = thresValSt || (feature ? feature.thresRef : hplcMsSt?.threshold?.value);
+  }
   const {
     curveIdx
   } = curveSt;
@@ -149,7 +158,9 @@ const mapStateToProps = (state, props) => (
   hideThresSt: _cfg.default.hideCmdThres(state.layout),
   isEditSt: state.threshold.list[state.curve.curveIdx].isEdit,
   thresValSt: parseFloat(state.threshold.list[state.curve.curveIdx].value) || 0,
-  curveSt: state.curve
+  curveSt: state.curve,
+  hplcMsSt: state.hplcMs,
+  layoutSt: state.layout
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   updateThresholdValueAct: _threshold.updateThresholdValue,
@@ -166,6 +177,11 @@ Threshold.propTypes = {
   curveSt: _propTypes.default.object.isRequired,
   updateThresholdValueAct: _propTypes.default.func.isRequired,
   resetThresholdValueAct: _propTypes.default.func.isRequired,
-  toggleThresholdIsEditAct: _propTypes.default.func.isRequired
+  toggleThresholdIsEditAct: _propTypes.default.func.isRequired,
+  hplcMsSt: _propTypes.default.object.isRequired,
+  layoutSt: _propTypes.default.string
+};
+Threshold.defaultProps = {
+  layoutSt: undefined
 };
 var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(Threshold));

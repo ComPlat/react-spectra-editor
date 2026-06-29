@@ -31,7 +31,39 @@ var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, function-paren-newline,
 react/function-component-definition, react/require-default-props */
 
-const styles = () => Object.assign({}, {}, _common.commonStyle);
+const styles = () => Object.assign({}, {
+  cardFlex: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    columnGap: 8,
+    rowGap: 4
+  },
+  lcMsToolbarLeft: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    columnGap: 4,
+    rowGap: 4,
+    flex: '1 1 auto',
+    minWidth: 0
+  },
+  lcMsToolbarRight: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    flex: '0 1 auto',
+    minWidth: 0
+  },
+  lcMsToolbarRightCluster: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    columnGap: 8,
+    rowGap: 4
+  }
+}, _common.commonStyle);
 const CmdBar = ({
   classes,
   feature,
@@ -41,21 +73,18 @@ const CmdBar = ({
   editorOnly,
   jcampIdx,
   hideThreshold,
-  layoutSt
+  hideMainEditTools,
+  layoutSt,
+  prependLcMsToolbar
 }) => {
   const isCvLayout = _format.default.isCyclicVoltaLayout(layoutSt);
   const hideIntegration = isCvLayout || _cfg.default.btnCmdIntg(layoutSt);
   const hideMultiplicity = isCvLayout || _cfg.default.btnCmdMpy(layoutSt);
-  return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
-    className: classes.card,
-    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_viewer.default, {
-      editorOnly: editorOnly
-    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_zoom.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_peak.default, {
-      jcampIdx: jcampIdx,
-      feature: feature
-    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_pecker.default, {
-      jcampIdx: jcampIdx
-    }), hideIntegration ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_integration.default, {}), hideMultiplicity ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_multiplicity.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_undo_redo.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r04_submit.default, {
+  const rightCluster = /*#__PURE__*/(0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_r01_layout.default, {
+      feature: feature,
+      hasEdit: hasEdit
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r04_submit.default, {
       operations: operations,
       feature: feature,
       forecast: forecast,
@@ -65,10 +94,35 @@ const CmdBar = ({
     }), hideThreshold ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_r03_threshold.default, {
       feature: feature,
       hasEdit: hasEdit
-    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r01_layout.default, {
-      feature: feature,
-      hasEdit: hasEdit
     }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r07_wavelength_btn.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r10_cv_density.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r08_change_axes.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r09_detector.default, {})]
+  });
+  if (prependLcMsToolbar) {
+    return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+      className: `${classes.card} ${classes.cardFlex}`,
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+        className: classes.lcMsToolbarLeft,
+        children: prependLcMsToolbar
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+        className: classes.lcMsToolbarRight,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+          className: classes.lcMsToolbarRightCluster,
+          children: rightCluster
+        })
+      })]
+    });
+  }
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+    className: classes.card,
+    children: [hideMainEditTools ? null : /*#__PURE__*/(0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_viewer.default, {
+        editorOnly: editorOnly
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_zoom.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_peak.default, {
+        jcampIdx: jcampIdx,
+        feature: feature
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_pecker.default, {
+        jcampIdx: jcampIdx
+      }), hideIntegration ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_integration.default, {}), hideMultiplicity ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_multiplicity.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_undo_redo.default, {})]
+    }), rightCluster]
   });
 };
 const mapStateToProps = (state, _) => (
@@ -76,7 +130,6 @@ const mapStateToProps = (state, _) => (
 {
   layoutSt: state.layout
 });
-const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({}, dispatch);
 CmdBar.propTypes = {
   classes: _propTypes.default.object.isRequired,
   feature: _propTypes.default.object.isRequired,
@@ -86,6 +139,11 @@ CmdBar.propTypes = {
   editorOnly: _propTypes.default.bool.isRequired,
   layoutSt: _propTypes.default.string.isRequired,
   jcampIdx: _propTypes.default.any,
-  hideThreshold: _propTypes.default.bool
+  hideThreshold: _propTypes.default.bool,
+  hideMainEditTools: _propTypes.default.bool,
+  prependLcMsToolbar: _propTypes.default.node
 };
-var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _withStyles.default)(styles))(CmdBar);
+CmdBar.defaultProps = {
+  prependLcMsToolbar: null
+};
+var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, null), (0, _withStyles.default)(styles))(CmdBar);

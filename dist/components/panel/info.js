@@ -232,8 +232,11 @@ const SECData = ({
 SECData.propTypes = {
   classes: _propTypes.default.object.isRequired,
   layout: _propTypes.default.string.isRequired,
-  detector: _propTypes.default.object.isRequired,
-  secData: _propTypes.default.object.isRequired
+  detector: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.object]),
+  secData: _propTypes.default.object
+};
+SECData.defaultProps = {
+  detector: ''
 };
 const DSCData = ({
   classes,
@@ -291,7 +294,7 @@ const DSCData = ({
 DSCData.propTypes = {
   classes: _propTypes.default.object.isRequired,
   layout: _propTypes.default.string.isRequired,
-  dscMetaData: _propTypes.default.object.isRequired,
+  dscMetaData: _propTypes.default.object,
   updateAction: _propTypes.default.func.isRequired
 };
 const InfoPanel = ({
@@ -307,12 +310,14 @@ const InfoPanel = ({
   shiftSt,
   curveSt,
   exactMass,
-  onExapnd,
+  onExpand,
   canChangeDescription,
   onDescriptionChanged,
   detectorSt,
   metaSt,
-  updateDSCMetaDataAct
+  updateDSCMetaDataAct,
+  hplcMsSt,
+  entities
 }) => {
   if (!feature) return null;
   const msExactMass = _format.default.isMsLayout(layoutSt) && exactMass ? formatMsExactMass(exactMass) : null;
@@ -329,11 +334,14 @@ const InfoPanel = ({
     curveIdx
   } = curveSt;
   const {
-    curves
-  } = detectorSt;
+    curves = []
+  } = detectorSt || {};
+  const currentEntity = Array.isArray(entities) ? entities[curveIdx] : null;
+  const entityTitle = currentEntity?.entity?.title || currentEntity?.title || currentEntity?.spectra?.[0]?.title || currentEntity?.entity?.spectra?.[0]?.title || '';
+  const displayTitle = title || entityTitle;
   const getSelectedDetectorForCurve = (_detectorSt, targetCurveIdx) => {
     const targetCurve = curves.find(curve => curve.curveIdx === targetCurveIdx);
-    return targetCurve ? targetCurve.selectedDetector.name : '';
+    return targetCurve?.selectedDetector?.name || '';
   };
   let selectedDetector = getSelectedDetectorForCurve(detectorSt, curveIdx);
 
@@ -358,7 +366,7 @@ const InfoPanel = ({
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Accordion, {
     "data-testid": "PanelInfo",
     expanded: expand,
-    onChange: onExapnd,
+    onChange: onExpand,
     disableGutters: true,
     sx: {
       '&.MuiAccordion-root.Mui-expanded': {
@@ -391,7 +399,7 @@ const InfoPanel = ({
           children: "Title : "
         }), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
           className: (0, _classnames.default)(classes.tTxt, 'txt-sv-panel-txt'),
-          children: title
+          children: displayTitle
         })]
       }), _format.default.isNmrLayout(layoutSt) ? /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
         className: (0, _classnames.default)(classes.rowRoot, classes.rowEven),
@@ -472,7 +480,25 @@ const InfoPanel = ({
           })
         })]
       }) : null]
-    })]
+    }), _format.default.isLCMsLayout(layoutSt) ? /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+      className: (0, _classnames.default)(classes.rowRoot, classes.rowOddSim),
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+        className: (0, _classnames.default)(classes.tTxt, classes.tHead, 'txt-sv-panel-txt'),
+        children: "Area under curve (AUC):"
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)("br", {}), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+        className: (0, _classnames.default)(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt'),
+        style: {
+          maxHeight: '80px',
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          wordBreak: 'break-word',
+          marginBottom: '100px'
+        },
+        children: aucValue(integration, hplcMsSt).split('\n').map((line, idx) => /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+          children: line
+        }, idx))
+      })]
+    }) : null]
   });
 };
 const mapStateToProps = (state, props) => (
@@ -483,7 +509,8 @@ const mapStateToProps = (state, props) => (
   shiftSt: state.shift,
   curveSt: state.curve,
   detectorSt: state.detector,
-  metaSt: state.meta
+  metaSt: state.meta,
+  hplcMsSt: state.hplcMs
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   updateDSCMetaDataAct: _meta.updateDSCMetaData
@@ -491,22 +518,24 @@ const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
 InfoPanel.propTypes = {
   classes: _propTypes.default.object.isRequired,
   expand: _propTypes.default.bool.isRequired,
-  feature: _propTypes.default.object.isRequired,
-  integration: _propTypes.default.object.isRequired,
+  feature: _propTypes.default.object,
+  integration: _propTypes.default.object,
   editorOnly: _propTypes.default.bool.isRequired,
   molSvg: _propTypes.default.string.isRequired,
   descriptions: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.array]).isRequired,
   layoutSt: _propTypes.default.string.isRequired,
-  simulationSt: _propTypes.default.array.isRequired,
+  simulationSt: _propTypes.default.object.isRequired,
   shiftSt: _propTypes.default.object.isRequired,
   curveSt: _propTypes.default.object.isRequired,
-  onExapnd: _propTypes.default.func.isRequired,
+  onExpand: _propTypes.default.func,
   canChangeDescription: _propTypes.default.bool.isRequired,
   onDescriptionChanged: _propTypes.default.func,
   exactMass: _propTypes.default.string,
   detectorSt: _propTypes.default.object.isRequired,
   metaSt: _propTypes.default.object.isRequired,
-  updateDSCMetaDataAct: _propTypes.default.func.isRequired
+  updateDSCMetaDataAct: _propTypes.default.func.isRequired,
+  hplcMsSt: _propTypes.default.object.isRequired,
+  entities: _propTypes.default.array
 };
 var _default = exports.default = (0, _reactRedux.connect)(
 // eslint-disable-line

@@ -10,6 +10,8 @@ var _mount = require("../../helpers/mount");
 var _converter = require("../../helpers/converter");
 var _brush = _interopRequireDefault(require("../../helpers/brush"));
 var _compass = require("../../helpers/compass");
+var _integration_focus = require("../../helpers/integration_focus");
+var _integration_split = require("../../helpers/integration_split");
 var _list_layout = require("../../constants/list_layout");
 var _format = _interopRequireDefault(require("../../helpers/format"));
 var _chem = require("../../helpers/chem");
@@ -18,7 +20,6 @@ var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 var _focus = require("../../helpers/focus");
 var _integration = require("../../helpers/integration");
 var _multiplicity_calc = require("../../helpers/multiplicity_calc");
-var _calc = require("../../helpers/calc");
 /* eslint-disable no-unused-vars, prefer-object-spread, no-mixed-operators,
 no-unneeded-ternary, arrow-body-style, max-len */
 
@@ -31,8 +32,14 @@ class MultiFocus {
       clickUiTargetAct,
       selectUiSweepAct,
       scrollUiWheelAct,
-      entities
+      entities,
+      uiSt,
+      splitIntegrationAct,
+      addVisualSplitLineAct,
+      removeVisualSplitLineAct
     } = props;
+    this.uiSt = uiSt;
+    this.graphIndex = uiSt?.zoom?.graphIndex;
     this.entities = entities;
     this.jcampIdx = 0;
     this.isShowAllCurves = false;
@@ -48,6 +55,9 @@ class MultiFocus {
     this.clickUiTargetAct = clickUiTargetAct;
     this.selectUiSweepAct = selectUiSweepAct;
     this.scrollUiWheelAct = scrollUiWheelAct;
+    this.splitIntegrationAct = splitIntegrationAct;
+    this.addVisualSplitLineAct = addVisualSplitLineAct;
+    this.removeVisualSplitLineAct = removeVisualSplitLineAct;
     this.brush = d3.brush();
     this.brushX = d3.brushX();
     this.axis = null;
@@ -74,6 +84,11 @@ class MultiFocus {
     this.shouldUpdate = {};
     // this.freq = false;
     this.layout = _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY;
+    this.isUiAddIntgSt = false;
+    this.isUiSplitIntgSt = false;
+    this.isUiVisualSplitIntgSt = false;
+    this.integrationSplitTargets = null;
+    this.firstIntegrationPoint = null;
     this.getShouldUpdate = this.getShouldUpdate.bind(this);
     this.resetShouldUpdate = this.resetShouldUpdate.bind(this);
     this.setTip = this.setTip.bind(this);
@@ -91,6 +106,10 @@ class MultiFocus {
     this.drawMtply = this.drawMtply.bind(this);
     this.drawAUC = this.drawAUC.bind(this);
     this.onClickTarget = this.onClickTarget.bind(this);
+    this.onClickIntegrationTarget = this.onClickIntegrationTarget.bind(this);
+    this.onIntegrationMouseMove = this.onIntegrationMouseMove.bind(this);
+    this.clearSplitPreview = this.clearSplitPreview.bind(this);
+    this.drawVisualSplitLines = this.drawVisualSplitLines.bind(this);
     this.mergedPeaks = this.mergedPeaks.bind(this);
     this.setDataPecker = this.setDataPecker.bind(this);
     this.drawPeckers = this.drawPeckers.bind(this);
@@ -121,7 +140,7 @@ class MultiFocus {
     const sameLySt = prevLySt === this.layout;
     const sameTePt = prevTePt === this.tTrEndPts.length;
     const sameDtPk = prevDtPk === this.dataPks.length;
-    const sameSfPk = JSON.stringify(prevSfPk) === JSON.stringify(this.tSfPeaks);
+    const sameSfPk = prevSfPk === this.tSfPeaks || Array.isArray(prevSfPk) && Array.isArray(this.tSfPeaks) && prevSfPk.length === this.tSfPeaks.length && prevSfPk.every((peak, idx) => peak === this.tSfPeaks[idx]);
     const sameData = prevData === this.data.length;
     const sameYFactor = prevYFactor === this.yTransformFactor;
     const sameJcampIdx = prevJcampIdx === this.jcampIdx;
@@ -304,6 +323,8 @@ class MultiFocus {
     this.path.style('stroke', this.pathColor);
     if (this.layout === _list_layout.LIST_LAYOUT.AIF) {
       this.path.attr('marker-mid', 'url(#arrow-left)');
+    } else {
+      this.path.attr('marker-mid', null);
     }
   }
   drawThres() {
@@ -336,6 +357,8 @@ class MultiFocus {
       path.attr('d', this.pathCall(data));
       if (this.layout === _list_layout.LIST_LAYOUT.AIF && this.isShowAllCurves === true) {
         path.attr('marker-mid', 'url(#arrow-left)');
+      } else {
+        path.attr('marker-mid', null);
       }
     });
     return null;
@@ -363,6 +386,23 @@ class MultiFocus {
     } else {
       this.clickUiTargetAct(data, onPeak, false, this.jcampIdx);
     }
+  }
+  clearSplitPreview() {
+    (0, _integration_split.clearIntegrationSplitPreview)(this);
+  }
+  onIntegrationMouseMove(event, data, shift, ignoreRef) {
+    (0, _integration_focus.handleIntegrationMouseMove)(this, event, data, shift, ignoreRef);
+  }
+  onClickIntegrationTarget(event, data) {
+    (0, _integration_focus.handleIntegrationClick)(this, event, data, (clickEvent, clickData) => {
+      this.onClickTarget(clickEvent, clickData);
+    });
+  }
+  drawVisualSplitLines(stack, shift, ignoreRef) {
+    (0, _integration_focus.drawVisualSplitLinesForFocus)(this, stack, shift, ignoreRef);
+  }
+  drawAUC(stack, shift = 0) {
+    (0, _integration_focus.drawIntegrationAUC)(this, stack, shift);
   }
   onClickPecker(event, data) {
     event.stopPropagation();
@@ -401,44 +441,6 @@ class MultiFocus {
       this.dataPeckers = (0, _converter.PeckersEdit)(spectra.list);
     }
     return this.dataPeckers;
-  }
-  drawAUC(stack) {
-    const {
-      xt,
-      yt
-    } = (0, _compass.TfRescale)(this);
-    const auc = this.tags.aucPath.selectAll('path').data(stack);
-    auc.exit().attr('class', 'exit').remove();
-    const integCurve = border => {
-      const {
-        xL,
-        xU
-      } = border;
-      const ps = this.data.filter(d => d.x > xL && d.x < xU);
-      if (!ps[0]) return null;
-      const point1 = ps[0];
-      const point2 = ps[ps.length - 1];
-      const slope = (0, _calc.calcSlope)(point1.x, point1.y, point2.x, point2.y);
-      let lastDY = point1.y;
-      return d3.area().x(d => xt(d.x)).y0((d, index) => {
-        if (index > 0) {
-          const lastD = ps[index - 1];
-          const y = slope * (d.x - lastD.x) + lastDY;
-          lastDY = y;
-          return yt(y);
-        }
-        return yt(0);
-      }).y1(d => yt(d.y))(ps);
-    };
-    auc.enter().append('path').attr('class', 'auc').attr('fill', 'red').attr('stroke', 'none').attr('fill-opacity', 0.2).attr('stroke-width', 2).merge(auc).attr('d', d => integCurve(d)).attr('id', d => `auc${(0, _focus.itgIdTag)(d)}`).on('mouseover', (event, d) => {
-      d3.select(`#auc${(0, _focus.itgIdTag)(d)}`).attr('stroke', 'blue');
-      d3.select(`#auc${(0, _focus.itgIdTag)(d)}`).attr('stroke', 'blue');
-      d3.select(`#auc${(0, _focus.itgIdTag)(d)}`).style('fill', 'blue');
-    }).on('mouseout', (event, d) => {
-      d3.select(`#auc${(0, _focus.itgIdTag)(d)}`).attr('stroke', 'none');
-      d3.select(`#auc${(0, _focus.itgIdTag)(d)}`).style('fill', 'red');
-      d3.select(`#auc${(0, _focus.itgIdTag)(d)}`).style('fill-opacity', 0.2);
-    }).on('click', (event, d) => this.onClickTarget(event, d));
   }
   drawPeaks(editPeakSt) {
     const {
@@ -603,7 +605,7 @@ class MultiFocus {
       this.tip.hide(tipParams, event.target);
     }).on('click', (event, d) => this.onClickPecker(event, d));
   }
-  drawInteg(integationSt) {
+  drawInteg(integrationState) {
     const {
       sameXY,
       sameLySt,
@@ -627,7 +629,7 @@ class MultiFocus {
     };
     const {
       integrations
-    } = integationSt;
+    } = integrationState;
     const selectedIntegration = integrations[this.jcampIdx];
     if (selectedIntegration === false || selectedIntegration === undefined) {
       clearIntegralPaths();
@@ -643,9 +645,20 @@ class MultiFocus {
     const isDisable = _cfg.default.btnCmdIntg(this.layout);
     const ignoreRef = _format.default.isHplcUvVisLayout(this.layout);
     const itgs = isDisable ? [] : stack;
-    const igbp = this.tags.igbPath.selectAll('path').data(itgs);
+    const {
+      showIntegSplit,
+      igBarData
+    } = (0, _integration_focus.buildIntegrationBarData)(this.layout, itgs);
+    Object.assign(this, {
+      integrationSplitTargets: {
+        stack: itgs,
+        shift,
+        ignoreRef
+      }
+    });
+    const igbp = this.tags.igbPath.selectAll('path').data(igBarData);
     igbp.exit().attr('class', 'exit').remove();
-    const igcp = this.tags.igcPath.selectAll('path').data(itgs);
+    const igcp = this.tags.igcPath.selectAll('path').data(igBarData);
     igcp.exit().attr('class', 'exit').remove();
     const igtp = this.tags.igtPath.selectAll('text').data(itgs);
     igtp.exit().attr('class', 'exit').remove();
@@ -656,7 +669,7 @@ class MultiFocus {
     }
     if (ignoreRef) {
       clearIntegralPaths();
-      this.drawAUC(stack);
+      this.drawAUC(stack, shift);
     } else {
       clearAUC();
       // rescale for zoom
@@ -673,7 +686,8 @@ class MultiFocus {
         d3.select(`#igbp${(0, _focus.itgIdTag)(d)}`).attr('stroke', '#228B22');
         d3.select(`#igbc${(0, _focus.itgIdTag)(d)}`).attr('stroke', '#228B22');
         d3.select(`#igtp${(0, _focus.itgIdTag)(d)}`).style('fill', '#228B22');
-      }).on('click', (event, d) => this.onClickTarget(event, d));
+        if (showIntegSplit) this.clearSplitPreview();
+      }).on('mousemove', showIntegSplit ? (event, d) => this.onIntegrationMouseMove(event, d, shift, ignoreRef) : null).on('click', (event, d) => this.onClickIntegrationTarget(event, d));
       const integCurve = border => {
         const {
           xL,
@@ -697,7 +711,8 @@ class MultiFocus {
         d3.select(`#igbp${(0, _focus.itgIdTag)(d)}`).attr('stroke', '#228B22');
         d3.select(`#igbc${(0, _focus.itgIdTag)(d)}`).attr('stroke', '#228B22');
         d3.select(`#igtp${(0, _focus.itgIdTag)(d)}`).style('fill', '#228B22');
-      }).on('click', (event, d) => this.onClickTarget(event, d));
+        if (showIntegSplit) this.clearSplitPreview();
+      }).on('mousemove', showIntegSplit ? (event, d) => this.onIntegrationMouseMove(event, d, shift, ignoreRef) : null).on('click', (event, d) => this.onClickIntegrationTarget(event, d));
       igtp.enter().append('text').attr('class', 'igtp').attr('font-family', 'Helvetica').style('font-size', '12px').attr('fill', '#228B22').style('text-anchor', 'middle').merge(igtp).attr('id', d => `igtp${(0, _focus.itgIdTag)(d)}`).text(d => (0, _integration.calcArea)(d, refArea, refFactor, ignoreRef)).attr('transform', d => `translate(${xt((d.xL + d.xU) / 2 - shift)}, ${dh - 12})`).on('mouseover', (event, d) => {
         d3.select(`#igbp${(0, _focus.itgIdTag)(d)}`).attr('stroke', 'blue');
         d3.select(`#igbc${(0, _focus.itgIdTag)(d)}`).attr('stroke', 'blue');
@@ -706,8 +721,10 @@ class MultiFocus {
         d3.select(`#igbp${(0, _focus.itgIdTag)(d)}`).attr('stroke', '#228B22');
         d3.select(`#igbc${(0, _focus.itgIdTag)(d)}`).attr('stroke', '#228B22');
         d3.select(`#igtp${(0, _focus.itgIdTag)(d)}`).style('fill', '#228B22');
-      }).on('click', (event, d) => this.onClickTarget(event, d));
+        if (showIntegSplit) this.clearSplitPreview();
+      }).on('mousemove', showIntegSplit ? (event, d) => this.onIntegrationMouseMove(event, d, shift, ignoreRef) : null).on('click', (event, d) => this.onClickIntegrationTarget(event, d));
     }
+    this.drawVisualSplitLines(showIntegSplit ? itgs : [], shift, ignoreRef);
   }
   drawMtply(mtplySt) {
     const {
@@ -726,6 +743,9 @@ class MultiFocus {
     const mpys = hasMpy ? selectedMulti.stack : [];
     const smExtext = hasMpy ? selectedMulti.smExtext : false;
     const shift = hasMpy ? selectedMulti.shift : 0;
+    const hasValidExtent = extent => extent && Number.isFinite(extent.xL) && Number.isFinite(extent.xU);
+    if (mpys.length === 0 || isDisable) return;
+    const activeExtent = hasValidExtent(smExtext) ? smExtext : mpys[0].xExtent;
     // rescale for zoom
     const {
       xt
@@ -741,7 +761,8 @@ class MultiFocus {
         peaks,
         xExtent
       } = m;
-      return peaks.map(p => Object.assign({}, p, {
+      const safePeaks = Array.isArray(peaks) ? peaks : [];
+      return safePeaks.filter(p => Number.isFinite(p?.x) && Number.isFinite(p?.y)).map(p => Object.assign({}, p, {
         xExtent
       }));
     });
@@ -756,7 +777,7 @@ class MultiFocus {
         xL,
         xU
       } = d.xExtent;
-      return smExtext.xL === xL && smExtext.xU === xU ? 'purple' : '#DA70D6';
+      return activeExtent.xL === xL && activeExtent.xU === xU ? 'purple' : '#DA70D6';
     };
     mpyb.enter().append('path').attr('class', 'mpyb').attr('fill', 'none').attr('stroke-width', 2).merge(mpyb).attr('stroke', d => mpyColor(d)).attr('id', d => `mpyb${(0, _focus.mpyIdTag)(d)}`).attr('d', d => mpyBar(d)).on('mouseover', (event, d) => {
       d3.selectAll(`#mpyb${(0, _focus.mpyIdTag)(d)}`).attr('stroke', 'blue');
@@ -860,12 +881,18 @@ class MultiFocus {
     editPeakSt,
     layoutSt,
     sweepExtentSt,
+    isUiAddIntgSt,
+    isUiSplitIntgSt,
+    isUiVisualSplitIntgSt,
     isUiNoBrushSt,
     cyclicvoltaSt,
     shiftSt,
-    integationSt,
-    mtplySt
+    integrationSt,
+    mtplySt,
+    uiSt
   }) {
+    this.uiSt = uiSt;
+    this.graphIndex = uiSt?.zoom?.graphIndex;
     this.svg = d3.select(this.rootKlass).select('.d3Svg');
     (0, _mount.MountMainFrame)(this, 'focus');
     (0, _mount.MountClip)(this);
@@ -879,6 +906,11 @@ class MultiFocus {
     this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt));
     this.setTip();
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, shiftSt, jcampIdx);
+    Object.assign(this, {
+      isUiSplitIntgSt,
+      isUiVisualSplitIntgSt
+    });
+    if (!isUiSplitIntgSt && !isUiVisualSplitIntgSt) this.clearSplitPreview();
     (0, _compass.MountCompass)(this);
     this.axis = (0, _mount.MountAxis)(this);
     this.path = (0, _mount.MountPath)(this, this.pathColor);
@@ -897,10 +929,10 @@ class MultiFocus {
       this.drawPeaks(editPeakSt);
       this.drawRef();
       this.drawPeckers();
-      this.drawInteg(integationSt);
+      this.drawInteg(integrationSt);
       this.drawMtply(mtplySt);
     }
-    (0, _brush.default)(this, false, isUiNoBrushSt);
+    (0, _brush.default)(this, isUiAddIntgSt, isUiNoBrushSt);
     this.resetShouldUpdate(editPeakSt);
   }
   update({
@@ -913,14 +945,20 @@ class MultiFocus {
     editPeakSt,
     layoutSt,
     sweepExtentSt,
+    isUiAddIntgSt,
+    isUiSplitIntgSt,
+    isUiVisualSplitIntgSt,
     isUiNoBrushSt,
     cyclicvoltaSt,
     shiftSt,
-    integationSt,
-    mtplySt
+    integrationSt,
+    mtplySt,
+    uiSt
   }) {
+    this.uiSt = uiSt;
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt));
+    this.graphIndex = uiSt?.zoom?.graphIndex;
     const {
       curveIdx,
       isShowAllCurve
@@ -929,6 +967,11 @@ class MultiFocus {
     this.isShowAllCurves = isShowAllCurve;
     this.entities = entities;
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, shiftSt, jcampIdx);
+    Object.assign(this, {
+      isUiSplitIntgSt,
+      isUiVisualSplitIntgSt
+    });
+    if (!isUiSplitIntgSt && !isUiVisualSplitIntgSt) this.clearSplitPreview();
     if (this.data && this.data.length > 0) {
       this.setConfig(sweepExtentSt);
       this.getShouldUpdate(editPeakSt);
@@ -939,10 +982,10 @@ class MultiFocus {
       this.drawPeaks(editPeakSt);
       this.drawRef();
       this.drawPeckers();
-      this.drawInteg(integationSt);
+      this.drawInteg(integrationSt);
       this.drawMtply(mtplySt);
     }
-    (0, _brush.default)(this, false, isUiNoBrushSt);
+    (0, _brush.default)(this, false, isUiNoBrushSt, this.uiSt, this.graphIndex);
     this.resetShouldUpdate(editPeakSt);
   }
 }

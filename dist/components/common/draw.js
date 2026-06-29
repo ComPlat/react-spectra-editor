@@ -5,16 +5,17 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.drawMain = exports.drawLabel = exports.drawDisplay = exports.drawDestroy = exports.drawArrowOnCurve = void 0;
 const d3 = require('d3');
-const drawMain = (klass, w, h) => {
-  d3.select(klass).append('svg').attr('class', 'd3Svg').attr('preserveAspectRatio', 'xMinYMin meet').attr('viewBox', `0 0 ${w} ${h}`);
+const {
+  LIST_BRUSH_SVG_GRAPH
+} = require('../../constants/list_graph');
+const drawMain = (klass, w, h, d3svgClass = LIST_BRUSH_SVG_GRAPH.LINE) => {
+  d3.select(klass).append('svg').attr('class', d3svgClass).attr('preserveAspectRatio', 'xMinYMin meet').attr('viewBox', `0 0 ${w} ${h}`);
 };
 exports.drawMain = drawMain;
 const drawLabel = (klass, cLabel, xLabel, yLabel) => {
   d3.select(klass).selectAll('.xLabel').text(xLabel);
   d3.select(klass).selectAll('.yLabel').text(yLabel);
-  if (cLabel) {
-    d3.select(klass).selectAll('.mark-text').text(cLabel);
-  }
+  d3.select(klass).selectAll('.mark-text').text(cLabel || '');
 };
 exports.drawLabel = drawLabel;
 const drawDisplay = (klass, isHidden) => {

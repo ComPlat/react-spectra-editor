@@ -97,10 +97,12 @@ const GraphSelectionPanel = ({
   if (subLayoutsInfo) {
     subLayoutValues = Object.keys(subLayoutsInfo);
   }
+  const subLayoutKey = subLayoutValues.join('|');
   const [selectedSubLayout, setSelectedSublayout] = (0, _react.useState)(subLayoutValues[0]);
+  const resolvedSelectedSubLayout = subLayoutValues.includes(selectedSubLayout) ? selectedSubLayout : subLayoutValues[0] || false;
   (0, _react.useEffect)(() => {
     setSelectedSublayout(subLayoutValues[0]);
-  }, subLayoutValues);
+  }, [subLayoutKey]);
   if (!curveSt) {
     return /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {});
   }
@@ -123,9 +125,9 @@ const GraphSelectionPanel = ({
   };
   let itemsSubLayout = [];
   if (selectedSubLayout && subLayoutValues.length > 1) {
-    const subLayout = subLayoutsInfo[selectedSubLayout];
-    if (subLayout) {
-      itemsSubLayout = subLayout.map((spectra, idx) => {
+    const subLayout = subLayoutsInfo?.[resolvedSelectedSubLayout];
+    try {
+      itemsSubLayout = Array.isArray(subLayout) ? subLayout.map((spectra, idx) => {
         const spectraIdx = spectra.curveIdx;
         const {
           color
@@ -136,7 +138,9 @@ const GraphSelectionPanel = ({
           color,
           label: displayName(spectra, spectraIdx, entityFileNames)
         };
-      });
+      }) : [];
+    } catch (e) {
+      console.log(e); //eslint-disable-line
     }
   }
   const items = listCurves.map((spectra, idx) => {
@@ -170,7 +174,7 @@ const GraphSelectionPanel = ({
         className: "txt-panel-header",
         children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
           className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title'),
-          children: "Graph selection"
+          children: "Graph selections"
         })
       })
     }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Divider, {}), layoutSt === _list_layout.LIST_LAYOUT.AIF ? /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.FormControlLabel, {
@@ -181,9 +185,9 @@ const GraphSelectionPanel = ({
       label: "Show all curves"
     }) : null, subLayoutValues && subLayoutValues.length > 1 ? /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
       children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tabs, {
-        value: selectedSubLayout,
+        value: resolvedSelectedSubLayout,
         onChange: onChangeTabSubLayout,
-        children: subLayoutValues.map((subLayout, i) => {
+        children: subLayoutValues.map(subLayout => {
           let subLayoutName = '';
           switch (subLayout.toUpperCase()) {
             case 'G/MOL':
@@ -204,7 +208,7 @@ const GraphSelectionPanel = ({
           return /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Tab, {
             value: subLayout,
             label: subLayoutName
-          }, i);
+          }, subLayout);
         })
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.List, {
         children: itemsSubLayout.map(item => renderCurveItem(classes, item, curveIdx, onChange))
@@ -226,13 +230,17 @@ const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
 }, dispatch);
 GraphSelectionPanel.propTypes = {
   classes: _propTypes.default.object.isRequired,
-  expand: _propTypes.default.bool.isRequired,
+  expand: _propTypes.default.bool,
   layoutSt: _propTypes.default.string.isRequired,
-  onExapnd: _propTypes.default.func.isRequired,
+  onExapnd: _propTypes.default.func,
+  onExpand: _propTypes.default.func,
   curveSt: _propTypes.default.object.isRequired,
   selectCurveAct: _propTypes.default.func.isRequired,
-  entityFileNames: _propTypes.default.array.isRequired,
+  entityFileNames: _propTypes.default.array,
   subLayoutsInfo: _propTypes.default.object,
   toggleShowAllCurveAct: _propTypes.default.func.isRequired
+};
+GraphSelectionPanel.defaultProps = {
+  entityFileNames: []
 };
 var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _styles.withStyles)(styles)(GraphSelectionPanel));

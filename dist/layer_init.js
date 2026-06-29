@@ -17,8 +17,11 @@ var _meta = require("./actions/meta");
 var _jcamp = require("./actions/jcamp");
 var _layer_prism = _interopRequireDefault(require("./layer_prism"));
 var _format = _interopRequireDefault(require("./helpers/format"));
+var _extractEntityLCMS = require("./helpers/extractEntityLCMS");
 var _multi_jcamps_viewer = _interopRequireDefault(require("./components/multi_jcamps_viewer"));
+var _hplc_viewer = _interopRequireDefault(require("./components/hplc_viewer"));
 var _curve = require("./actions/curve");
+var _hplc_ms = require("./actions/hplc_ms");
 var _ui = require("./actions/ui");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, default-param-last */
@@ -29,6 +32,18 @@ const hasActiveZoom = sweepExtent => {
 };
 const styles = () => ({});
 class LayerInit extends _react.default.Component {
+  static entitySignature(e) {
+    if (!e) return 'none';
+    const id = e.idDt ?? e.id ?? e.datasetId;
+    if (id != null && id !== '') return `id:${id}`;
+    const firstFeature = (Array.isArray(e.features) ? e.features[0] : null) || (Array.isArray(e.spectra) ? e.spectra[0] : null) || null;
+    const data0 = firstFeature?.data?.[0];
+    const xs = data0?.x;
+    const xLen = Array.isArray(xs) ? xs.length : 0;
+    const xHead = Array.isArray(xs) && xs.length > 0 ? xs[0] : '';
+    const xTail = Array.isArray(xs) && xs.length > 0 ? xs[xs.length - 1] : '';
+    return `sig:${e.layout || ''}|${e.title || ''}|${xLen}|${xHead}|${xTail}`;
+  }
   constructor(props) {
     super(props);
     const {
@@ -59,20 +74,39 @@ class LayerInit extends _react.default.Component {
   }
   componentDidUpdate(prevProps) {
     const {
+      others,
       multiEntities,
-      entity
+      entity,
+      operations
     } = this.props;
     this.normChange(prevProps);
-    this.updateOthers();
+    if (prevProps.operations !== operations || prevProps.entity !== entity) {
+      this.initReducer();
+    }
+    if (prevProps.others !== others) {
+      this.updateOthers();
+    }
     if (prevProps.multiEntities !== multiEntities || prevProps.entity !== entity) {
       this.updateMultiEntities(false);
     }
   }
   normChange(prevProps) {
     const {
-      entity
+      entity,
+      multiEntities,
+      clearHplcMsStateAct
     } = this.props;
     if (prevProps.entity !== entity) {
+      const prevIsLcms = _format.default.isLCMsLayout(prevProps.entity?.layout);
+      const nextIsLcms = _format.default.isLCMsLayout(entity?.layout);
+      const lcmsSessionActive = prevIsLcms && nextIsLcms && Array.isArray(multiEntities) && (0, _extractEntityLCMS.isLcMsGroup)(multiEntities);
+      if ((prevIsLcms || nextIsLcms) && !lcmsSessionActive) {
+        const prevSig = LayerInit.entitySignature(prevProps.entity);
+        const nextSig = LayerInit.entitySignature(entity);
+        if (prevSig !== nextSig) {
+          clearHplcMsStateAct();
+        }
+      }
       this.execReset();
     }
   }
@@ -89,11 +123,12 @@ class LayerInit extends _react.default.Component {
       updateDSCMetaDataAct,
       resetMultiplicityAct
     } = this.props;
+    if (!entity || !entity.layout) return;
     resetInitCommonAct();
     resetDetectorAct();
     const {
       layout,
-      features
+      features = {}
     } = entity;
     // Sync the layout deterministically on every spectrum open. Otherwise it
     // only updates via the d3 RESETALL, which can be skipped (active zoom or
@@ -140,14 +175,18 @@ class LayerInit extends _react.default.Component {
       operations,
       updateOperationAct
     } = this.props;
-    updateOperationAct(operations[0]);
+    if (Array.isArray(operations) && operations.length > 0) {
+      updateOperationAct(operations[0]);
+    }
   }
   updateOthers() {
     const {
       others,
       addOthersAct
     } = this.props;
-    addOthersAct(others);
+    if (others) {
+      addOthersAct(others);
+    }
   }
   buildSetAllCurvesPayload(entities, isInitial) {
     const {
@@ -167,9 +206,37 @@ class LayerInit extends _react.default.Component {
       setAllCurvesAct,
       entity
     } = this.props;
+    if (!entity || !entity.layout) return;
+    const lcmsCurveMeta = () => {
+      const uvvisFromMulti = Array.isArray(multiEntities) ? multiEntities.find(e => (0, _extractEntityLCMS.getLcMsInfo)(e).kind === 'uvvis') : null;
+      const mzFromMulti = Array.isArray(multiEntities) ? multiEntities.find(e => (0, _extractEntityLCMS.getLcMsInfo)(e).kind === 'mz') : null;
+      const idDt = uvvisFromMulti?.idDt ?? uvvisFromMulti?.id ?? uvvisFromMulti?.datasetId ?? entity?.idDt ?? entity?.id ?? entity?.datasetId ?? null;
+      const lcmsUvvisWavelength = entity?.lcms_uvvis_wavelength ?? entity?.lcmsUvvisWavelength ?? uvvisFromMulti?.lcms_uvvis_wavelength ?? uvvisFromMulti?.lcmsUvvisWavelength;
+      const lcmsMzPage = entity?.lcms_mz_page ?? entity?.lcmsMzPage ?? mzFromMulti?.lcms_mz_page ?? mzFromMulti?.lcmsMzPage ?? uvvisFromMulti?.lcms_mz_page ?? uvvisFromMulti?.lcmsMzPage;
+      const mzInfo = mzFromMulti ? (0, _extractEntityLCMS.getLcMsInfo)(mzFromMulti) : null;
+      const lcmsPolarity = entity?.lcms_polarity ?? entity?.lcmsPolarity ?? entity?.ticPolarity ?? mzFromMulti?.lcms_polarity ?? mzFromMulti?.lcmsPolarity ?? (mzInfo?.kind === 'mz' ? mzInfo.polarity : null);
+      const out = {};
+      if (idDt != null) out.idDt = idDt;
+      if (lcmsUvvisWavelength != null && lcmsUvvisWavelength !== '') {
+        out.lcmsUvvisWavelength = lcmsUvvisWavelength;
+      }
+      if (lcmsMzPage != null && lcmsMzPage !== '') {
+        out.lcmsMzPage = lcmsMzPage;
+      }
+      if (lcmsPolarity != null && lcmsPolarity !== '') {
+        out.lcmsPolarity = lcmsPolarity;
+      }
+      return Object.keys(out).length ? out : undefined;
+    };
     const isMultiSpectra = Array.isArray(multiEntities) && multiEntities.length > 1;
     if (isMultiSpectra) {
-      setAllCurvesAct(this.buildSetAllCurvesPayload(multiEntities, isInitial));
+      const meta = _format.default.isLCMsLayout(entity.layout) ? lcmsCurveMeta() : undefined;
+      setAllCurvesAct(this.buildSetAllCurvesPayload(multiEntities, isInitial), meta);
+      return;
+    }
+    if (_format.default.isLCMsLayout(entity.layout)) {
+      const entities = Array.isArray(multiEntities) && multiEntities.length > 0 ? multiEntities : [entity];
+      setAllCurvesAct(this.buildSetAllCurvesPayload(entities, isInitial), lcmsCurveMeta());
       return;
     }
     if (_format.default.isCyclicVoltaLayout(entity.layout)) {
@@ -195,15 +262,35 @@ class LayerInit extends _react.default.Component {
       onDescriptionChanged,
       multiEntities,
       entityFileNames,
-      userManualLink
+      userManualLink,
+      onLcmsPageRequest
     } = this.props;
-    const target = entity.spectra[0];
     const {
       layout
     } = entity;
-    const xxLabel = !xLabel && xLabel === '' ? `X (${target.xUnit})` : xLabel;
-    const yyLabel = !yLabel && yLabel === '' ? `Y (${target.yUnit})` : yLabel;
+    const hasMultiEntities = Array.isArray(multiEntities) && multiEntities.length > 0;
+    const hasLcmsEntity = hasMultiEntities && multiEntities.some(multiEntity => _format.default.isLCMsLayout(multiEntity?.layout));
+    const isDetectedLcmsGroup = hasLcmsEntity && (0, _extractEntityLCMS.isLcMsGroup)(multiEntities);
+    // For multi mode, trust multiEntities over single entity to avoid mixed-layout misrouting.
+    const isLcms = hasMultiEntities ? isDetectedLcmsGroup : _format.default.isLCMsLayout(layout);
+    const target = isLcms ? null : entity.spectra && Array.isArray(entity.spectra) && entity.spectra[0] || null;
+    const xxLabel = !xLabel && xLabel === '' && target && target.xUnit ? `X (${target.xUnit})` : xLabel;
+    const yyLabel = !yLabel && yLabel === '' && target && target.yUnit ? `Y (${target.yUnit})` : yLabel;
     const isMultiSpectra = Array.isArray(multiEntities) && multiEntities.length > 1;
+    if (isLcms) {
+      return /*#__PURE__*/(0, _jsxRuntime.jsx)(_hplc_viewer.default, {
+        entityFileNames: entityFileNames,
+        userManualLink: userManualLink,
+        molSvg: molSvg,
+        forecast: forecast,
+        operations: operations,
+        descriptions: descriptions,
+        canChangeDescription: canChangeDescription,
+        onDescriptionChanged: onDescriptionChanged,
+        editorOnly: editorOnly,
+        onLcmsPageRequest: onLcmsPageRequest
+      });
+    }
     if (isMultiSpectra) {
       return /*#__PURE__*/(0, _jsxRuntime.jsx)(_multi_jcamps_viewer.default, {
         multiEntities: multiEntities,
@@ -211,6 +298,8 @@ class LayerInit extends _react.default.Component {
         userManualLink: userManualLink,
         molSvg: molSvg,
         exactMass: exactMass,
+        forecast: forecast,
+        editorOnly: editorOnly,
         operations: operations,
         descriptions: descriptions,
         canChangeDescription: canChangeDescription,
@@ -224,6 +313,8 @@ class LayerInit extends _react.default.Component {
         userManualLink: userManualLink,
         molSvg: molSvg,
         exactMass: exactMass,
+        forecast: forecast,
+        editorOnly: editorOnly,
         operations: operations,
         descriptions: descriptions,
         canChangeDescription: canChangeDescription,
@@ -241,6 +332,8 @@ class LayerInit extends _react.default.Component {
       molSvg: molSvg,
       editorOnly: editorOnly,
       exactMass: exactMass,
+      entityFileNames: entityFileNames,
+      userManualLink: userManualLink,
       canChangeDescription: canChangeDescription,
       onDescriptionChanged: onDescriptionChanged
     });
@@ -262,6 +355,7 @@ const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   addOthersAct: _jcamp.addOthers,
   setAllCurvesAct: _curve.setAllCurves,
   updateDSCMetaDataAct: _meta.updateDSCMetaData,
+  clearHplcMsStateAct: _hplc_ms.clearHplcMsState,
   restoreSweepExtentAct: _ui.restoreSweepExtent
 }, dispatch);
 LayerInit.defaultProps = {
@@ -299,12 +393,17 @@ LayerInit.propTypes = {
   canChangeDescription: _propTypes.default.bool.isRequired,
   onDescriptionChanged: _propTypes.default.func,
   // eslint-disable-line
+  onLcmsPageRequest: _propTypes.default.func,
   setAllCurvesAct: _propTypes.default.func.isRequired,
   userManualLink: _propTypes.default.object,
   // eslint-disable-line
   resetDetectorAct: _propTypes.default.func.isRequired,
   resetMultiplicityAct: _propTypes.default.func.isRequired,
-  updateDSCMetaDataAct: _propTypes.default.func.isRequired
+  updateDSCMetaDataAct: _propTypes.default.func.isRequired,
+  clearHplcMsStateAct: _propTypes.default.func.isRequired
+};
+LayerInit.defaultProps = {
+  onLcmsPageRequest: null
 };
 var _default = exports.default = (0, _reactRedux.connect)(
 // eslint-disable-line

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.MountThresLine = exports.MountTags = exports.MountRef = exports.MountPath = exports.MountMarker = exports.MountMainFrame = exports.MountGrid = exports.MountComparePath = exports.MountClip = exports.MountBars = exports.MountAxisLabelY = exports.MountAxisLabelX = exports.MountAxis = void 0;
+exports.MountThresLine = exports.MountTags = exports.MountRef = exports.MountPath = exports.MountMarker = exports.MountMainFrame = exports.MountGrid = exports.MountGraphLabel = exports.MountComparePath = exports.MountClip = exports.MountBars = exports.MountAxisLabelY = exports.MountAxisLabelX = exports.MountAxis = void 0;
 var _compass = require("./compass");
 const MountTags = target => {
   const igbPath = target.root.append('g').attr('class', 'igbPath-clip').attr('clip-path', 'url(#clip)');
@@ -17,6 +17,7 @@ const MountTags = target => {
   const mpyt2Path = target.root.append('g').attr('class', 'mpyt2Path-clip').attr('clip-path', 'url(#clip)');
   const mpypPath = target.root.append('g').attr('class', 'mpypPath-clip').attr('clip-path', 'url(#clip)');
   const aucPath = target.root.append('g').attr('class', 'aucPath-clip').attr('clip-path', 'url(#clip)');
+  const visualSplitPath = target.root.append('g').attr('class', 'integration-visual-splits').attr('clip-path', 'url(#clip)');
   const peckerPath = target.root.append('g').attr('class', 'peckerPath-clip').attr('clip-path', 'url(#clip)');
   return {
     pPath,
@@ -30,6 +31,7 @@ const MountTags = target => {
     mpyt2Path,
     mpypPath,
     aucPath,
+    visualSplitPath,
     peckerPath // eslint-disable-line
   };
 };
@@ -91,6 +93,11 @@ const MountAxisLabelY = target => {
   target.root.append('text').attr('text-anchor', 'middle').attr('transform', yTrans).attr('class', 'yLabel').attr('font-family', 'Helvetica').style('font-size', '12px');
 };
 exports.MountAxisLabelY = MountAxisLabelY;
+const MountGraphLabel = target => {
+  const xTrans = `translate(${target.w / 2}, ${20})`;
+  target.root.append('text').attr('text-anchor', 'middle').attr('transform', xTrans).attr('class', 'mark-text').attr('font-family', 'Helvetica').style('font-size', '12px');
+};
+exports.MountGraphLabel = MountGraphLabel;
 const MountMarker = (target, color) => {
   const tTrans = `translate(${target.w - 80}, -10)`;
   const lTrans = `translate(${target.w - 200}, -18)`;

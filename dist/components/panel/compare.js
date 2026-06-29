@@ -10,7 +10,6 @@ var _propTypes = _interopRequireDefault(require("prop-types"));
 var _classnames = _interopRequireDefault(require("classnames"));
 var _reactRedux = require("react-redux");
 var _redux = require("redux");
-var _reactDropzone = _interopRequireDefault(require("react-dropzone"));
 var _material = require("@mui/material");
 var _ExpandMore = _interopRequireDefault(require("@mui/icons-material/ExpandMore"));
 var _HighlightOff = _interopRequireDefault(require("@mui/icons-material/HighlightOff"));
@@ -130,38 +129,35 @@ const content = (classes, desc) => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.T
     children: desc
   })
 });
-const inputOthers = (classes, jcampSt) => {
-  const {
-    selectedIdx,
-    jcamps
-  } = jcampSt;
-  const selectedJcamp = jcamps[selectedIdx];
-  const {
-    addOthersCb
-  } = selectedJcamp;
-  const fileName = '';
-  const desc = fileName || msgDefault;
-  const onDrop = jcampFiles => {
-    if (!addOthersCb) return;
-    addOthersCb({
-      jcamps: jcampFiles
-    });
-  };
-  return /*#__PURE__*/(0, _jsxRuntime.jsx)(_reactDropzone.default, {
-    className: "dropbox",
-    onDrop: onDrop,
-    children: ({
-      getRootProps,
-      getInputProps
-    }) => /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
-      ...getRootProps(),
-      className: (0, _classnames.default)(classes.baseDD),
-      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("input", {
-        ...getInputProps()
-      }), content(classes, desc)]
-    })
-  });
-};
+const inputOthers = (classes, desc, onDropFiles, onFileChange, inputRef) => /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+  className: (0, _classnames.default)(classes.baseDD),
+  role: "button",
+  tabIndex: 0,
+  onClick: () => inputRef.current?.click(),
+  onKeyDown: event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      inputRef.current?.click();
+    }
+  },
+  onDragOver: event => {
+    event.preventDefault();
+  },
+  onDrop: event => {
+    event.preventDefault();
+    onDropFiles(event.dataTransfer?.files);
+  },
+  children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("input", {
+    ref: inputRef,
+    type: "file",
+    multiple: true,
+    accept: ".dx,.jdx,.jcamp,.JCAMP",
+    style: {
+      display: 'none'
+    },
+    onChange: onFileChange
+  }), content(classes, desc)]
+});
 const compareList = (classes, jcampSt, rmOthersOneAct, toggleShowAct) => {
   const {
     selectedIdx,
@@ -221,37 +217,63 @@ const ComparePanel = ({
   jcampSt,
   rmOthersOneAct,
   toggleShowAct
-}) => /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Accordion, {
-  expanded: expand,
-  onChange: onExapnd,
-  disableGutters: true,
-  sx: {
-    '&.MuiAccordion-root.Mui-expanded': {
-      margin: 0
-    },
-    '&:before': {
-      display: 'none'
+}) => {
+  const inputRef = _react.default.useRef(null);
+  const {
+    selectedIdx,
+    jcamps
+  } = jcampSt;
+  const selectedJcamp = jcamps[selectedIdx];
+  const {
+    addOthersCb
+  } = selectedJcamp;
+  const desc = msgDefault;
+  const onDropFiles = filesLike => {
+    if (!addOthersCb) return;
+    const droppedFiles = Array.from(filesLike || []);
+    if (droppedFiles.length === 0) return;
+    addOthersCb({
+      jcamps: droppedFiles
+    });
+  };
+  const onFileChange = event => {
+    onDropFiles(event.target.files);
+    if (inputRef.current) {
+      inputRef.current.value = '';
     }
-  },
-  TransitionProps: {
-    unmountOnExit: true
-  } // increase Accordion performance
-  ,
-  children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.AccordionSummary, {
-    expandIcon: /*#__PURE__*/(0, _jsxRuntime.jsx)(_ExpandMore.default, {}),
-    className: (0, _classnames.default)(classes.panelSummary),
-    children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Typography, {
-      className: "txt-panel-header",
-      children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
-        className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title'),
-        children: "Spectra Comparisons"
+  };
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Accordion, {
+    expanded: expand,
+    onChange: onExapnd,
+    disableGutters: true,
+    sx: {
+      '&.MuiAccordion-root.Mui-expanded': {
+        margin: 0
+      },
+      '&:before': {
+        display: 'none'
+      }
+    },
+    TransitionProps: {
+      unmountOnExit: true
+    } // increase Accordion performance
+    ,
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.AccordionSummary, {
+      expandIcon: /*#__PURE__*/(0, _jsxRuntime.jsx)(_ExpandMore.default, {}),
+      className: (0, _classnames.default)(classes.panelSummary),
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Typography, {
+        className: "txt-panel-header",
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtBadge, 'txt-sv-panel-title'),
+          children: "Spectra Comparisons"
+        })
       })
-    })
-  }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Divider, {}), inputOthers(classes, jcampSt), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-    className: (0, _classnames.default)(classes.panelDetail),
-    children: compareList(classes, jcampSt, rmOthersOneAct, toggleShowAct)
-  })]
-});
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Divider, {}), inputOthers(classes, desc, onDropFiles, onFileChange, inputRef), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+      className: (0, _classnames.default)(classes.panelDetail),
+      children: compareList(classes, jcampSt, rmOthersOneAct, toggleShowAct)
+    })]
+  });
+};
 const mapStateToProps = (state, props) => (
 // eslint-disable-line
 {

@@ -13,10 +13,12 @@ var _redux = require("redux");
 var _material = require("@mui/material");
 var _styles = require("@mui/styles");
 var _submit = require("../../actions/submit");
+var _hplc_ms = require("../../actions/hplc_ms");
 var _r05_submit_btn = _interopRequireDefault(require("./r05_submit_btn"));
 var _r06_predict_btn = _interopRequireDefault(require("./r06_predict_btn"));
 var _common = require("./common");
 var _format = _interopRequireDefault(require("../../helpers/format"));
+var _list_layout = require("../../constants/list_layout");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, function-paren-newline,
 react/function-component-definition */
@@ -30,6 +32,10 @@ const styles = () => Object.assign({
   },
   fieldDecimal: {
     width: 80
+  },
+  fieldLcmsIntegrationsExport: {
+    width: 148,
+    minWidth: 148
   },
   fieldOpertaion: {
     width: 120
@@ -142,6 +148,44 @@ const decimalSelect = (classes, hideSwitch, decimalSt, updateDecimalAct) => {
     })]
   });
 };
+const lcmsIntegrationsExportSelect = (classes, layoutSt, value, onChange) => {
+  if (layoutSt !== _list_layout.LIST_LAYOUT.LC_MS) return null;
+  const v = ['percent', 'area', 'both'].includes(value) ? value : 'percent';
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
+    className: (0, _classnames.default)(classes.fieldLcmsIntegrationsExport),
+    variant: "outlined",
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputLabel, {
+      id: "select-lcms-intg-export-label",
+      className: (0, _classnames.default)(classes.selectLabel, 'select-sv-bar-label'),
+      children: "Integrations text"
+    }), /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Select, {
+      labelId: "select-lcms-intg-export-label",
+      label: "Integrations text",
+      value: v,
+      onChange: onChange,
+      className: (0, _classnames.default)(classes.selectInput, 'input-sv-bar-lcms-intg-export'),
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: "percent",
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt),
+          children: "Percent only"
+        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: "area",
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt),
+          children: "Area (AUC) only"
+        })
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
+        value: "both",
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+          className: (0, _classnames.default)(classes.txtOpt),
+          children: "Percent and area"
+        })
+      })]
+    })]
+  });
+};
 const operationSelect = (classes, operations, operation, onChangeSelect) => {
   const options = operations.map(o => /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
     value: o.name,
@@ -150,7 +194,8 @@ const operationSelect = (classes, operations, operation, onChangeSelect) => {
       children: o.name
     })
   }, o.name));
-  const selectedValue = operation.name || operations[0].name;
+  const operationNames = operations.map(o => o.name);
+  const selectedValue = operationNames.includes(operation?.name) ? operation.name : operations[0].name;
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
     className: (0, _classnames.default)(classes.fieldOpertaion),
     variant: "outlined",
@@ -199,16 +244,20 @@ const Submit = ({
   operationSt,
   decimalSt,
   isEmWaveSt,
+  layoutSt,
+  lcmsIntegrationsExportSt,
   toggleIsAscendAct,
   toggleIsIntensityAct,
   updateOperationAct,
-  updateDecimalAct
+  updateDecimalAct,
+  setLcmsIntegrationsExportAct
 }) => {
   const onChangeSelect = e => selectOperation(e.target.value, operations, updateOperationAct);
+  const onLcmsIntegrationsExport = e => setLcmsIntegrationsExportAct(e.target.value);
   if (!operations || operations.length === 0) return null;
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
     className: classes.groupRightMost,
-    children: [ascendSelect(classes, hideSwitch, isAscendSt, toggleIsAscendAct), intensitySelect(classes, hideSwitch || !isEmWaveSt, isIntensitySt, toggleIsIntensityAct), decimalSelect(classes, hideSwitch, decimalSt, updateDecimalAct), editorOnly ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_r06_predict_btn.default, {
+    children: [ascendSelect(classes, hideSwitch, isAscendSt, toggleIsAscendAct), intensitySelect(classes, hideSwitch || !isEmWaveSt, isIntensitySt, toggleIsIntensityAct), decimalSelect(classes, hideSwitch, decimalSt, updateDecimalAct), lcmsIntegrationsExportSelect(classes, layoutSt, lcmsIntegrationsExportSt, onLcmsIntegrationsExport), editorOnly ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_r06_predict_btn.default, {
       feature: feature,
       forecast: forecast
     }), operationSelect(classes, operations, operationSt, onChangeSelect), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r05_submit_btn.default, {
@@ -223,17 +272,20 @@ const Submit = ({
 const mapStateToProps = (state, props) => (
 // eslint-disable-line
 {
+  layoutSt: state.layout,
   isEmWaveSt: _format.default.isEmWaveLayout(state.layout),
   isAscendSt: state.submit.isAscend,
   isIntensitySt: state.submit.isIntensity,
   decimalSt: state.submit.decimal,
-  operationSt: state.submit.operation
+  operationSt: state.submit.operation,
+  lcmsIntegrationsExportSt: state.hplcMs?.lcmsIntegrationsExport || 'percent'
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   toggleIsAscendAct: _submit.toggleIsAscend,
   toggleIsIntensityAct: _submit.toggleIsIntensity,
   updateOperationAct: _submit.updateOperation,
-  updateDecimalAct: _submit.updateDecimal
+  updateDecimalAct: _submit.updateDecimal,
+  setLcmsIntegrationsExportAct: _hplc_ms.setLcmsIntegrationsExport
 }, dispatch);
 Submit.propTypes = {
   classes: _propTypes.default.object.isRequired,
@@ -251,6 +303,9 @@ Submit.propTypes = {
   toggleIsAscendAct: _propTypes.default.func.isRequired,
   toggleIsIntensityAct: _propTypes.default.func.isRequired,
   updateOperationAct: _propTypes.default.func.isRequired,
-  updateDecimalAct: _propTypes.default.func.isRequired
+  updateDecimalAct: _propTypes.default.func.isRequired,
+  layoutSt: _propTypes.default.string.isRequired,
+  lcmsIntegrationsExportSt: _propTypes.default.string.isRequired,
+  setLcmsIntegrationsExportAct: _propTypes.default.func.isRequired
 };
 var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(Submit);

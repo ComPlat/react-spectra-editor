@@ -3,13 +3,17 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.shouldDisplayLcmsSubViewerAt = exports.default = void 0;
 var _effects = require("redux-saga/effects");
 var _action_type = require("../constants/action_type");
 var _list_ui = require("../constants/list_ui");
 var _list_layout = require("../constants/list_layout");
-const getUiSt = state => state.ui;
-const getCurveSt = state => state.curve;
+var _list_graph = require("../constants/list_graph");
+var _saga_lcms_ui = require("./saga_lcms_ui");
+const getUiState = state => state.ui;
+const getCurveState = state => state.curve;
+const getHplcMsState = state => state.hplcMs;
+const getSubViewZoomActionType = () => _action_type.UI.SWEEP.SELECT_ZOOMIN_SUBVIEW || _action_type.UI.SWEEP.SELECT_ZOOMIN;
 const calcPeaks = payload => {
   const {
     xExtent,
@@ -28,76 +32,110 @@ const calcPeaks = payload => {
   const peaks = dataPks.filter(p => xL <= p.x && p.x <= xU && yL <= p.y && p.y <= yU);
   return peaks;
 };
+const getLayoutState = state => state.layout;
 function* selectUiSweep(action) {
-  const uiSt = yield (0, _effects.select)(getUiSt);
+  const uiState = yield (0, _effects.select)(getUiState);
+  const {
+    sweepType,
+    zoom
+  } = uiState;
   const {
     payload
   } = action;
-  const curveSt = yield (0, _effects.select)(getCurveSt);
+  const curveState = yield (0, _effects.select)(getCurveState);
   const {
     curveIdx
-  } = curveSt;
-  switch (uiSt.sweepType) {
+  } = curveState;
+  const hplcMsState = yield (0, _effects.select)(getHplcMsState);
+  const {
+    uvvis
+  } = hplcMsState;
+  const layoutState = yield (0, _effects.select)(getLayoutState);
+  switch (sweepType) {
     case _list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN:
-      yield (0, _effects.put)({
-        type: _action_type.UI.SWEEP.SELECT_ZOOMIN,
-        payload
-      });
+      if (layoutState === _list_layout.LIST_LAYOUT.LC_MS && uvvis.listWaveLength) {
+        yield* (0, _saga_lcms_ui.lcmsHandleSelectZoomIn)({
+          payload,
+          zoom
+        });
+      } else {
+        yield (0, _effects.put)({
+          type: _action_type.UI.SWEEP.SELECT_ZOOMIN,
+          payload
+        });
+      }
       break;
     case _list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET:
-      yield (0, _effects.put)({
-        type: _action_type.UI.SWEEP.SELECT_ZOOMRESET,
-        payload
-      });
+      if (layoutState === _list_layout.LIST_LAYOUT.LC_MS && (payload?.graphIndex === 0 || payload?.graphIndex === 1)) {
+        yield* (0, _saga_lcms_ui.lcmsHandleSelectZoomReset)();
+      } else {
+        yield (0, _effects.put)({
+          type: _action_type.UI.SWEEP.SELECT_ZOOMRESET,
+          payload
+        });
+      }
       break;
     case _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD:
-      yield (0, _effects.put)({
-        type: _action_type.UI.SWEEP.SELECT_INTEGRATION,
-        payload: {
-          newData: payload,
-          curveIdx
+      {
+        if (uvvis.selectedWaveLength && layoutState === _list_layout.LIST_LAYOUT.LC_MS) {
+          yield* (0, _saga_lcms_ui.lcmsHandleIntegrationAdd)({
+            uvvis,
+            payload
+          });
+        } else {
+          yield (0, _effects.put)({
+            type: _action_type.UI.SWEEP.SELECT_INTEGRATION,
+            payload: {
+              newData: payload,
+              curveIdx
+            }
+          });
         }
-      });
-      break;
-    case _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD:
-      const peaks = calcPeaks(payload); // eslint-disable-line
-      if (peaks.length === 0) {
         break;
       }
-      const newPayload = Object.assign({}, payload, {
-        peaks
-      }); // eslint-disable-line
+    case _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD:
+      {
+        const peaks = calcPeaks(payload); // eslint-disable-line
+        if (peaks.length === 0) {
+          break;
+        }
+        const newPayload = {
+          ...payload,
+          peaks
+        }; // eslint-disable-line
 
-      yield (0, _effects.put)({
-        type: _action_type.UI.SWEEP.SELECT_INTEGRATION,
-        payload: {
-          newData: newPayload,
-          curveIdx
-        }
-      });
-      yield (0, _effects.put)({
-        type: _action_type.UI.SWEEP.SELECT_MULTIPLICITY,
-        payload: {
-          newData: newPayload,
-          curveIdx
-        }
-      });
-      break;
+        yield (0, _effects.put)({
+          type: _action_type.UI.SWEEP.SELECT_INTEGRATION,
+          payload: {
+            newData: newPayload,
+            curveIdx
+          }
+        });
+        yield (0, _effects.put)({
+          type: _action_type.UI.SWEEP.SELECT_MULTIPLICITY,
+          payload: {
+            newData: newPayload,
+            curveIdx
+          }
+        });
+        break;
+      }
     default:
       break;
   }
   return null;
 }
-const getLayoutSt = state => state.layout;
 function* scrollUiWheel(action) {
-  const layoutSt = yield (0, _effects.select)(getLayoutSt);
+  const layoutState = yield (0, _effects.select)(getLayoutState);
   const {
     payload
   } = action;
+  if (!payload?.xExtent || !payload?.yExtent) return;
   const {
     xExtent,
     yExtent,
-    direction
+    direction,
+    brushClass
   } = payload;
   const {
     yL,
@@ -110,7 +148,7 @@ function* scrollUiWheel(action) {
     yExtent: false
   };
   let [nyeL, nyeU, h, nytL, nytU] = [0, 1, 1, 0, 1];
-  switch (layoutSt) {
+  switch (layoutState) {
     case _list_layout.LIST_LAYOUT.IR:
     case _list_layout.LIST_LAYOUT.RAMAN:
       [nyeL, nyeU] = [yeL + (yeU - yeL) * (1 - scale), yeU];
@@ -154,42 +192,95 @@ function* scrollUiWheel(action) {
       };
       break;
   }
-  yield (0, _effects.put)({
-    type: _action_type.UI.SWEEP.SELECT_ZOOMIN,
-    payload: nextExtent
-  });
+  if (brushClass === `.${_list_graph.LIST_BRUSH_SVG_GRAPH.RECT}`) {
+    yield (0, _effects.put)({
+      type: getSubViewZoomActionType(),
+      payload: nextExtent
+    });
+  } else {
+    yield (0, _effects.put)({
+      type: _action_type.UI.SWEEP.SELECT_ZOOMIN,
+      payload: nextExtent
+    });
+  }
 }
 const getUiSweepType = state => state.ui.sweepType;
+const shouldDisplayLcmsSubViewerAt = ({
+  isLcmsLayout,
+  payload,
+  sourceHint,
+  uiSweepType
+}) => isLcmsLayout && sourceHint === 'lcms_tic' && Number.isFinite(payload?.x) && [_list_ui.LIST_UI_SWEEP_TYPE.ZOOMIN, _list_ui.LIST_UI_SWEEP_TYPE.ZOOMRESET, _list_ui.LIST_UI_SWEEP_TYPE.PEAK_GROUP_SELECT].includes(uiSweepType);
+exports.shouldDisplayLcmsSubViewerAt = shouldDisplayLcmsSubViewerAt;
 function* clickUiTarget(action) {
   const {
     payload,
     onPeak,
     voltammetryPeakIdx,
     onPecker,
+    sourceHint,
     jcampIdx
   } = action;
   const uiSweepType = yield (0, _effects.select)(getUiSweepType);
-  const curveSt = yield (0, _effects.select)(getCurveSt);
+  const curveState = yield (0, _effects.select)(getCurveState);
   const {
     curveIdx
-  } = curveSt;
+  } = curveState;
   const targetCurveIdx = Number.isFinite(jcampIdx) ? jcampIdx : curveIdx;
+  const hplcMsState = yield (0, _effects.select)(getHplcMsState);
+  const {
+    uvvis
+  } = hplcMsState;
+  const isLcmsLayout = (yield (0, _effects.select)(getLayoutState)) === _list_layout.LIST_LAYOUT.LC_MS;
+  if (shouldDisplayLcmsSubViewerAt({
+    isLcmsLayout,
+    payload,
+    sourceHint,
+    uiSweepType
+  })) {
+    yield (0, _effects.put)({
+      type: _action_type.UI.SUB_VIEWER.DISPLAY_VIEWER_AT,
+      payload
+    });
+    return;
+  }
   if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.PEAK_ADD && !onPeak) {
-    yield (0, _effects.put)({
-      type: _action_type.EDITPEAK.ADD_POSITIVE,
-      payload: {
-        dataToAdd: payload,
-        curveIdx: targetCurveIdx
-      }
-    });
+    const spectrumId = hplcMsState?.uvvis?.selectedWaveLength;
+    if (isLcmsLayout && spectrumId == null) return;
+    const currentPeaks = hplcMsState?.uvvis?.currentSpectrum?.peaks || [];
+    const updatedPeaks = [...currentPeaks, payload];
+    if (isLcmsLayout && spectrumId != null) {
+      yield (0, _effects.put)({
+        type: _action_type.HPLC_MS.UPDATE_HPLCMS_PEAKS,
+        payload: {
+          spectrumId,
+          peaks: updatedPeaks
+        }
+      });
+    } else {
+      yield (0, _effects.put)({
+        type: _action_type.EDITPEAK.ADD_POSITIVE,
+        payload: {
+          dataToAdd: payload,
+          curveIdx: targetCurveIdx
+        }
+      });
+    }
   } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.PEAK_DELETE && onPeak) {
-    yield (0, _effects.put)({
-      type: _action_type.EDITPEAK.ADD_NEGATIVE,
-      payload: {
-        dataToAdd: payload,
-        curveIdx: targetCurveIdx
-      }
-    });
+    if (isLcmsLayout && uvvis.selectedWaveLength) {
+      yield* (0, _saga_lcms_ui.lcmsHandlePeakDelete)({
+        uvvis,
+        payload
+      });
+    } else {
+      yield (0, _effects.put)({
+        type: _action_type.EDITPEAK.ADD_NEGATIVE,
+        payload: {
+          dataToAdd: payload,
+          curveIdx: targetCurveIdx
+        }
+      });
+    }
   } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.ANCHOR_SHIFT && onPeak) {
     yield (0, _effects.put)({
       type: _action_type.SHIFT.SET_PEAK,
@@ -199,13 +290,20 @@ function* clickUiTarget(action) {
       }
     });
   } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_RM && onPeak) {
-    yield (0, _effects.put)({
-      type: _action_type.INTEGRATION.RM_ONE,
-      payload: {
-        dataToRemove: payload,
-        curveIdx: targetCurveIdx
-      }
-    });
+    if (uvvis.selectedWaveLength && isLcmsLayout) {
+      yield* (0, _saga_lcms_ui.lcmsHandleIntegrationRm)({
+        uvvis,
+        payload
+      });
+    } else {
+      yield (0, _effects.put)({
+        type: _action_type.INTEGRATION.RM_ONE,
+        payload: {
+          dataToRemove: payload,
+          curveIdx: targetCurveIdx
+        }
+      });
+    }
   } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_RM && onPeak) {
     yield (0, _effects.put)({
       type: _action_type.INTEGRATION.RM_ONE,
@@ -316,6 +414,11 @@ function* clickUiTarget(action) {
         index: voltammetryPeakIdx,
         jcampIdx: targetCurveIdx
       }
+    });
+  } else if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.PEAK_GROUP_SELECT) {
+    yield (0, _effects.put)({
+      type: _action_type.UI.SUB_VIEWER.DISPLAY_VIEWER_AT,
+      payload
     });
   }
 }

@@ -26,18 +26,19 @@ const useStyles = (0, _styles.makeStyles)(theme => ({
     color: 'black'
   }
 }));
-const MuButton = props => {
+const MuButton = exports.MuButton = /*#__PURE__*/_react.default.forwardRef((props, ref) => {
   const classes = useStyles();
   const {
     className,
     ...other
   } = props;
   return /*#__PURE__*/(0, _jsxRuntime.jsx)(_Button.default, {
+    ref: ref,
     className: (0, _classnames.default)(classes.muiBtn, className),
     ...other
   });
-};
-exports.MuButton = MuButton;
+});
+MuButton.displayName = 'MuButton';
 const commonStyle = exports.commonStyle = {
   card: {
     margin: '0 0 5px 52px',
