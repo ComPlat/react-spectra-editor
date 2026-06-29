@@ -6,7 +6,6 @@ import Jcampconverter from 'jcampconverter';
 import { createSelector } from 'reselect';
 
 import { shiftOffsetAtIndex } from './shift';
-import Cfg from './cfg';
 import Format from './format';
 import { LIST_LAYOUT } from '../constants/list_layout';
 import { getArea } from './integration';

@@ -265,7 +265,7 @@ const InfoPanel = ({
   classes, expand, feature, integration, editorOnly, molSvg, descriptions,
   layoutSt, simulationSt, shiftSt, curveSt, exactMass,
   onExpand, canChangeDescription, onDescriptionChanged, detectorSt,
-  metaSt, updateDSCMetaDataAct, hplcMsSt, entities,
+  metaSt, updateDSCMetaDataAct, entities,
 }) => {
   if (!feature) return null;
   const msExactMass = Format.isMsLayout(layoutSt) && exactMass
@@ -457,7 +457,7 @@ const InfoPanel = ({
                 marginBottom: '100px',
               }}
             >
-              {aucValue(integration, hplcMsSt)
+              {Format.formatHplcAucPanel(integration, feature)
                 .split('\n')
                 .map((line, idx) => (
                   <div key={idx}>{line}</div>
@@ -510,7 +510,6 @@ InfoPanel.propTypes = {
   detectorSt: PropTypes.object.isRequired,
   metaSt: PropTypes.object.isRequired,
   updateDSCMetaDataAct: PropTypes.func.isRequired,
-  hplcMsSt: PropTypes.object.isRequired,
   entities: PropTypes.array,
 };
 
