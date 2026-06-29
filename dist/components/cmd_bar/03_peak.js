@@ -117,7 +117,7 @@ const Peak = ({
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
         children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
           className: (0, _classnames.default)((0, _common.focusStyle)(isFocusRmPeakSt, classes), 'btn-sv-bar-rmpeak'),
-          onClick: onSweepPeakDELETE,
+          onClick: onSweepPeakDelete,
           children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
             className: (0, _classnames.default)(classes.txt, 'txt-sv-bar-rmpeak'),
             children: "P-"
