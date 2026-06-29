@@ -107,7 +107,7 @@ const Peak = ({
                     'btn-sv-bar-rmpeak',
                   )
                 }
-                onClick={onSweepPeakDELETE}
+                onClick={onSweepPeakDelete}
               >
                 <span className={classNames(classes.txt, 'txt-sv-bar-rmpeak')}>P-</span>
               </MuButton>

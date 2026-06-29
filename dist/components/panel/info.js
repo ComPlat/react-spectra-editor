@@ -317,7 +317,6 @@ const InfoPanel = ({
   detectorSt,
   metaSt,
   updateDSCMetaDataAct,
-  hplcMsSt,
   entities
 }) => {
   if (!feature) return null;
@@ -495,7 +494,7 @@ const InfoPanel = ({
           wordBreak: 'break-word',
           marginBottom: '100px'
         },
-        children: aucValue(integration, hplcMsSt).split('\n').map((line, idx) => /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+        children: _format.default.formatHplcAucPanel(integration, feature).split('\n').map((line, idx) => /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
           children: line
         }, idx))
       })]
@@ -535,7 +534,6 @@ InfoPanel.propTypes = {
   detectorSt: _propTypes.default.object.isRequired,
   metaSt: _propTypes.default.object.isRequired,
   updateDSCMetaDataAct: _propTypes.default.func.isRequired,
-  hplcMsSt: _propTypes.default.object.isRequired,
   entities: _propTypes.default.array
 };
 var _default = exports.default = (0, _reactRedux.connect)(
