@@ -147,6 +147,7 @@ class RectFocus {
       yt
     } = (0, _compass.TfRescale)(this);
     this.updatePathCall(xt, yt);
+    if (!this.tTrEndPts.length) return;
     const yRef = this.tTrEndPts[0].y;
     const bars = this.bars.selectAll('rect').data(this.data);
     bars.exit().attr('class', 'exit').remove();

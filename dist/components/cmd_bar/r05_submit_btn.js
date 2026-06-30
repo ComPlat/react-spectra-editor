@@ -4,7 +4,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.default = exports.computeCvYScaleFactor = void 0;
 var _react = _interopRequireDefault(require("react"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
 var _reactRedux = require("react-redux");
@@ -60,17 +60,16 @@ const computeCvYScaleFactor = (feature, cyclicvoltaSt) => {
   const rawArea = (cyclicvoltaSt.areaValue === '' ? 1.0 : cyclicvoltaSt.areaValue) || 1.0;
   const areaUnit = cyclicvoltaSt.areaUnit || 'cm²';
   const safeArea = rawArea > 0 ? rawArea : 1.0;
+  // areaInCm2 already converts mm² → cm², so factor is A/cm². Do NOT divide by 100 again.
   const areaInCm2 = areaUnit === 'mm²' ? safeArea / 100.0 : safeArea;
   let factor = 1.0 / areaInCm2;
   const baseY = feature && feature.yUnit ? String(feature.yUnit) : 'A';
   if (/mA/i.test(baseY)) {
     factor *= 1000.0;
   }
-  if (areaUnit === 'mm²') {
-    factor /= 100.0;
-  }
   return factor;
 };
+exports.computeCvYScaleFactor = computeCvYScaleFactor;
 const defaultThreshold = {
   isEdit: true,
   value: false,
