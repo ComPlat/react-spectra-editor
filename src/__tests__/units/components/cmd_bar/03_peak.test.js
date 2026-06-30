@@ -9,7 +9,7 @@ import { LIST_LAYOUT } from '../../../../constants/list_layout';
 const mockStore = configureStore([]);
 const store = mockStore({
   ui:{ sweepType: LIST_UI_SWEEP_TYPE.ZOOMIN },
-  layout: LIST_LAYOUT.MS,
+  layout: LIST_LAYOUT.IR,
   curve: { curveIdx: 0 },
   editPeak: {
     present: {

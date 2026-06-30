@@ -8,6 +8,7 @@ var _reactQuill = _interopRequireDefault(require("react-quill"));
 var _app = require("./app");
 var _extractEntityLCMS = require("./helpers/extractEntityLCMS");
 var _utils = require("./reducers/reducer_hplc_ms/utils");
+var _shift = require("./helpers/shift");
 var _nmr1h_jcamp = _interopRequireDefault(require("./__tests__/fixtures/nmr1h_jcamp"));
 var _nmr1h_2_jcamp = _interopRequireDefault(require("./__tests__/fixtures/nmr1h_2_jcamp"));
 var _nmr13c_dept_jcamp = _interopRequireDefault(require("./__tests__/fixtures/nmr13c_dept_jcamp"));
@@ -67,17 +68,6 @@ const pickSelectedSpectrumFromPayload = payload => {
   if (spectraList.length === 0) return {};
   const selectedIdx = Number.isFinite(payload?.curveSt?.curveIdx) ? payload.curveSt.curveIdx : 0;
   return spectraList[selectedIdx] || spectraList[0] || {};
-};
-const normalizeShiftForFormatting = shift => {
-  if (shift && Array.isArray(shift.shifts)) return shift;
-  return {
-    selectedIdx: 0,
-    shifts: [shift || {
-      ref: {},
-      peak: false,
-      enable: true
-    }]
-  };
 };
 const nmr1HEntity = _app.FN.ExtractJcamp(_nmr1h_jcamp.default);
 const nmr1HEntity2 = _app.FN.ExtractJcamp(_nmr1h_2_jcamp.default);
@@ -549,7 +539,7 @@ class DemoWriteIr extends _react.default.Component {
       maxY,
       minY
     };
-    const shiftForFormatting = normalizeShiftForFormatting(shift);
+    const shiftForFormatting = (0, _shift.normalizeShiftForFormatting)(shift);
     const body = _app.FN.peaksBody({
       peaks,
       layout: safeLayout,
@@ -748,7 +738,7 @@ class DemoWriteIr extends _react.default.Component {
       maxY,
       minY
     };
-    const shiftForFormatting = normalizeShiftForFormatting(shift);
+    const shiftForFormatting = (0, _shift.normalizeShiftForFormatting)(shift);
     const body = _app.FN.peaksBody({
       peaks,
       layout: safeLayout,

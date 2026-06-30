@@ -48,22 +48,27 @@ const scrollUiWheel = (payload) => (
   }
 );
 
-const clickUiTarget = (
-  payload,
-  onPeak,
-  voltammetryPeakIdx = 0,
-  jcampIdx = 0,
-  onPecker = false,
-  sourceHint = null,
-) => ({
-  type: UI.CLICK_TARGET,
-  payload,
-  onPeak,
-  voltammetryPeakIdx,
-  jcampIdx,
-  onPecker,
-  sourceHint,
-});
+const restoreSweepExtent = (payload) => (
+  {
+    type: UI.SWEEP.SELECT_ZOOMIN,
+    payload,
+  }
+);
+
+const clickUiTarget = (payload, onPeak, voltammetryPeakIdx, jcampIdx, onPecker, sourceHint) => {
+  const action = {
+    type: UI.CLICK_TARGET,
+    payload,
+    onPeak,
+    voltammetryPeakIdx: voltammetryPeakIdx ?? 0,
+    onPecker: onPecker ?? false,
+    sourceHint: sourceHint ?? null,
+  };
+  if (Number.isFinite(jcampIdx)) {
+    action.jcampIdx = jcampIdx;
+  }
+  return action;
+};
 
 const displaySubViewerAt = (payload) => ({
   type: UI.SUB_VIEWER.DISPLAY_VIEWER_AT,
@@ -75,6 +80,7 @@ export {
   setUiSweepType,
   selectUiSweep,
   scrollUiWheel,
+  restoreSweepExtent,
   clickUiTarget,
   displaySubViewerAt,
 };

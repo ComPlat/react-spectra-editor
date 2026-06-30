@@ -26,11 +26,6 @@ const initialState = {
     enable: true
   }]
 };
-const defaultEmptyShift = {
-  ref: shiftNone,
-  peak: false,
-  enable: true
-};
 const resetRef = payload => {
   const {
     shift,
@@ -71,22 +66,20 @@ const resetShift = (state, action) => {
     curveIdx,
     numberOfCurve
   } = curvesInfo;
-  const {
-    shifts
-  } = state;
+  const shifts = [...state.shifts];
   let selectedShift = shifts[curveIdx];
   if (selectedShift === false || selectedShift === undefined) {
-    selectedShift = defaultEmptyShift;
+    selectedShift = _shift.defaultEmptyShift;
   }
   if (isMultiCurve) {
     for (let idx = 0; idx < numberOfCurve; idx += 1) {
       const checkShift = shifts[idx];
       if (!checkShift) {
-        shifts[idx] = defaultEmptyShift;
+        shifts[idx] = _shift.defaultEmptyShift;
       }
     }
   }
-  const newShift = Object.assign({}, defaultEmptyShift, {
+  const newShift = Object.assign({}, _shift.defaultEmptyShift, {
     ref: resetRef(payload),
     enable: resetEnable(payload)
   });
@@ -104,7 +97,7 @@ const updateShift = (state, action) => {
   } = state;
   let selectedShift = shifts[selectedIdx];
   if (selectedShift === false || selectedShift === undefined) {
-    selectedShift = defaultEmptyShift;
+    selectedShift = _shift.defaultEmptyShift;
   }
   const newShift = Object.assign({}, selectedShift, {
     ref: false,
@@ -129,7 +122,7 @@ const setRef = (state, action) => {
   } = state;
   let selectedShift = shifts[curveIdx];
   if (selectedShift === false || selectedShift === undefined) {
-    selectedShift = defaultEmptyShift;
+    selectedShift = _shift.defaultEmptyShift;
   }
   const newShift = Object.assign({}, selectedShift, {
     ref: dataToSet,
@@ -154,7 +147,7 @@ const setPeak = (state, action) => {
   } = state;
   let selectedShift = shifts[curveIdx];
   if (selectedShift === false || selectedShift === undefined) {
-    selectedShift = defaultEmptyShift;
+    selectedShift = _shift.defaultEmptyShift;
   }
   const resX = (0, _shift.CalcResidualX)(selectedShift.ref, selectedShift.peak, dataToSet);
   const trueApex = (0, _shift.RealPts)([dataToSet], resX)[0];
@@ -178,7 +171,7 @@ const removePeak = (state, action) => {
   } = state;
   let selectedShift = shifts[selectedIdx];
   if (selectedShift === false || selectedShift === undefined) {
-    selectedShift = defaultEmptyShift;
+    selectedShift = _shift.defaultEmptyShift;
   }
   const newShift = Object.assign({}, selectedShift, {
     peak: false,
@@ -203,7 +196,7 @@ const addNegative = (state, action) => {
   } = state;
   let selectedShift = shifts[curveIdx];
   if (selectedShift === false || selectedShift === undefined) {
-    selectedShift = defaultEmptyShift;
+    selectedShift = _shift.defaultEmptyShift;
   }
   const rmApex = selectedShift.peak.x === dataToAdd.x;
   if (!rmApex) {
@@ -237,7 +230,11 @@ const shiftReducer = (state = initialState, action) => {
       return updateShift(initialState, action);
     case _action_type.MANAGER.RESETSHIFT:
       // case MANAGER.RESETALL:
-      return resetShift(initialState, action);
+      return resetShift(state, action);
+    case _action_type.CURVE.SELECT_WORKING_CURVE:
+      return Object.assign({}, state, {
+        selectedIdx: action.payload
+      });
     default:
       return state;
   }

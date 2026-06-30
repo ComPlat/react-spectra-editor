@@ -15,6 +15,7 @@ var _integration_split = require("../../helpers/integration_split");
 var _list_layout = require("../../constants/list_layout");
 var _format = _interopRequireDefault(require("../../helpers/format"));
 var _chem = require("../../helpers/chem");
+var _shift = require("../../helpers/shift");
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 var _focus = require("../../helpers/focus");
 var _integration = require("../../helpers/integration");
@@ -127,7 +128,8 @@ class MultiFocus {
       prevDtPk,
       prevSfPk,
       prevData,
-      prevYFactor
+      prevYFactor,
+      prevJcampIdx
     } = this.shouldUpdate;
     const {
       xt,
@@ -141,6 +143,7 @@ class MultiFocus {
     const sameSfPk = prevSfPk === this.tSfPeaks || Array.isArray(prevSfPk) && Array.isArray(this.tSfPeaks) && prevSfPk.length === this.tSfPeaks.length && prevSfPk.every((peak, idx) => peak === this.tSfPeaks[idx]);
     const sameData = prevData === this.data.length;
     const sameYFactor = prevYFactor === this.yTransformFactor;
+    const sameJcampIdx = prevJcampIdx === this.jcampIdx;
     this.shouldUpdate = Object.assign({}, this.shouldUpdate, {
       sameXY,
       sameEpSt,
@@ -150,7 +153,8 @@ class MultiFocus {
       sameDtPk,
       sameSfPk,
       sameData,
-      sameYFactor // eslint-disable-line
+      sameYFactor,
+      sameJcampIdx // eslint-disable-line
     });
   }
   resetShouldUpdate(prevEpSt) {
@@ -166,6 +170,7 @@ class MultiFocus {
     const prevData = this.data.length;
     const prevLySt = this.layout;
     const prevYFactor = this.yTransformFactor;
+    const prevJcampIdx = this.jcampIdx;
     this.shouldUpdate = Object.assign({}, this.shouldUpdate, {
       prevXt,
       prevYt,
@@ -176,7 +181,8 @@ class MultiFocus {
       prevDtPk,
       prevSfPk,
       prevData,
-      prevYFactor // eslint-disable-line
+      prevYFactor,
+      prevJcampIdx // eslint-disable-line
     });
   }
   setTip() {
@@ -202,7 +208,7 @@ class MultiFocus {
   transformYValue(y) {
     return y * this.yTransformFactor;
   }
-  setDataParams(filterSeed, peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt, jcampIdx = 0) {
+  setDataParams(filterSeed, peaks, tTrEndPts, tSfPeaks, layout, cyclicvoltaSt, shiftSt, jcampIdx = 0) {
     this.data = [];
     this.otherLineData = [];
     let filterSubLayoutValue = null;
@@ -214,7 +220,7 @@ class MultiFocus {
         feature,
         color
       } = entry;
-      const offset = (0, _chem.GetCyclicVoltaPreviousShift)(cyclicvoltaSt, jcampIdx);
+      const offset = _format.default.isCyclicVoltaLayout(layout) ? (0, _chem.GetCyclicVoltaPreviousShift)(cyclicvoltaSt, idx) : (0, _shift.shiftOffsetAtIndex)(shiftSt, idx);
       let currData = (0, _chem.convertTopic)(topic, layout, feature, offset);
       if (idx === jcampIdx) {
         if (!_format.default.isCyclicVoltaLayout(layout)) {
@@ -439,9 +445,10 @@ class MultiFocus {
       sameXY,
       sameEpSt,
       sameDtPk,
-      sameSfPk
+      sameSfPk,
+      sameJcampIdx
     } = this.shouldUpdate;
-    if (!_format.default.isCyclicVoltaLayout(this.layout) && sameXY && sameEpSt && sameDtPk && sameSfPk) return;
+    if (!_format.default.isCyclicVoltaLayout(this.layout) && sameXY && sameEpSt && sameDtPk && sameSfPk && sameJcampIdx) return;
 
     // rescale for zoom
     const {
@@ -474,6 +481,10 @@ class MultiFocus {
     }
     const mpp = this.tags.pPath.selectAll('path').data(dPks);
     mpp.exit().attr('class', 'exit').remove();
+    const clearPeakLabels = () => {
+      const bpTxt = this.tags.bpTxt.selectAll('text').data([]);
+      bpTxt.exit().attr('class', 'exit').remove();
+    };
     const linePath = [{
       x: -0.5,
       y: 10
@@ -530,6 +541,8 @@ class MultiFocus {
       const bpTxt = this.tags.bpTxt.selectAll('text').data(dPks);
       bpTxt.exit().attr('class', 'exit').remove();
       bpTxt.enter().append('text').attr('class', 'peak-text').attr('font-family', 'Helvetica').style('font-size', '12px').attr('fill', '#228B22').style('text-anchor', 'middle').merge(bpTxt).attr('id', d => `mpp${Math.round(1000 * d.x)}`).text(d => d.x.toFixed(2)).attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y) - 25})`).on('click', (event, d) => this.onClickTarget(event, d));
+    } else {
+      clearPeakLabels();
     }
     mpp.attr('fill', (_, index) => {
       return indexOfCVRefPeaks[index] === -1 ? 'blue' : 'red';
@@ -543,9 +556,10 @@ class MultiFocus {
       sameXY,
       sameEpSt,
       sameDtPk,
-      sameSfPk
+      sameSfPk,
+      sameJcampIdx
     } = this.shouldUpdate;
-    if (!_format.default.isCyclicVoltaLayout(this.layout) && sameXY && sameEpSt && sameDtPk && sameSfPk) return;
+    if (!_format.default.isCyclicVoltaLayout(this.layout) && sameXY && sameEpSt && sameDtPk && sameSfPk && sameJcampIdx) return;
 
     // rescale for zoom
     const {
@@ -594,29 +608,30 @@ class MultiFocus {
       sameXY,
       sameLySt,
       sameItSt,
-      sameData
+      sameData,
+      sameJcampIdx
     } = this.shouldUpdate;
-    if (sameXY && sameLySt && sameItSt && sameData) return;
+    if (sameXY && sameLySt && sameItSt && sameData && sameJcampIdx) return;
+    const clearIntegralPaths = () => {
+      const empty = [];
+      const igbp = this.tags.igbPath.selectAll('path').data(empty);
+      igbp.exit().attr('class', 'exit').remove();
+      const igcp = this.tags.igcPath.selectAll('path').data(empty);
+      igcp.exit().attr('class', 'exit').remove();
+      const igtp = this.tags.igtPath.selectAll('text').data(empty);
+      igtp.exit().attr('class', 'exit').remove();
+    };
+    const clearAUC = () => {
+      const auc = this.tags.aucPath.selectAll('path').data([]);
+      auc.exit().attr('class', 'exit').remove();
+    };
     const {
       integrations
     } = integrationState;
     const selectedIntegration = integrations[this.jcampIdx];
     if (selectedIntegration === false || selectedIntegration === undefined) {
-      Object.assign(this, {
-        integrationSplitTargets: {
-          stack: [],
-          shift: 0,
-          ignoreRef: false
-        }
-      });
-      const itgs = [];
-      const igbp = this.tags.igbPath.selectAll('path').data(itgs);
-      igbp.exit().attr('class', 'exit').remove();
-      const igcp = this.tags.igcPath.selectAll('path').data(itgs);
-      igcp.exit().attr('class', 'exit').remove();
-      const igtp = this.tags.igtPath.selectAll('text').data(itgs);
-      igtp.exit().attr('class', 'exit').remove();
-      this.drawVisualSplitLines([], 0, false);
+      clearIntegralPaths();
+      clearAUC();
       return;
     }
     const {
@@ -646,16 +661,15 @@ class MultiFocus {
     const igtp = this.tags.igtPath.selectAll('text').data(itgs);
     igtp.exit().attr('class', 'exit').remove();
     if (itgs.length === 0 || isDisable) {
-      // remove drawn area under curve
-      const auc = this.tags.aucPath.selectAll('path').data(stack);
-      auc.exit().attr('class', 'exit').remove();
-      auc.merge(auc);
-      this.drawVisualSplitLines(showIntegSplit ? itgs : [], shift, ignoreRef);
+      clearIntegralPaths();
+      clearAUC();
       return;
     }
     if (ignoreRef) {
+      clearIntegralPaths();
       this.drawAUC(stack, shift);
     } else {
+      clearAUC();
       // rescale for zoom
       const {
         xt
@@ -714,43 +728,20 @@ class MultiFocus {
     const {
       sameXY,
       sameLySt,
-      sameMySt
+      sameMySt,
+      sameJcampIdx
     } = this.shouldUpdate;
-    if (sameXY && sameLySt && sameMySt) return;
+    if (sameXY && sameLySt && sameMySt && sameJcampIdx) return;
     const {
       multiplicities
     } = mtplySt;
     const selectedMulti = multiplicities[this.jcampIdx];
-    if (selectedMulti === false || selectedMulti === undefined) {
-      const mpys = [];
-      const mpyb = this.tags.mpybPath.selectAll('path').data(mpys);
-      mpyb.exit().attr('class', 'exit').remove();
-      const mpyt1 = this.tags.mpyt1Path.selectAll('text').data(mpys);
-      mpyt1.exit().attr('class', 'exit').remove();
-      const mpyt2 = this.tags.mpyt2Path.selectAll('text').data(mpys);
-      mpyt2.exit().attr('class', 'exit').remove();
-      let mPeaks = mpys.map(m => {
-        const {
-          peaks,
-          xExtent
-        } = m;
-        return peaks.map(p => Object.assign({}, p, {
-          xExtent
-        }));
-      });
-      mPeaks = [].concat(...mPeaks);
-      const mpyp = this.tags.mpypPath.selectAll('path').data(mPeaks);
-      mpyp.exit().attr('class', 'exit').remove();
-      return;
-    }
-    const {
-      stack = [],
-      smExtext = false,
-      shift = 0
-    } = selectedMulti || {};
-    const hasValidExtent = extent => extent && Number.isFinite(extent.xL) && Number.isFinite(extent.xU);
-    const mpys = stack.filter(m => hasValidExtent(m?.xExtent));
     const isDisable = _cfg.default.btnCmdMpy(this.layout);
+    const hasMpy = !isDisable && selectedMulti?.stack?.length > 0;
+    const mpys = hasMpy ? selectedMulti.stack : [];
+    const smExtext = hasMpy ? selectedMulti.smExtext : false;
+    const shift = hasMpy ? selectedMulti.shift : 0;
+    const hasValidExtent = extent => extent && Number.isFinite(extent.xL) && Number.isFinite(extent.xU);
     if (mpys.length === 0 || isDisable) return;
     const activeExtent = hasValidExtent(smExtext) ? smExtext : mpys[0].xExtent;
     // rescale for zoom
@@ -893,6 +884,7 @@ class MultiFocus {
     isUiVisualSplitIntgSt,
     isUiNoBrushSt,
     cyclicvoltaSt,
+    shiftSt,
     integrationSt,
     mtplySt,
     uiSt
@@ -911,7 +903,7 @@ class MultiFocus {
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt));
     this.setTip();
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, shiftSt, jcampIdx);
     Object.assign(this, {
       isUiSplitIntgSt,
       isUiVisualSplitIntgSt
@@ -956,6 +948,7 @@ class MultiFocus {
     isUiVisualSplitIntgSt,
     isUiNoBrushSt,
     cyclicvoltaSt,
+    shiftSt,
     integrationSt,
     mtplySt,
     uiSt
@@ -971,7 +964,7 @@ class MultiFocus {
     const jcampIdx = curveIdx;
     this.isShowAllCurves = isShowAllCurve;
     this.entities = entities;
-    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
+    this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, shiftSt, jcampIdx);
     Object.assign(this, {
       isUiSplitIntgSt,
       isUiVisualSplitIntgSt

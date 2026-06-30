@@ -29,10 +29,8 @@ const Multiplicity = ({
   isFocusAddMpySt,
   disableAddMpySt,
   isFocusRmMpySt,
-  disableRmMpySt,
   isFocusAddPeakSt,
   isFocusRmPeakSt,
-  disableMpyPeakSt,
   setUiSweepTypeAct,
   clearMpyAllAct,
   curveSt
@@ -47,6 +45,9 @@ const Multiplicity = ({
   const onClearAll = () => clearMpyAllAct({
     curveIdx
   });
+  if (disableAddMpySt) {
+    return null;
+  }
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
     className: classes.group,
     children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
@@ -57,7 +58,6 @@ const Multiplicity = ({
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
         children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
           className: (0, _classnames.default)((0, _common.focusStyle)(isFocusAddMpySt, classes), 'btn-sv-bar-addmpy'),
-          disabled: disableAddMpySt,
           onClick: onSweepMutAdd,
           children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
             className: (0, _classnames.default)(classes.txt, 'txt-sv-bar-addmpy'),
@@ -73,7 +73,6 @@ const Multiplicity = ({
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
         children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
           className: (0, _classnames.default)((0, _common.focusStyle)(isFocusRmMpySt, classes), 'btn-sv-bar-rmmpy'),
-          disabled: disableRmMpySt,
           onClick: onOneMutAdd,
           children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
             className: (0, _classnames.default)(classes.txt, 'txt-sv-bar-rmmpy'),
@@ -89,7 +88,6 @@ const Multiplicity = ({
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
         children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
           className: (0, _classnames.default)((0, _common.focusStyle)(isFocusAddPeakSt, classes), 'btn-sv-bar-addpeakmpy'),
-          disabled: disableMpyPeakSt,
           onClick: onPeakMutAdd,
           children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
             className: (0, _classnames.default)(classes.txt, 'txt-sv-bar-addpeakmpy'),
@@ -105,7 +103,6 @@ const Multiplicity = ({
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
         children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
           className: (0, _classnames.default)((0, _common.focusStyle)(isFocusRmPeakSt, classes), 'btn-sv-bar-rmpeakmpy'),
-          disabled: disableMpyPeakSt,
           onClick: onPeakMutRm,
           children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
             className: (0, _classnames.default)(classes.txt, 'txt-sv-bar-rmpeakmpy'),
@@ -113,14 +110,12 @@ const Multiplicity = ({
           })
         })
       })
-    }), disableAddMpySt ? null :
-    /*#__PURE__*/
-    // eslint-disable-line
-    (0, _jsxRuntime.jsx)(_tri_btn.default, {
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_tri_btn.default, {
       content: {
         tp: 'Clear All Multiplicity'
       },
       cb: onClearAll,
+      isClearAllDisabled: false,
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
         className: (0, _classnames.default)(classes.txt, 'txt-sv-bar-rmallmpy'),
         children: "Jx"

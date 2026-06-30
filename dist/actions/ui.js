@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.setUiViewerType = exports.setUiSweepType = exports.selectUiSweep = exports.scrollUiWheel = exports.displaySubViewerAt = exports.clickUiTarget = void 0;
+exports.setUiViewerType = exports.setUiSweepType = exports.selectUiSweep = exports.scrollUiWheel = exports.restoreSweepExtent = exports.displaySubViewerAt = exports.clickUiTarget = void 0;
 var _action_type = require("../constants/action_type");
 var _list_ui = require("../constants/list_ui");
 var _integration_draft = require("../helpers/integration_draft.js");
@@ -45,15 +45,25 @@ const scrollUiWheel = payload => ({
   payload
 });
 exports.scrollUiWheel = scrollUiWheel;
-const clickUiTarget = (payload, onPeak, voltammetryPeakIdx = 0, jcampIdx = 0, onPecker = false, sourceHint = null) => ({
-  type: _action_type.UI.CLICK_TARGET,
-  payload,
-  onPeak,
-  voltammetryPeakIdx,
-  jcampIdx,
-  onPecker,
-  sourceHint
+const restoreSweepExtent = payload => ({
+  type: _action_type.UI.SWEEP.SELECT_ZOOMIN,
+  payload
 });
+exports.restoreSweepExtent = restoreSweepExtent;
+const clickUiTarget = (payload, onPeak, voltammetryPeakIdx, jcampIdx, onPecker, sourceHint) => {
+  const action = {
+    type: _action_type.UI.CLICK_TARGET,
+    payload,
+    onPeak,
+    voltammetryPeakIdx: voltammetryPeakIdx ?? 0,
+    onPecker: onPecker ?? false,
+    sourceHint: sourceHint ?? null
+  };
+  if (Number.isFinite(jcampIdx)) {
+    action.jcampIdx = jcampIdx;
+  }
+  return action;
+};
 exports.clickUiTarget = clickUiTarget;
 const displaySubViewerAt = payload => ({
   type: _action_type.UI.SUB_VIEWER.DISPLAY_VIEWER_AT,

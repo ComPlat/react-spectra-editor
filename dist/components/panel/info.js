@@ -165,44 +165,6 @@ const handleDescriptionChanged = (content, delta, source, editor, onDescriptionC
   if (!onDescriptionChanged) return;
   onDescriptionChanged(normalizeQuillValue(content), delta, source, editor);
 };
-const aucValue = (integration, hplcMsSt) => {
-  const values = [];
-  const stackIntegration = integration?.stack;
-  if (Array.isArray(stackIntegration)) {
-    let sumVal = 0.0;
-    stackIntegration.forEach(inte => {
-      if (inte.absoluteArea) {
-        sumVal += inte.absoluteArea;
-      }
-    });
-    sumVal = sumVal.toFixed(2);
-    stackIntegration.forEach(inte => {
-      if (inte.absoluteArea) {
-        const areaVal = inte.absoluteArea.toFixed(2);
-        const percent = (areaVal * 100 / sumVal).toFixed(2);
-        const valStr = areaVal + " (" + percent + "%)"; // eslint-disable-line
-        values.push(valStr);
-      }
-    });
-  }
-  const spectraList = hplcMsSt?.uvvis?.spectraList || [];
-  const listWaveLength = hplcMsSt?.uvvis?.listWaveLength || [];
-  spectraList.forEach((spectrum, idx) => {
-    const wavelength = listWaveLength[idx];
-    const integrations = spectrum?.integrations || [];
-    if (integrations.length > 0) {
-      const sumArea = integrations.reduce((sum, integ) => sum + (integ.absoluteArea ?? integ.area ?? 0), 0);
-      const integrationStrings = integrations.map(integ => {
-        const rawArea = integ.absoluteArea ?? integ.area ?? 0;
-        const areaVal = rawArea.toFixed(2);
-        const percent = sumArea > 0 ? (rawArea * 100 / sumArea).toFixed(2) : '0.00';
-        return `${areaVal} (${percent}%)`;
-      });
-      values.push(`[${wavelength} nm]: ${integrationStrings.join(', ')}`);
-    }
-  });
-  return values.join('\n');
-};
 const SECData = ({
   classes,
   layout,
@@ -482,7 +444,7 @@ const InfoPanel = ({
           children: "Area under curve (AUC):"
         }), /*#__PURE__*/(0, _jsxRuntime.jsx)("br", {}), /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
           className: (0, _classnames.default)(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt'),
-          children: aucValue(integration)
+          children: _format.default.formatHplcAucPanel(integration, feature)
         })]
       }) : null, /*#__PURE__*/(0, _jsxRuntime.jsx)(DSCData, {
         classes: classes,

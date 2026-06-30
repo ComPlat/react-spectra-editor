@@ -307,6 +307,12 @@ class LineFocus {
     mpp.exit()
       .attr('class', 'exit')
       .remove();
+    const clearPeakLabels = () => {
+      const bpTxt = this.tags.bpTxt.selectAll('text').data([]);
+      bpTxt.exit()
+        .attr('class', 'exit')
+        .remove();
+    };
 
     const linePath = [
       { x: -0.5, y: 10 },
@@ -367,6 +373,8 @@ class LineFocus {
         .text((d) => d.x.toFixed(2))
         .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(d.y) - 25})`)
         .on('click', (event, d) => this.onClickTarget(event, d));
+    } else {
+      clearPeakLabels();
     }
   }
 
@@ -376,8 +384,35 @@ class LineFocus {
     } = this.shouldUpdate;
     if (sameXY && sameLySt && sameItSt && sameData) return;
 
+    const clearIntegralPaths = () => {
+      const empty = [];
+      const igbp = this.tags.igbPath.selectAll('path').data(empty);
+      igbp.exit()
+        .attr('class', 'exit')
+        .remove();
+      const igcp = this.tags.igcPath.selectAll('path').data(empty);
+      igcp.exit()
+        .attr('class', 'exit')
+        .remove();
+      const igtp = this.tags.igtPath.selectAll('text').data(empty);
+      igtp.exit()
+        .attr('class', 'exit')
+        .remove();
+    };
+    const clearAUC = () => {
+      const auc = this.tags.aucPath.selectAll('path').data([]);
+      auc.exit()
+        .attr('class', 'exit')
+        .remove();
+    };
+
     const { selectedIdx, integrations } = integrationState;
     const selectedIntegration = integrations[selectedIdx];
+    if (selectedIntegration === false || selectedIntegration === undefined) {
+      clearIntegralPaths();
+      clearAUC();
+      return;
+    }
 
     const {
       stack, refArea, refFactor, shift,
@@ -406,19 +441,16 @@ class LineFocus {
       .remove();
 
     if (itgs.length === 0 || isDisable) {
-      // remove drawn area under curve
-      const auc = this.tags.aucPath.selectAll('path').data(stack);
-      auc.exit()
-        .attr('class', 'exit')
-        .remove();
-      auc.merge(auc);
-      this.drawVisualSplitLines(showIntegSplit ? itgs : [], shift, ignoreRef);
+      clearIntegralPaths();
+      clearAUC();
       return;
     }
 
     if (ignoreRef) {
+      clearIntegralPaths();
       this.drawAUC(stack, shift);
     } else {
+      clearAUC();
       // rescale for zoom
       const { xt } = TfRescale(this);
 
@@ -556,16 +588,16 @@ class LineFocus {
     const { selectedIdx, multiplicities = [] } = mtplySt || {};
     const selectedMulti = multiplicities[selectedIdx] || {};
 
-    const {
-      stack = [], smExtext = false, shift = 0,
-    } = selectedMulti;
+    const isDisable = Cfg.btnCmdMpy(this.layout);
+    const hasMpy = !isDisable && selectedMulti?.stack?.length > 0;
+    const mpys = hasMpy ? selectedMulti.stack : [];
+    const smExtext = hasMpy ? selectedMulti.smExtext : false;
+    const shift = hasMpy ? selectedMulti.shift : 0;
     const hasValidExtent = (extent) => (
       extent
       && Number.isFinite(extent.xL)
       && Number.isFinite(extent.xU)
     );
-    const mpys = stack.filter((m) => hasValidExtent(m?.xExtent));
-    const isDisable = Cfg.btnCmdMpy(this.layout);
     if (mpys.length === 0 || isDisable) return;
     const activeExtent = hasValidExtent(smExtext) ? smExtext : mpys[0].xExtent;
     // rescale for zoom

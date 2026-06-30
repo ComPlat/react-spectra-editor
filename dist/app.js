@@ -72,6 +72,8 @@ const SpectraEditor = ({
   multiMolSvgs,
   entityFileNames,
   userManualLink,
+  curveIdx,
+  sweepExtent,
   onLcmsPageRequest
 }) => /*#__PURE__*/(0, _jsxRuntime.jsx)(_reactRedux.Provider, {
   store: store,
@@ -80,6 +82,8 @@ const SpectraEditor = ({
     children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_layer_init.default, {
       entity: entity,
       multiEntities: multiEntities,
+      curveIdx: curveIdx,
+      sweepExtent: sweepExtent,
       entityFileNames: entityFileNames,
       userManualLink: userManualLink,
       others: others,
@@ -103,6 +107,8 @@ exports.SpectraEditor = SpectraEditor;
 SpectraEditor.propTypes = {
   entity: _propTypes.default.object.isRequired,
   multiEntities: _propTypes.default.array,
+  curveIdx: _propTypes.default.number,
+  sweepExtent: _propTypes.default.object,
   entityFileNames: _propTypes.default.array,
   others: _propTypes.default.object,
   cLabel: _propTypes.default.string,
