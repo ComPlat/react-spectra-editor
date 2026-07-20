@@ -47,9 +47,8 @@ const Peak = ({
   const showAddPeak = !disableAddPeakSt;
   const showRmPeak = !disableRmPeakSt;
   const showSetRef = !disableSetRefSt;
-  const showClearAll = !disableRmPeakSt;
 
-  if (!showAddPeak && !showRmPeak && !showSetRef && !showClearAll) {
+  if (!showAddPeak && !showRmPeak && !showSetRef) {
     return null;
   }
 
@@ -110,7 +109,7 @@ const Peak = ({
         ) : null
       }
       {
-        showClearAll ? (
+        showRmPeak ? (
           <TriBtn
             content={{ tp: 'Clear All Peaks' }}
             cb={onClearAll}
