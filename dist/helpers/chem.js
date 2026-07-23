@@ -15,7 +15,6 @@ exports.convertTopic = exports.convertThresEndPts = void 0;
 var _jcampconverter = _interopRequireDefault(require("jcampconverter"));
 var _reselect = require("reselect");
 var _shift = require("./shift");
-var _cfg = _interopRequireDefault(require("./cfg"));
 var _format = _interopRequireDefault(require("./format"));
 var _list_layout = require("../constants/list_layout");
 var _integration = require("./integration");

@@ -245,11 +245,11 @@ function* clickUiTarget(action) {
     return;
   }
   if (uiSweepType === _list_ui.LIST_UI_SWEEP_TYPE.PEAK_ADD && !onPeak) {
-    const spectrumId = hplcMsState?.uvvis?.selectedWaveLength;
-    if (isLcmsLayout && spectrumId == null) return;
-    const currentPeaks = hplcMsState?.uvvis?.currentSpectrum?.peaks || [];
-    const updatedPeaks = [...currentPeaks, payload];
-    if (isLcmsLayout && spectrumId != null) {
+    if (isLcmsLayout) {
+      const spectrumId = hplcMsState?.uvvis?.selectedWaveLength;
+      if (spectrumId == null) return;
+      const currentPeaks = hplcMsState?.uvvis?.currentSpectrum?.peaks || [];
+      const updatedPeaks = [...currentPeaks, payload];
       yield (0, _effects.put)({
         type: _action_type.HPLC_MS.UPDATE_HPLCMS_PEAKS,
         payload: {
