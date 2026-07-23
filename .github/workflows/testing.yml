@@ -12,3 +12,13 @@ jobs:
           node-version: 22.23.1
       - run: yarn install --frozen-lockfile
       - run: yarn test
+
+  verify-dist:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22.23.1
+      - run: yarn install --frozen-lockfile
+      - run: yarn verify:dist
