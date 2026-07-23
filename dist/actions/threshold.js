@@ -10,9 +10,9 @@ const updateThresholdValue = payload => ({
   payload
 });
 exports.updateThresholdValue = updateThresholdValue;
-const resetThresholdValue = () => ({
+const resetThresholdValue = (payload = false) => ({
   type: _action_type.THRESHOLD.RESET_VALUE,
-  payload: false
+  payload
 });
 exports.resetThresholdValue = resetThresholdValue;
 const toggleThresholdIsEdit = payload => ({

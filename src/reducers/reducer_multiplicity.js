@@ -1,7 +1,7 @@
 /* eslint-disable prefer-object-spread, default-param-last */
 import undoable from 'redux-undo';
 import {
-  UI, EDITPEAK, INTEGRATION, MULTIPLICITY, MANAGER,
+  UI, EDITPEAK, INTEGRATION, MULTIPLICITY, MANAGER, CURVE,
 } from '../constants/action_type';
 
 import { undoRedoConfig, undoRedoActions } from './undo_redo_config';
@@ -26,15 +26,19 @@ const defaultEmptyMultiplicity = {
 };
 
 const setShift = (state, action) => {
-  const shift = action.payload.prevOffset;
+  const { prevOffset, curveIdx } = action.payload;
+  const targetIdx = Number.isFinite(curveIdx) ? curveIdx : state.selectedIdx;
 
-  const { selectedIdx, multiplicities } = state;
-  const selectedMulti = multiplicities[selectedIdx];
+  const { multiplicities } = state;
+  let selectedMulti = multiplicities[targetIdx];
+  if (selectedMulti === false || selectedMulti === undefined) {
+    selectedMulti = defaultEmptyMultiplicity;
+  }
 
-  const newSelectedMulti = Object.assign({}, selectedMulti, { shift });
+  const newSelectedMulti = Object.assign({}, selectedMulti, { shift: prevOffset });
   const newMultiplicities = [...multiplicities];
-  newMultiplicities[selectedIdx] = newSelectedMulti;
-  return Object.assign({}, state, { multiplicities: newMultiplicities });
+  newMultiplicities[targetIdx] = newSelectedMulti;
+  return Object.assign({}, state, { multiplicities: newMultiplicities, selectedIdx: targetIdx });
 };
 
 const rmFromStack = (state, action) => {
@@ -127,6 +131,8 @@ const multiplicityReducer = (state = initialState, action) => {
   switch (action.type) {
     case EDITPEAK.SHIFT:
       return setShift(state, action);
+    case CURVE.SELECT_WORKING_CURVE:
+      return Object.assign({}, state, { selectedIdx: action.payload });
     case INTEGRATION.RM_ONE:
       return rmFromStack(state, action);
     case UI.SWEEP.SELECT_MULTIPLICITY_RDC:

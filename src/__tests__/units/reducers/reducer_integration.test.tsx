@@ -838,3 +838,42 @@ describe('Test redux reducer for integrations', () => {
     expect(newState).toBe(state);
   });
 });
+
+import { EDITPEAK, CURVE } from '../../../constants/action_type';
+
+describe('Test redux integration reducer (per-curve)', () => {
+  const baseIntegration = {
+    stack: [{ xL: 1, xU: 2, area: 1, absoluteArea: 1 }],
+    refArea: 1,
+    refFactor: 1,
+    shift: 0,
+    edited: false,
+  };
+
+  it('updates shift on the curve index from the payload', () => {
+    const state = {
+      selectedIdx: 0,
+      integrations: [baseIntegration, { ...baseIntegration, shift: 0 }],
+    };
+    const action = {
+      type: EDITPEAK.SHIFT,
+      payload: { prevOffset: 0.42, curveIdx: 1 },
+    };
+    const nextState = integrationReducer(state, action);
+    expect(nextState.integrations[1].shift).toEqual(0.42);
+    expect(nextState.integrations[0].shift).toEqual(0);
+    expect(nextState.selectedIdx).toEqual(1);
+  });
+
+  it('syncs selectedIdx when the working curve changes', () => {
+    const state = {
+      selectedIdx: 0,
+      integrations: [baseIntegration],
+    };
+    const nextState = integrationReducer(state, {
+      type: CURVE.SELECT_WORKING_CURVE,
+      payload: 2,
+    });
+    expect(nextState.selectedIdx).toEqual(2);
+  });
+});

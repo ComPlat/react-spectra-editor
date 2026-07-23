@@ -2,7 +2,7 @@
 import { put, takeEvery, select } from 'redux-saga/effects';
 
 import {
-  CURVE, CYCLIC_VOLTA_METRY, INTEGRATION, SIMULATION, MULTIPLICITY,
+  CURVE, CYCLIC_VOLTA_METRY, INTEGRATION, SIMULATION, MULTIPLICITY, MANAGER,
 } from '../constants/action_type';
 
 import { LIST_LAYOUT } from '../constants/list_layout';
@@ -121,6 +121,34 @@ function* setCyclicVoltametryRef(action) { // eslint-disable-line
   }));
 }
 
+function* setInitShifts() {
+  const curveSt = yield select(getCurveSt);
+  const { listCurves } = curveSt;
+  if (!listCurves || listCurves.length <= 1) {
+    return;
+  }
+
+  const layoutSt = yield select(getLayoutSt);
+  const numberOfCurve = listCurves.length;
+  for (let index = 0; index < listCurves.length; index += 1) {
+    const { feature } = listCurves[index];
+    if (feature) {
+      yield put({
+        type: MANAGER.RESETSHIFT,
+        payload: {
+          ...feature,
+          layout: layoutSt,
+          curvesInfo: {
+            isMultiCurve: true,
+            curveIdx: index,
+            numberOfCurve,
+          },
+        },
+      });
+    }
+  }
+}
+
 function* setInitIntegrations(action) { // eslint-disable-line
   const curveSt = yield select(getCurveSt);
   const { listCurves } = curveSt;
@@ -173,6 +201,7 @@ function* setInitIntegrations(action) { // eslint-disable-line
 
 const multiEntitiesSagas = [
   takeEvery(CURVE.SET_ALL_CURVES, setCyclicVoltametry),
+  takeEvery(CURVE.SET_ALL_CURVES, setInitShifts),
   takeEvery(CURVE.SET_ALL_CURVES, setInitIntegrations),
   takeEvery(CYCLIC_VOLTA_METRY.SET_FACTOR, setCyclicVoltametryRef),
 ];

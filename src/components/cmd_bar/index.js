@@ -23,6 +23,7 @@ import ChangeAxes from './r08_change_axes';
 import Detector from './r09_detector';
 import CvDensityControls from './r10_cv_density';
 import Format from '../../helpers/format';
+import Cfg from '../../helpers/cfg';
 
 const styles = () => (
   Object.assign(
@@ -71,6 +72,8 @@ const CmdBar = ({
   prependLcMsToolbar,
 }) => {
   const isCvLayout = Format.isCyclicVoltaLayout(layoutSt);
+  const hideIntegration = isCvLayout || Cfg.btnCmdIntg(layoutSt);
+  const hideMultiplicity = isCvLayout || Cfg.btnCmdMpy(layoutSt);
 
   const rightCluster = (
     <>
@@ -117,8 +120,8 @@ const CmdBar = ({
             <Zoom />
             <Peak jcampIdx={jcampIdx} feature={feature} />
             <Pecker jcampIdx={jcampIdx} />
-            {isCvLayout ? null : <Integration />}
-            {isCvLayout ? null : <Multiplicity />}
+            {hideIntegration ? null : <Integration />}
+            {hideMultiplicity ? null : <Multiplicity />}
             <UndoRedo />
           </>
         )

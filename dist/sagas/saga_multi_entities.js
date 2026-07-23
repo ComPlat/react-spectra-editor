@@ -167,6 +167,36 @@ function* setCyclicVoltametryRef(action) {
     }
   });
 }
+function* setInitShifts() {
+  const curveSt = yield (0, _effects.select)(getCurveSt);
+  const {
+    listCurves
+  } = curveSt;
+  if (!listCurves || listCurves.length <= 1) {
+    return;
+  }
+  const layoutSt = yield (0, _effects.select)(getLayoutSt);
+  const numberOfCurve = listCurves.length;
+  for (let index = 0; index < listCurves.length; index += 1) {
+    const {
+      feature
+    } = listCurves[index];
+    if (feature) {
+      yield (0, _effects.put)({
+        type: _action_type.MANAGER.RESETSHIFT,
+        payload: {
+          ...feature,
+          layout: layoutSt,
+          curvesInfo: {
+            isMultiCurve: true,
+            curveIdx: index,
+            numberOfCurve
+          }
+        }
+      });
+    }
+  }
+}
 function* setInitIntegrations(action) {
   // eslint-disable-line
   const curveSt = yield (0, _effects.select)(getCurveSt);
@@ -230,5 +260,5 @@ function* setInitIntegrations(action) {
     }
   }
 }
-const multiEntitiesSagas = [(0, _effects.takeEvery)(_action_type.CURVE.SET_ALL_CURVES, setCyclicVoltametry), (0, _effects.takeEvery)(_action_type.CURVE.SET_ALL_CURVES, setInitIntegrations), (0, _effects.takeEvery)(_action_type.CYCLIC_VOLTA_METRY.SET_FACTOR, setCyclicVoltametryRef)];
+const multiEntitiesSagas = [(0, _effects.takeEvery)(_action_type.CURVE.SET_ALL_CURVES, setCyclicVoltametry), (0, _effects.takeEvery)(_action_type.CURVE.SET_ALL_CURVES, setInitShifts), (0, _effects.takeEvery)(_action_type.CURVE.SET_ALL_CURVES, setInitIntegrations), (0, _effects.takeEvery)(_action_type.CYCLIC_VOLTA_METRY.SET_FACTOR, setCyclicVoltametryRef)];
 var _default = exports.default = multiEntitiesSagas;

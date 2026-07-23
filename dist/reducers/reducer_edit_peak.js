@@ -216,6 +216,10 @@ const editPeakReducer = (state = initialState, action) => {
       return processShift(state, action);
     case _action_type.EDITPEAK.CLEAR_ALL:
       return clearAllPeaks(state, action);
+    case _action_type.CURVE.SELECT_WORKING_CURVE:
+      return Object.assign({}, state, {
+        selectedIdx: action.payload
+      });
     case _action_type.MANAGER.RESETALL:
       return {
         selectedIdx: 0,

@@ -174,54 +174,6 @@ const handleDescriptionChanged = (content, delta, source, editor, onDescriptionC
   onDescriptionChanged(normalizeQuillValue(content), delta, source, editor);
 };
 
-const aucValue = (integration, hplcMsSt) => {
-  const values = [];
-  const stackIntegration = integration?.stack;
-  if (Array.isArray(stackIntegration)) {
-    let sumVal = 0.0;
-    stackIntegration.forEach((inte) => {
-      if (inte.absoluteArea) {
-        sumVal += inte.absoluteArea;
-      }
-    });
-    sumVal = sumVal.toFixed(2);
-    stackIntegration.forEach((inte) => {
-      if (inte.absoluteArea) {
-        const areaVal = inte.absoluteArea.toFixed(2);
-        const percent = (areaVal * 100 / sumVal).toFixed(2);
-        const valStr = areaVal + " (" + percent + "%)"; // eslint-disable-line
-        values.push(valStr);
-      }
-    });
-  }
-
-  const spectraList = hplcMsSt?.uvvis?.spectraList || [];
-  const listWaveLength = hplcMsSt?.uvvis?.listWaveLength || [];
-
-  spectraList.forEach((spectrum, idx) => {
-    const wavelength = listWaveLength[idx];
-    const integrations = spectrum?.integrations || [];
-
-    if (integrations.length > 0) {
-      const sumArea = integrations.reduce(
-        (sum, integ) => sum + (integ.absoluteArea ?? integ.area ?? 0),
-        0,
-      );
-
-      const integrationStrings = integrations.map((integ) => {
-        const rawArea = integ.absoluteArea ?? integ.area ?? 0;
-        const areaVal = rawArea.toFixed(2);
-        const percent = sumArea > 0 ? ((rawArea * 100) / sumArea).toFixed(2) : '0.00';
-        return `${areaVal} (${percent}%)`;
-      });
-
-      values.push(`[${wavelength} nm]: ${integrationStrings.join(', ')}`);
-    }
-  });
-
-  return values.join('\n');
-};
-
 const SECData = ({
   classes, layout, detector, secData,
 }) => {
@@ -313,7 +265,7 @@ const InfoPanel = ({
   classes, expand, feature, integration, editorOnly, molSvg, descriptions,
   layoutSt, simulationSt, shiftSt, curveSt, exactMass,
   onExpand, canChangeDescription, onDescriptionChanged, detectorSt,
-  metaSt, updateDSCMetaDataAct, hplcMsSt, entities,
+  metaSt, updateDSCMetaDataAct, entities,
 }) => {
   if (!feature) return null;
   const msExactMass = Format.isMsLayout(layoutSt) && exactMass
@@ -438,7 +390,7 @@ const InfoPanel = ({
               </span>
               <br />
               <span className={classNames(classes.tTxt, classes.tTxtSim, 'txt-sv-panel-txt')}>
-                {aucValue(integration)}
+                {Format.formatHplcAucPanel(integration, feature)}
               </span>
             </div>
           ) : null
@@ -505,7 +457,7 @@ const InfoPanel = ({
                 marginBottom: '100px',
               }}
             >
-              {aucValue(integration, hplcMsSt)
+              {Format.formatHplcAucPanel(integration, feature)
                 .split('\n')
                 .map((line, idx) => (
                   <div key={idx}>{line}</div>
@@ -558,7 +510,6 @@ InfoPanel.propTypes = {
   detectorSt: PropTypes.object.isRequired,
   metaSt: PropTypes.object.isRequired,
   updateDSCMetaDataAct: PropTypes.func.isRequired,
-  hplcMsSt: PropTypes.object.isRequired,
   entities: PropTypes.array,
 };
 

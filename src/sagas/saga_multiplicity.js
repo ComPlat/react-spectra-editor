@@ -9,6 +9,13 @@ const getCurveSt = (state) => state.curve;
 
 const getMultiplicitySt = (state) => state.multiplicity.present;
 
+const defaultEmptyMultiplicity = {
+  stack: [],
+  shift: 0,
+  smExtext: false,
+  edited: false,
+};
+
 function* selectMpy(action) {
   const metaSt = yield select(getMetaSt);
   const mpySt = yield select(getMultiplicitySt);
@@ -201,26 +208,16 @@ function* resetInitNmr(action) {
   const mpySt = yield select(getMultiplicitySt);
 
   const { curveIdx } = curveSt;
-  const { multiplicities } = mpySt;
-  const newMultiplicities = [...multiplicities];
-  newMultiplicities[curveIdx] = multiplicity;
+  // Always reset: keeping the previous spectrum's multiplicities would
+  // display stale data when the new entity has none saved.
+  const newMultiplicities = new Array(curveIdx + 1).fill(defaultEmptyMultiplicity);
+  newMultiplicities[curveIdx] = multiplicity || defaultEmptyMultiplicity;
   const payload = Object.assign({}, mpySt, { multiplicities: newMultiplicities, selectedIdx: curveIdx });  // eslint-disable-line
 
-  if (multiplicity) {
-    yield put({
-      type: MULTIPLICITY.RESET_ALL_RDC,
-      payload,
-    });
-  }
-  // const metaSt = yield select(getMetaSt);
-  // const mpySt = yield select(getMultiplicitySt);
-
-  // if (!multiplicity) {
-  //   yield put({
-  //     type: MULTIPLICITY.RESET_ALL_RDC,
-  //     payload: mpySt,
-  //   });
-  // }
+  yield put({
+    type: MULTIPLICITY.RESET_ALL_RDC,
+    payload,
+  });
 
   // const { stack } = multiplicity;
   // const newStack = stack.map((k) => {
