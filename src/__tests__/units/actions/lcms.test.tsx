@@ -15,6 +15,7 @@ import hplcMsTicPosJcamp from "../../fixtures/lc_ms_jcamp_tic_pos";
 import hplcMsTicNegJcamp from "../../fixtures/lc_ms_jcamp_tic_neg";
 import hplcMsUvvisJcamp from "../../fixtures/lc_ms_jcamp_uvvis";
 import lcMsMzChemstationJcamp from "../../fixtures/lc_ms_jcamp_mz_chemstation";
+import msJcamp from "../../fixtures/ms_jcamp";
 
 const hasSpectrumData = (entity: any) => {
   const data = entity?.spectra?.[0]?.data?.[0];
@@ -169,6 +170,11 @@ describe('LCMS ExtractJcamp', () => {
     expect(entity.features.length).toBeGreaterThan(0);
     const pages = extractPages(entity);
     expect(new Set(pages).size).toBeGreaterThan(1);
+  });
+
+  it('Extract a plain MS jcamp keeps the MS layout instead of LC/MS', () => {
+    const entity: any = ExtractJcamp(msJcamp);
+    expect(entity.layout).toEqual(LIST_LAYOUT.MS);
   });
 });
 
