@@ -176,6 +176,15 @@ describe('LCMS ExtractJcamp', () => {
     const entity: any = ExtractJcamp(msJcamp);
     expect(entity.layout).toEqual(LIST_LAYOUT.MS);
   });
+
+  it('Extract Chemstation MZ still resolves LC/MS when it also carries generic chem-spectra markers', () => {
+    const injected = lcMsMzChemstationJcamp.replace(
+      '##DATA TYPE=MASS SPECTRUM',
+      '##DATA TYPE=MASS SPECTRUM\n##$CSCATEGORY=SPECTRUM\n##$CSSCANAUTOTARGET=1',
+    );
+    const entity: any = ExtractJcamp(injected);
+    expect(entity.layout).toEqual(LIST_LAYOUT.LC_MS);
+  });
 });
 
 describe('LCMS grouping', () => {

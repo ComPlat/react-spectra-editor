@@ -67,10 +67,9 @@ export const isChemstationLcms = (source, jcamp) => {
   const scanMode = String(info.SCAN_MODE || info.SCANMODE || '').toUpperCase();
   const type = String(info.TYPE || '').toUpperCase();
   const software = String(info.SOFTWARE || '').toUpperCase();
-  const csCategory = jcamp?.info?.$CSCATEGORY;
-  const categories = Array.isArray(csCategory)
-    ? csCategory.map((c) => String(c).toUpperCase())
-    : [];
+  const categories = []
+    .concat(jcamp?.info?.$CSCATEGORY || [])
+    .map((c) => String(c).toUpperCase());
 
   const hasPolarityCategory = categories.some(
     (c) => c.includes('POSITIVE') || c.includes('NEGATIVE') || c.includes('NEUTRAL'),
@@ -102,20 +101,6 @@ export const isChemstationLcms = (source, jcamp) => {
   const hasMultipleSpectra = spectra.length > 1;
   const hasPageMetadata = spectra.some((s) => s?.page != null || s?.pageValue != null);
 
-  // A plain chem-spectra-generated MS jcamp carries a signature that never appears on a
-  // genuine Chemstation LC/MS export; bail out before its MASS SPECTRUM root DATA TYPE
-  // gets mistaken for one.
-  const hasCsCategorySpectrum = categories.some((c) => c === 'SPECTRUM');
-  const hasCsScanAutoTarget = /##\$CSSCANAUTOTARGET\s*=/i.test(source);
-  const hasMsUnitsTriplet = /##UNITS\s*=\s*M\/Z,\s*RELATIVE ABUNDANCE,\s*SECONDS/i.test(source);
-  const hasNtuplesMassSpectrum = /##NTUPLES\s*=\s*MASS SPECTRUM\b/i.test(source);
-  const looksLikePlainMsExport = (
-    hasCsCategorySpectrum || hasCsScanAutoTarget || hasMsUnitsTriplet || hasNtuplesMassSpectrum
-  );
-  if (looksLikePlainMsExport) {
-    return false;
-  }
-
   const hasNtuplesPageHeader = /##NTUPLES_PAGE_HEADER\s*=/.test(source);
   if (hasNtuplesPageHeader && (
     hasTicOrUvvisCategory
@@ -137,13 +122,7 @@ export const isChemstationLcms = (source, jcamp) => {
 
   if (
     hasMassSpectrumRootDataType
-    && (
-      hasScanModeHint
-      || hasTypeHint
-      || hasSoftwareHint
-      || hasTicOrUvvisCategory
-      || (hasMultipleSpectra && hasPageMetadata)
-    )
+    && (hasScanModeHint || hasTypeHint || hasSoftwareHint || hasTicOrUvvisCategory)
   ) {
     return true;
   }
@@ -152,6 +131,16 @@ export const isChemstationLcms = (source, jcamp) => {
     && (hasTypeHint || hasSoftwareHint || hasScanModeHint || spectra.length > 0)
   ) {
     return true;
+  }
+
+  // A multi-page MASS SPECTRUM root with no other chromatographic signal is ambiguous:
+  // both a genuine Chemstation m/z export and a plain multi-page MS NTUPLES export look
+  // like this. The only field that reliably tells them apart is this units triplet, which
+  // is unique to the plain export - so it only vetoes this weak fallback, never the
+  // stronger positive evidence handled above.
+  if (hasMassSpectrumRootDataType && hasMultipleSpectra && hasPageMetadata) {
+    const hasMsUnitsTriplet = /##UNITS\s*=\s*M\/Z,\s*RELATIVE ABUNDANCE,\s*SECONDS/i.test(source);
+    return !hasMsUnitsTriplet;
   }
 
   return false;
