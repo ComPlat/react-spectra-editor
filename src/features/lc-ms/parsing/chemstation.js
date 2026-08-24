@@ -1,4 +1,5 @@
 import { parsePageValue } from './lcmsMsPage';
+import { normalizeLcMsMode } from './lcmsCategory';
 
 export const parseChemstationPages = (source, jcamp) => {
   if (typeof source !== 'string') return [];
@@ -57,82 +58,76 @@ export const parseChemstationPages = (source, jcamp) => {
   return spectra;
 };
 
+// `\bTIC\b` rather than includes('TIC'), so STATIC / KINETIC / SYNTHETIC / OPTIC
+// do not read as a total-ion chromatogram.
+const TIC_TOKEN = /\bTIC\b/;
+
+// A JCAMP label repeated across blocks arrives from jcampconverter as an array
+// rather than a string, so every record read here is normalised to a list.
+const upperList = (value) => []
+  .concat(value == null ? [] : value)
+  .map((entry) => String(entry).toUpperCase());
+
+const upperTokens = (value) => upperList(value)
+  .reduce((acc, entry) => acc.concat(entry.split(/[,;]/)), [])
+  .map((token) => token.trim())
+  .filter(Boolean);
+
 export const isChemstationLcms = (source, jcamp) => {
   if (typeof source !== 'string') return false;
-  const dt = String(jcamp?.dataType || jcamp?.info?.DATATYPE || '').toUpperCase();
-  if (dt.includes('LC/MS') || dt.includes('MASS TIC')) return true;
 
-  const spectra = Array.isArray(jcamp?.spectra) ? jcamp.spectra : [];
   const info = jcamp?.info || {};
-  const scanMode = String(info.SCAN_MODE || info.SCANMODE || '').toUpperCase();
+  const spectra = Array.isArray(jcamp?.spectra) ? jcamp.spectra : [];
+  // jcampconverter leaves the root `dataType` undefined and canonicalises
+  // `##DATA TYPE` to info.DATATYPE, which may be an array on repeat.
+  const dataTypes = upperList(jcamp?.dataType ?? info.DATATYPE);
+  const spectrumDataTypes = spectra.map((s) => String(s?.dataType || '').toUpperCase());
   const type = String(info.TYPE || '').toUpperCase();
+
+  // 1. The file declares itself an LC/MS run or a total-ion chromatogram.
+  if (dataTypes.some((d) => d.includes('LC/MS') || d.includes('MASS TIC'))) return true;
+
+  // 2. A block declares chromatogram content.
+  if (spectrumDataTypes.some((d) => TIC_TOKEN.test(d))) return true;
+  if (type.includes('MS CHROMATOGRAM')) return true;
+
+  const hasMassSpectrumRootDataType = dataTypes.some((d) => d.includes('MASS SPECTRUM'));
+  const scanMode = normalizeLcMsMode(info.SCAN_MODE ?? info.SCANMODE);
   const software = String(info.SOFTWARE || '').toUpperCase();
-  const csCategory = jcamp?.info?.$CSCATEGORY;
-  const categories = Array.isArray(csCategory)
-    ? csCategory.map((c) => String(c).toUpperCase())
-    : [];
 
-  const hasPolarityCategory = categories.some(
-    (c) => c.includes('POSITIVE') || c.includes('NEGATIVE') || c.includes('NEUTRAL'),
-  );
-  const hasTicOrUvvisCategory = categories.some(
-    (c) => c.includes('TIC') || c.includes('UVVIS'),
-  );
-  const hasHplcUvvisSpectrumDataType = spectra.some((s) => {
-    const sdt = String(s?.dataType || '').toUpperCase();
-    return sdt.includes('HPLC UV-VIS') || sdt.includes('UVVIS');
-  });
-  const hasMassTicSpectrumDataType = spectra.some((s) => {
-    const sdt = String(s?.dataType || '').toUpperCase();
-    return sdt.includes('MASS TIC') || sdt.includes('TIC');
-  });
-  const hasMassSpectrumDataType = spectra.some((s) => {
-    const sdt = String(s?.dataType || '').toUpperCase();
-    return sdt.includes('MASS SPECTRUM');
-  });
-  const hasMassSpectrumRootDataType = dt.includes('MASS SPECTRUM');
-  const hasScanModeHint = (
-    scanMode.includes('POSITIVE')
-    || scanMode.includes('NEGATIVE')
-    || scanMode.includes('POSITIV')
-    || scanMode.includes('NEGATIV')
-  );
-  const hasTypeHint = type.includes('MS SPECTRUM') || type.includes('MS CHROMATOGRAM');
-  const hasSoftwareHint = software.includes('OPENLAB');
-  const hasMultipleSpectra = spectra.length > 1;
-  const hasPageMetadata = spectra.some((s) => s?.page != null || s?.pageValue != null);
+  // 3. Structural discriminator. A Chemstation LC/MS export indexes its m/z scans
+  //    by a retention-time PAGE variable (`##VAR_TYPE= PAGE, X, Y`); that page axis
+  //    is what makes the file chromatographic. A plain chem-spectra MS NTUPLES
+  //    export declares its time axis as a third INDEPENDENT variable
+  //    (`##VAR_TYPE= INDEPENDENT, DEPENDENT, INDEPENDENT`, `##SYMBOL= X, Y, T`) and
+  //    never declares a PAGE. Deciding on structure rather than on a units literal
+  //    means writer-to-writer differences in spacing or vocabulary cannot flip it.
+  //    Note `##VAR_TYPE` reaches us as info.VARTYPE - canonicDataLabels strips the
+  //    underscore and uppercases - and `##NTUPLES` is not retained at all.
+  const hasPageAxis = upperTokens(info.VARTYPE).includes('PAGE')
+    || /##NTUPLES_PAGE_HEADER\s*=/.test(source);
 
-  const hasNtuplesPageHeader = /##NTUPLES_PAGE_HEADER\s*=/.test(source);
-  if (hasNtuplesPageHeader && (
-    hasTicOrUvvisCategory
-    || hasHplcUvvisSpectrumDataType
-    || hasMassTicSpectrumDataType
-    || (hasMassSpectrumDataType && hasPolarityCategory)
-  )) {
-    return true;
+  if (hasPageAxis) {
+    // A PAGE axis alone is not conclusive - 2D NMR is page-indexed too - so the
+    // page-indexed content still has to look like LC/MS.
+    const categories = upperList(info.$CSCATEGORY);
+    return (
+      hasMassSpectrumRootDataType
+      || spectrumDataTypes.some((d) => d.includes('MASS SPECTRUM'))
+      || spectrumDataTypes.some((d) => d.includes('HPLC UV-VIS') || d.includes('UVVIS'))
+      || categories.some((c) => TIC_TOKEN.test(c) || c.includes('UVVIS'))
+      || categories.some((c) => (
+        c.includes('POSITIVE') || c.includes('NEGATIVE') || c.includes('NEUTRAL')
+      ))
+      || scanMode !== 'NEUTRAL'
+      || software.includes('OPENLAB')
+    );
   }
 
-  if (hasMultipleSpectra && hasPageMetadata && (
-    hasTicOrUvvisCategory
-    || hasHplcUvvisSpectrumDataType
-    || hasMassTicSpectrumDataType
-    || (hasMassSpectrumDataType && hasPolarityCategory)
-  )) {
-    return true;
-  }
-
-  if (
-    hasMassSpectrumRootDataType
-    && (hasMassSpectrumDataType || hasScanModeHint || hasTypeHint || hasSoftwareHint)
-  ) {
-    return true;
-  }
-  if (
-    hasMassTicSpectrumDataType
-    && (hasTypeHint || hasSoftwareHint || hasScanModeHint || spectra.length > 0)
-  ) {
-    return true;
-  }
-
-  return false;
+  // 4. No page axis: fall back to vendor identity for the Chemstation exports that
+  //    predate the page-indexed layout. Deliberately excludes a MASS SPECTRUM
+  //    per-block dataType and `##TYPE= MS SPECTRUM` - a plain MS export carries
+  //    both, and treating them as chromatographic evidence is what made a plain
+  //    file render as LC/MS in the first place.
+  return hasMassSpectrumRootDataType && (software.includes('OPENLAB') || scanMode !== 'NEUTRAL');
 };

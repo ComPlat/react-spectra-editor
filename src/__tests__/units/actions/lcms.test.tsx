@@ -15,6 +15,9 @@ import hplcMsTicPosJcamp from "../../fixtures/lc_ms_jcamp_tic_pos";
 import hplcMsTicNegJcamp from "../../fixtures/lc_ms_jcamp_tic_neg";
 import hplcMsUvvisJcamp from "../../fixtures/lc_ms_jcamp_uvvis";
 import lcMsMzChemstationJcamp from "../../fixtures/lc_ms_jcamp_mz_chemstation";
+import msJcamp from "../../fixtures/ms_jcamp";
+import gcJcamp from "../../fixtures/gc_1_jcamp";
+import hplcUvvisJcamp from "../../fixtures/hplc_uvvis_jcamp";
 
 const hasSpectrumData = (entity: any) => {
   const data = entity?.spectra?.[0]?.data?.[0];
@@ -169,6 +172,70 @@ describe('LCMS ExtractJcamp', () => {
     expect(entity.features.length).toBeGreaterThan(0);
     const pages = extractPages(entity);
     expect(new Set(pages).size).toBeGreaterThan(1);
+  });
+
+  it('Extract a plain MS jcamp keeps the MS layout instead of LC/MS', () => {
+    const entity: any = ExtractJcamp(msJcamp);
+    expect(entity.layout).toEqual(LIST_LAYOUT.MS);
+  });
+
+  it('Extract Chemstation MZ still resolves LC/MS when it also carries generic chem-spectra markers', () => {
+    const injected = lcMsMzChemstationJcamp.replace(
+      '##DATA TYPE=MASS SPECTRUM',
+      '##DATA TYPE=MASS SPECTRUM\n##$CSCATEGORY=SPECTRUM\n##$CSSCANAUTOTARGET=1',
+    );
+    const entity: any = ExtractJcamp(injected);
+    expect(entity.layout).toEqual(LIST_LAYOUT.LC_MS);
+  });
+
+  it('Extract a single-scan Chemstation MZ still resolves LC/MS', () => {
+    // The classifier runs before the ntuples->spectra expansion, so a genuine
+    // single-scan export reaches it with one spectrum.
+    const parts = lcMsMzChemstationJcamp.split('##PAGE=');
+    const single = `${parts[0]}##PAGE=${parts[1]}##END=\n`;
+    expect(single).not.toEqual(lcMsMzChemstationJcamp);
+    const entity: any = ExtractJcamp(single);
+    expect(entity.layout).toEqual(LIST_LAYOUT.LC_MS);
+  });
+
+  it('Extract Chemstation MZ is not demoted by an MS units line inside a comment', () => {
+    const injected = lcMsMzChemstationJcamp.replace(
+      '##DATA TYPE=MASS SPECTRUM',
+      '$$ ##UNITS= M/Z, RELATIVE ABUNDANCE, SECONDS\n##DATA TYPE=MASS SPECTRUM',
+    );
+    expect(injected).not.toEqual(lcMsMzChemstationJcamp);
+    const entity: any = ExtractJcamp(injected);
+    expect(entity.layout).toEqual(LIST_LAYOUT.LC_MS);
+  });
+
+  it.each([
+    ['MINUTES rather than SECONDS', 'M/Z, RELATIVE ABUNDANCE, MINUTES'],
+    ['a doubled space', 'M/Z, RELATIVE  ABUNDANCE, SECONDS'],
+    ['a different vocabulary', 'MASS, INTENSITY, SECONDS'],
+  ])('Extract a plain MS jcamp keeps the MS layout with %s', (_label, units) => {
+    const varied = msJcamp.replace('M/Z, RELATIVE ABUNDANCE, SECONDS', units);
+    expect(varied).not.toEqual(msJcamp);
+    const entity: any = ExtractJcamp(varied);
+    expect(entity.layout).toEqual(LIST_LAYOUT.MS);
+  });
+
+  it.each([
+    ['POSITIVE'],
+    ['STATIC'],
+    ['SPECTRUM'],
+  ])('Extract a plain MS jcamp keeps the MS layout with $CSCATEGORY=%s', (category) => {
+    const injected = msJcamp.replace(
+      '##DATA TYPE= MASS SPECTRUM',
+      `##$CSCATEGORY= ${category}\n##DATA TYPE= MASS SPECTRUM`,
+    );
+    expect(injected).not.toEqual(msJcamp);
+    const entity: any = ExtractJcamp(injected);
+    expect(entity.layout).toEqual(LIST_LAYOUT.MS);
+  });
+
+  it('Extract neighbouring chromatography layouts is unaffected', () => {
+    expect(ExtractJcamp(gcJcamp).layout).not.toEqual(LIST_LAYOUT.LC_MS);
+    expect(ExtractJcamp(hplcUvvisJcamp).layout).not.toEqual(LIST_LAYOUT.LC_MS);
   });
 });
 
