@@ -4,6 +4,17 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.8.1] - 2026-08-25
+
+### Fixed
+- LC/MS layout detection: a plain MS jcamp is no longer rendered with the LC/MS layout (#322)
+
+### Dependencies
+- Bump shell-quote 1.8.4 → 1.10.0 (#319)
+- Bump fast-uri 3.1.2 → 3.1.5 (#320)
+
+[1.8.1]: https://github.com/ComPlat/react-spectra-editor/releases/tag/v1.8.1
+
 ## [1.8.0] - 2026-06-29
 
 ### Added
