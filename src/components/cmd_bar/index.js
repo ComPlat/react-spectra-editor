@@ -23,6 +23,7 @@ import ChangeAxes from './r08_change_axes';
 import Detector from './r09_detector';
 import CvDensityControls from './r10_cv_density';
 import Format from '../../helpers/format';
+import { LIST_HOST_HOOK_CLASS } from '../../constants/list_graph';
 
 const styles = () => (
   Object.assign(
@@ -95,7 +96,7 @@ const CmdBar = ({
 
   if (prependLcMsToolbar) {
     return (
-      <div className={`${classes.card} ${classes.cardFlex}`}>
+      <div className={`${LIST_HOST_HOOK_CLASS.CMD_BAR} ${classes.card} ${classes.cardFlex}`}>
         <div className={classes.lcMsToolbarLeft}>
           { prependLcMsToolbar }
         </div>
@@ -109,7 +110,7 @@ const CmdBar = ({
   }
 
   return (
-    <div className={classes.card}>
+    <div className={`${LIST_HOST_HOOK_CLASS.CMD_BAR} ${classes.card}`}>
       {
         hideMainEditTools ? null : (
           <>

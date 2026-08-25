@@ -77,9 +77,20 @@ const isLcmsMsPageLoading = (mzEntities = [], hplcMsSt = {}) => {
 exports.isLcmsMsPageLoading = isLcmsMsPageLoading;
 const styles = () => Object.assign({}, {
   lcMsStackRoot: {
-    margin: '0 0 5px 52px'
+    margin: '0 0 5px 52px',
+    // This is the only place the editor mounts three chart containers stacked in one
+    // pane instead of a single one. A host stylesheet that stretches a single chart with
+    // `.d3Line { height: 100% }` would otherwise make each of the three as tall as
+    // this whole pane and push the TIC and m/z graphs out of a bounded, clipped
+    // container. As a flex column the same declaration becomes a flex-basis the
+    // three panes negotiate down to a third each, so the stack fits either way.
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: 0
   },
   lcMsToolbarRow: {
+    // Never absorb the shrink the chart panes above negotiate.
+    flexShrink: 0,
     display: 'flex',
     flexWrap: 'wrap',
     alignItems: 'center',
@@ -106,7 +117,10 @@ const styles = () => Object.assign({}, {
     flex: '0 1 auto'
   },
   lcMsGraphPanel: {
-    position: 'relative'
+    position: 'relative',
+    // Wraps the m/z chart, so it must flex like the two bare chart mounts beside it.
+    flex: '1 1 auto',
+    minHeight: 0
   },
   lcMsLoadingOverlay: {
     position: 'absolute',
@@ -667,7 +681,7 @@ class ViewerLineRect extends _react.default.Component {
       selectWavelengthAct(event);
     };
     return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
-      className: classes.lcMsStackRoot,
+      className: `${_list_graph.LIST_HOST_HOOK_CLASS.LCMS_STACK} ${classes.lcMsStackRoot}`,
       children: [omitUvvisToolbarRow ? null : /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
         className: classes.lcMsToolbarRow,
         children: [/*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
@@ -752,7 +766,7 @@ class ViewerLineRect extends _react.default.Component {
           })
         })]
       }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
-        className: classes.lcMsGraphPanel,
+        className: `${_list_graph.LIST_HOST_HOOK_CLASS.LCMS_GRAPH_PANEL} ${classes.lcMsGraphPanel}`,
         children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
           className: _list_graph.LIST_ROOT_SVG_GRAPH.RECT
         }), isMsLoading ? /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {

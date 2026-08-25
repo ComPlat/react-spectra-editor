@@ -37,7 +37,9 @@ import {
 import { LIST_UI_SWEEP_TYPE, LIST_NON_BRUSH_TYPES } from '../../constants/list_ui';
 import renderWavelengthSelect from '../../features/lc-ms/ui/wavelengthSelect';
 import { parseFeaturePageValue as parsePageValue } from '../../features/lc-ms/parsing/pageValue';
-import { LIST_ROOT_SVG_GRAPH, LIST_BRUSH_SVG_GRAPH } from '../../constants/list_graph';
+import {
+  LIST_ROOT_SVG_GRAPH, LIST_BRUSH_SVG_GRAPH, LIST_HOST_HOOK_CLASS,
+} from '../../constants/list_graph';
 import PeakGroup from '../cmd_bar/08_peak_group';
 import Threshold from '../cmd_bar/r03_threshold';
 import Integration from '../cmd_bar/04_integration';
@@ -89,8 +91,19 @@ const styles = () => (
     {
       lcMsStackRoot: {
         margin: '0 0 5px 52px',
+        // This is the only place the editor mounts three chart containers stacked in one
+        // pane instead of a single one. A host stylesheet that stretches a single chart with
+        // `.d3Line { height: 100% }` would otherwise make each of the three as tall as
+        // this whole pane and push the TIC and m/z graphs out of a bounded, clipped
+        // container. As a flex column the same declaration becomes a flex-basis the
+        // three panes negotiate down to a third each, so the stack fits either way.
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: 0,
       },
       lcMsToolbarRow: {
+        // Never absorb the shrink the chart panes above negotiate.
+        flexShrink: 0,
         display: 'flex',
         flexWrap: 'wrap',
         alignItems: 'center',
@@ -118,6 +131,9 @@ const styles = () => (
       },
       lcMsGraphPanel: {
         position: 'relative',
+        // Wraps the m/z chart, so it must flex like the two bare chart mounts beside it.
+        flex: '1 1 auto',
+        minHeight: 0,
       },
       lcMsLoadingOverlay: {
         position: 'absolute',
@@ -660,7 +676,7 @@ class ViewerLineRect extends React.Component {
       selectWavelengthAct(event);
     };
     return (
-      <div className={classes.lcMsStackRoot}>
+      <div className={`${LIST_HOST_HOOK_CLASS.LCMS_STACK} ${classes.lcMsStackRoot}`}>
         {
           omitUvvisToolbarRow ? null : (
             <div className={classes.lcMsToolbarRow}>
@@ -733,7 +749,7 @@ class ViewerLineRect extends React.Component {
             <Threshold feature={resolvedFeature} hasEdit={hasEdit} />
           </div>
         </div>
-        <div className={classes.lcMsGraphPanel}>
+        <div className={`${LIST_HOST_HOOK_CLASS.LCMS_GRAPH_PANEL} ${classes.lcMsGraphPanel}`}>
           <div className={LIST_ROOT_SVG_GRAPH.RECT} />
           {
             isMsLoading ? (

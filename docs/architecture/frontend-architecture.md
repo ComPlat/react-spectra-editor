@@ -208,6 +208,26 @@ The following table maps each host contract to runtime code inside the editor.
 
 `entity` must include `layout`, `spectra`, and `features` in the shape produced by `FN.ExtractJcamp` (`{ spectra, features, layout }`, plus layout-specific fields). `GetComparisons` transforms comparison entities in `jcamp` state for IR, HPLC UV/VIS, and XRD overlays.
 
+### DOM hooks for host stylesheets
+
+`withStyles` generates opaque class names (`jss8 jss4`) that change between builds, so a host
+stylesheet cannot target the editor's own containers. `LIST_HOST_HOOK_CLASS`
+(`src/constants/list_graph.js`) adds stable class names alongside them. They are part of the
+public DOM contract — renaming one is a breaking change for the host.
+
+| Class | Node | Why a host needs it |
+|---|---|---|
+| `rse-cmd-bar` | `CmdBar` root (`src/components/cmd_bar/index.js`) | The toolbar's outlined selects are compressed to 30px, so their shrunk `InputLabel` floats above its own box. A host that bounds the editor must not clip this row. |
+| `lcms-stack` | LC/MS stack root (`src/components/d3_line_rect/index.js`) | The one place the editor mounts three chart containers (`.d3Line`, `.d3Multi`, `.d3Rect`) stacked in a single pane rather than one. A blanket `.d3Line { height: 100% }` rule written for the single-chart layouts triples this stack's height. |
+| `lcms-graph-panel` | m/z pane wrapper inside the stack | Wraps `.d3Rect` plus the loading overlay, so it — not `.d3Rect` — is the flex item beside the other two charts. |
+
+The chart mount classes themselves (`d3Line` / `d3Multi` / `d3Rect` and the inner
+`d3Svg` / `d3SvgMulti` / `d3SvgRect`) are already stable (`LIST_ROOT_SVG_GRAPH`,
+`LIST_BRUSH_SVG_GRAPH`). Each chart is drawn as a `viewBox` with
+`preserveAspectRatio="xMinYMin meet"` (`src/components/common/draw.js`) sized from
+`window.inner*` at mount, with the LC/MS height already divided by three — so forcing
+`height: 100%` on a mount letterboxes the chart rather than enlarging it.
+
 ## Runtime Synchronization Patterns
 
 Runtime synchronization is distributed across `LayerInit`, reducers, sagas, and D3 viewers. The editor relies on action propagation rather than a single central controller.
