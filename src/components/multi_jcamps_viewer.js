@@ -21,6 +21,7 @@ import {
 } from '../actions/cyclic_voltammetry';
 import { LIST_LAYOUT } from '../constants/list_layout';
 import Format from '../helpers/format';
+import { LIST_HOST_HOOK_CLASS } from '../constants/list_graph';
 
 const styles = () => ({
   root: {
@@ -34,7 +35,10 @@ const styles = () => ({
     fontSize: '14px',
   },
   cvEditor: {
-    height: 'calc(90vh - 220px)',
+    // 230, not 220: `commonStyle.card` reserves 10px above the toolbar for the
+    // outlined selects' floating labels, and this constant is the budget left
+    // over after it. Keep the two in step.
+    height: 'calc(90vh - 230px)',
     display: 'flex',
     flexDirection: 'column',
     minHeight: 0,
@@ -111,7 +115,7 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
           editorOnly={editorOnly}
           hideThreshold={!Format.isNmrLayout(layoutSt)}
         />
-        <div className={classNames('react-spectrum-editor', isCyclicVolta && classes.cvEditor)}>
+        <div className={classNames(LIST_HOST_HOOK_CLASS.EDITOR_ROOT, isCyclicVolta && classes.cvEditor)}>
           <Grid container className={isCyclicVolta ? classes.cvTopRow : undefined}>
             <Grid item xs={9} className={isCyclicVolta ? classes.cvViewerCol : undefined}>
               <div className={isCyclicVolta ? classes.cvViewerWrap : undefined}>

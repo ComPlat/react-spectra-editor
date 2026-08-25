@@ -15,15 +15,19 @@ const LIST_BRUSH_SVG_GRAPH = {
 // between builds, so a host stylesheet has nothing else to target. Treat these as part
 // of the public DOM contract: do not rename them without a host-side change.
 //
-// Why hosts need them: LCMS_STACK marks the one place the editor mounts three sibling
-// chart containers (`.d3Line` + `.d3Multi` + `.d3Rect`) rather than a single one, so a
-// blanket `.d3Line { height: 100% }` rule triples the stack's height; CMD_BAR marks the
-// toolbar row, whose outlined select labels float above their own box and must not be
-// clipped by a host `overflow: hidden`.
+// All entries are `rse-` prefixed. These land in a host's global, non-modular stylesheet
+// alongside its own classes, so an unprefixed generic name like `lcms-stack` would be one
+// collision away from a host's own LC/MS markup - and the contract above makes such a name
+// expensive to change afterwards.
+//
+// EDITOR_ROOT is the oldest of these and the one hosts already target; it is listed here
+// so it is covered by the same contract as the rest, rather than living on as a bare
+// string literal in four components.
 const LIST_HOST_HOOK_CLASS = {
+  EDITOR_ROOT: 'react-spectrum-editor',
   CMD_BAR: 'rse-cmd-bar',
-  LCMS_STACK: 'lcms-stack',
-  LCMS_GRAPH_PANEL: 'lcms-graph-panel',
+  LCMS_STACK: 'rse-lcms-stack',
+  LCMS_GRAPH_PANEL: 'rse-lcms-graph-panel',
 };
 
 export {

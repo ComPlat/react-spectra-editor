@@ -14,6 +14,7 @@ import CmdBar from './components/cmd_bar/index';
 import LayerContent from './layer_content';
 import { LIST_UI_VIEWER_TYPE } from './constants/list_ui';
 import { extractParams } from './helpers/extractParams';
+import { LIST_HOST_HOOK_CLASS } from './constants/list_graph';
 
 const styles = () => ({
 });
@@ -55,7 +56,7 @@ const LayerPrism = ({
           operations={operations}
           editorOnly={editorOnly}
         />
-        <div className="react-spectrum-editor">
+        <div className={LIST_HOST_HOOK_CLASS.EDITOR_ROOT}>
           <Grid container>
             <Grid item xs={12}>
               <LayerContent
@@ -84,7 +85,7 @@ const LayerPrism = ({
         operations={operations}
         editorOnly={editorOnly}
       />
-      <div className="react-spectrum-editor">
+      <div className={LIST_HOST_HOOK_CLASS.EDITOR_ROOT}>
         <Grid container>
           <Grid item xs={9}>
             <LayerContent

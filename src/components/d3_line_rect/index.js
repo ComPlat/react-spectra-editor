@@ -92,14 +92,32 @@ const styles = () => (
       lcMsStackRoot: {
         margin: '0 0 5px 52px',
         // This is the only place the editor mounts three chart containers stacked in one
-        // pane instead of a single one. A host stylesheet that stretches a single chart with
-        // `.d3Line { height: 100% }` would otherwise make each of the three as tall as
-        // this whole pane and push the TIC and m/z graphs out of a bounded, clipped
-        // container. As a flex column the same declaration becomes a flex-basis the
-        // three panes negotiate down to a third each, so the stack fits either way.
+        // pane instead of a single one. A host stylesheet that stretches a single chart
+        // with `.d3Line { height: 100% }` would otherwise make each of the three as tall
+        // as this whole pane and push the TIC and m/z graphs out of a bounded, clipped
+        // container. As a flex column they share the pane instead, so the stack fits
+        // whether or not the host ships such a rule.
         display: 'flex',
         flexDirection: 'column',
+        // Load-bearing under a host that makes this node a flex item (chemotion_ELN's
+        // `.MuiGrid-grid-xs-9 { display: flex; flex-direction: column }` does), where the
+        // initial `min-height: auto` would otherwise resolve to the stack's content size
+        // and defeat the shrink below.
         minHeight: 0,
+        // All three panes need the SAME flex-basis or the deficit is shared in proportion
+        // to basis and one of them is squeezed to a fraction of a third. `height: 100%`
+        // rather than `flex-basis: 0`, because a host stylesheet loads after this JSS and
+        // chemotion_ELN already puts `height: 100%` on the two bare mounts with a higher
+        // specificity than anything reachable from here - a basis of 0 would lose that
+        // contest on `.d3Line`/`.d3Multi`, apply to the m/z panel alone, and collapse it to
+        // zero. Restating the same declaration agrees with such a host and supplies it for
+        // one that bounds our height without styling the mounts itself. Against an
+        // unbounded parent it computes to `auto`, i.e. the content height, as before.
+        '& > .d3Line, & > .d3Multi': {
+          flex: '1 1 auto',
+          minHeight: 0,
+          height: '100%',
+        },
       },
       lcMsToolbarRow: {
         // Never absorb the shrink the chart panes above negotiate.
@@ -131,9 +149,11 @@ const styles = () => (
       },
       lcMsGraphPanel: {
         position: 'relative',
-        // Wraps the m/z chart, so it must flex like the two bare chart mounts beside it.
+        // Wraps the m/z chart plus its loading overlay, so this - not `.d3Rect` - is the
+        // flex item beside the two bare mounts, and takes the same basis as they do.
         flex: '1 1 auto',
         minHeight: 0,
+        height: '100%',
       },
       lcMsLoadingOverlay: {
         position: 'absolute',

@@ -16,6 +16,7 @@ var _index2 = _interopRequireDefault(require("./components/cmd_bar/index"));
 var _layer_content = _interopRequireDefault(require("./layer_content"));
 var _list_ui = require("./constants/list_ui");
 var _extractParams = require("./helpers/extractParams");
+var _list_graph = require("./constants/list_graph");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, default-param-last,
 react/function-component-definition, react/require-default-props
@@ -74,7 +75,7 @@ const LayerPrism = ({
         operations: operations,
         editorOnly: editorOnly
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-        className: "react-spectrum-editor",
+        className: _list_graph.LIST_HOST_HOOK_CLASS.EDITOR_ROOT,
         children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
           container: true,
           children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
@@ -103,7 +104,7 @@ const LayerPrism = ({
       operations: operations,
       editorOnly: editorOnly
     }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-      className: "react-spectrum-editor",
+      className: _list_graph.LIST_HOST_HOOK_CLASS.EDITOR_ROOT,
       children: /*#__PURE__*/(0, _jsxRuntime.jsxs)(_Grid.default, {
         container: true,
         children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
