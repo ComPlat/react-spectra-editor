@@ -115,7 +115,12 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
           editorOnly={editorOnly}
           hideThreshold={!Format.isNmrLayout(layoutSt)}
         />
-        <div className={classNames(LIST_HOST_HOOK_CLASS.EDITOR_ROOT, isCyclicVolta && classes.cvEditor)}>
+        <div
+          className={classNames(
+            LIST_HOST_HOOK_CLASS.EDITOR_ROOT,
+            isCyclicVolta && classes.cvEditor,
+          )}
+        >
           <Grid container className={isCyclicVolta ? classes.cvTopRow : undefined}>
             <Grid item xs={9} className={isCyclicVolta ? classes.cvViewerCol : undefined}>
               <div className={isCyclicVolta ? classes.cvViewerWrap : undefined}>
