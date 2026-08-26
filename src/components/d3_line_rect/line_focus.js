@@ -16,7 +16,7 @@ import Cfg from '../../helpers/cfg';
 import Format from '../../helpers/format';
 import { calcArea } from '../../helpers/integration';
 import { LIST_UI_SWEEP_TYPE } from '../../constants/list_ui';
-import { resolveXExtent, resolveYExtent } from './resolve_extent';
+import { resolveXExtent, resolveYExtent } from '../../helpers/resolve_extent';
 
 const d3 = require('d3');
 

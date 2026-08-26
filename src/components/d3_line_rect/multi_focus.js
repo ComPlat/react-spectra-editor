@@ -16,7 +16,7 @@ import {
   convertTopic,
 } from '../../helpers/chem';
 import { getLcMsInfo } from '../../helpers/extractEntityLCMS';
-import { resolveXExtent, resolveYExtent } from './resolve_extent';
+import { resolveXExtent, resolveYExtent } from '../../helpers/resolve_extent';
 
 const d3 = require('d3');
 

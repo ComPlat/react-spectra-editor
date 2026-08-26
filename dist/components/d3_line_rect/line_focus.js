@@ -17,7 +17,7 @@ var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 var _format = _interopRequireDefault(require("../../helpers/format"));
 var _integration = require("../../helpers/integration");
 var _list_ui = require("../../constants/list_ui");
-var _resolve_extent = require("./resolve_extent");
+var _resolve_extent = require("../../helpers/resolve_extent");
 /* eslint-disable prefer-object-spread, no-mixed-operators */
 
 const d3 = require('d3');

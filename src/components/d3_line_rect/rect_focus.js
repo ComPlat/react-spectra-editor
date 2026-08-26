@@ -10,6 +10,7 @@ import { TfRescale, MountCompass } from '../../helpers/compass';
 import { PksEdit } from '../../helpers/converter';
 import { LIST_LAYOUT } from '../../constants/list_layout';
 import { LIST_ROOT_SVG_GRAPH, LIST_BRUSH_SVG_GRAPH } from '../../constants/list_graph';
+import { resolveXExtent } from '../../helpers/resolve_extent';
 
 const d3 = require('d3');
 
@@ -83,8 +84,10 @@ class RectFocus {
     }
     this.xOnlyBrush = this.layout === LIST_LAYOUT.LC_MS;
 
-    const xExtent = d3.extent(this.data, (d) => d.x);
-    this.scales.x.domain(xExtent);
+    // setConfig only runs once this.data is non-empty, so this is the only
+    // domain set when it's not — the same NaN-on-empty-data guard applies.
+    const { xL, xU } = resolveXExtent(this.data, (d) => d.x);
+    this.scales.x.domain([xL, xU]);
   }
 
   updatePathCall(xt, yt) {
@@ -98,11 +101,16 @@ class RectFocus {
     let { xExtent, yExtent } = sweepExtentSt || { xExtent: false, yExtent: false };
 
     if (!xExtent || !yExtent) {
-      const xes = d3.extent(this.data, (d) => d.x).sort((a, b) => a - b);
-      const padding = (xes[1] - xes[0]) * 0.005;
-      xExtent = { xL: Math.max(0, xes[0] - padding), xU: xes[1] + padding };
+      // resolveXExtent falls back to a fixed { xL: 0, xU: 1 } instead of NaN
+      // when this.data is empty (or every x is undefined) — d3.extent alone
+      // would return [undefined, undefined] here, and the padding/floor below
+      // would turn that into NaN before it ever reached scales.x.domain().
+      const { xL: fitXL, xU: fitXU } = resolveXExtent(this.data, (d) => d.x);
+      const padding = (fitXU - fitXL) * 0.005;
+      xExtent = { xL: Math.max(0, fitXL - padding), xU: fitXU + padding };
       const btm = 0; // MS baseline is always 0.
-      const top = d3.max(this.data, (d) => d.y);
+      const rawTop = d3.max(this.data, (d) => d.y);
+      const top = Number.isFinite(rawTop) ? rawTop : 1; // same empty-data guard, for y
       const height = top - btm;
       yExtent = {
         yL: (btm - this.factor * height),

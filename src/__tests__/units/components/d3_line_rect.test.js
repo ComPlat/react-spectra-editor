@@ -5,7 +5,7 @@ import {
 import LineFocus from '../../../components/d3_line_rect/line_focus';
 import MultiFocus, { pickTicIndex } from '../../../components/d3_line_rect/multi_focus';
 import RectFocus from '../../../components/d3_line_rect/rect_focus';
-import { resolveXExtent, resolveYExtent } from '../../../components/d3_line_rect/resolve_extent';
+import { resolveXExtent, resolveYExtent } from '../../../helpers/resolve_extent';
 import { ExtractJcamp, convertTopic } from '../../../helpers/chem';
 import { extractParams } from '../../../helpers/extractParams';
 import { LIST_LAYOUT } from '../../../constants/list_layout';
@@ -244,6 +244,37 @@ describe('LineFocus/MultiFocus.setConfig with empty data (N2 regression)', () =>
     expect(multiFocus.scales.x.domain).toHaveBeenCalledWith([0, 1]);
     expect(multiFocus.scales.x.domain.mock.calls[0][0].some(Number.isNaN)).toBe(false);
     expect(multiFocus.scales.y.domain.mock.calls[0][0].some(Number.isNaN)).toBe(false);
+  });
+
+  // Review finding S9: rect_focus.js (the m/z pane, same directory as
+  // line_focus.js/multi_focus.js) had the identical d3.extent(...).sort(...)
+  // pattern in setConfig, plus a second, unguarded d3.extent(...) in
+  // setDataParams — the only domain set at all when this.data is empty, since
+  // setConfig only runs once this.data.length > 0.
+  it('RectFocus.setConfig falls back to a placeholder xExtent instead of NaN when data is empty', () => {
+    const rectFocus = Object.create(RectFocus.prototype);
+    rectFocus.data = [];
+    rectFocus.factor = 0.125;
+    rectFocus.scales = {
+      x: { domain: jest.fn() },
+      y: { domain: jest.fn() },
+    };
+    rectFocus.axisCall = { x: { scale: jest.fn() }, y: { scale: jest.fn() } };
+
+    rectFocus.setConfig(false);
+
+    expect(rectFocus.scales.x.domain.mock.calls[0][0].some(Number.isNaN)).toBe(false);
+    expect(rectFocus.scales.y.domain.mock.calls[0][0].some(Number.isNaN)).toBe(false);
+  });
+
+  it('RectFocus.setDataParams falls back to a placeholder x domain instead of NaN when data is empty', () => {
+    const rectFocus = Object.create(RectFocus.prototype);
+    rectFocus.layout = null;
+    rectFocus.scales = { x: { domain: jest.fn() } };
+
+    rectFocus.setDataParams([], [], [], []);
+
+    expect(rectFocus.scales.x.domain).toHaveBeenCalledWith([0, 1]);
   });
 });
 
