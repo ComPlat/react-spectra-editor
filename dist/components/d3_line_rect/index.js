@@ -137,7 +137,15 @@ const computeLcmsUnionXExtent = (layoutSt, uvvisSeed = [], ticEntities = []) => 
 // plain equality is enough to tell "nothing changed" from "the data moved".
 exports.computeLcmsUnionXExtent = computeLcmsUnionXExtent;
 const sameXExtent = (a, b) => !!a && !!b && a.xL === b.xL && a.xU === b.xU;
+
+// When maybeSeedUnionXExtent just dispatched a new union, use it directly for
+// this render's sweepExtentSt instead of the still-stale (pre-dispatch) entry
+// — see maybeSeedUnionXExtent's own comment for why.
 exports.sameXExtent = sameXExtent;
+const withSeededExtent = (entry, seededXExtent) => seededXExtent ? {
+  xExtent: seededXExtent,
+  yExtent: false
+} : entry;
 const isLcmsMsPageLoading = (mzEntities = [], hplcMsSt = {}) => {
   const currentPageValue = hplcMsSt?.tic?.currentPageValue;
   if (!Number.isFinite(currentPageValue)) return false;
@@ -428,16 +436,23 @@ class ViewerLineRect extends _react.default.Component {
     const uvvisViewFeature = this.extractUvvisView();
     let uvvisSeed = [];
     if (uvvisViewFeature?.data?.[0]) {
+      const {
+        x,
+        y
+      } = uvvisViewFeature.data[0];
+      uvvisSeed = toSeed(x, y);
+    }
+
+    // Computed once, before either update() call, so both panes can use the
+    // same freshly-seeded value in this render — see maybeSeedUnionXExtent's
+    // own comment for why that matters. Symmetric with mountCharts, which
+    // already calls this before both create() calls.
+    const seededXExtent = this.maybeSeedUnionXExtent(layoutSt, uvvisSeed, ticEntities);
+    if (uvvisViewFeature?.data?.[0]) {
       const hasLineSvg = !!document.querySelector(`${this.rootKlassLine} .${_list_graph.LIST_BRUSH_SVG_GRAPH.LINE}`);
       if (!hasLineSvg) {
         (0, _draw.drawMain)(this.rootKlassLine, this.currentSizes.line.width, this.currentSizes.line.height, _list_graph.LIST_BRUSH_SVG_GRAPH.LINE);
       }
-      const currentData = uvvisViewFeature.data[0];
-      const {
-        x,
-        y
-      } = currentData;
-      uvvisSeed = toSeed(x, y);
       if (this.lineFocus) {
         this.lineFocus.update({
           filterSeed: uvvisSeed,
@@ -445,7 +460,7 @@ class ViewerLineRect extends _react.default.Component {
           tTrEndPts,
           isUiNoBrushSt: true,
           isUiAddIntgSt,
-          sweepExtentSt: sweepExtent[0],
+          sweepExtentSt: withSeededExtent(sweepExtent[0], seededXExtent),
           uiSt,
           layoutSt,
           integrationSt,
@@ -456,7 +471,6 @@ class ViewerLineRect extends _react.default.Component {
       (0, _draw.drawLabel)(this.rootKlassLine, null, 'Minutes', 'Intensity');
       (0, _draw.drawDisplay)(this.rootKlassLine, false);
     }
-    this.maybeSeedUnionXExtent(layoutSt, uvvisSeed, ticEntities);
     if (this.multiFocus) {
       const hasMultiSvg = !!document.querySelector(`${this.rootKlassMulti} .${_list_graph.LIST_BRUSH_SVG_GRAPH.MULTI}`);
       if (!hasMultiSvg) {
@@ -468,7 +482,7 @@ class ViewerLineRect extends _react.default.Component {
         hplcMsSt,
         tTrEndPts,
         layoutSt,
-        sweepExtentSt: sweepExtent[1],
+        sweepExtentSt: withSeededExtent(sweepExtent[1], seededXExtent),
         isUiAddIntgSt,
         isUiNoBrushSt,
         uiSt,
@@ -677,7 +691,7 @@ class ViewerLineRect extends _react.default.Component {
       } = currentData;
       uvvisSeed = toSeed(x, y);
     }
-    this.maybeSeedUnionXExtent(layoutSt, uvvisSeed, ticEntities);
+    const seededXExtent = this.maybeSeedUnionXExtent(layoutSt, uvvisSeed, ticEntities);
     (0, _draw.drawMain)(this.rootKlassLine, sizes.line.width, sizes.line.height, _list_graph.LIST_BRUSH_SVG_GRAPH.LINE);
     this.lineFocus.create({
       filterSeed: uvvisSeed,
@@ -685,7 +699,7 @@ class ViewerLineRect extends _react.default.Component {
       tTrEndPts,
       layoutSt,
       isUiNoBrushSt: true,
-      sweepExtentSt: sweepExtent[0],
+      sweepExtentSt: withSeededExtent(sweepExtent[0], seededXExtent),
       integrationSt,
       isUiAddIntgSt,
       editPeakSt,
@@ -701,7 +715,7 @@ class ViewerLineRect extends _react.default.Component {
       hplcMsSt,
       tTrEndPts,
       layoutSt,
-      sweepExtentSt: sweepExtent[1],
+      sweepExtentSt: withSeededExtent(sweepExtent[1], seededXExtent),
       isUiAddIntgSt,
       isUiNoBrushSt
     });
@@ -748,19 +762,26 @@ class ViewerLineRect extends _react.default.Component {
   // zoom (sweepExtent no longer matching our last seed) is never overridden.
   // Skips seeding while either side has no data yet, rather than committing a
   // partial union that would get stuck once one side's data arrives late.
+  //
+  // Returns the union whenever it dispatches a new one, so the caller can use
+  // it directly for the panes' create()/update() calls in this same render —
+  // dispatching alone wouldn't reach this.props until the next render, and
+  // building create()/update() from the still-stale (pre-dispatch) sweepExtent
+  // would auto-fit each pane to only its own data for one visible frame.
   maybeSeedUnionXExtent(layoutSt, uvvisSeed, ticEntities) {
     const {
       uiSt,
       seedLcmsUnionExtentAct
     } = this.props;
     const sweepExtent = uiSt?.zoom?.sweepExtent;
-    if (!Array.isArray(sweepExtent)) return;
+    if (!Array.isArray(sweepExtent)) return null;
     const isOursOrUnset = entry => !entry?.xExtent || sameXExtent(entry.xExtent, this.lastSeededXExtent);
-    if (!isOursOrUnset(sweepExtent[0]) || !isOursOrUnset(sweepExtent[1])) return;
+    if (!isOursOrUnset(sweepExtent[0]) || !isOursOrUnset(sweepExtent[1])) return null;
     const unionXExtent = computeLcmsUnionXExtent(layoutSt, uvvisSeed, ticEntities);
-    if (!unionXExtent || sameXExtent(unionXExtent, this.lastSeededXExtent)) return;
+    if (!unionXExtent || sameXExtent(unionXExtent, this.lastSeededXExtent)) return null;
     this.lastSeededXExtent = unionXExtent;
     seedLcmsUnionExtentAct(unionXExtent);
+    return unionXExtent;
   }
   extractUvvisView() {
     const {

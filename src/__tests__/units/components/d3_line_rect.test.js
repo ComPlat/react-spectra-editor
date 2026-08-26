@@ -402,18 +402,31 @@ describe('ViewerLineRect.maybeSeedUnionXExtent', () => {
     return instance;
   };
 
-  it('seeds the union when both panes are still unset', () => {
+  it('seeds the union when both panes are still unset, and returns it', () => {
     const instance = buildInstance([
       { xExtent: false, yExtent: false },
       { xExtent: false, yExtent: false },
     ]);
 
-    instance.maybeSeedUnionXExtent(layoutSt, uvvisSeed, ticEntities);
+    const returned = instance.maybeSeedUnionXExtent(layoutSt, uvvisSeed, ticEntities);
 
     const expected = computeLcmsUnionXExtent(layoutSt, uvvisSeed, ticEntities);
     expect(instance.props.seedLcmsUnionExtentAct).toHaveBeenCalledTimes(1);
     expect(instance.props.seedLcmsUnionExtentAct).toHaveBeenCalledWith(expected);
     expect(instance.lastSeededXExtent).toEqual(expected);
+    // Review finding S12: the caller needs this return value to use the freshly
+    // seeded extent for the *current* render's create()/update() calls,
+    // rather than the still-stale (pre-dispatch) sweepExtent from props.
+    expect(returned).toEqual(expected);
+  });
+
+  it('returns null (nothing to apply this render) when it does not seed', () => {
+    const instance = buildInstance([
+      { xExtent: { xL: 0, xU: 1 }, yExtent: false },
+      { xExtent: false, yExtent: false },
+    ]);
+
+    expect(instance.maybeSeedUnionXExtent(layoutSt, uvvisSeed, ticEntities)).toBeNull();
   });
 
   it('does not seed when an xExtent is present and does not match our last seed (a real user zoom)', () => {
@@ -595,6 +608,22 @@ describe('ViewerLineRect componentDidMount/componentDidUpdate wiring (S5)', () =
     expect(instance.multiFocus.create).toHaveBeenCalledTimes(1);
   });
 
+  // Review finding S12: dispatching the seed doesn't update this.props until
+  // the next render, so building create()'s sweepExtentSt from the still-stale
+  // (pre-dispatch) sweepExtent[0]/[1] — both still { xExtent: false } — would
+  // make each pane auto-fit to only its own data for one visible frame before
+  // the follow-up componentDidUpdate corrects them to the union.
+  it('componentDidMount passes the freshly seeded extent into both create() calls in the same render, not a stale false', () => {
+    const instance = buildInstance(unsetSweepExtent());
+
+    instance.componentDidMount();
+
+    const lineSweepExtentSt = instance.lineFocus.create.mock.calls[0][0].sweepExtentSt;
+    const multiSweepExtentSt = instance.multiFocus.create.mock.calls[0][0].sweepExtentSt;
+    expect(lineSweepExtentSt.xExtent).toEqual(expectedUnion);
+    expect(multiSweepExtentSt.xExtent).toEqual(expectedUnion);
+  });
+
   it('componentDidMount does not seed once a real zoom/seed already set an xExtent', () => {
     const sweepExtent = unsetSweepExtent();
     sweepExtent[0] = { xExtent: { xL: 0, xU: 1 }, yExtent: false };
@@ -614,6 +643,17 @@ describe('ViewerLineRect componentDidMount/componentDidUpdate wiring (S5)', () =
     expect(instance.props.seedLcmsUnionExtentAct).toHaveBeenCalledWith(expectedUnion);
     expect(instance.lineFocus.update).toHaveBeenCalledTimes(1);
     expect(instance.multiFocus.update).toHaveBeenCalledTimes(1);
+  });
+
+  it('componentDidUpdate passes the freshly seeded extent into both update() calls in the same render, not a stale false', () => {
+    const instance = buildInstance(unsetSweepExtent());
+
+    instance.componentDidUpdate(instance.props);
+
+    const lineSweepExtentSt = instance.lineFocus.update.mock.calls[0][0].sweepExtentSt;
+    const multiSweepExtentSt = instance.multiFocus.update.mock.calls[0][0].sweepExtentSt;
+    expect(lineSweepExtentSt.xExtent).toEqual(expectedUnion);
+    expect(multiSweepExtentSt.xExtent).toEqual(expectedUnion);
   });
 
   it('componentDidUpdate does not re-seed once one graph already has an xExtent', () => {
