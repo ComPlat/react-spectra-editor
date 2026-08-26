@@ -456,6 +456,84 @@ const extrSpectraMs = (jcamp, layout) => {
     return '';
   };
 
+  // jcamp.info.UNITS is the whole ##UNITS= line for every variable (X, Y, and
+  // often an implicit leading one — e.g. the NTUPLES page var — not listed in
+  // ##SYMBOL= at all), so substring-scanning the concatenated line for
+  // "SECOND"/"MINUTE" can match a Y-unit like "COUNTS PER SECOND" and
+  // misclassify an unrelated X-axis. Resolve only the token ##SYMBOL= says
+  // belongs to X, tolerating that common one-token UNITS/SYMBOL length
+  // mismatch (units[0] is the unlabeled variable's unit, X starts at units[1]).
+  const resolveJcampXUnit = (jcampInfo) => {
+    const { UNITS, SYMBOL } = jcampInfo || {};
+    if (!UNITS || !SYMBOL) return '';
+    const unitsString = Array.isArray(UNITS) ? UNITS[0] : UNITS;
+    const symbolString = Array.isArray(SYMBOL) ? SYMBOL[0] : SYMBOL;
+    const units = String(unitsString).split(',').map((u) => u.trim());
+    const symbols = String(symbolString).split(',').map((s) => s.trim().toUpperCase());
+    const xIdx = symbols.indexOf('X');
+    if (xIdx === -1) return '';
+    const offset = units.length === symbols.length + 1 ? 1 : 0;
+    return units[xIdx + offset] || '';
+  };
+
+  const jcampUnitsField = resolveJcampXUnit(jcamp?.info).toUpperCase();
+  const jcampUnitsIndicatesMinutes = jcampUnitsField.includes('MINUTE');
+  const jcampUnitsIndicatesSeconds = jcampUnitsField.includes('SECOND');
+
+  const getMaxAbsX = (data) => {
+    const xs = data?.[0]?.x;
+    if (!Array.isArray(xs) || xs.length === 0) return 0;
+    return xs.reduce((max, value) => {
+      const abs = Math.abs(Number(value));
+      return Number.isFinite(abs) && abs > max ? abs : max;
+    }, 0);
+  };
+
+  // LC-MS time axes (UVVIS and TIC alike) are tagged MINUTES, an explicit
+  // SECONDS, or an ambiguous "RETENTION TIME" that different exporters use for
+  // either unit. Only convert when nothing explicitly says MINUTES, and either
+  // SECONDS is explicit or the values themselves look like seconds (>60).
+  //
+  // The >60 magnitude fallback assumes no LC run runs longer than 60 minutes:
+  // an ambiguously-tagged, untagged-units 90-minute run reads as seconds and
+  // gets divided down to 1.5 minutes — wrong, but self-consistent, since this
+  // PR applies the same rule to both the TIC and UVVIS panes. Widening this
+  // threshold needs a real long-run fixture to weigh against short-run false
+  // positives, not a speculative bump — see issue #619's review (S11).
+  const resolveSecToMinScale = (spectrum) => {
+    const xUnitUpper = String(spectrum?.xUnit || '').toUpperCase();
+    const isExplicitMinutes = xUnitUpper.includes('MINUTE') || jcampUnitsIndicatesMinutes;
+    const isExplicitSeconds = xUnitUpper.includes('SECOND') || jcampUnitsIndicatesSeconds;
+    const isTimeAxis = xUnitUpper.includes('TIME') || xUnitUpper.includes('SECOND');
+    const dataLooksLikeSeconds = getMaxAbsX(spectrum?.data) > 60;
+    const needsSecToMin = isTimeAxis
+      && !isExplicitMinutes
+      && (isExplicitSeconds || dataLooksLikeSeconds);
+    return needsSecToMin ? (1 / 60) : 1;
+  };
+
+  // An m/z page's ##PAGE=T=... retention-time marker has no xUnit of its own
+  // (the spectrum's own xUnit is m/z) — it's expressed in whatever unit the
+  // sibling TIC axis uses, with no unit tag on the value itself. Reuse the
+  // same jcamp.info.UNITS override, and fall back to the value's own
+  // magnitude — the same ">60 minutes never happens" assumption as
+  // resolveSecToMinScale above, and the same caveat applies.
+  const resolvePageMinuteScale = (pageValue) => {
+    if (!Number.isFinite(pageValue)) return 1;
+    if (jcampUnitsIndicatesMinutes) return 1;
+    if (jcampUnitsIndicatesSeconds || Math.abs(pageValue) > 60) return 1 / 60;
+    return 1;
+  };
+
+  // Scale every data block's x, not only data[0]: a spectrum can carry more
+  // than one block, and rebuilding `data` as [data[0]] would silently drop the
+  // rest along with the conversion.
+  const scaleSpectrumDataX = (data, scale) => (data || []).map((block) => (
+    Array.isArray(block?.x)
+      ? Object.assign({}, block, { x: block.x.map((value) => value * scale) })
+      : block
+  ));
+
   if (isUvvisData) {
     const spectraList = jcamp.spectra || [];
     const uvvisSpectra = [];
@@ -511,29 +589,10 @@ const extrSpectraMs = (jcamp, layout) => {
 
     const container = jcamp?.info?.$OBSERVEDINTEGRALS ?? null;
 
-    const jcampUnitsField = String(jcamp?.info?.UNITS || '').toUpperCase();
-    const jcampUnitsIndicatesMinutes = jcampUnitsField.includes('MINUTE');
-    const jcampUnitsIndicatesSeconds = jcampUnitsField.includes('SECOND');
-
-    const getMaxAbsX = (data) => {
-      const xs = data?.[0]?.x;
-      if (!Array.isArray(xs) || xs.length === 0) return 0;
-      return xs.reduce((max, value) => {
-        const abs = Math.abs(Number(value));
-        return Number.isFinite(abs) && abs > max ? abs : max;
-      }, 0);
-    };
-
     uvvisSpectra.forEach(({ spectrum }, pairIdx) => {
-      const xUnitUpper = String(spectrum?.xUnit || '').toUpperCase();
-      const isExplicitMinutes = xUnitUpper.includes('MINUTE') || jcampUnitsIndicatesMinutes;
-      const isExplicitSeconds = xUnitUpper.includes('SECOND') || jcampUnitsIndicatesSeconds;
-      const isTimeAxis = xUnitUpper.includes('TIME') || xUnitUpper.includes('SECOND');
-      const dataLooksLikeSeconds = getMaxAbsX(spectrum?.data) > 60;
-      const needsSecToMin = isTimeAxis
-        && !isExplicitMinutes
-        && (isExplicitSeconds || dataLooksLikeSeconds);
-      const scaleX = (value) => (needsSecToMin ? value / 60 : value);
+      const minuteScale = resolveSecToMinScale(spectrum);
+      const needsSecToMin = minuteScale !== 1;
+      const scaleX = (value) => value * minuteScale;
       const pageKey = spectrum.pageValue ?? spectrum.page;
       const peakTable = peakTablesByPage.get(pageKey);
       let selectedPeakTable = null;
@@ -547,11 +606,9 @@ const extrSpectraMs = (jcamp, layout) => {
         selectedPeakTable = peakTable?.edit || peakTable?.auto || peakTable?.other || null;
       }
 
-      const originalData = spectrum?.data?.[0];
-      let normalizedData = spectrum.data;
-      if (needsSecToMin && originalData?.x) {
-        normalizedData = [{ ...originalData, x: originalData.x.map(scaleX) }];
-      }
+      const normalizedData = needsSecToMin
+        ? scaleSpectrumDataX(spectrum.data, minuteScale)
+        : spectrum.data;
 
       const mainSpectrum = {
         ...spectrum,
@@ -580,14 +637,29 @@ const extrSpectraMs = (jcamp, layout) => {
     (jcamp.spectra || []).forEach((s) => {
       const hasPoints = s?.data?.[0]?.x?.length > 0;
       if (hasPoints) {
-        finalSpectra.push({ ...s, csCategory: inferLcMsCategory(s, jcamp) });
+        const minuteScale = resolveSecToMinScale(s);
+        const data = minuteScale === 1 ? s.data : scaleSpectrumDataX(s.data, minuteScale);
+        finalSpectra.push({ ...s, data, csCategory: inferLcMsCategory(s, jcamp) });
       }
     });
   } else {
+    // Only LC-MS group entities (m/z pages paired with a TIC/UVVIS sibling)
+    // get their page value minute-normalized here — a standalone MS/GC-MS
+    // layout's ##PAGE= can mean something else entirely (scan number,
+    // precursor m/z, or a retention time already self-consistent within
+    // that file), so leave it untouched outside the LC-MS group case.
+    const isLcmsGroupLayout = layout === LIST_LAYOUT.LC_MS;
     (jcamp.spectra || []).forEach((s) => {
       const hasPoints = s?.data?.[0]?.x?.length > 0;
       if (hasPoints) {
-        finalSpectra.push({ ...s, csCategory: inferLcMsCategory(s, jcamp) });
+        let spectrum = s;
+        if (isLcmsGroupLayout) {
+          const pageScale = resolvePageMinuteScale(s?.pageValue);
+          if (pageScale !== 1) {
+            spectrum = { ...s, pageValue: s.pageValue * pageScale };
+          }
+        }
+        finalSpectra.push({ ...spectrum, csCategory: inferLcMsCategory(s, jcamp) });
       }
     });
   }

@@ -12,6 +12,29 @@ import { LIST_SHIFT_1H } from "../../../constants/list_shift";
 import { LIST_LAYOUT } from "../../../constants/list_layout";
 import emissionsJcamp from "../../fixtures/emissions_jcamp";
 import dlsAcfJcamp from "../../fixtures/dls_acf_jcamp";
+import lcMsTicChemstationJcamp from "../../fixtures/lc_ms_jcamp_tic_chemstation";
+import lcMsMzChemstationJcamp from "../../fixtures/lc_ms_jcamp_mz_chemstation";
+
+const buildTicJcamp = ({
+  xUnits, unitsLine = '', xValues, yValues,
+}: { xUnits: string, unitsLine?: string, xValues: number[], yValues: number[] }) => {
+  const lines = [
+    '##TITLE=Spectrum',
+    '##JCAMP-DX=5.00',
+    '##DATA TYPE=MASS TIC',
+    '##DATA CLASS=XYPOINTS',
+    `##XUNITS=${xUnits}`,
+    '##YUNITS=COUNTS',
+    ...(unitsLine ? [unitsLine] : []),
+    `##FIRSTX=${xValues[0]}`,
+    `##LASTX=${xValues[xValues.length - 1]}`,
+    `##NPOINTS=${xValues.length}`,
+    '##XYDATA=(XY..XY)',
+    ...xValues.map((x, i) => `${x}, ${yValues[i]}`),
+    '##END=',
+  ];
+  return `\n${lines.join('\n')}\n`;
+};
 
 function checkExtractSucceed(extractedData: any, forLayout: string) {
   const { spectra, features, layout } = extractedData
@@ -636,5 +659,115 @@ describe('Test for chem helper', () => {
       const offset = GetCyclicVoltaPreviousShift(voltaDataNoRef, 0)
       expect(offset).toEqual(-0.5)
     })
+  })
+
+  describe('Test TIC seconds-to-minutes normalization (issue #619)', () => {
+    it('leaves TIC x unchanged when XUNITS is explicit MINUTES, even past 60', () => {
+      const jcamp = buildTicJcamp({
+        xUnits: 'MINUTES',
+        xValues: [61, 90, 120],
+        yValues: [1, 2, 3],
+      });
+      const entity: any = ExtractJcamp(jcamp);
+      expect(entity.features[0].data[0].x).toEqual([61, 90, 120]);
+    });
+
+    it('scales TIC x to minutes when XUNITS is explicit SECONDS, even under 60', () => {
+      const jcamp = buildTicJcamp({
+        xUnits: 'SECONDS',
+        xValues: [6, 12, 18],
+        yValues: [1, 2, 3],
+      });
+      const entity: any = ExtractJcamp(jcamp);
+      const x = entity.features[0].data[0].x;
+      [0.1, 0.2, 0.3].forEach((expected, i) => expect(x[i]).toBeCloseTo(expected));
+    });
+
+    it('does not scale an ambiguous RETENTION TIME tag when values already look like minutes (<=60)', () => {
+      const jcamp = buildTicJcamp({
+        xUnits: 'RETENTION TIME',
+        xValues: [1.12, 7.5, 13.98],
+        yValues: [1, 2, 3],
+      });
+      const entity: any = ExtractJcamp(jcamp);
+      expect(entity.features[0].data[0].x).toEqual([1.12, 7.5, 13.98]);
+    });
+
+    it('scales an ambiguous RETENTION TIME tag when values look like seconds (>60)', () => {
+      const jcamp = buildTicJcamp({
+        xUnits: 'RETENTION TIME',
+        xValues: [60, 300, 600],
+        yValues: [1, 2, 3],
+      });
+      const entity: any = ExtractJcamp(jcamp);
+      const x = entity.features[0].data[0].x;
+      [1, 5, 10].forEach((expected, i) => expect(x[i]).toBeCloseTo(expected));
+    });
+
+    // Review finding S10: jcampUnitsIndicatesSeconds used to substring-scan the
+    // *whole* ##UNITS= line (X and Y units concatenated), so a Y-unit like
+    // "COUNTS PER SECOND" satisfied it and — because it short-circuits the
+    // magnitude guard via `isExplicitSeconds || dataLooksLikeSeconds` — divided
+    // an already-minutes, well-under-60 x-axis by 60 anyway. The fix resolves
+    // only the ##SYMBOL=-indexed X token instead of the concatenated line.
+    it("does not scale an already-minutes TIC x when only the Y unit's ##UNITS= token mentions seconds", () => {
+      const jcamp = buildTicJcamp({
+        xUnits: 'RETENTION TIME',
+        unitsLine: '##SYMBOL=X, Y\n##UNITS=, RETENTION TIME, COUNTS PER SECOND',
+        xValues: [1.12, 7.5, 13.98],
+        yValues: [1, 2, 3],
+      });
+      const entity: any = ExtractJcamp(jcamp);
+      expect(entity.features[0].data[0].x).toEqual([1.12, 7.5, 13.98]);
+    });
+
+    it('still scales when the X token itself (by ##SYMBOL= position) says seconds', () => {
+      const jcamp = buildTicJcamp({
+        xUnits: 'RETENTION TIME',
+        unitsLine: '##SYMBOL=X, Y\n##UNITS=SECONDS, COUNTS',
+        xValues: [6, 12, 18],
+        yValues: [1, 2, 3],
+      });
+      const entity: any = ExtractJcamp(jcamp);
+      const x = entity.features[0].data[0].x;
+      [0.1, 0.2, 0.3].forEach((expected, i) => expect(x[i]).toBeCloseTo(expected));
+    });
+
+    it('regression: retagging the chemstation TIC fixture like its sibling UVVIS fixture must not collapse its native-minutes range', () => {
+      // lc_ms_jcamp_uvvis_chemstation.js tags its (already-minutes) data this same way:
+      // ##XUNITS=RETENTION TIME plus a global ##UNITS=, MINUTES, ARBITRARY UNITS line.
+      const retagged = lcMsTicChemstationJcamp
+        .replace(/##XUNITS=MINUTES/g, '##XUNITS=RETENTION TIME')
+        .replace('##DATA CLASS=XYPOINTS', '##DATA CLASS=XYPOINTS\n##UNITS=, MINUTES, ARBITRARY UNITS');
+      const entity: any = ExtractJcamp(retagged);
+      const x = entity.features[0].data[0].x;
+      expect(x[0]).toBeCloseTo(1.1228, 3);
+      expect(x[x.length - 1]).toBeCloseTo(13.9829, 3);
+    });
+  })
+
+  // Review finding B3: resolveSecToMinScale only rescaled a TIC/UVVIS
+  // spectrum's data[0].x. An m/z entity's ##PAGE=T=... retention-time marker
+  // goes through a separate path (parseChemstationPages / the ntuples
+  // rebuild) that never touched it, so a seconds-tagged m/z sibling could
+  // still carry a raw-seconds page value even after the TIC axis itself was
+  // fixed — see the reducer-level regression in reducer_hplc_ms.test.tsx for
+  // how that clobbered tic.currentPageValue.
+  describe('Test m/z ##PAGE=T=... minute normalization (issue #619 / B3)', () => {
+    it('leaves already-minutes ##PAGE values unchanged', () => {
+      const entity: any = ExtractJcamp(lcMsMzChemstationJcamp);
+      expect(entity.features[0].pageValue).toBeCloseTo(1.1228166666666666);
+      expect(entity.features[1].pageValue).toBeCloseTo(1.1384333333333334);
+    });
+
+    it('scales ##PAGE values to minutes when they look like seconds (>60)', () => {
+      const secondsTaggedMz = lcMsMzChemstationJcamp.replace(
+        /##PAGE=T= ([\d.]+)/g,
+        (_match, num) => `##PAGE=T= ${Number(num) * 60}`,
+      );
+      const entity: any = ExtractJcamp(secondsTaggedMz);
+      expect(entity.features[0].pageValue).toBeCloseTo(1.1228166666666666);
+      expect(entity.features[1].pageValue).toBeCloseTo(1.1384333333333334);
+    });
   })
 })

@@ -14,6 +14,7 @@ var _format = _interopRequireDefault(require("../../helpers/format"));
 var _list_graph = require("../../constants/list_graph");
 var _chem = require("../../helpers/chem");
 var _extractEntityLCMS = require("../../helpers/extractEntityLCMS");
+var _resolve_extent = require("../../helpers/resolve_extent");
 /* eslint-disable no-unused-vars, prefer-object-spread, no-mixed-operators,
 no-unneeded-ternary, arrow-body-style, max-len */
 
@@ -256,20 +257,10 @@ class MultiFocus {
       }
     }
     if (!xExtent) {
-      const xes = d3.extent(allData, d => d.x).sort((a, b) => a - b);
-      xExtent = {
-        xL: xes[0],
-        xU: xes[1]
-      };
+      xExtent = (0, _resolve_extent.resolveXExtent)(allData, d => d.x);
     }
     if (!yExtent) {
-      const btm = d3.min(allData, d => d.y);
-      const top = d3.max(allData, d => d.y);
-      const height = top - btm;
-      yExtent = {
-        yL: btm - this.factor * height,
-        yU: top + this.factor * height
-      };
+      yExtent = (0, _resolve_extent.resolveYExtent)(allData, d => d.y, this.factor);
     }
     this.scales.x.domain([xExtent.xL, xExtent.xU]);
     this.scales.y.domain([yExtent.yL, yExtent.yU]);

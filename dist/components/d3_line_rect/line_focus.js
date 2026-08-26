@@ -17,6 +17,7 @@ var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
 var _format = _interopRequireDefault(require("../../helpers/format"));
 var _integration = require("../../helpers/integration");
 var _list_ui = require("../../constants/list_ui");
+var _resolve_extent = require("../../helpers/resolve_extent");
 /* eslint-disable prefer-object-spread, no-mixed-operators */
 
 const d3 = require('d3');
@@ -184,20 +185,10 @@ class LineFocus {
       yExtent: false
     };
     if (!xExtent) {
-      const xes = d3.extent(this.data, d => d.x).sort((a, b) => a - b);
-      xExtent = {
-        xL: xes[0],
-        xU: xes[1]
-      };
+      xExtent = (0, _resolve_extent.resolveXExtent)(this.data, d => d.x);
     }
     if (!yExtent) {
-      const btm = d3.min(this.data, d => d.y);
-      const top = d3.max(this.data, d => d.y);
-      const height = top - btm;
-      yExtent = {
-        yL: btm - this.factor * height,
-        yU: top + this.factor * height
-      };
+      yExtent = (0, _resolve_extent.resolveYExtent)(this.data, d => d.y, this.factor);
     }
     this.scales.x.domain([xExtent.xL, xExtent.xU]);
     this.scales.y.domain([yExtent.yL, yExtent.yU]);

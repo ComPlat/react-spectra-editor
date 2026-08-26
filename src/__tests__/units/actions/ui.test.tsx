@@ -4,6 +4,7 @@ import {
   selectUiSweep,
   setUiSweepType,
   setUiViewerType,
+  seedLcmsUnionExtent,
 } from "../../../actions/ui";
 import { UI } from "../../../constants/action_type";
 import { LIST_UI_SWEEP_TYPE } from "../../../constants/list_ui";
@@ -59,5 +60,19 @@ describe('Test redux action for ui', () => {
     expect(action.type).toEqual(UI.SWEEP.SET_TYPE);
     expect(action.payload).toEqual(LIST_UI_SWEEP_TYPE.INTEGRATION_ADD);
     expect(action.jcampIdx).toEqual(2);
+  });
+
+  it('seeds the LC-MS union x-extent onto graph 0 and mirrors it onto graph 1', () => {
+    const xExtent = { xL: 1.12, xU: 19.96 };
+    const action = seedLcmsUnionExtent(xExtent);
+    expect(action).toEqual({
+      type: UI.SWEEP.SELECT_ZOOMIN,
+      payload: {
+        graphIndex: 0,
+        zoomValue: { xExtent, yExtent: false },
+        lcmsSyncX: 1,
+        keepGraphIndex: true,
+      },
+    });
   });
 })

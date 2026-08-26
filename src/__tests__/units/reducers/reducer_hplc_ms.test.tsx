@@ -1,5 +1,7 @@
 import hplcMsReducer from "../../../reducers/reducer_hplc_ms";
 import { CURVE, HPLC_MS } from "../../../constants/action_type";
+import { ExtractJcamp } from "../../../helpers/chem";
+import lcMsMzChemstationJcamp from "../../fixtures/lc_ms_jcamp_mz_chemstation";
 
 const createTicCurve = (polarity: 'positive' | 'negative' | 'neutral', x = [1, 2], y = [10, 20]) => ({
   csCategory: ['tic', polarity],
@@ -425,5 +427,99 @@ describe('Test redux reducer_hplc_ms', () => {
     expect(state.uvvisEditHistory.future.length).toEqual(1);
     state = hplcMsReducer(state, { type: HPLC_MS.UVVIS_REDO } as any);
     expect(state.uvvis.spectraList[0].peaks.length).toEqual(origPeaks.length + 1);
+  });
+
+  describe('TIC minute normalization reaches hplcMs state, not just listCurves.topic (issue #619)', () => {
+    // Minute normalization happens once, in chem.js's extrSpectraMs, on the raw
+    // parsed spectra — before entity.features/entity.spectra exist. Building
+    // curves by hand (like createTicCurve above) bypasses that step entirely, so
+    // this exercises the real ExtractJcamp parse to prove the fix reaches every
+    // consumer of entity.features, not only the topic/feature extractParams builds.
+    const buildTicJcamp = (xUnits: string, xValues: number[], yValues: number[]) => {
+      const lines = [
+        '##TITLE=Spectrum',
+        '##JCAMP-DX=5.00',
+        '##DATA TYPE=MASS TIC',
+        '##DATA CLASS=XYPOINTS',
+        `##XUNITS=${xUnits}`,
+        '##YUNITS=COUNTS',
+        `##FIRSTX=${xValues[0]}`,
+        `##LASTX=${xValues[xValues.length - 1]}`,
+        `##NPOINTS=${xValues.length}`,
+        '##XYDATA=(XY..XY)',
+        ...xValues.map((x, i) => `${x}, ${yValues[i]}`),
+        '##END=',
+      ];
+      return `\n${lines.join('\n')}\n`;
+    };
+
+    const uvvisJcamp = `
+
+$$ === CHEMSPECTRA UVVIS PEAK TABLE ===
+##TITLE=probe-uvvis
+##JCAMP-DX=5.00
+##DATA TYPE=LC/MS
+##DATA CLASS=PEAK TABLE
+##SYMBOL=X, Y
+##XUNITS=MINUTES
+##YUNITS=DETECTOR SIGNAL
+##$CSCATEGORY=UVVIS PEAK TABLE
+##PAGE=210.0
+##NPOINTS=3
+##DATA TABLE= (XY..XY), PEAKS
+1.0, 10;
+5.0, 20;
+14.0, 30;
+##END=
+`;
+
+    it('a seconds-tagged TIC ends up minutes-scaled in state.hplcMs.tic and currentPageValue', () => {
+      const ticEntity = ExtractJcamp(buildTicJcamp('SECONDS', [67.369, 450, 838.976], [100, 200, 300]));
+      const uvvisEntity = ExtractJcamp(uvvisJcamp);
+
+      const state: any = hplcMsReducer(undefined, {
+        type: CURVE.SET_ALL_CURVES,
+        payload: [ticEntity, uvvisEntity],
+      } as any);
+
+      expect(state.tic.polarity).toEqual('neutral');
+      const x = state.tic.neutral.data.x;
+      [1.1228166666666666, 7.5, 13.982933333333333].forEach((expected, i) => {
+        expect(x[i]).toBeCloseTo(expected);
+      });
+      // the auto-selected retention time must be the minutes value, not the raw 67.369 seconds
+      expect(state.tic.currentPageValue).toBeCloseTo(1.1228166666666666);
+    });
+
+    // Review finding B3: resolveSecToMinScale only rescaled data[0].x. An m/z
+    // entity's ##PAGE=T=... retention-time markers go through a separate code
+    // path (parseChemstationPages / the ntuples rebuild) that never touched
+    // them, and hydrate.js unconditionally overrides tic.currentPageValue with
+    // that raw page value whenever an m/z feature yields one — so even after
+    // the TIC axis itself was fixed, a seconds-tagged m/z sibling could still
+    // clobber currentPageValue with an unscaled seconds number.
+    it("an m/z entity's seconds-tagged ##PAGE values do not clobber tic.currentPageValue with a raw-seconds RT (B3)", () => {
+      const ticEntity = ExtractJcamp(buildTicJcamp('SECONDS', [67.369, 450, 838.976], [100, 200, 300]));
+      const uvvisEntity = ExtractJcamp(uvvisJcamp);
+      // lc_ms_jcamp_mz_chemstation's own ##PAGE=T= values are already minutes
+      // (its first page, 1.1228166666666666, matches lc_ms_jcamp_tic_chemstation's
+      // ##FIRSTX exactly) — multiply them by 60 to simulate the seconds-tagged
+      // case the bug report describes.
+      const secondsTaggedMz = lcMsMzChemstationJcamp.replace(
+        /##PAGE=T= ([\d.]+)/g,
+        (_match: string, num: string) => `##PAGE=T= ${Number(num) * 60}`,
+      );
+      const mzEntity = ExtractJcamp(secondsTaggedMz);
+
+      const state: any = hplcMsReducer(undefined, {
+        type: CURVE.SET_ALL_CURVES,
+        payload: [ticEntity, mzEntity, uvvisEntity],
+      } as any);
+
+      expect(state.tic.neutral.data.x[0]).toBeCloseTo(1.1228166666666666);
+      // the m/z feature's retention time must be minutes-consistent with the
+      // TIC axis, not the raw 67.369-second page value it was tagged with.
+      expect(state.tic.currentPageValue).toBeCloseTo(1.1228166666666666);
+    });
   });
 });

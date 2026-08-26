@@ -16,11 +16,11 @@ import RedoIcon from '@mui/icons-material/Redo';
 import { MuButton, commonStyle, focusStyle } from '../cmd_bar/common';
 
 import {
-  ToThresEndPts, convertThresEndPts,
+  ToThresEndPts, convertThresEndPts, convertTopic,
 } from '../../helpers/chem';
 import { resetAll } from '../../actions/manager';
 import {
-  selectUiSweep, scrollUiWheel, clickUiTarget, setUiSweepType,
+  selectUiSweep, scrollUiWheel, clickUiTarget, setUiSweepType, seedLcmsUnionExtent,
 } from '../../actions/ui';
 import {
   selectWavelength, changeTic, updateCurrentPageValue, uvvisUndo, uvvisRedo,
@@ -45,6 +45,8 @@ import Threshold from '../cmd_bar/r03_threshold';
 import Integration from '../cmd_bar/04_integration';
 import Peak from '../cmd_bar/03_peak';
 import { getLcMsInfo } from '../../helpers/extractEntityLCMS';
+
+const d3 = require('d3');
 
 // Fallback viewBox, used only until the panes can be measured (and in jsdom, where
 // clientWidth/clientHeight are 0).
@@ -85,7 +87,7 @@ export const sameSizes = (a, b) => Boolean(a) && Boolean(b)
     && Math.abs(a[k].height - b[k].height) <= SIZE_EPSILON
   ));
 
-const toSeed = (xValues = [], yValues = []) => {
+export const toSeed = (xValues = [], yValues = []) => {
   const maxLength = Math.min(xValues.length, yValues.length);
   const seed = new Array(maxLength);
   for (let index = 0; index < maxLength; index += 1) {
@@ -93,6 +95,63 @@ const toSeed = (xValues = [], yValues = []) => {
   }
   return seed;
 };
+
+// Widen a running [xL, xU] pair (starting at [null, null]) by one d3.extent
+// result. d3.extent is what does the folding: it skips null/undefined/NaN,
+// which a hand-rolled min/max cannot — a single non-finite x would sit in the
+// accumulator forever (every comparison against NaN is false) and pin both
+// panes to a NaN domain that the seed guard then refuses to recompute.
+// convertTopic emits exactly that whenever topic.y outruns topic.x.
+const widenExtent = ([xL, xU], [nextL, nextU]) => (
+  (nextL === undefined || nextU === undefined)
+    ? [xL, xU]
+    : [
+      xL === null ? nextL : Math.min(xL, nextL),
+      xU === null ? nextU : Math.max(xU, nextU),
+    ]
+);
+
+// Mirrors MultiFocus.setDataParams' own guard (multi_focus.js) and reuses
+// convertTopic so an entity that MultiFocus itself would skip (no feature)
+// can't still widen the seeded union — the two panes would otherwise
+// disagree by construction.
+const foldTicXExtent = (layoutSt, ticEntities, extent) => (
+  (ticEntities || []).reduce((acc, entity) => {
+    const { topic, feature } = entity || {};
+    if (!feature || !topic) return acc;
+    return widenExtent(acc, d3.extent(convertTopic(topic, layoutSt, feature, 0), (d) => d.x));
+  }, extent)
+);
+
+// Both LC-MS panes need to agree on one x-domain before any zoom. Rather than
+// having each D3 focus class separately track the other pane's data, compute
+// the union once here and seed it into Redux (seedLcmsUnionExtentAct) — the
+// existing lcmsSyncX mirroring in updateZoom (reducer_ui.js) then keeps both
+// sweepExtent[0]/[1] on that same value, the same path a real zoom uses.
+// Returns null when either side has no data yet, so callers don't commit a
+// partial union that would otherwise get stuck once seeded.
+export const computeLcmsUnionXExtent = (layoutSt, uvvisSeed = [], ticEntities = []) => {
+  if (uvvisSeed.length === 0) return null;
+  const [uvvisXL, uvvisXU] = widenExtent([null, null], d3.extent(uvvisSeed, (d) => d.x));
+  if (uvvisXL === null) return null;
+  const [ticXL, ticXU] = foldTicXExtent(layoutSt, ticEntities, [null, null]);
+  if (ticXL === null) return null;
+  return { xL: Math.min(uvvisXL, ticXL), xU: Math.max(uvvisXU, ticXU) };
+};
+
+// computeLcmsUnionXExtent is a pure fold over the same underlying data each
+// render, so re-deriving an unchanged union yields bit-identical xL/xU —
+// plain equality is enough to tell "nothing changed" from "the data moved".
+export const sameXExtent = (a, b) => (
+  !!a && !!b && a.xL === b.xL && a.xU === b.xU
+);
+
+// When maybeSeedUnionXExtent just dispatched a new union, use it directly for
+// this render's sweepExtentSt instead of the still-stale (pre-dispatch) entry
+// — see maybeSeedUnionXExtent's own comment for why.
+const withSeededExtent = (entry, seededXExtent) => (
+  seededXExtent ? { xExtent: seededXExtent, yExtent: false } : entry
+);
 
 export const isLcmsMsPageLoading = (mzEntities = [], hplcMsSt = {}) => {
   const currentPageValue = hplcMsSt?.tic?.currentPageValue;
@@ -345,11 +404,19 @@ class ViewerLineRect extends React.Component {
     this.rectRef = React.createRef();
     this.resizeObserver = null;
     this.resizeFrame = null;
+    // Kept in step with the focus objects below: whatever sizes they were built from are
+    // the sizes the svg viewBoxes must use, so the two are set together and never drift.
     this.currentSizes = null;
 
     // Nothing is mounted yet, so this resolves to the fallback; componentDidMount
     // re-measures and rebuilds against the real panes.
-    this.createFocuses(this.resolvePaneSizes());
+    this.currentSizes = this.resolvePaneSizes();
+    this.createFocuses(this.currentSizes);
+
+    // The last union we ourselves wrote via seedLcmsUnionExtentAct, so
+    // maybeSeedUnionXExtent can tell "still our seed, safe to update" from "the
+    // user zoomed" without the reducer needing to know anything about it.
+    this.lastSeededXExtent = null;
 
     this.handleResize = this.handleResize.bind(this);
     this.extractSubView = this.extractSubView.bind(this);
@@ -357,6 +424,7 @@ class ViewerLineRect extends React.Component {
     this.extractUvvisView = this.extractUvvisView.bind(this);
     this.handleUvvisUndo = this.handleUvvisUndo.bind(this);
     this.handleUvvisRedo = this.handleUvvisRedo.bind(this);
+    this.maybeSeedUnionXExtent = this.maybeSeedUnionXExtent.bind(this);
   }
 
   componentDidMount() {
@@ -377,6 +445,18 @@ class ViewerLineRect extends React.Component {
     if (!Array.isArray(sweepExtent)) return;
 
     const uvvisViewFeature = this.extractUvvisView();
+    let uvvisSeed = [];
+    if (uvvisViewFeature?.data?.[0]) {
+      const { x, y } = uvvisViewFeature.data[0];
+      uvvisSeed = toSeed(x, y);
+    }
+
+    // Computed once, before either update() call, so both panes can use the
+    // same freshly-seeded value in this render — see maybeSeedUnionXExtent's
+    // own comment for why that matters. Symmetric with mountCharts, which
+    // already calls this before both create() calls.
+    const seededXExtent = this.maybeSeedUnionXExtent(layoutSt, uvvisSeed, ticEntities);
+
     if (uvvisViewFeature?.data?.[0]) {
       const hasLineSvg = !!document.querySelector(
         `${this.rootKlassLine} .${LIST_BRUSH_SVG_GRAPH.LINE}`,
@@ -389,9 +469,6 @@ class ViewerLineRect extends React.Component {
           LIST_BRUSH_SVG_GRAPH.LINE,
         );
       }
-      const currentData = uvvisViewFeature.data[0];
-      const { x, y } = currentData;
-      const uvvisSeed = toSeed(x, y);
       if (this.lineFocus) {
         this.lineFocus.update({
           filterSeed: uvvisSeed,
@@ -399,7 +476,7 @@ class ViewerLineRect extends React.Component {
           tTrEndPts,
           isUiNoBrushSt: true,
           isUiAddIntgSt,
-          sweepExtentSt: sweepExtent[0],
+          sweepExtentSt: withSeededExtent(sweepExtent[0], seededXExtent),
           uiSt,
           layoutSt,
           integrationSt,
@@ -429,7 +506,7 @@ class ViewerLineRect extends React.Component {
         hplcMsSt,
         tTrEndPts,
         layoutSt,
-        sweepExtentSt: sweepExtent[1],
+        sweepExtentSt: withSeededExtent(sweepExtent[1], seededXExtent),
         isUiAddIntgSt,
         isUiNoBrushSt,
         uiSt,
@@ -626,6 +703,7 @@ class ViewerLineRect extends React.Component {
       const { x, y } = currentData;
       uvvisSeed = toSeed(x, y);
     }
+    const seededXExtent = this.maybeSeedUnionXExtent(layoutSt, uvvisSeed, ticEntities);
     drawMain(this.rootKlassLine, sizes.line.width, sizes.line.height, LIST_BRUSH_SVG_GRAPH.LINE);
     this.lineFocus.create({
       filterSeed: uvvisSeed,
@@ -633,7 +711,7 @@ class ViewerLineRect extends React.Component {
       tTrEndPts,
       layoutSt,
       isUiNoBrushSt: true,
-      sweepExtentSt: sweepExtent[0],
+      sweepExtentSt: withSeededExtent(sweepExtent[0], seededXExtent),
       integrationSt,
       isUiAddIntgSt,
       editPeakSt,
@@ -650,7 +728,7 @@ class ViewerLineRect extends React.Component {
       hplcMsSt,
       tTrEndPts,
       layoutSt,
-      sweepExtentSt: sweepExtent[1],
+      sweepExtentSt: withSeededExtent(sweepExtent[1], seededXExtent),
       isUiAddIntgSt,
       isUiNoBrushSt,
     });
@@ -690,6 +768,39 @@ class ViewerLineRect extends React.Component {
       'Intensity',
     );
     drawDisplay(this.rootKlassRect, false);
+  }
+
+  // Seeds sweepExtent[0]/[1] with the same x-domain (via seedLcmsUnionExtentAct,
+  // reusing the existing lcmsSyncX mirroring in updateZoom) whenever both are
+  // still unset (before any zoom, or right after a zoom reset) OR still hold
+  // exactly what we ourselves seeded last time — so a TIC polarity switch (a
+  // different retention-time range, with sweepExtent untouched) keeps tracking
+  // the data instead of freezing on the first-seeded domain, while a real user
+  // zoom (sweepExtent no longer matching our last seed) is never overridden.
+  // Skips seeding while either side has no data yet, rather than committing a
+  // partial union that would get stuck once one side's data arrives late.
+  //
+  // Returns the union whenever it dispatches a new one, so the caller can use
+  // it directly for the panes' create()/update() calls in this same render —
+  // dispatching alone wouldn't reach this.props until the next render, and
+  // building create()/update() from the still-stale (pre-dispatch) sweepExtent
+  // would auto-fit each pane to only its own data for one visible frame.
+  maybeSeedUnionXExtent(layoutSt, uvvisSeed, ticEntities) {
+    const { uiSt, seedLcmsUnionExtentAct } = this.props;
+    const sweepExtent = uiSt?.zoom?.sweepExtent;
+    if (!Array.isArray(sweepExtent)) return null;
+
+    const isOursOrUnset = (entry) => (
+      !entry?.xExtent || sameXExtent(entry.xExtent, this.lastSeededXExtent)
+    );
+    if (!isOursOrUnset(sweepExtent[0]) || !isOursOrUnset(sweepExtent[1])) return null;
+
+    const unionXExtent = computeLcmsUnionXExtent(layoutSt, uvvisSeed, ticEntities);
+    if (!unionXExtent || sameXExtent(unionXExtent, this.lastSeededXExtent)) return null;
+
+    this.lastSeededXExtent = unionXExtent;
+    seedLcmsUnionExtentAct(unionXExtent);
+    return unionXExtent;
   }
 
   extractUvvisView() {
@@ -968,6 +1079,7 @@ const mapDispatchToProps = (dispatch) => (
     updateCurrentPageValueAct: updateCurrentPageValue,
     uvvisUndoAct: uvvisUndo,
     uvvisRedoAct: uvvisRedo,
+    seedLcmsUnionExtentAct: seedLcmsUnionExtent,
   }, dispatch)
 );
 
@@ -998,6 +1110,7 @@ ViewerLineRect.propTypes = {
   updateCurrentPageValueAct: PropTypes.func.isRequired,
   uvvisUndoAct: PropTypes.func.isRequired,
   uvvisRedoAct: PropTypes.func.isRequired,
+  seedLcmsUnionExtentAct: PropTypes.func.isRequired,
   omitUvvisToolbarRow: PropTypes.bool,
   onLcmsPageRequest: PropTypes.func,
 };
@@ -1008,6 +1121,10 @@ ViewerLineRect.defaultProps = {
   omitUvvisToolbarRow: false,
   onLcmsPageRequest: null,
 };
+
+// Unconnected class, exported for direct unit testing (e.g. maybeSeedUnionXExtent)
+// without mounting the full redux-connected component.
+export { ViewerLineRect as UnconnectedViewerLineRect };
 
 // export default connect(mapStateToProps, mapDispatchToProps)(ViewerLineRect);
 export default compose(
