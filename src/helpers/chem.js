@@ -493,6 +493,13 @@ const extrSpectraMs = (jcamp, layout) => {
   // SECONDS, or an ambiguous "RETENTION TIME" that different exporters use for
   // either unit. Only convert when nothing explicitly says MINUTES, and either
   // SECONDS is explicit or the values themselves look like seconds (>60).
+  //
+  // The >60 magnitude fallback assumes no LC run runs longer than 60 minutes:
+  // an ambiguously-tagged, untagged-units 90-minute run reads as seconds and
+  // gets divided down to 1.5 minutes — wrong, but self-consistent, since this
+  // PR applies the same rule to both the TIC and UVVIS panes. Widening this
+  // threshold needs a real long-run fixture to weigh against short-run false
+  // positives, not a speculative bump — see issue #619's review (S11).
   const resolveSecToMinScale = (spectrum) => {
     const xUnitUpper = String(spectrum?.xUnit || '').toUpperCase();
     const isExplicitMinutes = xUnitUpper.includes('MINUTE') || jcampUnitsIndicatesMinutes;
@@ -509,8 +516,8 @@ const extrSpectraMs = (jcamp, layout) => {
   // (the spectrum's own xUnit is m/z) — it's expressed in whatever unit the
   // sibling TIC axis uses, with no unit tag on the value itself. Reuse the
   // same jcamp.info.UNITS override, and fall back to the value's own
-  // magnitude (a page >60 "minutes" into a run is far less likely than one
-  // recorded in seconds).
+  // magnitude — the same ">60 minutes never happens" assumption as
+  // resolveSecToMinScale above, and the same caveat applies.
   const resolvePageMinuteScale = (pageValue) => {
     if (!Number.isFinite(pageValue)) return 1;
     if (jcampUnitsIndicatesMinutes) return 1;
