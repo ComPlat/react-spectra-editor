@@ -72,9 +72,17 @@ export const measurePane = (node) => {
   };
 };
 
+export // A pane whose height is content-derived (any host that does not bound us - the
+// standalone demo included) takes its height from the svg, whose height comes back from
+// the viewBox we are about to set. Re-measuring integer client boxes across that round
+// trip can differ by a pixel without anything really having moved, so require a real
+// change before paying for a remount.
+const SIZE_EPSILON = 2;
+
 export const sameSizes = (a, b) => Boolean(a) && Boolean(b)
   && ['line', 'multi', 'rect'].every((k) => (
-    a[k].width === b[k].width && a[k].height === b[k].height
+    Math.abs(a[k].width - b[k].width) <= SIZE_EPSILON
+    && Math.abs(a[k].height - b[k].height) <= SIZE_EPSILON
   ));
 
 const toSeed = (xValues = [], yValues = []) => {
@@ -336,6 +344,7 @@ class ViewerLineRect extends React.Component {
     this.multiRef = React.createRef();
     this.rectRef = React.createRef();
     this.resizeObserver = null;
+    this.resizeFrame = null;
     this.currentSizes = null;
 
     // Nothing is mounted yet, so this resolves to the fallback; componentDidMount
@@ -497,9 +506,22 @@ class ViewerLineRect extends React.Component {
   // size is the one the current viewBox already produces, so this settles after the first
   // pass instead of feeding itself.
   handleResize() {
-    const sizes = this.resolvePaneSizes();
-    if (sameSizes(sizes, this.currentSizes)) return;
-    this.mountCharts(sizes, false);
+    // Never mutate layout synchronously inside a ResizeObserver callback. The remount
+    // resizes the subtree being observed, and the browser abandons the delivery pass with
+    // "ResizeObserver loop completed with undelivered notifications" - which surfaces as
+    // an uncaught application error, not just a console warning. Deferring to the next
+    // frame lets the observer finish before anything moves.
+    //
+    // d3_multi remounts synchronously and gets away with it because its resize path is
+    // gated to Cyclic Voltammetry, whose container height is fixed by CSS and so cannot
+    // be fed back into by a redraw. This stack has no such guarantee.
+    if (this.resizeFrame != null) return;
+    this.resizeFrame = window.requestAnimationFrame(() => {
+      this.resizeFrame = null;
+      const sizes = this.resolvePaneSizes();
+      if (sameSizes(sizes, this.currentSizes)) return;
+      this.mountCharts(sizes, false);
+    });
   }
 
   handleUvvisUndo() {
@@ -562,6 +584,10 @@ class ViewerLineRect extends React.Component {
   }
 
   teardownResizeObserver() {
+    if (this.resizeFrame != null) {
+      window.cancelAnimationFrame(this.resizeFrame);
+      this.resizeFrame = null;
+    }
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
       this.resizeObserver = null;
@@ -631,16 +657,38 @@ class ViewerLineRect extends React.Component {
     drawLabel(this.rootKlassMulti, null, 'Minutes', 'Intensity');
     drawDisplay(this.rootKlassMulti, isHidden);
 
+    // Seed the m/z pane with the scan that is currently selected rather than with an
+    // empty series. On first mount there is none and this stays [] as before - but a
+    // resize remount happens long after componentDidUpdate has drawn a scan here, and
+    // recreating the pane empty would silently wipe it with nothing to redraw it.
+    const subViewFeature = this.extractSubView();
+    let subSeed = [];
+    let subTrEndPts = tTrEndPts;
+    let subLabel = null;
+    if (subViewFeature?.data?.[0]) {
+      const { x, y } = subViewFeature.data[0];
+      subSeed = toSeed(x, y);
+      subTrEndPts = convertThresEndPts(subViewFeature, hplcMsSt?.threshold?.value);
+      const pageValue = parsePageValue(subViewFeature);
+      subLabel = Number.isFinite(pageValue)
+        ? pageValue
+        : (subViewFeature?.pageValue ?? subViewFeature?.page ?? null);
+    }
     drawMain(this.rootKlassRect, sizes.rect.width, sizes.rect.height, LIST_BRUSH_SVG_GRAPH.RECT);
     this.rectFocus.create({
-      filterSeed: [],
+      filterSeed: subSeed,
       filterPeak: [],
-      tTrEndPts,
+      tTrEndPts: subTrEndPts,
       layoutSt,
       isUiNoBrushSt: true,
       sweepExtentSt: sweepExtent[2],
     });
-    drawLabel(this.rootKlassRect, null, 'm/z', 'Intensity');
+    drawLabel(
+      this.rootKlassRect,
+      subLabel != null ? `${subLabel} min` : null,
+      'm/z',
+      'Intensity',
+    );
     drawDisplay(this.rootKlassRect, false);
   }
 

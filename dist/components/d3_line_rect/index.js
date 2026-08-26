@@ -4,7 +4,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.sameSizes = exports.measurePane = exports.isLcmsMsPageLoading = exports.default = void 0;
+exports.sameSizes = exports.measurePane = exports.isLcmsMsPageLoading = exports.default = exports.SIZE_EPSILON = void 0;
 var _react = _interopRequireDefault(require("react"));
 var _reactRedux = require("react-redux");
 var _redux = require("redux");
@@ -69,7 +69,13 @@ const measurePane = node => {
   };
 };
 exports.measurePane = measurePane;
-const sameSizes = (a, b) => Boolean(a) && Boolean(b) && ['line', 'multi', 'rect'].every(k => a[k].width === b[k].width && a[k].height === b[k].height);
+// A pane whose height is content-derived (any host that does not bound us - the
+// standalone demo included) takes its height from the svg, whose height comes back from
+// the viewBox we are about to set. Re-measuring integer client boxes across that round
+// trip can differ by a pixel without anything really having moved, so require a real
+// change before paying for a remount.
+const SIZE_EPSILON = exports.SIZE_EPSILON = 2;
+const sameSizes = (a, b) => Boolean(a) && Boolean(b) && ['line', 'multi', 'rect'].every(k => Math.abs(a[k].width - b[k].width) <= SIZE_EPSILON && Math.abs(a[k].height - b[k].height) <= SIZE_EPSILON);
 exports.sameSizes = sameSizes;
 const toSeed = (xValues = [], yValues = []) => {
   const maxLength = Math.min(xValues.length, yValues.length);
@@ -322,6 +328,7 @@ class ViewerLineRect extends _react.default.Component {
     this.multiRef = /*#__PURE__*/_react.default.createRef();
     this.rectRef = /*#__PURE__*/_react.default.createRef();
     this.resizeObserver = null;
+    this.resizeFrame = null;
     this.currentSizes = null;
 
     // Nothing is mounted yet, so this resolves to the fallback; componentDidMount
@@ -470,9 +477,22 @@ class ViewerLineRect extends _react.default.Component {
   // size is the one the current viewBox already produces, so this settles after the first
   // pass instead of feeding itself.
   handleResize() {
-    const sizes = this.resolvePaneSizes();
-    if (sameSizes(sizes, this.currentSizes)) return;
-    this.mountCharts(sizes, false);
+    // Never mutate layout synchronously inside a ResizeObserver callback. The remount
+    // resizes the subtree being observed, and the browser abandons the delivery pass with
+    // "ResizeObserver loop completed with undelivered notifications" - which surfaces as
+    // an uncaught application error, not just a console warning. Deferring to the next
+    // frame lets the observer finish before anything moves.
+    //
+    // d3_multi remounts synchronously and gets away with it because its resize path is
+    // gated to Cyclic Voltammetry, whose container height is fixed by CSS and so cannot
+    // be fed back into by a redraw. This stack has no such guarantee.
+    if (this.resizeFrame != null) return;
+    this.resizeFrame = window.requestAnimationFrame(() => {
+      this.resizeFrame = null;
+      const sizes = this.resolvePaneSizes();
+      if (sameSizes(sizes, this.currentSizes)) return;
+      this.mountCharts(sizes, false);
+    });
   }
   handleUvvisUndo() {
     const {
@@ -543,6 +563,10 @@ class ViewerLineRect extends _react.default.Component {
     });
   }
   teardownResizeObserver() {
+    if (this.resizeFrame != null) {
+      window.cancelAnimationFrame(this.resizeFrame);
+      this.resizeFrame = null;
+    }
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
       this.resizeObserver = null;
@@ -621,16 +645,35 @@ class ViewerLineRect extends _react.default.Component {
     });
     (0, _draw.drawLabel)(this.rootKlassMulti, null, 'Minutes', 'Intensity');
     (0, _draw.drawDisplay)(this.rootKlassMulti, isHidden);
+
+    // Seed the m/z pane with the scan that is currently selected rather than with an
+    // empty series. On first mount there is none and this stays [] as before - but a
+    // resize remount happens long after componentDidUpdate has drawn a scan here, and
+    // recreating the pane empty would silently wipe it with nothing to redraw it.
+    const subViewFeature = this.extractSubView();
+    let subSeed = [];
+    let subTrEndPts = tTrEndPts;
+    let subLabel = null;
+    if (subViewFeature?.data?.[0]) {
+      const {
+        x,
+        y
+      } = subViewFeature.data[0];
+      subSeed = toSeed(x, y);
+      subTrEndPts = (0, _chem.convertThresEndPts)(subViewFeature, hplcMsSt?.threshold?.value);
+      const pageValue = (0, _pageValue.parseFeaturePageValue)(subViewFeature);
+      subLabel = Number.isFinite(pageValue) ? pageValue : subViewFeature?.pageValue ?? subViewFeature?.page ?? null;
+    }
     (0, _draw.drawMain)(this.rootKlassRect, sizes.rect.width, sizes.rect.height, _list_graph.LIST_BRUSH_SVG_GRAPH.RECT);
     this.rectFocus.create({
-      filterSeed: [],
+      filterSeed: subSeed,
       filterPeak: [],
-      tTrEndPts,
+      tTrEndPts: subTrEndPts,
       layoutSt,
       isUiNoBrushSt: true,
       sweepExtentSt: sweepExtent[2]
     });
-    (0, _draw.drawLabel)(this.rootKlassRect, null, 'm/z', 'Intensity');
+    (0, _draw.drawLabel)(this.rootKlassRect, subLabel != null ? `${subLabel} min` : null, 'm/z', 'Intensity');
     (0, _draw.drawDisplay)(this.rootKlassRect, false);
   }
   extractUvvisView() {

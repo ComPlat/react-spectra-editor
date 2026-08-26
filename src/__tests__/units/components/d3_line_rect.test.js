@@ -133,10 +133,19 @@ describe('sameSizes (resize guard)', () => {
     expect(sameSizes(sizes(1296, 197), sizes(1296, 197))).toBe(true);
   });
 
-  it('detects a change in any single pane', () => {
+  it('detects a real change in any single pane', () => {
     const a = sizes(1296, 197);
     const b = sizes(1296, 197);
-    b.rect = { width: 1296, height: 198 };
+    b.rect = { width: 1296, height: 260 };
     expect(sameSizes(a, b)).toBe(false);
+  });
+
+  it('absorbs a one-pixel difference, which is round-trip noise rather than a resize', () => {
+    // A content-height pane takes its height from the svg, whose height comes back from
+    // the viewBox this measurement sets. Treating a 1px integer-rounding difference as a
+    // resize would remount forever.
+    const a = sizes(1296, 197);
+    const b = sizes(1297, 198);
+    expect(sameSizes(a, b)).toBe(true);
   });
 });
