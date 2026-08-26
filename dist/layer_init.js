@@ -18,6 +18,7 @@ var _jcamp = require("./actions/jcamp");
 var _layer_prism = _interopRequireDefault(require("./layer_prism"));
 var _format = _interopRequireDefault(require("./helpers/format"));
 var _extractEntityLCMS = require("./helpers/extractEntityLCMS");
+var _timeAxis = require("./features/lc-ms/entities/timeAxis");
 var _multi_jcamps_viewer = _interopRequireDefault(require("./components/multi_jcamps_viewer"));
 var _hplc_viewer = _interopRequireDefault(require("./components/hplc_viewer"));
 var _curve = require("./actions/curve");
@@ -196,12 +197,12 @@ class LayerInit extends _react.default.Component {
     const isMultiSpectra = Array.isArray(multiEntities) && multiEntities.length > 1;
     if (isMultiSpectra) {
       const meta = _format.default.isLCMsLayout(entity.layout) ? lcmsCurveMeta() : undefined;
-      setAllCurvesAct(multiEntities, meta);
+      setAllCurvesAct((0, _timeAxis.reconcileLcMsTimeAxes)(multiEntities), meta);
       return;
     }
     if (_format.default.isLCMsLayout(entity.layout)) {
       const payload = Array.isArray(multiEntities) && multiEntities.length > 0 ? multiEntities : [entity];
-      setAllCurvesAct(payload, lcmsCurveMeta());
+      setAllCurvesAct((0, _timeAxis.reconcileLcMsTimeAxes)(payload), lcmsCurveMeta());
       return;
     }
     if (_format.default.isCyclicVoltaLayout(entity.layout)) {
