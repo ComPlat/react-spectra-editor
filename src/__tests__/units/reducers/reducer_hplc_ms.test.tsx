@@ -1,6 +1,7 @@
 import hplcMsReducer from "../../../reducers/reducer_hplc_ms";
 import { CURVE, HPLC_MS } from "../../../constants/action_type";
 import { ExtractJcamp } from "../../../helpers/chem";
+import lcMsMzChemstationJcamp from "../../fixtures/lc_ms_jcamp_mz_chemstation";
 
 const createTicCurve = (polarity: 'positive' | 'negative' | 'neutral', x = [1, 2], y = [10, 20]) => ({
   csCategory: ['tic', polarity],
@@ -487,6 +488,37 @@ $$ === CHEMSPECTRA UVVIS PEAK TABLE ===
         expect(x[i]).toBeCloseTo(expected);
       });
       // the auto-selected retention time must be the minutes value, not the raw 67.369 seconds
+      expect(state.tic.currentPageValue).toBeCloseTo(1.1228166666666666);
+    });
+
+    // Review finding B3: resolveSecToMinScale only rescaled data[0].x. An m/z
+    // entity's ##PAGE=T=... retention-time markers go through a separate code
+    // path (parseChemstationPages / the ntuples rebuild) that never touched
+    // them, and hydrate.js unconditionally overrides tic.currentPageValue with
+    // that raw page value whenever an m/z feature yields one — so even after
+    // the TIC axis itself was fixed, a seconds-tagged m/z sibling could still
+    // clobber currentPageValue with an unscaled seconds number.
+    it("an m/z entity's seconds-tagged ##PAGE values do not clobber tic.currentPageValue with a raw-seconds RT (B3)", () => {
+      const ticEntity = ExtractJcamp(buildTicJcamp('SECONDS', [67.369, 450, 838.976], [100, 200, 300]));
+      const uvvisEntity = ExtractJcamp(uvvisJcamp);
+      // lc_ms_jcamp_mz_chemstation's own ##PAGE=T= values are already minutes
+      // (its first page, 1.1228166666666666, matches lc_ms_jcamp_tic_chemstation's
+      // ##FIRSTX exactly) — multiply them by 60 to simulate the seconds-tagged
+      // case the bug report describes.
+      const secondsTaggedMz = lcMsMzChemstationJcamp.replace(
+        /##PAGE=T= ([\d.]+)/g,
+        (_match: string, num: string) => `##PAGE=T= ${Number(num) * 60}`,
+      );
+      const mzEntity = ExtractJcamp(secondsTaggedMz);
+
+      const state: any = hplcMsReducer(undefined, {
+        type: CURVE.SET_ALL_CURVES,
+        payload: [ticEntity, mzEntity, uvvisEntity],
+      } as any);
+
+      expect(state.tic.neutral.data.x[0]).toBeCloseTo(1.1228166666666666);
+      // the m/z feature's retention time must be minutes-consistent with the
+      // TIC axis, not the raw 67.369-second page value it was tagged with.
       expect(state.tic.currentPageValue).toBeCloseTo(1.1228166666666666);
     });
   });

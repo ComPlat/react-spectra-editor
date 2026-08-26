@@ -505,6 +505,19 @@ const extrSpectraMs = (jcamp, layout) => {
     return needsSecToMin ? 1 / 60 : 1;
   };
 
+  // An m/z page's ##PAGE=T=... retention-time marker has no xUnit of its own
+  // (the spectrum's own xUnit is m/z) — it's expressed in whatever unit the
+  // sibling TIC axis uses, with no unit tag on the value itself. Reuse the
+  // same jcamp.info.UNITS override, and fall back to the value's own
+  // magnitude (a page >60 "minutes" into a run is far less likely than one
+  // recorded in seconds).
+  const resolvePageMinuteScale = pageValue => {
+    if (!Number.isFinite(pageValue)) return 1;
+    if (jcampUnitsIndicatesMinutes) return 1;
+    if (jcampUnitsIndicatesSeconds || Math.abs(pageValue) > 60) return 1 / 60;
+    return 1;
+  };
+
   // Scale every data block's x, not only data[0]: a spectrum can carry more
   // than one block, and rebuilding `data` as [data[0]] would silently drop the
   // rest along with the conversion.
@@ -626,11 +639,27 @@ const extrSpectraMs = (jcamp, layout) => {
       }
     });
   } else {
+    // Only LC-MS group entities (m/z pages paired with a TIC/UVVIS sibling)
+    // get their page value minute-normalized here — a standalone MS/GC-MS
+    // layout's ##PAGE= can mean something else entirely (scan number,
+    // precursor m/z, or a retention time already self-consistent within
+    // that file), so leave it untouched outside the LC-MS group case.
+    const isLcmsGroupLayout = layout === _list_layout.LIST_LAYOUT.LC_MS;
     (jcamp.spectra || []).forEach(s => {
       const hasPoints = s?.data?.[0]?.x?.length > 0;
       if (hasPoints) {
+        let spectrum = s;
+        if (isLcmsGroupLayout) {
+          const pageScale = resolvePageMinuteScale(s?.pageValue);
+          if (pageScale !== 1) {
+            spectrum = {
+              ...s,
+              pageValue: s.pageValue * pageScale
+            };
+          }
+        }
         finalSpectra.push({
-          ...s,
+          ...spectrum,
           csCategory: (0, _parsing.inferLcMsCategory)(s, jcamp)
         });
       }

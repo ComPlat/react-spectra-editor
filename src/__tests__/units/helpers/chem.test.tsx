@@ -13,6 +13,7 @@ import { LIST_LAYOUT } from "../../../constants/list_layout";
 import emissionsJcamp from "../../fixtures/emissions_jcamp";
 import dlsAcfJcamp from "../../fixtures/dls_acf_jcamp";
 import lcMsTicChemstationJcamp from "../../fixtures/lc_ms_jcamp_tic_chemstation";
+import lcMsMzChemstationJcamp from "../../fixtures/lc_ms_jcamp_mz_chemstation";
 
 const buildTicJcamp = ({
   xUnits, unitsLine = '', xValues, yValues,
@@ -713,6 +714,31 @@ describe('Test for chem helper', () => {
       const x = entity.features[0].data[0].x;
       expect(x[0]).toBeCloseTo(1.1228, 3);
       expect(x[x.length - 1]).toBeCloseTo(13.9829, 3);
+    });
+  })
+
+  // Review finding B3: resolveSecToMinScale only rescaled a TIC/UVVIS
+  // spectrum's data[0].x. An m/z entity's ##PAGE=T=... retention-time marker
+  // goes through a separate path (parseChemstationPages / the ntuples
+  // rebuild) that never touched it, so a seconds-tagged m/z sibling could
+  // still carry a raw-seconds page value even after the TIC axis itself was
+  // fixed — see the reducer-level regression in reducer_hplc_ms.test.tsx for
+  // how that clobbered tic.currentPageValue.
+  describe('Test m/z ##PAGE=T=... minute normalization (issue #619 / B3)', () => {
+    it('leaves already-minutes ##PAGE values unchanged', () => {
+      const entity: any = ExtractJcamp(lcMsMzChemstationJcamp);
+      expect(entity.features[0].pageValue).toBeCloseTo(1.1228166666666666);
+      expect(entity.features[1].pageValue).toBeCloseTo(1.1384333333333334);
+    });
+
+    it('scales ##PAGE values to minutes when they look like seconds (>60)', () => {
+      const secondsTaggedMz = lcMsMzChemstationJcamp.replace(
+        /##PAGE=T= ([\d.]+)/g,
+        (_match, num) => `##PAGE=T= ${Number(num) * 60}`,
+      );
+      const entity: any = ExtractJcamp(secondsTaggedMz);
+      expect(entity.features[0].pageValue).toBeCloseTo(1.1228166666666666);
+      expect(entity.features[1].pageValue).toBeCloseTo(1.1384333333333334);
     });
   })
 })
