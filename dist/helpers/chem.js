@@ -479,7 +479,30 @@ const extrSpectraMs = (jcamp, layout) => {
     if (typeof raw === 'string') return idx === 0 ? raw : '';
     return '';
   };
-  const jcampUnitsField = String(jcamp?.info?.UNITS || '').toUpperCase();
+
+  // jcamp.info.UNITS is the whole ##UNITS= line for every variable (X, Y, and
+  // often an implicit leading one — e.g. the NTUPLES page var — not listed in
+  // ##SYMBOL= at all), so substring-scanning the concatenated line for
+  // "SECOND"/"MINUTE" can match a Y-unit like "COUNTS PER SECOND" and
+  // misclassify an unrelated X-axis. Resolve only the token ##SYMBOL= says
+  // belongs to X, tolerating that common one-token UNITS/SYMBOL length
+  // mismatch (units[0] is the unlabeled variable's unit, X starts at units[1]).
+  const resolveJcampXUnit = jcampInfo => {
+    const {
+      UNITS,
+      SYMBOL
+    } = jcampInfo || {};
+    if (!UNITS || !SYMBOL) return '';
+    const unitsString = Array.isArray(UNITS) ? UNITS[0] : UNITS;
+    const symbolString = Array.isArray(SYMBOL) ? SYMBOL[0] : SYMBOL;
+    const units = String(unitsString).split(',').map(u => u.trim());
+    const symbols = String(symbolString).split(',').map(s => s.trim().toUpperCase());
+    const xIdx = symbols.indexOf('X');
+    if (xIdx === -1) return '';
+    const offset = units.length === symbols.length + 1 ? 1 : 0;
+    return units[xIdx + offset] || '';
+  };
+  const jcampUnitsField = resolveJcampXUnit(jcamp?.info).toUpperCase();
   const jcampUnitsIndicatesMinutes = jcampUnitsField.includes('MINUTE');
   const jcampUnitsIndicatesSeconds = jcampUnitsField.includes('SECOND');
   const getMaxAbsX = data => {

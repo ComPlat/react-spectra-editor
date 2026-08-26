@@ -704,6 +704,35 @@ describe('Test for chem helper', () => {
       [1, 5, 10].forEach((expected, i) => expect(x[i]).toBeCloseTo(expected));
     });
 
+    // Review finding S10: jcampUnitsIndicatesSeconds used to substring-scan the
+    // *whole* ##UNITS= line (X and Y units concatenated), so a Y-unit like
+    // "COUNTS PER SECOND" satisfied it and — because it short-circuits the
+    // magnitude guard via `isExplicitSeconds || dataLooksLikeSeconds` — divided
+    // an already-minutes, well-under-60 x-axis by 60 anyway. The fix resolves
+    // only the ##SYMBOL=-indexed X token instead of the concatenated line.
+    it("does not scale an already-minutes TIC x when only the Y unit's ##UNITS= token mentions seconds", () => {
+      const jcamp = buildTicJcamp({
+        xUnits: 'RETENTION TIME',
+        unitsLine: '##SYMBOL=X, Y\n##UNITS=, RETENTION TIME, COUNTS PER SECOND',
+        xValues: [1.12, 7.5, 13.98],
+        yValues: [1, 2, 3],
+      });
+      const entity: any = ExtractJcamp(jcamp);
+      expect(entity.features[0].data[0].x).toEqual([1.12, 7.5, 13.98]);
+    });
+
+    it('still scales when the X token itself (by ##SYMBOL= position) says seconds', () => {
+      const jcamp = buildTicJcamp({
+        xUnits: 'RETENTION TIME',
+        unitsLine: '##SYMBOL=X, Y\n##UNITS=SECONDS, COUNTS',
+        xValues: [6, 12, 18],
+        yValues: [1, 2, 3],
+      });
+      const entity: any = ExtractJcamp(jcamp);
+      const x = entity.features[0].data[0].x;
+      [0.1, 0.2, 0.3].forEach((expected, i) => expect(x[i]).toBeCloseTo(expected));
+    });
+
     it('regression: retagging the chemstation TIC fixture like its sibling UVVIS fixture must not collapse its native-minutes range', () => {
       // lc_ms_jcamp_uvvis_chemstation.js tags its (already-minutes) data this same way:
       // ##XUNITS=RETENTION TIME plus a global ##UNITS=, MINUTES, ARBITRARY UNITS line.
