@@ -67,6 +67,12 @@ const displaySubViewerAt = payload => ({
 // x-domain via the existing lcmsSyncX mirroring in updateZoom
 // (reducer_ui.js), so both panes share one source of truth for their
 // x-extent instead of each auto-fitting to its own data independently.
+//
+// keepGraphIndex, because this is not a user zoom: a real SELECT_ZOOMIN moves
+// zoom.graphIndex to the pane the user just brushed, and saga_lcms_ui reads
+// that back to decide which pane the NEXT brush belongs to. Seeding is a
+// background write to slot 0, so letting it move the pointer would re-attribute
+// a pending TIC zoom (sweepTypes[1] === ZOOMIN) to the UVVIS pane.
 exports.displaySubViewerAt = displaySubViewerAt;
 const seedLcmsUnionExtent = xExtent => ({
   type: _action_type.UI.SWEEP.SELECT_ZOOMIN,
@@ -76,7 +82,8 @@ const seedLcmsUnionExtent = xExtent => ({
       xExtent,
       yExtent: false
     },
-    lcmsSyncX: 1
+    lcmsSyncX: 1,
+    keepGraphIndex: true
   }
 });
 exports.seedLcmsUnionExtent = seedLcmsUnionExtent;

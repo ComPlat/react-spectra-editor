@@ -71,6 +71,7 @@ describe('Test redux action for ui', () => {
         graphIndex: 0,
         zoomValue: { xExtent, yExtent: false },
         lcmsSyncX: 1,
+        keepGraphIndex: true,
       },
     });
   });

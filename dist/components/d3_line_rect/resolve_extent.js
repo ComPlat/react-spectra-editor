@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.resolveXExtent = exports.default = void 0;
+exports.resolveYExtent = exports.resolveXExtent = exports.default = void 0;
 const d3 = require('d3');
 
 // d3.extent already returns [min, max] in sorted order, so re-sorting it is
@@ -22,5 +22,25 @@ const resolveXExtent = (data, accessor) => {
     xU
   };
 };
+
+// The y half of the same setConfig has the same degenerate case, and one extra
+// step to get wrong: d3.min/d3.max over an empty (or all-undefined) set return
+// undefined, and the `factor` padding below turns that into NaN before it ever
+// reaches scales.y.domain(). Both focus classes computed this identically, so
+// the padding lives here once rather than twice.
 exports.resolveXExtent = resolveXExtent;
+const resolveYExtent = (data, accessor, factor) => {
+  const btm = d3.min(data, accessor);
+  const top = d3.max(data, accessor);
+  if (btm === undefined || top === undefined) return {
+    yL: 0,
+    yU: 1
+  };
+  const height = top - btm;
+  return {
+    yL: btm - factor * height,
+    yU: top + factor * height
+  };
+};
+exports.resolveYExtent = resolveYExtent;
 var _default = exports.default = resolveXExtent;

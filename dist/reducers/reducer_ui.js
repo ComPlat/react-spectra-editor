@@ -81,7 +81,8 @@ const updateZoom = (state, action) => {
   const {
     graphIndex,
     zoomValue,
-    lcmsSyncX
+    lcmsSyncX,
+    keepGraphIndex
   } = payload;
   if (!zoomValue) {
     return Object.assign({}, state, {
@@ -103,9 +104,12 @@ const updateZoom = (state, action) => {
       yExtent: false
     });
   }
+  // A user zoom moves the "which pane is being zoomed" pointer that
+  // saga_lcms_ui reads back on the next brush; a background seed writes slot 0
+  // without the user having touched that pane, so it must leave the pointer be.
   const newZoom = Object.assign({}, zoom, {
     sweepExtent,
-    graphIndex
+    graphIndex: keepGraphIndex ? zoom.graphIndex : graphIndex
   });
   return Object.assign({}, state, {
     zoom: newZoom

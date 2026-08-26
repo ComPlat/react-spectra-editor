@@ -40,6 +40,8 @@ var _extractEntityLCMS = require("../../helpers/extractEntityLCMS");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable no-mixed-operators, prefer-object-spread, react/function-component-definition */
 
+const d3 = require('d3');
+
 // Fallback viewBox, used only until the panes can be measured (and in jsdom, where
 // clientWidth/clientHeight are 0).
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
@@ -89,11 +91,14 @@ const toSeed = (xValues = [], yValues = []) => {
   return seed;
 };
 
-// Only the min/max of each side is ever needed, so fold x-values directly
-// into a running [xL, xU] pair instead of collecting them into an array to
-// sort — O(n) rather than O(n log n), no intermediate arrays.
+// Widen a running [xL, xU] pair (starting at [null, null]) by one d3.extent
+// result. d3.extent is what does the folding: it skips null/undefined/NaN,
+// which a hand-rolled min/max cannot — a single non-finite x would sit in the
+// accumulator forever (every comparison against NaN is false) and pin both
+// panes to a NaN domain that the seed guard then refuses to recompute.
+// convertTopic emits exactly that whenever topic.y outruns topic.x.
 exports.toSeed = toSeed;
-const foldXExtent = (xs, extent) => xs.reduce(([xL, xU], x) => [xL === null || x < xL ? x : xL, xU === null || x > xU ? x : xU], extent);
+const widenExtent = ([xL, xU], [nextL, nextU]) => nextL === undefined || nextU === undefined ? [xL, xU] : [xL === null ? nextL : Math.min(xL, nextL), xU === null ? nextU : Math.max(xU, nextU)];
 
 // Mirrors MultiFocus.setDataParams' own guard (multi_focus.js) and reuses
 // convertTopic so an entity that MultiFocus itself would skip (no feature)
@@ -105,9 +110,7 @@ const foldTicXExtent = (layoutSt, ticEntities, extent) => (ticEntities || []).re
     feature
   } = entity || {};
   if (!feature || !topic) return acc;
-  return foldXExtent((0, _chem.convertTopic)(topic, layoutSt, feature, 0).map(({
-    x
-  }) => x), acc);
+  return widenExtent(acc, d3.extent((0, _chem.convertTopic)(topic, layoutSt, feature, 0), d => d.x));
 }, extent);
 
 // Both LC-MS panes need to agree on one x-domain before any zoom. Rather than
@@ -119,7 +122,8 @@ const foldTicXExtent = (layoutSt, ticEntities, extent) => (ticEntities || []).re
 // partial union that would otherwise get stuck once seeded.
 const computeLcmsUnionXExtent = (layoutSt, uvvisSeed = [], ticEntities = []) => {
   if (uvvisSeed.length === 0) return null;
-  const [uvvisXL, uvvisXU] = foldXExtent(uvvisSeed.map(d => d.x), [null, null]);
+  const [uvvisXL, uvvisXU] = widenExtent([null, null], d3.extent(uvvisSeed, d => d.x));
+  if (uvvisXL === null) return null;
   const [ticXL, ticXU] = foldTicXExtent(layoutSt, ticEntities, [null, null]);
   if (ticXL === null) return null;
   return {
@@ -369,11 +373,14 @@ class ViewerLineRect extends _react.default.Component {
     this.rectRef = /*#__PURE__*/_react.default.createRef();
     this.resizeObserver = null;
     this.resizeFrame = null;
+    // Kept in step with the focus objects below: whatever sizes they were built from are
+    // the sizes the svg viewBoxes must use, so the two are set together and never drift.
     this.currentSizes = null;
 
     // Nothing is mounted yet, so this resolves to the fallback; componentDidMount
     // re-measures and rebuilds against the real panes.
-    this.createFocuses(this.resolvePaneSizes());
+    this.currentSizes = this.resolvePaneSizes();
+    this.createFocuses(this.currentSizes);
     this.handleResize = this.handleResize.bind(this);
     this.extractSubView = this.extractSubView.bind(this);
     this.notifyHostOnSubViewerChange = this.notifyHostOnSubViewerChange.bind(this);
@@ -407,12 +414,6 @@ class ViewerLineRect extends _react.default.Component {
       sweepExtent
     } = zoom || {};
     if (!Array.isArray(sweepExtent)) return;
-
-    // The re-create paths below need the sizes the focus classes were built with. They
-    // are set by mountCharts, but don't assume it has run - the constructor leaves
-    // currentSizes null, so an update that arrives before a completed mount would
-    // dereference it. Measure instead of throwing.
-    if (!this.currentSizes) this.currentSizes = this.resolvePaneSizes();
     const uvvisViewFeature = this.extractUvvisView();
     let uvvisSeed = [];
     if (uvvisViewFeature?.data?.[0]) {

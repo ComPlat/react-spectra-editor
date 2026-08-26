@@ -5,7 +5,7 @@ import {
 import LineFocus from '../../../components/d3_line_rect/line_focus';
 import MultiFocus, { pickTicIndex } from '../../../components/d3_line_rect/multi_focus';
 import RectFocus from '../../../components/d3_line_rect/rect_focus';
-import { resolveXExtent } from '../../../components/d3_line_rect/resolve_extent';
+import { resolveXExtent, resolveYExtent } from '../../../components/d3_line_rect/resolve_extent';
 import { ExtractJcamp, convertTopic } from '../../../helpers/chem';
 import { extractParams } from '../../../helpers/extractParams';
 import { LIST_LAYOUT } from '../../../constants/list_layout';
@@ -193,6 +193,21 @@ describe('resolveXExtent (N2: dead sort + degenerate empty-data case)', () => {
   });
 });
 
+describe('resolveYExtent (N2: the y half of the same degenerate case)', () => {
+  it('pads the real min/max by the given factor', () => {
+    const data = [{ y: 0 }, { y: 10 }];
+    expect(resolveYExtent(data, (d) => d.y, 0.1)).toEqual({ yL: -1, yU: 11 });
+  });
+
+  it('falls back to a placeholder range for empty data instead of NaN', () => {
+    expect(resolveYExtent([], (d) => d.y, 0.125)).toEqual({ yL: 0, yU: 1 });
+  });
+
+  it('falls back to a placeholder range when every y is undefined', () => {
+    expect(resolveYExtent([{ x: 1 }, { x: 2 }], (d) => d.y, 0.125)).toEqual({ yL: 0, yU: 1 });
+  });
+});
+
 describe('LineFocus/MultiFocus.setConfig with empty data (N2 regression)', () => {
   it('LineFocus falls back to a placeholder xExtent instead of NaN when data is empty', () => {
     const lineFocus = Object.create(LineFocus.prototype);
@@ -209,6 +224,7 @@ describe('LineFocus/MultiFocus.setConfig with empty data (N2 regression)', () =>
     expect(lineFocus.currentExtent.xExtent).toEqual({ xL: 0, xU: 1 });
     expect(lineFocus.scales.x.domain).toHaveBeenCalledWith([0, 1]);
     expect(lineFocus.scales.x.domain.mock.calls[0][0].some(Number.isNaN)).toBe(false);
+    expect(lineFocus.scales.y.domain.mock.calls[0][0].some(Number.isNaN)).toBe(false);
   });
 
   it('MultiFocus falls back to a placeholder xExtent instead of NaN when data is empty', () => {
@@ -227,6 +243,7 @@ describe('LineFocus/MultiFocus.setConfig with empty data (N2 regression)', () =>
     expect(multiFocus.currentExtent.xExtent).toEqual({ xL: 0, xU: 1 });
     expect(multiFocus.scales.x.domain).toHaveBeenCalledWith([0, 1]);
     expect(multiFocus.scales.x.domain.mock.calls[0][0].some(Number.isNaN)).toBe(false);
+    expect(multiFocus.scales.y.domain.mock.calls[0][0].some(Number.isNaN)).toBe(false);
   });
 });
 
@@ -287,6 +304,35 @@ describe('computeLcmsUnionXExtent', () => {
   // example of the two LC-MS panes having mismatched native time ranges (TIC stops
   // at ~14 min, UVVIS runs to ~20 min). The seeded union must span both, not clip
   // to whichever pane's own data happens to be shorter.
+  // A single non-finite x must not poison the union: it would be stored as a
+  // truthy { xL: NaN } extent, the seed guard would then refuse to recompute,
+  // and both panes would sit on domain([NaN, NaN]) until a manual zoom reset.
+  // convertTopic produces exactly that whenever topic.y outruns topic.x.
+  it('ignores non-finite x values on the UVVIS side rather than returning NaN', () => {
+    const uvvisSeed = [{ x: NaN, y: 1 }, { x: 0.5, y: 5 }, { x: 4, y: 8 }];
+    const topic = { x: [1, 2, 3], y: [10, 20, 30] };
+    const feature = { maxY: 30 };
+    expect(computeLcmsUnionXExtent(layoutSt, uvvisSeed, [{ topic, feature }]))
+      .toEqual({ xL: 0.5, xU: 4 });
+  });
+
+  it('ignores a TIC topic whose y outruns its x rather than returning NaN', () => {
+    const uvvisSeed = [{ x: 0.5, y: 5 }, { x: 4, y: 8 }];
+    const topic = { x: [1, 2], y: [10, 20, 30] };
+    const feature = { maxY: 30 };
+    const union = computeLcmsUnionXExtent(layoutSt, uvvisSeed, [{ topic, feature }]);
+    expect(Number.isFinite(union.xL)).toBe(true);
+    expect(Number.isFinite(union.xU)).toBe(true);
+    expect(union).toEqual({ xL: 0.5, xU: 4 });
+  });
+
+  it('returns null when every UVVIS x is non-finite, rather than a NaN extent', () => {
+    const topic = { x: [1, 2, 3], y: [10, 20, 30] };
+    const feature = { maxY: 30 };
+    expect(computeLcmsUnionXExtent(layoutSt, [{ x: NaN, y: 1 }], [{ topic, feature }]))
+      .toBeNull();
+  });
+
   it('spans the real chemstation TIC (~14 min) and UVVIS (~20 min) mismatched ranges', () => {
     const ticEntity = ExtractJcamp(lcMsTicChemstationJcamp);
     const uvvisEntity = ExtractJcamp(lcMsUvvisChemstationJcamp);
@@ -421,6 +467,14 @@ describe('ViewerLineRect componentDidMount/componentDidUpdate wiring (S5)', () =
     instance.rootKlassLine = '.line';
     instance.rootKlassMulti = '.multi';
     instance.rootKlassRect = '.rect';
+    // Object.create skips the constructor, so establish the invariants it would have:
+    // currentSizes is set there alongside the focus objects, and the re-create paths in
+    // componentDidUpdate read it.
+    instance.currentSizes = {
+      line: { width: 800, height: 260 },
+      multi: { width: 800, height: 260 },
+      rect: { width: 800, height: 260 },
+    };
     const stubFocuses = () => {
       instance.lineFocus = { create: jest.fn(), update: jest.fn() };
       instance.multiFocus = { create: jest.fn(), update: jest.fn() };

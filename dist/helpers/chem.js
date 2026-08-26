@@ -504,6 +504,13 @@ const extrSpectraMs = (jcamp, layout) => {
     const needsSecToMin = isTimeAxis && !isExplicitMinutes && (isExplicitSeconds || dataLooksLikeSeconds);
     return needsSecToMin ? 1 / 60 : 1;
   };
+
+  // Scale every data block's x, not only data[0]: a spectrum can carry more
+  // than one block, and rebuilding `data` as [data[0]] would silently drop the
+  // rest along with the conversion.
+  const scaleSpectrumDataX = (data, scale) => (data || []).map(block => Array.isArray(block?.x) ? Object.assign({}, block, {
+    x: block.x.map(value => value * scale)
+  }) : block);
   if (isUvvisData) {
     const spectraList = jcamp.spectra || [];
     const uvvisSpectra = [];
@@ -578,14 +585,7 @@ const extrSpectraMs = (jcamp, layout) => {
       } else {
         selectedPeakTable = peakTable?.edit || peakTable?.auto || peakTable?.other || null;
       }
-      const originalData = spectrum?.data?.[0];
-      let normalizedData = spectrum.data;
-      if (needsSecToMin && originalData?.x) {
-        normalizedData = [{
-          ...originalData,
-          x: originalData.x.map(scaleX)
-        }];
-      }
+      const normalizedData = needsSecToMin ? scaleSpectrumDataX(spectrum.data, minuteScale) : spectrum.data;
       const mainSpectrum = {
         ...spectrum,
         data: normalizedData,
@@ -614,14 +614,10 @@ const extrSpectraMs = (jcamp, layout) => {
     });
   } else if (isTicData) {
     (jcamp.spectra || []).forEach(s => {
-      const originalData = s?.data?.[0];
-      const hasPoints = originalData?.x?.length > 0;
+      const hasPoints = s?.data?.[0]?.x?.length > 0;
       if (hasPoints) {
         const minuteScale = resolveSecToMinScale(s);
-        const data = minuteScale === 1 ? s.data : [{
-          ...originalData,
-          x: originalData.x.map(value => value * minuteScale)
-        }];
+        const data = minuteScale === 1 ? s.data : scaleSpectrumDataX(s.data, minuteScale);
         finalSpectra.push({
           ...s,
           data,

@@ -16,7 +16,7 @@ import Cfg from '../../helpers/cfg';
 import Format from '../../helpers/format';
 import { calcArea } from '../../helpers/integration';
 import { LIST_UI_SWEEP_TYPE } from '../../constants/list_ui';
-import { resolveXExtent } from './resolve_extent';
+import { resolveXExtent, resolveYExtent } from './resolve_extent';
 
 const d3 = require('d3');
 
@@ -163,13 +163,7 @@ class LineFocus {
       xExtent = resolveXExtent(this.data, (d) => d.x);
     }
     if (!yExtent) {
-      const btm = d3.min(this.data, (d) => d.y);
-      const top = d3.max(this.data, (d) => d.y);
-      const height = top - btm;
-      yExtent = {
-        yL: (btm - this.factor * height),
-        yU: (top + this.factor * height),
-      };
+      yExtent = resolveYExtent(this.data, (d) => d.y, this.factor);
     }
 
     this.scales.x.domain([xExtent.xL, xExtent.xU]);

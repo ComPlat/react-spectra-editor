@@ -260,13 +260,7 @@ class MultiFocus {
       xExtent = (0, _resolve_extent.resolveXExtent)(allData, d => d.x);
     }
     if (!yExtent) {
-      const btm = d3.min(allData, d => d.y);
-      const top = d3.max(allData, d => d.y);
-      const height = top - btm;
-      yExtent = {
-        yL: btm - this.factor * height,
-        yU: top + this.factor * height
-      };
+      yExtent = (0, _resolve_extent.resolveYExtent)(allData, d => d.y, this.factor);
     }
     this.scales.x.domain([xExtent.xL, xExtent.xU]);
     this.scales.y.domain([yExtent.yL, yExtent.yU]);
