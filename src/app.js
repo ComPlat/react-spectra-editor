@@ -13,6 +13,7 @@ import reducers from './reducers/index';
 import sagas from './sagas/index';
 import LayerInit from './layer_init';
 import FN from './fn';
+import { LIST_HOST_HOOK_CLASS } from './constants/list_graph';
 
 // - - - store & middleware - - -
 const sagaMiddleware = createSagaMiddleware();
@@ -118,4 +119,9 @@ SpectraEditor.defaultProps = {
 
 export {
   SpectraEditor, FN, store,
+  // Published DOM hook class names - see docs/architecture/frontend-architecture.md.
+  // Exported here so a host can reference them programmatically instead of deep-importing
+  // dist/constants/list_graph or hard-coding the literals, which is the coupling the
+  // constant exists to remove.
+  LIST_HOST_HOOK_CLASS,
 };

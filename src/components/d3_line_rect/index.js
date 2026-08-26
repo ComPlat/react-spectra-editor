@@ -37,15 +37,53 @@ import {
 import { LIST_UI_SWEEP_TYPE, LIST_NON_BRUSH_TYPES } from '../../constants/list_ui';
 import renderWavelengthSelect from '../../features/lc-ms/ui/wavelengthSelect';
 import { parseFeaturePageValue as parsePageValue } from '../../features/lc-ms/parsing/pageValue';
-import { LIST_ROOT_SVG_GRAPH, LIST_BRUSH_SVG_GRAPH } from '../../constants/list_graph';
+import {
+  LIST_ROOT_SVG_GRAPH, LIST_BRUSH_SVG_GRAPH, LIST_HOST_HOOK_CLASS,
+} from '../../constants/list_graph';
 import PeakGroup from '../cmd_bar/08_peak_group';
 import Threshold from '../cmd_bar/r03_threshold';
 import Integration from '../cmd_bar/04_integration';
 import Peak from '../cmd_bar/03_peak';
 import { getLcMsInfo } from '../../helpers/extractEntityLCMS';
 
+// Fallback viewBox, used only until the panes can be measured (and in jsdom, where
+// clientWidth/clientHeight are 0).
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.8 / 3); // ROI
+
+// Below this, the drawable area net of the focus classes' margins (l:60 r:5 t:5 b:40)
+// stops being meaningful; clamp rather than let a scale range invert.
+const MIN_PANE_W = 240;
+const MIN_PANE_H = 96;
+
+// Each chart svg carries `preserveAspectRatio="xMinYMin meet"`, so it is the viewBox
+// aspect - not the container - that decides how much of the pane the drawing fills. With
+// a viewBox derived once from `window.innerWidth` at module load, a pane proportionally
+// wider than that ratio scales the drawing down to its height and leaves the surplus
+// width empty on the right, which is what a viewport wider than FHD produces. Measuring
+// the pane and matching the viewBox to it removes the letterboxing in both directions.
+export const measurePane = (node) => {
+  if (!node) return null;
+  const { clientWidth, clientHeight } = node;
+  if (!clientWidth || !clientHeight) return null;
+  return {
+    width: Math.max(Math.round(clientWidth), MIN_PANE_W),
+    height: Math.max(Math.round(clientHeight), MIN_PANE_H),
+  };
+};
+
+export // A pane whose height is content-derived (any host that does not bound us - the
+// standalone demo included) takes its height from the svg, whose height comes back from
+// the viewBox we are about to set. Re-measuring integer client boxes across that round
+// trip can differ by a pixel without anything really having moved, so require a real
+// change before paying for a remount.
+const SIZE_EPSILON = 2;
+
+export const sameSizes = (a, b) => Boolean(a) && Boolean(b)
+  && ['line', 'multi', 'rect'].every((k) => (
+    Math.abs(a[k].width - b[k].width) <= SIZE_EPSILON
+    && Math.abs(a[k].height - b[k].height) <= SIZE_EPSILON
+  ));
 
 const toSeed = (xValues = [], yValues = []) => {
   const maxLength = Math.min(xValues.length, yValues.length);
@@ -89,8 +127,37 @@ const styles = () => (
     {
       lcMsStackRoot: {
         margin: '0 0 5px 52px',
+        // This is the only place the editor mounts three chart containers stacked in one
+        // pane instead of a single one. A host stylesheet that stretches a single chart
+        // with `.d3Line { height: 100% }` would otherwise make each of the three as tall
+        // as this whole pane and push the TIC and m/z graphs out of a bounded, clipped
+        // container. As a flex column they share the pane instead, so the stack fits
+        // whether or not the host ships such a rule.
+        display: 'flex',
+        flexDirection: 'column',
+        // Load-bearing under a host that makes this node a flex item (chemotion_ELN's
+        // `.MuiGrid-grid-xs-9 { display: flex; flex-direction: column }` does), where the
+        // initial `min-height: auto` would otherwise resolve to the stack's content size
+        // and defeat the shrink below.
+        minHeight: 0,
+        // All three panes need the SAME flex-basis or the deficit is shared in proportion
+        // to basis and one of them is squeezed to a fraction of a third. `height: 100%`
+        // rather than `flex-basis: 0`, because a host stylesheet loads after this JSS and
+        // chemotion_ELN already puts `height: 100%` on the two bare mounts with a higher
+        // specificity than anything reachable from here - a basis of 0 would lose that
+        // contest on `.d3Line`/`.d3Multi`, apply to the m/z panel alone, and collapse it to
+        // zero. Restating the same declaration agrees with such a host and supplies it for
+        // one that bounds our height without styling the mounts itself. Against an
+        // unbounded parent it computes to `auto`, i.e. the content height, as before.
+        '& > .d3Line, & > .d3Multi': {
+          flex: '1 1 auto',
+          minHeight: 0,
+          height: '100%',
+        },
       },
       lcMsToolbarRow: {
+        // Never absorb the shrink the chart panes above negotiate.
+        flexShrink: 0,
         display: 'flex',
         flexWrap: 'wrap',
         alignItems: 'center',
@@ -118,6 +185,11 @@ const styles = () => (
       },
       lcMsGraphPanel: {
         position: 'relative',
+        // Wraps the m/z chart plus its loading overlay, so this - not `.d3Rect` - is the
+        // flex item beside the two bare mounts, and takes the same basis as they do.
+        flex: '1 1 auto',
+        minHeight: 0,
+        height: '100%',
       },
       lcMsLoadingOverlay: {
         position: 'absolute',
@@ -263,44 +335,23 @@ class ViewerLineRect extends React.Component {
   constructor(props) {
     super(props);
 
-    const {
-      clickUiTargetAct,
-      selectUiSweepAct,
-      scrollUiWheelAct,
-      ticEntities,
-      uvvisEntities,
-      uiSt,
-    } = props;
-
     this.rootKlassLine = `.${LIST_ROOT_SVG_GRAPH.LINE}`;
-    this.lineFocus = new LineFocus({
-      W,
-      H,
-      uvvisEntities,
-      clickUiTargetAct,
-      selectUiSweepAct,
-      scrollUiWheelAct,
-      graphIndex: 0,
-      uiSt,
-    });
-
     this.rootKlassMulti = `.${LIST_ROOT_SVG_GRAPH.MULTI}`;
-    this.multiFocus = new MultiFocus({
-      W,
-      H,
-      ticEntities,
-      clickUiTargetAct,
-      selectUiSweepAct,
-      scrollUiWheelAct,
-      graphIndex: 1,
-      uiSt,
-    });
-
     this.rootKlassRect = `.${LIST_ROOT_SVG_GRAPH.RECT}`;
-    this.rectFocus = new RectFocus({
-      W, H, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct, graphIndex: 2, uiSt,
-    });
 
+    this.stackRef = React.createRef();
+    this.lineRef = React.createRef();
+    this.multiRef = React.createRef();
+    this.rectRef = React.createRef();
+    this.resizeObserver = null;
+    this.resizeFrame = null;
+    this.currentSizes = null;
+
+    // Nothing is mounted yet, so this resolves to the fallback; componentDidMount
+    // re-measures and rebuilds against the real panes.
+    this.createFocuses(this.resolvePaneSizes());
+
+    this.handleResize = this.handleResize.bind(this);
     this.extractSubView = this.extractSubView.bind(this);
     this.notifyHostOnSubViewerChange = this.notifyHostOnSubViewerChange.bind(this);
     this.extractUvvisView = this.extractUvvisView.bind(this);
@@ -309,71 +360,8 @@ class ViewerLineRect extends React.Component {
   }
 
   componentDidMount() {
-    const {
-      curveSt, feature, ticEntities, hplcMsSt,
-      tTrEndPts, layoutSt,
-      isUiAddIntgSt, isUiNoBrushSt,
-      integrationSt,
-      isHidden,
-      resetAllAct, uiSt,
-      editPeakSt,
-    } = this.props;
-    drawDestroy(this.rootKlassMulti);
-    drawDestroy(this.rootKlassLine);
-    drawDestroy(this.rootKlassRect);
-    resetAllAct(feature);
-
-    const { zoom } = uiSt;
-    const { sweepExtent } = zoom;
-
-    const uvvisViewFeature = this.extractUvvisView();
-    let uvvisSeed = [];
-    if (uvvisViewFeature?.data?.[0]) {
-      const currentData = uvvisViewFeature.data[0];
-      const { x, y } = currentData;
-      uvvisSeed = toSeed(x, y);
-    }
-    drawMain(this.rootKlassLine, W, H, LIST_BRUSH_SVG_GRAPH.LINE);
-    this.lineFocus.create({
-      filterSeed: uvvisSeed,
-      filterPeak: [],
-      tTrEndPts,
-      layoutSt,
-      isUiNoBrushSt: true,
-      sweepExtentSt: sweepExtent[0],
-      integrationSt,
-      isUiAddIntgSt,
-      editPeakSt,
-      hplcMsSt,
-    });
-    drawLabel(this.rootKlassLine, null, 'Minutes', 'Intensity');
-    drawDisplay(this.rootKlassLine, false);
-
-    drawMain(this.rootKlassMulti, W, H, LIST_BRUSH_SVG_GRAPH.MULTI);
-    this.multiFocus.create({
-      ticEntities,
-      curveSt,
-      hplcMsSt,
-      tTrEndPts,
-      layoutSt,
-      sweepExtentSt: sweepExtent[1],
-      isUiAddIntgSt,
-      isUiNoBrushSt,
-    });
-    drawLabel(this.rootKlassMulti, null, 'Minutes', 'Intensity');
-    drawDisplay(this.rootKlassMulti, isHidden);
-
-    drawMain(this.rootKlassRect, W, H, LIST_BRUSH_SVG_GRAPH.RECT);
-    this.rectFocus.create({
-      filterSeed: [],
-      filterPeak: [],
-      tTrEndPts,
-      layoutSt,
-      isUiNoBrushSt: true,
-      sweepExtentSt: sweepExtent[2],
-    });
-    drawLabel(this.rootKlassRect, null, 'm/z', 'Intensity');
-    drawDisplay(this.rootKlassRect, false);
+    this.setupResizeObserver();
+    this.mountCharts(this.resolvePaneSizes(), true);
   }
 
   componentDidUpdate(prevProps) {
@@ -394,7 +382,12 @@ class ViewerLineRect extends React.Component {
         `${this.rootKlassLine} .${LIST_BRUSH_SVG_GRAPH.LINE}`,
       );
       if (!hasLineSvg) {
-        drawMain(this.rootKlassLine, W, H, LIST_BRUSH_SVG_GRAPH.LINE);
+        drawMain(
+          this.rootKlassLine,
+          this.currentSizes.line.width,
+          this.currentSizes.line.height,
+          LIST_BRUSH_SVG_GRAPH.LINE,
+        );
       }
       const currentData = uvvisViewFeature.data[0];
       const { x, y } = currentData;
@@ -423,7 +416,12 @@ class ViewerLineRect extends React.Component {
         `${this.rootKlassMulti} .${LIST_BRUSH_SVG_GRAPH.MULTI}`,
       );
       if (!hasMultiSvg) {
-        drawMain(this.rootKlassMulti, W, H, LIST_BRUSH_SVG_GRAPH.MULTI);
+        drawMain(
+          this.rootKlassMulti,
+          this.currentSizes.multi.width,
+          this.currentSizes.multi.height,
+          LIST_BRUSH_SVG_GRAPH.MULTI,
+        );
       }
       this.multiFocus.update({
         curveSt,
@@ -459,7 +457,12 @@ class ViewerLineRect extends React.Component {
         `${this.rootKlassRect} .${LIST_BRUSH_SVG_GRAPH.RECT}`,
       );
       if (!hasRectSvg) {
-        drawMain(this.rootKlassRect, W, H, LIST_BRUSH_SVG_GRAPH.RECT);
+        drawMain(
+          this.rootKlassRect,
+          this.currentSizes.rect.width,
+          this.currentSizes.rect.height,
+          LIST_BRUSH_SVG_GRAPH.RECT,
+        );
       }
       const { threshold } = hplcMsSt;
       const curTrEndPts = convertThresEndPts(subViewFeature, threshold.value);
@@ -493,9 +496,32 @@ class ViewerLineRect extends React.Component {
   }
 
   componentWillUnmount() {
+    this.teardownResizeObserver();
     drawDestroy(this.rootKlassLine);
     drawDestroy(this.rootKlassMulti);
     drawDestroy(this.rootKlassRect);
+  }
+
+  // Redraw only when a pane actually changed size. Against an unbounded host the measured
+  // size is the one the current viewBox already produces, so this settles after the first
+  // pass instead of feeding itself.
+  handleResize() {
+    // Never mutate layout synchronously inside a ResizeObserver callback. The remount
+    // resizes the subtree being observed, and the browser abandons the delivery pass with
+    // "ResizeObserver loop completed with undelivered notifications" - which surfaces as
+    // an uncaught application error, not just a console warning. Deferring to the next
+    // frame lets the observer finish before anything moves.
+    //
+    // d3_multi remounts synchronously and gets away with it because its resize path is
+    // gated to Cyclic Voltammetry, whose container height is fixed by CSS and so cannot
+    // be fed back into by a redraw. This stack has no such guarantee.
+    if (this.resizeFrame != null) return;
+    this.resizeFrame = window.requestAnimationFrame(() => {
+      this.resizeFrame = null;
+      const sizes = this.resolvePaneSizes();
+      if (sameSizes(sizes, this.currentSizes)) return;
+      this.mountCharts(sizes, false);
+    });
   }
 
   handleUvvisUndo() {
@@ -506,6 +532,164 @@ class ViewerLineRect extends React.Component {
   handleUvvisRedo() {
     const { uvvisRedoAct } = this.props;
     uvvisRedoAct();
+  }
+
+  setupResizeObserver() {
+    if (typeof ResizeObserver === 'undefined') return;
+    if (!this.stackRef.current || this.resizeObserver) return;
+    this.resizeObserver = new ResizeObserver(this.handleResize);
+    this.resizeObserver.observe(this.stackRef.current);
+  }
+
+  // Measure every pane, so a stack whose three panes differ in height (a host that has
+  // not equalised them) still gets a correct viewBox each.
+  resolvePaneSizes() {
+    const fallback = { width: W, height: H };
+    return {
+      line: measurePane(this.lineRef?.current) || fallback,
+      multi: measurePane(this.multiRef?.current) || fallback,
+      rect: measurePane(this.rectRef?.current) || fallback,
+    };
+  }
+
+  createFocuses(sizes) {
+    const {
+      clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
+      ticEntities, uvvisEntities, uiSt,
+    } = this.props;
+    const shared = {
+      clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct, uiSt,
+    };
+
+    this.lineFocus = new LineFocus({
+      W: sizes.line.width,
+      H: sizes.line.height,
+      uvvisEntities,
+      graphIndex: 0,
+      ...shared,
+    });
+    this.multiFocus = new MultiFocus({
+      W: sizes.multi.width,
+      H: sizes.multi.height,
+      ticEntities,
+      graphIndex: 1,
+      ...shared,
+    });
+    this.rectFocus = new RectFocus({
+      W: sizes.rect.width,
+      H: sizes.rect.height,
+      graphIndex: 2,
+      ...shared,
+    });
+  }
+
+  teardownResizeObserver() {
+    if (this.resizeFrame != null) {
+      window.cancelAnimationFrame(this.resizeFrame);
+      this.resizeFrame = null;
+    }
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
+    }
+  }
+
+  // The whole draw sequence, parameterised by pane size so a resize can re-run it. Only
+  // the first run resets redux (`shouldReset`); a resize must not discard the user's zoom,
+  // threshold or selection.
+  mountCharts(sizes, shouldReset = false) {
+    const {
+      curveSt, feature, ticEntities, hplcMsSt,
+      tTrEndPts, layoutSt,
+      isUiAddIntgSt, isUiNoBrushSt,
+      integrationSt,
+      isHidden,
+      resetAllAct, uiSt,
+      editPeakSt,
+    } = this.props;
+    this.currentSizes = sizes;
+    drawDestroy(this.rootKlassMulti);
+    drawDestroy(this.rootKlassLine);
+    drawDestroy(this.rootKlassRect);
+    if (shouldReset) {
+      resetAllAct(feature);
+    }
+    this.createFocuses(sizes);
+
+    const { zoom } = uiSt;
+    const { sweepExtent } = zoom;
+
+    const uvvisViewFeature = this.extractUvvisView();
+    let uvvisSeed = [];
+    if (uvvisViewFeature?.data?.[0]) {
+      const currentData = uvvisViewFeature.data[0];
+      const { x, y } = currentData;
+      uvvisSeed = toSeed(x, y);
+    }
+    drawMain(this.rootKlassLine, sizes.line.width, sizes.line.height, LIST_BRUSH_SVG_GRAPH.LINE);
+    this.lineFocus.create({
+      filterSeed: uvvisSeed,
+      filterPeak: [],
+      tTrEndPts,
+      layoutSt,
+      isUiNoBrushSt: true,
+      sweepExtentSt: sweepExtent[0],
+      integrationSt,
+      isUiAddIntgSt,
+      editPeakSt,
+      hplcMsSt,
+    });
+    drawLabel(this.rootKlassLine, null, 'Minutes', 'Intensity');
+    drawDisplay(this.rootKlassLine, false);
+
+    const multiSize = sizes.multi;
+    drawMain(this.rootKlassMulti, multiSize.width, multiSize.height, LIST_BRUSH_SVG_GRAPH.MULTI);
+    this.multiFocus.create({
+      ticEntities,
+      curveSt,
+      hplcMsSt,
+      tTrEndPts,
+      layoutSt,
+      sweepExtentSt: sweepExtent[1],
+      isUiAddIntgSt,
+      isUiNoBrushSt,
+    });
+    drawLabel(this.rootKlassMulti, null, 'Minutes', 'Intensity');
+    drawDisplay(this.rootKlassMulti, isHidden);
+
+    // Seed the m/z pane with the scan that is currently selected rather than with an
+    // empty series. On first mount there is none and this stays [] as before - but a
+    // resize remount happens long after componentDidUpdate has drawn a scan here, and
+    // recreating the pane empty would silently wipe it with nothing to redraw it.
+    const subViewFeature = this.extractSubView();
+    let subSeed = [];
+    let subTrEndPts = tTrEndPts;
+    let subLabel = null;
+    if (subViewFeature?.data?.[0]) {
+      const { x, y } = subViewFeature.data[0];
+      subSeed = toSeed(x, y);
+      subTrEndPts = convertThresEndPts(subViewFeature, hplcMsSt?.threshold?.value);
+      const pageValue = parsePageValue(subViewFeature);
+      subLabel = Number.isFinite(pageValue)
+        ? pageValue
+        : (subViewFeature?.pageValue ?? subViewFeature?.page ?? null);
+    }
+    drawMain(this.rootKlassRect, sizes.rect.width, sizes.rect.height, LIST_BRUSH_SVG_GRAPH.RECT);
+    this.rectFocus.create({
+      filterSeed: subSeed,
+      filterPeak: [],
+      tTrEndPts: subTrEndPts,
+      layoutSt,
+      isUiNoBrushSt: true,
+      sweepExtentSt: sweepExtent[2],
+    });
+    drawLabel(
+      this.rootKlassRect,
+      subLabel != null ? `${subLabel} min` : null,
+      'm/z',
+      'Intensity',
+    );
+    drawDisplay(this.rootKlassRect, false);
   }
 
   extractUvvisView() {
@@ -660,7 +844,10 @@ class ViewerLineRect extends React.Component {
       selectWavelengthAct(event);
     };
     return (
-      <div className={classes.lcMsStackRoot}>
+      <div
+        className={`${LIST_HOST_HOOK_CLASS.LCMS_STACK} ${classes.lcMsStackRoot}`}
+        ref={this.stackRef}
+      >
         {
           omitUvvisToolbarRow ? null : (
             <div className={classes.lcMsToolbarRow}>
@@ -707,7 +894,7 @@ class ViewerLineRect extends React.Component {
             </div>
           )
         }
-        <div className={LIST_ROOT_SVG_GRAPH.LINE} />
+        <div className={LIST_ROOT_SVG_GRAPH.LINE} ref={this.lineRef} />
         <div className={classes.lcMsToolbarRow}>
           <div className={classes.lcMsToolbarLeft}>
             {
@@ -722,19 +909,18 @@ class ViewerLineRect extends React.Component {
           </div>
           <div className={classes.lcMsToolbarRight} />
         </div>
-        <div className={LIST_ROOT_SVG_GRAPH.MULTI} />
+        <div className={LIST_ROOT_SVG_GRAPH.MULTI} ref={this.multiRef} />
         <div className={classes.lcMsToolbarRow}>
           <div className={classes.lcMsToolbarLeft}>
             {
               zoomView(classes, 2, uiSt, zoomInAct)
             }
-          </div>
-          <div className={classes.lcMsToolbarRight}>
             <Threshold feature={resolvedFeature} hasEdit={hasEdit} />
           </div>
+          <div className={classes.lcMsToolbarRight} />
         </div>
-        <div className={classes.lcMsGraphPanel}>
-          <div className={LIST_ROOT_SVG_GRAPH.RECT} />
+        <div className={`${LIST_HOST_HOOK_CLASS.LCMS_GRAPH_PANEL} ${classes.lcMsGraphPanel}`}>
+          <div className={LIST_ROOT_SVG_GRAPH.RECT} ref={this.rectRef} />
           {
             isMsLoading ? (
               <div

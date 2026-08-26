@@ -32,6 +32,13 @@ MuButton.displayName = 'MuButton';
 const commonStyle = {
   card: {
     margin: '0 0 5px 52px',
+    // The outlined selects below (Submit, Write Peaks, Write Intensity, Decimal) are
+    // compressed to `selectInput.height = 30`, well under MUI's outlined geometry, so
+    // their shrunk InputLabel floats to about -9px - outside this box. Without the
+    // padding it only rendered because nothing above clipped; a host that bounds the
+    // editor with `overflow: hidden` truncates the labels. Reserve the room here so it
+    // holds for any host.
+    paddingTop: 10,
     border: '1px solid white',
     borderRadius: 4,
   },

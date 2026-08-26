@@ -34,9 +34,22 @@ const theme = (0, _styles.createTheme)({
 });
 const styles = () => ({
   panels: {
-    maxHeight: 'calc(90vh - 220px)',
+    // `display: table` silently defeated both declarations below it: CSS leaves the
+    // effect of `max-height` on a table box undefined, and `overflow` does not make one
+    // a scroll container. So this panel never capped and never scrolled - it grew to the
+    // full height of its accordions (measured at 1512px for five expanded panels against
+    // a 748px column) and simply overflowed whatever contained it. That went unnoticed
+    // while the host let the page grow; a host that bounds the editor and clips it
+    // instead shows the panel truncated at the bottom with no way to scroll to the rest.
+    display: 'block',
+    // Take the height from a bounded parent when there is one; `height: 100%` against an
+    // unbounded parent computes to `auto`, so the viewport-derived cap below still
+    // applies in a host that does not constrain us (and now actually works).
+    height: '100%',
+    minHeight: 0,
+    // 230, not 220 - see the matching constant in multi_jcamps_viewer.js.
+    maxHeight: 'calc(90vh - 230px)',
     // ROI
-    display: 'table',
     overflowX: 'hidden',
     overflowY: 'auto',
     margin: '5px 0 0 0',

@@ -26,6 +26,7 @@ var _r08_change_axes = _interopRequireDefault(require("./r08_change_axes"));
 var _r09_detector = _interopRequireDefault(require("./r09_detector"));
 var _r10_cv_density = _interopRequireDefault(require("./r10_cv_density"));
 var _format = _interopRequireDefault(require("../../helpers/format"));
+var _list_graph = require("../../constants/list_graph");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, function-paren-newline,
 react/function-component-definition, react/require-default-props */
@@ -95,7 +96,7 @@ const CmdBar = ({
   });
   if (prependLcMsToolbar) {
     return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
-      className: `${classes.card} ${classes.cardFlex}`,
+      className: `${_list_graph.LIST_HOST_HOOK_CLASS.CMD_BAR} ${classes.card} ${classes.cardFlex}`,
       children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
         className: classes.lcMsToolbarLeft,
         children: prependLcMsToolbar
@@ -109,7 +110,7 @@ const CmdBar = ({
     });
   }
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
-    className: classes.card,
+    className: `${_list_graph.LIST_HOST_HOOK_CLASS.CMD_BAR} ${classes.card}`,
     children: [hideMainEditTools ? null : /*#__PURE__*/(0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
       children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_viewer.default, {
         editorOnly: editorOnly

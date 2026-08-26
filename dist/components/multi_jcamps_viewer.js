@@ -20,6 +20,7 @@ var _curve = require("../actions/curve");
 var _cyclic_voltammetry = require("../actions/cyclic_voltammetry");
 var _list_layout = require("../constants/list_layout");
 var _format = _interopRequireDefault(require("../helpers/format"));
+var _list_graph = require("../constants/list_graph");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable react/default-props-match-prop-types,
 react/require-default-props, react/no-unused-prop-types, react/jsx-boolean-value,
@@ -37,7 +38,10 @@ const styles = () => ({
     fontSize: '14px'
   },
   cvEditor: {
-    height: 'calc(90vh - 220px)',
+    // 230, not 220: `commonStyle.card` reserves 10px above the toolbar for the
+    // outlined selects' floating labels, and this constant is the budget left
+    // over after it. Keep the two in step.
+    height: 'calc(90vh - 230px)',
     display: 'flex',
     flexDirection: 'column',
     minHeight: 0,
@@ -130,7 +134,7 @@ class MultiJcampsViewer extends _react.default.Component {
         editorOnly: editorOnly,
         hideThreshold: !_format.default.isNmrLayout(layoutSt)
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-        className: (0, _classnames.default)('react-spectrum-editor', isCyclicVolta && classes.cvEditor),
+        className: (0, _classnames.default)(_list_graph.LIST_HOST_HOOK_CLASS.EDITOR_ROOT, isCyclicVolta && classes.cvEditor),
         children: /*#__PURE__*/(0, _jsxRuntime.jsxs)(_Grid.default, {
           container: true,
           className: isCyclicVolta ? classes.cvTopRow : undefined,

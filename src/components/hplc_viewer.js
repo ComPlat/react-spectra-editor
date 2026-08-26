@@ -15,6 +15,7 @@ import CmdBar from './cmd_bar/index';
 import ViewerLineRect from './d3_line_rect/index';
 import LcMsUvToolsBar from './lc_ms_uv_tools_bar';
 import { splitAndReindexEntities } from '../helpers/extractEntityLCMS';
+import { LIST_HOST_HOOK_CLASS } from '../constants/list_graph';
 
 const styles = () => ({
   root: {
@@ -60,7 +61,7 @@ class HPLCViewer extends React.Component { // eslint-disable-line
           hideMainEditTools={true}
           prependLcMsToolbar={<LcMsUvToolsBar />}
         />
-        <div className="react-spectrum-editor">
+        <div className={LIST_HOST_HOOK_CLASS.EDITOR_ROOT}>
           <Grid container>
             <Grid item xs={9}>
               <ViewerLineRect
