@@ -4,7 +4,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.isLcmsMsPageLoading = exports.default = void 0;
+exports.sameSizes = exports.measurePane = exports.isLcmsMsPageLoading = exports.default = void 0;
 var _react = _interopRequireDefault(require("react"));
 var _reactRedux = require("react-redux");
 var _redux = require("redux");
@@ -40,9 +40,37 @@ var _extractEntityLCMS = require("../../helpers/extractEntityLCMS");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable no-mixed-operators, prefer-object-spread, react/function-component-definition */
 
+// Fallback viewBox, used only until the panes can be measured (and in jsdom, where
+// clientWidth/clientHeight are 0).
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.8 / 3); // ROI
 
+// Below this, the drawable area net of the focus classes' margins (l:60 r:5 t:5 b:40)
+// stops being meaningful; clamp rather than let a scale range invert.
+const MIN_PANE_W = 240;
+const MIN_PANE_H = 96;
+
+// Each chart svg carries `preserveAspectRatio="xMinYMin meet"`, so it is the viewBox
+// aspect - not the container - that decides how much of the pane the drawing fills. With
+// a viewBox derived once from `window.innerWidth` at module load, a pane proportionally
+// wider than that ratio scales the drawing down to its height and leaves the surplus
+// width empty on the right, which is what a viewport wider than FHD produces. Measuring
+// the pane and matching the viewBox to it removes the letterboxing in both directions.
+const measurePane = node => {
+  if (!node) return null;
+  const {
+    clientWidth,
+    clientHeight
+  } = node;
+  if (!clientWidth || !clientHeight) return null;
+  return {
+    width: Math.max(Math.round(clientWidth), MIN_PANE_W),
+    height: Math.max(Math.round(clientHeight), MIN_PANE_H)
+  };
+};
+exports.measurePane = measurePane;
+const sameSizes = (a, b) => Boolean(a) && Boolean(b) && ['line', 'multi', 'rect'].every(k => a[k].width === b[k].width && a[k].height === b[k].height);
+exports.sameSizes = sameSizes;
 const toSeed = (xValues = [], yValues = []) => {
   const maxLength = Math.min(xValues.length, yValues.length);
   const seed = new Array(maxLength);
@@ -286,46 +314,20 @@ const ticSelect = (classes, hplcMsSt, handleTicChanged) => {
 class ViewerLineRect extends _react.default.Component {
   constructor(props) {
     super(props);
-    const {
-      clickUiTargetAct,
-      selectUiSweepAct,
-      scrollUiWheelAct,
-      ticEntities,
-      uvvisEntities,
-      uiSt
-    } = props;
     this.rootKlassLine = `.${_list_graph.LIST_ROOT_SVG_GRAPH.LINE}`;
-    this.lineFocus = new _line_focus.default({
-      W,
-      H,
-      uvvisEntities,
-      clickUiTargetAct,
-      selectUiSweepAct,
-      scrollUiWheelAct,
-      graphIndex: 0,
-      uiSt
-    });
     this.rootKlassMulti = `.${_list_graph.LIST_ROOT_SVG_GRAPH.MULTI}`;
-    this.multiFocus = new _multi_focus.default({
-      W,
-      H,
-      ticEntities,
-      clickUiTargetAct,
-      selectUiSweepAct,
-      scrollUiWheelAct,
-      graphIndex: 1,
-      uiSt
-    });
     this.rootKlassRect = `.${_list_graph.LIST_ROOT_SVG_GRAPH.RECT}`;
-    this.rectFocus = new _rect_focus.default({
-      W,
-      H,
-      clickUiTargetAct,
-      selectUiSweepAct,
-      scrollUiWheelAct,
-      graphIndex: 2,
-      uiSt
-    });
+    this.stackRef = /*#__PURE__*/_react.default.createRef();
+    this.lineRef = /*#__PURE__*/_react.default.createRef();
+    this.multiRef = /*#__PURE__*/_react.default.createRef();
+    this.rectRef = /*#__PURE__*/_react.default.createRef();
+    this.resizeObserver = null;
+    this.currentSizes = null;
+
+    // Nothing is mounted yet, so this resolves to the fallback; componentDidMount
+    // re-measures and rebuilds against the real panes.
+    this.createFocuses(this.resolvePaneSizes());
+    this.handleResize = this.handleResize.bind(this);
     this.extractSubView = this.extractSubView.bind(this);
     this.notifyHostOnSubViewerChange = this.notifyHostOnSubViewerChange.bind(this);
     this.extractUvvisView = this.extractUvvisView.bind(this);
@@ -333,80 +335,8 @@ class ViewerLineRect extends _react.default.Component {
     this.handleUvvisRedo = this.handleUvvisRedo.bind(this);
   }
   componentDidMount() {
-    const {
-      curveSt,
-      feature,
-      ticEntities,
-      hplcMsSt,
-      tTrEndPts,
-      layoutSt,
-      isUiAddIntgSt,
-      isUiNoBrushSt,
-      integrationSt,
-      isHidden,
-      resetAllAct,
-      uiSt,
-      editPeakSt
-    } = this.props;
-    (0, _draw.drawDestroy)(this.rootKlassMulti);
-    (0, _draw.drawDestroy)(this.rootKlassLine);
-    (0, _draw.drawDestroy)(this.rootKlassRect);
-    resetAllAct(feature);
-    const {
-      zoom
-    } = uiSt;
-    const {
-      sweepExtent
-    } = zoom;
-    const uvvisViewFeature = this.extractUvvisView();
-    let uvvisSeed = [];
-    if (uvvisViewFeature?.data?.[0]) {
-      const currentData = uvvisViewFeature.data[0];
-      const {
-        x,
-        y
-      } = currentData;
-      uvvisSeed = toSeed(x, y);
-    }
-    (0, _draw.drawMain)(this.rootKlassLine, W, H, _list_graph.LIST_BRUSH_SVG_GRAPH.LINE);
-    this.lineFocus.create({
-      filterSeed: uvvisSeed,
-      filterPeak: [],
-      tTrEndPts,
-      layoutSt,
-      isUiNoBrushSt: true,
-      sweepExtentSt: sweepExtent[0],
-      integrationSt,
-      isUiAddIntgSt,
-      editPeakSt,
-      hplcMsSt
-    });
-    (0, _draw.drawLabel)(this.rootKlassLine, null, 'Minutes', 'Intensity');
-    (0, _draw.drawDisplay)(this.rootKlassLine, false);
-    (0, _draw.drawMain)(this.rootKlassMulti, W, H, _list_graph.LIST_BRUSH_SVG_GRAPH.MULTI);
-    this.multiFocus.create({
-      ticEntities,
-      curveSt,
-      hplcMsSt,
-      tTrEndPts,
-      layoutSt,
-      sweepExtentSt: sweepExtent[1],
-      isUiAddIntgSt,
-      isUiNoBrushSt
-    });
-    (0, _draw.drawLabel)(this.rootKlassMulti, null, 'Minutes', 'Intensity');
-    (0, _draw.drawDisplay)(this.rootKlassMulti, isHidden);
-    (0, _draw.drawMain)(this.rootKlassRect, W, H, _list_graph.LIST_BRUSH_SVG_GRAPH.RECT);
-    this.rectFocus.create({
-      filterSeed: [],
-      filterPeak: [],
-      tTrEndPts,
-      layoutSt,
-      isUiNoBrushSt: true,
-      sweepExtentSt: sweepExtent[2]
-    });
-    (0, _draw.drawLabel)(this.rootKlassRect, null, 'm/z', 'Intensity');
-    (0, _draw.drawDisplay)(this.rootKlassRect, false);
+    this.setupResizeObserver();
+    this.mountCharts(this.resolvePaneSizes(), true);
   }
   componentDidUpdate(prevProps) {
     const {
@@ -433,7 +363,7 @@ class ViewerLineRect extends _react.default.Component {
     if (uvvisViewFeature?.data?.[0]) {
       const hasLineSvg = !!document.querySelector(`${this.rootKlassLine} .${_list_graph.LIST_BRUSH_SVG_GRAPH.LINE}`);
       if (!hasLineSvg) {
-        (0, _draw.drawMain)(this.rootKlassLine, W, H, _list_graph.LIST_BRUSH_SVG_GRAPH.LINE);
+        (0, _draw.drawMain)(this.rootKlassLine, this.currentSizes.line.width, this.currentSizes.line.height, _list_graph.LIST_BRUSH_SVG_GRAPH.LINE);
       }
       const currentData = uvvisViewFeature.data[0];
       const {
@@ -462,7 +392,7 @@ class ViewerLineRect extends _react.default.Component {
     if (this.multiFocus) {
       const hasMultiSvg = !!document.querySelector(`${this.rootKlassMulti} .${_list_graph.LIST_BRUSH_SVG_GRAPH.MULTI}`);
       if (!hasMultiSvg) {
-        (0, _draw.drawMain)(this.rootKlassMulti, W, H, _list_graph.LIST_BRUSH_SVG_GRAPH.MULTI);
+        (0, _draw.drawMain)(this.rootKlassMulti, this.currentSizes.multi.width, this.currentSizes.multi.height, _list_graph.LIST_BRUSH_SVG_GRAPH.MULTI);
       }
       this.multiFocus.update({
         curveSt,
@@ -497,7 +427,7 @@ class ViewerLineRect extends _react.default.Component {
     if (subViewFeature) {
       const hasRectSvg = !!document.querySelector(`${this.rootKlassRect} .${_list_graph.LIST_BRUSH_SVG_GRAPH.RECT}`);
       if (!hasRectSvg) {
-        (0, _draw.drawMain)(this.rootKlassRect, W, H, _list_graph.LIST_BRUSH_SVG_GRAPH.RECT);
+        (0, _draw.drawMain)(this.rootKlassRect, this.currentSizes.rect.width, this.currentSizes.rect.height, _list_graph.LIST_BRUSH_SVG_GRAPH.RECT);
       }
       const {
         threshold
@@ -530,9 +460,19 @@ class ViewerLineRect extends _react.default.Component {
     }
   }
   componentWillUnmount() {
+    this.teardownResizeObserver();
     (0, _draw.drawDestroy)(this.rootKlassLine);
     (0, _draw.drawDestroy)(this.rootKlassMulti);
     (0, _draw.drawDestroy)(this.rootKlassRect);
+  }
+
+  // Redraw only when a pane actually changed size. Against an unbounded host the measured
+  // size is the one the current viewBox already produces, so this settles after the first
+  // pass instead of feeding itself.
+  handleResize() {
+    const sizes = this.resolvePaneSizes();
+    if (sameSizes(sizes, this.currentSizes)) return;
+    this.mountCharts(sizes, false);
   }
   handleUvvisUndo() {
     const {
@@ -545,6 +485,153 @@ class ViewerLineRect extends _react.default.Component {
       uvvisRedoAct
     } = this.props;
     uvvisRedoAct();
+  }
+  setupResizeObserver() {
+    if (typeof ResizeObserver === 'undefined') return;
+    if (!this.stackRef.current || this.resizeObserver) return;
+    this.resizeObserver = new ResizeObserver(this.handleResize);
+    this.resizeObserver.observe(this.stackRef.current);
+  }
+
+  // Measure every pane, so a stack whose three panes differ in height (a host that has
+  // not equalised them) still gets a correct viewBox each.
+  resolvePaneSizes() {
+    const fallback = {
+      width: W,
+      height: H
+    };
+    return {
+      line: measurePane(this.lineRef?.current) || fallback,
+      multi: measurePane(this.multiRef?.current) || fallback,
+      rect: measurePane(this.rectRef?.current) || fallback
+    };
+  }
+  createFocuses(sizes) {
+    const {
+      clickUiTargetAct,
+      selectUiSweepAct,
+      scrollUiWheelAct,
+      ticEntities,
+      uvvisEntities,
+      uiSt
+    } = this.props;
+    const shared = {
+      clickUiTargetAct,
+      selectUiSweepAct,
+      scrollUiWheelAct,
+      uiSt
+    };
+    this.lineFocus = new _line_focus.default({
+      W: sizes.line.width,
+      H: sizes.line.height,
+      uvvisEntities,
+      graphIndex: 0,
+      ...shared
+    });
+    this.multiFocus = new _multi_focus.default({
+      W: sizes.multi.width,
+      H: sizes.multi.height,
+      ticEntities,
+      graphIndex: 1,
+      ...shared
+    });
+    this.rectFocus = new _rect_focus.default({
+      W: sizes.rect.width,
+      H: sizes.rect.height,
+      graphIndex: 2,
+      ...shared
+    });
+  }
+  teardownResizeObserver() {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
+    }
+  }
+
+  // The whole draw sequence, parameterised by pane size so a resize can re-run it. Only
+  // the first run resets redux (`shouldReset`); a resize must not discard the user's zoom,
+  // threshold or selection.
+  mountCharts(sizes, shouldReset = false) {
+    const {
+      curveSt,
+      feature,
+      ticEntities,
+      hplcMsSt,
+      tTrEndPts,
+      layoutSt,
+      isUiAddIntgSt,
+      isUiNoBrushSt,
+      integrationSt,
+      isHidden,
+      resetAllAct,
+      uiSt,
+      editPeakSt
+    } = this.props;
+    this.currentSizes = sizes;
+    (0, _draw.drawDestroy)(this.rootKlassMulti);
+    (0, _draw.drawDestroy)(this.rootKlassLine);
+    (0, _draw.drawDestroy)(this.rootKlassRect);
+    if (shouldReset) {
+      resetAllAct(feature);
+    }
+    this.createFocuses(sizes);
+    const {
+      zoom
+    } = uiSt;
+    const {
+      sweepExtent
+    } = zoom;
+    const uvvisViewFeature = this.extractUvvisView();
+    let uvvisSeed = [];
+    if (uvvisViewFeature?.data?.[0]) {
+      const currentData = uvvisViewFeature.data[0];
+      const {
+        x,
+        y
+      } = currentData;
+      uvvisSeed = toSeed(x, y);
+    }
+    (0, _draw.drawMain)(this.rootKlassLine, sizes.line.width, sizes.line.height, _list_graph.LIST_BRUSH_SVG_GRAPH.LINE);
+    this.lineFocus.create({
+      filterSeed: uvvisSeed,
+      filterPeak: [],
+      tTrEndPts,
+      layoutSt,
+      isUiNoBrushSt: true,
+      sweepExtentSt: sweepExtent[0],
+      integrationSt,
+      isUiAddIntgSt,
+      editPeakSt,
+      hplcMsSt
+    });
+    (0, _draw.drawLabel)(this.rootKlassLine, null, 'Minutes', 'Intensity');
+    (0, _draw.drawDisplay)(this.rootKlassLine, false);
+    const multiSize = sizes.multi;
+    (0, _draw.drawMain)(this.rootKlassMulti, multiSize.width, multiSize.height, _list_graph.LIST_BRUSH_SVG_GRAPH.MULTI);
+    this.multiFocus.create({
+      ticEntities,
+      curveSt,
+      hplcMsSt,
+      tTrEndPts,
+      layoutSt,
+      sweepExtentSt: sweepExtent[1],
+      isUiAddIntgSt,
+      isUiNoBrushSt
+    });
+    (0, _draw.drawLabel)(this.rootKlassMulti, null, 'Minutes', 'Intensity');
+    (0, _draw.drawDisplay)(this.rootKlassMulti, isHidden);
+    (0, _draw.drawMain)(this.rootKlassRect, sizes.rect.width, sizes.rect.height, _list_graph.LIST_BRUSH_SVG_GRAPH.RECT);
+    this.rectFocus.create({
+      filterSeed: [],
+      filterPeak: [],
+      tTrEndPts,
+      layoutSt,
+      isUiNoBrushSt: true,
+      sweepExtentSt: sweepExtent[2]
+    });
+    (0, _draw.drawLabel)(this.rootKlassRect, null, 'm/z', 'Intensity');
+    (0, _draw.drawDisplay)(this.rootKlassRect, false);
   }
   extractUvvisView() {
     const {
@@ -702,6 +789,7 @@ class ViewerLineRect extends _react.default.Component {
     };
     return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
       className: `${_list_graph.LIST_HOST_HOOK_CLASS.LCMS_STACK} ${classes.lcMsStackRoot}`,
+      ref: this.stackRef,
       children: [omitUvvisToolbarRow ? null : /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
         className: classes.lcMsToolbarRow,
         children: [/*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
@@ -754,7 +842,8 @@ class ViewerLineRect extends _react.default.Component {
           className: classes.lcMsToolbarRight
         })]
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-        className: _list_graph.LIST_ROOT_SVG_GRAPH.LINE
+        className: _list_graph.LIST_ROOT_SVG_GRAPH.LINE,
+        ref: this.lineRef
       }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
         className: classes.lcMsToolbarRow,
         children: [/*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
@@ -772,23 +861,24 @@ class ViewerLineRect extends _react.default.Component {
           className: classes.lcMsToolbarRight
         })]
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-        className: _list_graph.LIST_ROOT_SVG_GRAPH.MULTI
+        className: _list_graph.LIST_ROOT_SVG_GRAPH.MULTI,
+        ref: this.multiRef
       }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
         className: classes.lcMsToolbarRow,
-        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
           className: classes.lcMsToolbarLeft,
-          children: zoomView(classes, 2, uiSt, zoomInAct)
-        }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-          className: classes.lcMsToolbarRight,
-          children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_r03_threshold.default, {
+          children: [zoomView(classes, 2, uiSt, zoomInAct), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r03_threshold.default, {
             feature: resolvedFeature,
             hasEdit: hasEdit
-          })
+          })]
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+          className: classes.lcMsToolbarRight
         })]
       }), /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
         className: `${_list_graph.LIST_HOST_HOOK_CLASS.LCMS_GRAPH_PANEL} ${classes.lcMsGraphPanel}`,
         children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-          className: _list_graph.LIST_ROOT_SVG_GRAPH.RECT
+          className: _list_graph.LIST_ROOT_SVG_GRAPH.RECT,
+          ref: this.rectRef
         }), isMsLoading ? /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
           className: classes.lcMsLoadingOverlay,
           "data-testid": "lcms-ms-loading",
