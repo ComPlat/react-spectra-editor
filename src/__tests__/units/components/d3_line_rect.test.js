@@ -361,12 +361,13 @@ describe('ViewerLineRect.maybeSeedUnionXExtent', () => {
   const feature = { maxY: 30 };
   const ticEntities = [{ topic, feature }];
 
-  const buildInstance = (sweepExtent) => {
+  const buildInstance = (sweepExtent, lastSeededXExtent = null) => {
     const instance = Object.create(UnconnectedViewerLineRect.prototype);
     instance.props = {
       uiSt: { zoom: { sweepExtent } },
       seedLcmsUnionExtentAct: jest.fn(),
     };
+    instance.lastSeededXExtent = lastSeededXExtent;
     return instance;
   };
 
@@ -378,19 +379,76 @@ describe('ViewerLineRect.maybeSeedUnionXExtent', () => {
 
     instance.maybeSeedUnionXExtent(layoutSt, uvvisSeed, ticEntities);
 
+    const expected = computeLcmsUnionXExtent(layoutSt, uvvisSeed, ticEntities);
     expect(instance.props.seedLcmsUnionExtentAct).toHaveBeenCalledTimes(1);
-    expect(instance.props.seedLcmsUnionExtentAct).toHaveBeenCalledWith(
-      computeLcmsUnionXExtent(layoutSt, uvvisSeed, ticEntities),
-    );
+    expect(instance.props.seedLcmsUnionExtentAct).toHaveBeenCalledWith(expected);
+    expect(instance.lastSeededXExtent).toEqual(expected);
   });
 
-  it('does not re-seed once either pane already has an xExtent (user zoom or prior seed)', () => {
+  it('does not seed when an xExtent is present and does not match our last seed (a real user zoom)', () => {
     const instance = buildInstance([
       { xExtent: { xL: 0, xU: 1 }, yExtent: false },
       { xExtent: false, yExtent: false },
     ]);
 
     instance.maybeSeedUnionXExtent(layoutSt, uvvisSeed, ticEntities);
+
+    expect(instance.props.seedLcmsUnionExtentAct).not.toHaveBeenCalled();
+  });
+
+  // Review finding S6: before this, an xExtent already present on either pane
+  // blocked recomputation forever, so a TIC polarity switch (a different
+  // retention-time range, with sweepExtent left untouched) kept the
+  // first-seeded domain. lastSeededXExtent lets maybeSeedUnionXExtent tell
+  // "still our own seed" from "the user zoomed" and keep tracking the data
+  // in the former case.
+  it('re-seeds with a new union when the data changed but the pane still holds our own last seed (S6)', () => {
+    const firstUnion = computeLcmsUnionXExtent(layoutSt, uvvisSeed, ticEntities);
+    const instance = buildInstance([
+      { xExtent: firstUnion, yExtent: false },
+      { xExtent: firstUnion, yExtent: false },
+    ], firstUnion);
+
+    // simulate a TIC polarity switch: a different curve, different RT range
+    const switchedTicEntities = [{
+      topic: { x: [50, 60], y: [1, 2] },
+      feature: { maxY: 2 },
+    }];
+
+    instance.maybeSeedUnionXExtent(layoutSt, uvvisSeed, switchedTicEntities);
+
+    const expected = computeLcmsUnionXExtent(layoutSt, uvvisSeed, switchedTicEntities);
+    expect(expected).not.toEqual(firstUnion);
+    expect(instance.props.seedLcmsUnionExtentAct).toHaveBeenCalledTimes(1);
+    expect(instance.props.seedLcmsUnionExtentAct).toHaveBeenCalledWith(expected);
+    expect(instance.lastSeededXExtent).toEqual(expected);
+  });
+
+  it('does not re-seed when the data is unchanged and the pane still holds our own last seed', () => {
+    const firstUnion = computeLcmsUnionXExtent(layoutSt, uvvisSeed, ticEntities);
+    const instance = buildInstance([
+      { xExtent: firstUnion, yExtent: false },
+      { xExtent: firstUnion, yExtent: false },
+    ], firstUnion);
+
+    instance.maybeSeedUnionXExtent(layoutSt, uvvisSeed, ticEntities);
+
+    expect(instance.props.seedLcmsUnionExtentAct).not.toHaveBeenCalled();
+  });
+
+  it('never re-seeds once the pane holds a real zoom, even if the underlying data later changes', () => {
+    const firstUnion = computeLcmsUnionXExtent(layoutSt, uvvisSeed, ticEntities);
+    // the user zoomed graph 1 to something that is not our last seed
+    const instance = buildInstance([
+      { xExtent: firstUnion, yExtent: false },
+      { xExtent: { xL: 1.4, xU: 1.6 }, yExtent: { yL: 0, yU: 1 } },
+    ], firstUnion);
+
+    const switchedTicEntities = [{
+      topic: { x: [50, 60], y: [1, 2] },
+      feature: { maxY: 2 },
+    }];
+    instance.maybeSeedUnionXExtent(layoutSt, uvvisSeed, switchedTicEntities);
 
     expect(instance.props.seedLcmsUnionExtentAct).not.toHaveBeenCalled();
   });

@@ -139,6 +139,13 @@ export const computeLcmsUnionXExtent = (layoutSt, uvvisSeed = [], ticEntities = 
   return { xL: Math.min(uvvisXL, ticXL), xU: Math.max(uvvisXU, ticXU) };
 };
 
+// computeLcmsUnionXExtent is a pure fold over the same underlying data each
+// render, so re-deriving an unchanged union yields bit-identical xL/xU —
+// plain equality is enough to tell "nothing changed" from "the data moved".
+export const sameXExtent = (a, b) => (
+  !!a && !!b && a.xL === b.xL && a.xU === b.xU
+);
+
 export const isLcmsMsPageLoading = (mzEntities = [], hplcMsSt = {}) => {
   const currentPageValue = hplcMsSt?.tic?.currentPageValue;
   if (!Number.isFinite(currentPageValue)) return false;
@@ -398,6 +405,11 @@ class ViewerLineRect extends React.Component {
     // re-measures and rebuilds against the real panes.
     this.currentSizes = this.resolvePaneSizes();
     this.createFocuses(this.currentSizes);
+
+    // The last union we ourselves wrote via seedLcmsUnionExtentAct, so
+    // maybeSeedUnionXExtent can tell "still our seed, safe to update" from "the
+    // user zoomed" without the reducer needing to know anything about it.
+    this.lastSeededXExtent = null;
 
     this.handleResize = this.handleResize.bind(this);
     this.extractSubView = this.extractSubView.bind(this);
@@ -747,17 +759,28 @@ class ViewerLineRect extends React.Component {
 
   // Seeds sweepExtent[0]/[1] with the same x-domain (via seedLcmsUnionExtentAct,
   // reusing the existing lcmsSyncX mirroring in updateZoom) whenever both are
-  // still unset — i.e. before any zoom, or right after a zoom reset. Skips
-  // seeding while either side has no data yet, rather than committing a
+  // still unset (before any zoom, or right after a zoom reset) OR still hold
+  // exactly what we ourselves seeded last time — so a TIC polarity switch (a
+  // different retention-time range, with sweepExtent untouched) keeps tracking
+  // the data instead of freezing on the first-seeded domain, while a real user
+  // zoom (sweepExtent no longer matching our last seed) is never overridden.
+  // Skips seeding while either side has no data yet, rather than committing a
   // partial union that would get stuck once one side's data arrives late.
   maybeSeedUnionXExtent(layoutSt, uvvisSeed, ticEntities) {
     const { uiSt, seedLcmsUnionExtentAct } = this.props;
     const sweepExtent = uiSt?.zoom?.sweepExtent;
     if (!Array.isArray(sweepExtent)) return;
-    if (sweepExtent[0]?.xExtent || sweepExtent[1]?.xExtent) return;
+
+    const isOursOrUnset = (entry) => (
+      !entry?.xExtent || sameXExtent(entry.xExtent, this.lastSeededXExtent)
+    );
+    if (!isOursOrUnset(sweepExtent[0]) || !isOursOrUnset(sweepExtent[1])) return;
 
     const unionXExtent = computeLcmsUnionXExtent(layoutSt, uvvisSeed, ticEntities);
-    if (unionXExtent) seedLcmsUnionExtentAct(unionXExtent);
+    if (!unionXExtent || sameXExtent(unionXExtent, this.lastSeededXExtent)) return;
+
+    this.lastSeededXExtent = unionXExtent;
+    seedLcmsUnionExtentAct(unionXExtent);
   }
 
   extractUvvisView() {
