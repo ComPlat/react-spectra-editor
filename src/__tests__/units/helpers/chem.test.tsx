@@ -12,6 +12,28 @@ import { LIST_SHIFT_1H } from "../../../constants/list_shift";
 import { LIST_LAYOUT } from "../../../constants/list_layout";
 import emissionsJcamp from "../../fixtures/emissions_jcamp";
 import dlsAcfJcamp from "../../fixtures/dls_acf_jcamp";
+import lcMsTicChemstationJcamp from "../../fixtures/lc_ms_jcamp_tic_chemstation";
+
+const buildTicJcamp = ({
+  xUnits, unitsLine = '', xValues, yValues,
+}: { xUnits: string, unitsLine?: string, xValues: number[], yValues: number[] }) => {
+  const lines = [
+    '##TITLE=Spectrum',
+    '##JCAMP-DX=5.00',
+    '##DATA TYPE=MASS TIC',
+    '##DATA CLASS=XYPOINTS',
+    `##XUNITS=${xUnits}`,
+    '##YUNITS=COUNTS',
+    ...(unitsLine ? [unitsLine] : []),
+    `##FIRSTX=${xValues[0]}`,
+    `##LASTX=${xValues[xValues.length - 1]}`,
+    `##NPOINTS=${xValues.length}`,
+    '##XYDATA=(XY..XY)',
+    ...xValues.map((x, i) => `${x}, ${yValues[i]}`),
+    '##END=',
+  ];
+  return `\n${lines.join('\n')}\n`;
+};
 
 function checkExtractSucceed(extractedData: any, forLayout: string) {
   const { spectra, features, layout } = extractedData
@@ -636,5 +658,61 @@ describe('Test for chem helper', () => {
       const offset = GetCyclicVoltaPreviousShift(voltaDataNoRef, 0)
       expect(offset).toEqual(-0.5)
     })
+  })
+
+  describe('Test TIC seconds-to-minutes normalization (issue #619)', () => {
+    it('leaves TIC x unchanged when XUNITS is explicit MINUTES, even past 60', () => {
+      const jcamp = buildTicJcamp({
+        xUnits: 'MINUTES',
+        xValues: [61, 90, 120],
+        yValues: [1, 2, 3],
+      });
+      const entity: any = ExtractJcamp(jcamp);
+      expect(entity.features[0].data[0].x).toEqual([61, 90, 120]);
+    });
+
+    it('scales TIC x to minutes when XUNITS is explicit SECONDS, even under 60', () => {
+      const jcamp = buildTicJcamp({
+        xUnits: 'SECONDS',
+        xValues: [6, 12, 18],
+        yValues: [1, 2, 3],
+      });
+      const entity: any = ExtractJcamp(jcamp);
+      const x = entity.features[0].data[0].x;
+      [0.1, 0.2, 0.3].forEach((expected, i) => expect(x[i]).toBeCloseTo(expected));
+    });
+
+    it('does not scale an ambiguous RETENTION TIME tag when values already look like minutes (<=60)', () => {
+      const jcamp = buildTicJcamp({
+        xUnits: 'RETENTION TIME',
+        xValues: [1.12, 7.5, 13.98],
+        yValues: [1, 2, 3],
+      });
+      const entity: any = ExtractJcamp(jcamp);
+      expect(entity.features[0].data[0].x).toEqual([1.12, 7.5, 13.98]);
+    });
+
+    it('scales an ambiguous RETENTION TIME tag when values look like seconds (>60)', () => {
+      const jcamp = buildTicJcamp({
+        xUnits: 'RETENTION TIME',
+        xValues: [60, 300, 600],
+        yValues: [1, 2, 3],
+      });
+      const entity: any = ExtractJcamp(jcamp);
+      const x = entity.features[0].data[0].x;
+      [1, 5, 10].forEach((expected, i) => expect(x[i]).toBeCloseTo(expected));
+    });
+
+    it('regression: retagging the chemstation TIC fixture like its sibling UVVIS fixture must not collapse its native-minutes range', () => {
+      // lc_ms_jcamp_uvvis_chemstation.js tags its (already-minutes) data this same way:
+      // ##XUNITS=RETENTION TIME plus a global ##UNITS=, MINUTES, ARBITRARY UNITS line.
+      const retagged = lcMsTicChemstationJcamp
+        .replace(/##XUNITS=MINUTES/g, '##XUNITS=RETENTION TIME')
+        .replace('##DATA CLASS=XYPOINTS', '##DATA CLASS=XYPOINTS\n##UNITS=, MINUTES, ARBITRARY UNITS');
+      const entity: any = ExtractJcamp(retagged);
+      const x = entity.features[0].data[0].x;
+      expect(x[0]).toBeCloseTo(1.1228, 3);
+      expect(x[x.length - 1]).toBeCloseTo(13.9829, 3);
+    });
   })
 })

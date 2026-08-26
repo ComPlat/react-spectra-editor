@@ -1,6 +1,7 @@
 import uiReducer from "../../../reducers/reducer_ui";
 import { UI } from "../../../constants/action_type";
 import { LIST_UI_SWEEP_TYPE } from "../../../constants/list_ui";
+import { seedLcmsUnionExtent } from "../../../actions/ui";
 
 describe('Test redux reducer_ui', () => {
   it('keeps only the selected graph in zoom mode', () => {
@@ -79,6 +80,19 @@ describe('Test redux reducer_ui', () => {
 
       expect(next.zoom.sweepExtent[0]).toEqual({ xExtent, yExtent: { yL: 0, yU: 1 } });
       expect(next.zoom.sweepExtent[1]).toEqual({ xExtent: false, yExtent: false });
+    });
+
+    // Review finding S4: the LC-MS union domain (computed once by
+    // ViewerLineRect.maybeSeedUnionXExtent from the TIC/UVVIS data) must reuse
+    // this exact same lcmsSyncX mirroring, so both panes end up on the
+    // identical xExtent rather than a second, parallel sync mechanism.
+    it('seedLcmsUnionExtent puts both graphs on the identical xExtent', () => {
+      const unionXExtent = { xL: 1.12, xU: 19.96 };
+      const next = uiReducer(undefined, seedLcmsUnionExtent(unionXExtent) as any);
+
+      expect(next.zoom.sweepExtent[0]).toEqual({ xExtent: unionXExtent, yExtent: false });
+      expect(next.zoom.sweepExtent[1]).toEqual({ xExtent: unionXExtent, yExtent: false });
+      expect(next.zoom.sweepExtent[0]).toEqual(next.zoom.sweepExtent[1]);
     });
   });
 });

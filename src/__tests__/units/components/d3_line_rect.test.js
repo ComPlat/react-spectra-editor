@@ -1,6 +1,28 @@
-import { isLcmsMsPageLoading, measurePane, sameSizes } from '../../../components/d3_line_rect/index';
-import { pickTicIndex } from '../../../components/d3_line_rect/multi_focus';
+import {
+  isLcmsMsPageLoading, measurePane, sameSizes,
+  UnconnectedViewerLineRect, computeLcmsUnionXExtent, toSeed,
+} from '../../../components/d3_line_rect/index';
+import LineFocus from '../../../components/d3_line_rect/line_focus';
+import MultiFocus, { pickTicIndex } from '../../../components/d3_line_rect/multi_focus';
 import RectFocus from '../../../components/d3_line_rect/rect_focus';
+import { resolveXExtent } from '../../../components/d3_line_rect/resolve_extent';
+import { ExtractJcamp, convertTopic } from '../../../helpers/chem';
+import { extractParams } from '../../../helpers/extractParams';
+import { LIST_LAYOUT } from '../../../constants/list_layout';
+import lcMsTicChemstationJcamp from '../../fixtures/lc_ms_jcamp_tic_chemstation';
+import lcMsUvvisChemstationJcamp from '../../fixtures/lc_ms_jcamp_uvvis_chemstation';
+
+// componentDidMount/componentDidUpdate do real DOM/D3 drawing via these helpers.
+// Mocked out so the "wiring" tests below can invoke the real lifecycle methods
+// (not a hand-built stand-in) without needing a mounted SVG tree — only
+// index.js imports from this module (rect_focus.js does not), so it doesn't
+// affect the RectFocus.drawBar test below.
+jest.mock('../../../components/common/draw', () => ({
+  drawMain: jest.fn(),
+  drawLabel: jest.fn(),
+  drawDisplay: jest.fn(),
+  drawDestroy: jest.fn(),
+}));
 
 describe('isLcmsMsPageLoading', () => {
   const buildMzEntity = (polarity, pageValues) => ({
@@ -147,5 +169,317 @@ describe('sameSizes (resize guard)', () => {
     const a = sizes(1296, 197);
     const b = sizes(1297, 198);
     expect(sameSizes(a, b)).toBe(true);
+  });
+});
+
+// Review finding N2: d3.extent already returns [min, max] sorted, so the
+// .sort() that used to follow it was dead work — and it silently let an
+// empty/all-undefined data set through as { xL: undefined, xU: undefined },
+// which would reach scales.x.domain() as NaN. resolveXExtent drops the sort
+// and falls back to a fixed placeholder range instead.
+describe('resolveXExtent (N2: dead sort + degenerate empty-data case)', () => {
+  it('returns the min/max of the data, unsorted input notwithstanding', () => {
+    const data = [{ x: 5 }, { x: 1 }, { x: 3 }];
+    expect(resolveXExtent(data, (d) => d.x)).toEqual({ xL: 1, xU: 5 });
+  });
+
+  it('falls back to a fixed placeholder range for an empty data array', () => {
+    expect(resolveXExtent([], (d) => d.x)).toEqual({ xL: 0, xU: 1 });
+  });
+
+  it('falls back to a fixed placeholder range when every x is undefined', () => {
+    const data = [{ y: 1 }, { y: 2 }];
+    expect(resolveXExtent(data, (d) => d.x)).toEqual({ xL: 0, xU: 1 });
+  });
+});
+
+describe('LineFocus/MultiFocus.setConfig with empty data (N2 regression)', () => {
+  it('LineFocus falls back to a placeholder xExtent instead of NaN when data is empty', () => {
+    const lineFocus = Object.create(LineFocus.prototype);
+    lineFocus.data = [];
+    lineFocus.factor = 0.125;
+    lineFocus.scales = {
+      x: { domain: jest.fn() },
+      y: { domain: jest.fn() },
+    };
+    lineFocus.axisCall = { x: { scale: jest.fn() }, y: { scale: jest.fn() } };
+
+    lineFocus.setConfig(false);
+
+    expect(lineFocus.currentExtent.xExtent).toEqual({ xL: 0, xU: 1 });
+    expect(lineFocus.scales.x.domain).toHaveBeenCalledWith([0, 1]);
+    expect(lineFocus.scales.x.domain.mock.calls[0][0].some(Number.isNaN)).toBe(false);
+  });
+
+  it('MultiFocus falls back to a placeholder xExtent instead of NaN when data is empty', () => {
+    const multiFocus = Object.create(MultiFocus.prototype);
+    multiFocus.data = [];
+    multiFocus.otherLineData = [];
+    multiFocus.factor = 0.125;
+    multiFocus.scales = {
+      x: { domain: jest.fn() },
+      y: { domain: jest.fn() },
+    };
+    multiFocus.axisCall = { x: { scale: jest.fn() }, y: { scale: jest.fn() } };
+
+    multiFocus.setConfig(false);
+
+    expect(multiFocus.currentExtent.xExtent).toEqual({ xL: 0, xU: 1 });
+    expect(multiFocus.scales.x.domain).toHaveBeenCalledWith([0, 1]);
+    expect(multiFocus.scales.x.domain.mock.calls[0][0].some(Number.isNaN)).toBe(false);
+  });
+});
+
+// Review finding S4: rather than each D3 focus class independently tracking the
+// other pane's data (siblingSeed), the union x-domain is computed once here and
+// seeded into Redux (seedLcmsUnionExtentAct), reusing the existing lcmsSyncX
+// mirroring in updateZoom (reducer_ui.js) as the single source of truth for
+// both panes' shared x-extent.
+describe('computeLcmsUnionXExtent', () => {
+  const layoutSt = LIST_LAYOUT.LC_MS;
+
+  it('returns null when the TIC side has no data yet, instead of a partial union', () => {
+    const uvvisSeed = [{ x: 1, y: 10 }, { x: 2, y: 20 }];
+    expect(computeLcmsUnionXExtent(layoutSt, uvvisSeed, [])).toBeNull();
+  });
+
+  it('returns null when the UVVIS side has no data yet, instead of a partial union', () => {
+    const topic = { x: [1, 2, 3], y: [10, 20, 30] };
+    const feature = { maxY: 30 };
+    expect(computeLcmsUnionXExtent(layoutSt, [], [{ topic, feature }])).toBeNull();
+  });
+
+  // Mirrors MultiFocus.setDataParams' own `if (!feature || !topic) return;`
+  // guard: an entity MultiFocus itself would skip must not still widen the
+  // seeded union, or the two panes would disagree by construction.
+  it('ignores a TIC entity with a topic but no feature, exactly like MultiFocus would', () => {
+    const uvvisSeed = [{ x: 1, y: 10 }, { x: 2, y: 20 }];
+    const noFeatureEntity = { topic: { x: [100, 200], y: [1, 2] }, feature: null };
+    expect(computeLcmsUnionXExtent(layoutSt, uvvisSeed, [noFeatureEntity])).toBeNull();
+  });
+
+  it('ignores a TIC entity with a feature but no topic', () => {
+    const uvvisSeed = [{ x: 1, y: 10 }, { x: 2, y: 20 }];
+    const noTopicEntity = { topic: null, feature: { maxY: 30 } };
+    expect(computeLcmsUnionXExtent(layoutSt, uvvisSeed, [noTopicEntity])).toBeNull();
+  });
+
+  it('unions a valid TIC entity (via convertTopic) with the UVVIS seed', () => {
+    const uvvisSeed = [{ x: 0.5, y: 5 }, { x: 4, y: 8 }];
+    const topic = { x: [1, 2, 3], y: [10, 20, 30] };
+    const feature = { maxY: 30 };
+    expect(computeLcmsUnionXExtent(layoutSt, uvvisSeed, [{ topic, feature }]))
+      .toEqual({ xL: 0.5, xU: 4 });
+  });
+
+  it('a feature-less TIC entity contributes nothing while a valid sibling still does', () => {
+    const uvvisSeed = [{ x: 0, y: 1 }];
+    const topic = { x: [5, 6], y: [50, 60] };
+    const feature = { maxY: 60 };
+    const validEntity = { topic, feature };
+    const invalidEntity = { topic: { x: [100, 200], y: [1, 2] }, feature: null };
+
+    expect(computeLcmsUnionXExtent(layoutSt, uvvisSeed, [validEntity, invalidEntity]))
+      .toEqual({ xL: 0, xU: 6 });
+  });
+
+  // Regression for #619: the chemstation TIC and UVVIS fixtures are a real-world
+  // example of the two LC-MS panes having mismatched native time ranges (TIC stops
+  // at ~14 min, UVVIS runs to ~20 min). The seeded union must span both, not clip
+  // to whichever pane's own data happens to be shorter.
+  it('spans the real chemstation TIC (~14 min) and UVVIS (~20 min) mismatched ranges', () => {
+    const ticEntity = ExtractJcamp(lcMsTicChemstationJcamp);
+    const uvvisEntity = ExtractJcamp(lcMsUvvisChemstationJcamp);
+    const { topic: ticTopic } = extractParams(ticEntity, null, null);
+    const uvvisData = uvvisEntity.features[0].data[0];
+
+    expect(ticTopic.x[ticTopic.x.length - 1]).toBeCloseTo(13.98, 1);
+    expect(uvvisData.x[uvvisData.x.length - 1]).toBeCloseTo(19.96, 1);
+
+    const uvvisSeed = toSeed(uvvisData.x, uvvisData.y);
+    const ticEntityWithTopic = { topic: ticTopic, feature: { maxY: 1 } };
+    const union = computeLcmsUnionXExtent(layoutSt, uvvisSeed, [ticEntityWithTopic]);
+
+    // UVVIS starts slightly before zero (-0.0435) and TIC starts at ~1.12 — the
+    // union's lower bound is whichever is smaller (UVVIS), its upper bound
+    // whichever is larger (UVVIS's ~19.96, well past TIC's ~13.98).
+    expect(union.xL).toBeCloseTo(uvvisData.x[0], 1);
+    expect(union.xU).toBeCloseTo(19.96, 1);
+  });
+});
+
+describe('ViewerLineRect.maybeSeedUnionXExtent', () => {
+  const layoutSt = LIST_LAYOUT.LC_MS;
+  const uvvisSeed = [{ x: 1, y: 10 }, { x: 2, y: 20 }];
+  const topic = { x: [1, 2, 3], y: [10, 20, 30] };
+  const feature = { maxY: 30 };
+  const ticEntities = [{ topic, feature }];
+
+  const buildInstance = (sweepExtent) => {
+    const instance = Object.create(UnconnectedViewerLineRect.prototype);
+    instance.props = {
+      uiSt: { zoom: { sweepExtent } },
+      seedLcmsUnionExtentAct: jest.fn(),
+    };
+    return instance;
+  };
+
+  it('seeds the union when both panes are still unset', () => {
+    const instance = buildInstance([
+      { xExtent: false, yExtent: false },
+      { xExtent: false, yExtent: false },
+    ]);
+
+    instance.maybeSeedUnionXExtent(layoutSt, uvvisSeed, ticEntities);
+
+    expect(instance.props.seedLcmsUnionExtentAct).toHaveBeenCalledTimes(1);
+    expect(instance.props.seedLcmsUnionExtentAct).toHaveBeenCalledWith(
+      computeLcmsUnionXExtent(layoutSt, uvvisSeed, ticEntities),
+    );
+  });
+
+  it('does not re-seed once either pane already has an xExtent (user zoom or prior seed)', () => {
+    const instance = buildInstance([
+      { xExtent: { xL: 0, xU: 1 }, yExtent: false },
+      { xExtent: false, yExtent: false },
+    ]);
+
+    instance.maybeSeedUnionXExtent(layoutSt, uvvisSeed, ticEntities);
+
+    expect(instance.props.seedLcmsUnionExtentAct).not.toHaveBeenCalled();
+  });
+
+  it('does not seed a partial union while one side has no data yet', () => {
+    const instance = buildInstance([
+      { xExtent: false, yExtent: false },
+      { xExtent: false, yExtent: false },
+    ]);
+
+    instance.maybeSeedUnionXExtent(layoutSt, [], ticEntities);
+
+    expect(instance.props.seedLcmsUnionExtentAct).not.toHaveBeenCalled();
+  });
+
+  it('does nothing when sweepExtent is not yet an array', () => {
+    const instance = buildInstance(undefined);
+
+    expect(() => (
+      instance.maybeSeedUnionXExtent(layoutSt, uvvisSeed, ticEntities)
+    )).not.toThrow();
+    expect(instance.props.seedLcmsUnionExtentAct).not.toHaveBeenCalled();
+  });
+});
+
+// Review finding S5: computeLcmsUnionXExtent and maybeSeedUnionXExtent are unit
+// tested directly above, but nothing proves componentDidMount/componentDidUpdate
+// actually derive uvvisSeed/ticEntities from real props and call
+// maybeSeedUnionXExtent with them — delete either call site and every test
+// above would still pass. These invoke the real (unmocked) lifecycle methods
+// on a plain instance to close that gap; only the DOM-drawing helpers and the
+// three D3 focus objects are stubbed.
+describe('ViewerLineRect componentDidMount/componentDidUpdate wiring (S5)', () => {
+  const layoutSt = LIST_LAYOUT.LC_MS;
+  const ticEntities = [{
+    topic: { x: [0, 5], y: [1, 2] },
+    feature: { maxY: 2 },
+  }];
+  const uvvisEntities = [{
+    layout: LIST_LAYOUT.LC_MS,
+    features: [{ data: [{ x: [1, 2], y: [10, 20] }] }],
+  }];
+  // The union of uvvisEntities' x=[1,2] and ticEntities' convertTopic-mapped x=[0,5].
+  const expectedUnion = { xL: 0, xU: 5 };
+
+  const buildProps = (sweepExtent) => ({
+    layoutSt,
+    curveSt: {},
+    feature: {},
+    ticEntities,
+    uvvisEntities,
+    mzEntities: [],
+    hplcMsSt: {
+      uvvis: { wavelengthIdx: 0 },
+      tic: { polarity: 'positive' },
+    },
+    tTrEndPts: [],
+    isUiAddIntgSt: false,
+    isUiNoBrushSt: false,
+    integrationSt: {},
+    isHidden: false,
+    editPeakSt: {},
+    resetAllAct: jest.fn(),
+    seedLcmsUnionExtentAct: jest.fn(),
+    uiSt: {
+      zoom: { sweepExtent },
+      subViewerAt: null,
+    },
+  });
+
+  const buildInstance = (sweepExtent) => {
+    const instance = Object.create(UnconnectedViewerLineRect.prototype);
+    instance.props = buildProps(sweepExtent);
+    instance.rootKlassLine = '.line';
+    instance.rootKlassMulti = '.multi';
+    instance.rootKlassRect = '.rect';
+    const stubFocuses = () => {
+      instance.lineFocus = { create: jest.fn(), update: jest.fn() };
+      instance.multiFocus = { create: jest.fn(), update: jest.fn() };
+      instance.rectFocus = { create: jest.fn(), update: jest.fn() };
+    };
+    stubFocuses();
+    // mountCharts rebuilds the three focus objects every time it runs (it has to - a
+    // resize remount gives them new pane sizes), so stubbing them once would let the real
+    // D3 classes replace the stubs mid-lifecycle. Install them from createFocuses instead,
+    // which keeps this test stubbing exactly what it says it stubs.
+    instance.createFocuses = stubFocuses;
+    return instance;
+  };
+
+  const unsetSweepExtent = () => ([
+    { xExtent: false, yExtent: false },
+    { xExtent: false, yExtent: false },
+    { xExtent: false, yExtent: false },
+  ]);
+
+  it('componentDidMount seeds the real, props-derived union', () => {
+    const instance = buildInstance(unsetSweepExtent());
+
+    instance.componentDidMount();
+
+    expect(instance.props.seedLcmsUnionExtentAct).toHaveBeenCalledTimes(1);
+    expect(instance.props.seedLcmsUnionExtentAct).toHaveBeenCalledWith(expectedUnion);
+    expect(instance.lineFocus.create).toHaveBeenCalledTimes(1);
+    expect(instance.multiFocus.create).toHaveBeenCalledTimes(1);
+  });
+
+  it('componentDidMount does not seed once a real zoom/seed already set an xExtent', () => {
+    const sweepExtent = unsetSweepExtent();
+    sweepExtent[0] = { xExtent: { xL: 0, xU: 1 }, yExtent: false };
+    const instance = buildInstance(sweepExtent);
+
+    instance.componentDidMount();
+
+    expect(instance.props.seedLcmsUnionExtentAct).not.toHaveBeenCalled();
+  });
+
+  it('componentDidUpdate re-seeds after a real reset (both graphs back to false)', () => {
+    const instance = buildInstance(unsetSweepExtent());
+
+    instance.componentDidUpdate(instance.props);
+
+    expect(instance.props.seedLcmsUnionExtentAct).toHaveBeenCalledTimes(1);
+    expect(instance.props.seedLcmsUnionExtentAct).toHaveBeenCalledWith(expectedUnion);
+    expect(instance.lineFocus.update).toHaveBeenCalledTimes(1);
+    expect(instance.multiFocus.update).toHaveBeenCalledTimes(1);
+  });
+
+  it('componentDidUpdate does not re-seed once one graph already has an xExtent', () => {
+    const sweepExtent = unsetSweepExtent();
+    sweepExtent[1] = { xExtent: { xL: 2, xU: 9 }, yExtent: false };
+    const instance = buildInstance(sweepExtent);
+
+    instance.componentDidUpdate(instance.props);
+
+    expect(instance.props.seedLcmsUnionExtentAct).not.toHaveBeenCalled();
   });
 });

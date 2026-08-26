@@ -14,6 +14,7 @@ var _format = _interopRequireDefault(require("../../helpers/format"));
 var _list_graph = require("../../constants/list_graph");
 var _chem = require("../../helpers/chem");
 var _extractEntityLCMS = require("../../helpers/extractEntityLCMS");
+var _resolve_extent = require("./resolve_extent");
 /* eslint-disable no-unused-vars, prefer-object-spread, no-mixed-operators,
 no-unneeded-ternary, arrow-body-style, max-len */
 
@@ -256,11 +257,7 @@ class MultiFocus {
       }
     }
     if (!xExtent) {
-      const xes = d3.extent(allData, d => d.x).sort((a, b) => a - b);
-      xExtent = {
-        xL: xes[0],
-        xU: xes[1]
-      };
+      xExtent = (0, _resolve_extent.resolveXExtent)(allData, d => d.x);
     }
     if (!yExtent) {
       const btm = d3.min(allData, d => d.y);

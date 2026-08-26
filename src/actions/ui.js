@@ -70,6 +70,19 @@ const displaySubViewerAt = (payload) => ({
   payload: payload == null ? { x: null, y: null } : payload,
 });
 
+// Seeds the LC-MS UVVIS (graph 0) and TIC (graph 1) panes with the same
+// x-domain via the existing lcmsSyncX mirroring in updateZoom
+// (reducer_ui.js), so both panes share one source of truth for their
+// x-extent instead of each auto-fitting to its own data independently.
+const seedLcmsUnionExtent = (xExtent) => ({
+  type: UI.SWEEP.SELECT_ZOOMIN,
+  payload: {
+    graphIndex: 0,
+    zoomValue: { xExtent, yExtent: false },
+    lcmsSyncX: 1,
+  },
+});
+
 export {
   setUiViewerType,
   setUiSweepType,
@@ -77,4 +90,5 @@ export {
   scrollUiWheel,
   clickUiTarget,
   displaySubViewerAt,
+  seedLcmsUnionExtent,
 };

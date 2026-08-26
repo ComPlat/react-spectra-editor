@@ -16,6 +16,7 @@ import {
   convertTopic,
 } from '../../helpers/chem';
 import { getLcMsInfo } from '../../helpers/extractEntityLCMS';
+import { resolveXExtent } from './resolve_extent';
 
 const d3 = require('d3');
 
@@ -266,8 +267,7 @@ class MultiFocus {
     }
 
     if (!xExtent) {
-      const xes = d3.extent(allData, (d) => d.x).sort((a, b) => a - b);
-      xExtent = { xL: xes[0], xU: xes[1] };
+      xExtent = resolveXExtent(allData, (d) => d.x);
     }
     if (!yExtent) {
       const btm = d3.min(allData, (d) => d.y);

@@ -1,5 +1,6 @@
 import hplcMsReducer from "../../../reducers/reducer_hplc_ms";
 import { CURVE, HPLC_MS } from "../../../constants/action_type";
+import { ExtractJcamp } from "../../../helpers/chem";
 
 const createTicCurve = (polarity: 'positive' | 'negative' | 'neutral', x = [1, 2], y = [10, 20]) => ({
   csCategory: ['tic', polarity],
@@ -425,5 +426,68 @@ describe('Test redux reducer_hplc_ms', () => {
     expect(state.uvvisEditHistory.future.length).toEqual(1);
     state = hplcMsReducer(state, { type: HPLC_MS.UVVIS_REDO } as any);
     expect(state.uvvis.spectraList[0].peaks.length).toEqual(origPeaks.length + 1);
+  });
+
+  describe('TIC minute normalization reaches hplcMs state, not just listCurves.topic (issue #619)', () => {
+    // Minute normalization happens once, in chem.js's extrSpectraMs, on the raw
+    // parsed spectra — before entity.features/entity.spectra exist. Building
+    // curves by hand (like createTicCurve above) bypasses that step entirely, so
+    // this exercises the real ExtractJcamp parse to prove the fix reaches every
+    // consumer of entity.features, not only the topic/feature extractParams builds.
+    const buildTicJcamp = (xUnits: string, xValues: number[], yValues: number[]) => {
+      const lines = [
+        '##TITLE=Spectrum',
+        '##JCAMP-DX=5.00',
+        '##DATA TYPE=MASS TIC',
+        '##DATA CLASS=XYPOINTS',
+        `##XUNITS=${xUnits}`,
+        '##YUNITS=COUNTS',
+        `##FIRSTX=${xValues[0]}`,
+        `##LASTX=${xValues[xValues.length - 1]}`,
+        `##NPOINTS=${xValues.length}`,
+        '##XYDATA=(XY..XY)',
+        ...xValues.map((x, i) => `${x}, ${yValues[i]}`),
+        '##END=',
+      ];
+      return `\n${lines.join('\n')}\n`;
+    };
+
+    const uvvisJcamp = `
+
+$$ === CHEMSPECTRA UVVIS PEAK TABLE ===
+##TITLE=probe-uvvis
+##JCAMP-DX=5.00
+##DATA TYPE=LC/MS
+##DATA CLASS=PEAK TABLE
+##SYMBOL=X, Y
+##XUNITS=MINUTES
+##YUNITS=DETECTOR SIGNAL
+##$CSCATEGORY=UVVIS PEAK TABLE
+##PAGE=210.0
+##NPOINTS=3
+##DATA TABLE= (XY..XY), PEAKS
+1.0, 10;
+5.0, 20;
+14.0, 30;
+##END=
+`;
+
+    it('a seconds-tagged TIC ends up minutes-scaled in state.hplcMs.tic and currentPageValue', () => {
+      const ticEntity = ExtractJcamp(buildTicJcamp('SECONDS', [67.369, 450, 838.976], [100, 200, 300]));
+      const uvvisEntity = ExtractJcamp(uvvisJcamp);
+
+      const state: any = hplcMsReducer(undefined, {
+        type: CURVE.SET_ALL_CURVES,
+        payload: [ticEntity, uvvisEntity],
+      } as any);
+
+      expect(state.tic.polarity).toEqual('neutral');
+      const x = state.tic.neutral.data.x;
+      [1.1228166666666666, 7.5, 13.982933333333333].forEach((expected, i) => {
+        expect(x[i]).toBeCloseTo(expected);
+      });
+      // the auto-selected retention time must be the minutes value, not the raw 67.369 seconds
+      expect(state.tic.currentPageValue).toBeCloseTo(1.1228166666666666);
+    });
   });
 });

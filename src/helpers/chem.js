@@ -456,6 +456,35 @@ const extrSpectraMs = (jcamp, layout) => {
     return '';
   };
 
+  const jcampUnitsField = String(jcamp?.info?.UNITS || '').toUpperCase();
+  const jcampUnitsIndicatesMinutes = jcampUnitsField.includes('MINUTE');
+  const jcampUnitsIndicatesSeconds = jcampUnitsField.includes('SECOND');
+
+  const getMaxAbsX = (data) => {
+    const xs = data?.[0]?.x;
+    if (!Array.isArray(xs) || xs.length === 0) return 0;
+    return xs.reduce((max, value) => {
+      const abs = Math.abs(Number(value));
+      return Number.isFinite(abs) && abs > max ? abs : max;
+    }, 0);
+  };
+
+  // LC-MS time axes (UVVIS and TIC alike) are tagged MINUTES, an explicit
+  // SECONDS, or an ambiguous "RETENTION TIME" that different exporters use for
+  // either unit. Only convert when nothing explicitly says MINUTES, and either
+  // SECONDS is explicit or the values themselves look like seconds (>60).
+  const resolveSecToMinScale = (spectrum) => {
+    const xUnitUpper = String(spectrum?.xUnit || '').toUpperCase();
+    const isExplicitMinutes = xUnitUpper.includes('MINUTE') || jcampUnitsIndicatesMinutes;
+    const isExplicitSeconds = xUnitUpper.includes('SECOND') || jcampUnitsIndicatesSeconds;
+    const isTimeAxis = xUnitUpper.includes('TIME') || xUnitUpper.includes('SECOND');
+    const dataLooksLikeSeconds = getMaxAbsX(spectrum?.data) > 60;
+    const needsSecToMin = isTimeAxis
+      && !isExplicitMinutes
+      && (isExplicitSeconds || dataLooksLikeSeconds);
+    return needsSecToMin ? (1 / 60) : 1;
+  };
+
   if (isUvvisData) {
     const spectraList = jcamp.spectra || [];
     const uvvisSpectra = [];
@@ -511,29 +540,10 @@ const extrSpectraMs = (jcamp, layout) => {
 
     const container = jcamp?.info?.$OBSERVEDINTEGRALS ?? null;
 
-    const jcampUnitsField = String(jcamp?.info?.UNITS || '').toUpperCase();
-    const jcampUnitsIndicatesMinutes = jcampUnitsField.includes('MINUTE');
-    const jcampUnitsIndicatesSeconds = jcampUnitsField.includes('SECOND');
-
-    const getMaxAbsX = (data) => {
-      const xs = data?.[0]?.x;
-      if (!Array.isArray(xs) || xs.length === 0) return 0;
-      return xs.reduce((max, value) => {
-        const abs = Math.abs(Number(value));
-        return Number.isFinite(abs) && abs > max ? abs : max;
-      }, 0);
-    };
-
     uvvisSpectra.forEach(({ spectrum }, pairIdx) => {
-      const xUnitUpper = String(spectrum?.xUnit || '').toUpperCase();
-      const isExplicitMinutes = xUnitUpper.includes('MINUTE') || jcampUnitsIndicatesMinutes;
-      const isExplicitSeconds = xUnitUpper.includes('SECOND') || jcampUnitsIndicatesSeconds;
-      const isTimeAxis = xUnitUpper.includes('TIME') || xUnitUpper.includes('SECOND');
-      const dataLooksLikeSeconds = getMaxAbsX(spectrum?.data) > 60;
-      const needsSecToMin = isTimeAxis
-        && !isExplicitMinutes
-        && (isExplicitSeconds || dataLooksLikeSeconds);
-      const scaleX = (value) => (needsSecToMin ? value / 60 : value);
+      const minuteScale = resolveSecToMinScale(spectrum);
+      const needsSecToMin = minuteScale !== 1;
+      const scaleX = (value) => value * minuteScale;
       const pageKey = spectrum.pageValue ?? spectrum.page;
       const peakTable = peakTablesByPage.get(pageKey);
       let selectedPeakTable = null;
@@ -578,9 +588,14 @@ const extrSpectraMs = (jcamp, layout) => {
     });
   } else if (isTicData) {
     (jcamp.spectra || []).forEach((s) => {
-      const hasPoints = s?.data?.[0]?.x?.length > 0;
+      const originalData = s?.data?.[0];
+      const hasPoints = originalData?.x?.length > 0;
       if (hasPoints) {
-        finalSpectra.push({ ...s, csCategory: inferLcMsCategory(s, jcamp) });
+        const minuteScale = resolveSecToMinScale(s);
+        const data = minuteScale === 1
+          ? s.data
+          : [{ ...originalData, x: originalData.x.map((value) => value * minuteScale) }];
+        finalSpectra.push({ ...s, data, csCategory: inferLcMsCategory(s, jcamp) });
       }
     });
   } else {

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.setUiViewerType = exports.setUiSweepType = exports.selectUiSweep = exports.scrollUiWheel = exports.displaySubViewerAt = exports.clickUiTarget = void 0;
+exports.setUiViewerType = exports.setUiSweepType = exports.selectUiSweep = exports.seedLcmsUnionExtent = exports.scrollUiWheel = exports.displaySubViewerAt = exports.clickUiTarget = void 0;
 var _action_type = require("../constants/action_type");
 var _list_ui = require("../constants/list_ui");
 var _integration_draft = require("../helpers/integration_draft.js");
@@ -62,4 +62,21 @@ const displaySubViewerAt = payload => ({
     y: null
   } : payload
 });
+
+// Seeds the LC-MS UVVIS (graph 0) and TIC (graph 1) panes with the same
+// x-domain via the existing lcmsSyncX mirroring in updateZoom
+// (reducer_ui.js), so both panes share one source of truth for their
+// x-extent instead of each auto-fitting to its own data independently.
 exports.displaySubViewerAt = displaySubViewerAt;
+const seedLcmsUnionExtent = xExtent => ({
+  type: _action_type.UI.SWEEP.SELECT_ZOOMIN,
+  payload: {
+    graphIndex: 0,
+    zoomValue: {
+      xExtent,
+      yExtent: false
+    },
+    lcmsSyncX: 1
+  }
+});
+exports.seedLcmsUnionExtent = seedLcmsUnionExtent;
