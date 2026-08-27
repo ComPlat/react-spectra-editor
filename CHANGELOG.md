@@ -4,6 +4,16 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.8.2] - 2026-08-27
+
+### Fixed
+- LC/MS retention time is normalized to minutes and the UV and TIC panes share an aligned domain (#323)
+- LC/MS: a UV/VIS axis delivered in seconds behind a MINUTES label is corrected (#326)
+- LC/MS: the three-graph stack, the toolbar and the panel now fit their container (#325)
+- CV: an incomplete feature no longer takes the whole editor down (#327)
+
+[1.8.2]: https://github.com/ComPlat/react-spectra-editor/releases/tag/v1.8.2
+
 ## [1.8.1] - 2026-08-25
 
 ### Fixed
