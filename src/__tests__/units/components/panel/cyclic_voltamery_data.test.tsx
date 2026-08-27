@@ -92,3 +92,38 @@ describe('<CyclicVoltammetryPanel />', () => {
     })
   })
 });
+
+// Reported as a white screen when opening a CV analysis:
+//   TypeError: Cannot read properties of undefined (reading '0')
+//     at getRatio (cyclic_voltamery_data.js)  <- feature.data[0]
+//     at Array.map
+// getRatio dereferences feature.data[0] unconditionally, before the max/min guard that
+// decides whether the value is used at all. The surrounding component already treats the
+// feature as possibly incomplete (`feature?.data?.[0]?.x?.length` in multi_jcamps_viewer),
+// and getDelta right above it guards properly, so this one site was the outlier. A stored
+// peak list with a feature that carries no data block is enough to take the whole editor
+// down.
+describe('<CyclicVoltammetryPanel /> with an incomplete feature', () => {
+  const renderWith = (feature: any): RenderResult => render(
+    <Provider store={store}>
+      <CyclicVoltammetryPanel
+        expand={false}
+        onExapnd={() => {}}
+        molSvg=""
+        feature={feature}
+      />
+    </Provider>,
+  );
+
+  it('renders when the feature carries no data block', () => {
+    expect(() => renderWith({ xUnit: 'V', yUnit: 'A', maxX: 1.0 })).not.toThrow();
+  });
+
+  it('renders when the feature has an empty data array', () => {
+    expect(() => renderWith({ xUnit: 'V', yUnit: 'A', maxX: 1.0, data: [] })).not.toThrow();
+  });
+
+  it('renders when the data block has no x/y arrays', () => {
+    expect(() => renderWith({ xUnit: 'V', yUnit: 'A', maxX: 1.0, data: [{}] })).not.toThrow();
+  });
+});

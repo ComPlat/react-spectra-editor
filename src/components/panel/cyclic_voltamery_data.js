@@ -208,10 +208,32 @@ const CyclicVoltammetryPanel = ({
   };
 
   const getRatio = (feature, data) => {
-    const featureData = feature.data[0];
-    const idx = featureData.x.indexOf(feature.maxX);
-    const y_pecker = data.pecker ? data.pecker.y : featureData.y[idx];
-    return (data.max && data.min) ? Format.strNumberFixedLength(GetCyclicVoltaRatio(data.max.y, data.min.y, y_pecker), 3) : 'nd';
+    // Guard first, as getDelta above does. The ratio is only defined for a complete peak
+    // pair, and the feature is only consulted at all when this row has no pecker of its
+    // own - so nothing here should be reaching into the curve before it knows it needs to.
+    if (!data.max || !data.min) return 'nd';
+
+    let yPecker;
+    if (data.pecker) {
+      yPecker = data.pecker.y;
+    } else {
+      // A stored peak list can outlive the curve it was measured on: an entity may arrive
+      // with its cyclic-voltammetry data hydrated but no data block on the feature, and
+      // this panel is rendered from the peak list rather than from the curve. Dereferencing
+      // the curve unconditionally here took the whole editor down with
+      // "Cannot read properties of undefined" rather than degrading this one cell.
+      const featureData = feature?.data?.[0];
+      const xs = featureData?.x;
+      const idx = Array.isArray(xs) ? xs.indexOf(feature?.maxX) : -1;
+      yPecker = idx >= 0 ? featureData?.y?.[idx] : undefined;
+    }
+    // GetCyclicVoltaRatio would turn a missing value into NaN and render "NaN"; say
+    // "nd" instead, which is what every other cell in this table shows when unknown.
+    if (!Number.isFinite(yPecker)) return 'nd';
+
+    return Format.strNumberFixedLength(
+      GetCyclicVoltaRatio(data.max.y, data.min.y, yPecker), 3,
+    );
   };
 
   const rows = list.map((o, idx) => (
