@@ -17,6 +17,7 @@ import { addOthers } from './actions/jcamp';
 import LayerPrism from './layer_prism';
 import Format from './helpers/format';
 import { getLcMsInfo, isLcMsGroup } from './helpers/extractEntityLCMS';
+import { reconcileLcMsTimeAxes } from './features/lc-ms/entities/timeAxis';
 import MultiJcampsViewer from './components/multi_jcamps_viewer';
 import HPLCViewer from './components/hplc_viewer';
 import { setAllCurves } from './actions/curve';
@@ -182,7 +183,7 @@ class LayerInit extends React.Component {
     const isMultiSpectra = Array.isArray(multiEntities) && multiEntities.length > 1;
     if (isMultiSpectra) {
       const meta = Format.isLCMsLayout(entity.layout) ? lcmsCurveMeta() : undefined;
-      setAllCurvesAct(multiEntities, meta);
+      setAllCurvesAct(reconcileLcMsTimeAxes(multiEntities), meta);
       return;
     }
 
@@ -190,7 +191,7 @@ class LayerInit extends React.Component {
       const payload = (Array.isArray(multiEntities) && multiEntities.length > 0)
         ? multiEntities
         : [entity];
-      setAllCurvesAct(payload, lcmsCurveMeta());
+      setAllCurvesAct(reconcileLcMsTimeAxes(payload), lcmsCurveMeta());
       return;
     }
 
