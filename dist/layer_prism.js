@@ -39,20 +39,37 @@ const getThresholdState = state => {
 // whenever `feature`'s reference changes, and that cascades into a fresh
 // state.threshold reference, causing LayerPrism to re-render and rebuild
 // `feature` again, and so on, once per host render. Since `entity` can carry
-// large spectral data arrays, avoid stringifying it wholesale; use the same
-// lightweight id/shape signature LayerInit already uses to detect "same
-// dataset, new reference".
+// large spectral data arrays, avoid stringifying it wholesale; digest only
+// each data block's length/first/last on BOTH axes.
+//
+// Unlike LayerInit's own (lower-stakes) entitySignature helper - which only
+// gates whether to re-dispatch a redux init action, so a false "unchanged"
+// merely skips a re-init - this signature directly gates what actually gets
+// RENDERED, so it must not collide between two genuinely different entities.
+// An X-only, first-spectrum-only digest is not safe enough for that: many
+// instrument types (IR in particular) resample every measurement onto the
+// same standardized wavenumber grid, so two completely different samples
+// can share identical x length/head/tail while their y (measured) values
+// differ - and an entity's actually-displayed data is not always its first
+// spectra entry (an MS-layout entity's topic comes from spectra[scanIdx],
+// selected by getScanIdx, not spectra[0]). Digest every spectrum block (not
+// just the first) and both axes, plus the feature blocks extractParams
+// itself reads (autoPeak/editPeak), so a mismatch anywhere in what
+// extractParams actually consumes invalidates the cache.
+const dataBlockDigest = data0 => {
+  if (!data0) return 'none';
+  const xs = Array.isArray(data0.x) ? data0.x : [];
+  const ys = Array.isArray(data0.y) ? data0.y : [];
+  return `${xs.length}:${xs[0]}:${xs[xs.length - 1]}:${ys.length}:${ys[0]}:${ys[ys.length - 1]}`;
+};
 const entitySignature = e => {
   if (!e) return 'none';
   const id = e.idDt ?? e.id ?? e.datasetId;
-  if (id != null && id !== '') return `id:${id}`;
-  const firstFeature = (Array.isArray(e.features) ? e.features[0] : null) || (Array.isArray(e.spectra) ? e.spectra[0] : null) || null;
-  const data0 = firstFeature?.data?.[0];
-  const xs = data0?.x;
-  const xLen = Array.isArray(xs) ? xs.length : 0;
-  const xHead = Array.isArray(xs) && xs.length > 0 ? xs[0] : '';
-  const xTail = Array.isArray(xs) && xs.length > 0 ? xs[xs.length - 1] : '';
-  return `sig:${e.layout || ''}|${e.title || ''}|${xLen}|${xHead}|${xTail}`;
+  const spectraDigest = Array.isArray(e.spectra) ? e.spectra.map(s => dataBlockDigest(s?.data?.[0])).join(';') : 'none';
+  const features = e.features && typeof e.features === 'object' && !Array.isArray(e.features) ? e.features : {};
+  const autoDigest = dataBlockDigest(features.autoPeak?.data?.[0]);
+  const editDigest = dataBlockDigest(features.editPeak?.data?.[0]);
+  return `${e.layout || ''}|${e.title || ''}|id:${id ?? ''}|sp:${spectraDigest}|auto:${autoDigest}|edit:${editDigest}`;
 };
 const useExtractedParams = (entity, thresSt, scanSt) => {
   const signature = `${entitySignature(entity)}|${JSON.stringify(thresSt)}|${JSON.stringify(scanSt)}`;
