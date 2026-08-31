@@ -1,10 +1,15 @@
 import configureStore from 'redux-mock-store'
 import { Provider } from 'react-redux'
-import { render } from '@testing-library/react'; 
+import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Peak from '../../../../components/cmd_bar/03_peak';
 import { LIST_UI_SWEEP_TYPE } from '../../../../constants/list_ui';
 import { LIST_LAYOUT } from '../../../../constants/list_layout';
+import { extractAutoPeaks } from '../../../../helpers/extractPeaksEdit';
+
+jest.mock('../../../../helpers/extractPeaksEdit', () => ({
+  extractAutoPeaks: jest.fn(() => []),
+}));
 
 const mockStore = configureStore([]);
 const store = mockStore({
@@ -102,5 +107,44 @@ describe('<Peak />', () => {
     const renderResult = queryByTestId('Peak');
     expect(renderResult).toBeInTheDocument();
     expect(renderResult.childElementCount).toEqual(3);
+  });
+
+  it('Clear All Peaks uses the selected curve\'s shift offset, not curve 0\'s', () => {
+    extractAutoPeaks.mockClear();
+    const curveIdx = 2;
+    const nonZeroCurveStore = mockStore({
+      ui: { sweepType: LIST_UI_SWEEP_TYPE.ZOOMIN },
+      layout: LIST_LAYOUT.H1,
+      curve: { curveIdx },
+      editPeak: {
+        present: {
+          selectedIdx: 0,
+          peaks: [{ prevOffset: 0, pos: [], neg: [] }],
+        },
+      },
+      threshold: {
+        selectedIdx: 0,
+        list: [
+          { isEdit: true, value: false, upper: false, lower: false },
+          { isEdit: true, value: false, upper: false, lower: false },
+          { isEdit: true, value: false, upper: false, lower: false },
+        ],
+      },
+      shift: { shifts: [] },
+      cyclicvolta: {},
+    });
+    nonZeroCurveStore.dispatch = jest.fn(dispatchMock);
+
+    const { container } = render(
+      <AppWrapper store={nonZeroCurveStore}>
+        <Peak feature={{}} />
+      </AppWrapper>,
+    );
+
+    fireEvent.click(container.querySelector('.btn-sv-bar-one'));
+    fireEvent.click(container.querySelector('.btn-sv-bar-yes'));
+
+    expect(extractAutoPeaks).toHaveBeenCalledTimes(1);
+    expect(extractAutoPeaks.mock.calls[0][4]).toEqual(curveIdx);
   });
 })

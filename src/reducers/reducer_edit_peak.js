@@ -153,7 +153,7 @@ const clearAllPeaks = (state, action) => {
   });
   const newPeaks = [...peaks];
   newPeaks[curveIdx] = newSelectedEditPeaks;
-  return Object.assign({}, state, { peaks: newPeaks });
+  return Object.assign({}, state, { peaks: newPeaks, selectedIdx: curveIdx });
 };
 
 const editPeakReducer = (state = initialState, action) => {

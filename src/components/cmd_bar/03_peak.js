@@ -46,7 +46,7 @@ const Peak = ({
     if (layoutSt === LIST_LAYOUT.LC_MS) {
       clearAllPeaksHplcMsAct();
     } else {
-      const dataPeaks = extractAutoPeaks(feature, thresSt, shiftSt, layoutSt);
+      const dataPeaks = extractAutoPeaks(feature, thresSt, shiftSt, layoutSt, curveIdx);
       clearAllPeaksAct({ curveIdx, dataPeaks });
     }
   };
