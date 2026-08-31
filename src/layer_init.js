@@ -42,6 +42,11 @@ class LayerInit extends React.Component {
     return `sig:${e.layout || ''}|${e.title || ''}|${xLen}|${xHead}|${xTail}`;
   }
 
+  static multiEntitiesSignature(entities) {
+    if (!Array.isArray(entities)) return 'none';
+    return `len:${entities.length}|${entities.map((e) => LayerInit.entitySignature(e)).join('||')}`;
+  }
+
   constructor(props) {
     super(props);
 
@@ -63,22 +68,25 @@ class LayerInit extends React.Component {
     const {
       others, multiEntities, entity, operations,
     } = this.props;
-    this.normChange(prevProps);
-    if (prevProps.operations !== operations || prevProps.entity !== entity) {
+    const entityChanged = LayerInit.entitySignature(prevProps.entity)
+      !== LayerInit.entitySignature(entity);
+    this.normChange(prevProps, entityChanged);
+    if (prevProps.operations !== operations || entityChanged) {
       this.initReducer();
     }
     if (prevProps.others !== others) {
       this.updateOthers();
     }
-    if (prevProps.multiEntities !== multiEntities
-      || prevProps.entity !== entity) {
+    if (LayerInit.multiEntitiesSignature(prevProps.multiEntities)
+      !== LayerInit.multiEntitiesSignature(multiEntities)
+      || entityChanged) {
       this.updateMultiEntities();
     }
   }
 
-  normChange(prevProps) {
+  normChange(prevProps, entityChanged) {
     const { entity, multiEntities, clearHplcMsStateAct } = this.props;
-    if (prevProps.entity !== entity) {
+    if (entityChanged) {
       const prevIsLcms = Format.isLCMsLayout(prevProps.entity?.layout);
       const nextIsLcms = Format.isLCMsLayout(entity?.layout);
       const lcmsSessionActive = prevIsLcms && nextIsLcms
