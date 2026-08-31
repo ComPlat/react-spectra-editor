@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-var _react = _interopRequireDefault(require("react"));
+var _react = _interopRequireWildcard(require("react"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
 var _reactRedux = require("react-redux");
 var _redux = require("redux");
@@ -18,6 +18,7 @@ var _list_ui = require("./constants/list_ui");
 var _extractParams = require("./helpers/extractParams");
 var _list_graph = require("./constants/list_graph");
 var _jsxRuntime = require("react/jsx-runtime");
+function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function _interopRequireWildcard(e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 /* eslint-disable prefer-object-spread, default-param-last,
 react/function-component-definition, react/require-default-props
 */
@@ -29,6 +30,40 @@ const getThresholdState = state => {
   if (!Array.isArray(thresholdList)) return {};
   if (!Number.isInteger(curveIdx)) return thresholdList[0] || {};
   return thresholdList[curveIdx] || thresholdList[0] || {};
+};
+
+// A host that rebuilds `entity` as a fresh object literal on every render
+// (no memoization on its side) must not hand ViewerLine (via extractParams'
+// `feature`) a brand-new object every single time regardless of whether the
+// underlying data changed - ViewerLine.normChange dispatches MANAGER.RESETALL
+// whenever `feature`'s reference changes, and that cascades into a fresh
+// state.threshold reference, causing LayerPrism to re-render and rebuild
+// `feature` again, and so on, once per host render. Since `entity` can carry
+// large spectral data arrays, avoid stringifying it wholesale; use the same
+// lightweight id/shape signature LayerInit already uses to detect "same
+// dataset, new reference".
+const entitySignature = e => {
+  if (!e) return 'none';
+  const id = e.idDt ?? e.id ?? e.datasetId;
+  if (id != null && id !== '') return `id:${id}`;
+  const firstFeature = (Array.isArray(e.features) ? e.features[0] : null) || (Array.isArray(e.spectra) ? e.spectra[0] : null) || null;
+  const data0 = firstFeature?.data?.[0];
+  const xs = data0?.x;
+  const xLen = Array.isArray(xs) ? xs.length : 0;
+  const xHead = Array.isArray(xs) && xs.length > 0 ? xs[0] : '';
+  const xTail = Array.isArray(xs) && xs.length > 0 ? xs[xs.length - 1] : '';
+  return `sig:${e.layout || ''}|${e.title || ''}|${xLen}|${xHead}|${xTail}`;
+};
+const useExtractedParams = (entity, thresSt, scanSt) => {
+  const signature = `${entitySignature(entity)}|${JSON.stringify(thresSt)}|${JSON.stringify(scanSt)}`;
+  const cacheRef = (0, _react.useRef)(null);
+  if (!cacheRef.current || cacheRef.current.signature !== signature) {
+    cacheRef.current = {
+      signature,
+      result: (0, _extractParams.extractParams)(entity, thresSt, scanSt)
+    };
+  }
+  return cacheRef.current.result;
 };
 const LayerPrism = ({
   entity,
@@ -57,7 +92,7 @@ const LayerPrism = ({
     hasEdit,
     integration: initialIntegration,
     features
-  } = (0, _extractParams.extractParams)(entity, thresSt, scanSt);
+  } = useExtractedParams(entity, thresSt, scanSt);
   if (!topic) return null;
   const curveIdx = curveSt && Number.isFinite(curveSt.curveIdx) ? curveSt.curveIdx : 0;
   const liveIntegrations = integrationSt && Array.isArray(integrationSt.integrations) ? integrationSt.integrations : null;
