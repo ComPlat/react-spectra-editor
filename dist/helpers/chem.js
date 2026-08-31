@@ -619,14 +619,17 @@ const extrSpectraMs = (jcamp, layout) => {
       const pageKey = spectrum.pageValue ?? spectrum.page;
       const peakTable = peakTablesByPage.get(pageKey);
       let selectedPeakTable = null;
-      if (hasPeakData(peakTable?.edit)) {
+      // A saved-but-empty EDIT_PEAK table (e.g. after "Clear All Peaks") must
+      // still win over auto/other, or the deliberately-cleared peaks
+      // resurface as the untouched auto-detected ones on reload.
+      if (peakTable?.edit) {
         selectedPeakTable = peakTable.edit;
       } else if (hasPeakData(peakTable?.auto)) {
         selectedPeakTable = peakTable.auto;
       } else if (hasPeakData(peakTable?.other)) {
         selectedPeakTable = peakTable.other;
       } else {
-        selectedPeakTable = peakTable?.edit || peakTable?.auto || peakTable?.other || null;
+        selectedPeakTable = peakTable?.auto || peakTable?.other || null;
       }
       const normalizedData = needsSecToMin ? scaleSpectrumDataX(spectrum.data, minuteScale) : spectrum.data;
       const mainSpectrum = {

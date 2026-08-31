@@ -31,7 +31,10 @@ const extractSharedParams = (entity, thresholdState, scanIdx = 0) => {
   } = entity || {};
   const autoPeak = features.autoPeak || features[scanIdx] || features[0] || {};
   const editPeak = features.editPeak || features[scanIdx] || features[0] || {};
-  const hasEdit = !!editPeak?.data?.[0]?.x?.length;
+  // A saved-but-empty EDIT_PEAK block (e.g. after "Clear All Peaks") must still
+  // count as an edit, or it gets treated as if no edit ever existed and the
+  // untouched auto-detected peaks resurface on reload.
+  const hasEdit = features.editPeak != null || !!editPeak?.data?.[0]?.x?.length;
   const feature = hasEdit && thresholdState?.isEdit ? editPeak : autoPeak;
   const {
     integration,

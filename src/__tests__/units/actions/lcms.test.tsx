@@ -147,6 +147,24 @@ describe('LCMS ExtractJcamp', () => {
     expect(getLcMsInfo(entity).kind).toEqual('uvvis');
   });
 
+  it('Extract UVVIS keeps a saved-but-empty edit-peak table over the auto one (issue #329)', () => {
+    // Page 210's EDIT_PEAK block below genuinely has 3 rows in the fixture;
+    // emptying it here mimics reloading a file after "Clear All Peaks" was
+    // saved, while its sibling AUTO_PEAK block (11 rows) is left untouched.
+    const editPeakTableWithData = '##NPOINTS=0\n##PEAKTABLE= (XY..XY)\n594.86279296875, 150.07945251464844;\n599.2625122070312, 227.96824645996094;\n199.68751525878906, 415.1648254394531;\n##END=';
+    const emptiedEditPeakTable = '##NPOINTS=0\n##PEAKTABLE= (XY..XY)\n##END=';
+    expect(hplcMsUvvisJcamp.split(editPeakTableWithData).length - 1).toEqual(1);
+
+    const withEdit: any = ExtractJcamp(hplcMsUvvisJcamp);
+    const page210WithEdit = withEdit.spectra.find((s: any) => s.pageValue === 210);
+    expect(page210WithEdit.peaks.length).toEqual(3);
+
+    const injected = hplcMsUvvisJcamp.replace(editPeakTableWithData, emptiedEditPeakTable);
+    const withEmptiedEdit: any = ExtractJcamp(injected);
+    const page210Emptied = withEmptiedEdit.spectra.find((s: any) => s.pageValue === 210);
+    expect(page210Emptied.peaks).toEqual([]);
+  });
+
   it('Extract UVVIS reads ##$CSLCMSMZPAGE from first CHEMSPECTRA UVVIS peak table block', () => {
     const injected = hplcMsUvvisJcamp.replace(
       '$$ === CHEMSPECTRA UVVIS PEAK TABLE ===\n',
