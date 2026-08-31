@@ -54,7 +54,7 @@ const resetRef = (payload) => {
 };
 
 const resetEnable = (payload) => {
-  const { typ } = payload.operation;
+  const { typ } = payload.operation || {};
   switch (typ) {
     case 'NMR':
       return true;
