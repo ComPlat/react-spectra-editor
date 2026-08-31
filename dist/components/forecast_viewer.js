@@ -19,6 +19,29 @@ var _list_ui = require("../constants/list_ui");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable react/no-unused-prop-types */
 
+// A host that rebuilds `forecast` as a fresh object literal on every render
+// (no memoization on its side) must not make ForecastViewer re-dispatch
+// FORECAST.INIT_STATUS on every single re-render regardless of whether the
+// prediction data actually changed - only `predictions`/`molecule` drive
+// initForecastReducer's effect, so compare those by content instead of the
+// whole `forecast` object by reference.
+const forecastSignature = forecast => {
+  if (!forecast || typeof forecast !== 'object') return 'none';
+  const {
+    predictions,
+    molecule
+  } = forecast;
+  try {
+    return JSON.stringify({
+      predictions,
+      molecule
+    });
+  } catch (e) {
+    // Unstringifiable content (e.g. a circular structure): never treat as
+    // equal, so we fall back to the old always-refresh behavior.
+    return null;
+  }
+};
 const styles = () => ({
   root: {
     flexGrow: 1
@@ -43,9 +66,9 @@ class ForecastViewer extends _react.default.Component {
     const {
       forecast
     } = this.props;
-    const prevForecast = forecast;
-    const nextForecast = prevProps.forecast;
-    if (prevForecast !== nextForecast) {
+    const prevSig = forecastSignature(prevProps.forecast);
+    const nextSig = forecastSignature(forecast);
+    if (prevSig === null || nextSig === null || prevSig !== nextSig) {
       this.initForecastReducer();
     }
   }
