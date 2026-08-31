@@ -144,7 +144,10 @@ const processShift = (state, action) => {
 const clearAllPeaks = (state, action) => {
   const { curveIdx, dataPeaks } = action.payload;
   const { peaks } = state;
-  const selectedEditPeaks = peaks[curveIdx];
+  let selectedEditPeaks = peaks[curveIdx];
+  if (!selectedEditPeaks) {
+    selectedEditPeaks = defaultEmptyPeaks;
+  }
 
   const { pos } = selectedEditPeaks;
 
