@@ -1,7 +1,7 @@
 /* eslint-disable prefer-object-spread, default-param-last,
 react/function-component-definition, react/require-default-props
 */
-import React from 'react';
+import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -27,6 +27,40 @@ const getThresholdState = (state) => {
   return thresholdList[curveIdx] || thresholdList[0] || {};
 };
 
+// A host that rebuilds `entity` as a fresh object literal on every render
+// (no memoization on its side) must not hand ViewerLine (via extractParams'
+// `feature`) a brand-new object every single time regardless of whether the
+// underlying data changed - ViewerLine.normChange dispatches MANAGER.RESETALL
+// whenever `feature`'s reference changes, and that cascades into a fresh
+// state.threshold reference, causing LayerPrism to re-render and rebuild
+// `feature` again, and so on, once per host render. Since `entity` can carry
+// large spectral data arrays, avoid stringifying it wholesale; use the same
+// lightweight id/shape signature LayerInit already uses to detect "same
+// dataset, new reference".
+const entitySignature = (e) => {
+  if (!e) return 'none';
+  const id = e.idDt ?? e.id ?? e.datasetId;
+  if (id != null && id !== '') return `id:${id}`;
+  const firstFeature = (Array.isArray(e.features) ? e.features[0] : null)
+    || (Array.isArray(e.spectra) ? e.spectra[0] : null)
+    || null;
+  const data0 = firstFeature?.data?.[0];
+  const xs = data0?.x;
+  const xLen = Array.isArray(xs) ? xs.length : 0;
+  const xHead = Array.isArray(xs) && xs.length > 0 ? xs[0] : '';
+  const xTail = Array.isArray(xs) && xs.length > 0 ? xs[xs.length - 1] : '';
+  return `sig:${e.layout || ''}|${e.title || ''}|${xLen}|${xHead}|${xTail}`;
+};
+
+const useExtractedParams = (entity, thresSt, scanSt) => {
+  const signature = `${entitySignature(entity)}|${JSON.stringify(thresSt)}|${JSON.stringify(scanSt)}`;
+  const cacheRef = useRef(null);
+  if (!cacheRef.current || cacheRef.current.signature !== signature) {
+    cacheRef.current = { signature, result: extractParams(entity, thresSt, scanSt) };
+  }
+  return cacheRef.current.result;
+};
+
 const LayerPrism = ({
   entity, cLabel, xLabel, yLabel, forecast, operations,
   descriptions, molSvg, editorOnly, exactMass,
@@ -35,7 +69,7 @@ const LayerPrism = ({
 }) => {
   const {
     topic, feature, hasEdit, integration: initialIntegration, features,
-  } = extractParams(entity, thresSt, scanSt);
+  } = useExtractedParams(entity, thresSt, scanSt);
   if (!topic) return null;
 
   const curveIdx = (curveSt && Number.isFinite(curveSt.curveIdx)) ? curveSt.curveIdx : 0;
