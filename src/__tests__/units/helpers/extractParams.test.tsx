@@ -47,6 +47,34 @@ describe('Test extract parameters helper', () => {
       expect(params.hasEdit).toEqual(true);
     });
 
+    it('keeps a saved-but-empty edit table instead of resurrecting auto peaks (issue #329)', () => {
+      const clearedEntity = {
+        layout: LIST_LAYOUT.MS,
+        features: {
+          autoPeak: {
+            scanAutoTarget: 1,
+            data: [{ x: [1, 2], y: [10, 20] }],
+            origin: 'auto',
+          },
+          editPeak: {
+            scanEditTarget: 1,
+            data: [{ x: [], y: [] }],
+            origin: 'edit',
+          },
+        },
+        spectra: [{ data: [{ x: [100], y: [1000] }] }],
+      };
+
+      const params: any = extractParams(
+        clearedEntity as any,
+        { isEdit: true } as any,
+        { target: 1, isAuto: false } as any,
+      );
+      expect(params.hasEdit).toEqual(true);
+      expect(params.feature.origin).toEqual('edit');
+      expect(params.feature.data[0].x).toEqual([]);
+    });
+
     it('supports forceLcms option even on MS layout', () => {
       const params: any = extractParams(
         msEntity as any,
