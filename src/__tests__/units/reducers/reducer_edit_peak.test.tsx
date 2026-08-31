@@ -81,4 +81,16 @@ describe('Test redux reducer for edit peak', () => {
     const newState = editPeakReducer(peaksState, action)
     expect(newState).toEqual(expectedValue)
   })
+
+  it('Clear all peaks moves selectedIdx to the cleared curve, like the other peak mutators', () => {
+    action.type = EDITPEAK.CLEAR_ALL
+    action.payload = { curveIdx: 1, dataPeaks: [] }
+    peaksState = {
+      peaks: [{pos: [], neg: []}, {pos: [{x: 1, y: 2}], neg: []}],
+      selectedIdx: 0,
+    }
+    const newState = editPeakReducer(peaksState, action)
+    expect(newState.selectedIdx).toEqual(1)
+    expect(newState.peaks[1]).toEqual({pos: [], neg: [{x: 1, y: 2}]})
+  })
 })
