@@ -984,28 +984,15 @@ const isPeakTable = (s) => (
 );
 
 const extrFeaturesNi = (jcamp, layout, peakUp, spectra) => {
-  const nfs = {};
-  const category = jcamp.info.$CSCATEGORY;
-  if (category) {
-    const idxEditPeak = category.indexOf('EDIT_PEAK');
-    if (idxEditPeak >= 0) {
-      const sEP = jcamp.spectra[idxEditPeak];
-      const thresRef = calcThresRef(sEP, peakUp);
-      nfs.editPeak = buildPeakFeature(jcamp, layout, peakUp, sEP, thresRef);
-    }
-    const idxAutoPeak = category.indexOf('AUTO_PEAK');
-    if (idxAutoPeak >= 0) {
-      const sAP = jcamp.spectra[idxAutoPeak];
-      const thresRef = calcThresRef(sAP, peakUp);
-      nfs.autoPeak = buildPeakFeature(jcamp, layout, peakUp, sAP, thresRef);
-    }
-    nfs.integration = buildIntegFeature(jcamp, spectra);
-    nfs.multiplicity = buildMpyFeature(jcamp);
-    nfs.simulation = buildSimFeature(jcamp);
-    return nfs;
-  }
-
-  // workaround for legacy design
+  // jcamp.info.$CSCATEGORY is NOT reliably an array with one entry per
+  // jcamp.spectra[i] - jcampconverter's LDR parsing can leave it as a plain
+  // string (the label's raw storage key can differ subtly across otherwise
+  // equivalent LDR occurrences, e.g. across files merged from different
+  // sources), and even when it IS an array, using .indexOf() on it to index
+  // into the unrelated jcamp.spectra array only works by coincidence when
+  // the two arrays happen to line up 1:1. Instead, identify each spectrum's
+  // role from its own dataType via isPeakTable(), which is self-contained
+  // and works regardless of $CSCATEGORY's shape or block count/order.
   const features = jcamp.spectra.map((s) => {
     const thresRef = calcThresRef(s, peakUp);
     return isPeakTable(s)
