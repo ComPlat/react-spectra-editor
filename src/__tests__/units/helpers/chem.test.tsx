@@ -6,6 +6,7 @@ import {
   buildIntegFeature, convertThresEndPts,
 } from "../../../helpers/chem";
 import nmr1HJcamp from "../../fixtures/nmr1h_jcamp";
+import nmr13cJcamp from "../../fixtures/nmr13c_jcamp";
 import aifJcamp1 from "../../fixtures/aif_jcamp_1";
 import dlsIntensityJcamp from '../../fixtures/dls_intensity_jcamp';
 import { LIST_SHIFT_1H } from "../../../constants/list_shift";
@@ -768,6 +769,32 @@ describe('Test for chem helper', () => {
       const entity: any = ExtractJcamp(secondsTaggedMz);
       expect(entity.features[0].pageValue).toBeCloseTo(1.1228166666666666);
       expect(entity.features[1].pageValue).toBeCloseTo(1.1384333333333334);
+    });
+  })
+
+  // extrFeaturesNi used to pick editPeak/autoPeak by looking up
+  // jcamp.info.$CSCATEGORY.indexOf('EDIT_PEAK'/'AUTO_PEAK') and using that
+  // as an index into the UNRELATED jcamp.spectra array. That only worked by
+  // coincidence when the two arrays happened to line up 1:1 - an extra
+  // $CSCATEGORY LDR anywhere else in the file (e.g. on a non-spectrum
+  // section, as real multi-file/bagit archives can carry) desyncs them.
+  // See issue #329's blank-graph/NaN-MHz report for a real-world case.
+  describe('Test extrFeaturesNi editPeak/autoPeak assignment is position-based, not $CSCATEGORY-index-based (issue #329)', () => {
+    it('still assigns editPeak/autoPeak to their own PEAKTABLE blocks when an extra $CSCATEGORY LDR desyncs the two arrays', () => {
+      const injected = nmr13cJcamp.replace('##BLOCKS=1', '##BLOCKS=1\n##$CSCATEGORY=SOMETHING_ELSE');
+      expect(injected).not.toEqual(nmr13cJcamp);
+
+      const entity: any = ExtractJcamp(injected);
+      const { editPeak, autoPeak } = entity.features;
+
+      expect(editPeak).toBeDefined();
+      expect(autoPeak).toBeDefined();
+      // EDIT_PEAK block's own ##PEAKTABLE= starts at x=-11.045182110091531;
+      // AUTO_PEAK's own starts at x=104.69281295027619 (see nmr13c_jcamp.js).
+      // A desynced index would either swap these or run off the end of
+      // jcamp.spectra entirely.
+      expect(editPeak.data[0].x[0]).toBeCloseTo(-11.045182110091531);
+      expect(autoPeak.data[0].x[0]).toBeCloseTo(104.69281295027619);
     });
   })
 })
