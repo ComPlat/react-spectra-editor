@@ -119,3 +119,63 @@ describe('LayerInit — multi-curve host prop churn does not re-dispatch SET_ALL
     expect(setAllCurvesCount).toBe(2);
   });
 });
+
+// An id-only signature collides for these: `idDt` is a DATASET-scope key shared
+// by every curve of an LC/MS group, so it stays constant while the host swaps in
+// a genuinely different page. Digesting the content is what tells them apart.
+const buildLcMsPage = (yValues: number[]) => ({
+  idDt: 'dataset-42',
+  layout: LIST_LAYOUT.CYCLIC_VOLTAMMETRY,
+  title: 'curve-a',
+  spectra: [{ data: [{ x: [1, 2, 3], y: yValues }] }],
+});
+
+describe('LayerInit — a changed entity is still detected when its id stays constant', () => {
+  it('dispatches SET_ALL_CURVES when multiEntities content changes under a constant idDt', () => {
+    const store = mockStore(storeState);
+    const pageA = buildLcMsPage([1, 2, 3]);
+
+    const { rerender } = render(
+      <Provider store={store}>
+        <LayerInit {...baseProps} entity={pageA} multiEntities={[pageA]} />
+      </Provider>,
+    );
+
+    expect(store.getActions().filter((a) => a.type === CURVE.SET_ALL_CURVES).length).toBe(1);
+
+    // Same idDt, same x grid and same array lengths - only the measured y values
+    // differ, exactly as a new LC/MS retention time (or an IR sample resampled
+    // onto the standardized wavenumber grid) arrives.
+    const pageB = buildLcMsPage([100, 200, 300]);
+
+    rerender(
+      <Provider store={store}>
+        <LayerInit {...baseProps} entity={pageB} multiEntities={[pageB]} />
+      </Provider>,
+    );
+
+    expect(store.getActions().filter((a) => a.type === CURVE.SET_ALL_CURVES).length).toBe(2);
+  });
+
+  it('still suppresses the re-dispatch for a content-equivalent rebuild carrying that same id', () => {
+    const store = mockStore(storeState);
+    const pageA = buildLcMsPage([1, 2, 3]);
+
+    const { rerender } = render(
+      <Provider store={store}>
+        <LayerInit {...baseProps} entity={pageA} multiEntities={[pageA]} />
+      </Provider>,
+    );
+
+    for (let i = 0; i < 5; i += 1) {
+      const rebuilt = buildLcMsPage([1, 2, 3]);
+      rerender(
+        <Provider store={store}>
+          <LayerInit {...baseProps} entity={rebuilt} multiEntities={[rebuilt]} />
+        </Provider>,
+      );
+    }
+
+    expect(store.getActions().filter((a) => a.type === CURVE.SET_ALL_CURVES).length).toBe(1);
+  });
+});

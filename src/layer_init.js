@@ -16,6 +16,7 @@ import { updateMetaPeaks, updateDSCMetaData } from './actions/meta';
 import { addOthers } from './actions/jcamp';
 import LayerPrism from './layer_prism';
 import Format from './helpers/format';
+import { entitySignature, multiEntitiesSignature } from './helpers/entity_signature';
 import { getLcMsInfo, isLcMsGroup } from './helpers/extractEntityLCMS';
 import { reconcileLcMsTimeAxes } from './features/lc-ms/entities/timeAxis';
 import MultiJcampsViewer from './components/multi_jcamps_viewer';
@@ -27,26 +28,6 @@ const styles = () => ({
 });
 
 class LayerInit extends React.Component {
-  static entitySignature(e) {
-    if (!e) return 'none';
-    const id = e.idDt ?? e.id ?? e.datasetId;
-    if (id != null && id !== '') return `id:${id}`;
-    const firstFeature = (Array.isArray(e.features) ? e.features[0] : null)
-      || (Array.isArray(e.spectra) ? e.spectra[0] : null)
-      || null;
-    const data0 = firstFeature?.data?.[0];
-    const xs = data0?.x;
-    const xLen = Array.isArray(xs) ? xs.length : 0;
-    const xHead = Array.isArray(xs) && xs.length > 0 ? xs[0] : '';
-    const xTail = Array.isArray(xs) && xs.length > 0 ? xs[xs.length - 1] : '';
-    return `sig:${e.layout || ''}|${e.title || ''}|${xLen}|${xHead}|${xTail}`;
-  }
-
-  static multiEntitiesSignature(entities) {
-    if (!Array.isArray(entities)) return 'none';
-    return `len:${entities.length}|${entities.map((e) => LayerInit.entitySignature(e)).join('||')}`;
-  }
-
   constructor(props) {
     super(props);
 
@@ -68,8 +49,8 @@ class LayerInit extends React.Component {
     const {
       others, multiEntities, entity, operations,
     } = this.props;
-    const entityChanged = LayerInit.entitySignature(prevProps.entity)
-      !== LayerInit.entitySignature(entity);
+    const entityChanged = entitySignature(prevProps.entity)
+      !== entitySignature(entity);
     this.normChange(prevProps, entityChanged);
     if (prevProps.operations !== operations || entityChanged) {
       this.initReducer();
@@ -77,8 +58,8 @@ class LayerInit extends React.Component {
     if (prevProps.others !== others) {
       this.updateOthers();
     }
-    if (LayerInit.multiEntitiesSignature(prevProps.multiEntities)
-      !== LayerInit.multiEntitiesSignature(multiEntities)
+    if (multiEntitiesSignature(prevProps.multiEntities)
+      !== multiEntitiesSignature(multiEntities)
       || entityChanged) {
       this.updateMultiEntities();
     }
@@ -93,8 +74,8 @@ class LayerInit extends React.Component {
         && Array.isArray(multiEntities)
         && isLcMsGroup(multiEntities);
       if ((prevIsLcms || nextIsLcms) && !lcmsSessionActive) {
-        const prevSig = LayerInit.entitySignature(prevProps.entity);
-        const nextSig = LayerInit.entitySignature(entity);
+        const prevSig = entitySignature(prevProps.entity);
+        const nextSig = entitySignature(entity);
         if (prevSig !== nextSig) {
           clearHplcMsStateAct();
         }
