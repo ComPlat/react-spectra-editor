@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-var _react = _interopRequireDefault(require("react"));
+var _react = _interopRequireWildcard(require("react"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
 var _reactRedux = require("react-redux");
 var _redux = require("redux");
@@ -16,8 +16,10 @@ var _index2 = _interopRequireDefault(require("./components/cmd_bar/index"));
 var _layer_content = _interopRequireDefault(require("./layer_content"));
 var _list_ui = require("./constants/list_ui");
 var _extractParams = require("./helpers/extractParams");
+var _entity_signature = require("./helpers/entity_signature");
 var _list_graph = require("./constants/list_graph");
 var _jsxRuntime = require("react/jsx-runtime");
+function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function _interopRequireWildcard(e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 /* eslint-disable prefer-object-spread, default-param-last,
 react/function-component-definition, react/require-default-props
 */
@@ -29,6 +31,30 @@ const getThresholdState = state => {
   if (!Array.isArray(thresholdList)) return {};
   if (!Number.isInteger(curveIdx)) return thresholdList[0] || {};
   return thresholdList[curveIdx] || thresholdList[0] || {};
+};
+
+// A host that rebuilds `entity` as a fresh object literal on every render (no
+// memoization on its side) must not hand ViewerLine (via extractParams'
+// `feature`) a brand-new object every single time regardless of whether the
+// underlying data changed - ViewerLine.normChange dispatches MANAGER.RESETALL
+// whenever `feature`'s reference changes, and that cascades into a fresh
+// state.threshold reference, causing LayerPrism to re-render and rebuild
+// `feature` again, and so on, once per host render.
+//
+// This signature gates what actually gets RENDERED, so it must not collide
+// between two genuinely different entities; see helpers/entity_signature for
+// why it digests every spectra block on both axes rather than just the first
+// block's x values.
+const useExtractedParams = (entity, thresSt, scanSt) => {
+  const signature = `${(0, _entity_signature.entitySignature)(entity)}|${JSON.stringify(thresSt)}|${JSON.stringify(scanSt)}`;
+  const cacheRef = (0, _react.useRef)(null);
+  if (!cacheRef.current || cacheRef.current.signature !== signature) {
+    cacheRef.current = {
+      signature,
+      result: (0, _extractParams.extractParams)(entity, thresSt, scanSt)
+    };
+  }
+  return cacheRef.current.result;
 };
 const LayerPrism = ({
   entity,
@@ -57,7 +83,7 @@ const LayerPrism = ({
     hasEdit,
     integration: initialIntegration,
     features
-  } = (0, _extractParams.extractParams)(entity, thresSt, scanSt);
+  } = useExtractedParams(entity, thresSt, scanSt);
   if (!topic) return null;
   const curveIdx = curveSt && Number.isFinite(curveSt.curveIdx) ? curveSt.curveIdx : 0;
   const liveIntegrations = integrationSt && Array.isArray(integrationSt.integrations) ? integrationSt.integrations : null;

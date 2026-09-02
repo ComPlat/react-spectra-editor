@@ -1,7 +1,7 @@
 /* eslint-disable prefer-object-spread, default-param-last,
 react/function-component-definition, react/require-default-props
 */
-import React from 'react';
+import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -14,6 +14,7 @@ import CmdBar from './components/cmd_bar/index';
 import LayerContent from './layer_content';
 import { LIST_UI_VIEWER_TYPE } from './constants/list_ui';
 import { extractParams } from './helpers/extractParams';
+import { entitySignature } from './helpers/entity_signature';
 import { LIST_HOST_HOOK_CLASS } from './constants/list_graph';
 
 const styles = () => ({
@@ -27,6 +28,27 @@ const getThresholdState = (state) => {
   return thresholdList[curveIdx] || thresholdList[0] || {};
 };
 
+// A host that rebuilds `entity` as a fresh object literal on every render (no
+// memoization on its side) must not hand ViewerLine (via extractParams'
+// `feature`) a brand-new object every single time regardless of whether the
+// underlying data changed - ViewerLine.normChange dispatches MANAGER.RESETALL
+// whenever `feature`'s reference changes, and that cascades into a fresh
+// state.threshold reference, causing LayerPrism to re-render and rebuild
+// `feature` again, and so on, once per host render.
+//
+// This signature gates what actually gets RENDERED, so it must not collide
+// between two genuinely different entities; see helpers/entity_signature for
+// why it digests every spectra block on both axes rather than just the first
+// block's x values.
+const useExtractedParams = (entity, thresSt, scanSt) => {
+  const signature = `${entitySignature(entity)}|${JSON.stringify(thresSt)}|${JSON.stringify(scanSt)}`;
+  const cacheRef = useRef(null);
+  if (!cacheRef.current || cacheRef.current.signature !== signature) {
+    cacheRef.current = { signature, result: extractParams(entity, thresSt, scanSt) };
+  }
+  return cacheRef.current.result;
+};
+
 const LayerPrism = ({
   entity, cLabel, xLabel, yLabel, forecast, operations,
   descriptions, molSvg, editorOnly, exactMass,
@@ -35,7 +57,7 @@ const LayerPrism = ({
 }) => {
   const {
     topic, feature, hasEdit, integration: initialIntegration, features,
-  } = extractParams(entity, thresSt, scanSt);
+  } = useExtractedParams(entity, thresSt, scanSt);
   if (!topic) return null;
 
   const curveIdx = (curveSt && Number.isFinite(curveSt.curveIdx)) ? curveSt.curveIdx : 0;

@@ -17,6 +17,7 @@ var _meta = require("./actions/meta");
 var _jcamp = require("./actions/jcamp");
 var _layer_prism = _interopRequireDefault(require("./layer_prism"));
 var _format = _interopRequireDefault(require("./helpers/format"));
+var _entity_signature = require("./helpers/entity_signature");
 var _extractEntityLCMS = require("./helpers/extractEntityLCMS");
 var _timeAxis = require("./features/lc-ms/entities/timeAxis");
 var _multi_jcamps_viewer = _interopRequireDefault(require("./components/multi_jcamps_viewer"));
@@ -28,18 +29,6 @@ var _jsxRuntime = require("react/jsx-runtime");
 
 const styles = () => ({});
 class LayerInit extends _react.default.Component {
-  static entitySignature(e) {
-    if (!e) return 'none';
-    const id = e.idDt ?? e.id ?? e.datasetId;
-    if (id != null && id !== '') return `id:${id}`;
-    const firstFeature = (Array.isArray(e.features) ? e.features[0] : null) || (Array.isArray(e.spectra) ? e.spectra[0] : null) || null;
-    const data0 = firstFeature?.data?.[0];
-    const xs = data0?.x;
-    const xLen = Array.isArray(xs) ? xs.length : 0;
-    const xHead = Array.isArray(xs) && xs.length > 0 ? xs[0] : '';
-    const xTail = Array.isArray(xs) && xs.length > 0 ? xs[xs.length - 1] : '';
-    return `sig:${e.layout || ''}|${e.title || ''}|${xLen}|${xHead}|${xTail}`;
-  }
   constructor(props) {
     super(props);
     this.normChange = this.normChange.bind(this);
@@ -61,30 +50,31 @@ class LayerInit extends _react.default.Component {
       entity,
       operations
     } = this.props;
-    this.normChange(prevProps);
-    if (prevProps.operations !== operations || prevProps.entity !== entity) {
+    const entityChanged = (0, _entity_signature.entitySignature)(prevProps.entity) !== (0, _entity_signature.entitySignature)(entity);
+    this.normChange(prevProps, entityChanged);
+    if (prevProps.operations !== operations || entityChanged) {
       this.initReducer();
     }
     if (prevProps.others !== others) {
       this.updateOthers();
     }
-    if (prevProps.multiEntities !== multiEntities || prevProps.entity !== entity) {
+    if ((0, _entity_signature.multiEntitiesSignature)(prevProps.multiEntities) !== (0, _entity_signature.multiEntitiesSignature)(multiEntities) || entityChanged) {
       this.updateMultiEntities();
     }
   }
-  normChange(prevProps) {
+  normChange(prevProps, entityChanged) {
     const {
       entity,
       multiEntities,
       clearHplcMsStateAct
     } = this.props;
-    if (prevProps.entity !== entity) {
+    if (entityChanged) {
       const prevIsLcms = _format.default.isLCMsLayout(prevProps.entity?.layout);
       const nextIsLcms = _format.default.isLCMsLayout(entity?.layout);
       const lcmsSessionActive = prevIsLcms && nextIsLcms && Array.isArray(multiEntities) && (0, _extractEntityLCMS.isLcMsGroup)(multiEntities);
       if ((prevIsLcms || nextIsLcms) && !lcmsSessionActive) {
-        const prevSig = LayerInit.entitySignature(prevProps.entity);
-        const nextSig = LayerInit.entitySignature(entity);
+        const prevSig = (0, _entity_signature.entitySignature)(prevProps.entity);
+        const nextSig = (0, _entity_signature.entitySignature)(entity);
         if (prevSig !== nextSig) {
           clearHplcMsStateAct();
         }
