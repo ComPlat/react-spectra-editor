@@ -79,10 +79,7 @@ const CmdBar = ({
 }) => {
   const isCvLayout = _format.default.isCyclicVoltaLayout(layoutSt);
   const rightCluster = /*#__PURE__*/(0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
-    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_r01_layout.default, {
-      feature: feature,
-      hasEdit: hasEdit
-    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r04_submit.default, {
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_r04_submit.default, {
       operations: operations,
       feature: feature,
       forecast: forecast,
@@ -90,6 +87,9 @@ const CmdBar = ({
       hideSwitch: false,
       disabled: false
     }), hideThreshold ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_r03_threshold.default, {
+      feature: feature,
+      hasEdit: hasEdit
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r01_layout.default, {
       feature: feature,
       hasEdit: hasEdit
     }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r07_wavelength_btn.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r10_cv_density.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r08_change_axes.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r09_detector.default, {})]

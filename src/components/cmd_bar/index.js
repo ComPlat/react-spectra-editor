@@ -75,7 +75,6 @@ const CmdBar = ({
 
   const rightCluster = (
     <>
-      <Layout feature={feature} hasEdit={hasEdit} />
       <Submit
         operations={operations}
         feature={feature}
@@ -87,6 +86,7 @@ const CmdBar = ({
       {
         hideThreshold ? null : (<Threshold feature={feature} hasEdit={hasEdit} />)
       }
+      <Layout feature={feature} hasEdit={hasEdit} />
       <Wavelength />
       <CvDensityControls />
       <ChangeAxes />
