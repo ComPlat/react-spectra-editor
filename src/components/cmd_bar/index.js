@@ -60,6 +60,28 @@ const styles = () => (
         columnGap: 8,
         rowGap: 4,
       },
+      toolbarRow: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'flex-start',
+        columnGap: 8,
+        rowGap: 12,
+      },
+      toolbarLeft: {
+        flex: '1 1 auto',
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        rowGap: 4,
+      },
+      toolbarRight: {
+        flex: '1 1 auto',
+        display: 'flex',
+        flexDirection: 'row-reverse',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        rowGap: 4,
+      },
     },
     commonStyle,
   )
@@ -110,21 +132,25 @@ const CmdBar = ({
   }
 
   return (
-    <div className={`${LIST_HOST_HOOK_CLASS.CMD_BAR} ${classes.card}`}>
-      {
-        hideMainEditTools ? null : (
-          <>
-            <Viewer editorOnly={editorOnly} />
-            <Zoom />
-            <Peak jcampIdx={jcampIdx} feature={feature} />
-            <Pecker jcampIdx={jcampIdx} />
-            {isCvLayout ? null : <Integration />}
-            {isCvLayout ? null : <Multiplicity />}
-            <UndoRedo />
-          </>
-        )
-      }
-      { rightCluster }
+    <div className={`${LIST_HOST_HOOK_CLASS.CMD_BAR} ${classes.card} ${classes.toolbarRow}`}>
+      <div className={classes.toolbarLeft}>
+        {
+          hideMainEditTools ? null : (
+            <>
+              <Viewer editorOnly={editorOnly} />
+              <Zoom />
+              <Peak jcampIdx={jcampIdx} feature={feature} />
+              <Pecker jcampIdx={jcampIdx} />
+              {isCvLayout ? null : <Integration />}
+              {isCvLayout ? null : <Multiplicity />}
+              <UndoRedo />
+            </>
+          )
+        }
+      </div>
+      <div className={classes.toolbarRight}>
+        { rightCluster }
+      </div>
     </div>
   );
 };
