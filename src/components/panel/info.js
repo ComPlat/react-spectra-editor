@@ -95,11 +95,18 @@ const styles = () => ({
     fontFamily: 'Helvetica',
     textAlign: 'left',
   },
+  structureBox: {
+    margin: '10px 10px',
+    border: '1px solid #ced4da',
+    borderRadius: '4px',
+    backgroundColor: '#f8f9fa',
+  },
   quillContainer: {
     margin: '10px 10px',
     backgroundColor: '#fff',
     '& .ql-container': {
-      border: 'none',
+      border: '1px solid #ced4da',
+      borderRadius: '4px',
     },
     '& .ql-editor': {
       minHeight: '60px',
@@ -421,11 +428,13 @@ const InfoPanel = ({
           !molSvg
             ? null
             : (
-              <SvgFileZoomPan
-                svg={molSvg}
-                duration={300}
-                resize
-              />
+              <div className={classes.structureBox}>
+                <SvgFileZoomPan
+                  svg={molSvg}
+                  duration={300}
+                  resize
+                />
+              </div>
             )
         }
         {

@@ -98,11 +98,18 @@ const styles = () => ({
     fontFamily: 'Helvetica',
     textAlign: 'left'
   },
+  structureBox: {
+    margin: '10px 10px',
+    border: '1px solid #ced4da',
+    borderRadius: '4px',
+    backgroundColor: '#f8f9fa'
+  },
   quillContainer: {
     margin: '10px 10px',
     backgroundColor: '#fff',
     '& .ql-container': {
-      border: 'none'
+      border: '1px solid #ced4da',
+      borderRadius: '4px'
     },
     '& .ql-editor': {
       minHeight: '60px'
@@ -468,10 +475,13 @@ const InfoPanel = ({
         layout: layoutSt,
         detector: selectedDetector,
         secData: secData
-      }), !molSvg ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_reactSvgFileZoomPan.default, {
-        svg: molSvg,
-        duration: 300,
-        resize: true
+      }), !molSvg ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+        className: classes.structureBox,
+        children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_reactSvgFileZoomPan.default, {
+          svg: molSvg,
+          duration: 300,
+          resize: true
+        })
       }), _format.default.isHplcUvVisLayout(layoutSt) ? /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
         className: (0, _classnames.default)(classes.rowRoot, classes.rowOddSim),
         children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
