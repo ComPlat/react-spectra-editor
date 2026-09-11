@@ -53,6 +53,9 @@ const styles = () => ({
     margin: '5px 0 0 0',
     padding: '0 0 0 0',
     width: '100%'
+  },
+  panelsCv: {
+    maxHeight: 'calc(90vh - 230px)'
   }
 });
 class PanelViewer extends _react.default.Component {
@@ -113,7 +116,7 @@ class PanelViewer extends _react.default.Component {
     const curveCount = Array.isArray(listCurves) ? listCurves.length : 0;
     const hideGraphSelection = curveCount <= 1 || _format.default.isLCMsLayout(layoutSt);
     return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-      className: (0, _classnames.default)(classes.panels),
+      className: (0, _classnames.default)(classes.panels, hideCyclicVolta && classes.panelsCv),
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_styles.StyledEngineProvider, {
         injectFirst: true,
         children: /*#__PURE__*/(0, _jsxRuntime.jsxs)(_styles.ThemeProvider, {

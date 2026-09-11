@@ -21,7 +21,7 @@ describe('common/draw', () => {
       expect(renderResult).toBeInTheDocument();
       const svgElement = document.querySelector('svg');
       expect(svgElement).toHaveClass('d3Svg');
-      expect(svgElement).toHaveAttribute('preserveAspectRatio', 'xMinYMin meet');
+      expect(svgElement).toHaveAttribute('preserveAspectRatio', 'none');
       expect(svgElement).toHaveAttribute('viewBox', '0 0 100 100');
     });
   });

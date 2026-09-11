@@ -50,6 +50,11 @@ const styles = () => ({
     padding: '0 0 0 0',
     width: '100%',
   },
+  // The CV layout stacks a panel below the chart in the same column; an unbounded panel
+  // here overlaps the chart, so keep the viewport cap for CV only.
+  panelsCv: {
+    maxHeight: 'calc(90vh - 230px)',
+  },
 });
 
 class PanelViewer extends React.Component {
@@ -96,7 +101,7 @@ class PanelViewer extends React.Component {
     const hideGraphSelection = curveCount <= 1 || Format.isLCMsLayout(layoutSt);
 
     return (
-      <div className={classNames(classes.panels)}>
+      <div className={classNames(classes.panels, hideCyclicVolta && classes.panelsCv)}>
         <StyledEngineProvider injectFirst>
           <ThemeProvider
             theme={theme}
