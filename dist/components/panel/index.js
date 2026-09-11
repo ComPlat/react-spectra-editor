@@ -47,9 +47,7 @@ const styles = () => ({
     // applies in a host that does not constrain us (and now actually works).
     height: '100%',
     minHeight: 0,
-    // 230, not 220 - see the matching constant in multi_jcamps_viewer.js.
-    maxHeight: 'calc(90vh - 230px)',
-    // ROI
+    maxHeight: 'none',
     overflowX: 'hidden',
     overflowY: 'auto',
     margin: '5px 0 0 0',
