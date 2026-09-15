@@ -99,7 +99,7 @@ const styles = () => ({
     textAlign: 'left'
   },
   structureBox: {
-    margin: '10px 10px',
+    margin: '10px 0px',
     border: '1px solid #ced4da',
     borderRadius: '4px',
     backgroundColor: '#f8f9fa'
