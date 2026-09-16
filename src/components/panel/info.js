@@ -105,8 +105,7 @@ const styles = () => ({
     margin: '10px 10px',
     backgroundColor: '#fff',
     '& .ql-container': {
-      border: '1px solid #ced4da',
-      borderRadius: '4px',
+      border: 'none',
     },
     '& .ql-editor': {
       minHeight: '60px',
