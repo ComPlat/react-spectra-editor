@@ -98,7 +98,8 @@ class PanelViewer extends React.Component {
     const onExpandGraphSelection = () => this.onToggleExpand('graph');
     const { listCurves } = curveSt;
     const curveCount = Array.isArray(listCurves) ? listCurves.length : 0;
-    const hideGraphSelection = curveCount <= 1 || Format.isLCMsLayout(layoutSt);
+    const hideGraphSelection = (curveCount <= 1 && !Format.isCyclicVoltaLayout(layoutSt))
+      || Format.isLCMsLayout(layoutSt);
 
     return (
       <div className={classNames(classes.panels, hideCyclicVolta && classes.panelsCv)}>
