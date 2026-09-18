@@ -62,6 +62,28 @@ const styles = () => Object.assign({}, {
     alignItems: 'center',
     columnGap: 8,
     rowGap: 4
+  },
+  toolbarRow: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'flex-start',
+    columnGap: 8,
+    rowGap: 12
+  },
+  toolbarLeft: {
+    flex: '1 1 auto',
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    rowGap: 4
+  },
+  toolbarRight: {
+    flex: '1 1 auto',
+    display: 'flex',
+    flexDirection: 'row-reverse',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    rowGap: 4
   }
 }, _common.commonStyle);
 const CmdBar = ({
@@ -79,10 +101,7 @@ const CmdBar = ({
 }) => {
   const isCvLayout = _format.default.isCyclicVoltaLayout(layoutSt);
   const rightCluster = /*#__PURE__*/(0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
-    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_r01_layout.default, {
-      feature: feature,
-      hasEdit: hasEdit
-    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r04_submit.default, {
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_r04_submit.default, {
       operations: operations,
       feature: feature,
       forecast: forecast,
@@ -90,6 +109,9 @@ const CmdBar = ({
       hideSwitch: false,
       disabled: false
     }), hideThreshold ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_r03_threshold.default, {
+      feature: feature,
+      hasEdit: hasEdit
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r01_layout.default, {
       feature: feature,
       hasEdit: hasEdit
     }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r07_wavelength_btn.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r10_cv_density.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r08_change_axes.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r09_detector.default, {})]
@@ -110,17 +132,23 @@ const CmdBar = ({
     });
   }
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
-    className: `${_list_graph.LIST_HOST_HOOK_CLASS.CMD_BAR} ${classes.card}`,
-    children: [hideMainEditTools ? null : /*#__PURE__*/(0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
-      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_viewer.default, {
-        editorOnly: editorOnly
-      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_zoom.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_peak.default, {
-        jcampIdx: jcampIdx,
-        feature: feature
-      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_pecker.default, {
-        jcampIdx: jcampIdx
-      }), isCvLayout ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_integration.default, {}), isCvLayout ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_multiplicity.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_undo_redo.default, {})]
-    }), rightCluster]
+    className: `${_list_graph.LIST_HOST_HOOK_CLASS.CMD_BAR} ${classes.card} ${classes.toolbarRow}`,
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+      className: classes.toolbarLeft,
+      children: hideMainEditTools ? null : /*#__PURE__*/(0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
+        children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_viewer.default, {
+          editorOnly: editorOnly
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_zoom.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_peak.default, {
+          jcampIdx: jcampIdx,
+          feature: feature
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_pecker.default, {
+          jcampIdx: jcampIdx
+        }), isCvLayout ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_integration.default, {}), isCvLayout ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_multiplicity.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_undo_redo.default, {})]
+      })
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+      className: classes.toolbarRight,
+      children: rightCluster
+    })]
   });
 };
 const mapStateToProps = (state, _) => (

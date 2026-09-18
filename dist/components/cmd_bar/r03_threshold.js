@@ -58,7 +58,10 @@ const setThreshold = (classes, thresVal, updateThresholdValueAct, curveSt) => {
   };
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
     variant: "outlined",
-    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TextField, {
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputLabel, {
+      className: (0, _classnames.default)(classes.txtLabelTopInput),
+      children: "Threshold"
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.TextField, {
       className: classes.field,
       id: "outlined-name",
       placeholder: "N.A.",
@@ -76,9 +79,6 @@ const setThreshold = (classes, thresVal, updateThresholdValueAct, curveSt) => {
       onBlur: onBlur,
       onKeyPress: onEnterPress,
       variant: "outlined"
-    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputLabel, {
-      className: (0, _classnames.default)(classes.txtLabelBottomInput),
-      children: "Threshold"
     })]
   });
 };

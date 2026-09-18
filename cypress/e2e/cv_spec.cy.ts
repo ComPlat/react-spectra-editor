@@ -35,7 +35,7 @@ describe('CV', () => {
     cy.get('.btn-sv-bar-addpecker').click()
     cy.get('.d3Svg').scrollIntoView()
     cy.get('.d3Svg')
-      .trigger('click', 1350 + offset, 750, {
+      .trigger('click', 1200 + offset, 750, {
         which: 1,
         view: view,
       })
@@ -65,7 +65,7 @@ describe('CV', () => {
     cy.get('.btn-sv-bar-rmpecker').click()
     cy.get('.d3Svg').scrollIntoView()
     cy.get('.d3Svg')
-      .trigger('click', 1350 + offset, 750, {
+      .trigger('click', 1200 + offset, 750, {
         which: 1,
         view: view,
       })

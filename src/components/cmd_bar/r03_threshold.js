@@ -56,6 +56,7 @@ const setThreshold = (
 
   return (
     <FormControl variant="outlined">
+      <InputLabel className={classNames(classes.txtLabelTopInput)}>Threshold</InputLabel>
       <TextField
         className={classes.field}
         id="outlined-name"
@@ -73,7 +74,6 @@ const setThreshold = (
         onKeyPress={onEnterPress}
         variant="outlined"
       />
-      <InputLabel className={classNames(classes.txtLabelBottomInput)}>Threshold</InputLabel>
     </FormControl>
   );
 };

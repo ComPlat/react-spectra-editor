@@ -140,7 +140,7 @@ class MultiJcampsViewer extends _react.default.Component {
           className: isCyclicVolta ? classes.cvTopRow : undefined,
           children: [/*#__PURE__*/(0, _jsxRuntime.jsxs)(_Grid.default, {
             item: true,
-            xs: 9,
+            xs: 8,
             className: isCyclicVolta ? classes.cvViewerCol : undefined,
             children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
               className: isCyclicVolta ? classes.cvViewerWrap : undefined,
@@ -161,7 +161,7 @@ class MultiJcampsViewer extends _react.default.Component {
             }) : null]
           }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
             item: true,
-            xs: 3,
+            xs: 4,
             align: "center",
             children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_index.default, {
               jcampIdx: curveIdx,

@@ -40,18 +40,20 @@ const styles = () => ({
     // while the host let the page grow; a host that bounds the editor and clips it
     // instead shows the panel truncated at the bottom with no way to scroll to the rest.
     display: 'block',
-    // Take the height from a bounded parent when there is one; `height: 100%` against an
-    // unbounded parent computes to `auto`, so the viewport-derived cap below still
-    // applies in a host that does not constrain us (and now actually works).
+    // Fill a bounded parent (the ELN modal); overflowY scrolls when content is taller.
     height: '100%',
     minHeight: 0,
-    // 230, not 220 - see the matching constant in multi_jcamps_viewer.js.
-    maxHeight: 'calc(90vh - 230px)', // ROI
+    maxHeight: 'none',
     overflowX: 'hidden',
     overflowY: 'auto',
     margin: '5px 0 0 0',
     padding: '0 0 0 0',
     width: '100%',
+  },
+  // The CV layout stacks a panel below the chart in the same column; an unbounded panel
+  // here overlaps the chart, so keep the viewport cap for CV only.
+  panelsCv: {
+    maxHeight: 'calc(90vh - 230px)',
   },
 });
 
@@ -96,10 +98,11 @@ class PanelViewer extends React.Component {
     const onExpandGraphSelection = () => this.onToggleExpand('graph');
     const { listCurves } = curveSt;
     const curveCount = Array.isArray(listCurves) ? listCurves.length : 0;
-    const hideGraphSelection = curveCount <= 1 || Format.isLCMsLayout(layoutSt);
+    const hideGraphSelection = (curveCount <= 1 && !Format.isCyclicVoltaLayout(layoutSt))
+      || Format.isLCMsLayout(layoutSt);
 
     return (
-      <div className={classNames(classes.panels)}>
+      <div className={classNames(classes.panels, hideCyclicVolta && classes.panelsCv)}>
         <StyledEngineProvider injectFirst>
           <ThemeProvider
             theme={theme}

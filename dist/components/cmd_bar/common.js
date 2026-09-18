@@ -41,7 +41,7 @@ const MuButton = exports.MuButton = /*#__PURE__*/_react.default.forwardRef((prop
 MuButton.displayName = 'MuButton';
 const commonStyle = exports.commonStyle = {
   card: {
-    margin: '0 0 5px 52px',
+    margin: '0 0 5px 0',
     // The outlined selects below (Submit, Write Peaks, Write Intensity, Decimal) are
     // compressed to `selectInput.height = 30`, well under MUI's outlined geometry, so
     // their shrunk InputLabel floats to about -9px - outside this box. Without the
@@ -59,13 +59,11 @@ const commonStyle = exports.commonStyle = {
   },
   groupRightMost: {
     display: 'inline-block',
-    float: 'right',
     margin: '0px 0px 0px 10px',
     verticalAlign: 'middle'
   },
   groupRight: {
     display: 'inline-block',
-    float: 'right',
     margin: '0px 0px 0px 10px',
     verticalAlign: 'middle'
   },
