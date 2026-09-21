@@ -135,6 +135,7 @@ class RectFocus {
       yt
     } = (0, _compass.TfRescale)(this);
     this.updatePathCall(xt, yt);
+    if (!this.tTrEndPts.length) return;
     const yRef = this.tTrEndPts[0].y;
     const msMaxY = d3.max(this.data, row => row.y) || 0;
     const bars = this.bars.selectAll('rect').data(this.data);
