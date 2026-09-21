@@ -23,6 +23,7 @@ import MultiJcampsViewer from './components/multi_jcamps_viewer';
 import HPLCViewer from './components/hplc_viewer';
 import { setAllCurves } from './actions/curve';
 import { clearHplcMsState } from './actions/hplc_ms';
+import { LIST_LAYOUT } from './constants/list_layout';
 
 const styles = () => ({
 });
@@ -90,10 +91,14 @@ class LayerInit extends React.Component {
       resetInitCommonAct, resetInitMsAct, resetInitNmrAct, resetInitCommonWithIntergationAct,
       resetDetectorAct, updateDSCMetaDataAct, resetMultiplicityAct, updateLayoutAct,
     } = this.props;
-    if (!entity || !entity.layout) return;
+    if (!entity) return;
     resetInitCommonAct();
     resetDetectorAct();
-    const { layout, features = {} } = entity;
+    const { layout: rawLayout, features = {} } = entity;
+    // A datatype this frontend's own classifier (or the backend's) does not
+    // recognise yields a falsy layout. Normalize it to PLAIN so it never
+    // inherits whatever layout was previously in the Redux state slice.
+    const layout = rawLayout || LIST_LAYOUT.PLAIN;
     updateLayoutAct(layout);
     if (Format.isMsLayout(layout)) {
       // const { autoPeak, editPeak } = features; // TBD
@@ -137,7 +142,7 @@ class LayerInit extends React.Component {
 
   updateMultiEntities() {
     const { multiEntities, setAllCurvesAct, entity } = this.props;
-    if (!entity || !entity.layout) return;
+    if (!entity) return;
     const lcmsCurveMeta = () => {
       const uvvisFromMulti = Array.isArray(multiEntities)
         ? multiEntities.find((e) => getLcMsInfo(e).kind === 'uvvis')

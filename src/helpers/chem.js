@@ -366,7 +366,8 @@ const readLayout = (jcamp) => {
     if (dataType.includes('CIRCULAR DICHROISM SPECTROSCOPY')) {
       return LIST_LAYOUT.CDS;
     }
-    if (dataType.includes('SIZE EXCLUSION CHROMATOGRAPHY')) {
+    if (dataType.includes('SIZE EXCLUSION CHROMATOGRAPHY')
+      || dataType.includes('GEL PERMEATION CHROMATOGRAPHY')) {
       return LIST_LAYOUT.SEC;
     }
     if (dataType.includes('GAS CHROMATOGRAPHY')) {

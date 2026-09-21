@@ -24,6 +24,7 @@ var _multi_jcamps_viewer = _interopRequireDefault(require("./components/multi_jc
 var _hplc_viewer = _interopRequireDefault(require("./components/hplc_viewer"));
 var _curve = require("./actions/curve");
 var _hplc_ms = require("./actions/hplc_ms");
+var _list_layout = require("./constants/list_layout");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, default-param-last */
 
@@ -95,13 +96,17 @@ class LayerInit extends _react.default.Component {
       resetMultiplicityAct,
       updateLayoutAct
     } = this.props;
-    if (!entity || !entity.layout) return;
+    if (!entity) return;
     resetInitCommonAct();
     resetDetectorAct();
     const {
-      layout,
+      layout: rawLayout,
       features = {}
     } = entity;
+    // A datatype this frontend's own classifier (or the backend's) does not
+    // recognise yields a falsy layout. Normalize it to PLAIN so it never
+    // inherits whatever layout was previously in the Redux state slice.
+    const layout = rawLayout || _list_layout.LIST_LAYOUT.PLAIN;
     updateLayoutAct(layout);
     if (_format.default.isMsLayout(layout)) {
       // const { autoPeak, editPeak } = features; // TBD
@@ -162,7 +167,7 @@ class LayerInit extends _react.default.Component {
       setAllCurvesAct,
       entity
     } = this.props;
-    if (!entity || !entity.layout) return;
+    if (!entity) return;
     const lcmsCurveMeta = () => {
       const uvvisFromMulti = Array.isArray(multiEntities) ? multiEntities.find(e => (0, _extractEntityLCMS.getLcMsInfo)(e).kind === 'uvvis') : null;
       const mzFromMulti = Array.isArray(multiEntities) ? multiEntities.find(e => (0, _extractEntityLCMS.getLcMsInfo)(e).kind === 'mz') : null;
