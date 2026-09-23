@@ -11,64 +11,53 @@ describe('CV', () => {
     cy.get('.d3Svg text.yLabel').should('have.text', 'A')
   })
 
-  function addMaxPeak(view, offset=0) {
-    cy.get('.btn-sv-bar-addpeak').click()
+  // Click x is a fraction of the chart's rendered width, not a pixel, so a change to the
+  // chart column's width cannot move a click off its target (or off the chart) unnoticed.
+  // The fractions are the original coordinates over the chart's width at this viewport
+  // when it filled a 9/12 column (1440px).
+  const X_MAX_PEAK = 1110 / 1440
+  const X_MIN_PEAK = 1050 / 1440
+  const X_PECKER = 1350 / 1440
+
+  function clickChart(fraction, y, offset, view) {
     cy.get('.d3Svg').scrollIntoView()
-    cy.get('.d3Svg')
-      .trigger('click', 1110 + offset, 480, {
+    cy.get('.d3Svg').then(($svg) => {
+      const x = fraction * $svg[0].getBoundingClientRect().width + offset
+      cy.wrap($svg).trigger('click', x, y, {
         which: 1,
         view: view,
       })
+    })
+  }
+
+  function addMaxPeak(view, offset=0) {
+    cy.get('.btn-sv-bar-addpeak').click()
+    clickChart(X_MAX_PEAK, 480, offset, view)
   }
 
   function addMinPeak(view, offset=0) {
     cy.get('.btn-sv-bar-addpeak').click()
-    cy.get('.d3Svg').scrollIntoView()
-    cy.get('.d3Svg')
-      .trigger('click', 1050 + offset, 750, {
-        which: 1,
-        view: view,
-      })
+    clickChart(X_MIN_PEAK, 750, offset, view)
   }
 
   function addPecker(view, offset=0) {
     cy.get('.btn-sv-bar-addpecker').click()
-    cy.get('.d3Svg').scrollIntoView()
-    cy.get('.d3Svg')
-      .trigger('click', 1200 + offset, 750, {
-        which: 1,
-        view: view,
-      })
+    clickChart(X_PECKER, 750, offset, view)
   }
 
   function removeMaxPeak(view, offset=0) {
     cy.get('.btn-sv-bar-rmpeak').click()
-    cy.get('.d3Svg').scrollIntoView()
-    cy.get('.d3Svg')
-    .trigger('click', 1110 + offset, 450, {
-      which: 1,
-      view: view,
-    })
+    clickChart(X_MAX_PEAK, 450, offset, view)
   }
 
   function removeMinPeak(view, offset=0) {
     cy.get('.btn-sv-bar-rmpeak').click()
-    cy.get('.d3Svg').scrollIntoView()
-    cy.get('.d3Svg')
-      .trigger('click', 1050 + offset, 750, {
-        which: 1,
-        view: view,
-      })
+    clickChart(X_MIN_PEAK, 750, offset, view)
   }
 
   function removePecker(view, offset=0) {
     cy.get('.btn-sv-bar-rmpecker').click()
-    cy.get('.d3Svg').scrollIntoView()
-    cy.get('.d3Svg')
-      .trigger('click', 1200 + offset, 750, {
-        which: 1,
-        view: view,
-      })
+    clickChart(X_PECKER, 750, offset, view)
   }
 
   it('Zoom in and zoom out on peaks', () => {
