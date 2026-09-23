@@ -26,7 +26,10 @@ import {
   drawMain, drawLabel, drawDisplay, drawDestroy, drawArrowOnCurve,
 } from '../common/draw';
 
-const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
+// Fallback size, and the aspect used when the host leaves the height open - see
+// getTargetSize. 8/12 matches the `xs={8}` chart column of MultiJcampsViewer, the only
+// host of this viewer.
+const W = Math.round(window.innerWidth * 0.90 * 8 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.85); // ROI
 
 class ViewerMulti extends React.Component {
@@ -56,6 +59,7 @@ class ViewerMulti extends React.Component {
 
     this.normChange = this.normChange.bind(this);
     this.handleResize = this.handleResize.bind(this);
+    this.scheduleResize = this.scheduleResize.bind(this);
     this.syncFocusActions = this.syncFocusActions.bind(this);
   }
 
@@ -77,9 +81,7 @@ class ViewerMulti extends React.Component {
     this.syncFocusActions();
     this.normChange(prevProps);
 
-    if (Format.isCyclicVoltaLayout(layoutSt)) {
-      this.handleResize();
-    }
+    this.handleResize();
     const hasRelevantChange = prevProps.entities !== entities
       || prevProps.curveSt !== curveSt
       || prevProps.seed !== seed
@@ -133,38 +135,57 @@ class ViewerMulti extends React.Component {
   }
 
   handleResize() {
-    const { layoutSt } = this.props;
-    if (!Format.isCyclicVoltaLayout(layoutSt)) return;
-    const size = this.getContainerSize();
-    if (!size) return;
-    if (!this.currentSize
-      || size.width !== this.currentSize.width
-      || size.height !== this.currentSize.height) {
+    const node = this.containerRef.current;
+    if (!node || !this.currentSize) return;
+    const { clientWidth, clientHeight } = node;
+    if (!clientWidth) return;
+    // An unbounded container's height is the chart's own, so it is not an input.
+    if (clientWidth !== this.currentSize.width
+      || (this.isHeightBounded && clientHeight !== this.currentSize.height)) {
       this.mountChart(this.props, false);
     }
   }
 
-  getContainerSize() {
+  // Draw at the container's size so the viewBox matches the box the svg is laid out in:
+  // with `xMinYMin meet` the chart then fills its pane and never distorts. `width` is
+  // taken before the chart is removed (a page scrollbar can come and go with it); the
+  // height after. A container that keeps a height while empty is bounded by its host
+  // (the ELN pane, the CV column) and that height is used. One that collapses takes its
+  // height from the chart, so measuring it would feed back - the old svg plus its inline
+  // baseline gap - and grow a few px on every resize without end; derive it from the
+  // width instead.
+  getTargetSize(width) {
     const node = this.containerRef.current;
-    if (!node) return null;
-    const { clientWidth, clientHeight } = node;
-    if (!clientWidth || !clientHeight) return null;
-    return { width: clientWidth, height: clientHeight };
-  }
-
-  getTargetSize(layoutSt) {
-    if (Format.isCyclicVoltaLayout(layoutSt)) {
-      const size = this.getContainerSize();
-      if (size) return size;
-    }
-    return { width: W, height: H };
+    const boundedHeight = node ? node.clientHeight : 0;
+    this.isHeightBounded = boundedHeight > 0;
+    if (!width) return { width: W, height: H };
+    return {
+      width,
+      height: this.isHeightBounded ? boundedHeight : Math.round((width * H) / W),
+    };
   }
 
   setupResizeObserver() {
     if (typeof ResizeObserver === 'undefined') return;
     if (!this.containerRef.current || this.resizeObserver) return;
-    this.resizeObserver = new ResizeObserver(this.handleResize);
+    this.resizeObserver = new ResizeObserver(this.scheduleResize);
     this.resizeObserver.observe(this.containerRef.current);
+  }
+
+  // A bounded container's size does not depend on the chart, so redraw at once, before
+  // the next paint. An unbounded one does: remounting inside the observer callback resizes
+  // what it observes in the same frame, which the browser reports as a "ResizeObserver
+  // loop" error - wait for the next frame instead.
+  scheduleResize() {
+    if (this.isHeightBounded) {
+      this.handleResize();
+      return;
+    }
+    if (this.resizeFrame) return;
+    this.resizeFrame = window.requestAnimationFrame(() => {
+      this.resizeFrame = null;
+      this.handleResize();
+    });
   }
 
   syncFocusActions() {
@@ -184,6 +205,10 @@ class ViewerMulti extends React.Component {
   }
 
   teardownResizeObserver() {
+    if (this.resizeFrame) {
+      window.cancelAnimationFrame(this.resizeFrame);
+      this.resizeFrame = null;
+    }
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
       this.resizeObserver = null;
@@ -250,10 +275,12 @@ class ViewerMulti extends React.Component {
       integrationSt, mtplySt, uiSt,
     } = props;
 
-    const size = this.getTargetSize(layoutSt);
+    const node = this.containerRef.current;
+    const width = node ? node.clientWidth : 0;
+    drawDestroy(this.rootKlass);
+    const size = this.getTargetSize(width);
     this.currentSize = size;
 
-    drawDestroy(this.rootKlass);
     if (shouldReset) {
       resetAllAct(feature);
     }
