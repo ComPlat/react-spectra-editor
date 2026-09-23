@@ -11,6 +11,7 @@ const initialState = {
   listCurves: [],
   curveIdx: 0,
   isShowAllCurve: false,
+  isNormalized: false,
 };
 
 const normalizeSetAllCurvesPayload = (payload) => {
@@ -94,6 +95,8 @@ const curveReducer = (state = initialState, action) => {
       return setAllCurves(state, action);
     case CURVE.SET_SHOULD_SHOW_ALL_CURVES:
       return Object.assign({}, state, { isShowAllCurve: action.payload });
+    case CURVE.SET_NORMALIZED:
+      return Object.assign({}, state, { isNormalized: !!action.payload });
     default:
       return state;
   }
