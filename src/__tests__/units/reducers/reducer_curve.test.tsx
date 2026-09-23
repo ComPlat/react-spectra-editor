@@ -29,6 +29,13 @@ describe('Test redux curve reducer', () => {
     expect(newState).toEqual(curveState)
   })
 
+  it('Toggle normalization of curves', () => {
+    action.type = CURVE.SET_NORMALIZED
+    action.payload = true
+    const { isNormalized } = curveReducer(curveState, action)
+    expect(isNormalized).toEqual(true)
+  })
+
   it('Select the working curve', () => {
     action.type = CURVE.SELECT_WORKING_CURVE
     action.payload = 2

@@ -16,7 +16,8 @@ var _format = _interopRequireDefault(require("../helpers/format"));
 const initialState = {
   listCurves: [],
   curveIdx: 0,
-  isShowAllCurve: false
+  isShowAllCurve: false,
+  isNormalized: false
 };
 const normalizeSetAllCurvesPayload = payload => {
   if (Array.isArray(payload)) {
@@ -117,6 +118,10 @@ const curveReducer = (state = initialState, action) => {
     case _action_type.CURVE.SET_SHOULD_SHOW_ALL_CURVES:
       return Object.assign({}, state, {
         isShowAllCurve: action.payload
+      });
+    case _action_type.CURVE.SET_NORMALIZED:
+      return Object.assign({}, state, {
+        isNormalized: !!action.payload
       });
     default:
       return state;
