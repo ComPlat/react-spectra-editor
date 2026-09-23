@@ -1,7 +1,7 @@
 /* eslint-disable prefer-object-spread, default-param-last */
 import undoable from 'redux-undo';
 import {
-  UI, INTEGRATION, EDITPEAK, MANAGER,
+  UI, INTEGRATION, EDITPEAK, MANAGER, CURVE,
 } from '../constants/action_type';
 import {
   generateVisualSplitGroupId,
@@ -455,15 +455,18 @@ const setFkr = (state, action) => {
 };
 
 const setShift = (state, action) => {
-  const { selectedIdx, integrations } = state;
-  const selectedIntegration = integrations[selectedIdx];
+  const { integrations } = state;
+  const { prevOffset, curveIdx } = action.payload;
+  const targetIdx = Number.isFinite(curveIdx) ? curveIdx : state.selectedIdx;
+  let selectedIntegration = integrations[targetIdx];
+  if (selectedIntegration === false || selectedIntegration === undefined) {
+    selectedIntegration = defaultEmptyIntegration;
+  }
 
-  const shift = action.payload.prevOffset;
-
-  const newIntegration = Object.assign({}, selectedIntegration, { shift });
+  const newIntegration = Object.assign({}, selectedIntegration, { shift: prevOffset });
   const newArrIntegration = [...integrations];
-  newArrIntegration[selectedIdx] = newIntegration;
-  return Object.assign({}, state, { integrations: newArrIntegration });
+  newArrIntegration[targetIdx] = newIntegration;
+  return Object.assign({}, state, { integrations: newArrIntegration, selectedIdx: targetIdx });
 };
 
 const resetAll = (state, action) => {
@@ -504,6 +507,8 @@ const integrationReducer = (state = initialState, action) => {
       return clearAll(state, action);
     case EDITPEAK.SHIFT:
       return setShift(state, action);
+    case CURVE.SELECT_WORKING_CURVE:
+      return Object.assign({}, state, { selectedIdx: action.payload });
     case MANAGER.RESETALL:
       return state;
     default:

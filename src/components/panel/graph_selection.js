@@ -20,36 +20,78 @@ const styles = () => ({
     backgroundColor: '#eee',
     height: 22,
   },
-  curve: {
+  curveItem: {
+    display: 'flex',
+    alignItems: 'center',
     width: '100%',
-  },
-  line: {
-    height: '2px',
-    borderWidth: '0',
-    margin: '0',
+    fontSize: '0.8em',
+    padding: '6px 8px',
+    margin: 0,
+    cursor: 'pointer',
   },
   curveDefault: {
     backgroundColor: '#fff',
-    fontSize: '0.8em',
-    margin: '0',
-    padding: '10px 2px 2px 10px',
-    maxWidth: '95%',
-    overflowWrap: 'anywhere',
   },
   curveSelected: {
-    backgroundColor: '#2196f3',
-    fontSize: '0.8em',
-    color: '#fff',
-    padding: '10px 2px 2px 10px',
-    maxWidth: '95%',
+    backgroundColor: '#e0e0e0',
+  },
+  curveIndex: {
+    flexShrink: 0,
+    marginRight: '4px',
+    fontStyle: 'italic',
+  },
+  curveLabel: {
+    flexShrink: 0,
+    marginRight: '8px',
     overflowWrap: 'anywhere',
   },
+  colorBar: {
+    flex: 1,
+    height: '6px',
+    borderRadius: '1px',
+    minWidth: '24px',
+    alignSelf: 'center',
+  },
 });
+
+const fallbackName = (entityFileNames, idx) => {
+  if (entityFileNames && idx < entityFileNames.length) {
+    return entityFileNames[idx];
+  }
+  return '';
+};
+
+const displayName = (spectra, idx, entityFileNames) => (
+  spectra?.title
+  || spectra?.feature?.title
+  || spectra?.spectrum?.title
+  || fallbackName(entityFileNames, idx)
+  || `Spectrum ${idx + 1}`
+);
+
+const renderCurveItem = (classes, item, curveIdx, onChange) => (
+  <ListItem
+    key={item.idx}
+    disablePadding
+    onClick={() => onChange(item.idx)}
+    className={classNames(
+      classes.curveItem,
+      item.idx === curveIdx ? classes.curveSelected : classes.curveDefault,
+    )}
+  >
+    <span className={classes.curveIndex}>{item.name}</span>
+    {item.label !== '' ? <span className={classes.curveLabel}>{item.label}</span> : null}
+    <span
+      className={classes.colorBar}
+      style={{ backgroundColor: item.color }}
+    />
+  </ListItem>
+);
 
 const GraphSelectionPanel = ({
   classes, curveSt,
   entityFileNames, subLayoutsInfo, layoutSt,
-  selectCurveAct, toggleShowAllCurveAct,
+  selectCurveAct, toggleShowAllCurveAct, expand, onExapnd,
 }) => {
   let subLayoutValues = [];
   if (subLayoutsInfo) {
@@ -89,33 +131,37 @@ const GraphSelectionPanel = ({
   let itemsSubLayout = [];
   if (selectedSubLayout && subLayoutValues.length > 1) {
     const subLayout = subLayoutsInfo?.[resolvedSelectedSubLayout];
-    itemsSubLayout = Array.isArray(subLayout) ? subLayout.map((spectra, idx) => {
-      const spectraIdx = spectra.curveIdx;
-      const { color } = spectra;
-      let filename = '';
-      if (entityFileNames && spectraIdx < entityFileNames.length) {
-        filename = entityFileNames[spectraIdx];
-      }
-      return {
-        name: `${idx + 1}.`, idx: spectraIdx, color, filename,
-      };
-    }) : [];
+    try {
+      itemsSubLayout = Array.isArray(subLayout) ? subLayout.map((spectra, idx) => {
+        const spectraIdx = spectra.curveIdx;
+        const { color } = spectra;
+        return {
+          name: `${idx + 1}.`,
+          idx: spectraIdx,
+          color,
+          label: displayName(spectra, spectraIdx, entityFileNames),
+        };
+      }) : [];
+    } catch (e) {
+      console.log(e); //eslint-disable-line
+    }
   }
 
   const items = listCurves.map((spectra, idx) => {
     const { color } = spectra;
-    let filename = '';
-    if (entityFileNames && idx < entityFileNames.length) {
-      filename = entityFileNames[idx];
-    }
     return {
-      name: `${idx + 1}.`, idx, color, filename,
+      name: `${idx + 1}.`,
+      idx,
+      color,
+      label: displayName(spectra, idx, entityFileNames),
     };
   });
 
   return (
     <Accordion
       data-testid="GraphSelectionPanel"
+      expanded={expand}
+      onChange={onExapnd}
       disableGutters
       sx={{
         '&.MuiAccordion-root.Mui-expanded': { margin: 0 },
@@ -172,60 +218,17 @@ const GraphSelectionPanel = ({
             </Tabs>
             <List>
               {
-                itemsSubLayout.map((item) => (
-                  <ListItem
-                    key={item.idx}
-                    onClick={() => onChange(item.idx)}
-                    className={
-                      classNames((item.idx === curveIdx ? classes.curveSelected : classes.curveDefault))  // eslint-disable-line
-                    }
-                  >
-                    <span className={classNames(classes.curve)}>
-                      <i>{ item.name }</i>
-                      <span style={{ float: 'right', width: '95%' }}>
-                        <hr
-                          className={classNames(classes.line)}
-                          style={{ backgroundColor: item.color }}
-                        />
-                        {
-                          item.filename !== '' ? <span>File: { item.filename }</span> : null  // eslint-disable-line
-                        }
-                      </span>
-                    </span>
-                  </ListItem>
-                ))
+                itemsSubLayout.map((item) => renderCurveItem(classes, item, curveIdx, onChange))
               }
             </List>
           </div>
+        ) : (
+          <List>
+            {
+              items.map((item) => renderCurveItem(classes, item, curveIdx, onChange))
+            }
+          </List>
         )
-          : (
-            <List>
-              {
-                items.map((item) => (
-                  <ListItem
-                    key={item.idx}
-                    onClick={() => onChange(item.idx)}
-                    className={
-                      classNames((item.idx === curveIdx ? classes.curveSelected : classes.curveDefault))  // eslint-disable-line
-                    }
-                  >
-                    <span className={classNames(classes.curve)}>
-                      <i>{ item.name }</i>
-                      <span style={{ float: 'right', width: '95%' }}>
-                        <hr
-                          className={classNames(classes.line)}
-                          style={{ backgroundColor: item.color }}
-                        />
-                        {
-                          item.filename !== '' ? <span>File: { item.filename }</span> : null  // eslint-disable-line
-                        }
-                      </span>
-                    </span>
-                  </ListItem>
-                ))
-              }
-            </List>
-          )
       }
     </Accordion>
   );

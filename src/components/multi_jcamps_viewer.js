@@ -19,7 +19,6 @@ import { setAllCurves } from '../actions/curve';
 import {
   addNewCylicVoltaPairPeak, addCylicVoltaMaxPeak, addCylicVoltaMinPeak, addCylicVoltaPecker,
 } from '../actions/cyclic_voltammetry';
-import { LIST_LAYOUT } from '../constants/list_layout';
 import Format from '../helpers/format';
 import { LIST_HOST_HOOK_CLASS } from '../constants/list_graph';
 
@@ -65,8 +64,10 @@ const styles = () => ({
   },
 });
 
-const seperatingSubLayout = (entities, featureCondition, layoutSt) => {
-  if (layoutSt === LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
+export const seperatingSubLayout = (entities, featureCondition, layoutSt) => {
+  // Only SEC and GC have sub-layouts (the plot filters their curves by unit);
+  // other layouts must not be split into tabs just because units differ.
+  if (!Format.isSECLayout(layoutSt) && !Format.isGCLayout(layoutSt)) {
     return null;
   }
   const storedDict = {};
@@ -114,6 +115,7 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
           operations={operations}
           editorOnly={editorOnly}
           hideThreshold={!Format.isNmrLayout(layoutSt)}
+          showNormalize={!isCyclicVolta && entities.length > 1}
         />
         <div
           className={classNames(

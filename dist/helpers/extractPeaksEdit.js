@@ -31,24 +31,8 @@ var _integration = require("./integration");
 var _submit = require("../features/lc-ms/submit");
 /* eslint-disable max-len */
 
-const niOffset = (shiftSt, atIndex = 0) => {
-  const {
-    shifts
-  } = shiftSt;
-  const selectedShift = shifts[atIndex];
-  if (!selectedShift) {
-    return 0;
-  }
-  const {
-    ref,
-    peak
-  } = selectedShift;
-  const offset = (0, _shift.FromManualToOffset)(ref, peak);
-  return offset;
-};
-const msOffset = () => 0;
 const extractAutoPeaks = (feature, thresSt, shiftSt, layoutSt, atIndex = 0) => {
-  const offset = _format.default.isMsLayout(layoutSt) || _format.default.isLCMsLayout(layoutSt) ? msOffset() : niOffset(shiftSt, atIndex);
+  const offset = _format.default.isMsLayout(layoutSt) || _format.default.isLCMsLayout(layoutSt) ? 0 : (0, _shift.shiftOffsetAtIndex)(shiftSt, atIndex);
   const peaks = (0, _chem.Convert2Peak)(feature, thresSt.value, offset);
   return peaks;
 };

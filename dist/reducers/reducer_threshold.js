@@ -16,14 +16,12 @@ const initialState = {
     lower: false
   }]
 };
-
-// const defaultThresHold = {
-//   isEdit: true,
-//   value: false,
-//   upper: false,
-//   lower: false,
-// };
-
+const defaultThresHold = {
+  isEdit: true,
+  value: false,
+  upper: false,
+  lower: false
+};
 const setThresHoldValue = (state, action) => {
   const {
     payload
@@ -126,12 +124,16 @@ const setThresHoldLower = (state, action) => {
     list: newListThres
   });
 };
-const setThresHoldIsEdit = state => {
+const setThresHoldIsEdit = (state, action) => {
+  const {
+    payload
+  } = action;
   const {
     list,
     selectedIdx
   } = state;
-  const selectedThres = list[selectedIdx];
+  const curveIdx = payload && payload.curveIdx !== undefined ? payload.curveIdx : selectedIdx;
+  const selectedThres = list[curveIdx] || defaultThresHold;
   const {
     isEdit
   } = selectedThres;
@@ -139,9 +141,10 @@ const setThresHoldIsEdit = state => {
     isEdit: !isEdit
   });
   const newListThres = [...list];
-  newListThres[selectedIdx] = newSelectedThres;
+  newListThres[curveIdx] = newSelectedThres;
   return Object.assign({}, state, {
-    list: newListThres
+    list: newListThres,
+    selectedIdx: curveIdx
   });
 };
 const resetAll = (state, action) => {
@@ -151,6 +154,21 @@ const resetAll = (state, action) => {
   const {
     list
   } = state;
+  if (payload && payload.curveIdx !== undefined) {
+    const {
+      curveIdx
+    } = payload;
+    const selectedThres = list[curveIdx] || defaultThresHold;
+    const newSelectedThres = Object.assign({}, selectedThres, {
+      value: payload.thresRef
+    });
+    const newListThres = [...list];
+    newListThres[curveIdx] = newSelectedThres;
+    return Object.assign({}, state, {
+      selectedIdx: curveIdx,
+      list: newListThres
+    });
+  }
   const newList = list.map(item => ({
     isEdit: item.isEdit,
     value: payload && payload.thresRef,
@@ -201,6 +219,10 @@ const thresholdReducer = (state = initialState, action) => {
   switch (action.type) {
     case _action_type.CURVE.SET_ALL_CURVES:
       return setListThreshold(state, action);
+    case _action_type.CURVE.SELECT_WORKING_CURVE:
+      return Object.assign({}, state, {
+        selectedIdx: action.payload
+      });
     case _action_type.THRESHOLD.UPDATE_VALUE:
       return setThresHoldValue(state, action);
     case _action_type.THRESHOLD.UPDATE_UPPER_VALUE:
@@ -210,7 +232,7 @@ const thresholdReducer = (state = initialState, action) => {
     case _action_type.THRESHOLD.RESET_VALUE:
       return setThresHoldValue(state, action);
     case _action_type.THRESHOLD.TOGGLE_ISEDIT:
-      return setThresHoldIsEdit(state);
+      return setThresHoldIsEdit(state, action);
     case _action_type.MANAGER.RESET_INIT_COMMON:
       return resetInitCommon(state);
     case _action_type.MANAGER.RESETALL:

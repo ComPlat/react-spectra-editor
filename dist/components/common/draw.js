@@ -26,7 +26,7 @@ const drawDisplay = (klass, isHidden) => {
   }
 };
 exports.drawDisplay = drawDisplay;
-const drawDestroy = klass => d3.select(`${klass} > *`).remove();
+const drawDestroy = klass => d3.select(klass).selectAll('*').remove();
 exports.drawDestroy = drawDestroy;
 const drawArrowOnCurve = (klass, isHidden) => {
   if (isHidden) {

@@ -4,7 +4,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.seperatingSubLayout = exports.default = void 0;
 var _react = _interopRequireDefault(require("react"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
 var _classnames = _interopRequireDefault(require("classnames"));
@@ -18,7 +18,6 @@ var _index2 = _interopRequireDefault(require("./cmd_bar/index"));
 var _index3 = _interopRequireDefault(require("./d3_multi/index"));
 var _curve = require("../actions/curve");
 var _cyclic_voltammetry = require("../actions/cyclic_voltammetry");
-var _list_layout = require("../constants/list_layout");
 var _format = _interopRequireDefault(require("../helpers/format"));
 var _list_graph = require("../constants/list_graph");
 var _jsxRuntime = require("react/jsx-runtime");
@@ -68,7 +67,9 @@ const styles = () => ({
   }
 });
 const seperatingSubLayout = (entities, featureCondition, layoutSt) => {
-  if (layoutSt === _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
+  // Only SEC and GC have sub-layouts (the plot filters their curves by unit);
+  // other layouts must not be split into tabs just because units differ.
+  if (!_format.default.isSECLayout(layoutSt) && !_format.default.isGCLayout(layoutSt)) {
     return null;
   }
   const storedDict = {};
@@ -85,6 +86,7 @@ const seperatingSubLayout = (entities, featureCondition, layoutSt) => {
   });
   return Object.assign({}, storedDict);
 };
+exports.seperatingSubLayout = seperatingSubLayout;
 class MultiJcampsViewer extends _react.default.Component {
   // eslint-disable-line
   render() {
@@ -132,7 +134,8 @@ class MultiJcampsViewer extends _react.default.Component {
         forecast: forecast || {},
         operations: operations,
         editorOnly: editorOnly,
-        hideThreshold: !_format.default.isNmrLayout(layoutSt)
+        hideThreshold: !_format.default.isNmrLayout(layoutSt),
+        showNormalize: !isCyclicVolta && entities.length > 1
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
         className: (0, _classnames.default)(_list_graph.LIST_HOST_HOOK_CLASS.EDITOR_ROOT, isCyclicVolta && classes.cvEditor),
         children: /*#__PURE__*/(0, _jsxRuntime.jsxs)(_Grid.default, {
