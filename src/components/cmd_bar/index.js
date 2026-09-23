@@ -74,12 +74,15 @@ const styles = () => (
         alignItems: 'center',
         rowGap: 4,
       },
+      // A plain `row`, so the visual order is the DOM order (and the tab order) and
+      // matches the LC/MS branch below. Controls start at Layout and are left-aligned;
+      // Submit pins itself to the far right with `groupRightMost`'s auto margin.
       toolbarRight: {
         flex: '1 1 auto',
         display: 'flex',
-        flexDirection: 'row-reverse',
         flexWrap: 'wrap',
         alignItems: 'center',
+        justifyContent: 'flex-start',
         rowGap: 4,
       },
     },
@@ -95,8 +98,17 @@ const CmdBar = ({
 }) => {
   const isCvLayout = Format.isCyclicVoltaLayout(layoutSt);
 
+  // Layout first, Submit (its option dropdown and button) last, in every layout.
   const rightCluster = (
     <>
+      <Layout feature={feature} hasEdit={hasEdit} />
+      {
+        hideThreshold ? null : (<Threshold feature={feature} hasEdit={hasEdit} />)
+      }
+      <Wavelength />
+      <CvDensityControls />
+      <ChangeAxes />
+      <Detector />
       <Submit
         operations={operations}
         feature={feature}
@@ -105,14 +117,6 @@ const CmdBar = ({
         hideSwitch={false}
         disabled={false}
       />
-      {
-        hideThreshold ? null : (<Threshold feature={feature} hasEdit={hasEdit} />)
-      }
-      <Layout feature={feature} hasEdit={hasEdit} />
-      <Wavelength />
-      <CvDensityControls />
-      <ChangeAxes />
-      <Detector />
     </>
   );
 
