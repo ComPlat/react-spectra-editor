@@ -47,15 +47,14 @@ const styles = () => ({
     // applies in a host that does not constrain us (and now actually works).
     height: '100%',
     minHeight: 0,
-    maxHeight: 'none',
+    // 230, not 220 - see the matching constant in multi_jcamps_viewer.js.
+    maxHeight: 'calc(90vh - 230px)',
+    // ROI
     overflowX: 'hidden',
     overflowY: 'auto',
     margin: '5px 0 0 0',
     padding: '0 0 0 0',
     width: '100%'
-  },
-  panelsCv: {
-    maxHeight: 'calc(90vh - 230px)'
   }
 });
 class PanelViewer extends _react.default.Component {
@@ -114,9 +113,9 @@ class PanelViewer extends _react.default.Component {
       listCurves
     } = curveSt;
     const curveCount = Array.isArray(listCurves) ? listCurves.length : 0;
-    const hideGraphSelection = (curveCount <= 1 && !_format.default.isCyclicVoltaLayout(layoutSt)) || _format.default.isLCMsLayout(layoutSt);
+    const hideGraphSelection = curveCount <= 1 && !_format.default.isCyclicVoltaLayout(layoutSt) || _format.default.isLCMsLayout(layoutSt);
     return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-      className: (0, _classnames.default)(classes.panels, hideCyclicVolta && classes.panelsCv),
+      className: (0, _classnames.default)(classes.panels),
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_styles.StyledEngineProvider, {
         injectFirst: true,
         children: /*#__PURE__*/(0, _jsxRuntime.jsxs)(_styles.ThemeProvider, {
