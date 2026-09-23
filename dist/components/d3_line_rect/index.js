@@ -169,7 +169,8 @@ const isLcmsMsPageLoading = (mzEntities = [], hplcMsSt = {}) => {
 exports.isLcmsMsPageLoading = isLcmsMsPageLoading;
 const styles = () => Object.assign({}, {
   lcMsStackRoot: {
-    margin: '0 0 5px 52px',
+    // Flush left, like the toolbar card above it (`commonStyle.card`).
+    margin: '0 0 5px 0',
     // This is the only place the editor mounts three chart containers stacked in one
     // pane instead of a single one. A host stylesheet that stretches a single chart
     // with `.d3Line { height: 100% }` would otherwise make each of the three as tall
