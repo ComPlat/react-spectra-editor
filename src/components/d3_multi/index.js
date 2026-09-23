@@ -11,6 +11,7 @@ import {
 } from '../../helpers/chem';
 import Format from '../../helpers/format';
 import Cfg from '../../helpers/cfg';
+import ContainerSize from '../../helpers/container_size';
 import { resetAll } from '../../actions/manager';
 import { selectUiSweep, scrollUiWheel, clickUiTarget } from '../../actions/ui';
 import {
@@ -27,7 +28,7 @@ import {
 } from '../common/draw';
 
 // Fallback size, and the aspect used when the host leaves the height open - see
-// getTargetSize. 8/12 matches the `xs={8}` chart column of MultiJcampsViewer, the only
+// ContainerSize. 8/12 matches the `xs={8}` chart column of MultiJcampsViewer, the only
 // host of this viewer.
 const W = Math.round(window.innerWidth * 0.90 * 8 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.85); // ROI
@@ -42,8 +43,6 @@ class ViewerMulti extends React.Component {
     } = this.props;
     this.rootKlass = `.${LIST_ROOT_SVG_GRAPH.LINE}`;
     this.containerRef = React.createRef();
-    this.currentSize = null;
-    this.resizeObserver = null;
 
     this.focus = new MultiFocus({
       W,
@@ -59,12 +58,16 @@ class ViewerMulti extends React.Component {
 
     this.normChange = this.normChange.bind(this);
     this.handleResize = this.handleResize.bind(this);
-    this.scheduleResize = this.scheduleResize.bind(this);
     this.syncFocusActions = this.syncFocusActions.bind(this);
+    this.size = new ContainerSize(
+      () => this.containerRef.current,
+      { width: W, height: H },
+      this.handleResize,
+    );
   }
 
   componentDidMount() {
-    this.setupResizeObserver();
+    this.size.observe();
     this.mountChart(this.props, true);
   }
 
@@ -131,61 +134,11 @@ class ViewerMulti extends React.Component {
 
   componentWillUnmount() {
     drawDestroy(this.rootKlass);
-    this.teardownResizeObserver();
+    this.size.disconnect();
   }
 
   handleResize() {
-    const node = this.containerRef.current;
-    if (!node || !this.currentSize) return;
-    const { clientWidth, clientHeight } = node;
-    if (!clientWidth) return;
-    // An unbounded container's height is the chart's own, so it is not an input.
-    if (clientWidth !== this.currentSize.width
-      || (this.isHeightBounded && clientHeight !== this.currentSize.height)) {
-      this.mountChart(this.props, false);
-    }
-  }
-
-  // Draw at the container's size so the viewBox matches the box the svg is laid out in:
-  // with `xMinYMin meet` the chart then fills its pane and never distorts. `width` is
-  // taken before the chart is removed (a page scrollbar can come and go with it); the
-  // height after. A container that keeps a height while empty is bounded by its host
-  // (the ELN pane, the CV column) and that height is used. One that collapses takes its
-  // height from the chart, so measuring it would feed back - the old svg plus its inline
-  // baseline gap - and grow a few px on every resize without end; derive it from the
-  // width instead.
-  getTargetSize(width) {
-    const node = this.containerRef.current;
-    const boundedHeight = node ? node.clientHeight : 0;
-    this.isHeightBounded = boundedHeight > 0;
-    if (!width) return { width: W, height: H };
-    return {
-      width,
-      height: this.isHeightBounded ? boundedHeight : Math.round((width * H) / W),
-    };
-  }
-
-  setupResizeObserver() {
-    if (typeof ResizeObserver === 'undefined') return;
-    if (!this.containerRef.current || this.resizeObserver) return;
-    this.resizeObserver = new ResizeObserver(this.scheduleResize);
-    this.resizeObserver.observe(this.containerRef.current);
-  }
-
-  // A bounded container's size does not depend on the chart, so redraw at once, before
-  // the next paint. An unbounded one does: remounting inside the observer callback resizes
-  // what it observes in the same frame, which the browser reports as a "ResizeObserver
-  // loop" error - wait for the next frame instead.
-  scheduleResize() {
-    if (this.isHeightBounded) {
-      this.handleResize();
-      return;
-    }
-    if (this.resizeFrame) return;
-    this.resizeFrame = window.requestAnimationFrame(() => {
-      this.resizeFrame = null;
-      this.handleResize();
-    });
+    if (this.size.hasChanged()) this.mountChart(this.props, false);
   }
 
   syncFocusActions() {
@@ -202,17 +155,6 @@ class ViewerMulti extends React.Component {
       addVisualSplitLineAct,
       removeVisualSplitLineAct,
     });
-  }
-
-  teardownResizeObserver() {
-    if (this.resizeFrame) {
-      window.cancelAnimationFrame(this.resizeFrame);
-      this.resizeFrame = null;
-    }
-    if (this.resizeObserver) {
-      this.resizeObserver.disconnect();
-      this.resizeObserver = null;
-    }
   }
 
   resolveAxisLabels(props) {
@@ -275,11 +217,9 @@ class ViewerMulti extends React.Component {
       integrationSt, mtplySt, uiSt,
     } = props;
 
-    const node = this.containerRef.current;
-    const width = node ? node.clientWidth : 0;
+    const width = this.size.measureWidth();
     drawDestroy(this.rootKlass);
-    const size = this.getTargetSize(width);
-    this.currentSize = size;
+    const size = this.size.target(width);
 
     if (shouldReset) {
       resetAllAct(feature);

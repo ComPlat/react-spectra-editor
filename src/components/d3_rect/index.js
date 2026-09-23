@@ -10,11 +10,14 @@ import {
 import { resetAll } from '../../actions/manager';
 import { selectUiSweep, scrollUiWheel, clickUiTarget } from '../../actions/ui';
 import RectFocus from './rect_focus';
+import ContainerSize from '../../helpers/container_size';
 import {
   drawMain, drawLabel, drawDisplay, drawDestroy,
 } from '../common/draw';
 import { LIST_UI_SWEEP_TYPE, LIST_NON_BRUSH_TYPES } from '../../constants/list_ui';
 
+// Fallback size, and the aspect used when the host leaves the height open - see
+// ContainerSize.
 const W = Math.round(window.innerWidth * 0.90 * 8 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.85); // ROI
 
@@ -22,41 +25,22 @@ class ViewerRect extends React.Component {
   constructor(props) {
     super(props);
 
-    const { clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct } = props;
     this.rootKlass = '.d3Rect';
-    this.focus = new RectFocus({
-      W, H, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
-    });
+    this.containerRef = React.createRef();
+    this.focus = this.createFocus({ width: W, height: H });
 
     this.normChange = this.normChange.bind(this);
+    this.handleResize = this.handleResize.bind(this);
+    this.size = new ContainerSize(
+      () => this.containerRef.current,
+      { width: W, height: H },
+      this.handleResize,
+    );
   }
 
   componentDidMount() {
-    const {
-      seed, peak, cLabel, xLabel, yLabel, feature,
-      tTrEndPts, tSfPeaks, isHidden, decimalSt,
-      sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
-      resetAllAct,
-    } = this.props;
-    drawDestroy(this.rootKlass);
-    resetAllAct(feature);
-
-    const filterSeed = seed;
-    const filterPeak = peak;
-
-    drawMain(this.rootKlass, W, H);
-    this.focus.create({
-      filterSeed,
-      filterPeak,
-      tTrEndPts,
-      tSfPeaks,
-      decimal: decimalSt,
-      sweepExtentSt,
-      isUiAddIntgSt,
-      isUiNoBrushSt,
-    });
-    drawLabel(this.rootKlass, cLabel, xLabel, yLabel);
-    drawDisplay(this.rootKlass, isHidden);
+    this.size.observe();
+    this.mountChart(true);
   }
 
   componentDidUpdate(prevProps) {
@@ -66,6 +50,7 @@ class ViewerRect extends React.Component {
       sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
     } = this.props;
     this.normChange(prevProps);
+    this.handleResize();
 
     const filterSeed = seed;
     const filterPeak = peak;
@@ -85,6 +70,50 @@ class ViewerRect extends React.Component {
 
   componentWillUnmount() {
     drawDestroy(this.rootKlass);
+    this.size.disconnect();
+  }
+
+  handleResize() {
+    if (this.size.hasChanged()) this.mountChart(false);
+  }
+
+  // The focus lays its scales out once, from the size it is built with: a new size needs a
+  // new focus.
+  createFocus(size) {
+    const { clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct } = this.props;
+    return new RectFocus({
+      W: size.width, H: size.height, clickUiTargetAct, selectUiSweepAct, scrollUiWheelAct,
+    });
+  }
+
+  // Draws the chart from scratch at its container's size: on mount (resetting the feature's
+  // edit state, as the first draw always has) and whenever the container is resized.
+  mountChart(shouldReset) {
+    const {
+      seed, peak, cLabel, xLabel, yLabel, feature,
+      tTrEndPts, tSfPeaks, isHidden, decimalSt,
+      sweepExtentSt, isUiAddIntgSt, isUiNoBrushSt,
+      resetAllAct,
+    } = this.props;
+    const width = this.size.measureWidth();
+    drawDestroy(this.rootKlass);
+    const size = this.size.target(width);
+    if (shouldReset) resetAllAct(feature);
+
+    this.focus = this.createFocus(size);
+    drawMain(this.rootKlass, size.width, size.height);
+    this.focus.create({
+      filterSeed: seed,
+      filterPeak: peak,
+      tTrEndPts,
+      tSfPeaks,
+      decimal: decimalSt,
+      sweepExtentSt,
+      isUiAddIntgSt,
+      isUiNoBrushSt,
+    });
+    drawLabel(this.rootKlass, cLabel, xLabel, yLabel);
+    drawDisplay(this.rootKlass, isHidden);
   }
 
   normChange(prevProps) {
@@ -97,7 +126,7 @@ class ViewerRect extends React.Component {
 
   render() {
     return (
-      <div className="d3Rect" />
+      <div className="d3Rect" ref={this.containerRef} />
     );
   }
 }
