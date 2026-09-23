@@ -137,7 +137,9 @@ function* setInitShifts() {
         type: MANAGER.RESETSHIFT,
         payload: {
           ...feature,
-          layout: layoutSt,
+          // Resolve the solvent against the curve's own layout; the global
+          // layout may belong to a different nucleus (e.g. 1H vs 13C names).
+          layout: feature.operation?.layout || layoutSt,
           curvesInfo: {
             isMultiCurve: true,
             curveIdx: index,

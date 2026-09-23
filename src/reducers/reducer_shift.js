@@ -44,7 +44,7 @@ const resetRef = (payload) => {
       target = l;
     }
   });
-  return target || shiftNone[0];
+  return target || shiftNone;
 };
 
 const resetEnable = (payload) => {
