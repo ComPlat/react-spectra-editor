@@ -353,9 +353,9 @@ const InfoPanel = ({
   } = shiftSt;
   const selectedShift = shifts[curveIdx];
   let showSolvName = solventName;
-  if (selectedShift !== undefined) {
-    const shiftName = selectedShift.ref.name;
-    showSolvName = shiftName === '- - -' ? solventName : shiftName;
+  const shiftName = selectedShift?.ref?.name;
+  if (shiftName && shiftName !== '- - -') {
+    showSolvName = shiftName;
   }
   let originStack = null;
   if (integration) {
