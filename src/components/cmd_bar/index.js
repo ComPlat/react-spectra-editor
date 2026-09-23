@@ -22,6 +22,7 @@ import Pecker from './07_pecker';
 import ChangeAxes from './r08_change_axes';
 import Detector from './r09_detector';
 import CvDensityControls from './r10_cv_density';
+import Normalize from './r11_normalize';
 import Format from '../../helpers/format';
 import { LIST_HOST_HOOK_CLASS } from '../../constants/list_graph';
 import Cfg from '../../helpers/cfg';
@@ -68,7 +69,7 @@ const styles = () => (
 
 const CmdBar = ({
   classes, feature, hasEdit, forecast, operations, editorOnly, jcampIdx, hideThreshold,
-  hideMainEditTools,
+  hideMainEditTools, showNormalize,
   layoutSt,
   prependLcMsToolbar,
 }) => {
@@ -93,6 +94,7 @@ const CmdBar = ({
       <Wavelength />
       <CvDensityControls />
       <ChangeAxes />
+      { showNormalize ? <Normalize /> : null }
       <Detector />
     </>
   );
@@ -149,10 +151,12 @@ CmdBar.propTypes = {
   jcampIdx: PropTypes.any,
   hideThreshold: PropTypes.bool,
   hideMainEditTools: PropTypes.bool,
+  showNormalize: PropTypes.bool,
   prependLcMsToolbar: PropTypes.node,
 };
 
 CmdBar.defaultProps = {
+  showNormalize: false,
   prependLcMsToolbar: null,
 };
 

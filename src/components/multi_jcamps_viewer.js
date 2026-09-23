@@ -114,6 +114,7 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
           operations={operations}
           editorOnly={editorOnly}
           hideThreshold={!Format.isNmrLayout(layoutSt)}
+          showNormalize={!isCyclicVolta && entities.length > 1}
         />
         <div
           className={classNames(

@@ -25,6 +25,7 @@ var _pecker = _interopRequireDefault(require("./07_pecker"));
 var _r08_change_axes = _interopRequireDefault(require("./r08_change_axes"));
 var _r09_detector = _interopRequireDefault(require("./r09_detector"));
 var _r10_cv_density = _interopRequireDefault(require("./r10_cv_density"));
+var _r11_normalize = _interopRequireDefault(require("./r11_normalize"));
 var _format = _interopRequireDefault(require("../../helpers/format"));
 var _list_graph = require("../../constants/list_graph");
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
@@ -75,6 +76,7 @@ const CmdBar = ({
   jcampIdx,
   hideThreshold,
   hideMainEditTools,
+  showNormalize,
   layoutSt,
   prependLcMsToolbar
 }) => {
@@ -95,7 +97,7 @@ const CmdBar = ({
     }), hideThreshold ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_r03_threshold.default, {
       feature: feature,
       hasEdit: hasEdit
-    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r07_wavelength_btn.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r10_cv_density.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r08_change_axes.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r09_detector.default, {})]
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r07_wavelength_btn.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r10_cv_density.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r08_change_axes.default, {}), showNormalize ? /*#__PURE__*/(0, _jsxRuntime.jsx)(_r11_normalize.default, {}) : null, /*#__PURE__*/(0, _jsxRuntime.jsx)(_r09_detector.default, {})]
   });
   if (prependLcMsToolbar) {
     return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
@@ -142,9 +144,11 @@ CmdBar.propTypes = {
   jcampIdx: _propTypes.default.any,
   hideThreshold: _propTypes.default.bool,
   hideMainEditTools: _propTypes.default.bool,
+  showNormalize: _propTypes.default.bool,
   prependLcMsToolbar: _propTypes.default.node
 };
 CmdBar.defaultProps = {
+  showNormalize: false,
   prependLcMsToolbar: null
 };
 var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, null), (0, _withStyles.default)(styles))(CmdBar);

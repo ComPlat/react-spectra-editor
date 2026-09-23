@@ -232,6 +232,9 @@ class ViewerMulti extends React.Component {
       const baseUnit = /mA/i.test(String(yyLabel)) ? 'mA' : 'A';
       yyLabel = `Current density in ${baseUnit}/${areaUnit}`;
     }
+    if (curveSt && curveSt.isNormalized && !Format.isCyclicVoltaLayout(props.layoutSt)) {
+      yyLabel = 'Normalized intensity in %';
+    }
     return { xxLabel, yyLabel };
   }
 

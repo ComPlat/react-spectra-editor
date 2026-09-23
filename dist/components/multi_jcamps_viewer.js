@@ -132,7 +132,8 @@ class MultiJcampsViewer extends _react.default.Component {
         forecast: forecast || {},
         operations: operations,
         editorOnly: editorOnly,
-        hideThreshold: !_format.default.isNmrLayout(layoutSt)
+        hideThreshold: !_format.default.isNmrLayout(layoutSt),
+        showNormalize: !isCyclicVolta && entities.length > 1
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
         className: (0, _classnames.default)(_list_graph.LIST_HOST_HOOK_CLASS.EDITOR_ROOT, isCyclicVolta && classes.cvEditor),
         children: /*#__PURE__*/(0, _jsxRuntime.jsxs)(_Grid.default, {

@@ -31,6 +31,7 @@ import {
   calcArea,
 } from '../../helpers/integration';
 import { calcMpyCenter } from '../../helpers/multiplicity_calc';
+import { maxY, scaleToReference, toPercent } from '../../helpers/normalize';
 
 const d3 = require('d3');
 
@@ -45,6 +46,8 @@ class MultiFocus {
     this.entities = entities;
     this.jcampIdx = 0;
     this.isShowAllCurves = false;
+    this.isNormalized = false;
+    this.normRefMax = null;
     this.rootKlass = '.d3Line';
     this.margin = {
       t: 5,
@@ -127,7 +130,7 @@ class MultiFocus {
     const {
       prevXt, prevYt, prevEpSt, prevLySt,
       prevTePt, prevDtPk, prevSfPk, prevData, prevYFactor,
-      prevJcampIdx,
+      prevJcampIdx, prevNormRefMax,
     } = this.shouldUpdate;
     const { xt, yt } = TfRescale(this);
     const sameXY = xt(1.1) === prevXt && prevYt === yt(1.1);
@@ -143,7 +146,8 @@ class MultiFocus {
         && prevSfPk.every((peak, idx) => peak === this.tSfPeaks[idx])
       );
     const sameData = prevData === this.data.length;
-    const sameYFactor = prevYFactor === this.yTransformFactor;
+    const sameYFactor = prevYFactor === this.yTransformFactor
+      && prevNormRefMax === this.normRefMax;
     const sameJcampIdx = prevJcampIdx === this.jcampIdx;
     this.shouldUpdate = Object.assign(
       {},
@@ -166,12 +170,13 @@ class MultiFocus {
     const prevLySt = this.layout;
     const prevYFactor = this.yTransformFactor;
     const prevJcampIdx = this.jcampIdx;
+    const prevNormRefMax = this.normRefMax;
     this.shouldUpdate = Object.assign(
       {},
       this.shouldUpdate,
       {
         prevXt, prevYt, prevEpSt, prevLySt, // eslint-disable-line
-        prevTePt, prevDtPk, prevSfPk, prevData, prevYFactor, prevJcampIdx, // eslint-disable-line
+        prevTePt, prevDtPk, prevSfPk, prevData, prevYFactor, prevJcampIdx, prevNormRefMax, // eslint-disable-line
       },
     );
   }
@@ -233,6 +238,7 @@ class MultiFocus {
         return data.filterSublayout === filterSubLayoutValue;
       });
     }
+    this.applyNormalization(layout);
 
     if (this.jcampIdx === jcampIdx) {
       this.dataPks = [...peaks];
@@ -244,6 +250,20 @@ class MultiFocus {
     this.layout = layout;
     this.cyclicvoltaSt = cyclicvoltaSt;
     this.jcampIdx = jcampIdx;
+  }
+
+  applyNormalization(layout) {
+    // The working curve keeps its raw values (peaks, integrations, etc. stay
+    // in data units); the other curves are scaled onto its highest peak and
+    // the y axis is relabelled as percent of that peak.
+    this.normRefMax = null;
+    if (!this.isNormalized || Format.isCyclicVoltaLayout(layout)) return;
+    const refMax = maxY(this.data);
+    if (!(refMax > 0)) return;
+    this.normRefMax = refMax;
+    this.otherLineData = this.otherLineData.map((entry) => (
+      Object.assign({}, entry, { data: scaleToReference(entry.data, refMax) })
+    ));
   }
 
   updatePathCall(xt, yt) {
@@ -292,6 +312,12 @@ class MultiFocus {
     this.axisCall.y.scale(yt);
     if (this.layout === LIST_LAYOUT.CYCLIC_VOLTAMMETRY) {
       this.setYAxisTickFormat();
+    } else if (this.normRefMax) {
+      const refMax = this.normRefMax;
+      const format = d3.format('.3~r');
+      this.axisCall.y.tickFormat((v) => format(toPercent(v, refMax)));
+    } else {
+      this.axisCall.y.tickFormat(d3.format('.2n'));
     }
 
     this.currentExtent = { xExtent, yExtent };
@@ -1079,9 +1105,10 @@ class MultiFocus {
     MountMainFrame(this, 'focus');
     MountClip(this);
 
-    const { curveIdx, isShowAllCurve } = curveSt;
+    const { curveIdx, isShowAllCurve, isNormalized } = curveSt;
     const jcampIdx = curveIdx;
     this.isShowAllCurves = isShowAllCurve;
+    this.isNormalized = !!isNormalized;
 
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
     this.scales = InitScale(this, this.reverseXAxis(layoutSt));
@@ -1128,9 +1155,10 @@ class MultiFocus {
     this.scales = InitScale(this, this.reverseXAxis(layoutSt));
     this.graphIndex = uiSt?.zoom?.graphIndex;
 
-    const { curveIdx, isShowAllCurve } = curveSt;
+    const { curveIdx, isShowAllCurve, isNormalized } = curveSt;
     const jcampIdx = curveIdx;
     this.isShowAllCurves = isShowAllCurve;
+    this.isNormalized = !!isNormalized;
     this.entities = entities;
 
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, shiftSt, jcampIdx);
