@@ -63,7 +63,7 @@ class HPLCViewer extends React.Component { // eslint-disable-line
         />
         <div className={LIST_HOST_HOOK_CLASS.EDITOR_ROOT}>
           <Grid container>
-            <Grid item xs={9}>
+            <Grid item xs={8}>
               <ViewerLineRect
                 ticEntities={ticEntities}
                 uvvisEntities={uvvisEntities}
@@ -79,7 +79,7 @@ class HPLCViewer extends React.Component { // eslint-disable-line
                 onLcmsPageRequest={onLcmsPageRequest}
               />
             </Grid>
-            <Grid item xs={3} align="center">
+            <Grid item xs={4} align="center">
               <PanelViewer
                 entities={entities}
                 jcampIdx={curveIdx}

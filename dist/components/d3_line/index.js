@@ -22,7 +22,7 @@ var _cyclic_voltammetry = require("../../actions/cyclic_voltammetry");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable no-mixed-operators */
 
-const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
+const W = Math.round(window.innerWidth * 0.90 * 8 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.85); // ROI
 
 class ViewerLine extends _react.default.Component {

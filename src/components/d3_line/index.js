@@ -22,7 +22,7 @@ import { LIST_ROOT_SVG_GRAPH } from '../../constants/list_graph';
 import Cfg from '../../helpers/cfg';
 import { addNewCylicVoltaPairPeak, addCylicVoltaMaxPeak, addCylicVoltaMinPeak } from '../../actions/cyclic_voltammetry';
 
-const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
+const W = Math.round(window.innerWidth * 0.90 * 8 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.85); // ROI
 
 class ViewerLine extends React.Component {

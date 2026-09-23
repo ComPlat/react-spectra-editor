@@ -109,7 +109,7 @@ const LayerPrism = ({
       />
       <div className={LIST_HOST_HOOK_CLASS.EDITOR_ROOT}>
         <Grid container>
-          <Grid item xs={9}>
+          <Grid item xs={8}>
             <LayerContent
               topic={topic}
               feature={feature}
@@ -121,7 +121,7 @@ const LayerPrism = ({
               operations={operations}
             />
           </Grid>
-          <Grid item xs={3} align="center">
+          <Grid item xs={4} align="center">
             <PanelViewer
               feature={feature}
               integration={integration}

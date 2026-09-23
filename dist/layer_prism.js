@@ -135,7 +135,7 @@ const LayerPrism = ({
         container: true,
         children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
           item: true,
-          xs: 9,
+          xs: 8,
           children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_layer_content.default, {
             topic: topic,
             feature: feature,
@@ -148,7 +148,7 @@ const LayerPrism = ({
           })
         }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
           item: true,
-          xs: 3,
+          xs: 4,
           align: "center",
           children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_index.default, {
             feature: feature,

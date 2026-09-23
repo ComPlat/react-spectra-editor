@@ -93,7 +93,7 @@ class HPLCViewer extends _react.default.Component {
           container: true,
           children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Grid, {
             item: true,
-            xs: 9,
+            xs: 8,
             children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_index3.default, {
               ticEntities: ticEntities,
               uvvisEntities: uvvisEntities,
@@ -110,7 +110,7 @@ class HPLCViewer extends _react.default.Component {
             })
           }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Grid, {
             item: true,
-            xs: 3,
+            xs: 4,
             align: "center",
             children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_index.default, {
               entities: entities,
