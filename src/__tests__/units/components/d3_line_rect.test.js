@@ -1,3 +1,4 @@
+import * as d3 from 'd3';
 import {
   isLcmsMsPageLoading, measurePane, sameSizes,
   UnconnectedViewerLineRect, computeLcmsUnionXExtent, toSeed,
@@ -94,15 +95,50 @@ describe('isLcmsMsPageLoading', () => {
 // threshold makes convertThresEndPts return [] (see chem.test.tsx) while the
 // MS bars are still present, so drawBar must guard the empty endpoint list
 // instead of crashing.
-describe('RectFocus.drawBar with an empty threshold-endpoint list (B7)', () => {
-  it('does not crash when tTrEndPts is empty but bars exist', () => {
+//
+// Review finding S4 (PR #336): the original guard (`if (!this.tTrEndPts.length)
+// return;`) fixed the crash by skipping the rest of drawBar() entirely, but
+// tTrEndPts only decides bar *color* (barColor's above/below-threshold fill) -- none
+// of the enter/exit/transform positioning depends on it. Returning early meant an
+// empty threshold blanked the chart on mount, or left stale (un-removed,
+// un-repositioned) bars on a later update, even though this.data was populated. The
+// fix falls back to a neutral yRef (-Infinity, so every bar gets the default color)
+// and lets the rest of drawBar() run as normal.
+describe('RectFocus.drawBar with an empty threshold-endpoint list (B7 / S4)', () => {
+  const buildFocus = () => {
+    const root = document.createElement('div');
     const rf = Object.create(RectFocus.prototype);
-    rf.bars = {}; // truthy → passes the `if (!this.bars)` guard
+    rf.bars = d3.select(root); // a real selection: `if (!this.bars)` also passes
     rf.scales = { x: (v) => v, y: (v) => v }; // TfRescale reads focus.scales.{x,y}
     rf.updatePathCall = () => {}; // stub out the d3 path update
-    rf.data = [{ x: 1, y: 2 }]; // bars present
+    rf.data = [{ x: 1, y: 2 }, { x: 2, y: 3 }]; // bars present
     rf.tTrEndPts = []; // cleared threshold → empty endpoints
+    return { root, rf };
+  };
+
+  it('does not crash when tTrEndPts is empty but bars exist', () => {
+    const { rf } = buildFocus();
     expect(() => rf.drawBar()).not.toThrow();
+  });
+
+  it('still draws (not blanks) the bars when tTrEndPts is empty', () => {
+    const { root, rf } = buildFocus();
+    rf.drawBar();
+    const rects = root.querySelectorAll('rect');
+    expect(rects.length).toBe(rf.data.length);
+    rects.forEach((rect) => expect(rect.getAttribute('fill')).toBe('steelblue'));
+  });
+
+  it('still updates (not leaves stale) the bars on a later call with new data', () => {
+    const { root, rf } = buildFocus();
+    rf.drawBar();
+
+    rf.data = [{ x: 5, y: 9 }];
+    rf.drawBar();
+
+    const rects = root.querySelectorAll('rect');
+    expect(rects.length).toBe(1);
+    expect(rects[0].getAttribute('transform')).toBe('translate(5, 9)');
   });
 });
 

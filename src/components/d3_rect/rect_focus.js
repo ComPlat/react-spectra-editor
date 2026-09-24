@@ -129,8 +129,12 @@ class RectFocus {
     const { xt, yt } = TfRescale(this);
     this.updatePathCall(xt, yt);
 
-    if (!this.tTrEndPts.length) return;
-    const yRef = this.tTrEndPts[0].y;
+    // tTrEndPts only decides barColor's above/below-threshold fill -- an empty list
+    // (no threshold, no feature.thresRef) means there is nothing to compare against,
+    // not that there is nothing to draw. -Infinity keeps every bar's default color
+    // instead of skipping enter/exit/transform entirely, which left the chart blank
+    // on mount or stale (un-removed, un-repositioned) on a later update/zoom.
+    const yRef = this.tTrEndPts.length ? this.tTrEndPts[0].y : -Infinity;
     const msMaxY = d3.max(this.data, (row) => row.y) || 0;
 
     const bars = this.bars.selectAll('rect')

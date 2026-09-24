@@ -162,8 +162,13 @@ class RectFocus {
       yt
     } = (0, _compass.TfRescale)(this);
     this.updatePathCall(xt, yt);
-    if (!this.tTrEndPts.length) return;
-    const yRef = this.tTrEndPts[0].y;
+
+    // tTrEndPts only decides barColor's above/below-threshold fill -- an empty list
+    // (no threshold, no feature.thresRef) means there is nothing to compare against,
+    // not that there is nothing to draw. -Infinity keeps every bar's default color
+    // instead of skipping enter/exit/transform entirely, which left the chart blank
+    // on mount or stale (un-removed, un-repositioned) on a later update/zoom.
+    const yRef = this.tTrEndPts.length ? this.tTrEndPts[0].y : -Infinity;
     const bars = this.bars.selectAll('rect').data(this.data);
     bars.exit().attr('class', 'exit').remove();
     const gnd = yt(0);
