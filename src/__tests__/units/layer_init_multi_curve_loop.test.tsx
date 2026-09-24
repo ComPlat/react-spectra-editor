@@ -179,3 +179,39 @@ describe('LayerInit — a changed entity is still detected when its id stays con
     expect(store.getActions().filter((a) => a.type === CURVE.SET_ALL_CURVES).length).toBe(1);
   });
 });
+
+// Review finding S9 (PR #336): no test covered updateMultiEntities' own guard change
+// (`if (!entity || !entity.layout) return` -> `if (!entity) return`). Before it, an
+// unrecognized-datatype entity's falsy layout made updateMultiEntities skip entirely --
+// so switching from a real multi-curve session (CV here) to such an entity never
+// dispatched SET_ALL_CURVES at all, leaving the previous session's curves/curveIdx
+// stuck in Redux instead of resetting to the single-entity default.
+describe('LayerInit updateMultiEntities — an unrecognized-datatype entity still resets curve state (S9)', () => {
+  it('dispatches SET_ALL_CURVES(false), clearing a stale multi-curve session, when switching to it', () => {
+    const store = mockStore(storeState);
+    const [entityA, entityB] = buildEquivalentMultiEntities();
+
+    const { rerender } = render(
+      <Provider store={store}>
+        <LayerInit {...baseProps} entity={entityA} multiEntities={[entityA, entityB]} />
+      </Provider>,
+    );
+    expect(store.getActions().filter((a) => a.type === CURVE.SET_ALL_CURVES).length).toBe(1);
+
+    const plainEntity = {
+      layout: false,
+      title: 'unrecognized',
+      spectra: [{ data: [{ x: [1, 2], y: [1, 2] }] }],
+    };
+    rerender(
+      <Provider store={store}>
+        <LayerInit {...baseProps} entity={plainEntity} multiEntities={[]} />
+      </Provider>,
+    );
+
+    const setAllCurvesActions = store.getActions()
+      .filter((a) => a.type === CURVE.SET_ALL_CURVES);
+    expect(setAllCurvesActions.length).toBe(2);
+    expect(setAllCurvesActions[1].payload).toBe(false);
+  });
+});

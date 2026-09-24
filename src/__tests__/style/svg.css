@@ -2,3 +2,12 @@
   width: 100%;
   height: 100%;
 }
+
+/*
+ * Review finding S7 (PR #336): the LC/MS stack used to need an explicit height here
+ * to avoid growing without bound in this (or any other) unbounded host -- see
+ * d3_line_rect/index.js's own ContainerSize comment for why that is no longer true.
+ * Each pane now derives its height from its own measured width instead of ever
+ * reading its own clientHeight back, so it no longer depends on an ancestor (this
+ * stylesheet, chemotion_ELN's legacy/spectra.scss, or any other host) bounding it.
+ */

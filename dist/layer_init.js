@@ -24,6 +24,7 @@ var _multi_jcamps_viewer = _interopRequireDefault(require("./components/multi_jc
 var _hplc_viewer = _interopRequireDefault(require("./components/hplc_viewer"));
 var _curve = require("./actions/curve");
 var _hplc_ms = require("./actions/hplc_ms");
+var _list_layout = require("./constants/list_layout");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, default-param-last */
 
@@ -36,6 +37,12 @@ class LayerInit extends _react.default.Component {
     this.initReducer = this.initReducer.bind(this);
     this.updateOthers = this.updateOthers.bind(this);
     this.updateMultiEntities = this.updateMultiEntities.bind(this);
+    // Review finding S5 (PR #336): a layout the user picks by hand (the dropdown
+    // dispatches updateLayoutAct directly, bypassing execReset) for an
+    // unrecognized-datatype entity, keyed to that entity's dataset id. See
+    // componentDidUpdate and execReset for why this can't just be read back from
+    // Redux state.layout at the point execReset needs it.
+    this.manualLayoutOverride = null;
   }
   componentDidMount() {
     this.execReset();
@@ -48,9 +55,32 @@ class LayerInit extends _react.default.Component {
       others,
       multiEntities,
       entity,
-      operations
+      operations,
+      layoutSt
     } = this.props;
     const entityChanged = (0, _entity_signature.entitySignature)(prevProps.entity) !== (0, _entity_signature.entitySignature)(entity);
+    // Review finding S5 (PR #336): state.layout changing to something other than
+    // PLAIN while the entity itself did not is the user picking a layout by hand
+    // (the dropdown dispatches updateLayoutAct directly -- the only other place
+    // that happens for an entity execReset would otherwise force to PLAIN).
+    // Remember it against this dataset so a later refresh of the SAME dataset can
+    // restore it -- see execReset for why reading state.layout back live at that
+    // point doesn't work. Excluding a transition *to* PLAIN here is deliberate: a
+    // child's RESETALL (dispatched on its own mount, independent of any entity
+    // change -- see the ForecastViewer-swap note in the S5 test file) carries this
+    // still-unrecognized entity's own static PLAIN classification and can clobber
+    // a just-recorded pick back to PLAIN in the very same tick; that must not
+    // overwrite the real pick this override exists to remember.
+    const entityIsUnrecognized = !entity?.layout || _format.default.isPlainLayout(entity.layout);
+    if (!entityChanged && prevProps.layoutSt !== layoutSt && entityIsUnrecognized && layoutSt !== _list_layout.LIST_LAYOUT.PLAIN) {
+      const datasetId = entity?.idDt ?? entity?.id ?? entity?.datasetId;
+      if (datasetId != null) {
+        this.manualLayoutOverride = {
+          datasetId,
+          layout: layoutSt
+        };
+      }
+    }
     this.normChange(prevProps, entityChanged);
     if (prevProps.operations !== operations || entityChanged) {
       this.initReducer();
@@ -95,13 +125,45 @@ class LayerInit extends _react.default.Component {
       resetMultiplicityAct,
       updateLayoutAct
     } = this.props;
-    if (!entity || !entity.layout) return;
+    if (!entity) return;
     resetInitCommonAct();
     resetDetectorAct();
     const {
-      layout,
+      layout: rawLayout,
       features = {}
     } = entity;
+    // helpers/chem.js's readLayout() itself now returns PLAIN (not a falsy
+    // value) for a datatype it does not recognise, so entity.layout is
+    // already normalized for anything built via FN.ExtractJcamp. This is
+    // belt-and-suspenders for a host-constructed entity that skips that
+    // classifier and hands us a falsy layout directly -- it must not inherit
+    // whatever layout was previously in the Redux state slice either.
+    //
+    // Review finding S5 (PR #336): that normalization must not clobber a layout
+    // the user picked by hand for THIS SAME dataset. A host that keys the editor
+    // by dataset (chemotion_ELN does) can pass a refreshed entity for an
+    // unrecognized datatype without remounting -- entitySignature still changes
+    // (new content), execReset still runs, and naively PLAIN would land back over
+    // that manual choice on every such refresh.
+    //
+    // This can't be answered by reading this.props.layoutSt here: ViewerLine (a
+    // descendant, whose componentDidUpdate fires before this one) independently
+    // dispatches RESETALL whenever the `feature` prop it's handed changes
+    // reference -- which a refreshed entity's new content digest also does --
+    // carrying that entity's own (still PLAIN) operation.layout. That RESETALL
+    // already overwrote state.layout back to PLAIN by the time this line runs, so
+    // this.props.layoutSt is exactly the value being raced, not a usable source
+    // of truth. manualLayoutOverride is written only from componentDidUpdate's own
+    // observation of a *prior*, separate commit where layoutSt changed with no
+    // entity change -- immune to this commit's race -- and is what restores the
+    // choice after that RESETALL clobbers it.
+    const datasetId = entity.idDt ?? entity.id ?? entity.datasetId;
+    const override = datasetId != null && this.manualLayoutOverride?.datasetId === datasetId ? this.manualLayoutOverride.layout : null;
+    // rawLayout is 'PLAIN', not falsy, for anything built via readLayout -- so
+    // `rawLayout || ...` alone never reaches the override or host-constructed-entity
+    // fallback below. Both must be treated as "unrecognized, override-eligible".
+    const isUnrecognized = !rawLayout || _format.default.isPlainLayout(rawLayout);
+    const layout = isUnrecognized ? override || _list_layout.LIST_LAYOUT.PLAIN : rawLayout;
     updateLayoutAct(layout);
     if (_format.default.isMsLayout(layout)) {
       // const { autoPeak, editPeak } = features; // TBD
@@ -134,6 +196,28 @@ class LayerInit extends _react.default.Component {
         dscMetaData
       } = features;
       updateDSCMetaDataAct(dscMetaData);
+    } else if (_format.default.isPlainLayout(layout)) {
+      // Review finding S3 (PR #336): this used to fall into the generic `else`
+      // below, which only resets multiplicity. buildIntegFeature/buildMpyFeature/
+      // buildSimFeature always return a truthy object (with empty stacks) even for
+      // a PLAIN entity, so integration/multiplicity/simulation from whatever was
+      // PREVIOUSLY open at this curveIdx survived untouched -- invisible in the UI
+      // (which hides integrals for PLAIN) but still read by the host's
+      // submit/export path and saved against the PLAIN spectrum. Reset the same
+      // per-curve slices the NMR branch above does, plus DSC metadata, which is
+      // equally stale-prone and equally invisible here.
+      const {
+        integration,
+        multiplicity,
+        simulation
+      } = features;
+      updateMetaPeaksAct(entity);
+      resetInitNmrAct({
+        integration,
+        multiplicity,
+        simulation
+      });
+      updateDSCMetaDataAct(undefined);
     } else {
       resetMultiplicityAct();
     }
@@ -162,7 +246,7 @@ class LayerInit extends _react.default.Component {
       setAllCurvesAct,
       entity
     } = this.props;
-    if (!entity || !entity.layout) return;
+    if (!entity) return;
     const lcmsCurveMeta = () => {
       const uvvisFromMulti = Array.isArray(multiEntities) ? multiEntities.find(e => (0, _extractEntityLCMS.getLcMsInfo)(e).kind === 'uvvis') : null;
       const mzFromMulti = Array.isArray(multiEntities) ? multiEntities.find(e => (0, _extractEntityLCMS.getLcMsInfo)(e).kind === 'mz') : null;
@@ -297,7 +381,9 @@ class LayerInit extends _react.default.Component {
 }
 const mapStateToProps = (state, props) => (
 // eslint-disable-line
-{});
+{
+  layoutSt: state.layout
+});
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   resetInitCommonAct: _manager.resetInitCommon,
   resetInitNmrAct: _manager.resetInitNmr,
@@ -315,6 +401,7 @@ const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
 }, dispatch);
 LayerInit.propTypes = {
   entity: _propTypes.default.object.isRequired,
+  layoutSt: _propTypes.default.string.isRequired,
   multiEntities: _propTypes.default.array,
   // eslint-disable-line
   entityFileNames: _propTypes.default.array,

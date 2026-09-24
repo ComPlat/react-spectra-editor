@@ -1,5 +1,6 @@
+import * as d3 from 'd3';
 import {
-  isLcmsMsPageLoading, measurePane, sameSizes,
+  isLcmsMsPageLoading,
   UnconnectedViewerLineRect, computeLcmsUnionXExtent, toSeed,
 } from '../../../components/d3_line_rect/index';
 import LineFocus from '../../../components/d3_line_rect/line_focus';
@@ -9,6 +10,8 @@ import { resolveXExtent, resolveYExtent } from '../../../helpers/resolve_extent'
 import { ExtractJcamp, convertTopic } from '../../../helpers/chem';
 import { extractParams } from '../../../helpers/extractParams';
 import { LIST_LAYOUT } from '../../../constants/list_layout';
+import ContainerSize from '../../../helpers/container_size';
+import { drawMain } from '../../../components/common/draw';
 import lcMsTicChemstationJcamp from '../../fixtures/lc_ms_jcamp_tic_chemstation';
 import lcMsUvvisChemstationJcamp from '../../fixtures/lc_ms_jcamp_uvvis_chemstation';
 
@@ -94,83 +97,81 @@ describe('isLcmsMsPageLoading', () => {
 // threshold makes convertThresEndPts return [] (see chem.test.tsx) while the
 // MS bars are still present, so drawBar must guard the empty endpoint list
 // instead of crashing.
-describe('RectFocus.drawBar with an empty threshold-endpoint list (B7)', () => {
-  it('does not crash when tTrEndPts is empty but bars exist', () => {
+//
+// Review finding S4 (PR #336): the original guard (`if (!this.tTrEndPts.length)
+// return;`) fixed the crash by skipping the rest of drawBar() entirely, but
+// tTrEndPts only decides bar *color* (barColor's above/below-threshold fill) -- none
+// of the enter/exit/transform positioning depends on it. Returning early meant an
+// empty threshold blanked the chart on mount, or left stale (un-removed,
+// un-repositioned) bars on a later update, even though this.data was populated. The
+// fix falls back to a neutral yRef (-Infinity, so every bar gets the default color)
+// and lets the rest of drawBar() run as normal.
+describe('RectFocus.drawBar with an empty threshold-endpoint list (B7 / S4)', () => {
+  const buildFocus = () => {
+    const root = document.createElement('div');
     const rf = Object.create(RectFocus.prototype);
-    rf.bars = {}; // truthy → passes the `if (!this.bars)` guard
+    rf.bars = d3.select(root); // a real selection: `if (!this.bars)` also passes
     rf.scales = { x: (v) => v, y: (v) => v }; // TfRescale reads focus.scales.{x,y}
     rf.updatePathCall = () => {}; // stub out the d3 path update
-    rf.data = [{ x: 1, y: 2 }]; // bars present
+    rf.data = [{ x: 1, y: 2 }, { x: 2, y: 3 }]; // bars present
     rf.tTrEndPts = []; // cleared threshold → empty endpoints
+    return { root, rf };
+  };
+
+  it('does not crash when tTrEndPts is empty but bars exist', () => {
+    const { rf } = buildFocus();
     expect(() => rf.drawBar()).not.toThrow();
   });
-});
 
-// The letterboxing this guards against is a layout effect jsdom cannot observe (it reports
-// clientWidth/clientHeight as 0), so what is testable here is the measurement logic and its
-// fallback. The claim that the panes actually fill their width rests on browser
-// measurement, recorded in the commit message.
-describe('measurePane (LC/MS pane sizing)', () => {
-  it('returns null for a missing node, so callers fall back to the fixed viewBox', () => {
-    expect(measurePane(null)).toBeNull();
-    expect(measurePane(undefined)).toBeNull();
+  it('still draws (not blanks) the bars when tTrEndPts is empty', () => {
+    const { root, rf } = buildFocus();
+    rf.drawBar();
+    const rects = root.querySelectorAll('rect');
+    expect(rects.length).toBe(rf.data.length);
+    rects.forEach((rect) => expect(rect.getAttribute('fill')).toBe('steelblue'));
   });
 
-  it('returns null for an unlaid-out node rather than a degenerate 0x0 viewBox', () => {
-    // This is the jsdom case, and also a pane measured before first paint.
-    expect(measurePane({ clientWidth: 0, clientHeight: 0 })).toBeNull();
-    expect(measurePane({ clientWidth: 800, clientHeight: 0 })).toBeNull();
-  });
+  it('still updates (not leaves stale) the bars on a later call with new data', () => {
+    const { root, rf } = buildFocus();
+    rf.drawBar();
 
-  it('measures a laid-out pane', () => {
-    expect(measurePane({ clientWidth: 1296, clientHeight: 197 }))
-      .toEqual({ width: 1296, height: 197 });
-  });
+    rf.data = [{ x: 5, y: 9 }];
+    rf.drawBar();
 
-  it('rounds sub-pixel box metrics', () => {
-    expect(measurePane({ clientWidth: 1295.6, clientHeight: 196.4 }))
-      .toEqual({ width: 1296, height: 196 });
-  });
-
-  it('clamps below the focus classes own margins, where a scale range would invert', () => {
-    // margins are l:60 r:5 t:5 b:40, so an unclamped 40x20 pane yields a negative
-    // drawable width and height.
-    expect(measurePane({ clientWidth: 40, clientHeight: 20 }))
-      .toEqual({ width: 240, height: 96 });
+    const rects = root.querySelectorAll('rect');
+    expect(rects.length).toBe(1);
+    expect(rects[0].getAttribute('transform')).toBe('translate(5, 9)');
   });
 });
 
-describe('sameSizes (resize guard)', () => {
-  const sizes = (w, h) => ({
-    line: { width: w, height: h },
-    multi: { width: w, height: h },
-    rect: { width: w, height: h },
+// Review finding S1 (PR #336): this LineFocus (the LC/MS UV/VIS pane) carried its own
+// copy of the non-reversed-layout whitelist, missing PLAIN even after
+// d3_line/line_focus.js's copy was fixed for it. Now delegates to the single shared
+// Format.isNonReversedXLayout.
+describe('LineFocus.reverseXAxis (S1, d3_line_rect copy)', () => {
+  const lf = Object.create(LineFocus.prototype);
+
+  it('does not reverse the axis for PLAIN', () => {
+    expect(lf.reverseXAxis(LIST_LAYOUT.PLAIN)).toBe(false);
   });
 
-  it('treats a null previous size as different, so the first measure always mounts', () => {
-    expect(sameSizes(sizes(100, 50), null)).toBe(false);
-  });
-
-  it('is true for identical sizes, which is what stops a resize feedback loop', () => {
-    expect(sameSizes(sizes(1296, 197), sizes(1296, 197))).toBe(true);
-  });
-
-  it('detects a real change in any single pane', () => {
-    const a = sizes(1296, 197);
-    const b = sizes(1296, 197);
-    b.rect = { width: 1296, height: 260 };
-    expect(sameSizes(a, b)).toBe(false);
-  });
-
-  it('absorbs a one-pixel difference, which is round-trip noise rather than a resize', () => {
-    // A content-height pane takes its height from the svg, whose height comes back from
-    // the viewBox this measurement sets. Treating a 1px integer-rounding difference as a
-    // resize would remount forever.
-    const a = sizes(1296, 197);
-    const b = sizes(1297, 198);
-    expect(sameSizes(a, b)).toBe(true);
+  it('still reverses the axis for NMR layouts', () => {
+    expect(lf.reverseXAxis(LIST_LAYOUT.C13)).toBe(true);
   });
 });
+
+// Review finding S7 (PR #336): measurePane/sameSizes read each pane's live
+// clientHeight unconditionally, with only an epsilon guard against redrawing
+// forever -- against an unbounded host (nothing here bounds a pane to a
+// height that does not depend on its own content) that live height already
+// is the previous draw's own height, feeding a genuine, unbounded growth
+// loop. Replaced by three per-pane ContainerSize instances (helpers/
+// container_size.js, from #335), the same fix d3_line/d3_rect already use:
+// an unbounded pane's height is derived from its measured *width* and a
+// fixed fallback aspect instead of ever being read back from its own
+// clientHeight, so there is nothing left to feed the loop. See
+// single_curve_chart_size.test.js for the single-pane version of the test
+// below; ContainerSize's own unit behaviour is exercised through both.
 
 // Review finding N2: d3.extent already returns [min, max] sorted, so the
 // .sort() that used to follow it was dead work — and it silently let an
@@ -571,12 +572,15 @@ describe('ViewerLineRect componentDidMount/componentDidUpdate wiring (S5)', () =
     instance.rootKlassRect = '.rect';
     // Object.create skips the constructor, so establish the invariants it would have:
     // currentSizes is set there alongside the focus objects, and the re-create paths in
-    // componentDidUpdate read it.
-    instance.currentSizes = {
-      line: { width: 800, height: 260 },
-      multi: { width: 800, height: 260 },
-      rect: { width: 800, height: 260 },
-    };
+    // componentDidUpdate read it. mountCharts (componentDidMount) recomputes it via the
+    // three ContainerSize instances below -- a null getNode (nothing rendered in this
+    // Object.create-built instance) makes each one fall back to this same fallback size.
+    const fallback = { width: 800, height: 260 };
+    instance.currentSizes = { line: fallback, multi: fallback, rect: fallback };
+    const nullGetNode = () => null;
+    instance.lineSize = new ContainerSize(nullGetNode, fallback, () => {});
+    instance.multiSize = new ContainerSize(nullGetNode, fallback, () => {});
+    instance.rectSize = new ContainerSize(nullGetNode, fallback, () => {});
     const stubFocuses = () => {
       instance.lineFocus = { create: jest.fn(), update: jest.fn() };
       instance.multiFocus = { create: jest.fn(), update: jest.fn() };
@@ -664,5 +668,94 @@ describe('ViewerLineRect componentDidMount/componentDidUpdate wiring (S5)', () =
     instance.componentDidUpdate(instance.props);
 
     expect(instance.props.seedLcmsUnionExtentAct).not.toHaveBeenCalled();
+  });
+});
+
+// Review finding S7 (PR #336): each pane's height used to be read live off its own
+// clientHeight unconditionally (measurePane), which is circular against an unbounded
+// host (nothing bounds .rse-lcms-stack or its panes to a height that does not depend
+// on their own content) -- the previous draw's own height feeds the next measurement,
+// growing without bound. Now backed by one ContainerSize per pane (helpers/
+// container_size.js, from #335): on an unbounded pane (clientHeight 0 once its content
+// is removed, same as an empty container in a real unbounded browser layout) the
+// target height is derived from the measured *width* and a fixed fallback aspect
+// instead of ever being read back from the pane's own clientHeight, so there is
+// nothing for a growth loop to feed on. mountCharts's drawMain calls are inspected
+// directly (drawMain is mocked at the top of this file) rather than a real svg's
+// viewBox, consistent with the rest of this file's UnconnectedViewerLineRect tests.
+describe('ViewerLineRect pane sizing (S7)', () => {
+  // Mirrors d3_line_rect/index.js's own fallback (not exported) so the fallback-aspect
+  // math below can be checked without duplicating a magic number.
+  const W = Math.round(window.innerWidth * 0.90 * 9 / 12);
+  const H = Math.round(window.innerHeight * 0.90 * 0.8 / 3);
+
+  const buildInstance = (paneClientHeight) => {
+    const instance = Object.create(UnconnectedViewerLineRect.prototype);
+    instance.props = {
+      layoutSt: LIST_LAYOUT.LC_MS,
+      curveSt: {},
+      feature: {},
+      ticEntities: [],
+      uvvisEntities: [],
+      mzEntities: [],
+      hplcMsSt: { uvvis: { wavelengthIdx: 0 }, tic: { polarity: 'positive' } },
+      tTrEndPts: [],
+      isUiAddIntgSt: false,
+      isUiNoBrushSt: false,
+      integrationSt: {},
+      isHidden: false,
+      editPeakSt: {},
+      resetAllAct: jest.fn(),
+      seedLcmsUnionExtentAct: jest.fn(),
+      uiSt: { zoom: { sweepExtent: [{ xExtent: false }, { xExtent: false }, { xExtent: false }] } },
+    };
+    instance.rootKlassLine = '.d3Line';
+    instance.rootKlassMulti = '.d3Multi';
+    instance.rootKlassRect = '.d3Rect';
+    // A plain stub, not a real DOM node: clientWidth/clientHeight are all
+    // ContainerSize reads off it.
+    instance.lineRef = { current: { clientWidth: 1000, clientHeight: paneClientHeight } };
+    instance.multiRef = { current: { clientWidth: 1000, clientHeight: paneClientHeight } };
+    instance.rectRef = { current: { clientWidth: 1000, clientHeight: paneClientHeight } };
+    instance.handleResize = () => {};
+    const fallback = { width: W, height: H };
+    instance.lineSize = new ContainerSize(() => instance.lineRef.current, fallback, instance.handleResize);
+    instance.multiSize = new ContainerSize(() => instance.multiRef.current, fallback, instance.handleResize);
+    instance.rectSize = new ContainerSize(() => instance.rectRef.current, fallback, instance.handleResize);
+    instance.createFocuses = () => {
+      instance.lineFocus = { create: jest.fn(), update: jest.fn() };
+      instance.multiFocus = { create: jest.fn(), update: jest.fn() };
+      instance.rectFocus = { create: jest.fn(), update: jest.fn() };
+    };
+    return instance;
+  };
+
+  const sizeArgsFor = (rootKlass) => {
+    const call = drawMain.mock.calls.find((args) => args[0] === rootKlass);
+    return { width: call[1], height: call[2] };
+  };
+
+  beforeEach(() => drawMain.mockClear());
+
+  it('draws every pane at its own bounded height', () => {
+    const instance = buildInstance(500);
+    instance.componentDidMount();
+
+    expect(sizeArgsFor('.d3Line')).toEqual({ width: 1000, height: 500 });
+    expect(sizeArgsFor('.d3Multi')).toEqual({ width: 1000, height: 500 });
+    expect(sizeArgsFor('.d3Rect')).toEqual({ width: 1000, height: 500 });
+  });
+
+  it('derives an unbounded pane height from its width and the fallback aspect, not its own clientHeight', () => {
+    const instance = buildInstance(0);
+    instance.componentDidMount();
+
+    const expectedHeight = Math.max(Math.round((1000 * H) / W), 96);
+    expect(sizeArgsFor('.d3Line')).toEqual({ width: 1000, height: expectedHeight });
+    expect(sizeArgsFor('.d3Multi')).toEqual({ width: 1000, height: expectedHeight });
+    expect(sizeArgsFor('.d3Rect')).toEqual({ width: 1000, height: expectedHeight });
+    // Not what a live (and, against an unbounded host, circular) clientHeight
+    // read of 0 would have produced.
+    expect(expectedHeight).toBeGreaterThan(0);
   });
 });

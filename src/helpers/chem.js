@@ -332,7 +332,7 @@ const readLayout = (jcamp) => {
   const { xType, spectra } = jcamp;
   if (xType && Format.isNmrLayout(xType)) return xType;
   if (!spectra || !Array.isArray(spectra) || spectra.length === 0) {
-    return false;
+    return LIST_LAYOUT.PLAIN;
   }
   const { dataType } = spectra[0] || {};
   if (dataType) {
@@ -366,7 +366,15 @@ const readLayout = (jcamp) => {
     if (dataType.includes('CIRCULAR DICHROISM SPECTROSCOPY')) {
       return LIST_LAYOUT.CDS;
     }
-    if (dataType.includes('SIZE EXCLUSION CHROMATOGRAPHY')) {
+    // Review finding S6 (PR #336): the backend upper-cases both sides before
+    // comparing against data_type.json (chem_spectra/lib/converter/jcamp/base.py),
+    // so a file whose ##DATA TYPE= isn't shouted-case (e.g. "Gel Permeation
+    // Chromatography") still classifies there. This check alone must match that,
+    // since it is the one place this frontend mirrors an alias from that
+    // admin-configurable file rather than a fixed spectroscopy term.
+    const upperDataType = dataType.toUpperCase();
+    if (upperDataType.includes('SIZE EXCLUSION CHROMATOGRAPHY')
+      || upperDataType.includes('GEL PERMEATION CHROMATOGRAPHY')) {
       return LIST_LAYOUT.SEC;
     }
     if (dataType.includes('GAS CHROMATOGRAPHY')) {
@@ -388,7 +396,7 @@ const readLayout = (jcamp) => {
       return LIST_LAYOUT.LC_MS;
     }
   }
-  return false;
+  return LIST_LAYOUT.PLAIN;
 };
 
 const extrSpectraShare = (spectra, layout) => (
@@ -1021,6 +1029,15 @@ const extrFeaturesNi = (jcamp, layout, peakUp, spectra) => {
 
 const getBoundary = (s) => {
   const { x, y } = s.data[0];
+  // Review finding S6 (PR #336): Math.max/min of an empty array is -Infinity/
+  // +Infinity, not 0 -- an empty (0-point) peak-table block, same as this repo's
+  // own PLAIN demo fixture uses, took every caller of getBoundary (XRD, the
+  // CV/SEC/AIF/CDS/GC "array shape" features, MS) to genuinely infinite bounds.
+  if (!Array.isArray(x) || !Array.isArray(y) || x.length === 0 || y.length === 0) {
+    return {
+      maxX: 0, minX: 0, maxY: 0, minY: 0,
+    };
+  }
   const maxX = Math.max(...x);
   const minX = Math.min(...x);
   const maxY = Math.max(...y);

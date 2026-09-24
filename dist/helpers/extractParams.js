@@ -27,10 +27,26 @@ const getScanIdx = (entity, scanState) => {
 const extractSharedParams = (entity, thresholdState, scanIdx = 0) => {
   const {
     spectra = [],
-    features = {}
+    features = {},
+    layout
   } = entity || {};
-  const autoPeak = features.autoPeak || features[scanIdx] || features[0] || {};
-  const editPeak = features.editPeak || features[scanIdx] || features[0] || {};
+  // Copilot review on PR #336: an entity with no autoPeak/editPeak feature (a real,
+  // recognised NMR/IR/UVVIS/XRD entity that simply has no peak table yet, not just an
+  // unrecognised-datatype one) used to fall back to a bare {}, with no operation.layout
+  // at all. ViewerLine/ViewerRect dispatch this feature as RESETALL's payload
+  // (mountChart/normChange), and reducer_layout.js's RESETALL case falls back to PLAIN
+  // whenever payload.operation.layout is missing -- forcing a perfectly ordinary
+  // entity's layout to PLAIN just because it has no peak data yet. extractLcmsParams
+  // already avoids this (its feature always carries operation: { layout }); mirroring
+  // that here is what keeps RESETALL's fallback meaningful only for a genuinely
+  // unrecognised entity, whose own layout already is PLAIN.
+  const emptyFeature = {
+    operation: {
+      layout
+    }
+  };
+  const autoPeak = features.autoPeak || features[scanIdx] || features[0] || emptyFeature;
+  const editPeak = features.editPeak || features[scanIdx] || features[0] || emptyFeature;
   const hasEdit = !!editPeak?.data?.[0]?.x?.length;
   const feature = hasEdit && thresholdState?.isEdit ? editPeak : autoPeak;
   const {

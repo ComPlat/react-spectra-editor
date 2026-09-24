@@ -14,6 +14,7 @@ import emissionsJcamp from "../../fixtures/emissions_jcamp";
 import dlsAcfJcamp from "../../fixtures/dls_acf_jcamp";
 import lcMsTicChemstationJcamp from "../../fixtures/lc_ms_jcamp_tic_chemstation";
 import lcMsMzChemstationJcamp from "../../fixtures/lc_ms_jcamp_mz_chemstation";
+import plainJcamp from "../../fixtures/plain_layout_jcamp";
 
 const buildTicJcamp = ({
   xUnits, unitsLine = '', xValues, yValues,
@@ -35,6 +36,62 @@ const buildTicJcamp = ({
   ];
   return `\n${lines.join('\n')}\n`;
 };
+
+// Mixed-case ##DATA TYPE= and an empty (0-point) PEAKTABLE block, same shape as the
+// PLAIN fixture's own peak-table blocks -- both are what review finding S6 (PR #336)
+// flagged for the GEL PERMEATION CHROMATOGRAPHY alias specifically.
+const buildGpcJcamp = (dataType: string) => `
+##TITLE=GPC Demo
+##JCAMP-DX=5.0
+##DATA TYPE=LINK
+##BLOCKS=1
+
+
+$$ === CHEMSPECTRA SPECTRUM ORIG ===
+##TITLE=GPC Demo
+##JCAMP-DX=5.00
+##DATA TYPE=${dataType}
+##DATA CLASS=XYDATA
+##XUNITS=MINUTES
+##YUNITS=ARBITRARY UNITS
+##XFACTOR=1.0
+##YFACTOR=1.0
+##FIRSTX=0.0
+##LASTX=9.0
+##MAXX=9.0
+##MAXY=81.0
+##MINX=0.0
+##MINY=0.0
+##NPOINTS=10
+##XYDATA= (XY..XY)
+0.0, 0.0
+1.0, 1.0
+2.0, 4.0
+3.0, 9.0
+4.0, 16.0
+5.0, 25.0
+6.0, 36.0
+7.0, 49.0
+8.0, 64.0
+9.0, 81.0
+##END=
+
+
+$$ === CHEMSPECTRA PEAK TABLE AUTO ===
+##TITLE=GPC Demo
+##JCAMP-DX=5.00
+##DATA TYPE=${dataType}PEAKTABLE
+##DATA CLASS=PEAKTABLE
+##MAXX=9.0
+##MAXY=81.0
+##MINX=0.0
+##MINY=0.0
+##NPOINTS=0
+##PEAKTABLE= (XY..XY)
+##END=
+
+##END=
+`;
 
 function checkExtractSucceed(extractedData: any, forLayout: string) {
   const { spectra, features, layout } = extractedData
@@ -135,7 +192,67 @@ describe('Test for chem helper', () => {
         checkSpectraInfo(extractedData, 'DLS intensity')
       })
     })
-    
+
+    // Review finding B2 (PR #336): readLayout() used to return `false` for a
+    // datatype it does not recognise, leaving entity.layout,
+    // spectra[].layout and feature.operation.layout all falsy -- consistent
+    // with neither each other nor any other layout in the entity, and
+    // invisible to a host reading the entity object directly (e.g.
+    // chemotion_ELN's buildOpsByLayout). It must return the same PLAIN
+    // every other unrecognized-datatype consumer converges on.
+    describe('Extract unrecognized datatype (PLAIN)', () => {
+      let extractedData: { spectra: any, features: any, layout: any }
+
+      beforeAll(() => {
+        extractedData = ExtractJcamp(plainJcamp)
+      })
+
+      it('Extract succeed ', () => {
+        checkExtractSucceed(extractedData, LIST_LAYOUT.PLAIN)
+      })
+
+      it('Check spectra info ', () => {
+        checkSpectraInfo(extractedData, 'SQUID')
+      })
+
+      it('normalizes spectra[].layout and feature.operation.layout to PLAIN too', () => {
+        const { spectra, features } = extractedData
+        expect(spectra[0].layout).toEqual(LIST_LAYOUT.PLAIN)
+        expect(features.editPeak.operation.layout).toEqual(LIST_LAYOUT.PLAIN)
+        expect(features.autoPeak.operation.layout).toEqual(LIST_LAYOUT.PLAIN)
+      })
+    })
+
+    // Review finding S6 (PR #336): the GEL PERMEATION CHROMATOGRAPHY alias this PR
+    // added mirrors an admin-configurable backend mapping whose own comparison
+    // upper-cases both sides (chem_spectra/lib/converter/jcamp/base.py) -- this
+    // frontend's must too, or a non-shouted-case file the backend recognises
+    // becomes PLAIN here instead of SEC.
+    describe('Extract GEL PERMEATION CHROMATOGRAPHY (GPC -> SEC alias)', () => {
+      it('classifies a mixed-case ##DATA TYPE= as SEC, same as the backend would', () => {
+        const extractedData = ExtractJcamp(buildGpcJcamp('Gel Permeation Chromatography'))
+        checkExtractSucceed(extractedData, LIST_LAYOUT.SEC)
+      })
+
+      it('classifies the shouted-case form as SEC too', () => {
+        const extractedData = ExtractJcamp(buildGpcJcamp('GEL PERMEATION CHROMATOGRAPHY'))
+        checkExtractSucceed(extractedData, LIST_LAYOUT.SEC)
+      })
+
+      // Review finding S6: SEC routes through extrFeaturesCylicVolta, which maps
+      // getBoundary over every spectra block including the 0-point PEAKTABLE AUTO
+      // block here -- Math.max/min of an empty array is -Infinity/+Infinity, not 0.
+      it('does not produce Infinity bounds from the empty PEAKTABLE AUTO block', () => {
+        const { features } = ExtractJcamp(buildGpcJcamp('GEL PERMEATION CHROMATOGRAPHY'))
+        expect(Array.isArray(features)).toBe(true)
+        features.forEach((feature: any) => {
+          expect(Number.isFinite(feature.maxX)).toBe(true)
+          expect(Number.isFinite(feature.minX)).toBe(true)
+          expect(Number.isFinite(feature.maxY)).toBe(true)
+          expect(Number.isFinite(feature.minY)).toBe(true)
+        })
+      })
+    })
   })
 
   describe('Test convert to topic', () => {
