@@ -37,6 +37,12 @@ class LayerInit extends React.Component {
     this.initReducer = this.initReducer.bind(this);
     this.updateOthers = this.updateOthers.bind(this);
     this.updateMultiEntities = this.updateMultiEntities.bind(this);
+    // Review finding S5 (PR #336): a layout the user picks by hand (the dropdown
+    // dispatches updateLayoutAct directly, bypassing execReset) for an
+    // unrecognized-datatype entity, keyed to that entity's dataset id. See
+    // componentDidUpdate and execReset for why this can't just be read back from
+    // Redux state.layout at the point execReset needs it.
+    this.manualLayoutOverride = null;
   }
 
   componentDidMount() {
@@ -48,10 +54,32 @@ class LayerInit extends React.Component {
 
   componentDidUpdate(prevProps) {
     const {
-      others, multiEntities, entity, operations,
+      others, multiEntities, entity, operations, layoutSt,
     } = this.props;
     const entityChanged = entitySignature(prevProps.entity)
       !== entitySignature(entity);
+    // Review finding S5 (PR #336): state.layout changing to something other than
+    // PLAIN while the entity itself did not is the user picking a layout by hand
+    // (the dropdown dispatches updateLayoutAct directly -- the only other place
+    // that happens for an entity execReset would otherwise force to PLAIN).
+    // Remember it against this dataset so a later refresh of the SAME dataset can
+    // restore it -- see execReset for why reading state.layout back live at that
+    // point doesn't work. Excluding a transition *to* PLAIN here is deliberate: a
+    // child's RESETALL (dispatched on its own mount, independent of any entity
+    // change -- see the ForecastViewer-swap note in the S5 test file) carries this
+    // still-unrecognized entity's own static PLAIN classification and can clobber
+    // a just-recorded pick back to PLAIN in the very same tick; that must not
+    // overwrite the real pick this override exists to remember.
+    const entityIsUnrecognized = !entity?.layout || Format.isPlainLayout(entity.layout);
+    if (
+      !entityChanged && prevProps.layoutSt !== layoutSt
+      && entityIsUnrecognized && layoutSt !== LIST_LAYOUT.PLAIN
+    ) {
+      const datasetId = entity?.idDt ?? entity?.id ?? entity?.datasetId;
+      if (datasetId != null) {
+        this.manualLayoutOverride = { datasetId, layout: layoutSt };
+      }
+    }
     this.normChange(prevProps, entityChanged);
     if (prevProps.operations !== operations || entityChanged) {
       this.initReducer();
@@ -101,7 +129,34 @@ class LayerInit extends React.Component {
     // belt-and-suspenders for a host-constructed entity that skips that
     // classifier and hands us a falsy layout directly -- it must not inherit
     // whatever layout was previously in the Redux state slice either.
-    const layout = rawLayout || LIST_LAYOUT.PLAIN;
+    //
+    // Review finding S5 (PR #336): that normalization must not clobber a layout
+    // the user picked by hand for THIS SAME dataset. A host that keys the editor
+    // by dataset (chemotion_ELN does) can pass a refreshed entity for an
+    // unrecognized datatype without remounting -- entitySignature still changes
+    // (new content), execReset still runs, and naively PLAIN would land back over
+    // that manual choice on every such refresh.
+    //
+    // This can't be answered by reading this.props.layoutSt here: ViewerLine (a
+    // descendant, whose componentDidUpdate fires before this one) independently
+    // dispatches RESETALL whenever the `feature` prop it's handed changes
+    // reference -- which a refreshed entity's new content digest also does --
+    // carrying that entity's own (still PLAIN) operation.layout. That RESETALL
+    // already overwrote state.layout back to PLAIN by the time this line runs, so
+    // this.props.layoutSt is exactly the value being raced, not a usable source
+    // of truth. manualLayoutOverride is written only from componentDidUpdate's own
+    // observation of a *prior*, separate commit where layoutSt changed with no
+    // entity change -- immune to this commit's race -- and is what restores the
+    // choice after that RESETALL clobbers it.
+    const datasetId = entity.idDt ?? entity.id ?? entity.datasetId;
+    const override = (datasetId != null && this.manualLayoutOverride?.datasetId === datasetId)
+      ? this.manualLayoutOverride.layout
+      : null;
+    // rawLayout is 'PLAIN', not falsy, for anything built via readLayout -- so
+    // `rawLayout || ...` alone never reaches the override or host-constructed-entity
+    // fallback below. Both must be treated as "unrecognized, override-eligible".
+    const isUnrecognized = !rawLayout || Format.isPlainLayout(rawLayout);
+    const layout = isUnrecognized ? (override || LIST_LAYOUT.PLAIN) : rawLayout;
     updateLayoutAct(layout);
     if (Format.isMsLayout(layout)) {
       // const { autoPeak, editPeak } = features; // TBD
@@ -314,7 +369,9 @@ class LayerInit extends React.Component {
 }
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
-  {}
+  {
+    layoutSt: state.layout,
+  }
 );
 
 const mapDispatchToProps = (dispatch) => (
@@ -337,6 +394,7 @@ const mapDispatchToProps = (dispatch) => (
 
 LayerInit.propTypes = {
   entity: PropTypes.object.isRequired,
+  layoutSt: PropTypes.string.isRequired,
   multiEntities: PropTypes.array, // eslint-disable-line
   entityFileNames: PropTypes.array, // eslint-disable-line
   others: PropTypes.object.isRequired,
