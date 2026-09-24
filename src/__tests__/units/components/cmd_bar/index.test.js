@@ -14,8 +14,10 @@ import CmdBar from '../../../../components/cmd_bar/index';
 // dropdown, then its button), whichever branch renders it. The order is carried by the
 // DOM alone - no `row-reverse` - so DOM order is what the user sees and tabs through.
 // Uses the editor's own store, set to 13C: an NMR layout, so the solvent/reference select
-// (`.input-sv-bar-shift`, hidden outside NMR) renders. Set explicitly - the store's initial
-// layout is the neutral PLAIN, which has no solvent select.
+// (`.input-sv-bar-shift`, hidden outside NMR) renders. Set explicitly in beforeEach - this
+// store is a module-level singleton shared across the whole suite, so state.layout could
+// otherwise still be whatever an earlier test left it at (its own default is C13, not
+// PLAIN - see reducer_layout.js - but this test must not depend on that either).
 describe('<CmdBar /> right cluster order', () => {
   const theme = createTheme();
   const operations = [{ name: 'save', value: () => {} }];

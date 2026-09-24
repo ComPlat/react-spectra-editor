@@ -60,6 +60,28 @@ describe('Test extract parameters helper', () => {
     });
   });
 
+  // Copilot review on PR #336: an entity with no autoPeak/editPeak feature used to
+  // fall back to a bare {} with no operation.layout. ViewerLine/ViewerRect dispatch
+  // this feature as RESETALL's payload, and reducer_layout.js's RESETALL case falls
+  // back to PLAIN whenever operation.layout is missing -- so a perfectly ordinary,
+  // recognised entity that simply has no peak table yet (not an unrecognised-datatype
+  // one) had its layout forced to PLAIN too. The fallback now carries
+  // operation: { layout }, mirroring extractLcmsParams, which already did this.
+  describe('Non-MS layout with no peak feature', () => {
+    it('still reports the entity\'s own layout via feature.operation.layout', () => {
+      const irEntity = {
+        layout: LIST_LAYOUT.IR,
+        features: {},
+        spectra: [{ data: [{ x: [1, 2], y: [10, 20] }] }],
+      };
+
+      const params: any = extractParams(irEntity as any, { isEdit: false } as any, {} as any);
+
+      expect(params.feature.operation.layout).toEqual(LIST_LAYOUT.IR);
+      expect(params.hasEdit).toEqual(false);
+    });
+  });
+
   describe('LC/MS layout', () => {
     it('extracts TIC x/y directly from first valid spectrum', () => {
       const lcmsEntity = {
