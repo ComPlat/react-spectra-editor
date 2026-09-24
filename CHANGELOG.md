@@ -4,6 +4,18 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.8.3] - 2026-09-24
+
+### Fixed
+- Multi-curve: opening a spectrum no longer loops into "Maximum update depth exceeded" when the host rebuilds its entity on every render, and Clear All Peaks now persists (#330)
+- The editor fits the space its host gives it: charts draw at their container's size, the toolbar wraps with Layout first and Submit last in every layout, and the info panel scrolls as one (#335)
+
+### Dependencies
+- Bump fast-uri 3.1.5 → 3.1.7 (#332)
+- Bump browserslist 4.28.2 → 4.28.7 (#333)
+
+[1.8.3]: https://github.com/ComPlat/react-spectra-editor/releases/tag/v1.8.3
+
 ## [1.8.2] - 2026-08-27
 
 ### Fixed
