@@ -9,6 +9,7 @@ import rootReducer from '../../reducers/index';
 import rootSaga from '../../sagas/index';
 import LayerInit from '../../layer_init';
 import { ExtractJcamp } from '../../helpers/chem';
+import { LIST_LAYOUT } from '../../constants/list_layout';
 import nmr1HJcamp from '../fixtures/nmr1h_jcamp';
 import dscJcamp from '../fixtures/dsc_jcamp';
 import plainJcamp from '../fixtures/plain_layout_jcamp';
@@ -92,5 +93,26 @@ describe('LayerInit execReset — PLAIN clears per-curve state instead of inheri
     );
 
     expect(store.getState().meta.dscMetaData).toBeUndefined();
+  });
+});
+
+// Review finding S9 (PR #336): no test exercised execReset's own PLAIN-normalization
+// fallback directly -- S3/S5 above only reach it incidentally, via an entity *switch*
+// (componentDidUpdate). This covers the literal scenario execReset's own comment
+// documents -- "a host-constructed entity that skips [readLayout] and hands us a
+// falsy layout directly" -- on the very first mount (componentDidMount), where there
+// is no previous entity for a switch-based test to start from.
+describe('LayerInit execReset — normalizes a host-constructed falsy layout on first mount (S9)', () => {
+  it('sets state.layout to PLAIN, not the reducer default, for an entity whose layout is false', () => {
+    const store = buildStore();
+    const hostEntity = { ...ExtractJcamp(plainJcamp), layout: false };
+
+    render(
+      <Provider store={store}>
+        <LayerInit {...baseProps} entity={hostEntity} />
+      </Provider>,
+    );
+
+    expect(store.getState().layout).toEqual(LIST_LAYOUT.PLAIN);
   });
 });
