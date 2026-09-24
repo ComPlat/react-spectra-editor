@@ -13,8 +13,9 @@ import CmdBar from '../../../../components/cmd_bar/index';
 // The right-hand toolbar cluster reads Layout first and ends with Submit (its option
 // dropdown, then its button), whichever branch renders it. The order is carried by the
 // DOM alone - no `row-reverse` - so DOM order is what the user sees and tabs through.
-// Uses the editor's own store, set to 13C: an NMR layout, so Threshold renders. Set
-// explicitly - the store's initial layout is the neutral PLAIN, which has none of it.
+// Uses the editor's own store, set to 13C: an NMR layout, so the solvent/reference select
+// (`.input-sv-bar-shift`, hidden outside NMR) renders. Set explicitly - the store's initial
+// layout is the neutral PLAIN, which has no solvent select.
 describe('<CmdBar /> right cluster order', () => {
   const theme = createTheme();
   const operations = [{ name: 'save', value: () => {} }];
