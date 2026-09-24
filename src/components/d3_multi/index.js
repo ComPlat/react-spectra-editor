@@ -11,6 +11,7 @@ import {
 } from '../../helpers/chem';
 import Format from '../../helpers/format';
 import Cfg from '../../helpers/cfg';
+import ContainerSize from '../../helpers/container_size';
 import { resetAll } from '../../actions/manager';
 import { selectUiSweep, scrollUiWheel, clickUiTarget } from '../../actions/ui';
 import {
@@ -26,6 +27,9 @@ import {
   drawMain, drawLabel, drawDisplay, drawDestroy, drawArrowOnCurve,
 } from '../common/draw';
 
+// Fallback size, and the aspect used when the host leaves the height open - see
+// ContainerSize. 9/12 matches the `xs={9}` chart column of MultiJcampsViewer, the only
+// host of this viewer.
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.85); // ROI
 
@@ -39,8 +43,6 @@ class ViewerMulti extends React.Component {
     } = this.props;
     this.rootKlass = `.${LIST_ROOT_SVG_GRAPH.LINE}`;
     this.containerRef = React.createRef();
-    this.currentSize = null;
-    this.resizeObserver = null;
 
     this.focus = new MultiFocus({
       W,
@@ -57,10 +59,15 @@ class ViewerMulti extends React.Component {
     this.normChange = this.normChange.bind(this);
     this.handleResize = this.handleResize.bind(this);
     this.syncFocusActions = this.syncFocusActions.bind(this);
+    this.size = new ContainerSize(
+      () => this.containerRef.current,
+      { width: W, height: H },
+      this.handleResize,
+    );
   }
 
   componentDidMount() {
-    this.setupResizeObserver();
+    this.size.observe();
     this.mountChart(this.props, true);
   }
 
@@ -77,9 +84,7 @@ class ViewerMulti extends React.Component {
     this.syncFocusActions();
     this.normChange(prevProps);
 
-    if (Format.isCyclicVoltaLayout(layoutSt)) {
-      this.handleResize();
-    }
+    this.handleResize();
     const hasRelevantChange = prevProps.entities !== entities
       || prevProps.curveSt !== curveSt
       || prevProps.seed !== seed
@@ -129,42 +134,11 @@ class ViewerMulti extends React.Component {
 
   componentWillUnmount() {
     drawDestroy(this.rootKlass);
-    this.teardownResizeObserver();
+    this.size.disconnect();
   }
 
   handleResize() {
-    const { layoutSt } = this.props;
-    if (!Format.isCyclicVoltaLayout(layoutSt)) return;
-    const size = this.getContainerSize();
-    if (!size) return;
-    if (!this.currentSize
-      || size.width !== this.currentSize.width
-      || size.height !== this.currentSize.height) {
-      this.mountChart(this.props, false);
-    }
-  }
-
-  getContainerSize() {
-    const node = this.containerRef.current;
-    if (!node) return null;
-    const { clientWidth, clientHeight } = node;
-    if (!clientWidth || !clientHeight) return null;
-    return { width: clientWidth, height: clientHeight };
-  }
-
-  getTargetSize(layoutSt) {
-    if (Format.isCyclicVoltaLayout(layoutSt)) {
-      const size = this.getContainerSize();
-      if (size) return size;
-    }
-    return { width: W, height: H };
-  }
-
-  setupResizeObserver() {
-    if (typeof ResizeObserver === 'undefined') return;
-    if (!this.containerRef.current || this.resizeObserver) return;
-    this.resizeObserver = new ResizeObserver(this.handleResize);
-    this.resizeObserver.observe(this.containerRef.current);
+    if (this.size.hasChanged()) this.mountChart(this.props, false);
   }
 
   syncFocusActions() {
@@ -181,13 +155,6 @@ class ViewerMulti extends React.Component {
       addVisualSplitLineAct,
       removeVisualSplitLineAct,
     });
-  }
-
-  teardownResizeObserver() {
-    if (this.resizeObserver) {
-      this.resizeObserver.disconnect();
-      this.resizeObserver = null;
-    }
   }
 
   resolveAxisLabels(props) {
@@ -250,10 +217,10 @@ class ViewerMulti extends React.Component {
       integrationSt, mtplySt, uiSt,
     } = props;
 
-    const size = this.getTargetSize(layoutSt);
-    this.currentSize = size;
-
+    const width = this.size.measureWidth();
     drawDestroy(this.rootKlass);
+    const size = this.size.target(width);
+
     if (shouldReset) {
       resetAllAct(feature);
     }

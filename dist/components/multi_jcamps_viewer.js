@@ -62,7 +62,10 @@ const styles = () => ({
     flex: '1 1 auto',
     minHeight: 0
   },
+  // Natural height only: the chart above sizes itself to cvViewerWrap, so any share of the
+  // column this panel grows into is height the chart never gets back - see ContainerSize.
   cvPanelBelow: {
+    flex: '0 0 auto',
     marginTop: 16,
     width: '100%'
   }

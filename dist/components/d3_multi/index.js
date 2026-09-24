@@ -12,6 +12,7 @@ var _propTypes = _interopRequireDefault(require("prop-types"));
 var _chem = require("../../helpers/chem");
 var _format = _interopRequireDefault(require("../../helpers/format"));
 var _cfg = _interopRequireDefault(require("../../helpers/cfg"));
+var _container_size = _interopRequireDefault(require("../../helpers/container_size"));
 var _manager = require("../../actions/manager");
 var _ui = require("../../actions/ui");
 var _integration = require("../../actions/integration");
@@ -24,6 +25,9 @@ var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable no-mixed-operators, react/require-default-props,
 react/no-unused-prop-types */
 
+// Fallback size, and the aspect used when the host leaves the height open - see
+// ContainerSize. 9/12 matches the `xs={9}` chart column of MultiJcampsViewer, the only
+// host of this viewer.
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.85); // ROI
 
@@ -41,8 +45,6 @@ class ViewerMulti extends _react.default.Component {
     } = this.props;
     this.rootKlass = `.${_list_graph.LIST_ROOT_SVG_GRAPH.LINE}`;
     this.containerRef = /*#__PURE__*/_react.default.createRef();
-    this.currentSize = null;
-    this.resizeObserver = null;
     this.focus = new _multi_focus.default({
       W,
       H,
@@ -57,9 +59,13 @@ class ViewerMulti extends _react.default.Component {
     this.normChange = this.normChange.bind(this);
     this.handleResize = this.handleResize.bind(this);
     this.syncFocusActions = this.syncFocusActions.bind(this);
+    this.size = new _container_size.default(() => this.containerRef.current, {
+      width: W,
+      height: H
+    }, this.handleResize);
   }
   componentDidMount() {
-    this.setupResizeObserver();
+    this.size.observe();
     this.mountChart(this.props, true);
   }
   componentDidUpdate(prevProps) {
@@ -89,9 +95,7 @@ class ViewerMulti extends _react.default.Component {
     } = this.props;
     this.syncFocusActions();
     this.normChange(prevProps);
-    if (_format.default.isCyclicVoltaLayout(layoutSt)) {
-      this.handleResize();
-    }
+    this.handleResize();
     const hasRelevantChange = prevProps.entities !== entities || prevProps.curveSt !== curveSt || prevProps.seed !== seed || prevProps.peak !== peak || prevProps.tTrEndPts !== tTrEndPts || prevProps.tSfPeaks !== tSfPeaks || prevProps.editPeakSt !== editPeakSt || prevProps.layoutSt !== layoutSt || prevProps.sweepExtentSt !== sweepExtentSt || prevProps.isUiNoBrushSt !== isUiNoBrushSt || prevProps.isHidden !== isHidden || prevProps.cyclicvoltaSt !== cyclicvoltaSt || prevProps.integrationSt !== integrationSt || prevProps.mtplySt !== mtplySt || prevProps.axesUnitsSt !== axesUnitsSt || prevProps.uiSt !== uiSt || prevProps.cLabel !== cLabel || prevProps.xLabel !== xLabel || prevProps.yLabel !== yLabel;
     if (!hasRelevantChange) return;
     const {
@@ -123,47 +127,10 @@ class ViewerMulti extends _react.default.Component {
   }
   componentWillUnmount() {
     (0, _draw.drawDestroy)(this.rootKlass);
-    this.teardownResizeObserver();
+    this.size.disconnect();
   }
   handleResize() {
-    const {
-      layoutSt
-    } = this.props;
-    if (!_format.default.isCyclicVoltaLayout(layoutSt)) return;
-    const size = this.getContainerSize();
-    if (!size) return;
-    if (!this.currentSize || size.width !== this.currentSize.width || size.height !== this.currentSize.height) {
-      this.mountChart(this.props, false);
-    }
-  }
-  getContainerSize() {
-    const node = this.containerRef.current;
-    if (!node) return null;
-    const {
-      clientWidth,
-      clientHeight
-    } = node;
-    if (!clientWidth || !clientHeight) return null;
-    return {
-      width: clientWidth,
-      height: clientHeight
-    };
-  }
-  getTargetSize(layoutSt) {
-    if (_format.default.isCyclicVoltaLayout(layoutSt)) {
-      const size = this.getContainerSize();
-      if (size) return size;
-    }
-    return {
-      width: W,
-      height: H
-    };
-  }
-  setupResizeObserver() {
-    if (typeof ResizeObserver === 'undefined') return;
-    if (!this.containerRef.current || this.resizeObserver) return;
-    this.resizeObserver = new ResizeObserver(this.handleResize);
-    this.resizeObserver.observe(this.containerRef.current);
+    if (this.size.hasChanged()) this.mountChart(this.props, false);
   }
   syncFocusActions() {
     if (!this.focus) return;
@@ -183,12 +150,6 @@ class ViewerMulti extends _react.default.Component {
       addVisualSplitLineAct,
       removeVisualSplitLineAct
     });
-  }
-  teardownResizeObserver() {
-    if (this.resizeObserver) {
-      this.resizeObserver.disconnect();
-      this.resizeObserver = null;
-    }
   }
   resolveAxisLabels(props) {
     const {
@@ -284,9 +245,9 @@ class ViewerMulti extends _react.default.Component {
       mtplySt,
       uiSt
     } = props;
-    const size = this.getTargetSize(layoutSt);
-    this.currentSize = size;
+    const width = this.size.measureWidth();
     (0, _draw.drawDestroy)(this.rootKlass);
+    const size = this.size.target(width);
     if (shouldReset) {
       resetAllAct(feature);
     }
