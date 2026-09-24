@@ -332,7 +332,7 @@ const readLayout = (jcamp) => {
   const { xType, spectra } = jcamp;
   if (xType && Format.isNmrLayout(xType)) return xType;
   if (!spectra || !Array.isArray(spectra) || spectra.length === 0) {
-    return false;
+    return LIST_LAYOUT.PLAIN;
   }
   const { dataType } = spectra[0] || {};
   if (dataType) {
@@ -389,7 +389,7 @@ const readLayout = (jcamp) => {
       return LIST_LAYOUT.LC_MS;
     }
   }
-  return false;
+  return LIST_LAYOUT.PLAIN;
 };
 
 const extrSpectraShare = (spectra, layout) => (

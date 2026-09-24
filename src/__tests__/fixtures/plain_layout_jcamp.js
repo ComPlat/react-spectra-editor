@@ -1,8 +1,9 @@
 // A JCAMP file whose ##DATA TYPE= ("SQUID") this frontend's classifier does not
-// recognise -- readLayout() returns false for it, same as an unmapped datatype
-// coming from chem-spectra-app's data_type.json (see chem-spectra-app#291).
-// Used by the standalone demo to exercise the PLAIN/generic-curve fallback with
-// simple, easy-to-eyeball x/y test data (y = x^2).
+// recognise -- readLayout() returns LIST_LAYOUT.PLAIN for it, same as an
+// unmapped datatype coming from chem-spectra-app's data_type.json (see
+// chem-spectra-app#291). Used by the standalone demo to exercise the
+// PLAIN/generic-curve fallback with simple, easy-to-eyeball x/y test data
+// (y = x^2).
 const plainJcamp = `
 ##TITLE=Plain Layout Demo
 ##JCAMP-DX=5.0

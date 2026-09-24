@@ -366,7 +366,7 @@ const readLayout = jcamp => {
   } = jcamp;
   if (xType && _format.default.isNmrLayout(xType)) return xType;
   if (!spectra || !Array.isArray(spectra) || spectra.length === 0) {
-    return false;
+    return _list_layout.LIST_LAYOUT.PLAIN;
   }
   const {
     dataType
@@ -424,7 +424,7 @@ const readLayout = jcamp => {
       return _list_layout.LIST_LAYOUT.LC_MS;
     }
   }
-  return false;
+  return _list_layout.LIST_LAYOUT.PLAIN;
 };
 const extrSpectraShare = (spectra, layout) => spectra.map(s => Object.assign({
   layout

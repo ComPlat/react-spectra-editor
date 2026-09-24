@@ -14,6 +14,7 @@ import emissionsJcamp from "../../fixtures/emissions_jcamp";
 import dlsAcfJcamp from "../../fixtures/dls_acf_jcamp";
 import lcMsTicChemstationJcamp from "../../fixtures/lc_ms_jcamp_tic_chemstation";
 import lcMsMzChemstationJcamp from "../../fixtures/lc_ms_jcamp_mz_chemstation";
+import plainJcamp from "../../fixtures/plain_layout_jcamp";
 
 const buildTicJcamp = ({
   xUnits, unitsLine = '', xValues, yValues,
@@ -135,7 +136,36 @@ describe('Test for chem helper', () => {
         checkSpectraInfo(extractedData, 'DLS intensity')
       })
     })
-    
+
+    // Review finding B2 (PR #336): readLayout() used to return `false` for a
+    // datatype it does not recognise, leaving entity.layout,
+    // spectra[].layout and feature.operation.layout all falsy -- consistent
+    // with neither each other nor any other layout in the entity, and
+    // invisible to a host reading the entity object directly (e.g.
+    // chemotion_ELN's buildOpsByLayout). It must return the same PLAIN
+    // every other unrecognized-datatype consumer converges on.
+    describe('Extract unrecognized datatype (PLAIN)', () => {
+      let extractedData: { spectra: any, features: any, layout: any }
+
+      beforeAll(() => {
+        extractedData = ExtractJcamp(plainJcamp)
+      })
+
+      it('Extract succeed ', () => {
+        checkExtractSucceed(extractedData, LIST_LAYOUT.PLAIN)
+      })
+
+      it('Check spectra info ', () => {
+        checkSpectraInfo(extractedData, 'SQUID')
+      })
+
+      it('normalizes spectra[].layout and feature.operation.layout to PLAIN too', () => {
+        const { spectra, features } = extractedData
+        expect(spectra[0].layout).toEqual(LIST_LAYOUT.PLAIN)
+        expect(features.editPeak.operation.layout).toEqual(LIST_LAYOUT.PLAIN)
+        expect(features.autoPeak.operation.layout).toEqual(LIST_LAYOUT.PLAIN)
+      })
+    })
   })
 
   describe('Test convert to topic', () => {

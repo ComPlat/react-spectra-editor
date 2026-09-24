@@ -103,9 +103,12 @@ class LayerInit extends _react.default.Component {
       layout: rawLayout,
       features = {}
     } = entity;
-    // A datatype this frontend's own classifier (or the backend's) does not
-    // recognise yields a falsy layout. Normalize it to PLAIN so it never
-    // inherits whatever layout was previously in the Redux state slice.
+    // helpers/chem.js's readLayout() itself now returns PLAIN (not a falsy
+    // value) for a datatype it does not recognise, so entity.layout is
+    // already normalized for anything built via FN.ExtractJcamp. This is
+    // belt-and-suspenders for a host-constructed entity that skips that
+    // classifier and hands us a falsy layout directly -- it must not inherit
+    // whatever layout was previously in the Redux state slice either.
     const layout = rawLayout || _list_layout.LIST_LAYOUT.PLAIN;
     updateLayoutAct(layout);
     if (_format.default.isMsLayout(layout)) {
