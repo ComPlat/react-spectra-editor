@@ -614,6 +614,7 @@ const is19FLayout = layoutSt => _list_layout.LIST_LAYOUT.F19 === layoutSt;
 const is13CLayout = layoutSt => _list_layout.LIST_LAYOUT.C13 === layoutSt;
 const is1HLayout = layoutSt => _list_layout.LIST_LAYOUT.H1 === layoutSt;
 const isMsLayout = layoutSt => _list_layout.LIST_LAYOUT.MS === layoutSt;
+const isPlainLayout = layoutSt => _list_layout.LIST_LAYOUT.PLAIN === layoutSt;
 const isIrLayout = layoutSt => [_list_layout.LIST_LAYOUT.IR, 'INFRARED'].indexOf(layoutSt) >= 0;
 const isRamanLayout = layoutSt => _list_layout.LIST_LAYOUT.RAMAN === layoutSt;
 const isUvVisLayout = layoutSt => _list_layout.LIST_LAYOUT.UVVIS === layoutSt;
@@ -822,6 +823,7 @@ const Format = {
   is15NLayout,
   is29SiLayout,
   isMsLayout,
+  isPlainLayout,
   isIrLayout,
   isRamanLayout,
   isUvVisLayout,

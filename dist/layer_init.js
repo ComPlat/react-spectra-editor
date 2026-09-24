@@ -142,6 +142,28 @@ class LayerInit extends _react.default.Component {
         dscMetaData
       } = features;
       updateDSCMetaDataAct(dscMetaData);
+    } else if (_format.default.isPlainLayout(layout)) {
+      // Review finding S3 (PR #336): this used to fall into the generic `else`
+      // below, which only resets multiplicity. buildIntegFeature/buildMpyFeature/
+      // buildSimFeature always return a truthy object (with empty stacks) even for
+      // a PLAIN entity, so integration/multiplicity/simulation from whatever was
+      // PREVIOUSLY open at this curveIdx survived untouched -- invisible in the UI
+      // (which hides integrals for PLAIN) but still read by the host's
+      // submit/export path and saved against the PLAIN spectrum. Reset the same
+      // per-curve slices the NMR branch above does, plus DSC metadata, which is
+      // equally stale-prone and equally invisible here.
+      const {
+        integration,
+        multiplicity,
+        simulation
+      } = features;
+      updateMetaPeaksAct(entity);
+      resetInitNmrAct({
+        integration,
+        multiplicity,
+        simulation
+      });
+      updateDSCMetaDataAct(undefined);
     } else {
       resetMultiplicityAct();
     }
