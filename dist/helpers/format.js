@@ -632,6 +632,22 @@ const isAIFLayout = layoutSt => _list_layout.LIST_LAYOUT.AIF === layoutSt;
 const isEmissionsLayout = layoutSt => _list_layout.LIST_LAYOUT.EMISSIONS === layoutSt;
 const isDLSACFLayout = layoutSt => _list_layout.LIST_LAYOUT.DLS_ACF === layoutSt;
 const isDLSIntensityLayout = layoutSt => _list_layout.LIST_LAYOUT.DLS_INTENSITY === layoutSt;
+
+// Single source of truth for which layouts draw ascending left-to-right instead of the
+// NMR/IR-style reversed x-axis. d3_line/line_focus.js, d3_line_rect/line_focus.js and
+// d3_multi/multi_focus.js each used to carry their own copy of this list, and it had
+// already drifted between them (multi_focus.js was missing EMISSIONS/DLS_ACF/
+// DLS_INTENSITY, and PLAIN -- the generic-curve fallback for a datatype nobody
+// recognises -- had only been added to d3_line's copy). A layout can reach more than
+// one of those three components (a single AIF/SEC/GC entity draws through d3_line;
+// select more than one of any type and the same entity draws through multi_focus
+// instead), so a single entity flipping which axis convention it uses depending on
+// how many curves happen to be selected is exactly the kind of bug per-component
+// copies of this list produce. Included here is the union of what the three lists
+// already agreed on: AIF was previously only non-reversed in multi_focus.js -- taken
+// as the deliberate choice made when multi-curve AIF support was added, against
+// d3_line's copy simply never having been updated to match, rather than the reverse.
+const isNonReversedXLayout = layoutSt => [_list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS, _list_layout.LIST_LAYOUT.TGA, _list_layout.LIST_LAYOUT.DSC, _list_layout.LIST_LAYOUT.XRD, _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY, _list_layout.LIST_LAYOUT.CDS, _list_layout.LIST_LAYOUT.DLS_ACF, _list_layout.LIST_LAYOUT.SEC, _list_layout.LIST_LAYOUT.GC, _list_layout.LIST_LAYOUT.EMISSIONS, _list_layout.LIST_LAYOUT.DLS_INTENSITY, _list_layout.LIST_LAYOUT.AIF, _list_layout.LIST_LAYOUT.PLAIN].indexOf(layoutSt) >= 0;
 const getNmrTyp = layout => {
   switch (layout) {
     case _list_layout.LIST_LAYOUT.H1:
@@ -832,6 +848,7 @@ const Format = {
   hasMultiCurves,
   isAIFLayout,
   isDLSACFLayout,
+  isNonReversedXLayout,
   strNumberFixedDecimal,
   formatedXRD,
   strNumberFixedLength,

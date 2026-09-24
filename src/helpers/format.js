@@ -610,6 +610,31 @@ const isEmissionsLayout = (layoutSt) => (LIST_LAYOUT.EMISSIONS === layoutSt);
 const isDLSACFLayout = (layoutSt) => (LIST_LAYOUT.DLS_ACF === layoutSt);
 const isDLSIntensityLayout = (layoutSt) => (LIST_LAYOUT.DLS_INTENSITY === layoutSt);
 
+// Single source of truth for which layouts draw ascending left-to-right instead of the
+// NMR/IR-style reversed x-axis. d3_line/line_focus.js, d3_line_rect/line_focus.js and
+// d3_multi/multi_focus.js each used to carry their own copy of this list, and it had
+// already drifted between them (multi_focus.js was missing EMISSIONS/DLS_ACF/
+// DLS_INTENSITY, and PLAIN -- the generic-curve fallback for a datatype nobody
+// recognises -- had only been added to d3_line's copy). A layout can reach more than
+// one of those three components (a single AIF/SEC/GC entity draws through d3_line;
+// select more than one of any type and the same entity draws through multi_focus
+// instead), so a single entity flipping which axis convention it uses depending on
+// how many curves happen to be selected is exactly the kind of bug per-component
+// copies of this list produce. Included here is the union of what the three lists
+// already agreed on: AIF was previously only non-reversed in multi_focus.js -- taken
+// as the deliberate choice made when multi-curve AIF support was added, against
+// d3_line's copy simply never having been updated to match, rather than the reverse.
+const isNonReversedXLayout = (layoutSt) => (
+  [
+    LIST_LAYOUT.UVVIS, LIST_LAYOUT.HPLC_UVVIS,
+    LIST_LAYOUT.TGA, LIST_LAYOUT.DSC,
+    LIST_LAYOUT.XRD, LIST_LAYOUT.CYCLIC_VOLTAMMETRY,
+    LIST_LAYOUT.CDS, LIST_LAYOUT.DLS_ACF, LIST_LAYOUT.SEC, LIST_LAYOUT.GC,
+    LIST_LAYOUT.EMISSIONS, LIST_LAYOUT.DLS_INTENSITY, LIST_LAYOUT.AIF,
+    LIST_LAYOUT.PLAIN,
+  ].indexOf(layoutSt) >= 0
+);
+
 const getNmrTyp = (layout) => {
   switch (layout) {
     case LIST_LAYOUT.H1:
@@ -788,6 +813,7 @@ const Format = {
   hasMultiCurves,
   isAIFLayout,
   isDLSACFLayout,
+  isNonReversedXLayout,
   strNumberFixedDecimal,
   formatedXRD,
   strNumberFixedLength,

@@ -600,4 +600,33 @@ describe('Test format helper', () => {
       expect(fromState).toMatch(/2 min \(A=/);
     })
   })
+
+  // Review finding S1 (PR #336): d3_line/line_focus.js, d3_line_rect/line_focus.js and
+  // d3_multi/multi_focus.js each carried their own copy of this whitelist and had
+  // already drifted (multi_focus.js was missing EMISSIONS/DLS_ACF/DLS_INTENSITY, and
+  // PLAIN had only been added to d3_line's copy) -- a layout can reach more than one of
+  // those three components, so a single entity's axis direction could flip depending on
+  // how many curves happened to be selected. All three now delegate to this one helper.
+  describe('isNonReversedXLayout', () => {
+    it('does not reverse the axis for PLAIN', () => {
+      expect(Format.isNonReversedXLayout(LIST_LAYOUT.PLAIN)).toBe(true)
+    })
+
+    it('still reverses the axis for NMR layouts', () => {
+      expect(Format.isNonReversedXLayout(LIST_LAYOUT.C13)).toBe(false)
+    })
+
+    it('does not reverse the axis for TGA, DSC and XRD', () => {
+      expect(Format.isNonReversedXLayout(LIST_LAYOUT.TGA)).toBe(true)
+      expect(Format.isNonReversedXLayout(LIST_LAYOUT.DSC)).toBe(true)
+      expect(Format.isNonReversedXLayout(LIST_LAYOUT.XRD)).toBe(true)
+    })
+
+    it('does not reverse the axis for AIF, EMISSIONS, DLS ACF and DLS intensity', () => {
+      expect(Format.isNonReversedXLayout(LIST_LAYOUT.AIF)).toBe(true)
+      expect(Format.isNonReversedXLayout(LIST_LAYOUT.EMISSIONS)).toBe(true)
+      expect(Format.isNonReversedXLayout(LIST_LAYOUT.DLS_ACF)).toBe(true)
+      expect(Format.isNonReversedXLayout(LIST_LAYOUT.DLS_INTENSITY)).toBe(true)
+    })
+  })
 })

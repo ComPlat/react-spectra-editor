@@ -106,6 +106,22 @@ describe('RectFocus.drawBar with an empty threshold-endpoint list (B7)', () => {
   });
 });
 
+// Review finding S1 (PR #336): this LineFocus (the LC/MS UV/VIS pane) carried its own
+// copy of the non-reversed-layout whitelist, missing PLAIN even after
+// d3_line/line_focus.js's copy was fixed for it. Now delegates to the single shared
+// Format.isNonReversedXLayout.
+describe('LineFocus.reverseXAxis (S1, d3_line_rect copy)', () => {
+  const lf = Object.create(LineFocus.prototype);
+
+  it('does not reverse the axis for PLAIN', () => {
+    expect(lf.reverseXAxis(LIST_LAYOUT.PLAIN)).toBe(false);
+  });
+
+  it('still reverses the axis for NMR layouts', () => {
+    expect(lf.reverseXAxis(LIST_LAYOUT.C13)).toBe(true);
+  });
+});
+
 // The letterboxing this guards against is a layout effect jsdom cannot observe (it reports
 // clientWidth/clientHeight as 0), so what is testable here is the measurement logic and its
 // fallback. The claim that the panes actually fill their width rests on browser

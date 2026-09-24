@@ -804,16 +804,7 @@ class LineFocus {
   }
 
   reverseXAxis(layoutSt) {
-    // PLAIN is the generic-curve fallback for a datatype nobody recognises (see
-    // chem-spectra-app#291 and layer_init.js's PLAIN normalization) -- there is no
-    // spectroscopy convention to justify assuming a reversed axis for it, any more
-    // than for TGA/DSC/XRD below.
-    return [LIST_LAYOUT.UVVIS, LIST_LAYOUT.HPLC_UVVIS,
-      LIST_LAYOUT.TGA, LIST_LAYOUT.DSC,
-      LIST_LAYOUT.XRD, LIST_LAYOUT.CYCLIC_VOLTAMMETRY,
-      LIST_LAYOUT.CDS, LIST_LAYOUT.DLS_ACF, LIST_LAYOUT.SEC, LIST_LAYOUT.GC,
-      LIST_LAYOUT.EMISSIONS, LIST_LAYOUT.DLS_INTENSITY,
-      LIST_LAYOUT.PLAIN].indexOf(layoutSt) < 0;
+    return !Format.isNonReversedXLayout(layoutSt);
   }
 
   create({
