@@ -60,6 +60,31 @@ const styles = () => (
         columnGap: 8,
         rowGap: 4,
       },
+      toolbarRow: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'flex-start',
+        columnGap: 8,
+        rowGap: 12,
+      },
+      toolbarLeft: {
+        flex: '1 1 auto',
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        rowGap: 4,
+      },
+      // A plain `row`, so the visual order is the DOM order (and the tab order) and
+      // matches the LC/MS branch below. Controls start at Layout and are left-aligned;
+      // Submit pins itself to the far right with `groupRightMost`'s auto margin.
+      toolbarRight: {
+        flex: '1 1 auto',
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        rowGap: 4,
+      },
     },
     commonStyle,
   )
@@ -73,9 +98,17 @@ const CmdBar = ({
 }) => {
   const isCvLayout = Format.isCyclicVoltaLayout(layoutSt);
 
+  // Layout first, Submit (its option dropdown and button) last, in every layout.
   const rightCluster = (
     <>
       <Layout feature={feature} hasEdit={hasEdit} />
+      {
+        hideThreshold ? null : (<Threshold feature={feature} hasEdit={hasEdit} />)
+      }
+      <Wavelength />
+      <CvDensityControls />
+      <ChangeAxes />
+      <Detector />
       <Submit
         operations={operations}
         feature={feature}
@@ -84,13 +117,6 @@ const CmdBar = ({
         hideSwitch={false}
         disabled={false}
       />
-      {
-        hideThreshold ? null : (<Threshold feature={feature} hasEdit={hasEdit} />)
-      }
-      <Wavelength />
-      <CvDensityControls />
-      <ChangeAxes />
-      <Detector />
     </>
   );
 
@@ -110,21 +136,25 @@ const CmdBar = ({
   }
 
   return (
-    <div className={`${LIST_HOST_HOOK_CLASS.CMD_BAR} ${classes.card}`}>
-      {
-        hideMainEditTools ? null : (
-          <>
-            <Viewer editorOnly={editorOnly} />
-            <Zoom />
-            <Peak jcampIdx={jcampIdx} feature={feature} />
-            <Pecker jcampIdx={jcampIdx} />
-            {isCvLayout ? null : <Integration />}
-            {isCvLayout ? null : <Multiplicity />}
-            <UndoRedo />
-          </>
-        )
-      }
-      { rightCluster }
+    <div className={`${LIST_HOST_HOOK_CLASS.CMD_BAR} ${classes.card} ${classes.toolbarRow}`}>
+      <div className={classes.toolbarLeft}>
+        {
+          hideMainEditTools ? null : (
+            <>
+              <Viewer editorOnly={editorOnly} />
+              <Zoom />
+              <Peak jcampIdx={jcampIdx} feature={feature} />
+              <Pecker jcampIdx={jcampIdx} />
+              {isCvLayout ? null : <Integration />}
+              {isCvLayout ? null : <Multiplicity />}
+              <UndoRedo />
+            </>
+          )
+        }
+      </div>
+      <div className={classes.toolbarRight}>
+        { rightCluster }
+      </div>
     </div>
   );
 };
