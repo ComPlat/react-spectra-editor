@@ -14,6 +14,7 @@ var _manager = require("../../actions/manager");
 var _ui = require("../../actions/ui");
 var _integration = require("../../actions/integration");
 var _line_focus = _interopRequireDefault(require("./line_focus"));
+var _container_size = _interopRequireDefault(require("../../helpers/container_size"));
 var _draw = require("../common/draw");
 var _list_ui = require("../../constants/list_ui");
 var _list_graph = require("../../constants/list_graph");
@@ -22,101 +23,31 @@ var _cyclic_voltammetry = require("../../actions/cyclic_voltammetry");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable no-mixed-operators */
 
+// Fallback size, and the aspect used when the host leaves the height open - see
+// ContainerSize.
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.85); // ROI
 
 class ViewerLine extends _react.default.Component {
   constructor(props) {
     super(props);
-    const {
-      clickUiTargetAct,
-      selectUiSweepAct,
-      scrollUiWheelAct,
-      splitIntegrationAct,
-      addVisualSplitLineAct,
-      removeVisualSplitLineAct
-    } = props;
     this.rootKlass = `.${_list_graph.LIST_ROOT_SVG_GRAPH.LINE}`;
-    this.focus = new _line_focus.default({
-      W,
-      H,
-      clickUiTargetAct,
-      selectUiSweepAct,
-      scrollUiWheelAct,
-      splitIntegrationAct,
-      addVisualSplitLineAct,
-      removeVisualSplitLineAct
+    this.containerRef = /*#__PURE__*/_react.default.createRef();
+    this.focus = this.createFocus({
+      width: W,
+      height: H
     });
     this.normChange = this.normChange.bind(this);
     this.syncFocusActions = this.syncFocusActions.bind(this);
+    this.handleResize = this.handleResize.bind(this);
+    this.size = new _container_size.default(() => this.containerRef.current, {
+      width: W,
+      height: H
+    }, this.handleResize);
   }
   componentDidMount() {
-    const {
-      seed,
-      peak,
-      cLabel,
-      xLabel,
-      yLabel,
-      feature,
-      freq,
-      comparisons,
-      tTrEndPts,
-      tSfPeaks,
-      editPeakSt,
-      layoutSt,
-      integrationSt,
-      mtplySt,
-      sweepExtentSt,
-      isUiAddIntgSt,
-      isUiSplitIntgSt,
-      isUiVisualSplitIntgSt,
-      isUiNoBrushSt,
-      isHidden,
-      wavelength,
-      axesUnitsSt,
-      resetAllAct,
-      uiSt
-    } = this.props;
-    this.syncFocusActions();
-    (0, _draw.drawDestroy)(this.rootKlass);
-    resetAllAct(feature);
-    let xxLabel = xLabel;
-    let yyLabel = yLabel;
-    if (axesUnitsSt) {
-      const {
-        axes
-      } = axesUnitsSt;
-      const {
-        xUnit,
-        yUnit
-      } = axes[0];
-      xxLabel = xUnit === '' ? xLabel : xUnit;
-      yyLabel = yUnit === '' ? yLabel : yUnit;
-    }
-    const filterSeed = seed;
-    const filterPeak = peak;
-    (0, _draw.drawMain)(this.rootKlass, W, H);
-    this.focus.create({
-      filterSeed,
-      filterPeak,
-      freq,
-      comparisons,
-      tTrEndPts,
-      tSfPeaks,
-      editPeakSt,
-      layoutSt,
-      integrationSt,
-      mtplySt,
-      sweepExtentSt,
-      isUiAddIntgSt,
-      isUiSplitIntgSt,
-      isUiVisualSplitIntgSt,
-      isUiNoBrushSt,
-      wavelength,
-      uiSt
-    });
-    (0, _draw.drawLabel)(this.rootKlass, cLabel, xxLabel, yyLabel);
-    (0, _draw.drawDisplay)(this.rootKlass, isHidden);
+    this.size.observe();
+    this.mountChart(true);
   }
   componentDidUpdate(prevProps) {
     const {
@@ -145,6 +76,7 @@ class ViewerLine extends _react.default.Component {
     } = this.props;
     this.syncFocusActions();
     this.normChange(prevProps);
+    this.handleResize();
     let xxLabel = xLabel;
     let yyLabel = yLabel;
     if (axesUnitsSt) {
@@ -184,6 +116,105 @@ class ViewerLine extends _react.default.Component {
   }
   componentWillUnmount() {
     (0, _draw.drawDestroy)(this.rootKlass);
+    this.size.disconnect();
+  }
+  handleResize() {
+    if (this.size.hasChanged()) this.mountChart(false);
+  }
+
+  // The focus lays its scales out once, from the size it is built with: a new size needs a
+  // new focus.
+  createFocus(size) {
+    const {
+      clickUiTargetAct,
+      selectUiSweepAct,
+      scrollUiWheelAct,
+      splitIntegrationAct,
+      addVisualSplitLineAct,
+      removeVisualSplitLineAct
+    } = this.props;
+    return new _line_focus.default({
+      W: size.width,
+      H: size.height,
+      clickUiTargetAct,
+      selectUiSweepAct,
+      scrollUiWheelAct,
+      splitIntegrationAct,
+      addVisualSplitLineAct,
+      removeVisualSplitLineAct
+    });
+  }
+
+  // Draws the chart from scratch at its container's size: on mount (resetting the feature's
+  // edit state, as the first draw always has) and whenever the container is resized.
+  mountChart(shouldReset) {
+    const {
+      seed,
+      peak,
+      cLabel,
+      xLabel,
+      yLabel,
+      feature,
+      freq,
+      comparisons,
+      tTrEndPts,
+      tSfPeaks,
+      editPeakSt,
+      layoutSt,
+      integrationSt,
+      mtplySt,
+      sweepExtentSt,
+      isUiAddIntgSt,
+      isUiSplitIntgSt,
+      isUiVisualSplitIntgSt,
+      isUiNoBrushSt,
+      isHidden,
+      wavelength,
+      axesUnitsSt,
+      resetAllAct,
+      uiSt
+    } = this.props;
+    const width = this.size.measureWidth();
+    (0, _draw.drawDestroy)(this.rootKlass);
+    const size = this.size.target(width);
+    if (shouldReset) resetAllAct(feature);
+    this.focus = this.createFocus(size);
+    this.syncFocusActions();
+    let xxLabel = xLabel;
+    let yyLabel = yLabel;
+    if (axesUnitsSt) {
+      const {
+        axes
+      } = axesUnitsSt;
+      const {
+        xUnit,
+        yUnit
+      } = axes[0];
+      xxLabel = xUnit === '' ? xLabel : xUnit;
+      yyLabel = yUnit === '' ? yLabel : yUnit;
+    }
+    (0, _draw.drawMain)(this.rootKlass, size.width, size.height);
+    this.focus.create({
+      filterSeed: seed,
+      filterPeak: peak,
+      freq,
+      comparisons,
+      tTrEndPts,
+      tSfPeaks,
+      editPeakSt,
+      layoutSt,
+      integrationSt,
+      mtplySt,
+      sweepExtentSt,
+      isUiAddIntgSt,
+      isUiSplitIntgSt,
+      isUiVisualSplitIntgSt,
+      isUiNoBrushSt,
+      wavelength,
+      uiSt
+    });
+    (0, _draw.drawLabel)(this.rootKlass, cLabel, xxLabel, yyLabel);
+    (0, _draw.drawDisplay)(this.rootKlass, isHidden);
   }
   syncFocusActions() {
     if (!this.focus) return;
@@ -216,7 +247,8 @@ class ViewerLine extends _react.default.Component {
   }
   render() {
     return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-      className: _list_graph.LIST_ROOT_SVG_GRAPH.LINE
+      className: _list_graph.LIST_ROOT_SVG_GRAPH.LINE,
+      ref: this.containerRef
     });
   }
 }
