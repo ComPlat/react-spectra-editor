@@ -4,17 +4,10 @@
 }
 
 /*
- * The LC/MS stack (src/components/d3_line_rect/index.js, class rse-lcms-stack)
- * measures its own clientHeight and derives its rendered height from that
- * measurement's viewBox in turn (see the "content-derived" pane comment on
- * lcMsStackRoot in that file). Without an ancestor that gives it a real,
- * non-content-derived height, that round trip has no fixed point to settle on
- * and the stack grows without bound. A real host (chemotion_ELN) supplies this
- * kind of bound through its own layout; this standalone demo has none, so it
- * needs the same fixed height stated explicitly here. rse-lcms-graph-panel and
- * the two bare .d3Line/.d3Multi mounts already resolve `height: 100%` off this
- * (see lcMsStackRoot/lcMsGraphPanel), so only the stack root itself needs it.
+ * Review finding S7 (PR #336): the LC/MS stack used to need an explicit height here
+ * to avoid growing without bound in this (or any other) unbounded host -- see
+ * d3_line_rect/index.js's own ContainerSize comment for why that is no longer true.
+ * Each pane now derives its height from its own measured width instead of ever
+ * reading its own clientHeight back, so it no longer depends on an ancestor (this
+ * stylesheet, chemotion_ELN's legacy/spectra.scss, or any other host) bounding it.
  */
-.rse-lcms-stack {
-  height: 70vh;
-}
