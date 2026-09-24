@@ -77,12 +77,15 @@ const styles = () => Object.assign({}, {
     alignItems: 'center',
     rowGap: 4
   },
+  // A plain `row`, so the visual order is the DOM order (and the tab order) and
+  // matches the LC/MS branch below. Controls start at Layout and are left-aligned;
+  // Submit pins itself to the far right with `groupRightMost`'s auto margin.
   toolbarRight: {
     flex: '1 1 auto',
     display: 'flex',
-    flexDirection: 'row-reverse',
     flexWrap: 'wrap',
     alignItems: 'center',
+    justifyContent: 'flex-start',
     rowGap: 4
   }
 }, _common.commonStyle);
@@ -100,21 +103,23 @@ const CmdBar = ({
   prependLcMsToolbar
 }) => {
   const isCvLayout = _format.default.isCyclicVoltaLayout(layoutSt);
+
+  // Layout first, Submit (its option dropdown and button) last, in every layout.
   const rightCluster = /*#__PURE__*/(0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
-    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_r04_submit.default, {
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_r01_layout.default, {
+      feature: feature,
+      hasEdit: hasEdit
+    }), hideThreshold ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_r03_threshold.default, {
+      feature: feature,
+      hasEdit: hasEdit
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r07_wavelength_btn.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r10_cv_density.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r08_change_axes.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r09_detector.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r04_submit.default, {
       operations: operations,
       feature: feature,
       forecast: forecast,
       editorOnly: editorOnly,
       hideSwitch: false,
       disabled: false
-    }), hideThreshold ? null : /*#__PURE__*/(0, _jsxRuntime.jsx)(_r03_threshold.default, {
-      feature: feature,
-      hasEdit: hasEdit
-    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r01_layout.default, {
-      feature: feature,
-      hasEdit: hasEdit
-    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r07_wavelength_btn.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r10_cv_density.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r08_change_axes.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r09_detector.default, {})]
+    })]
   });
   if (prependLcMsToolbar) {
     return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {

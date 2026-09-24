@@ -43,8 +43,12 @@ const styles = () => ({
     borderTop: '1px solid #dcdcdc',
     color: 'rgba(0, 0, 0, 0.87)',
   },
+  // No height cap: the enclosing `panels` is the one vertical scroll container. Width is
+  // another matter - `panels` sets `overflowX: hidden`, so anything wider than the column
+  // would be cut off; scroll it sideways here instead.
   panelDetail: {
     backgroundColor: '#fff',
+    overflowX: 'auto',
   },
   table: {
     width: 'auto',
@@ -73,7 +77,7 @@ const styles = () => ({
     minHeight: 36,
     lineHeight: '24px',
     overflow: 'visible',
-    overflowWrap: 'word-break',
+    overflowWrap: 'anywhere',
   },
   simPlaceholder: {
     color: 'rgba(0, 0, 0, 0.54)',

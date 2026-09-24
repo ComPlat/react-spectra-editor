@@ -57,9 +57,11 @@ const commonStyle = exports.commonStyle = {
     margin: '0px 0px 0px 10px',
     verticalAlign: 'middle'
   },
+  // Submit's group: the auto left margin takes the free space of its flex line, so it
+  // sits at the far right however the toolbar wraps.
   groupRightMost: {
     display: 'inline-block',
-    margin: '0px 0px 0px 10px',
+    margin: '0px 0px 0px auto',
     verticalAlign: 'middle'
   },
   groupRight: {

@@ -31,10 +31,10 @@ const styles = (theme) => ({
   },
   txtBadge: {
   },
+  // As in info.js: `panels` scrolls vertically, the detail only sideways.
   panelDetail: {
     backgroundColor: '#fff',
-    maxHeight: 'calc(90vh - 220px)', // ROI
-    overflow: 'auto',
+    overflowX: 'auto',
   },
   table: {
     width: '100%',

@@ -59,7 +59,10 @@ const styles = () => ({
     flex: '1 1 auto',
     minHeight: 0,
   },
+  // Natural height only: the chart above sizes itself to cvViewerWrap, so any share of the
+  // column this panel grows into is height the chart never gets back - see ContainerSize.
   cvPanelBelow: {
+    flex: '0 0 auto',
     marginTop: 16,
     width: '100%',
   },
@@ -122,7 +125,7 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
           )}
         >
           <Grid container className={isCyclicVolta ? classes.cvTopRow : undefined}>
-            <Grid item xs={8} className={isCyclicVolta ? classes.cvViewerCol : undefined}>
+            <Grid item xs={9} className={isCyclicVolta ? classes.cvViewerCol : undefined}>
               <div className={isCyclicVolta ? classes.cvViewerWrap : undefined}>
                 <ViewerMulti
                   entities={entities}
@@ -142,7 +145,7 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
                 </div>
               ) : null}
             </Grid>
-            <Grid item xs={4} align="center">
+            <Grid item xs={3} align="center">
               <PanelViewer
                 jcampIdx={curveIdx}
                 entityFileNames={entityFileNames}

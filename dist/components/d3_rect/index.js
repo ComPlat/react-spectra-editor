@@ -13,66 +13,36 @@ var _chem = require("../../helpers/chem");
 var _manager = require("../../actions/manager");
 var _ui = require("../../actions/ui");
 var _rect_focus = _interopRequireDefault(require("./rect_focus"));
+var _container_size = _interopRequireDefault(require("../../helpers/container_size"));
 var _draw = require("../common/draw");
 var _list_ui = require("../../constants/list_ui");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable no-mixed-operators */
 
+// Fallback size, and the aspect used when the host leaves the height open - see
+// ContainerSize.
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.85); // ROI
 
 class ViewerRect extends _react.default.Component {
   constructor(props) {
     super(props);
-    const {
-      clickUiTargetAct,
-      selectUiSweepAct,
-      scrollUiWheelAct
-    } = props;
     this.rootKlass = '.d3Rect';
-    this.focus = new _rect_focus.default({
-      W,
-      H,
-      clickUiTargetAct,
-      selectUiSweepAct,
-      scrollUiWheelAct
+    this.containerRef = /*#__PURE__*/_react.default.createRef();
+    this.focus = this.createFocus({
+      width: W,
+      height: H
     });
     this.normChange = this.normChange.bind(this);
+    this.handleResize = this.handleResize.bind(this);
+    this.size = new _container_size.default(() => this.containerRef.current, {
+      width: W,
+      height: H
+    }, this.handleResize);
   }
   componentDidMount() {
-    const {
-      seed,
-      peak,
-      cLabel,
-      xLabel,
-      yLabel,
-      feature,
-      tTrEndPts,
-      tSfPeaks,
-      isHidden,
-      decimalSt,
-      sweepExtentSt,
-      isUiAddIntgSt,
-      isUiNoBrushSt,
-      resetAllAct
-    } = this.props;
-    (0, _draw.drawDestroy)(this.rootKlass);
-    resetAllAct(feature);
-    const filterSeed = seed;
-    const filterPeak = peak;
-    (0, _draw.drawMain)(this.rootKlass, W, H);
-    this.focus.create({
-      filterSeed,
-      filterPeak,
-      tTrEndPts,
-      tSfPeaks,
-      decimal: decimalSt,
-      sweepExtentSt,
-      isUiAddIntgSt,
-      isUiNoBrushSt
-    });
-    (0, _draw.drawLabel)(this.rootKlass, cLabel, xLabel, yLabel);
-    (0, _draw.drawDisplay)(this.rootKlass, isHidden);
+    this.size.observe();
+    this.mountChart(true);
   }
   componentDidUpdate(prevProps) {
     const {
@@ -87,6 +57,7 @@ class ViewerRect extends _react.default.Component {
       isUiNoBrushSt
     } = this.props;
     this.normChange(prevProps);
+    this.handleResize();
     const filterSeed = seed;
     const filterPeak = peak;
     this.focus.update({
@@ -103,6 +74,66 @@ class ViewerRect extends _react.default.Component {
   }
   componentWillUnmount() {
     (0, _draw.drawDestroy)(this.rootKlass);
+    this.size.disconnect();
+  }
+  handleResize() {
+    if (this.size.hasChanged()) this.mountChart(false);
+  }
+
+  // The focus lays its scales out once, from the size it is built with: a new size needs a
+  // new focus.
+  createFocus(size) {
+    const {
+      clickUiTargetAct,
+      selectUiSweepAct,
+      scrollUiWheelAct
+    } = this.props;
+    return new _rect_focus.default({
+      W: size.width,
+      H: size.height,
+      clickUiTargetAct,
+      selectUiSweepAct,
+      scrollUiWheelAct
+    });
+  }
+
+  // Draws the chart from scratch at its container's size: on mount (resetting the feature's
+  // edit state, as the first draw always has) and whenever the container is resized.
+  mountChart(shouldReset) {
+    const {
+      seed,
+      peak,
+      cLabel,
+      xLabel,
+      yLabel,
+      feature,
+      tTrEndPts,
+      tSfPeaks,
+      isHidden,
+      decimalSt,
+      sweepExtentSt,
+      isUiAddIntgSt,
+      isUiNoBrushSt,
+      resetAllAct
+    } = this.props;
+    const width = this.size.measureWidth();
+    (0, _draw.drawDestroy)(this.rootKlass);
+    const size = this.size.target(width);
+    if (shouldReset) resetAllAct(feature);
+    this.focus = this.createFocus(size);
+    (0, _draw.drawMain)(this.rootKlass, size.width, size.height);
+    this.focus.create({
+      filterSeed: seed,
+      filterPeak: peak,
+      tTrEndPts,
+      tSfPeaks,
+      decimal: decimalSt,
+      sweepExtentSt,
+      isUiAddIntgSt,
+      isUiNoBrushSt
+    });
+    (0, _draw.drawLabel)(this.rootKlass, cLabel, xLabel, yLabel);
+    (0, _draw.drawDisplay)(this.rootKlass, isHidden);
   }
   normChange(prevProps) {
     const {
@@ -116,7 +147,8 @@ class ViewerRect extends _react.default.Component {
   }
   render() {
     return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
-      className: "d3Rect"
+      className: "d3Rect",
+      ref: this.containerRef
     });
   }
 }
