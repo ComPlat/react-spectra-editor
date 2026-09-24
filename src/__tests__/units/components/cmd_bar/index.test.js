@@ -6,15 +6,20 @@ import { createTheme } from '@mui/material';
 import { ThemeProvider } from '@mui/styles';
 
 import { store } from '../../../../app';
+import { updateLayout } from '../../../../actions/layout';
+import { LIST_LAYOUT } from '../../../../constants/list_layout';
 import CmdBar from '../../../../components/cmd_bar/index';
 
 // The right-hand toolbar cluster reads Layout first and ends with Submit (its option
 // dropdown, then its button), whichever branch renders it. The order is carried by the
 // DOM alone - no `row-reverse` - so DOM order is what the user sees and tabs through.
-// Uses the editor's own store (default layout 13C, an NMR layout, so Threshold renders).
+// Uses the editor's own store, set to 13C: an NMR layout, so Threshold renders. Set
+// explicitly - the store's initial layout is the neutral PLAIN, which has none of it.
 describe('<CmdBar /> right cluster order', () => {
   const theme = createTheme();
   const operations = [{ name: 'save', value: () => {} }];
+
+  beforeEach(() => store.dispatch(updateLayout(LIST_LAYOUT.C13)));
 
   const renderBar = (prependLcMsToolbar = null) => render(
     <Provider store={store}>
