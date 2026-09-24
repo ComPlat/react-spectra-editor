@@ -3,8 +3,12 @@ import { LAYOUT, MANAGER } from '../../../constants/action_type';
 import { LIST_LAYOUT } from '../../../constants/list_layout';
 
 describe('reducer_layout', () => {
-  it('defaults to PLAIN, not an NMR type', () => {
-    expect(layoutReducer(undefined, { type: '@@INIT' })).toEqual(LIST_LAYOUT.PLAIN);
+  // Review finding S2 (PR #336): reverted from LIST_LAYOUT.PLAIN back to C13. See the
+  // comment on initialState in reducer_layout.js for why PLAIN here was never
+  // load-bearing for the unrecognized-datatype fix (B2 covers that) and cost a
+  // ForecastViewer double-mount on the first NMR/IR/UVVIS/XRD entity of a page session.
+  it('defaults to C13, matching what chemotion_ELN is tuned around', () => {
+    expect(layoutReducer(undefined, { type: '@@INIT' })).toEqual(LIST_LAYOUT.C13);
   });
 
   it('LAYOUT.UPDATE sets the layout directly', () => {
