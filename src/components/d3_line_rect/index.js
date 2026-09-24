@@ -50,7 +50,7 @@ const d3 = require('d3');
 
 // Fallback viewBox, used only until the panes can be measured (and in jsdom, where
 // clientWidth/clientHeight are 0).
-const W = Math.round(window.innerWidth * 0.90 * 8 / 12); // ROI
+const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.8 / 3); // ROI
 
 // Below this, the drawable area net of the focus classes' margins (l:60 r:5 t:5 b:40)
@@ -196,7 +196,7 @@ const styles = () => (
         display: 'flex',
         flexDirection: 'column',
         // Load-bearing under a host that makes this node a flex item (chemotion_ELN's
-        // `.MuiGrid-grid-xs-8 { display: flex; flex-direction: column }` does), where the
+        // `.MuiGrid-grid-xs-9 { display: flex; flex-direction: column }` does), where the
         // initial `min-height: auto` would otherwise resolve to the stack's content size
         // and defeat the shrink below.
         minHeight: 0,

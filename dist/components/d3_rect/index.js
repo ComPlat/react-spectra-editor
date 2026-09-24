@@ -21,7 +21,7 @@ var _jsxRuntime = require("react/jsx-runtime");
 
 // Fallback size, and the aspect used when the host leaves the height open - see
 // ContainerSize.
-const W = Math.round(window.innerWidth * 0.90 * 8 / 12); // ROI
+const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.85); // ROI
 
 class ViewerRect extends _react.default.Component {

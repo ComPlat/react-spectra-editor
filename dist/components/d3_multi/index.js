@@ -26,9 +26,9 @@ var _jsxRuntime = require("react/jsx-runtime");
 react/no-unused-prop-types */
 
 // Fallback size, and the aspect used when the host leaves the height open - see
-// ContainerSize. 8/12 matches the `xs={8}` chart column of MultiJcampsViewer, the only
+// ContainerSize. 9/12 matches the `xs={9}` chart column of MultiJcampsViewer, the only
 // host of this viewer.
-const W = Math.round(window.innerWidth * 0.90 * 8 / 12); // ROI
+const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.85); // ROI
 
 class ViewerMulti extends _react.default.Component {
