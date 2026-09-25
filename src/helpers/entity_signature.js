@@ -38,6 +38,11 @@ const dataBlockDigest = (data0) => {
 //
 // The feature blocks extractParams itself reads (autoPeak/editPeak) are folded
 // in too, so a mismatch anywhere in what extractParams consumes shows up here.
+//
+// So is the NMR simulation. A host "Refresh Simulation" round-trip returns the
+// same spectrum and peaks with only `features.simulation` filled in; if the
+// signature ignored it, LayerInit would skip execReset and the simulated peaks
+// would only appear after a remount.
 const entitySignature = (e) => {
   if (!e) return 'none';
   const id = e.idDt ?? e.id ?? e.datasetId;
@@ -49,7 +54,9 @@ const entitySignature = (e) => {
     : {};
   const autoDigest = dataBlockDigest(features.autoPeak?.data?.[0]);
   const editDigest = dataBlockDigest(features.editPeak?.data?.[0]);
-  return `${e.layout || ''}|${e.title || ''}|id:${id ?? ''}|sp:${spectraDigest}|auto:${autoDigest}|edit:${editDigest}`;
+  const simPeaks = features.simulation?.nmrSimPeaks;
+  const simDigest = Array.isArray(simPeaks) ? `${simPeaks.length}:${simPeaks.join(',')}` : 'none';
+  return `${e.layout || ''}|${e.title || ''}|id:${id ?? ''}|sp:${spectraDigest}|auto:${autoDigest}|edit:${editDigest}|sim:${simDigest}`;
 };
 
 // Signature for a list of entities (`multiEntities`).
