@@ -4,6 +4,13 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.8.4] - 2026-09-25
+
+### Fixed
+- NMR: simulated peaks returned by the host's Refresh Simulation now show in place, without reopening the editor (#339)
+
+[1.8.4]: https://github.com/ComPlat/react-spectra-editor/releases/tag/v1.8.4
+
 ## [1.8.3] - 2026-09-24
 
 ### Fixed
