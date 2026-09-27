@@ -710,6 +710,13 @@ class MultiFocus {
     }
     this.drawVisualSplitLines(showIntegSplit ? itgs : [], shift, ignoreRef);
   }
+  clearMtply() {
+    // Nothing to draw: still empty the layers, or the previous spectrum's multiplets stay drawn.
+    this.tags.mpybPath.selectAll('path').remove();
+    this.tags.mpyt1Path.selectAll('text').remove();
+    this.tags.mpyt2Path.selectAll('text').remove();
+    this.tags.mpypPath.selectAll('path').remove();
+  }
   drawMtply(mtplySt) {
     const {
       sameXY,
@@ -722,25 +729,7 @@ class MultiFocus {
     } = mtplySt;
     const selectedMulti = multiplicities[this.jcampIdx];
     if (selectedMulti === false || selectedMulti === undefined) {
-      const mpys = [];
-      const mpyb = this.tags.mpybPath.selectAll('path').data(mpys);
-      mpyb.exit().attr('class', 'exit').remove();
-      const mpyt1 = this.tags.mpyt1Path.selectAll('text').data(mpys);
-      mpyt1.exit().attr('class', 'exit').remove();
-      const mpyt2 = this.tags.mpyt2Path.selectAll('text').data(mpys);
-      mpyt2.exit().attr('class', 'exit').remove();
-      let mPeaks = mpys.map(m => {
-        const {
-          peaks,
-          xExtent
-        } = m;
-        return peaks.map(p => Object.assign({}, p, {
-          xExtent
-        }));
-      });
-      mPeaks = [].concat(...mPeaks);
-      const mpyp = this.tags.mpypPath.selectAll('path').data(mPeaks);
-      mpyp.exit().attr('class', 'exit').remove();
+      this.clearMtply();
       return;
     }
     const {
@@ -751,7 +740,10 @@ class MultiFocus {
     const hasValidExtent = extent => extent && Number.isFinite(extent.xL) && Number.isFinite(extent.xU);
     const mpys = stack.filter(m => hasValidExtent(m?.xExtent));
     const isDisable = _cfg.default.btnCmdMpy(this.layout);
-    if (mpys.length === 0 || isDisable) return;
+    if (mpys.length === 0 || isDisable) {
+      this.clearMtply();
+      return;
+    }
     const activeExtent = hasValidExtent(smExtext) ? smExtext : mpys[0].xExtent;
     // rescale for zoom
     const {

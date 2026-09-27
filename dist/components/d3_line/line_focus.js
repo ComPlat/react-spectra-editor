@@ -457,6 +457,13 @@ class LineFocus {
     }
     this.drawVisualSplitLines(showIntegSplit ? itgs : [], shift, ignoreRef);
   }
+  clearMtply() {
+    // Nothing to draw: still empty the layers, or the previous spectrum's multiplets stay drawn.
+    this.tags.mpybPath.selectAll('path').remove();
+    this.tags.mpyt1Path.selectAll('text').remove();
+    this.tags.mpyt2Path.selectAll('text').remove();
+    this.tags.mpypPath.selectAll('path').remove();
+  }
   drawMtply(mtplySt) {
     const {
       sameXY,
@@ -477,7 +484,10 @@ class LineFocus {
     const hasValidExtent = extent => extent && Number.isFinite(extent.xL) && Number.isFinite(extent.xU);
     const mpys = stack.filter(m => hasValidExtent(m?.xExtent));
     const isDisable = _cfg.default.btnCmdMpy(this.layout);
-    if (mpys.length === 0 || isDisable) return;
+    if (mpys.length === 0 || isDisable) {
+      this.clearMtply();
+      return;
+    }
     const activeExtent = hasValidExtent(smExtext) ? smExtext : mpys[0].xExtent;
     // rescale for zoom
     const {
