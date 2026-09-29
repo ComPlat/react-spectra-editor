@@ -31,6 +31,11 @@ const btnCmdIntg = (layoutSt) => !(Format.isNmrLayout(layoutSt)|| Format.isHplcU
 
 const showIntegSplitTools = (layoutSt) => Format.isHplcUvVisLayout(layoutSt);
 
+// Layouts drawn by a view that honours an inverted y-axis (d3_line, d3_multi). The
+// MS bar chart and the LC/MS stack do not, so they get neither the toggle nor the
+// inversion -- this decides both.
+const showInvertY = (layoutSt) => !(Format.isMsLayout(layoutSt) || Format.isLCMsLayout(layoutSt));
+
 const btnCmdMpy = (layoutSt) => !Format.isNmrLayout(layoutSt);
 
 const btnCmdMpyPeak = (layoutSt, mpySt, curveIdx = 0) => {
@@ -71,6 +76,7 @@ const Config = {
   btnCmdSetRef,
   btnCmdIntg,
   showIntegSplitTools,
+  showInvertY,
   btnCmdMpy,
   btnCmdMpyPeak,
   hideCmdThres,

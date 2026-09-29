@@ -1075,7 +1075,7 @@ class MultiFocus {
     editPeakSt, layoutSt,
     sweepExtentSt, isUiAddIntgSt, isUiSplitIntgSt, isUiVisualSplitIntgSt, isUiNoBrushSt,
     cyclicvoltaSt,
-    integrationSt, mtplySt, uiSt,
+    integrationSt, mtplySt, uiSt, yInvertedSt = false,
   }) {
     this.uiSt = uiSt;
     this.graphIndex = uiSt?.zoom?.graphIndex;
@@ -1088,7 +1088,7 @@ class MultiFocus {
     this.isShowAllCurves = isShowAllCurve;
 
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
-    this.scales = InitScale(this, this.reverseXAxis(layoutSt));
+    this.scales = InitScale(this, this.reverseXAxis(layoutSt), yInvertedSt);
     this.setTip();
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
     Object.assign(this, { isUiSplitIntgSt, isUiVisualSplitIntgSt });
@@ -1125,11 +1125,11 @@ class MultiFocus {
     filterSeed, filterPeak, tTrEndPts, tSfPeaks,
     editPeakSt, layoutSt,
     sweepExtentSt, isUiAddIntgSt, isUiSplitIntgSt, isUiVisualSplitIntgSt, isUiNoBrushSt, cyclicvoltaSt,
-    integrationSt, mtplySt, uiSt,
+    integrationSt, mtplySt, uiSt, yInvertedSt = false,
   }) {
     this.uiSt = uiSt;
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
-    this.scales = InitScale(this, this.reverseXAxis(layoutSt));
+    this.scales = InitScale(this, this.reverseXAxis(layoutSt), yInvertedSt);
     this.graphIndex = uiSt?.zoom?.graphIndex;
 
     const { curveIdx, isShowAllCurve } = curveSt;

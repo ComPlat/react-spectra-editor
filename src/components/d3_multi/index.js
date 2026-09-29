@@ -79,7 +79,7 @@ class ViewerMulti extends React.Component {
       sweepExtentSt, isUiAddIntgSt, isUiSplitIntgSt, isUiVisualSplitIntgSt, isUiNoBrushSt,
       isHidden, cyclicvoltaSt,
       integrationSt, mtplySt, axesUnitsSt,
-      uiSt,
+      uiSt, yInvertedSt,
     } = this.props;
     this.syncFocusActions();
     this.normChange(prevProps);
@@ -101,6 +101,7 @@ class ViewerMulti extends React.Component {
       || prevProps.mtplySt !== mtplySt
       || prevProps.axesUnitsSt !== axesUnitsSt
       || prevProps.uiSt !== uiSt
+      || prevProps.yInvertedSt !== yInvertedSt
       || prevProps.cLabel !== cLabel
       || prevProps.xLabel !== xLabel
       || prevProps.yLabel !== yLabel;
@@ -126,6 +127,7 @@ class ViewerMulti extends React.Component {
       integrationSt,
       mtplySt,
       uiSt,
+      yInvertedSt,
     });
     drawLabel(this.rootKlass, cLabel, xxLabel, yyLabel);
     drawDisplay(this.rootKlass, isHidden);
@@ -214,7 +216,7 @@ class ViewerMulti extends React.Component {
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt,
       sweepExtentSt, isUiAddIntgSt, isUiSplitIntgSt, isUiVisualSplitIntgSt, isUiNoBrushSt,
       isHidden, resetAllAct, cyclicvoltaSt,
-      integrationSt, mtplySt, uiSt,
+      integrationSt, mtplySt, uiSt, yInvertedSt,
     } = props;
 
     const width = this.size.measureWidth();
@@ -248,6 +250,7 @@ class ViewerMulti extends React.Component {
       integrationSt,
       mtplySt,
       uiSt,
+      yInvertedSt,
     });
     drawLabel(this.rootKlass, cLabel, xxLabel, yyLabel);
     drawDisplay(this.rootKlass, isHidden);
@@ -277,6 +280,7 @@ const mapStateToProps = (state, props) => (
     tSfPeaks: ToShiftPeaks(state, props),
     editPeakSt: state.editPeak.present,
     layoutSt: state.layout,
+    yInvertedSt: Cfg.showInvertY(state.layout) && state.yInverted,
     sweepExtentSt: state.ui.sweepExtent,
     isUiAddIntgSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
     isUiSplitIntgSt: Cfg.showIntegSplitTools(state.layout)
@@ -320,6 +324,7 @@ ViewerMulti.propTypes = {
   tSfPeaks: PropTypes.array.isRequired,
   editPeakSt: PropTypes.object.isRequired,
   layoutSt: PropTypes.string.isRequired,
+  yInvertedSt: PropTypes.bool.isRequired,
   integrationSt: PropTypes.object.isRequired,
   mtplySt: PropTypes.object.isRequired,
   sweepExtentSt: PropTypes.object.isRequired,
