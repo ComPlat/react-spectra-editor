@@ -91,12 +91,13 @@ class ViewerMulti extends _react.default.Component {
       integrationSt,
       mtplySt,
       axesUnitsSt,
-      uiSt
+      uiSt,
+      yInvertedSt
     } = this.props;
     this.syncFocusActions();
     this.normChange(prevProps);
     this.handleResize();
-    const hasRelevantChange = prevProps.entities !== entities || prevProps.curveSt !== curveSt || prevProps.seed !== seed || prevProps.peak !== peak || prevProps.tTrEndPts !== tTrEndPts || prevProps.tSfPeaks !== tSfPeaks || prevProps.editPeakSt !== editPeakSt || prevProps.layoutSt !== layoutSt || prevProps.sweepExtentSt !== sweepExtentSt || prevProps.isUiNoBrushSt !== isUiNoBrushSt || prevProps.isHidden !== isHidden || prevProps.cyclicvoltaSt !== cyclicvoltaSt || prevProps.integrationSt !== integrationSt || prevProps.mtplySt !== mtplySt || prevProps.axesUnitsSt !== axesUnitsSt || prevProps.uiSt !== uiSt || prevProps.cLabel !== cLabel || prevProps.xLabel !== xLabel || prevProps.yLabel !== yLabel;
+    const hasRelevantChange = prevProps.entities !== entities || prevProps.curveSt !== curveSt || prevProps.seed !== seed || prevProps.peak !== peak || prevProps.tTrEndPts !== tTrEndPts || prevProps.tSfPeaks !== tSfPeaks || prevProps.editPeakSt !== editPeakSt || prevProps.layoutSt !== layoutSt || prevProps.sweepExtentSt !== sweepExtentSt || prevProps.isUiNoBrushSt !== isUiNoBrushSt || prevProps.isHidden !== isHidden || prevProps.cyclicvoltaSt !== cyclicvoltaSt || prevProps.integrationSt !== integrationSt || prevProps.mtplySt !== mtplySt || prevProps.axesUnitsSt !== axesUnitsSt || prevProps.uiSt !== uiSt || prevProps.yInvertedSt !== yInvertedSt || prevProps.cLabel !== cLabel || prevProps.xLabel !== xLabel || prevProps.yLabel !== yLabel;
     if (!hasRelevantChange) return;
     const {
       xxLabel,
@@ -119,7 +120,8 @@ class ViewerMulti extends _react.default.Component {
       cyclicvoltaSt,
       integrationSt,
       mtplySt,
-      uiSt
+      uiSt,
+      yInvertedSt
     });
     (0, _draw.drawLabel)(this.rootKlass, cLabel, xxLabel, yyLabel);
     (0, _draw.drawDisplay)(this.rootKlass, isHidden);
@@ -243,7 +245,8 @@ class ViewerMulti extends _react.default.Component {
       cyclicvoltaSt,
       integrationSt,
       mtplySt,
-      uiSt
+      uiSt,
+      yInvertedSt
     } = props;
     const width = this.size.measureWidth();
     (0, _draw.drawDestroy)(this.rootKlass);
@@ -274,7 +277,8 @@ class ViewerMulti extends _react.default.Component {
       cyclicvoltaSt,
       integrationSt,
       mtplySt,
-      uiSt
+      uiSt,
+      yInvertedSt
     });
     (0, _draw.drawLabel)(this.rootKlass, cLabel, xxLabel, yyLabel);
     (0, _draw.drawDisplay)(this.rootKlass, isHidden);
@@ -303,6 +307,7 @@ const mapStateToProps = (state, props) => ({
   tSfPeaks: (0, _chem.ToShiftPeaks)(state, props),
   editPeakSt: state.editPeak.present,
   layoutSt: state.layout,
+  yInvertedSt: _cfg.default.showInvertY(state.layout) && state.yInverted,
   sweepExtentSt: state.ui.sweepExtent,
   isUiAddIntgSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_ADD,
   isUiSplitIntgSt: _cfg.default.showIntegSplitTools(state.layout) && state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.INTEGRATION_SPLIT,
@@ -339,6 +344,7 @@ ViewerMulti.propTypes = {
   tSfPeaks: _propTypes.default.array.isRequired,
   editPeakSt: _propTypes.default.object.isRequired,
   layoutSt: _propTypes.default.string.isRequired,
+  yInvertedSt: _propTypes.default.bool.isRequired,
   integrationSt: _propTypes.default.object.isRequired,
   mtplySt: _propTypes.default.object.isRequired,
   sweepExtentSt: _propTypes.default.object.isRequired,

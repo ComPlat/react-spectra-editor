@@ -14,6 +14,11 @@ const btnCmdSetRef = layoutSt => !_format.default.isNmrLayout(layoutSt);
 const btnCmdIntg = layoutSt => !(_format.default.isNmrLayout(layoutSt) || _format.default.isHplcUvVisLayout(layoutSt) || _format.default.isLCMsLayout(layoutSt)); // eslint-disable-line
 
 const showIntegSplitTools = layoutSt => _format.default.isHplcUvVisLayout(layoutSt);
+
+// Layouts drawn by a view that honours an inverted y-axis (d3_line, d3_multi). The
+// MS bar chart and the LC/MS stack do not, so they get neither the toggle nor the
+// inversion -- this decides both.
+const showInvertY = layoutSt => !(_format.default.isMsLayout(layoutSt) || _format.default.isLCMsLayout(layoutSt));
 const btnCmdMpy = layoutSt => !_format.default.isNmrLayout(layoutSt);
 const btnCmdMpyPeak = (layoutSt, mpySt, curveIdx = 0) => {
   const {
@@ -51,6 +56,7 @@ const Config = {
   btnCmdSetRef,
   btnCmdIntg,
   showIntegSplitTools,
+  showInvertY,
   btnCmdMpy,
   btnCmdMpyPeak,
   hideCmdThres,
