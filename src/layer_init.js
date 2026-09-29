@@ -7,7 +7,7 @@ import { bindActionCreators } from 'redux';
 import { withStyles } from '@mui/styles';
 
 import { updateOperation } from './actions/submit';
-import { updateLayout, setCurrentDataset } from './actions/layout';
+import { updateLayout, setCurrentDataset, setManualLayoutOverride } from './actions/layout';
 import {
   resetInitCommon, resetInitNmr, resetInitMs, resetInitCommonWithIntergation, resetDetector,
   resetMultiplicity,
@@ -40,7 +40,24 @@ class LayerInit extends React.Component {
   }
 
   componentDidMount() {
-    this.execReset();
+    // Review finding B3 (PR #336): the override recorded in reducer_layout_override.js
+    // must not survive past the LayerInit instance it was picked for. Most hosts
+    // (chemotion_ELN included -- see execReset's own comment) key their <SpectraEditor>
+    // by dataset id and never pass that id down as an entity field, so a genuine
+    // switch to a different dataset remounts this component fresh rather than handing
+    // it a new entity prop; a same-dataset refresh does not. Clearing here, before
+    // execReset runs, is what scopes the override to "picked sometime during this
+    // mount" for a host with no other identity signal to key it on.
+    //
+    // execReset(true) below, not just this dispatch: this.props is a snapshot from
+    // before componentDidMount ran (react-redux updates it only on a subsequent
+    // render, never synchronously mid-lifecycle-method), so execReset reading
+    // this.props.layoutOverrideSt here would still see whatever was stored before
+    // this dispatch, not after it -- the explicit flag is what actually makes this
+    // one call ignore it, regardless of prop timing.
+    const { setManualLayoutOverrideAct } = this.props;
+    setManualLayoutOverrideAct(null);
+    this.execReset(true);
     this.initReducer();
     this.updateOthers();
     this.updateMultiEntities();
@@ -85,7 +102,7 @@ class LayerInit extends React.Component {
     }
   }
 
-  execReset() {
+  execReset(freshMount = false) {
     const {
       entity, layoutOverrideSt, updateMetaPeaksAct,
       resetInitCommonAct, resetInitMsAct, resetInitNmrAct, resetInitCommonWithIntergationAct,
@@ -123,9 +140,32 @@ class LayerInit extends React.Component {
     // dropdown's own dispatch (r01_layout.js's onChange, alongside updateLayoutAct),
     // never by RESETALL, so it cannot be raced or clobbered by it -- including an
     // explicit PLAIN selection, which is recorded the same as any other pick.
-    const override = (
-      datasetId != null && layoutOverrideSt?.override?.datasetId === datasetId
-    ) ? layoutOverrideSt.override.layout : null;
+    //
+    // Review finding B3 (PR #336): matching on datasetId alone left this dead for
+    // chemotion_ELN specifically -- its non-LC/MS entities (FN.buildData's pass-through
+    // shape, `{ spectra, features, layout }`) never carry idDt/id/datasetId at all, so
+    // datasetId is always null there and no override could ever match. componentDidMount
+    // clearing the override above is what makes it safe to trust *any* stored override
+    // once no id is available to check: it can only have been picked during this same
+    // mount, for this same entity, since a genuine switch to a different dataset either
+    // remounts this component (chemotion_ELN's <SpectraEditor key={...}>, clearing it)
+    // or -- for a host that both omits an id and reuses the same instance across
+    // datasets -- was never distinguishable from a refresh in the first place. When an
+    // id *is* available on both sides, still require it to match, for a host that
+    // reuses the same instance across datasets it does identify.
+    //
+    // freshMount: componentDidMount dispatches setManualLayoutOverrideAct(null) and
+    // calls execReset(true) in the same lifecycle call. react-redux does not update
+    // this.props synchronously from that dispatch -- layoutOverrideSt here would
+    // still be the pre-clear value from whatever host/instance existed before this
+    // mount, not the clear that was just dispatched. A freshMount call ignores
+    // layoutOverrideSt entirely rather than trust that stale snapshot; the dispatch
+    // still matters for Redux hygiene, since it's what the NEXT execReset() call
+    // (normChange, no freshMount) will correctly see.
+    const storedOverride = freshMount ? null : layoutOverrideSt?.override;
+    const idsDiffer = datasetId != null && storedOverride?.datasetId != null
+      && storedOverride.datasetId !== datasetId;
+    const override = (storedOverride && !idsDiffer) ? storedOverride.layout : null;
     // rawLayout is 'PLAIN', not falsy, for anything built via readLayout -- so
     // `rawLayout || ...` alone never reaches the override or host-constructed-entity
     // fallback below. Both must be treated as "unrecognized, override-eligible".
@@ -359,6 +399,7 @@ const mapDispatchToProps = (dispatch) => (
     updateOperationAct: updateOperation,
     updateLayoutAct: updateLayout,
     setCurrentDatasetAct: setCurrentDataset,
+    setManualLayoutOverrideAct: setManualLayoutOverride,
     updateMetaPeaksAct: updateMetaPeaks,
     addOthersAct: addOthers,
     setAllCurvesAct: setAllCurves,
@@ -389,6 +430,7 @@ LayerInit.propTypes = {
   updateOperationAct: PropTypes.func.isRequired,
   updateLayoutAct: PropTypes.func.isRequired,
   setCurrentDatasetAct: PropTypes.func.isRequired,
+  setManualLayoutOverrideAct: PropTypes.func.isRequired,
   updateMetaPeaksAct: PropTypes.func.isRequired,
   addOthersAct: PropTypes.func.isRequired,
   canChangeDescription: PropTypes.bool.isRequired,

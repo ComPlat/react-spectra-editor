@@ -47,21 +47,27 @@ const buildStore = () => {
   return store;
 };
 
-// A host keying the editor by dataset (chemotion_ELN does) can refresh the same
-// unrecognized-datatype dataset's entity -- a fresh object, so entitySignature still
-// differs and execReset still runs -- without ever unmounting LayerInit. idDt is what
-// entitySignature (and this fix) key a "same dataset" comparison on.
-const buildPlainEntity = (idDt, tweak = 0) => {
-  const entity: any = ExtractJcamp(plainJcamp);
-  entity.idDt = idDt;
-  // A trivial content change so entitySignature differs between calls, mirroring a
-  // real "refreshed" entity rather than a byte-identical re-post.
-  entity.spectra = entity.spectra.map((s: any) => ({
+// A trivial content change so entitySignature differs between calls, mirroring a real
+// "refreshed" entity rather than a byte-identical re-post.
+const tweakEntity = (entity, tweak) => ({
+  ...entity,
+  spectra: entity.spectra.map((s: any) => ({
     ...s,
     data: s.data.map((d: any) => ({ ...d, y: d.y.map((v: number) => v + tweak) })),
-  }));
-  return entity;
-};
+  })),
+});
+
+// Review finding B3 (PR #336): FN.buildData -- what chemotion_ELN's loadEntity/
+// loadEntitySafe actually call (ViewSpectra.js) -- is a pure pass-through
+// (helpers/format.js), so the entity chemotion_ELN hands <SpectraEditor> is exactly
+// ExtractJcamp's own shape: { spectra, features, layout }, with no idDt/id/datasetId
+// anywhere on it. Verified directly against chemotion_ELN@hub/main.
+const buildHostShapedEntity = (tweak = 0) => tweakEntity(ExtractJcamp(plainJcamp), tweak);
+
+// A host that DOES attach an id (this repo's own demo, or a future host).
+const buildIdentifiedEntity = (idDt, tweak = 0) => (
+  { ...tweakEntity(ExtractJcamp(plainJcamp), tweak), idDt }
+);
 
 // Mirrors exactly what r01_layout.js's onChange now dispatches -- the two actions
 // travel together, from the same source, whether or not anything downstream races them.
@@ -70,57 +76,119 @@ const pickLayout = (store, datasetId, layout) => {
   store.dispatch(setManualLayoutOverride({ datasetId, layout }));
 };
 
-// Review finding S5 (PR #336) and its Copilot follow-up: removing the !entity.layout
-// early return in execReset means an unrecognized-datatype entity now always gets its
-// layout normalized -- but naively that meant PLAIN landing back over a layout the user
-// picked by hand (e.g. '1H', to get NMR tools) every time the same dataset's entity was
-// refreshed. S5's first attempt inferred the pick by watching Redux state.layout change
-// in componentDidUpdate, which a child's own RESETALL dispatch (independent of any
-// entity change) could race or clobber in the very same tick -- most concretely, with a
-// real (non-empty) forecast prop (chemotion_ELN "always supplies" one, per S2), the pick
-// itself triggers a ViewerLine -> ForecastViewer swap whose fresh mount immediately
-// dispatches RESETALL(PLAIN). The pick is now captured at its source instead (the
-// dropdown's own dispatch, reducer_layout_override.js), immune to that race.
-describe('LayerInit execReset — a manual layout override survives a same-dataset refresh (S5)', () => {
-  it('keeps the manually picked layout across a refresh of the same dataset', () => {
+// Review finding S5 (PR #336) and its Copilot/B3 follow-ups: removing the
+// !entity.layout early return in execReset means an unrecognized-datatype entity now
+// always gets its layout normalized -- but naively that meant PLAIN landing back over
+// a layout the user picked by hand (e.g. '1H', to get NMR tools) whenever anything
+// re-triggered execReset for the same dataset. Two independent bugs had to be fixed
+// for this to work in chemotion_ELN specifically, not just in this repo's own tests:
+//
+//  - The override must be captured at its source (the dropdown's own dispatch, via
+//    reducer_layout_override.js), not inferred later by diffing Redux state.layout --
+//    a child's RESETALL can change that same state in the same tick as the pick.
+//  - The override must not require an id to key on. chemotion_ELN's non-LC/MS entity
+//    is FN.buildData's pass-through shape -- { spectra, features, layout }, nothing
+//    else -- so datasetId is always null there (buildHostShapedEntity, above, models
+//    this exactly; the id-based tests further down cover a host that does supply one).
+//    componentDidMount clears the override, which is what makes it safe to trust
+//    *any* stored override once no id is available to check: chemotion_ELN keys its
+//    <SpectraEditor> by dataset (key={`dataset-${id}`}), so a genuine switch to a
+//    different dataset remounts this component -- clearing the override -- while a
+//    same-dataset refresh does not.
+describe('LayerInit execReset — a manual layout override survives a same-dataset refresh (S5, B3)', () => {
+  it('keeps the manually picked layout across a refresh, for a host-shaped entity with no id', () => {
     const store = buildStore();
 
     const { rerender } = render(
       <Provider store={store}>
-        <LayerInit {...baseProps} forecast={{}} entity={buildPlainEntity('dataset-1')} />
+        <LayerInit {...baseProps} forecast={{}} entity={buildHostShapedEntity()} />
       </Provider>,
     );
     expect(store.getState().layout).toEqual(LIST_LAYOUT.PLAIN);
 
-    pickLayout(store, 'dataset-1', LIST_LAYOUT.H1);
+    pickLayout(store, null, LIST_LAYOUT.H1);
     expect(store.getState().layout).toEqual(LIST_LAYOUT.H1);
 
-    // Host refreshes the same dataset (same idDt, new content) without remounting.
+    // Host refreshes the same dataset (new content, same LayerInit instance -- no
+    // remount) without a key change, exactly as chemotion_ELN's own <SpectraEditor
+    // key={...}> would for a refresh of the dataset that key names.
     rerender(
       <Provider store={store}>
-        <LayerInit {...baseProps} forecast={{}} entity={buildPlainEntity('dataset-1', 1)} />
+        <LayerInit {...baseProps} forecast={{}} entity={buildHostShapedEntity(1)} />
       </Provider>,
     );
 
     expect(store.getState().layout).toEqual(LIST_LAYOUT.H1);
   });
 
-  it('still resets to PLAIN when the dataset actually changes', () => {
+  it('resets to PLAIN when the host remounts for a genuinely different dataset (key change)', () => {
     const store = buildStore();
 
     const { rerender } = render(
       <Provider store={store}>
-        <LayerInit {...baseProps} forecast={{}} entity={buildPlainEntity('dataset-1')} />
+        <LayerInit {...baseProps} key="dataset-1" forecast={{}} entity={buildHostShapedEntity()} />
+      </Provider>,
+    );
+    pickLayout(store, null, LIST_LAYOUT.H1);
+    expect(store.getState().layout).toEqual(LIST_LAYOUT.H1);
+
+    // A different key, exactly as chemotion_ELN's key={`dataset-${id}`} would produce
+    // for a genuinely different dataset -- React unmounts and remounts LayerInit.
+    rerender(
+      <Provider store={store}>
+        <LayerInit {...baseProps} key="dataset-2" forecast={{}} entity={buildHostShapedEntity()} />
+      </Provider>,
+    );
+
+    expect(store.getState().layout).toEqual(LIST_LAYOUT.PLAIN);
+  });
+
+  it('remembers an explicit PLAIN selection instead of reapplying an older cached override', () => {
+    const store = buildStore();
+
+    const { rerender } = render(
+      <Provider store={store}>
+        <LayerInit {...baseProps} forecast={{}} entity={buildHostShapedEntity()} />
+      </Provider>,
+    );
+    pickLayout(store, null, LIST_LAYOUT.H1);
+    expect(store.getState().layout).toEqual(LIST_LAYOUT.H1);
+
+    // The user explicitly goes back to PLAIN by hand.
+    pickLayout(store, null, LIST_LAYOUT.PLAIN);
+    expect(store.getState().layout).toEqual(LIST_LAYOUT.PLAIN);
+
+    // A later refresh of the same dataset must not resurrect the earlier H1 pick.
+    rerender(
+      <Provider store={store}>
+        <LayerInit {...baseProps} forecast={{}} entity={buildHostShapedEntity(1)} />
+      </Provider>,
+    );
+
+    expect(store.getState().layout).toEqual(LIST_LAYOUT.PLAIN);
+  });
+
+  // A host that does attach an id is still supported, and gets an extra layer of
+  // precision from it: the id must also match, on top of the mount-scoping above --
+  // useful for a host that reuses the same LayerInit instance across datasets it does
+  // identify, rather than remounting via a key the way chemotion_ELN does.
+  it('still resets to PLAIN for a different, identified dataset within the same mount', () => {
+    const store = buildStore();
+
+    const { rerender } = render(
+      <Provider store={store}>
+        <LayerInit {...baseProps} forecast={{}} entity={buildIdentifiedEntity('dataset-1')} />
       </Provider>,
     );
     pickLayout(store, 'dataset-1', LIST_LAYOUT.H1);
     expect(store.getState().layout).toEqual(LIST_LAYOUT.H1);
 
-    // A genuinely different, also-unrecognized dataset must not inherit the
-    // previous dataset's manual override.
+    // No key change here -- the same LayerInit instance is reused, as it would be for
+    // a host that does not key <SpectraEditor> by dataset. The id mismatch alone must
+    // reject the stale override.
     rerender(
       <Provider store={store}>
-        <LayerInit {...baseProps} forecast={{}} entity={buildPlainEntity('dataset-2')} />
+        <LayerInit {...baseProps} forecast={{}} entity={buildIdentifiedEntity('dataset-2')} />
       </Provider>,
     );
 
@@ -132,50 +200,38 @@ describe('LayerInit execReset — a manual layout override survives a same-datas
   // for a PLAIN entity swaps Content from ViewerLine to ForecastViewer, whose fresh
   // inner viewer's own componentDidMount unconditionally dispatches RESETALL carrying
   // the entity's own (still PLAIN) operation.layout. Capturing the pick at its source
-  // (pickLayout, above, via reducer_layout_override.js) means that first clobber no
-  // longer erases the *override* -- a later same-dataset refresh's execReset correctly
-  // reads it back and dispatches updateLayoutAct('1H') again. But that dispatch is
-  // itself state.layout going PLAIN -> '1H', which swaps Content to ForecastViewer
-  // *again*, whose fresh mount dispatches RESETALL('PLAIN') *again* -- re-clobbering
-  // the very dispatch that just fixed it, in the same tick. Confirmed by instrumenting
-  // the actual dispatch sequence: LAYOUT_SET_CURRENT_DATASET, UPDATE_LAYOUT('1H')
-  // (execReset correctly restoring the override), then RESET_ALL(PLAIN) once more
-  // (ForecastViewer's fresh mount). A reactive "detect state.layout drifted from the
-  // override and redispatch" fix would re-trigger this same swap-and-clobber on its
-  // own correction and loop forever -- confirmed by tracing it, not just suspected.
-  // The only fix that does not loop is having mountChart's RESETALL dispatch (d3_line/
-  // index.js, and the structurally identical d3_rect/d3_multi) stop unconditionally
-  // trusting the entity's own static operation.layout and defer to the current
-  // authoritative layout (state.layout, or a matching override) instead -- the same
-  // territory as the S2 architecture discussion already deferred to the team, now with
-  // a second, independent reason to have it.
-
-  // Copilot follow-up: excluding PLAIN from what gets recorded (S5's first attempt)
-  // meant an explicit "back to plain" choice never overwrote an older cached override,
-  // which then reappeared on the next same-dataset refresh. Recording every pick,
-  // PLAIN included, fixes this.
-  it('remembers an explicit PLAIN selection instead of reapplying an older cached override', () => {
-    const store = buildStore();
-
-    const { rerender } = render(
-      <Provider store={store}>
-        <LayerInit {...baseProps} forecast={{}} entity={buildPlainEntity('dataset-1')} />
-      </Provider>,
-    );
-    pickLayout(store, 'dataset-1', LIST_LAYOUT.H1);
-    expect(store.getState().layout).toEqual(LIST_LAYOUT.H1);
-
-    // The user explicitly goes back to PLAIN by hand.
-    pickLayout(store, 'dataset-1', LIST_LAYOUT.PLAIN);
-    expect(store.getState().layout).toEqual(LIST_LAYOUT.PLAIN);
-
-    // A later refresh of the same dataset must not resurrect the earlier H1 pick.
-    rerender(
-      <Provider store={store}>
-        <LayerInit {...baseProps} forecast={{}} entity={buildPlainEntity('dataset-1', 1)} />
-      </Provider>,
-    );
-
-    expect(store.getState().layout).toEqual(LIST_LAYOUT.PLAIN);
-  });
+  // means that first clobber no longer erases the *override* -- a later same-dataset
+  // refresh's execReset correctly reads it back and dispatches updateLayoutAct('1H')
+  // again. But that dispatch is itself state.layout going PLAIN -> '1H', which swaps
+  // Content to ForecastViewer *again*, whose fresh mount dispatches RESETALL('PLAIN')
+  // *again* -- re-clobbering the very dispatch that just fixed it, in the same tick.
+  // Confirmed by instrumenting the actual dispatch sequence, not just reasoning about
+  // it. This is not unique to layouts that swap to ForecastViewer, either (review
+  // finding B3): ANY layout other than PLAIN routes Content to a different component
+  // than PLAIN's own ViewerLine (isMs/isLCMs/showForecast all key off layoutSt), so
+  // restoring ANY override this way remounts something, whose own unconditional
+  // RESETALL re-clobbers it the same way -- B3's own example is MS/TGA, not just the
+  // NMR-type/ForecastViewer case this file's comments previously singled out.
+  //
+  // Nor is the swap the only trigger: an *ordinary* re-render that never touches the
+  // entity prop at all -- a threshold toggle, a scan target change -- rebuilds
+  // layer_prism.js's memoized `feature` (useExtractedParams keys on
+  // JSON.stringify(thresSt)/scanSt too, not just entitySignature(entity)), which
+  // ViewerLine.normChange sees as a reference change and dispatches RESETALL for,
+  // exactly like a real entity change would. But entitySignature(entity) itself is
+  // unchanged by a threshold toggle, so LayerInit's own entityChanged gate never
+  // re-fires execReset to correct the resulting clobber -- nothing here observes or
+  // corrects it at all, override-restoration logic included.
+  //
+  // A reactive "detect state.layout drifted from the override and redispatch" fix
+  // would re-trigger the same swap-and-clobber on its own correction and loop
+  // forever, for both triggers -- restoring PLAIN's own component back to the
+  // override's is a remount exactly as much as the swap-to-ForecastViewer case is.
+  // The only fix that does not loop is having mountChart's RESETALL dispatch
+  // (d3_line/index.js, and the structurally identical d3_rect/d3_multi) stop
+  // unconditionally trusting the entity's own static operation.layout and defer to
+  // the current authoritative layout instead -- the same territory as the S2
+  // architecture discussion already deferred to the team, now with independent
+  // confirmation from two directions that it needs to happen for a manual override
+  // to be reliable at all, not just in the one scenario first reported.
 });
