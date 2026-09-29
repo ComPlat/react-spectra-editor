@@ -37,18 +37,17 @@ const buildTicJcamp = ({
   return `\n${lines.join('\n')}\n`;
 };
 
-// Mixed-case ##DATA TYPE= and an empty (0-point) PEAKTABLE block, same shape as the
-// PLAIN fixture's own peak-table blocks -- both are what review finding S6 (PR #336)
-// flagged for the GEL PERMEATION CHROMATOGRAPHY alias specifically.
-const buildGpcJcamp = (dataType: string) => `
-##TITLE=GPC Demo
+// A minimal XYDATA file for a given ##DATA TYPE=, with an empty (0-point)
+// PEAKTABLE block like the PLAIN fixture's.
+const buildXyJcamp = (dataType: string) => `
+##TITLE=XY Demo
 ##JCAMP-DX=5.0
 ##DATA TYPE=LINK
 ##BLOCKS=1
 
 
 $$ === CHEMSPECTRA SPECTRUM ORIG ===
-##TITLE=GPC Demo
+##TITLE=XY Demo
 ##JCAMP-DX=5.00
 ##DATA TYPE=${dataType}
 ##DATA CLASS=XYDATA
@@ -223,27 +222,41 @@ describe('Test for chem helper', () => {
       })
     })
 
-    // Review finding S6 (PR #336): the GEL PERMEATION CHROMATOGRAPHY alias this PR
-    // added mirrors an admin-configurable backend mapping whose own comparison
-    // upper-cases both sides (chem_spectra/lib/converter/jcamp/base.py) -- this
-    // frontend's must too, or a non-shouted-case file the backend recognises
-    // becomes PLAIN here instead of SEC.
+    // The backend upper-cases both sides when matching data_type.json, so a
+    // non-shouted-case file it recognises must not become PLAIN here.
+    // Single-crystal XRD must not fall into powder XRD's substring match.
+    describe('Extract SINGLE CRYSTAL X-RAY DIFFRACTION', () => {
+      it('classifies single-crystal XRD as PLAIN', () => {
+        const extractedData = ExtractJcamp(buildXyJcamp('SINGLE CRYSTAL X-RAY DIFFRACTION'))
+        checkExtractSucceed(extractedData, LIST_LAYOUT.PLAIN)
+      })
+
+      it('classifies a mixed-case form as PLAIN too', () => {
+        const extractedData = ExtractJcamp(buildXyJcamp('Single Crystal X-Ray Diffraction'))
+        checkExtractSucceed(extractedData, LIST_LAYOUT.PLAIN)
+      })
+
+      it('still classifies powder X-RAY DIFFRACTION as XRD', () => {
+        const extractedData = ExtractJcamp(buildXyJcamp('X-RAY DIFFRACTION'))
+        checkExtractSucceed(extractedData, LIST_LAYOUT.XRD)
+      })
+    })
+
     describe('Extract GEL PERMEATION CHROMATOGRAPHY (GPC -> SEC alias)', () => {
       it('classifies a mixed-case ##DATA TYPE= as SEC, same as the backend would', () => {
-        const extractedData = ExtractJcamp(buildGpcJcamp('Gel Permeation Chromatography'))
+        const extractedData = ExtractJcamp(buildXyJcamp('Gel Permeation Chromatography'))
         checkExtractSucceed(extractedData, LIST_LAYOUT.SEC)
       })
 
       it('classifies the shouted-case form as SEC too', () => {
-        const extractedData = ExtractJcamp(buildGpcJcamp('GEL PERMEATION CHROMATOGRAPHY'))
+        const extractedData = ExtractJcamp(buildXyJcamp('GEL PERMEATION CHROMATOGRAPHY'))
         checkExtractSucceed(extractedData, LIST_LAYOUT.SEC)
       })
 
-      // Review finding S6: SEC routes through extrFeaturesCylicVolta, which maps
-      // getBoundary over every spectra block including the 0-point PEAKTABLE AUTO
-      // block here -- Math.max/min of an empty array is -Infinity/+Infinity, not 0.
+      // SEC maps getBoundary over every block, including the 0-point PEAKTABLE AUTO
+      // one -- Math.max/min of an empty array is -Infinity/+Infinity, not 0.
       it('does not produce Infinity bounds from the empty PEAKTABLE AUTO block', () => {
-        const { features } = ExtractJcamp(buildGpcJcamp('GEL PERMEATION CHROMATOGRAPHY'))
+        const { features } = ExtractJcamp(buildXyJcamp('GEL PERMEATION CHROMATOGRAPHY'))
         expect(Array.isArray(features)).toBe(true)
         features.forEach((feature: any) => {
           expect(Number.isFinite(feature.maxX)).toBe(true)

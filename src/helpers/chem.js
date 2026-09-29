@@ -336,6 +336,14 @@ const readLayout = (jcamp) => {
   }
   const { dataType } = spectra[0] || {};
   if (dataType) {
+    // Case-insensitive, like the backend's own comparison against data_type.json.
+    const upperDataType = dataType.toUpperCase();
+    // Single-crystal XRD is a reflection dataset, not a 1D diffractogram, and has no
+    // layout of its own yet -- PLAIN, not the powder XRD layout below, whose substring
+    // check it would otherwise match.
+    if (upperDataType.includes('SINGLE CRYSTAL X-RAY DIFFRACTION')) {
+      return LIST_LAYOUT.PLAIN;
+    }
     if (dataType.includes('INFRARED SPECTRUM')) {
       return LIST_LAYOUT.IR;
     }
@@ -366,13 +374,6 @@ const readLayout = (jcamp) => {
     if (dataType.includes('CIRCULAR DICHROISM SPECTROSCOPY')) {
       return LIST_LAYOUT.CDS;
     }
-    // Review finding S6 (PR #336): the backend upper-cases both sides before
-    // comparing against data_type.json (chem_spectra/lib/converter/jcamp/base.py),
-    // so a file whose ##DATA TYPE= isn't shouted-case (e.g. "Gel Permeation
-    // Chromatography") still classifies there. This check alone must match that,
-    // since it is the one place this frontend mirrors an alias from that
-    // admin-configurable file rather than a fixed spectroscopy term.
-    const upperDataType = dataType.toUpperCase();
     if (upperDataType.includes('SIZE EXCLUSION CHROMATOGRAPHY')
       || upperDataType.includes('GEL PERMEATION CHROMATOGRAPHY')) {
       return LIST_LAYOUT.SEC;
