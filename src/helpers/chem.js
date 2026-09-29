@@ -1032,7 +1032,7 @@ const getBoundary = (s) => {
   const { x, y } = s.data[0];
   // Math.max/min of an empty array is -Infinity/+Infinity: an empty (0-point)
   // peak-table block must not give its feature infinite bounds.
-  if (!Array.isArray(x) || !Array.isArray(y) || x.length === 0 || y.length === 0) {
+  if (!x?.length || !y?.length) {
     return {
       maxX: 0, minX: 0, maxY: 0, minY: 0,
     };
