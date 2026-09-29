@@ -233,9 +233,8 @@ describe('Test for chem helper', () => {
       })
     })
 
-    // Single-crystal XRD must not fall into powder XRD's substring match.
-    // chem-spectra-app records what it did to the y signal: converted to %T, or mirrored
-    // on request. Kept records reach a host only through the features built from them.
+    // chem-spectra-app records what a client asked for: absorbance converted to %T, or
+    // y drawn inverted. Kept records reach a host only through the features built from them.
     describe('Extract $CSTRANSMITTANCE / $CSINVERTY', () => {
       const withRecords = (records: string, everyBlock = false) => {
         const marker = '##$CSTHRESHOLD='
@@ -267,6 +266,17 @@ describe('Test for chem helper', () => {
         })
       })
 
+      // Since chem-spectra-app#304 inverting is a viewing preference, so it can
+      // accompany a %T conversion.
+      it('exposes both when the file carries both', () => {
+        const feats = peakFeatures(withRecords('##$CSTRANSMITTANCE=true\n##$CSINVERTY=true\n'))
+        expect(feats.length).toBeGreaterThan(0)
+        feats.forEach((f: any) => {
+          expect(f.convertedToTransmittance).toBe(true)
+          expect(f.invertedY).toBe(true)
+        })
+      })
+
       it('reads both as false when the file does not declare them', () => {
         const feats = peakFeatures(ExtractJcamp(irJcamp))
         expect(feats.length).toBeGreaterThan(0)
@@ -285,6 +295,7 @@ describe('Test for chem helper', () => {
       })
     })
 
+    // Single-crystal XRD must not fall into powder XRD's substring match.
     describe('Extract SINGLE CRYSTAL X-RAY DIFFRACTION', () => {
       it('classifies single-crystal XRD as PLAIN', () => {
         const extractedData = ExtractJcamp(buildXyJcamp('SINGLE CRYSTAL X-RAY DIFFRACTION'))

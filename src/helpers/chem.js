@@ -814,9 +814,10 @@ const buildPeakFeature = (jcamp, layout, peakUp, s, thresRef, upperThres = false
     weAreaUnit: info.$CSWEAREAUNIT || '',
     currentMode: (info.$CSCURRENTMODE || ''),
     csCategory: info.$CSCATEGORY || s.csCategory,
-    // What chem-spectra-app did to the y signal on request: converted absorbance to
-    // %T, or mirrored it (mutually exclusive; written only when done). The numbers
-    // alone cannot tell the two apart. A file that was %T to begin with has neither.
+    // What a client asked chem-spectra-app to do with the y signal; written only when
+    // asked. $CSTRANSMITTANCE: absorbance was converted to %T -- a file that was %T to
+    // begin with has no record. $CSINVERTY: draw y inverted; the stored data is left
+    // untouched from chem-spectra-app#304 (#298 mirrored it instead).
     convertedToTransmittance: isTrueRecord(info.$CSTRANSMITTANCE),
     invertedY: isTrueRecord(info.$CSINVERTY),
   };
