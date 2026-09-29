@@ -29,12 +29,8 @@ describe('MultiFocus.computeYTransformFactor — CV current density (B5)', () =>
   });
 });
 
-// Review finding S1 (PR #336): reverseXAxis() carried its own copy of the
-// non-reversed-layout whitelist, missing PLAIN (and EMISSIONS/DLS_ACF/
-// DLS_INTENSITY) even after d3_line/line_focus.js's copy was fixed. A
-// multi-selection of an unrecognized-datatype entity routes through this
-// component, so it kept the reversed axis the PLAIN fix was meant to remove.
-// Now delegates to the single shared Format.isNonReversedXLayout.
+// S1: a multi-selection including an unrecognised-datatype entity draws here, so
+// this must use the shared Format.isNonReversedXLayout too.
 describe('MultiFocus.reverseXAxis (S1)', () => {
   const mf = Object.create(MultiFocus.prototype);
 
@@ -49,4 +45,13 @@ describe('MultiFocus.reverseXAxis (S1)', () => {
   it('still does not reverse the axis for AIF', () => {
     expect(mf.reverseXAxis(LIST_LAYOUT.AIF)).toBe(false);
   });
+
+  // These were missing from this component's own list, so a multi-selection of
+  // them drew reversed while a single one drew ascending.
+  it.each([LIST_LAYOUT.EMISSIONS, LIST_LAYOUT.DLS_ACF, LIST_LAYOUT.DLS_INTENSITY])(
+    'does not reverse the axis for %s',
+    (layout) => {
+      expect(mf.reverseXAxis(layout)).toBe(false);
+    },
+  );
 });

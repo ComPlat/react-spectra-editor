@@ -60,19 +60,9 @@ const MIN_PANE_H = 96;
 // width empty on the right, which is what a viewport wider than FHD produces. Measuring
 // the pane and matching the viewBox to it removes the letterboxing in both directions.
 //
-// Review finding S7 (PR #336): each pane's height used to be read live off its own
-// clientHeight unconditionally, with only a "did it actually change" epsilon guard
-// against redrawing forever. Against an unbounded host (nothing here bounds
-// .rse-lcms-stack or its three panes to a height that does not depend on their own
-// content) that live height is the previous draw's own height plus a sub-pixel layout
-// remainder, feeding a genuine, unbounded growth loop -- the standalone demo hit it,
-// and nothing about this component itself stopped it happening again in any other
-// unbounded host (a Storybook story, a new modal). ContainerSize (helpers/
-// container_size.js, from #335) is what d3_line/d3_rect already use to break this: it
-// derives an unbounded pane's height from its measured *width* and a fixed fallback
-// aspect instead of ever reading its own clientHeight back, so there is nothing for the
-// loop to feed on. One instance per pane, since a host is free to leave the three
-// panes at different heights.
+// Each pane is sized by its own ContainerSize (as d3_line/d3_rect are), so a pane whose
+// height is not bounded by the host takes it from its width instead of reading back the
+// height of its own previous draw -- which grew without end on every resize.
 const clampPaneSize = ({
   width,
   height
@@ -390,6 +380,7 @@ class ViewerLineRect extends _react.default.Component {
     // the sizes the svg viewBoxes must use, so the two are set together and never drift.
     this.currentSizes = null;
     this.handleResize = this.handleResize.bind(this);
+    this.resizeFrame = null;
     const fallback = {
       width: W,
       height: H
@@ -554,6 +545,10 @@ class ViewerLineRect extends _react.default.Component {
     }
   }
   componentWillUnmount() {
+    if (this.resizeFrame != null) {
+      window.cancelAnimationFrame(this.resizeFrame);
+      this.resizeFrame = null;
+    }
     this.lineSize.disconnect();
     this.multiSize.disconnect();
     this.rectSize.disconnect();
@@ -562,16 +557,20 @@ class ViewerLineRect extends _react.default.Component {
     (0, _draw.drawDestroy)(this.rootKlassRect);
   }
 
-  // Redraw when any pane actually changed size. Each ContainerSize instance already
-  // debounces its own unbounded case to the next animation frame (see its own comment
-  // for why a synchronous remount inside a ResizeObserver callback throws a "loop
-  // completed with undelivered notifications" error) and derives an unbounded pane's
-  // height from its measured width instead of its own clientHeight, so there is nothing
-  // here left to feed a growth loop.
+  // Redraw when any pane actually changed size. All three ContainerSize instances call
+  // this, and a height-bounded one calls it synchronously from inside its ResizeObserver
+  // callback -- but the redraw rebuilds every pane, including unbounded ones whose
+  // observers may still be delivering, which the browser reports as "ResizeObserver loop
+  // completed with undelivered notifications". So always defer to the next frame, once
+  // for however many panes reported.
   handleResize() {
-    if (this.lineSize.hasChanged() || this.multiSize.hasChanged() || this.rectSize.hasChanged()) {
-      this.mountCharts(false);
-    }
+    if (this.resizeFrame != null) return;
+    this.resizeFrame = window.requestAnimationFrame(() => {
+      this.resizeFrame = null;
+      if (this.lineSize.hasChanged() || this.multiSize.hasChanged() || this.rectSize.hasChanged()) {
+        this.mountCharts(false);
+      }
+    });
   }
   handleUvvisUndo() {
     const {

@@ -110,22 +110,8 @@ const shiftSelect = (classes, layoutSt, setShiftRefAct, shiftSt, curveSt) => {
     })]
   });
 };
-const layoutSelect = (classes, layoutSt, updateLayoutAct, currentDatasetId, setManualLayoutOverrideAct) => {
-  // Review finding on PR #336 (Copilot, second pass): captured at the source, not
-  // inferred later by diffing Redux state.layout -- see reducer_layout_override.js
-  // for why that's the only reliable place to record this. Dispatched for every
-  // pick, PLAIN included, so an explicit "back to plain" choice is remembered too,
-  // rather than leaving whatever was picked before it cached.
-  const onChange = e => {
-    const layout = e.target.value;
-    updateLayoutAct(layout);
-    if (currentDatasetId != null) {
-      setManualLayoutOverrideAct({
-        datasetId: currentDatasetId,
-        layout
-      });
-    }
-  };
+const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
+  const onChange = e => updateLayoutAct(e.target.value);
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.FormControl, {
     className: (0, _classnames.default)(classes.fieldLayout),
     children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.InputLabel, {
@@ -351,10 +337,8 @@ const Layout = ({
   feature,
   hasEdit,
   layoutSt,
-  currentDatasetId,
   setShiftRefAct,
   updateLayoutAct,
-  setManualLayoutOverrideAct,
   curveSt,
   shiftSt
 }) => {
@@ -373,7 +357,7 @@ const Layout = ({
   }, [unset, best, curveIdx, setShiftRefAct]);
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
     className: classes.groupRight,
-    children: [layoutSelect(classes, layoutSt, updateLayoutAct, currentDatasetId, setManualLayoutOverrideAct), shiftSelect(classes, layoutSt, setShiftRefAct, shiftSt, curveSt), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r02_scan.default, {
+    children: [layoutSelect(classes, layoutSt, updateLayoutAct), shiftSelect(classes, layoutSt, setShiftRefAct, shiftSt, curveSt), /*#__PURE__*/(0, _jsxRuntime.jsx)(_r02_scan.default, {
       feature: feature,
       hasEdit: hasEdit
     })]
@@ -383,25 +367,20 @@ const mapStateToProps = (state, props) => (
 // eslint-disable-line
 {
   layoutSt: state.layout,
-  currentDatasetId: state.layoutOverride.currentDatasetId,
   curveSt: state.curve,
   shiftSt: state.shift
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   setShiftRefAct: _shift.setShiftRef,
-  updateLayoutAct: _layout.updateLayout,
-  setManualLayoutOverrideAct: _layout.setManualLayoutOverride
+  updateLayoutAct: _layout.updateLayout
 }, dispatch);
 Layout.propTypes = {
   classes: _propTypes.default.object.isRequired,
   feature: _propTypes.default.object.isRequired,
   hasEdit: _propTypes.default.bool.isRequired,
   layoutSt: _propTypes.default.string.isRequired,
-  currentDatasetId: _propTypes.default.oneOfType([_propTypes.default.string, _propTypes.default.number]),
-  // eslint-disable-line
   setShiftRefAct: _propTypes.default.func.isRequired,
   updateLayoutAct: _propTypes.default.func.isRequired,
-  setManualLayoutOverrideAct: _propTypes.default.func.isRequired,
   curveSt: _propTypes.default.object.isRequired,
   shiftSt: _propTypes.default.object.isRequired
 };

@@ -372,62 +372,63 @@ const readLayout = jcamp => {
     dataType
   } = spectra[0] || {};
   if (dataType) {
-    if (dataType.includes('INFRARED SPECTRUM')) {
+    // Case-insensitive, like the backend's own comparison against data_type.json.
+    const upperDataType = dataType.toUpperCase();
+    // Single-crystal XRD is a reflection dataset, not a 1D diffractogram, and has no
+    // layout of its own yet -- PLAIN, not the powder XRD layout below, whose substring
+    // check it would otherwise match.
+    if (upperDataType.includes('SINGLE CRYSTAL X-RAY DIFFRACTION')) {
+      return _list_layout.LIST_LAYOUT.PLAIN;
+    }
+    if (upperDataType.includes('INFRARED SPECTRUM')) {
       return _list_layout.LIST_LAYOUT.IR;
     }
-    if (dataType.includes('RAMAN SPECTRUM')) {
+    if (upperDataType.includes('RAMAN SPECTRUM')) {
       return _list_layout.LIST_LAYOUT.RAMAN;
     }
-    if (dataType.includes('UV/VIS SPECTRUM')) {
-      if (dataType.includes('HPLC')) {
+    if (upperDataType.includes('UV/VIS SPECTRUM')) {
+      if (upperDataType.includes('HPLC')) {
         return _list_layout.LIST_LAYOUT.HPLC_UVVIS;
       }
       return _list_layout.LIST_LAYOUT.UVVIS;
     }
-    if (dataType.includes('THERMOGRAVIMETRIC ANALYSIS')) {
+    if (upperDataType.includes('THERMOGRAVIMETRIC ANALYSIS')) {
       return _list_layout.LIST_LAYOUT.TGA;
     }
-    if (dataType.includes('DIFFERENTIAL SCANNING CALORIMETRY')) {
+    if (upperDataType.includes('DIFFERENTIAL SCANNING CALORIMETRY')) {
       return _list_layout.LIST_LAYOUT.DSC;
     }
-    if (dataType.includes('X-RAY DIFFRACTION')) {
+    if (upperDataType.includes('X-RAY DIFFRACTION')) {
       return _list_layout.LIST_LAYOUT.XRD;
     }
-    if (dataType.includes('MASS SPECTRUM')) {
+    if (upperDataType.includes('MASS SPECTRUM')) {
       return _list_layout.LIST_LAYOUT.MS;
     }
-    if (dataType.includes('CYCLIC VOLTAMMETRY')) {
+    if (upperDataType.includes('CYCLIC VOLTAMMETRY')) {
       return _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY;
     }
-    if (dataType.includes('CIRCULAR DICHROISM SPECTROSCOPY')) {
+    if (upperDataType.includes('CIRCULAR DICHROISM SPECTROSCOPY')) {
       return _list_layout.LIST_LAYOUT.CDS;
     }
-    // Review finding S6 (PR #336): the backend upper-cases both sides before
-    // comparing against data_type.json (chem_spectra/lib/converter/jcamp/base.py),
-    // so a file whose ##DATA TYPE= isn't shouted-case (e.g. "Gel Permeation
-    // Chromatography") still classifies there. This check alone must match that,
-    // since it is the one place this frontend mirrors an alias from that
-    // admin-configurable file rather than a fixed spectroscopy term.
-    const upperDataType = dataType.toUpperCase();
     if (upperDataType.includes('SIZE EXCLUSION CHROMATOGRAPHY') || upperDataType.includes('GEL PERMEATION CHROMATOGRAPHY')) {
       return _list_layout.LIST_LAYOUT.SEC;
     }
-    if (dataType.includes('GAS CHROMATOGRAPHY')) {
+    if (upperDataType.includes('GAS CHROMATOGRAPHY')) {
       return _list_layout.LIST_LAYOUT.GC;
     }
-    if (dataType.includes('SORPTION-DESORPTION MEASUREMENT')) {
+    if (upperDataType.includes('SORPTION-DESORPTION MEASUREMENT')) {
       return _list_layout.LIST_LAYOUT.AIF;
     }
-    if (dataType.includes('Emissions')) {
+    if (upperDataType.includes('EMISSIONS')) {
       return _list_layout.LIST_LAYOUT.EMISSIONS;
     }
-    if (dataType.includes('DLS ACF')) {
+    if (upperDataType.includes('DLS ACF')) {
       return _list_layout.LIST_LAYOUT.DLS_ACF;
     }
-    if (dataType.includes('DLS intensity')) {
+    if (upperDataType.includes('DLS INTENSITY')) {
       return _list_layout.LIST_LAYOUT.DLS_INTENSITY;
     }
-    if (dataType.includes('LC/MS')) {
+    if (upperDataType.includes('LC/MS')) {
       return _list_layout.LIST_LAYOUT.LC_MS;
     }
   }
@@ -1056,11 +1057,9 @@ const getBoundary = s => {
     x,
     y
   } = s.data[0];
-  // Review finding S6 (PR #336): Math.max/min of an empty array is -Infinity/
-  // +Infinity, not 0 -- an empty (0-point) peak-table block, same as this repo's
-  // own PLAIN demo fixture uses, took every caller of getBoundary (XRD, the
-  // CV/SEC/AIF/CDS/GC "array shape" features, MS) to genuinely infinite bounds.
-  if (!Array.isArray(x) || !Array.isArray(y) || x.length === 0 || y.length === 0) {
+  // Math.max/min of an empty array is -Infinity/+Infinity: an empty (0-point)
+  // peak-table block must not give its feature infinite bounds.
+  if (!x?.length || !y?.length) {
     return {
       maxX: 0,
       minX: 0,

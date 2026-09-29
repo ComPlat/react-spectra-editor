@@ -7,7 +7,7 @@ import { bindActionCreators } from 'redux';
 import { withStyles } from '@mui/styles';
 
 import { updateOperation } from './actions/submit';
-import { updateLayout, setCurrentDataset, setManualLayoutOverride } from './actions/layout';
+import { updateLayout } from './actions/layout';
 import {
   resetInitCommon, resetInitNmr, resetInitMs, resetInitCommonWithIntergation, resetDetector,
   resetMultiplicity,
@@ -28,6 +28,9 @@ import { LIST_LAYOUT } from './constants/list_layout';
 const styles = () => ({
 });
 
+const isUnrecognized = (entity) => !entity?.layout || Format.isPlainLayout(entity.layout);
+const datasetIdOf = (entity) => entity?.idDt ?? entity?.id ?? entity?.datasetId;
+
 class LayerInit extends React.Component {
   constructor(props) {
     super(props);
@@ -40,24 +43,7 @@ class LayerInit extends React.Component {
   }
 
   componentDidMount() {
-    // Review finding B3 (PR #336): the override recorded in reducer_layout_override.js
-    // must not survive past the LayerInit instance it was picked for. Most hosts
-    // (chemotion_ELN included -- see execReset's own comment) key their <SpectraEditor>
-    // by dataset id and never pass that id down as an entity field, so a genuine
-    // switch to a different dataset remounts this component fresh rather than handing
-    // it a new entity prop; a same-dataset refresh does not. Clearing here, before
-    // execReset runs, is what scopes the override to "picked sometime during this
-    // mount" for a host with no other identity signal to key it on.
-    //
-    // execReset(true) below, not just this dispatch: this.props is a snapshot from
-    // before componentDidMount ran (react-redux updates it only on a subsequent
-    // render, never synchronously mid-lifecycle-method), so execReset reading
-    // this.props.layoutOverrideSt here would still see whatever was stored before
-    // this dispatch, not after it -- the explicit flag is what actually makes this
-    // one call ignore it, regardless of prop timing.
-    const { setManualLayoutOverrideAct } = this.props;
-    setManualLayoutOverrideAct(null);
-    this.execReset(true);
+    this.execReset();
     this.initReducer();
     this.updateOthers();
     this.updateMultiEntities();
@@ -98,79 +84,33 @@ class LayerInit extends React.Component {
           clearHplcMsStateAct();
         }
       }
-      this.execReset();
+      this.execReset(prevProps.entity);
     }
   }
 
-  execReset(freshMount = false) {
+  execReset(prevEntity = null) {
     const {
-      entity, layoutOverrideSt, updateMetaPeaksAct,
+      entity, layoutSt, updateMetaPeaksAct,
       resetInitCommonAct, resetInitMsAct, resetInitNmrAct, resetInitCommonWithIntergationAct,
       resetDetectorAct, updateDSCMetaDataAct, resetMultiplicityAct, updateLayoutAct,
-      setCurrentDatasetAct,
     } = this.props;
     if (!entity) return;
     resetInitCommonAct();
     resetDetectorAct();
-    const { layout: rawLayout, features = {} } = entity;
-    const datasetId = entity.idDt ?? entity.id ?? entity.datasetId;
-    setCurrentDatasetAct(datasetId ?? null);
-    // helpers/chem.js's readLayout() itself now returns PLAIN (not a falsy
-    // value) for a datatype it does not recognise, so entity.layout is
-    // already normalized for anything built via FN.ExtractJcamp. This is
-    // belt-and-suspenders for a host-constructed entity that skips that
-    // classifier and hands us a falsy layout directly -- it must not inherit
-    // whatever layout was previously in the Redux state slice either.
-    //
-    // Review finding S5 (PR #336) and a Copilot follow-up: that normalization must
-    // not clobber a layout the user picked by hand for THIS SAME dataset. A host
-    // that keys the editor by dataset (chemotion_ELN does) can pass a refreshed
-    // entity for an unrecognized datatype without remounting -- entitySignature
-    // still changes (new content), execReset still runs, and naively PLAIN would
-    // land back over that manual choice on every such refresh.
-    //
-    // This can't be answered by inferring a pick from watching state.layout change
-    // in componentDidUpdate (S5's first attempt): a child's RESETALL dispatch (e.g.
-    // ForecastViewer's mount-time reset, independent of any entity change) can also
-    // change that same state, in the same tick as the pick, in whichever order
-    // react-redux happens to schedule the two -- so state.layout does not reliably
-    // reflect "the last thing the user chose" by the time this line runs, and a
-    // watcher can miss the pick, or mistake the child's own reset for one.
-    // layoutOverrideSt (reducer_layout_override.js) is written only by the layout
-    // dropdown's own dispatch (r01_layout.js's onChange, alongside updateLayoutAct),
-    // never by RESETALL, so it cannot be raced or clobbered by it -- including an
-    // explicit PLAIN selection, which is recorded the same as any other pick.
-    //
-    // Review finding B3 (PR #336): matching on datasetId alone left this dead for
-    // chemotion_ELN specifically -- its non-LC/MS entities (FN.buildData's pass-through
-    // shape, `{ spectra, features, layout }`) never carry idDt/id/datasetId at all, so
-    // datasetId is always null there and no override could ever match. componentDidMount
-    // clearing the override above is what makes it safe to trust *any* stored override
-    // once no id is available to check: it can only have been picked during this same
-    // mount, for this same entity, since a genuine switch to a different dataset either
-    // remounts this component (chemotion_ELN's <SpectraEditor key={...}>, clearing it)
-    // or -- for a host that both omits an id and reuses the same instance across
-    // datasets -- was never distinguishable from a refresh in the first place. When an
-    // id *is* available on both sides, still require it to match, for a host that
-    // reuses the same instance across datasets it does identify.
-    //
-    // freshMount: componentDidMount dispatches setManualLayoutOverrideAct(null) and
-    // calls execReset(true) in the same lifecycle call. react-redux does not update
-    // this.props synchronously from that dispatch -- layoutOverrideSt here would
-    // still be the pre-clear value from whatever host/instance existed before this
-    // mount, not the clear that was just dispatched. A freshMount call ignores
-    // layoutOverrideSt entirely rather than trust that stale snapshot; the dispatch
-    // still matters for Redux hygiene, since it's what the NEXT execReset() call
-    // (normChange, no freshMount) will correctly see.
-    const storedOverride = freshMount ? null : layoutOverrideSt?.override;
-    const idsDiffer = datasetId != null && storedOverride?.datasetId != null
-      && storedOverride.datasetId !== datasetId;
-    const override = (storedOverride && !idsDiffer) ? storedOverride.layout : null;
-    // rawLayout is 'PLAIN', not falsy, for anything built via readLayout -- so
-    // `rawLayout || ...` alone never reaches the override or host-constructed-entity
-    // fallback below. Both must be treated as "unrecognized, override-eligible".
-    const isUnrecognized = !rawLayout || Format.isPlainLayout(rawLayout);
-    const layout = isUnrecognized ? (override || LIST_LAYOUT.PLAIN) : rawLayout;
+    const { features = {} } = entity;
+    // An unrecognised entity (readLayout's PLAIN, or a host-constructed falsy layout)
+    // gets PLAIN, never whatever layout the previous entity left in state -- except
+    // when it replaces another unrecognised entity in this same mount, e.g. a host
+    // refreshing the dataset after a save. Then the current layout is either PLAIN or
+    // one the user picked by hand, and is kept. Different ids mean a different dataset.
+    let { layout } = entity;
+    if (isUnrecognized(entity)) {
+      const prevId = datasetIdOf(prevEntity);
+      const nextId = datasetIdOf(entity);
+      const sameDataset = prevId == null || nextId == null || prevId === nextId;
+      const keepCurrent = prevEntity && isUnrecognized(prevEntity) && sameDataset;
+      layout = keepCurrent ? layoutSt : LIST_LAYOUT.PLAIN;
+    }
     updateLayoutAct(layout);
     if (Format.isMsLayout(layout)) {
       // const { autoPeak, editPeak } = features; // TBD
@@ -194,15 +134,10 @@ class LayerInit extends React.Component {
       const { dscMetaData } = features;
       updateDSCMetaDataAct(dscMetaData);
     } else if (Format.isPlainLayout(layout)) {
-      // Review finding S3 (PR #336): this used to fall into the generic `else`
-      // below, which only resets multiplicity. buildIntegFeature/buildMpyFeature/
-      // buildSimFeature always return a truthy object (with empty stacks) even for
-      // a PLAIN entity, so integration/multiplicity/simulation from whatever was
-      // PREVIOUSLY open at this curveIdx survived untouched -- invisible in the UI
-      // (which hides integrals for PLAIN) but still read by the host's
-      // submit/export path and saved against the PLAIN spectrum. Reset the same
-      // per-curve slices the NMR branch above does, plus DSC metadata, which is
-      // equally stale-prone and equally invisible here.
+      // The PLAIN chart hides integrals and multiplets, but a host's submit/export
+      // path still reads them: overwrite this curve's slices (the build* features
+      // are empty, never falsy, for PLAIN) and DSC metadata rather than keep
+      // whatever the previous spectrum left there.
       const { integration, multiplicity, simulation } = features;
       updateMetaPeaksAct(entity);
       resetInitNmrAct({
@@ -384,7 +319,7 @@ class LayerInit extends React.Component {
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
-    layoutOverrideSt: state.layoutOverride,
+    layoutSt: state.layout,
   }
 );
 
@@ -398,8 +333,6 @@ const mapDispatchToProps = (dispatch) => (
     resetMultiplicityAct: resetMultiplicity,
     updateOperationAct: updateOperation,
     updateLayoutAct: updateLayout,
-    setCurrentDatasetAct: setCurrentDataset,
-    setManualLayoutOverrideAct: setManualLayoutOverride,
     updateMetaPeaksAct: updateMetaPeaks,
     addOthersAct: addOthers,
     setAllCurvesAct: setAllCurves,
@@ -410,7 +343,7 @@ const mapDispatchToProps = (dispatch) => (
 
 LayerInit.propTypes = {
   entity: PropTypes.object.isRequired,
-  layoutOverrideSt: PropTypes.object.isRequired,
+  layoutSt: PropTypes.string.isRequired,
   multiEntities: PropTypes.array, // eslint-disable-line
   entityFileNames: PropTypes.array, // eslint-disable-line
   others: PropTypes.object.isRequired,
@@ -429,8 +362,6 @@ LayerInit.propTypes = {
   resetInitCommonWithIntergationAct: PropTypes.func.isRequired,
   updateOperationAct: PropTypes.func.isRequired,
   updateLayoutAct: PropTypes.func.isRequired,
-  setCurrentDatasetAct: PropTypes.func.isRequired,
-  setManualLayoutOverrideAct: PropTypes.func.isRequired,
   updateMetaPeaksAct: PropTypes.func.isRequired,
   addOthersAct: PropTypes.func.isRequired,
   canChangeDescription: PropTypes.bool.isRequired,
