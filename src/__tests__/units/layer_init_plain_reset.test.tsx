@@ -9,6 +9,7 @@ import rootReducer from '../../reducers/index';
 import rootSaga from '../../sagas/index';
 import LayerInit from '../../layer_init';
 import { updateLayout } from '../../actions/layout';
+import { toggleThresholdIsEdit } from '../../actions/threshold';
 import { ExtractJcamp } from '../../helpers/chem';
 import { LIST_LAYOUT } from '../../constants/list_layout';
 import nmr1HJcamp from '../fixtures/nmr1h_jcamp';
@@ -148,5 +149,99 @@ describe('LayerInit — layout of an unrecognised entity with a forecast', () =>
     });
 
     expect(store.getState().layout).toEqual(LIST_LAYOUT.H1);
+  });
+});
+
+// Shaped like chemotion_ELN's entity: FN.buildData(ExtractJcamp(...)).entity carries no
+// idDt. `tweak` changes the content, so entitySignature differs as for a refresh.
+const buildPlainEntity = (tweak = 0, extra = {}) => {
+  const entity: any = ExtractJcamp(plainJcamp);
+  entity.spectra = entity.spectra.map((s: any) => ({
+    ...s,
+    data: s.data.map((d: any) => ({ ...d, y: d.y.map((v: number) => v + tweak) })),
+  }));
+  return { ...entity, ...extra };
+};
+
+const pick = (store, layout) => act(() => { store.dispatch(updateLayout(layout)); });
+
+// S5: a layout picked by hand for an unrecognised entity survives what the host does
+// to that same dataset, and does not leak into a different one.
+describe('LayerInit — a hand-picked layout for an unrecognised entity', () => {
+  it('survives a refresh of the same dataset', () => {
+    const store = buildStore();
+    const { rerender } = render(
+      <Provider store={store}><LayerInit {...baseProps} entity={buildPlainEntity()} /></Provider>,
+    );
+    pick(store, LIST_LAYOUT.H1);
+
+    rerender(
+      <Provider store={store}><LayerInit {...baseProps} entity={buildPlainEntity(1)} /></Provider>,
+    );
+
+    expect(store.getState().layout).toEqual(LIST_LAYOUT.H1);
+  });
+
+  it('survives a threshold edit toggle', () => {
+    const store = buildStore();
+    render(
+      <Provider store={store}><LayerInit {...baseProps} entity={buildPlainEntity()} /></Provider>,
+    );
+    pick(store, LIST_LAYOUT.H1);
+
+    act(() => { store.dispatch(toggleThresholdIsEdit()); });
+
+    expect(store.getState().layout).toEqual(LIST_LAYOUT.H1);
+  });
+
+  it('stays PLAIN on a refresh after the user picked PLAIN again', () => {
+    const store = buildStore();
+    const { rerender } = render(
+      <Provider store={store}><LayerInit {...baseProps} entity={buildPlainEntity()} /></Provider>,
+    );
+    pick(store, LIST_LAYOUT.H1);
+    pick(store, LIST_LAYOUT.PLAIN);
+
+    rerender(
+      <Provider store={store}><LayerInit {...baseProps} entity={buildPlainEntity(1)} /></Provider>,
+    );
+
+    expect(store.getState().layout).toEqual(LIST_LAYOUT.PLAIN);
+  });
+
+  it('is dropped when the host remounts the editor for another dataset', () => {
+    const store = buildStore();
+    const { rerender } = render(
+      <Provider store={store}>
+        <LayerInit key="dataset-1" {...baseProps} entity={buildPlainEntity()} />
+      </Provider>,
+    );
+    pick(store, LIST_LAYOUT.H1);
+
+    rerender(
+      <Provider store={store}>
+        <LayerInit key="dataset-2" {...baseProps} entity={buildPlainEntity(1)} />
+      </Provider>,
+    );
+
+    expect(store.getState().layout).toEqual(LIST_LAYOUT.PLAIN);
+  });
+
+  it('is dropped when both entities carry different dataset ids', () => {
+    const store = buildStore();
+    const { rerender } = render(
+      <Provider store={store}>
+        <LayerInit {...baseProps} entity={buildPlainEntity(0, { idDt: 1 })} />
+      </Provider>,
+    );
+    pick(store, LIST_LAYOUT.H1);
+
+    rerender(
+      <Provider store={store}>
+        <LayerInit {...baseProps} entity={buildPlainEntity(1, { idDt: 2 })} />
+      </Provider>,
+    );
+
+    expect(store.getState().layout).toEqual(LIST_LAYOUT.PLAIN);
   });
 });

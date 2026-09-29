@@ -28,6 +28,9 @@ import { LIST_LAYOUT } from './constants/list_layout';
 const styles = () => ({
 });
 
+const isUnrecognized = (entity) => !entity?.layout || Format.isPlainLayout(entity.layout);
+const datasetIdOf = (entity) => entity?.idDt ?? entity?.id ?? entity?.datasetId;
+
 class LayerInit extends React.Component {
   constructor(props) {
     super(props);
@@ -81,25 +84,33 @@ class LayerInit extends React.Component {
           clearHplcMsStateAct();
         }
       }
-      this.execReset();
+      this.execReset(prevProps.entity);
     }
   }
 
-  execReset() {
+  execReset(prevEntity = null) {
     const {
-      entity, updateMetaPeaksAct,
+      entity, layoutSt, updateMetaPeaksAct,
       resetInitCommonAct, resetInitMsAct, resetInitNmrAct, resetInitCommonWithIntergationAct,
       resetDetectorAct, updateDSCMetaDataAct, resetMultiplicityAct, updateLayoutAct,
     } = this.props;
     if (!entity) return;
     resetInitCommonAct();
     resetDetectorAct();
-    const { layout: rawLayout, features = {} } = entity;
-    // readLayout() returns PLAIN for a datatype it does not recognise; a
-    // host-constructed entity may still hand us a falsy layout. Either way the
-    // entity gets PLAIN, never whatever layout the previous entity left in state.
-    const layout = (!rawLayout || Format.isPlainLayout(rawLayout))
-      ? LIST_LAYOUT.PLAIN : rawLayout;
+    const { features = {} } = entity;
+    // An unrecognised entity (readLayout's PLAIN, or a host-constructed falsy layout)
+    // gets PLAIN, never whatever layout the previous entity left in state -- except
+    // when it replaces another unrecognised entity in this same mount, e.g. a host
+    // refreshing the dataset after a save. Then the current layout is either PLAIN or
+    // one the user picked by hand, and is kept. Different ids mean a different dataset.
+    let { layout } = entity;
+    if (isUnrecognized(entity)) {
+      const prevId = datasetIdOf(prevEntity);
+      const nextId = datasetIdOf(entity);
+      const sameDataset = prevId == null || nextId == null || prevId === nextId;
+      const keepCurrent = prevEntity && isUnrecognized(prevEntity) && sameDataset;
+      layout = keepCurrent ? layoutSt : LIST_LAYOUT.PLAIN;
+    }
     updateLayoutAct(layout);
     if (Format.isMsLayout(layout)) {
       // const { autoPeak, editPeak } = features; // TBD
@@ -307,7 +318,9 @@ class LayerInit extends React.Component {
 }
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
-  {}
+  {
+    layoutSt: state.layout,
+  }
 );
 
 const mapDispatchToProps = (dispatch) => (
@@ -330,6 +343,7 @@ const mapDispatchToProps = (dispatch) => (
 
 LayerInit.propTypes = {
   entity: PropTypes.object.isRequired,
+  layoutSt: PropTypes.string.isRequired,
   multiEntities: PropTypes.array, // eslint-disable-line
   entityFileNames: PropTypes.array, // eslint-disable-line
   others: PropTypes.object.isRequired,
