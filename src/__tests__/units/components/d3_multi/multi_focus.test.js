@@ -45,4 +45,13 @@ describe('MultiFocus.reverseXAxis (S1)', () => {
   it('still does not reverse the axis for AIF', () => {
     expect(mf.reverseXAxis(LIST_LAYOUT.AIF)).toBe(false);
   });
+
+  // These were missing from this component's own list, so a multi-selection of
+  // them drew reversed while a single one drew ascending.
+  it.each([LIST_LAYOUT.EMISSIONS, LIST_LAYOUT.DLS_ACF, LIST_LAYOUT.DLS_INTENSITY])(
+    'does not reverse the axis for %s',
+    (layout) => {
+      expect(mf.reverseXAxis(layout)).toBe(false);
+    },
+  );
 });
