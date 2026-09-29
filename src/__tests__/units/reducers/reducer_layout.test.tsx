@@ -3,10 +3,9 @@ import { LAYOUT, MANAGER } from '../../../constants/action_type';
 import { LIST_LAYOUT } from '../../../constants/list_layout';
 
 describe('reducer_layout', () => {
-  // Review finding S2 (PR #336): reverted from LIST_LAYOUT.PLAIN back to C13. See the
-  // comment on initialState in reducer_layout.js for why PLAIN here was never
-  // load-bearing for the unrecognized-datatype fix (B2 covers that) and cost a
-  // ForecastViewer double-mount on the first NMR/IR/UVVIS/XRD entity of a page session.
+  // layer_content.js decides whether to mount ForecastViewer from this slice before
+  // LayerInit.execReset has run, so a C13 default lets the common NMR case mount it
+  // directly instead of swapping to it a tick later.
   it('defaults to C13, matching what chemotion_ELN is tuned around', () => {
     expect(layoutReducer(undefined, { type: '@@INIT' })).toEqual(LIST_LAYOUT.C13);
   });
@@ -25,25 +24,24 @@ describe('reducer_layout', () => {
     })).toEqual(LIST_LAYOUT.MS);
   });
 
-  // Regression (review finding B2): a child component (e.g. ViewerLine.normChange)
-  // dispatches RESETALL with the *new* entity's feature ahead of
-  // LayerInit.execReset. For an unrecognized-datatype entity whose feature carries
-  // no (or a falsy) operation.layout, falling back to the stale `state` here left
-  // the Redux layout on whatever the *previous* entity used for one render -- e.g.
-  // an NMR layout, with its reversed axis and shift handling, drawing a spectrum
-  // that has no such basis. The fallback must be the same neutral PLAIN every
-  // other consumer converges on, never the leftover state.
-  it('RESETALL falls back to PLAIN, not the stale previous layout, when operation.layout is missing', () => {
+  // PLAIN on a feature means "unrecognised datatype", not a layout choice: a viewer
+  // remounting under a layout the user picked (the ForecastViewer swap) must not
+  // reset that pick. LayerInit.execReset owns setting PLAIN on an entity change.
+  it('RESETALL keeps the current layout when the feature\'s layout is PLAIN', () => {
+    expect(layoutReducer(LIST_LAYOUT.H1, {
+      type: MANAGER.RESETALL,
+      payload: { operation: { layout: LIST_LAYOUT.PLAIN } },
+    })).toEqual(LIST_LAYOUT.H1);
+  });
+
+  it('RESETALL keeps the current layout when operation.layout is missing', () => {
     expect(layoutReducer(LIST_LAYOUT.C13, {
       type: MANAGER.RESETALL,
       payload: { operation: {} },
-    })).toEqual(LIST_LAYOUT.PLAIN);
-  });
-
-  it('RESETALL falls back to PLAIN when the payload itself is missing operation', () => {
+    })).toEqual(LIST_LAYOUT.C13);
     expect(layoutReducer(LIST_LAYOUT.C13, {
       type: MANAGER.RESETALL,
       payload: {},
-    })).toEqual(LIST_LAYOUT.PLAIN);
+    })).toEqual(LIST_LAYOUT.C13);
   });
 });

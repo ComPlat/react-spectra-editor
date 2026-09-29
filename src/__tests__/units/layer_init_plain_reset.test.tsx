@@ -1,5 +1,5 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
@@ -8,6 +8,7 @@ import createSagaMiddleware from 'redux-saga';
 import rootReducer from '../../reducers/index';
 import rootSaga from '../../sagas/index';
 import LayerInit from '../../layer_init';
+import { updateLayout } from '../../actions/layout';
 import { ExtractJcamp } from '../../helpers/chem';
 import { LIST_LAYOUT } from '../../constants/list_layout';
 import nmr1HJcamp from '../fixtures/nmr1h_jcamp';
@@ -48,13 +49,10 @@ const buildStore = () => {
   return store;
 };
 
-// Review finding S3 (PR #336): execReset's PLAIN branch used to fall into the generic
-// `else`, which only resets multiplicity -- integration, multiplicity and meta data
-// from whichever spectrum was previously open at this curveIdx survived untouched.
-// Invisible in the UI (PLAIN hides integrals), but a host's submit/export path still
-// reads that stale state and saves it against the PLAIN spectrum -- carried-over NMR
-// or DSC state on exactly the entity type this PR says gets none of that.
-describe('LayerInit execReset — PLAIN clears per-curve state instead of inheriting it (S3)', () => {
+// The PLAIN chart hides integrals and multiplets, but a host's submit/export path
+// still reads them -- state left over from the previous spectrum at this curveIdx
+// would be saved against the PLAIN one.
+describe('LayerInit execReset — PLAIN clears per-curve state instead of inheriting it', () => {
   it('clears multiplicity left over from a previously open NMR entity', () => {
     const store = buildStore();
 
@@ -96,13 +94,8 @@ describe('LayerInit execReset — PLAIN clears per-curve state instead of inheri
   });
 });
 
-// Review finding S9 (PR #336): no test exercised execReset's own PLAIN-normalization
-// fallback directly -- S3/S5 above only reach it incidentally, via an entity *switch*
-// (componentDidUpdate). This covers the literal scenario execReset's own comment
-// documents -- "a host-constructed entity that skips [readLayout] and hands us a
-// falsy layout directly" -- on the very first mount (componentDidMount), where there
-// is no previous entity for a switch-based test to start from.
-describe('LayerInit execReset — normalizes a host-constructed falsy layout on first mount (S9)', () => {
+// A host-constructed entity can skip readLayout and hand over a falsy layout.
+describe('LayerInit execReset — normalizes a host-constructed falsy layout on first mount', () => {
   it('sets state.layout to PLAIN, not the reducer default, for an entity whose layout is false', () => {
     const store = buildStore();
     const hostEntity = { ...ExtractJcamp(plainJcamp), layout: false };
@@ -114,5 +107,46 @@ describe('LayerInit execReset — normalizes a host-constructed falsy layout on 
     );
 
     expect(store.getState().layout).toEqual(LIST_LAYOUT.PLAIN);
+  });
+});
+
+// baseProps carries a real forecast, as chemotion_ELN always does: picking an NMR
+// layout swaps Content to ForecastViewer, whose freshly mounted viewer dispatches
+// RESETALL with the entity's own (PLAIN) feature.
+describe('LayerInit — layout of an unrecognised entity with a forecast', () => {
+  it('still lands on PLAIN when switching from an NMR entity', () => {
+    const store = buildStore();
+
+    const { rerender } = render(
+      <Provider store={store}>
+        <LayerInit {...baseProps} entity={ExtractJcamp(nmr1HJcamp)} />
+      </Provider>,
+    );
+    expect(store.getState().layout).toEqual(LIST_LAYOUT.H1);
+
+    rerender(
+      <Provider store={store}>
+        <LayerInit {...baseProps} entity={ExtractJcamp(plainJcamp)} />
+      </Provider>,
+    );
+
+    expect(store.getState().layout).toEqual(LIST_LAYOUT.PLAIN);
+  });
+
+  it('keeps a layout picked by hand instead of the remounted viewer resetting it', () => {
+    const store = buildStore();
+
+    render(
+      <Provider store={store}>
+        <LayerInit {...baseProps} entity={ExtractJcamp(plainJcamp)} />
+      </Provider>,
+    );
+    expect(store.getState().layout).toEqual(LIST_LAYOUT.PLAIN);
+
+    act(() => {
+      store.dispatch(updateLayout(LIST_LAYOUT.H1));
+    });
+
+    expect(store.getState().layout).toEqual(LIST_LAYOUT.H1);
   });
 });
