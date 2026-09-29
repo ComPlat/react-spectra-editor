@@ -11,14 +11,8 @@ import RectFocus from '../../../components/d3_rect/rect_focus';
 // helpers/chem.js) while data is still present crashed componentDidMount with
 // "Cannot read properties of undefined (reading 'y')".
 //
-// Review finding S4 (PR #336): the original B7 guard (`if (!this.tTrEndPts.length)
-// return;`) fixed the crash by skipping the rest of drawBar() entirely, but
-// tTrEndPts only decides bar *color* (barColor's above/below-threshold fill) -- none
-// of the enter/exit/transform positioning depends on it. Returning early meant an
-// empty threshold blanked the chart on mount, or left stale (un-removed,
-// un-repositioned) bars on a later update, even though this.data was populated. The
-// fix falls back to a neutral yRef (-Infinity, so every bar gets the default color)
-// and lets the rest of drawBar() run as normal.
+// S4: tTrEndPts only decides bar colour -- an empty list must still draw, remove
+// and reposition bars, just in the default colour.
 describe('RectFocus.drawBar with an empty threshold-endpoint list (B7 / S4, d3_rect copy)', () => {
   const buildFocus = () => {
     const root = document.createElement('div');

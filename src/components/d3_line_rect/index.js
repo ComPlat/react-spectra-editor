@@ -66,19 +66,9 @@ const MIN_PANE_H = 96;
 // width empty on the right, which is what a viewport wider than FHD produces. Measuring
 // the pane and matching the viewBox to it removes the letterboxing in both directions.
 //
-// Review finding S7 (PR #336): each pane's height used to be read live off its own
-// clientHeight unconditionally, with only a "did it actually change" epsilon guard
-// against redrawing forever. Against an unbounded host (nothing here bounds
-// .rse-lcms-stack or its three panes to a height that does not depend on their own
-// content) that live height is the previous draw's own height plus a sub-pixel layout
-// remainder, feeding a genuine, unbounded growth loop -- the standalone demo hit it,
-// and nothing about this component itself stopped it happening again in any other
-// unbounded host (a Storybook story, a new modal). ContainerSize (helpers/
-// container_size.js, from #335) is what d3_line/d3_rect already use to break this: it
-// derives an unbounded pane's height from its measured *width* and a fixed fallback
-// aspect instead of ever reading its own clientHeight back, so there is nothing for the
-// loop to feed on. One instance per pane, since a host is free to leave the three
-// panes at different heights.
+// Each pane is sized by its own ContainerSize (as d3_line/d3_rect are), so a pane whose
+// height is not bounded by the host takes it from its width instead of reading back the
+// height of its own previous draw -- which grew without end on every resize.
 const clampPaneSize = ({ width, height }) => ({
   width: Math.max(Math.round(width), MIN_PANE_W),
   height: Math.max(Math.round(height), MIN_PANE_H),

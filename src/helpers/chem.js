@@ -1030,10 +1030,8 @@ const extrFeaturesNi = (jcamp, layout, peakUp, spectra) => {
 
 const getBoundary = (s) => {
   const { x, y } = s.data[0];
-  // Review finding S6 (PR #336): Math.max/min of an empty array is -Infinity/
-  // +Infinity, not 0 -- an empty (0-point) peak-table block, same as this repo's
-  // own PLAIN demo fixture uses, took every caller of getBoundary (XRD, the
-  // CV/SEC/AIF/CDS/GC "array shape" features, MS) to genuinely infinite bounds.
+  // Math.max/min of an empty array is -Infinity/+Infinity: an empty (0-point)
+  // peak-table block must not give its feature infinite bounds.
   if (!Array.isArray(x) || !Array.isArray(y) || x.length === 0 || y.length === 0) {
     return {
       maxX: 0, minX: 0, maxY: 0, minY: 0,

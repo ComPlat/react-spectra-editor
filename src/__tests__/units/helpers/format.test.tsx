@@ -601,12 +601,8 @@ describe('Test format helper', () => {
     })
   })
 
-  // Review finding S1 (PR #336): d3_line/line_focus.js, d3_line_rect/line_focus.js and
-  // d3_multi/multi_focus.js each carried their own copy of this whitelist and had
-  // already drifted (multi_focus.js was missing EMISSIONS/DLS_ACF/DLS_INTENSITY, and
-  // PLAIN had only been added to d3_line's copy) -- a layout can reach more than one of
-  // those three components, so a single entity's axis direction could flip depending on
-  // how many curves happened to be selected. All three now delegate to this one helper.
+  // S1: the single list every line/multi focus delegates to, so an entity's axis
+  // direction does not depend on how many curves are selected.
   describe('isNonReversedXLayout', () => {
     it('does not reverse the axis for PLAIN', () => {
       expect(Format.isNonReversedXLayout(LIST_LAYOUT.PLAIN)).toBe(true)

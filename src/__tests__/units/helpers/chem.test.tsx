@@ -192,13 +192,8 @@ describe('Test for chem helper', () => {
       })
     })
 
-    // Review finding B2 (PR #336): readLayout() used to return `false` for a
-    // datatype it does not recognise, leaving entity.layout,
-    // spectra[].layout and feature.operation.layout all falsy -- consistent
-    // with neither each other nor any other layout in the entity, and
-    // invisible to a host reading the entity object directly (e.g.
-    // chemotion_ELN's buildOpsByLayout). It must return the same PLAIN
-    // every other unrecognized-datatype consumer converges on.
+    // B2: an unrecognised datatype gets PLAIN on entity.layout, spectra[].layout and
+    // feature.operation.layout alike, for any host reading the entity directly.
     describe('Extract unrecognized datatype (PLAIN)', () => {
       let extractedData: { spectra: any, features: any, layout: any }
 

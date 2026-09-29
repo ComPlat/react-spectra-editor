@@ -98,14 +98,8 @@ describe('isLcmsMsPageLoading', () => {
 // MS bars are still present, so drawBar must guard the empty endpoint list
 // instead of crashing.
 //
-// Review finding S4 (PR #336): the original guard (`if (!this.tTrEndPts.length)
-// return;`) fixed the crash by skipping the rest of drawBar() entirely, but
-// tTrEndPts only decides bar *color* (barColor's above/below-threshold fill) -- none
-// of the enter/exit/transform positioning depends on it. Returning early meant an
-// empty threshold blanked the chart on mount, or left stale (un-removed,
-// un-repositioned) bars on a later update, even though this.data was populated. The
-// fix falls back to a neutral yRef (-Infinity, so every bar gets the default color)
-// and lets the rest of drawBar() run as normal.
+// S4: tTrEndPts only decides bar colour -- an empty list must still draw, remove
+// and reposition bars, just in the default colour.
 describe('RectFocus.drawBar with an empty threshold-endpoint list (B7 / S4)', () => {
   const buildFocus = () => {
     const root = document.createElement('div');
@@ -144,10 +138,7 @@ describe('RectFocus.drawBar with an empty threshold-endpoint list (B7 / S4)', ()
   });
 });
 
-// Review finding S1 (PR #336): this LineFocus (the LC/MS UV/VIS pane) carried its own
-// copy of the non-reversed-layout whitelist, missing PLAIN even after
-// d3_line/line_focus.js's copy was fixed for it. Now delegates to the single shared
-// Format.isNonReversedXLayout.
+// S1: the LC/MS UV/VIS pane uses the shared Format.isNonReversedXLayout.
 describe('LineFocus.reverseXAxis (S1, d3_line_rect copy)', () => {
   const lf = Object.create(LineFocus.prototype);
 
@@ -160,18 +151,9 @@ describe('LineFocus.reverseXAxis (S1, d3_line_rect copy)', () => {
   });
 });
 
-// Review finding S7 (PR #336): measurePane/sameSizes read each pane's live
-// clientHeight unconditionally, with only an epsilon guard against redrawing
-// forever -- against an unbounded host (nothing here bounds a pane to a
-// height that does not depend on its own content) that live height already
-// is the previous draw's own height, feeding a genuine, unbounded growth
-// loop. Replaced by three per-pane ContainerSize instances (helpers/
-// container_size.js, from #335), the same fix d3_line/d3_rect already use:
-// an unbounded pane's height is derived from its measured *width* and a
-// fixed fallback aspect instead of ever being read back from its own
-// clientHeight, so there is nothing left to feed the loop. See
-// single_curve_chart_size.test.js for the single-pane version of the test
-// below; ContainerSize's own unit behaviour is exercised through both.
+// S7: panes are sized by ContainerSize, so an unbounded pane takes its height from
+// its width instead of feeding back its own previous draw. See
+// single_curve_chart_size.test.js for the single-pane version.
 
 // Review finding N2: d3.extent already returns [min, max] sorted, so the
 // .sort() that used to follow it was dead work — and it silently let an
@@ -671,18 +653,9 @@ describe('ViewerLineRect componentDidMount/componentDidUpdate wiring (S5)', () =
   });
 });
 
-// Review finding S7 (PR #336): each pane's height used to be read live off its own
-// clientHeight unconditionally (measurePane), which is circular against an unbounded
-// host (nothing bounds .rse-lcms-stack or its panes to a height that does not depend
-// on their own content) -- the previous draw's own height feeds the next measurement,
-// growing without bound. Now backed by one ContainerSize per pane (helpers/
-// container_size.js, from #335): on an unbounded pane (clientHeight 0 once its content
-// is removed, same as an empty container in a real unbounded browser layout) the
-// target height is derived from the measured *width* and a fixed fallback aspect
-// instead of ever being read back from the pane's own clientHeight, so there is
-// nothing for a growth loop to feed on. mountCharts's drawMain calls are inspected
-// directly (drawMain is mocked at the top of this file) rather than a real svg's
-// viewBox, consistent with the rest of this file's UnconnectedViewerLineRect tests.
+// S7: per-pane ContainerSize sizing. An unbounded pane has clientHeight 0 once its
+// content is removed, so its height comes from its width and the fallback aspect.
+// drawMain is mocked at the top of this file, so its calls are inspected directly.
 describe('ViewerLineRect pane sizing (S7)', () => {
   // Mirrors d3_line_rect/index.js's own fallback (not exported) so the fallback-aspect
   // math below can be checked without duplicating a magic number.
