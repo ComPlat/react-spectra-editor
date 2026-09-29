@@ -344,56 +344,56 @@ const readLayout = (jcamp) => {
     if (upperDataType.includes('SINGLE CRYSTAL X-RAY DIFFRACTION')) {
       return LIST_LAYOUT.PLAIN;
     }
-    if (dataType.includes('INFRARED SPECTRUM')) {
+    if (upperDataType.includes('INFRARED SPECTRUM')) {
       return LIST_LAYOUT.IR;
     }
-    if (dataType.includes('RAMAN SPECTRUM')) {
+    if (upperDataType.includes('RAMAN SPECTRUM')) {
       return LIST_LAYOUT.RAMAN;
     }
-    if (dataType.includes('UV/VIS SPECTRUM')) {
-      if (dataType.includes('HPLC')) {
+    if (upperDataType.includes('UV/VIS SPECTRUM')) {
+      if (upperDataType.includes('HPLC')) {
         return LIST_LAYOUT.HPLC_UVVIS;
       }
       return LIST_LAYOUT.UVVIS;
     }
-    if (dataType.includes('THERMOGRAVIMETRIC ANALYSIS')) {
+    if (upperDataType.includes('THERMOGRAVIMETRIC ANALYSIS')) {
       return LIST_LAYOUT.TGA;
     }
-    if (dataType.includes('DIFFERENTIAL SCANNING CALORIMETRY')) {
+    if (upperDataType.includes('DIFFERENTIAL SCANNING CALORIMETRY')) {
       return LIST_LAYOUT.DSC;
     }
-    if (dataType.includes('X-RAY DIFFRACTION')) {
+    if (upperDataType.includes('X-RAY DIFFRACTION')) {
       return LIST_LAYOUT.XRD;
     }
-    if (dataType.includes('MASS SPECTRUM')) {
+    if (upperDataType.includes('MASS SPECTRUM')) {
       return LIST_LAYOUT.MS;
     }
-    if (dataType.includes('CYCLIC VOLTAMMETRY')) {
+    if (upperDataType.includes('CYCLIC VOLTAMMETRY')) {
       return LIST_LAYOUT.CYCLIC_VOLTAMMETRY;
     }
-    if (dataType.includes('CIRCULAR DICHROISM SPECTROSCOPY')) {
+    if (upperDataType.includes('CIRCULAR DICHROISM SPECTROSCOPY')) {
       return LIST_LAYOUT.CDS;
     }
     if (upperDataType.includes('SIZE EXCLUSION CHROMATOGRAPHY')
       || upperDataType.includes('GEL PERMEATION CHROMATOGRAPHY')) {
       return LIST_LAYOUT.SEC;
     }
-    if (dataType.includes('GAS CHROMATOGRAPHY')) {
+    if (upperDataType.includes('GAS CHROMATOGRAPHY')) {
       return LIST_LAYOUT.GC;
     }
-    if (dataType.includes('SORPTION-DESORPTION MEASUREMENT')) {
+    if (upperDataType.includes('SORPTION-DESORPTION MEASUREMENT')) {
       return LIST_LAYOUT.AIF;
     }
-    if (dataType.includes('Emissions')) {
+    if (upperDataType.includes('EMISSIONS')) {
       return LIST_LAYOUT.EMISSIONS;
     }
-    if (dataType.includes('DLS ACF')) {
+    if (upperDataType.includes('DLS ACF')) {
       return LIST_LAYOUT.DLS_ACF;
     }
-    if (dataType.includes('DLS intensity')) {
+    if (upperDataType.includes('DLS INTENSITY')) {
       return LIST_LAYOUT.DLS_INTENSITY;
     }
-    if (dataType.includes('LC/MS')) {
+    if (upperDataType.includes('LC/MS')) {
       return LIST_LAYOUT.LC_MS;
     }
   }

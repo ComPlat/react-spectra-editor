@@ -219,6 +219,19 @@ describe('Test for chem helper', () => {
 
     // The backend upper-cases both sides when matching data_type.json, so a
     // non-shouted-case file it recognises must not become PLAIN here.
+    // Every datatype check is case-insensitive, like the backend's.
+    describe('Extract a datatype in non-shouted case', () => {
+      it('classifies Thermogravimetric analysis as TGA', () => {
+        const extractedData = ExtractJcamp(buildXyJcamp('Thermogravimetric analysis'))
+        checkExtractSucceed(extractedData, LIST_LAYOUT.TGA)
+      })
+
+      it('classifies an upper-cased EMISSIONS as Emissions', () => {
+        const extractedData = ExtractJcamp(buildXyJcamp('EMISSIONS'))
+        checkExtractSucceed(extractedData, LIST_LAYOUT.EMISSIONS)
+      })
+    })
+
     // Single-crystal XRD must not fall into powder XRD's substring match.
     describe('Extract SINGLE CRYSTAL X-RAY DIFFRACTION', () => {
       it('classifies single-crystal XRD as PLAIN', () => {
