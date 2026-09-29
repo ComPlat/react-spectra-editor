@@ -34,6 +34,14 @@ const MANAGER = {
 
 const LAYOUT = {
   UPDATE: 'UPDATE_LAYOUT',
+  // Review finding on PR #336 (Copilot, second pass): a manual layout pick must be
+  // captured at its source (the dropdown's own dispatch), not inferred later by
+  // diffing Redux state.layout -- a child's RESETALL can change that same state
+  // (independent of any entity change, e.g. ForecastViewer's mount-time reset) in the
+  // same tick as the pick, in whichever order react-redux happens to schedule the two,
+  // so diffing it after the fact cannot tell the two apart. See reducer_layout_override.js.
+  SET_CURRENT_DATASET: 'LAYOUT_SET_CURRENT_DATASET',
+  SET_MANUAL_OVERRIDE: 'LAYOUT_SET_MANUAL_OVERRIDE',
 };
 
 const SHIFT = {

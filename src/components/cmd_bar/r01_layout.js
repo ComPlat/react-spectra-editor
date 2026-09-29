@@ -12,7 +12,7 @@ import {
 import withStyles from '@mui/styles/withStyles';
 
 import Scan from './r02_scan';
-import { updateLayout } from '../../actions/layout';
+import { updateLayout, setManualLayoutOverride } from '../../actions/layout';
 import { setShiftRef } from '../../actions/shift';
 import { LIST_LAYOUT } from '../../constants/list_layout';
 import { getListShift } from '../../constants/list_shift';
@@ -113,8 +113,21 @@ const shiftSelect = (
   );
 };
 
-const layoutSelect = (classes, layoutSt, updateLayoutAct) => {
-  const onChange = (e) => updateLayoutAct(e.target.value);
+const layoutSelect = (
+  classes, layoutSt, updateLayoutAct, currentDatasetId, setManualLayoutOverrideAct,
+) => {
+  // Review finding on PR #336 (Copilot, second pass): captured at the source, not
+  // inferred later by diffing Redux state.layout -- see reducer_layout_override.js
+  // for why that's the only reliable place to record this. Dispatched for every
+  // pick, PLAIN included, so an explicit "back to plain" choice is remembered too,
+  // rather than leaving whatever was picked before it cached.
+  const onChange = (e) => {
+    const layout = e.target.value;
+    updateLayoutAct(layout);
+    if (currentDatasetId != null) {
+      setManualLayoutOverrideAct({ datasetId: currentDatasetId, layout });
+    }
+  };
 
   return (
     <FormControl
@@ -280,8 +293,8 @@ function isRefUnset(shiftSt, curveIdx, list) {
 }
 
 const Layout = ({
-  classes, feature, hasEdit, layoutSt,
-  setShiftRefAct, updateLayoutAct, curveSt, shiftSt,
+  classes, feature, hasEdit, layoutSt, currentDatasetId,
+  setShiftRefAct, updateLayoutAct, setManualLayoutOverrideAct, curveSt, shiftSt,
 }) => {
   const { curveIdx } = curveSt;
   const list = getListShift(layoutSt) || [];
@@ -295,7 +308,9 @@ const Layout = ({
 
   return (
     <span className={classes.groupRight}>
-      { layoutSelect(classes, layoutSt, updateLayoutAct) }
+      { layoutSelect(
+        classes, layoutSt, updateLayoutAct, currentDatasetId, setManualLayoutOverrideAct,
+      ) }
       { shiftSelect(classes, layoutSt, setShiftRefAct, shiftSt, curveSt) }
       <Scan feature={feature} hasEdit={hasEdit} />
     </span>
@@ -305,6 +320,7 @@ const Layout = ({
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     layoutSt: state.layout,
+    currentDatasetId: state.layoutOverride.currentDatasetId,
     curveSt: state.curve,
     shiftSt: state.shift,
   }
@@ -314,6 +330,7 @@ const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     setShiftRefAct: setShiftRef,
     updateLayoutAct: updateLayout,
+    setManualLayoutOverrideAct: setManualLayoutOverride,
   }, dispatch)
 );
 
@@ -322,8 +339,10 @@ Layout.propTypes = {
   feature: PropTypes.object.isRequired,
   hasEdit: PropTypes.bool.isRequired,
   layoutSt: PropTypes.string.isRequired,
+  currentDatasetId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), // eslint-disable-line
   setShiftRefAct: PropTypes.func.isRequired,
   updateLayoutAct: PropTypes.func.isRequired,
+  setManualLayoutOverrideAct: PropTypes.func.isRequired,
   curveSt: PropTypes.object.isRequired,
   shiftSt: PropTypes.object.isRequired,
 };

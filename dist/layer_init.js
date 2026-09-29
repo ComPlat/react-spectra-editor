@@ -37,12 +37,6 @@ class LayerInit extends _react.default.Component {
     this.initReducer = this.initReducer.bind(this);
     this.updateOthers = this.updateOthers.bind(this);
     this.updateMultiEntities = this.updateMultiEntities.bind(this);
-    // Review finding S5 (PR #336): a layout the user picks by hand (the dropdown
-    // dispatches updateLayoutAct directly, bypassing execReset) for an
-    // unrecognized-datatype entity, keyed to that entity's dataset id. See
-    // componentDidUpdate and execReset for why this can't just be read back from
-    // Redux state.layout at the point execReset needs it.
-    this.manualLayoutOverride = null;
   }
   componentDidMount() {
     this.execReset();
@@ -55,32 +49,9 @@ class LayerInit extends _react.default.Component {
       others,
       multiEntities,
       entity,
-      operations,
-      layoutSt
+      operations
     } = this.props;
     const entityChanged = (0, _entity_signature.entitySignature)(prevProps.entity) !== (0, _entity_signature.entitySignature)(entity);
-    // Review finding S5 (PR #336): state.layout changing to something other than
-    // PLAIN while the entity itself did not is the user picking a layout by hand
-    // (the dropdown dispatches updateLayoutAct directly -- the only other place
-    // that happens for an entity execReset would otherwise force to PLAIN).
-    // Remember it against this dataset so a later refresh of the SAME dataset can
-    // restore it -- see execReset for why reading state.layout back live at that
-    // point doesn't work. Excluding a transition *to* PLAIN here is deliberate: a
-    // child's RESETALL (dispatched on its own mount, independent of any entity
-    // change -- see the ForecastViewer-swap note in the S5 test file) carries this
-    // still-unrecognized entity's own static PLAIN classification and can clobber
-    // a just-recorded pick back to PLAIN in the very same tick; that must not
-    // overwrite the real pick this override exists to remember.
-    const entityIsUnrecognized = !entity?.layout || _format.default.isPlainLayout(entity.layout);
-    if (!entityChanged && prevProps.layoutSt !== layoutSt && entityIsUnrecognized && layoutSt !== _list_layout.LIST_LAYOUT.PLAIN) {
-      const datasetId = entity?.idDt ?? entity?.id ?? entity?.datasetId;
-      if (datasetId != null) {
-        this.manualLayoutOverride = {
-          datasetId,
-          layout: layoutSt
-        };
-      }
-    }
     this.normChange(prevProps, entityChanged);
     if (prevProps.operations !== operations || entityChanged) {
       this.initReducer();
@@ -115,6 +86,7 @@ class LayerInit extends _react.default.Component {
   execReset() {
     const {
       entity,
+      layoutOverrideSt,
       updateMetaPeaksAct,
       resetInitCommonAct,
       resetInitMsAct,
@@ -123,7 +95,8 @@ class LayerInit extends _react.default.Component {
       resetDetectorAct,
       updateDSCMetaDataAct,
       resetMultiplicityAct,
-      updateLayoutAct
+      updateLayoutAct,
+      setCurrentDatasetAct
     } = this.props;
     if (!entity) return;
     resetInitCommonAct();
@@ -132,6 +105,8 @@ class LayerInit extends _react.default.Component {
       layout: rawLayout,
       features = {}
     } = entity;
+    const datasetId = entity.idDt ?? entity.id ?? entity.datasetId;
+    setCurrentDatasetAct(datasetId ?? null);
     // helpers/chem.js's readLayout() itself now returns PLAIN (not a falsy
     // value) for a datatype it does not recognise, so entity.layout is
     // already normalized for anything built via FN.ExtractJcamp. This is
@@ -139,26 +114,25 @@ class LayerInit extends _react.default.Component {
     // classifier and hands us a falsy layout directly -- it must not inherit
     // whatever layout was previously in the Redux state slice either.
     //
-    // Review finding S5 (PR #336): that normalization must not clobber a layout
-    // the user picked by hand for THIS SAME dataset. A host that keys the editor
-    // by dataset (chemotion_ELN does) can pass a refreshed entity for an
-    // unrecognized datatype without remounting -- entitySignature still changes
-    // (new content), execReset still runs, and naively PLAIN would land back over
-    // that manual choice on every such refresh.
+    // Review finding S5 (PR #336) and a Copilot follow-up: that normalization must
+    // not clobber a layout the user picked by hand for THIS SAME dataset. A host
+    // that keys the editor by dataset (chemotion_ELN does) can pass a refreshed
+    // entity for an unrecognized datatype without remounting -- entitySignature
+    // still changes (new content), execReset still runs, and naively PLAIN would
+    // land back over that manual choice on every such refresh.
     //
-    // This can't be answered by reading this.props.layoutSt here: ViewerLine (a
-    // descendant, whose componentDidUpdate fires before this one) independently
-    // dispatches RESETALL whenever the `feature` prop it's handed changes
-    // reference -- which a refreshed entity's new content digest also does --
-    // carrying that entity's own (still PLAIN) operation.layout. That RESETALL
-    // already overwrote state.layout back to PLAIN by the time this line runs, so
-    // this.props.layoutSt is exactly the value being raced, not a usable source
-    // of truth. manualLayoutOverride is written only from componentDidUpdate's own
-    // observation of a *prior*, separate commit where layoutSt changed with no
-    // entity change -- immune to this commit's race -- and is what restores the
-    // choice after that RESETALL clobbers it.
-    const datasetId = entity.idDt ?? entity.id ?? entity.datasetId;
-    const override = datasetId != null && this.manualLayoutOverride?.datasetId === datasetId ? this.manualLayoutOverride.layout : null;
+    // This can't be answered by inferring a pick from watching state.layout change
+    // in componentDidUpdate (S5's first attempt): a child's RESETALL dispatch (e.g.
+    // ForecastViewer's mount-time reset, independent of any entity change) can also
+    // change that same state, in the same tick as the pick, in whichever order
+    // react-redux happens to schedule the two -- so state.layout does not reliably
+    // reflect "the last thing the user chose" by the time this line runs, and a
+    // watcher can miss the pick, or mistake the child's own reset for one.
+    // layoutOverrideSt (reducer_layout_override.js) is written only by the layout
+    // dropdown's own dispatch (r01_layout.js's onChange, alongside updateLayoutAct),
+    // never by RESETALL, so it cannot be raced or clobbered by it -- including an
+    // explicit PLAIN selection, which is recorded the same as any other pick.
+    const override = datasetId != null && layoutOverrideSt?.override?.datasetId === datasetId ? layoutOverrideSt.override.layout : null;
     // rawLayout is 'PLAIN', not falsy, for anything built via readLayout -- so
     // `rawLayout || ...` alone never reaches the override or host-constructed-entity
     // fallback below. Both must be treated as "unrecognized, override-eligible".
@@ -382,7 +356,7 @@ class LayerInit extends _react.default.Component {
 const mapStateToProps = (state, props) => (
 // eslint-disable-line
 {
-  layoutSt: state.layout
+  layoutOverrideSt: state.layoutOverride
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   resetInitCommonAct: _manager.resetInitCommon,
@@ -393,6 +367,7 @@ const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   resetMultiplicityAct: _manager.resetMultiplicity,
   updateOperationAct: _submit.updateOperation,
   updateLayoutAct: _layout.updateLayout,
+  setCurrentDatasetAct: _layout.setCurrentDataset,
   updateMetaPeaksAct: _meta.updateMetaPeaks,
   addOthersAct: _jcamp.addOthers,
   setAllCurvesAct: _curve.setAllCurves,
@@ -401,7 +376,7 @@ const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
 }, dispatch);
 LayerInit.propTypes = {
   entity: _propTypes.default.object.isRequired,
-  layoutSt: _propTypes.default.string.isRequired,
+  layoutOverrideSt: _propTypes.default.object.isRequired,
   multiEntities: _propTypes.default.array,
   // eslint-disable-line
   entityFileNames: _propTypes.default.array,
@@ -422,6 +397,7 @@ LayerInit.propTypes = {
   resetInitCommonWithIntergationAct: _propTypes.default.func.isRequired,
   updateOperationAct: _propTypes.default.func.isRequired,
   updateLayoutAct: _propTypes.default.func.isRequired,
+  setCurrentDatasetAct: _propTypes.default.func.isRequired,
   updateMetaPeaksAct: _propTypes.default.func.isRequired,
   addOthersAct: _propTypes.default.func.isRequired,
   canChangeDescription: _propTypes.default.bool.isRequired,

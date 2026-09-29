@@ -8,7 +8,7 @@ import createSagaMiddleware from 'redux-saga';
 import rootReducer from '../../reducers/index';
 import rootSaga from '../../sagas/index';
 import LayerInit from '../../layer_init';
-import { updateLayout } from '../../actions/layout';
+import { updateLayout, setManualLayoutOverride } from '../../actions/layout';
 import { ExtractJcamp } from '../../helpers/chem';
 import { LIST_LAYOUT } from '../../constants/list_layout';
 import plainJcamp from '../fixtures/plain_layout_jcamp';
@@ -24,11 +24,6 @@ jest.mock('../../components/common/draw', () => ({
   drawArrowOnCurve: jest.fn(),
 }));
 
-// forecast is deliberately EMPTY here (unlike layer_prism_single_curve_loop.test.tsx's
-// baseProps), so Content never swaps between ViewerLine and ForecastViewer as layoutSt
-// changes. That swap is its own, separate source of a spurious RESETALL (see the
-// "also found" note below) -- this file isolates the one mechanism layer_init.js:94
-// actually controls.
 const baseProps = {
   others: { others: [], addOthersCb: false },
   cLabel: '',
@@ -37,7 +32,6 @@ const baseProps = {
   molSvg: '',
   editorOnly: true,
   exactMass: '',
-  forecast: {},
   operations: [],
   descriptions: [],
   canChangeDescription: false,
@@ -69,30 +63,42 @@ const buildPlainEntity = (idDt, tweak = 0) => {
   return entity;
 };
 
-// Review finding S5 (PR #336): removing the !entity.layout early return in execReset
-// means an unrecognized-datatype entity now always gets its layout normalized -- but
-// naively that meant PLAIN landing back over a layout the user picked by hand (e.g.
-// '1H', to get NMR tools) every time the same dataset's entity was refreshed.
+// Mirrors exactly what r01_layout.js's onChange now dispatches -- the two actions
+// travel together, from the same source, whether or not anything downstream races them.
+const pickLayout = (store, datasetId, layout) => {
+  store.dispatch(updateLayout(layout));
+  store.dispatch(setManualLayoutOverride({ datasetId, layout }));
+};
+
+// Review finding S5 (PR #336) and its Copilot follow-up: removing the !entity.layout
+// early return in execReset means an unrecognized-datatype entity now always gets its
+// layout normalized -- but naively that meant PLAIN landing back over a layout the user
+// picked by hand (e.g. '1H', to get NMR tools) every time the same dataset's entity was
+// refreshed. S5's first attempt inferred the pick by watching Redux state.layout change
+// in componentDidUpdate, which a child's own RESETALL dispatch (independent of any
+// entity change) could race or clobber in the very same tick -- most concretely, with a
+// real (non-empty) forecast prop (chemotion_ELN "always supplies" one, per S2), the pick
+// itself triggers a ViewerLine -> ForecastViewer swap whose fresh mount immediately
+// dispatches RESETALL(PLAIN). The pick is now captured at its source instead (the
+// dropdown's own dispatch, reducer_layout_override.js), immune to that race.
 describe('LayerInit execReset — a manual layout override survives a same-dataset refresh (S5)', () => {
   it('keeps the manually picked layout across a refresh of the same dataset', () => {
     const store = buildStore();
 
     const { rerender } = render(
       <Provider store={store}>
-        <LayerInit {...baseProps} entity={buildPlainEntity('dataset-1')} />
+        <LayerInit {...baseProps} forecast={{}} entity={buildPlainEntity('dataset-1')} />
       </Provider>,
     );
     expect(store.getState().layout).toEqual(LIST_LAYOUT.PLAIN);
 
-    // The user picks a layout by hand from the dropdown -- dispatches
-    // updateLayoutAct directly, bypassing execReset entirely.
-    store.dispatch(updateLayout(LIST_LAYOUT.H1));
+    pickLayout(store, 'dataset-1', LIST_LAYOUT.H1);
     expect(store.getState().layout).toEqual(LIST_LAYOUT.H1);
 
     // Host refreshes the same dataset (same idDt, new content) without remounting.
     rerender(
       <Provider store={store}>
-        <LayerInit {...baseProps} entity={buildPlainEntity('dataset-1', 1)} />
+        <LayerInit {...baseProps} forecast={{}} entity={buildPlainEntity('dataset-1', 1)} />
       </Provider>,
     );
 
@@ -104,17 +110,17 @@ describe('LayerInit execReset — a manual layout override survives a same-datas
 
     const { rerender } = render(
       <Provider store={store}>
-        <LayerInit {...baseProps} entity={buildPlainEntity('dataset-1')} />
+        <LayerInit {...baseProps} forecast={{}} entity={buildPlainEntity('dataset-1')} />
       </Provider>,
     );
-    store.dispatch(updateLayout(LIST_LAYOUT.H1));
+    pickLayout(store, 'dataset-1', LIST_LAYOUT.H1);
     expect(store.getState().layout).toEqual(LIST_LAYOUT.H1);
 
     // A genuinely different, also-unrecognized dataset must not inherit the
     // previous dataset's manual override.
     rerender(
       <Provider store={store}>
-        <LayerInit {...baseProps} entity={buildPlainEntity('dataset-2')} />
+        <LayerInit {...baseProps} forecast={{}} entity={buildPlainEntity('dataset-2')} />
       </Provider>,
     );
 
@@ -122,16 +128,54 @@ describe('LayerInit execReset — a manual layout override survives a same-datas
   });
 
   // NOT fixed here, and deliberately not asserted: with a real (non-empty) forecast
-  // prop -- chemotion_ELN "always supplies" one, per S2 -- picking a non-PLAIN
-  // layout makes Content swap from ViewerLine to ForecastViewer. That swap mounts a
-  // *fresh* inner viewer instance, whose own componentDidMount unconditionally
-  // dispatches RESETALL carrying the entity's own (still PLAIN) operation.layout,
-  // clobbering the pick back to PLAIN in the same tick as the pick itself -- before
-  // this file's mechanism (which relies on componentDidUpdate observing the pick as
-  // its own, distinct commit) ever gets a chance to record it; React/Redux can batch
-  // the pick and the clobber into one commit, making the intermediate 'real layout'
-  // state invisible to LayerInit entirely. See the PR discussion for review finding
-  // S5 for why this needs either a riskier reactive-restore (real infinite-loop risk
-  // once ForecastViewer's swap-on-mount is in the loop) or a more invasive change
-  // overlapping the S2 architecture discussion, rather than being folded in here.
+  // prop -- chemotion_ELN "always supplies" one, per S2 -- picking a non-PLAIN layout
+  // for a PLAIN entity swaps Content from ViewerLine to ForecastViewer, whose fresh
+  // inner viewer's own componentDidMount unconditionally dispatches RESETALL carrying
+  // the entity's own (still PLAIN) operation.layout. Capturing the pick at its source
+  // (pickLayout, above, via reducer_layout_override.js) means that first clobber no
+  // longer erases the *override* -- a later same-dataset refresh's execReset correctly
+  // reads it back and dispatches updateLayoutAct('1H') again. But that dispatch is
+  // itself state.layout going PLAIN -> '1H', which swaps Content to ForecastViewer
+  // *again*, whose fresh mount dispatches RESETALL('PLAIN') *again* -- re-clobbering
+  // the very dispatch that just fixed it, in the same tick. Confirmed by instrumenting
+  // the actual dispatch sequence: LAYOUT_SET_CURRENT_DATASET, UPDATE_LAYOUT('1H')
+  // (execReset correctly restoring the override), then RESET_ALL(PLAIN) once more
+  // (ForecastViewer's fresh mount). A reactive "detect state.layout drifted from the
+  // override and redispatch" fix would re-trigger this same swap-and-clobber on its
+  // own correction and loop forever -- confirmed by tracing it, not just suspected.
+  // The only fix that does not loop is having mountChart's RESETALL dispatch (d3_line/
+  // index.js, and the structurally identical d3_rect/d3_multi) stop unconditionally
+  // trusting the entity's own static operation.layout and defer to the current
+  // authoritative layout (state.layout, or a matching override) instead -- the same
+  // territory as the S2 architecture discussion already deferred to the team, now with
+  // a second, independent reason to have it.
+
+  // Copilot follow-up: excluding PLAIN from what gets recorded (S5's first attempt)
+  // meant an explicit "back to plain" choice never overwrote an older cached override,
+  // which then reappeared on the next same-dataset refresh. Recording every pick,
+  // PLAIN included, fixes this.
+  it('remembers an explicit PLAIN selection instead of reapplying an older cached override', () => {
+    const store = buildStore();
+
+    const { rerender } = render(
+      <Provider store={store}>
+        <LayerInit {...baseProps} forecast={{}} entity={buildPlainEntity('dataset-1')} />
+      </Provider>,
+    );
+    pickLayout(store, 'dataset-1', LIST_LAYOUT.H1);
+    expect(store.getState().layout).toEqual(LIST_LAYOUT.H1);
+
+    // The user explicitly goes back to PLAIN by hand.
+    pickLayout(store, 'dataset-1', LIST_LAYOUT.PLAIN);
+    expect(store.getState().layout).toEqual(LIST_LAYOUT.PLAIN);
+
+    // A later refresh of the same dataset must not resurrect the earlier H1 pick.
+    rerender(
+      <Provider store={store}>
+        <LayerInit {...baseProps} forecast={{}} entity={buildPlainEntity('dataset-1', 1)} />
+      </Provider>,
+    );
+
+    expect(store.getState().layout).toEqual(LIST_LAYOUT.PLAIN);
+  });
 });

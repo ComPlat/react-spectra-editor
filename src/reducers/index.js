@@ -4,6 +4,7 @@ import undoableEditPeakReducer from './reducer_edit_peak';
 import statusReducer from './reducer_status';
 import managerReducer from './reducer_manager';
 import layoutReducer from './reducer_layout';
+import layoutOverrideReducer from './reducer_layout_override';
 import shiftReducer from './reducer_shift';
 import scanReducer from './reducer_scan';
 import forecastReducer from './reducer_forecast';
@@ -27,6 +28,7 @@ const rootReducer = combineReducers({
   status: statusReducer,
   manager: managerReducer,
   layout: layoutReducer,
+  layoutOverride: layoutOverrideReducer,
   shift: shiftReducer,
   scan: scanReducer,
   forecast: forecastReducer,
