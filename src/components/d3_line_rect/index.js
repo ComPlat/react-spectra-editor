@@ -394,6 +394,7 @@ class ViewerLineRect extends React.Component {
     this.currentSizes = null;
 
     this.handleResize = this.handleResize.bind(this);
+    this.resizeFrame = null;
     const fallback = { width: W, height: H };
     this.lineSize = new ContainerSize(() => this.lineRef.current, fallback, this.handleResize);
     this.multiSize = new ContainerSize(() => this.multiRef.current, fallback, this.handleResize);
@@ -565,6 +566,10 @@ class ViewerLineRect extends React.Component {
   }
 
   componentWillUnmount() {
+    if (this.resizeFrame != null) {
+      window.cancelAnimationFrame(this.resizeFrame);
+      this.resizeFrame = null;
+    }
     this.lineSize.disconnect();
     this.multiSize.disconnect();
     this.rectSize.disconnect();
@@ -573,16 +578,21 @@ class ViewerLineRect extends React.Component {
     drawDestroy(this.rootKlassRect);
   }
 
-  // Redraw when any pane actually changed size. Each ContainerSize instance already
-  // debounces its own unbounded case to the next animation frame (see its own comment
-  // for why a synchronous remount inside a ResizeObserver callback throws a "loop
-  // completed with undelivered notifications" error) and derives an unbounded pane's
-  // height from its measured width instead of its own clientHeight, so there is nothing
-  // here left to feed a growth loop.
+  // Redraw when any pane actually changed size. All three ContainerSize instances call
+  // this, and a height-bounded one calls it synchronously from inside its ResizeObserver
+  // callback -- but the redraw rebuilds every pane, including unbounded ones whose
+  // observers may still be delivering, which the browser reports as "ResizeObserver loop
+  // completed with undelivered notifications". So always defer to the next frame, once
+  // for however many panes reported.
   handleResize() {
-    if (this.lineSize.hasChanged() || this.multiSize.hasChanged() || this.rectSize.hasChanged()) {
-      this.mountCharts(false);
-    }
+    if (this.resizeFrame != null) return;
+    this.resizeFrame = window.requestAnimationFrame(() => {
+      this.resizeFrame = null;
+      if (this.lineSize.hasChanged() || this.multiSize.hasChanged()
+        || this.rectSize.hasChanged()) {
+        this.mountCharts(false);
+      }
+    });
   }
 
   handleUvvisUndo() {

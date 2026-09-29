@@ -732,3 +732,46 @@ describe('ViewerLineRect pane sizing (S7)', () => {
     expect(expectedHeight).toBeGreaterThan(0);
   });
 });
+
+// Every pane's ContainerSize calls the one handleResize, a bounded one synchronously
+// from its ResizeObserver callback. The redraw rebuilds all three panes, so it is
+// deferred to a single frame however many panes reported.
+describe('ViewerLineRect.handleResize', () => {
+  let frames;
+  beforeEach(() => {
+    frames = [];
+    jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => frames.push(cb));
+  });
+  afterEach(() => jest.restoreAllMocks());
+
+  const buildInstance = (changed) => {
+    const instance = Object.create(UnconnectedViewerLineRect.prototype);
+    instance.resizeFrame = null;
+    instance.lineSize = { hasChanged: () => changed };
+    instance.multiSize = { hasChanged: () => false };
+    instance.rectSize = { hasChanged: () => false };
+    instance.mountCharts = jest.fn();
+    return instance;
+  };
+
+  it('redraws once, on the next frame, for three pane notifications', () => {
+    const instance = buildInstance(true);
+    instance.handleResize();
+    instance.handleResize();
+    instance.handleResize();
+
+    expect(frames).toHaveLength(1);
+    expect(instance.mountCharts).not.toHaveBeenCalled();
+
+    frames[0]();
+    expect(instance.mountCharts).toHaveBeenCalledTimes(1);
+    expect(instance.mountCharts).toHaveBeenCalledWith(false);
+  });
+
+  it('does not redraw when no pane changed size', () => {
+    const instance = buildInstance(false);
+    instance.handleResize();
+    frames[0]();
+    expect(instance.mountCharts).not.toHaveBeenCalled();
+  });
+});
