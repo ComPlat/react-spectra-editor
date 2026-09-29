@@ -585,6 +585,14 @@ const is13CLayout = (layoutSt) => (LIST_LAYOUT.C13 === layoutSt);
 const is1HLayout = (layoutSt) => (LIST_LAYOUT.H1 === layoutSt);
 const isMsLayout = (layoutSt) => (LIST_LAYOUT.MS === layoutSt);
 const isPlainLayout = (layoutSt) => (LIST_LAYOUT.PLAIN === layoutSt);
+// The layout a RESETALL payload (a viewer's feature) asks for, or null to keep the
+// current one. PLAIN or missing only says the datatype was not recognised -- not a
+// layout choice -- so a viewer remounting under a layout picked by hand must not
+// reset it. Every reducer that takes a layout from RESETALL must use this.
+const resetAllLayout = (feature) => {
+  const layout = feature?.operation?.layout;
+  return (layout && layout !== LIST_LAYOUT.PLAIN) ? layout : null;
+};
 const isIrLayout = (layoutSt) => ([LIST_LAYOUT.IR, 'INFRARED'].indexOf(layoutSt) >= 0);
 const isRamanLayout = (layoutSt) => (LIST_LAYOUT.RAMAN === layoutSt);
 const isUvVisLayout = (layoutSt) => (LIST_LAYOUT.UVVIS === layoutSt);
@@ -779,6 +787,7 @@ const Format = {
   is29SiLayout,
   isMsLayout,
   isPlainLayout,
+  resetAllLayout,
   isIrLayout,
   isRamanLayout,
   isUvVisLayout,

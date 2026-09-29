@@ -12,6 +12,7 @@ import { updateLayout } from '../../actions/layout';
 import { toggleThresholdIsEdit } from '../../actions/threshold';
 import { ExtractJcamp } from '../../helpers/chem';
 import { LIST_LAYOUT } from '../../constants/list_layout';
+import Format from '../../helpers/format';
 import nmr1HJcamp from '../fixtures/nmr1h_jcamp';
 import dscJcamp from '../fixtures/dsc_jcamp';
 import plainJcamp from '../fixtures/plain_layout_jcamp';
@@ -133,6 +134,29 @@ describe('LayerInit — layout of an unrecognised entity with a forecast', () =>
 
     expect(store.getState().layout).toEqual(LIST_LAYOUT.PLAIN);
   });
+
+  // Picking MS swaps in ViewerRect, picking IR swaps in ForecastViewer; each remounted
+  // viewer dispatches RESETALL with the PLAIN feature. Both use a precision different
+  // from PLAIN's, so the submit decimal must follow the kept layout, not the feature.
+  it.each([LIST_LAYOUT.MS, LIST_LAYOUT.IR])(
+    'keeps the submit precision of a hand-picked %s after the viewer remounts',
+    (picked) => {
+      const store = buildStore();
+      render(
+        <Provider store={store}>
+          <LayerInit {...baseProps} entity={ExtractJcamp(plainJcamp)} />
+        </Provider>,
+      );
+      expect(store.getState().submit.decimal).toEqual(Format.spectraDigit(LIST_LAYOUT.PLAIN));
+
+      act(() => {
+        store.dispatch(updateLayout(picked));
+      });
+
+      expect(store.getState().layout).toEqual(picked);
+      expect(store.getState().submit.decimal).toEqual(Format.spectraDigit(picked));
+    },
+  );
 
   it('keeps a layout picked by hand instead of the remounted viewer resetting it', () => {
     const store = buildStore();
