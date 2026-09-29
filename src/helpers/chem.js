@@ -784,6 +784,10 @@ const extractVoltammetryData = (jcamp) => {
   return peakStack;
 };
 
+// A `##$CS...=true` record; one written in several blocks is parsed into an array.
+const isTrueRecord = (value) => [].concat(value ?? [])
+  .some((v) => String(v).trim().toLowerCase() === 'true');
+
 const buildPeakFeature = (jcamp, layout, peakUp, s, thresRef, upperThres = false, lowerThres = false) => {
   const { xType, info } = jcamp;
   const subTyp = xType ? ` - ${xType}` : '';
@@ -810,6 +814,11 @@ const buildPeakFeature = (jcamp, layout, peakUp, s, thresRef, upperThres = false
     weAreaUnit: info.$CSWEAREAUNIT || '',
     currentMode: (info.$CSCURRENTMODE || ''),
     csCategory: info.$CSCATEGORY || s.csCategory,
+    // What chem-spectra-app did to the y signal on request: converted absorbance to
+    // %T, or mirrored it (mutually exclusive; written only when done). The numbers
+    // alone cannot tell the two apart. A file that was %T to begin with has neither.
+    convertedToTransmittance: isTrueRecord(info.$CSTRANSMITTANCE),
+    invertedY: isTrueRecord(info.$CSINVERTY),
   };
 
   if (layout === 'LC/MS') {
@@ -1179,7 +1188,7 @@ const ExtractJcamp = (source) => {
     source,
     {
       xy: true,
-      keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDINTEGRALSGROUPS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS|\$CSUPPERTHRESHOLD|\$CSLOWERTHRESHOLD|\$CSCYCLICVOLTAMMETRYDATA|UNITS|SYMBOL|\$CSAUTOMETADATA|\$DETECTOR|MN|MW|D|MP|MELTINGPOINT|TG|\$CSSCANRATE|\$CSSPECTRUMDIRECTION|\$CSWEAREAVALUE|\$CSWEAREAUNIT|\$CSCURRENTMODE|\$CSLCMSMZPAGE|SCAN_MODE|SCANMODE|VAR_TYPE|VARTYPE|TYPE|SOFTWARE|DATATYPE)/, // eslint-disable-line
+      keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDINTEGRALSGROUPS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS|\$CSUPPERTHRESHOLD|\$CSLOWERTHRESHOLD|\$CSCYCLICVOLTAMMETRYDATA|UNITS|SYMBOL|\$CSAUTOMETADATA|\$DETECTOR|MN|MW|D|MP|MELTINGPOINT|TG|\$CSSCANRATE|\$CSSPECTRUMDIRECTION|\$CSTRANSMITTANCE|\$CSINVERTY|\$CSWEAREAVALUE|\$CSWEAREAUNIT|\$CSCURRENTMODE|\$CSLCMSMZPAGE|SCAN_MODE|SCANMODE|VAR_TYPE|VARTYPE|TYPE|SOFTWARE|DATATYPE)/, // eslint-disable-line
     },
   );
   const isChemstation = isChemstationLcms(source, jcamp);

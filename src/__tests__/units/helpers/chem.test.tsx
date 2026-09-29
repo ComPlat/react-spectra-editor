@@ -15,6 +15,7 @@ import dlsAcfJcamp from "../../fixtures/dls_acf_jcamp";
 import lcMsTicChemstationJcamp from "../../fixtures/lc_ms_jcamp_tic_chemstation";
 import lcMsMzChemstationJcamp from "../../fixtures/lc_ms_jcamp_mz_chemstation";
 import plainJcamp from "../../fixtures/plain_layout_jcamp";
+import irJcamp from "../../fixtures/ir_jcamp";
 
 const buildTicJcamp = ({
   xUnits, unitsLine = '', xValues, yValues,
@@ -233,6 +234,57 @@ describe('Test for chem helper', () => {
     })
 
     // Single-crystal XRD must not fall into powder XRD's substring match.
+    // chem-spectra-app records what it did to the y signal: converted to %T, or mirrored
+    // on request. Kept records reach a host only through the features built from them.
+    describe('Extract $CSTRANSMITTANCE / $CSINVERTY', () => {
+      const withRecords = (records: string, everyBlock = false) => {
+        const marker = '##$CSTHRESHOLD='
+        const source = everyBlock
+          ? irJcamp.split(marker).join(`${records}${marker}`)
+          : irJcamp.replace(marker, `${records}${marker}`)
+        expect(source).not.toEqual(irJcamp)
+        return ExtractJcamp(source)
+      }
+      const peakFeatures = ({ features }: any) => [features.editPeak, features.autoPeak].filter(Boolean)
+
+      it('exposes $CSTRANSMITTANCE on the peak features', () => {
+        const feats = peakFeatures(withRecords('##$CSTRANSMITTANCE=true\n'))
+        expect(feats.length).toBeGreaterThan(0)
+        feats.forEach((f: any) => {
+          expect(f.convertedToTransmittance).toBe(true)
+          expect(f.invertedY).toBe(false)
+        })
+      })
+
+      it('exposes $CSINVERTY on the peak features, also when repeated in every block', () => {
+        [false, true].forEach((everyBlock) => {
+          const feats = peakFeatures(withRecords('##$CSINVERTY=true\n', everyBlock))
+          expect(feats.length).toBeGreaterThan(0)
+          feats.forEach((f: any) => {
+            expect(f.invertedY).toBe(true)
+            expect(f.convertedToTransmittance).toBe(false)
+          })
+        })
+      })
+
+      it('reads both as false when the file does not declare them', () => {
+        const feats = peakFeatures(ExtractJcamp(irJcamp))
+        expect(feats.length).toBeGreaterThan(0)
+        feats.forEach((f: any) => {
+          expect(f.convertedToTransmittance).toBe(false)
+          expect(f.invertedY).toBe(false)
+        })
+      })
+
+      it('still keeps $CSTHRESHOLD alongside them', () => {
+        const plainRef = peakFeatures(ExtractJcamp(irJcamp)).map((f: any) => f.thresRef)
+        const withRef = peakFeatures(withRecords('##$CSTRANSMITTANCE=true\n'))
+          .map((f: any) => f.thresRef)
+        expect(withRef).toEqual(plainRef)
+        expect(plainRef.every((r: number) => r !== 5)).toBe(true) // 5 is the no-threshold fallback
+      })
+    })
+
     describe('Extract SINGLE CRYSTAL X-RAY DIFFRACTION', () => {
       it('classifies single-crystal XRD as PLAIN', () => {
         const extractedData = ExtractJcamp(buildXyJcamp('SINGLE CRYSTAL X-RAY DIFFRACTION'))
