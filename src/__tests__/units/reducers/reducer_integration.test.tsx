@@ -1,4 +1,4 @@
-import { INTEGRATION } from "../../../constants/action_type";
+import { INTEGRATION, MULTIPLICITY } from "../../../constants/action_type";
 import undoableIntegrationReducer, { integrationReducer } from "../../../reducers/reducer_integration";
 import { ActionCreators, newHistory } from "redux-undo";
 
@@ -836,5 +836,79 @@ describe('Test redux reducer for integrations', () => {
     });
 
     expect(newState).toBe(state);
+  });
+});
+
+import { EDITPEAK, CURVE } from '../../../constants/action_type';
+
+describe('Test redux integration reducer (per-curve)', () => {
+  const baseIntegration = {
+    stack: [{ xL: 1, xU: 2, area: 1, absoluteArea: 1 }],
+    refArea: 1,
+    refFactor: 1,
+    shift: 0,
+    edited: false,
+  };
+
+  it('updates shift on the curve index from the payload', () => {
+    const state = {
+      selectedIdx: 0,
+      integrations: [baseIntegration, { ...baseIntegration, shift: 0 }],
+    };
+    const action = {
+      type: EDITPEAK.SHIFT,
+      payload: { prevOffset: 0.42, curveIdx: 1 },
+    };
+    const nextState = integrationReducer(state, action);
+    expect(nextState.integrations[1].shift).toEqual(0.42);
+    expect(nextState.integrations[0].shift).toEqual(0);
+    expect(nextState.selectedIdx).toEqual(1);
+  });
+
+  it('syncs selectedIdx when the working curve changes', () => {
+    const state = {
+      selectedIdx: 0,
+      integrations: [baseIntegration],
+    };
+    const nextState = integrationReducer(state, {
+      type: CURVE.SELECT_WORKING_CURVE,
+      payload: 2,
+    });
+    expect(nextState.selectedIdx).toEqual(2);
+  });
+
+  describe('Clear all multiplicity', () => {
+    const state: any = {
+      selectedIdx: 0,
+      integrations: [
+        {
+          stack: [
+            { xL: 1, xU: 2, area: 1 },
+            { xL: 3, xU: 4, area: 1 },
+            { xL: 5, xU: 6, area: 1 },
+          ],
+          refArea: 1, refFactor: 1, shift: 0, edited: false,
+        },
+        { stack: [{ xL: 1, xU: 2, area: 1 }], refArea: 1, refFactor: 1, shift: 0, edited: false },
+      ],
+    };
+
+    it('removes the integrations of the cleared multiplets and keeps standalone ones', () => {
+      const newState = integrationReducer(state, {
+        type: MULTIPLICITY.CLEAR_ALL,
+        payload: { curveIdx: 0, xExtents: [{ xL: 1, xU: 2 }, { xL: 5, xU: 6 }] },
+      });
+      expect(newState.integrations[0].stack).toEqual([{ xL: 3, xU: 4, area: 1 }]);
+      expect(newState.integrations[0].edited).toBe(true);
+      expect(newState.integrations[1]).toBe(state.integrations[1]);
+    });
+
+    it('leaves the state untouched when no multiplet ranges are given', () => {
+      const newState = integrationReducer(state, {
+        type: MULTIPLICITY.CLEAR_ALL,
+        payload: { curveIdx: 0 },
+      });
+      expect(newState).toBe(state);
+    });
   });
 });

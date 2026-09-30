@@ -29,6 +29,13 @@ describe('Test redux curve reducer', () => {
     expect(newState).toEqual(curveState)
   })
 
+  it('Toggle normalization of curves', () => {
+    action.type = CURVE.SET_NORMALIZED
+    action.payload = true
+    const { isNormalized } = curveReducer(curveState, action)
+    expect(isNormalized).toEqual(true)
+  })
+
   it('Select the working curve', () => {
     action.type = CURVE.SELECT_WORKING_CURVE
     action.payload = 2
@@ -56,6 +63,24 @@ describe('Test redux curve reducer', () => {
     expect(topic && feature && integration && color).not.toBeNull()
     expect(hasEdit).toEqual(true)
     expect(maxminPeak).toBeNull()
+  })
+
+  it('Preserves the selected curve index when reloading all curves', () => {
+    action.type = CURVE.SET_ALL_CURVES
+    const entity = ExtractJcamp(nmr1HJcamp)
+    curveState = { listCurves: [], curveIdx: 2 }
+    action.payload = [ entity, entity, entity ]
+    const { curveIdx } = curveReducer(curveState, action)
+    expect(curveIdx).toEqual(2)
+  })
+
+  it('Uses an explicit curve index when provided', () => {
+    action.type = CURVE.SET_ALL_CURVES
+    const entity = ExtractJcamp(nmr1HJcamp)
+    curveState = { listCurves: [], curveIdx: 0 }
+    action.payload = { entities: [ entity, entity, entity ], curveIdx: 1 }
+    const { curveIdx } = curveReducer(curveState, action)
+    expect(curveIdx).toEqual(1)
   })
 
   it('Toggle show all curves', () => {

@@ -22,8 +22,10 @@ import Pecker from './07_pecker';
 import ChangeAxes from './r08_change_axes';
 import Detector from './r09_detector';
 import CvDensityControls from './r10_cv_density';
+import Normalize from './r11_normalize';
 import Format from '../../helpers/format';
 import { LIST_HOST_HOOK_CLASS } from '../../constants/list_graph';
+import Cfg from '../../helpers/cfg';
 
 const styles = () => (
   Object.assign(
@@ -92,11 +94,13 @@ const styles = () => (
 
 const CmdBar = ({
   classes, feature, hasEdit, forecast, operations, editorOnly, jcampIdx, hideThreshold,
-  hideMainEditTools,
+  hideMainEditTools, showNormalize,
   layoutSt,
   prependLcMsToolbar,
 }) => {
   const isCvLayout = Format.isCyclicVoltaLayout(layoutSt);
+  const hideIntegration = isCvLayout || Cfg.btnCmdIntg(layoutSt);
+  const hideMultiplicity = isCvLayout || Cfg.btnCmdMpy(layoutSt);
 
   // Layout first, Submit (its option dropdown and button) last, in every layout.
   const rightCluster = (
@@ -108,6 +112,7 @@ const CmdBar = ({
       <Wavelength />
       <CvDensityControls />
       <ChangeAxes />
+      { showNormalize ? <Normalize /> : null }
       <Detector />
       <Submit
         operations={operations}
@@ -145,8 +150,8 @@ const CmdBar = ({
               <Zoom />
               <Peak jcampIdx={jcampIdx} feature={feature} />
               <Pecker jcampIdx={jcampIdx} />
-              {isCvLayout ? null : <Integration />}
-              {isCvLayout ? null : <Multiplicity />}
+              {hideIntegration ? null : <Integration />}
+              {hideMultiplicity ? null : <Multiplicity />}
               <UndoRedo />
             </>
           )
@@ -176,10 +181,12 @@ CmdBar.propTypes = {
   jcampIdx: PropTypes.any,
   hideThreshold: PropTypes.bool,
   hideMainEditTools: PropTypes.bool,
+  showNormalize: PropTypes.bool,
   prependLcMsToolbar: PropTypes.node,
 };
 
 CmdBar.defaultProps = {
+  showNormalize: false,
   prependLcMsToolbar: null,
 };
 

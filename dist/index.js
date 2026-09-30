@@ -8,6 +8,8 @@ var _reactQuill = _interopRequireDefault(require("react-quill"));
 var _app = require("./app");
 var _extractEntityLCMS = require("./helpers/extractEntityLCMS");
 var _utils = require("./reducers/reducer_hplc_ms/utils");
+var _shift = require("./helpers/shift");
+var _curve_name = _interopRequireDefault(require("./helpers/curve_name"));
 var _nmr1h_jcamp = _interopRequireDefault(require("./__tests__/fixtures/nmr1h_jcamp"));
 var _nmr1h_2_jcamp = _interopRequireDefault(require("./__tests__/fixtures/nmr1h_2_jcamp"));
 var _nmr13c_dept_jcamp = _interopRequireDefault(require("./__tests__/fixtures/nmr13c_dept_jcamp"));
@@ -68,16 +70,17 @@ const pickSelectedSpectrumFromPayload = payload => {
   const selectedIdx = Number.isFinite(payload?.curveSt?.curveIdx) ? payload.curveSt.curveIdx : 0;
   return spectraList[selectedIdx] || spectraList[0] || {};
 };
-const normalizeShiftForFormatting = shift => {
-  if (shift && Array.isArray(shift.shifts)) return shift;
-  return {
-    selectedIdx: 0,
-    shifts: [shift || {
-      ref: {},
-      peak: false,
-      enable: true
-    }]
-  };
+
+// With several graphs, say which one the written text comes from (same name
+// as the graph selection panel). LC/MS panes are one measurement, not graphs.
+const withGraphName = (desc, payload, layout) => {
+  const {
+    listCurves
+  } = _app.store.getState().curve;
+  if (!desc || !Array.isArray(listCurves) || listCurves.length < 2) return desc;
+  if (_app.FN.isLCMsLayout(layout)) return desc;
+  const curveIdx = Number.isFinite(payload?.curveSt?.curveIdx) ? payload.curveSt.curveIdx : 0;
+  return `${(0, _curve_name.default)(listCurves[curveIdx], curveIdx)}: ${desc}`;
 };
 const nmr1HEntity = _app.FN.ExtractJcamp(_nmr1h_jcamp.default);
 const nmr1HEntity2 = _app.FN.ExtractJcamp(_nmr1h_2_jcamp.default);
@@ -376,6 +379,15 @@ class DemoWriteIr extends _react.default.Component {
       });
     };
   }
+
+  // The entity of the curve the payload was written for, so a multi-curve
+  // write uses that curve's own metadata (frequency, boundaries, ...).
+  entityForPayload(payload, layout) {
+    const multiEntities = this.loadMultiEntities();
+    const curveIdx = Number.isFinite(payload?.curveSt?.curveIdx) ? payload.curveSt.curveIdx : 0;
+    if (_app.FN.isLCMsLayout(layout) || multiEntities.length < 2) return this.loadEntity();
+    return multiEntities[curveIdx] || this.loadEntity();
+  }
   loadEntity() {
     const {
       typ
@@ -408,7 +420,14 @@ class DemoWriteIr extends _react.default.Component {
       case 'dsc':
         return dscEntity;
       case 'xrd':
+      case 'multi xrd':
         return xrdEntity1;
+      case 'multi':
+        return nmr1HEntity;
+      case 'multi hplc':
+        return hplcUVVisEntity;
+      case 'multi ir':
+        return compIr1Entity;
       case 'cyclic volta':
         return cyclicVoltaEntity2;
       case 'cds':
@@ -531,9 +550,10 @@ class DemoWriteIr extends _react.default.Component {
     integration,
     waveLength,
     cyclicvoltaSt,
-    curveSt
+    curveSt,
+    entity: curveEntity
   }) {
-    const entity = this.loadEntity();
+    const entity = curveEntity || this.loadEntity();
     const safeLayout = layout || entity?.layout;
     const {
       features
@@ -549,7 +569,7 @@ class DemoWriteIr extends _react.default.Component {
       maxY,
       minY
     };
-    const shiftForFormatting = normalizeShiftForFormatting(shift);
+    const shiftForFormatting = (0, _shift.normalizeShiftForFormatting)(shift);
     const body = _app.FN.peaksBody({
       peaks,
       layout: safeLayout,
@@ -603,17 +623,20 @@ class DemoWriteIr extends _react.default.Component {
     shift,
     isAscend,
     decimal,
-    layout
+    layout,
+    entity: curveEntity
   }) {
     // obsv freq
-    const entity = this.loadEntity();
+    const entity = curveEntity || this.loadEntity();
     const {
       features
     } = entity;
     const {
       observeFrequency
     } = Array.isArray(features) ? features[0] : features.editPeak || features.autoPeak;
-    const freq = observeFrequency[0];
+    // May be a number, a string or a (nested) array depending on the JCAMP.
+    let freq = Array.isArray(observeFrequency) ? observeFrequency[0] : observeFrequency;
+    if (Array.isArray(freq)) [freq] = freq;
     const freqStr = freq ? `${parseInt(freq, 10)} MHz, ` : '';
     // multiplicity
     const {
@@ -680,16 +703,18 @@ class DemoWriteIr extends _react.default.Component {
       integration
     } = pickSelectedSpectrumFromPayload(payload);
     if (!_app.FN.isNmrLayout(layout)) return;
+    const entity = this.entityForPayload(payload, layout);
     const desc = this.formatMpy({
       multiplicity,
       integration,
       shift,
       isAscend,
       decimal,
-      layout
+      layout,
+      entity
     });
     this.setState({
-      desc
+      desc: withGraphName(desc, payload, layout)
     });
   }
   writePeak(payload) {
@@ -705,6 +730,7 @@ class DemoWriteIr extends _react.default.Component {
       cyclicvoltaSt,
       curveSt
     } = pickSelectedSpectrumFromPayload(payload);
+    const entity = this.entityForPayload(payload, layout);
     const desc = this.formatPks({
       peaks,
       layout,
@@ -716,10 +742,11 @@ class DemoWriteIr extends _react.default.Component {
       waveLength,
       // eslint-disable-line
       cyclicvoltaSt,
-      curveSt // eslint-disable-line
+      curveSt,
+      entity // eslint-disable-line
     });
     this.setState({
-      desc
+      desc: withGraphName(desc, payload, layout)
     });
   }
   savePeaks(payload) {
@@ -732,7 +759,7 @@ class DemoWriteIr extends _react.default.Component {
       isIntensity,
       waveLength
     } = pickSelectedSpectrumFromPayload(payload);
-    const entity = this.loadEntity();
+    const entity = this.entityForPayload(payload, layout);
     const safeLayout = layout || entity?.layout;
     const {
       features
@@ -748,7 +775,7 @@ class DemoWriteIr extends _react.default.Component {
       maxY,
       minY
     };
-    const shiftForFormatting = normalizeShiftForFormatting(shift);
+    const shiftForFormatting = (0, _shift.normalizeShiftForFormatting)(shift);
     const body = _app.FN.peaksBody({
       peaks,
       layout: safeLayout,

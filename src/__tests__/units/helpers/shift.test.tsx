@@ -1,4 +1,6 @@
-import { CalcResidualX, FromManualToOffset, RealPts, VirtalPts } from "../../../helpers/shift";
+import {
+  CalcResidualX, FromManualToOffset, RealPts, VirtalPts, shiftOffsetAtIndex,
+} from "../../../helpers/shift";
 import { LIST_SHIFT_1H, LIST_SHIFT_13C } from "../../../constants/list_shift";
 
 describe('Test helper for shift', () => {
@@ -62,6 +64,23 @@ describe('Test helper for shift', () => {
       ]
       const virtualPoints = VirtalPts(points, 18.5)
       expect(virtualPoints).toEqual(expected)
+    })
+  })
+
+  describe('Test shift offset at index', () => {
+    it('Returns zero when shift state is missing', () => {
+      expect(shiftOffsetAtIndex(null, 0)).toEqual(0)
+    })
+
+    it('Returns offset for the requested curve index', () => {
+      const shiftSt = {
+        shifts: [
+          { ref: LIST_SHIFT_1H[0], peak: false },
+          { ref: LIST_SHIFT_1H[1], peak: { x: 1.5, y: 2 } },
+        ],
+      }
+      expect(shiftOffsetAtIndex(shiftSt, 0)).toEqual(0)
+      expect(shiftOffsetAtIndex(shiftSt, 1)).toEqual(-0.54)
     })
   })
 

@@ -11,6 +11,8 @@ import ReactQuill from 'react-quill';
 import { SpectraEditor, FN, store } from './app';
 import { getLcMsInfo } from './helpers/extractEntityLCMS';
 import { snapRtToAxis } from './reducers/reducer_hplc_ms/utils';
+import { normalizeShiftForFormatting } from './helpers/shift';
+import curveDisplayName from './helpers/curve_name';
 import nmr1HJcamp from './__tests__/fixtures/nmr1h_jcamp';
 import nmr1H2Jcamp from './__tests__/fixtures/nmr1h_2_jcamp';
 import nmr13CDeptJcamp from './__tests__/fixtures/nmr13c_dept_jcamp';
@@ -70,12 +72,14 @@ const pickSelectedSpectrumFromPayload = (payload) => {
   return spectraList[selectedIdx] || spectraList[0] || {};
 };
 
-const normalizeShiftForFormatting = (shift) => {
-  if (shift && Array.isArray(shift.shifts)) return shift;
-  return {
-    selectedIdx: 0,
-    shifts: [shift || { ref: {}, peak: false, enable: true }],
-  };
+// With several graphs, say which one the written text comes from (same name
+// as the graph selection panel). LC/MS panes are one measurement, not graphs.
+const withGraphName = (desc, payload, layout) => {
+  const { listCurves } = store.getState().curve;
+  if (!desc || !Array.isArray(listCurves) || listCurves.length < 2) return desc;
+  if (FN.isLCMsLayout(layout)) return desc;
+  const curveIdx = Number.isFinite(payload?.curveSt?.curveIdx) ? payload.curveSt.curveIdx : 0;
+  return `${curveDisplayName(listCurves[curveIdx], curveIdx)}: ${desc}`;
 };
 
 const nmr1HEntity = FN.ExtractJcamp(nmr1HJcamp);
@@ -415,6 +419,15 @@ class DemoWriteIr extends React.Component {
     };
   }
 
+  // The entity of the curve the payload was written for, so a multi-curve
+  // write uses that curve's own metadata (frequency, boundaries, ...).
+  entityForPayload(payload, layout) {
+    const multiEntities = this.loadMultiEntities();
+    const curveIdx = Number.isFinite(payload?.curveSt?.curveIdx) ? payload.curveSt.curveIdx : 0;
+    if (FN.isLCMsLayout(layout) || multiEntities.length < 2) return this.loadEntity();
+    return multiEntities[curveIdx] || this.loadEntity();
+  }
+
   loadEntity() {
     const { typ } = this.state;
     switch (typ) {
@@ -445,7 +458,14 @@ class DemoWriteIr extends React.Component {
       case 'dsc':
         return dscEntity;
       case 'xrd':
+      case 'multi xrd':
         return xrdEntity1;
+      case 'multi':
+        return nmr1HEntity;
+      case 'multi hplc':
+        return hplcUVVisEntity;
+      case 'multi ir':
+        return compIr1Entity;
       case 'cyclic volta':
         return cyclicVoltaEntity2;
       case 'cds':
@@ -565,9 +585,9 @@ class DemoWriteIr extends React.Component {
 
   formatPks({
     peaks, layout, shift, isAscend, decimal, isIntensity, integration, waveLength,
-    cyclicvoltaSt, curveSt,
+    cyclicvoltaSt, curveSt, entity: curveEntity,
   }) {
-    const entity = this.loadEntity();
+    const entity = curveEntity || this.loadEntity();
     const safeLayout = layout || entity?.layout;
     const { features } = entity;
     const { temperature } = entity;
@@ -616,15 +636,17 @@ class DemoWriteIr extends React.Component {
   }
 
   formatMpy({
-    multiplicity, integration, shift, isAscend, decimal, layout,
+    multiplicity, integration, shift, isAscend, decimal, layout, entity: curveEntity,
   }) {
     // obsv freq
-    const entity = this.loadEntity();
+    const entity = curveEntity || this.loadEntity();
     const { features } = entity;
     const { observeFrequency } = Array.isArray(features)
       ? features[0]
       : (features.editPeak || features.autoPeak);
-    const freq = observeFrequency[0];
+    // May be a number, a string or a (nested) array depending on the JCAMP.
+    let freq = Array.isArray(observeFrequency) ? observeFrequency[0] : observeFrequency;
+    if (Array.isArray(freq)) [freq] = freq;
     const freqStr = freq ? `${parseInt(freq, 10)} MHz, ` : '';
     // multiplicity
     const { refArea, refFactor } = integration;
@@ -677,10 +699,11 @@ class DemoWriteIr extends React.Component {
       layout, shift, isAscend, decimal, multiplicity, integration,
     } = pickSelectedSpectrumFromPayload(payload);
     if (!FN.isNmrLayout(layout)) return;
+    const entity = this.entityForPayload(payload, layout);
     const desc = this.formatMpy({
-      multiplicity, integration, shift, isAscend, decimal, layout,
+      multiplicity, integration, shift, isAscend, decimal, layout, entity,
     });
-    this.setState({ desc });
+    this.setState({ desc: withGraphName(desc, payload, layout) });
   }
 
   writePeak(payload) {
@@ -688,18 +711,19 @@ class DemoWriteIr extends React.Component {
       peaks, layout, shift, isAscend, decimal, isIntensity, integration, waveLength,
       cyclicvoltaSt, curveSt,
     } = pickSelectedSpectrumFromPayload(payload);
+    const entity = this.entityForPayload(payload, layout);
     const desc = this.formatPks({
       peaks, layout, shift, isAscend, decimal, isIntensity, integration, waveLength, // eslint-disable-line
-      cyclicvoltaSt, curveSt, // eslint-disable-line
+      cyclicvoltaSt, curveSt, entity, // eslint-disable-line
     });
-    this.setState({ desc });
+    this.setState({ desc: withGraphName(desc, payload, layout) });
   }
 
   savePeaks(payload) {
     const {
       peaks, layout, shift, isAscend, decimal, isIntensity, waveLength,
     } = pickSelectedSpectrumFromPayload(payload);
-    const entity = this.loadEntity();
+    const entity = this.entityForPayload(payload, layout);
     const safeLayout = layout || entity?.layout;
     const { features } = entity;
     const { temperature } = entity;

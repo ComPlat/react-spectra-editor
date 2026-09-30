@@ -29,13 +29,12 @@ const Multiplicity = ({
   isFocusAddMpySt,
   disableAddMpySt,
   isFocusRmMpySt,
-  disableRmMpySt,
   isFocusAddPeakSt,
   isFocusRmPeakSt,
-  disableMpyPeakSt,
   setUiSweepTypeAct,
   clearMpyAllAct,
-  curveSt
+  curveSt,
+  multiplicitySt
 }) => {
   const onSweepMutAdd = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD);
   const onOneMutAdd = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_RM);
@@ -44,9 +43,19 @@ const Multiplicity = ({
   const {
     curveIdx
   } = curveSt;
-  const onClearAll = () => clearMpyAllAct({
-    curveIdx
-  });
+  // Send the cleared multiplets' ranges so their integrations (added together
+  // with them by J+) are removed too, like J- does for a single multiplet.
+  const onClearAll = () => {
+    const stack = multiplicitySt?.multiplicities?.[curveIdx]?.stack || [];
+    const xExtents = stack.map(m => m.xExtent).filter(Boolean);
+    clearMpyAllAct({
+      curveIdx,
+      xExtents
+    });
+  };
+  if (disableAddMpySt) {
+    return null;
+  }
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
     className: classes.group,
     children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
@@ -57,7 +66,6 @@ const Multiplicity = ({
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
         children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
           className: (0, _classnames.default)((0, _common.focusStyle)(isFocusAddMpySt, classes), 'btn-sv-bar-addmpy'),
-          disabled: disableAddMpySt,
           onClick: onSweepMutAdd,
           children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
             className: (0, _classnames.default)(classes.txt, 'txt-sv-bar-addmpy'),
@@ -73,7 +81,6 @@ const Multiplicity = ({
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
         children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
           className: (0, _classnames.default)((0, _common.focusStyle)(isFocusRmMpySt, classes), 'btn-sv-bar-rmmpy'),
-          disabled: disableRmMpySt,
           onClick: onOneMutAdd,
           children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
             className: (0, _classnames.default)(classes.txt, 'txt-sv-bar-rmmpy'),
@@ -89,7 +96,6 @@ const Multiplicity = ({
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
         children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
           className: (0, _classnames.default)((0, _common.focusStyle)(isFocusAddPeakSt, classes), 'btn-sv-bar-addpeakmpy'),
-          disabled: disableMpyPeakSt,
           onClick: onPeakMutAdd,
           children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
             className: (0, _classnames.default)(classes.txt, 'txt-sv-bar-addpeakmpy'),
@@ -105,7 +111,6 @@ const Multiplicity = ({
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
         children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
           className: (0, _classnames.default)((0, _common.focusStyle)(isFocusRmPeakSt, classes), 'btn-sv-bar-rmpeakmpy'),
-          disabled: disableMpyPeakSt,
           onClick: onPeakMutRm,
           children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
             className: (0, _classnames.default)(classes.txt, 'txt-sv-bar-rmpeakmpy'),
@@ -113,14 +118,12 @@ const Multiplicity = ({
           })
         })
       })
-    }), disableAddMpySt ? null :
-    /*#__PURE__*/
-    // eslint-disable-line
-    (0, _jsxRuntime.jsx)(_tri_btn.default, {
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_tri_btn.default, {
       content: {
         tp: 'Clear All Multiplicity'
       },
       cb: onClearAll,
+      isClearAllDisabled: false,
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
         className: (0, _classnames.default)(classes.txt, 'txt-sv-bar-rmallmpy'),
         children: "Jx"
@@ -138,7 +141,8 @@ const mapStateToProps = (state, props) => (
   isFocusAddPeakSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_ADD,
   isFocusRmPeakSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_RM,
   disableMpyPeakSt: _cfg.default.btnCmdMpyPeak(state.layout, state.multiplicity.present, state.curve.curveIdx),
-  curveSt: state.curve
+  curveSt: state.curve,
+  multiplicitySt: state.multiplicity.present
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   setUiSweepTypeAct: _ui.setUiSweepType,
@@ -155,6 +159,7 @@ Multiplicity.propTypes = {
   disableMpyPeakSt: _propTypes.default.bool.isRequired,
   setUiSweepTypeAct: _propTypes.default.func.isRequired,
   clearMpyAllAct: _propTypes.default.func.isRequired,
-  curveSt: _propTypes.default.object.isRequired
+  curveSt: _propTypes.default.object.isRequired,
+  multiplicitySt: _propTypes.default.object.isRequired
 };
 var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _withStyles.default)(styles)(Multiplicity));
