@@ -33,7 +33,8 @@ const Multiplicity = ({
   isFocusRmPeakSt,
   setUiSweepTypeAct,
   clearMpyAllAct,
-  curveSt
+  curveSt,
+  multiplicitySt
 }) => {
   const onSweepMutAdd = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD);
   const onOneMutAdd = () => setUiSweepTypeAct(_list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_RM);
@@ -42,9 +43,16 @@ const Multiplicity = ({
   const {
     curveIdx
   } = curveSt;
-  const onClearAll = () => clearMpyAllAct({
-    curveIdx
-  });
+  // Send the cleared multiplets' ranges so their integrations (added together
+  // with them by J+) are removed too, like J- does for a single multiplet.
+  const onClearAll = () => {
+    const stack = multiplicitySt?.multiplicities?.[curveIdx]?.stack || [];
+    const xExtents = stack.map(m => m.xExtent).filter(Boolean);
+    clearMpyAllAct({
+      curveIdx,
+      xExtents
+    });
+  };
   if (disableAddMpySt) {
     return null;
   }
@@ -133,7 +141,8 @@ const mapStateToProps = (state, props) => (
   isFocusAddPeakSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_ADD,
   isFocusRmPeakSt: state.ui.sweepType === _list_ui.LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_RM,
   disableMpyPeakSt: _cfg.default.btnCmdMpyPeak(state.layout, state.multiplicity.present, state.curve.curveIdx),
-  curveSt: state.curve
+  curveSt: state.curve,
+  multiplicitySt: state.multiplicity.present
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   setUiSweepTypeAct: _ui.setUiSweepType,
@@ -150,6 +159,7 @@ Multiplicity.propTypes = {
   disableMpyPeakSt: _propTypes.default.bool.isRequired,
   setUiSweepTypeAct: _propTypes.default.func.isRequired,
   clearMpyAllAct: _propTypes.default.func.isRequired,
-  curveSt: _propTypes.default.object.isRequired
+  curveSt: _propTypes.default.object.isRequired,
+  multiplicitySt: _propTypes.default.object.isRequired
 };
 var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _withStyles.default)(styles)(Multiplicity));

@@ -29,14 +29,20 @@ const styles = () => (
 const Multiplicity = ({
   classes, isFocusAddMpySt, disableAddMpySt, isFocusRmMpySt,
   isFocusAddPeakSt, isFocusRmPeakSt,
-  setUiSweepTypeAct, clearMpyAllAct, curveSt,
+  setUiSweepTypeAct, clearMpyAllAct, curveSt, multiplicitySt,
 }) => {
   const onSweepMutAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD);
   const onOneMutAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_RM);
   const onPeakMutAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_ADD);
   const onPeakMutRm = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_RM);
   const { curveIdx } = curveSt;
-  const onClearAll = () => clearMpyAllAct({ curveIdx });
+  // Send the cleared multiplets' ranges so their integrations (added together
+  // with them by J+) are removed too, like J- does for a single multiplet.
+  const onClearAll = () => {
+    const stack = multiplicitySt?.multiplicities?.[curveIdx]?.stack || [];
+    const xExtents = stack.map((m) => m.xExtent).filter(Boolean);
+    clearMpyAllAct({ curveIdx, xExtents });
+  };
 
   if (disableAddMpySt) {
     return null;
@@ -125,6 +131,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     isFocusRmPeakSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_RM,
     disableMpyPeakSt: Cfg.btnCmdMpyPeak(state.layout, state.multiplicity.present, state.curve.curveIdx),
     curveSt: state.curve,
+    multiplicitySt: state.multiplicity.present,
   }
 );
 
@@ -147,6 +154,7 @@ Multiplicity.propTypes = {
   setUiSweepTypeAct: PropTypes.func.isRequired,
   clearMpyAllAct: PropTypes.func.isRequired,
   curveSt: PropTypes.object.isRequired,
+  multiplicitySt: PropTypes.object.isRequired,
 };
 
 export default connect(
