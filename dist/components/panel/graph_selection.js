@@ -15,6 +15,7 @@ var _styles = require("@mui/styles");
 var _material = require("@mui/material");
 var _curve = require("../../actions/curve");
 var _list_layout = require("../../constants/list_layout");
+var _curve_name = _interopRequireDefault(require("../../helpers/curve_name"));
 var _jsxRuntime = require("react/jsx-runtime");
 function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function _interopRequireWildcard(e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 /* eslint-disable react/function-component-definition, function-paren-newline,
@@ -58,13 +59,6 @@ const styles = () => ({
     alignSelf: 'center'
   }
 });
-const fallbackName = (entityFileNames, idx) => {
-  if (entityFileNames && idx < entityFileNames.length) {
-    return entityFileNames[idx];
-  }
-  return '';
-};
-const displayName = (spectra, idx, entityFileNames) => spectra?.title || spectra?.feature?.title || spectra?.spectrum?.title || fallbackName(entityFileNames, idx) || `Spectrum ${idx + 1}`;
 const renderCurveItem = (classes, item, curveIdx, onChange) => /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.ListItem, {
   disablePadding: true,
   onClick: () => onChange(item.idx),
@@ -136,7 +130,7 @@ const GraphSelectionPanel = ({
           name: `${idx + 1}.`,
           idx: spectraIdx,
           color,
-          label: displayName(spectra, spectraIdx, entityFileNames)
+          label: (0, _curve_name.default)(spectra, spectraIdx, entityFileNames)
         };
       }) : [];
     } catch (e) {
@@ -151,7 +145,7 @@ const GraphSelectionPanel = ({
       name: `${idx + 1}.`,
       idx,
       color,
-      label: displayName(spectra, idx, entityFileNames)
+      label: (0, _curve_name.default)(spectra, idx, entityFileNames)
     };
   });
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Accordion, {
