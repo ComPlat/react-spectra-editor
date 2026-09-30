@@ -614,6 +614,15 @@ const is19FLayout = layoutSt => _list_layout.LIST_LAYOUT.F19 === layoutSt;
 const is13CLayout = layoutSt => _list_layout.LIST_LAYOUT.C13 === layoutSt;
 const is1HLayout = layoutSt => _list_layout.LIST_LAYOUT.H1 === layoutSt;
 const isMsLayout = layoutSt => _list_layout.LIST_LAYOUT.MS === layoutSt;
+const isPlainLayout = layoutSt => _list_layout.LIST_LAYOUT.PLAIN === layoutSt;
+// The layout a RESETALL payload (a viewer's feature) asks for, or null to keep the
+// current one. PLAIN or missing only says the datatype was not recognised -- not a
+// layout choice -- so a viewer remounting under a layout picked by hand must not
+// reset it. Every reducer that takes a layout from RESETALL must use this.
+const resetAllLayout = feature => {
+  const layout = feature?.operation?.layout;
+  return layout && layout !== _list_layout.LIST_LAYOUT.PLAIN ? layout : null;
+};
 const isIrLayout = layoutSt => [_list_layout.LIST_LAYOUT.IR, 'INFRARED'].indexOf(layoutSt) >= 0;
 const isRamanLayout = layoutSt => _list_layout.LIST_LAYOUT.RAMAN === layoutSt;
 const isUvVisLayout = layoutSt => _list_layout.LIST_LAYOUT.UVVIS === layoutSt;
@@ -632,6 +641,12 @@ const isAIFLayout = layoutSt => _list_layout.LIST_LAYOUT.AIF === layoutSt;
 const isEmissionsLayout = layoutSt => _list_layout.LIST_LAYOUT.EMISSIONS === layoutSt;
 const isDLSACFLayout = layoutSt => _list_layout.LIST_LAYOUT.DLS_ACF === layoutSt;
 const isDLSIntensityLayout = layoutSt => _list_layout.LIST_LAYOUT.DLS_INTENSITY === layoutSt;
+
+// Layouts drawn ascending left-to-right; anything else gets the NMR/IR-style reversed
+// x-axis. Shared by every line/multi focus, so an entity keeps its axis direction
+// however many curves are selected. Keep in step with chem-spectra-app's
+// SpectrumTechnique.x_reversed, which draws the backend's preview image.
+const isNonReversedXLayout = layoutSt => [_list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS, _list_layout.LIST_LAYOUT.TGA, _list_layout.LIST_LAYOUT.DSC, _list_layout.LIST_LAYOUT.XRD, _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY, _list_layout.LIST_LAYOUT.CDS, _list_layout.LIST_LAYOUT.DLS_ACF, _list_layout.LIST_LAYOUT.SEC, _list_layout.LIST_LAYOUT.GC, _list_layout.LIST_LAYOUT.EMISSIONS, _list_layout.LIST_LAYOUT.DLS_INTENSITY, _list_layout.LIST_LAYOUT.AIF, _list_layout.LIST_LAYOUT.PLAIN].indexOf(layoutSt) >= 0;
 const getNmrTyp = layout => {
   switch (layout) {
     case _list_layout.LIST_LAYOUT.H1:
@@ -806,6 +821,8 @@ const Format = {
   is15NLayout,
   is29SiLayout,
   isMsLayout,
+  isPlainLayout,
+  resetAllLayout,
   isIrLayout,
   isRamanLayout,
   isUvVisLayout,
@@ -832,6 +849,7 @@ const Format = {
   hasMultiCurves,
   isAIFLayout,
   isDLSACFLayout,
+  isNonReversedXLayout,
   strNumberFixedDecimal,
   formatedXRD,
   strNumberFixedLength,

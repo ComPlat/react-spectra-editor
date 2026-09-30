@@ -27,10 +27,19 @@ const getScanIdx = (entity, scanState) => {
 const extractSharedParams = (entity, thresholdState, scanIdx = 0) => {
   const {
     spectra = [],
-    features = {}
+    features = {},
+    layout
   } = entity || {};
-  const autoPeak = features.autoPeak || features[scanIdx] || features[0] || {};
-  const editPeak = features.editPeak || features[scanIdx] || features[0] || {};
+  // Viewers dispatch this feature as RESETALL's payload, which sets the layout from
+  // operation.layout -- so an entity with no peak feature yet must still carry its
+  // own layout, as extractLcmsParams' feature does.
+  const emptyFeature = {
+    operation: {
+      layout
+    }
+  };
+  const autoPeak = features.autoPeak || features[scanIdx] || features[0] || emptyFeature;
+  const editPeak = features.editPeak || features[scanIdx] || features[0] || emptyFeature;
   const hasEdit = !!editPeak?.data?.[0]?.x?.length;
   const feature = hasEdit && thresholdState?.isEdit ? editPeak : autoPeak;
   const {

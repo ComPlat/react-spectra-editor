@@ -59,6 +59,7 @@ import gcJcamp3 from './__tests__/fixtures/gc_3_jcamp';
 import emissionsJcamp from './__tests__/fixtures/emissions_jcamp';
 import dlsAcfJcamp from './__tests__/fixtures/dls_acf_jcamp';
 import dlsIntensityJcamp from './__tests__/fixtures/dls_intensity_jcamp';
+import plainJcamp from './__tests__/fixtures/plain_layout_jcamp';
 import { q1H, qIR, q13C } from './__tests__/fixtures/qDescValue';
 import './__tests__/style/svg.css';
 
@@ -123,6 +124,7 @@ const gcEntity3 = FN.ExtractJcamp(gcJcamp3);
 const emissionsEntity = FN.ExtractJcamp(emissionsJcamp);
 const dlsAcfEntity = FN.ExtractJcamp(dlsAcfJcamp);
 const dlsIntensityEntity = FN.ExtractJcamp(dlsIntensityJcamp);
+const plainEntity = FN.ExtractJcamp(plainJcamp);
 
 const cloneData = (value) => JSON.parse(JSON.stringify(value));
 
@@ -468,6 +470,8 @@ class DemoWriteIr extends React.Component {
         return lcmsEntity;
       case 'lcms chemstation':
         return hplcMsUvvisChemstationEntity;
+      case 'plain':
+        return plainEntity;
       default:
         return msEntity;
     }
@@ -981,6 +985,14 @@ class DemoWriteIr extends React.Component {
             onClick={this.onClick('lcms chemstation')}
           >
             LC/MS Chemstation
+          </Button>
+          <Button
+            id='btn-plain'
+            variant="contained"
+            style={{ margin: '0 10px 0 10px' }}
+            onClick={this.onClick('plain')}
+          >
+            PLAIN
           </Button>
           <Button
             variant="contained"

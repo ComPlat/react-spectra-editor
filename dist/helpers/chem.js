@@ -366,65 +366,73 @@ const readLayout = jcamp => {
   } = jcamp;
   if (xType && _format.default.isNmrLayout(xType)) return xType;
   if (!spectra || !Array.isArray(spectra) || spectra.length === 0) {
-    return false;
+    return _list_layout.LIST_LAYOUT.PLAIN;
   }
   const {
     dataType
   } = spectra[0] || {};
   if (dataType) {
-    if (dataType.includes('INFRARED SPECTRUM')) {
+    // Case-insensitive, like the backend's own comparison against data_type.json.
+    const upperDataType = dataType.toUpperCase();
+    // Single-crystal XRD is a reflection dataset, not a 1D diffractogram, and has no
+    // layout of its own yet -- PLAIN, not the powder XRD layout below, whose substring
+    // check it would otherwise match.
+    if (upperDataType.includes('SINGLE CRYSTAL X-RAY DIFFRACTION')) {
+      return _list_layout.LIST_LAYOUT.PLAIN;
+    }
+    if (upperDataType.includes('INFRARED SPECTRUM')) {
       return _list_layout.LIST_LAYOUT.IR;
     }
-    if (dataType.includes('RAMAN SPECTRUM')) {
+    if (upperDataType.includes('RAMAN SPECTRUM')) {
       return _list_layout.LIST_LAYOUT.RAMAN;
     }
-    if (dataType.includes('UV/VIS SPECTRUM')) {
-      if (dataType.includes('HPLC')) {
+    if (upperDataType.includes('UV/VIS SPECTRUM')) {
+      if (upperDataType.includes('HPLC')) {
         return _list_layout.LIST_LAYOUT.HPLC_UVVIS;
       }
       return _list_layout.LIST_LAYOUT.UVVIS;
     }
-    if (dataType.includes('THERMOGRAVIMETRIC ANALYSIS')) {
+    if (upperDataType.includes('THERMOGRAVIMETRIC ANALYSIS')) {
       return _list_layout.LIST_LAYOUT.TGA;
     }
-    if (dataType.includes('DIFFERENTIAL SCANNING CALORIMETRY')) {
+    if (upperDataType.includes('DIFFERENTIAL SCANNING CALORIMETRY')) {
       return _list_layout.LIST_LAYOUT.DSC;
     }
-    if (dataType.includes('X-RAY DIFFRACTION')) {
+    if (upperDataType.includes('X-RAY DIFFRACTION')) {
       return _list_layout.LIST_LAYOUT.XRD;
     }
-    if (dataType.includes('MASS SPECTRUM')) {
+    if (upperDataType.includes('MASS SPECTRUM')) {
       return _list_layout.LIST_LAYOUT.MS;
     }
-    if (dataType.includes('CYCLIC VOLTAMMETRY')) {
+    if (upperDataType.includes('CYCLIC VOLTAMMETRY')) {
       return _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY;
     }
-    if (dataType.includes('CIRCULAR DICHROISM SPECTROSCOPY')) {
+    if (upperDataType.includes('CIRCULAR DICHROISM SPECTROSCOPY')) {
       return _list_layout.LIST_LAYOUT.CDS;
     }
-    if (dataType.includes('SIZE EXCLUSION CHROMATOGRAPHY')) {
+    if (upperDataType.includes('SIZE EXCLUSION CHROMATOGRAPHY') || upperDataType.includes('GEL PERMEATION CHROMATOGRAPHY')) {
       return _list_layout.LIST_LAYOUT.SEC;
     }
-    if (dataType.includes('GAS CHROMATOGRAPHY')) {
+    if (upperDataType.includes('GAS CHROMATOGRAPHY')) {
       return _list_layout.LIST_LAYOUT.GC;
     }
-    if (dataType.includes('SORPTION-DESORPTION MEASUREMENT')) {
+    if (upperDataType.includes('SORPTION-DESORPTION MEASUREMENT')) {
       return _list_layout.LIST_LAYOUT.AIF;
     }
-    if (dataType.includes('Emissions')) {
+    if (upperDataType.includes('EMISSIONS')) {
       return _list_layout.LIST_LAYOUT.EMISSIONS;
     }
-    if (dataType.includes('DLS ACF')) {
+    if (upperDataType.includes('DLS ACF')) {
       return _list_layout.LIST_LAYOUT.DLS_ACF;
     }
-    if (dataType.includes('DLS intensity')) {
+    if (upperDataType.includes('DLS INTENSITY')) {
       return _list_layout.LIST_LAYOUT.DLS_INTENSITY;
     }
-    if (dataType.includes('LC/MS')) {
+    if (upperDataType.includes('LC/MS')) {
       return _list_layout.LIST_LAYOUT.LC_MS;
     }
   }
-  return false;
+  return _list_layout.LIST_LAYOUT.PLAIN;
 };
 const extrSpectraShare = (spectra, layout) => spectra.map(s => Object.assign({
   layout
@@ -806,6 +814,9 @@ const extractVoltammetryData = jcamp => {
   });
   return peakStack;
 };
+
+// A `##$CS...=true` record; one written in several blocks is parsed into an array.
+const isTrueRecord = value => [].concat(value ?? []).some(v => String(v).trim().toLowerCase() === 'true');
 const buildPeakFeature = (jcamp, layout, peakUp, s, thresRef, upperThres = false, lowerThres = false) => {
   const {
     xType,
@@ -833,7 +844,13 @@ const buildPeakFeature = (jcamp, layout, peakUp, s, thresRef, upperThres = false
     weAreaValue: info.$CSWEAREAVALUE || '',
     weAreaUnit: info.$CSWEAREAUNIT || '',
     currentMode: info.$CSCURRENTMODE || '',
-    csCategory: info.$CSCATEGORY || s.csCategory
+    csCategory: info.$CSCATEGORY || s.csCategory,
+    // What a client asked chem-spectra-app to do with the y signal; written only when
+    // asked. $CSTRANSMITTANCE: absorbance was converted to %T -- a file that was %T to
+    // begin with has no record. $CSINVERTY: draw y inverted; the stored data is left
+    // untouched from chem-spectra-app#304 (#298 mirrored it instead).
+    convertedToTransmittance: isTrueRecord(info.$CSTRANSMITTANCE),
+    invertedY: isTrueRecord(info.$CSINVERTY)
   };
   if (layout === 'LC/MS') {
     if (s.peaks) baseFeature.peaks = s.peaks;
@@ -1049,6 +1066,16 @@ const getBoundary = s => {
     x,
     y
   } = s.data[0];
+  // Math.max/min of an empty array is -Infinity/+Infinity: an empty (0-point)
+  // peak-table block must not give its feature infinite bounds.
+  if (!x?.length || !y?.length) {
+    return {
+      maxX: 0,
+      minX: 0,
+      maxY: 0,
+      minY: 0
+    };
+  }
   const maxX = Math.max(...x);
   const minX = Math.min(...x);
   const maxY = Math.max(...y);
@@ -1211,7 +1238,7 @@ const ensureSpectrumData = (spectrum, source) => {
 const ExtractJcamp = source => {
   const jcamp = _jcampconverter.default.convert(source, {
     xy: true,
-    keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDINTEGRALSGROUPS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS|\$CSUPPERTHRESHOLD|\$CSLOWERTHRESHOLD|\$CSCYCLICVOLTAMMETRYDATA|UNITS|SYMBOL|\$CSAUTOMETADATA|\$DETECTOR|MN|MW|D|MP|MELTINGPOINT|TG|\$CSSCANRATE|\$CSSPECTRUMDIRECTION|\$CSWEAREAVALUE|\$CSWEAREAUNIT|\$CSCURRENTMODE|\$CSLCMSMZPAGE|SCAN_MODE|SCANMODE|VAR_TYPE|VARTYPE|TYPE|SOFTWARE|DATATYPE)/ // eslint-disable-line
+    keepRecordsRegExp: /(\$CSTHRESHOLD|\$CSSCANAUTOTARGET|\$CSSCANEDITTARGET|\$CSSCANCOUNT|\$CSSOLVENTNAME|\$CSSOLVENTVALUE|\$CSSOLVENTX|\$CSCATEGORY|\$CSITAREA|\$CSITFACTOR|\$OBSERVEDINTEGRALS|\$OBSERVEDINTEGRALSGROUPS|\$OBSERVEDMULTIPLETS|\$OBSERVEDMULTIPLETSPEAKS|\.SOLVENTNAME|\.OBSERVEFREQUENCY|\$CSSIMULATIONPEAKS|\$CSUPPERTHRESHOLD|\$CSLOWERTHRESHOLD|\$CSCYCLICVOLTAMMETRYDATA|UNITS|SYMBOL|\$CSAUTOMETADATA|\$DETECTOR|MN|MW|D|MP|MELTINGPOINT|TG|\$CSSCANRATE|\$CSSPECTRUMDIRECTION|\$CSTRANSMITTANCE|\$CSINVERTY|\$CSWEAREAVALUE|\$CSWEAREAUNIT|\$CSCURRENTMODE|\$CSLCMSMZPAGE|SCAN_MODE|SCANMODE|VAR_TYPE|VARTYPE|TYPE|SOFTWARE|DATATYPE)/ // eslint-disable-line
   });
   const isChemstation = (0, _parsing.isChemstationLcms)(source, jcamp);
   const parsedPages = (0, _parsing.parseChemstationPages)(source, jcamp);

@@ -45,6 +45,7 @@ import Threshold from '../cmd_bar/r03_threshold';
 import Integration from '../cmd_bar/04_integration';
 import Peak from '../cmd_bar/03_peak';
 import { getLcMsInfo } from '../../helpers/extractEntityLCMS';
+import ContainerSize from '../../helpers/container_size';
 
 const d3 = require('d3');
 
@@ -64,28 +65,14 @@ const MIN_PANE_H = 96;
 // wider than that ratio scales the drawing down to its height and leaves the surplus
 // width empty on the right, which is what a viewport wider than FHD produces. Measuring
 // the pane and matching the viewBox to it removes the letterboxing in both directions.
-export const measurePane = (node) => {
-  if (!node) return null;
-  const { clientWidth, clientHeight } = node;
-  if (!clientWidth || !clientHeight) return null;
-  return {
-    width: Math.max(Math.round(clientWidth), MIN_PANE_W),
-    height: Math.max(Math.round(clientHeight), MIN_PANE_H),
-  };
-};
-
-export // A pane whose height is content-derived (any host that does not bound us - the
-// standalone demo included) takes its height from the svg, whose height comes back from
-// the viewBox we are about to set. Re-measuring integer client boxes across that round
-// trip can differ by a pixel without anything really having moved, so require a real
-// change before paying for a remount.
-const SIZE_EPSILON = 2;
-
-export const sameSizes = (a, b) => Boolean(a) && Boolean(b)
-  && ['line', 'multi', 'rect'].every((k) => (
-    Math.abs(a[k].width - b[k].width) <= SIZE_EPSILON
-    && Math.abs(a[k].height - b[k].height) <= SIZE_EPSILON
-  ));
+//
+// Each pane is sized by its own ContainerSize (as d3_line/d3_rect are), so a pane whose
+// height is not bounded by the host takes it from its width instead of reading back the
+// height of its own previous draw -- which grew without end on every resize.
+const clampPaneSize = ({ width, height }) => ({
+  width: Math.max(Math.round(width), MIN_PANE_W),
+  height: Math.max(Math.round(height), MIN_PANE_H),
+});
 
 export const toSeed = (xValues = [], yValues = []) => {
   const maxLength = Math.min(xValues.length, yValues.length);
@@ -399,19 +386,23 @@ class ViewerLineRect extends React.Component {
     this.rootKlassMulti = `.${LIST_ROOT_SVG_GRAPH.MULTI}`;
     this.rootKlassRect = `.${LIST_ROOT_SVG_GRAPH.RECT}`;
 
-    this.stackRef = React.createRef();
     this.lineRef = React.createRef();
     this.multiRef = React.createRef();
     this.rectRef = React.createRef();
-    this.resizeObserver = null;
-    this.resizeFrame = null;
     // Kept in step with the focus objects below: whatever sizes they were built from are
     // the sizes the svg viewBoxes must use, so the two are set together and never drift.
     this.currentSizes = null;
 
+    this.handleResize = this.handleResize.bind(this);
+    this.resizeFrame = null;
+    const fallback = { width: W, height: H };
+    this.lineSize = new ContainerSize(() => this.lineRef.current, fallback, this.handleResize);
+    this.multiSize = new ContainerSize(() => this.multiRef.current, fallback, this.handleResize);
+    this.rectSize = new ContainerSize(() => this.rectRef.current, fallback, this.handleResize);
+
     // Nothing is mounted yet, so this resolves to the fallback; componentDidMount
     // re-measures and rebuilds against the real panes.
-    this.currentSizes = this.resolvePaneSizes();
+    this.currentSizes = { line: fallback, multi: fallback, rect: fallback };
     this.createFocuses(this.currentSizes);
 
     // The last union we ourselves wrote via seedLcmsUnionExtentAct, so
@@ -419,7 +410,6 @@ class ViewerLineRect extends React.Component {
     // user zoomed" without the reducer needing to know anything about it.
     this.lastSeededXExtent = null;
 
-    this.handleResize = this.handleResize.bind(this);
     this.extractSubView = this.extractSubView.bind(this);
     this.notifyHostOnSubViewerChange = this.notifyHostOnSubViewerChange.bind(this);
     this.extractUvvisView = this.extractUvvisView.bind(this);
@@ -429,8 +419,10 @@ class ViewerLineRect extends React.Component {
   }
 
   componentDidMount() {
-    this.setupResizeObserver();
-    this.mountCharts(this.resolvePaneSizes(), true);
+    this.lineSize.observe();
+    this.multiSize.observe();
+    this.rectSize.observe();
+    this.mountCharts(true);
   }
 
   componentDidUpdate(prevProps) {
@@ -574,31 +566,32 @@ class ViewerLineRect extends React.Component {
   }
 
   componentWillUnmount() {
-    this.teardownResizeObserver();
+    if (this.resizeFrame != null) {
+      window.cancelAnimationFrame(this.resizeFrame);
+      this.resizeFrame = null;
+    }
+    this.lineSize.disconnect();
+    this.multiSize.disconnect();
+    this.rectSize.disconnect();
     drawDestroy(this.rootKlassLine);
     drawDestroy(this.rootKlassMulti);
     drawDestroy(this.rootKlassRect);
   }
 
-  // Redraw only when a pane actually changed size. Against an unbounded host the measured
-  // size is the one the current viewBox already produces, so this settles after the first
-  // pass instead of feeding itself.
+  // Redraw when any pane actually changed size. All three ContainerSize instances call
+  // this, and a height-bounded one calls it synchronously from inside its ResizeObserver
+  // callback -- but the redraw rebuilds every pane, including unbounded ones whose
+  // observers may still be delivering, which the browser reports as "ResizeObserver loop
+  // completed with undelivered notifications". So always defer to the next frame, once
+  // for however many panes reported.
   handleResize() {
-    // Never mutate layout synchronously inside a ResizeObserver callback. The remount
-    // resizes the subtree being observed, and the browser abandons the delivery pass with
-    // "ResizeObserver loop completed with undelivered notifications" - which surfaces as
-    // an uncaught application error, not just a console warning. Deferring to the next
-    // frame lets the observer finish before anything moves.
-    //
-    // d3_multi remounts synchronously and gets away with it because its resize path is
-    // gated to Cyclic Voltammetry, whose container height is fixed by CSS and so cannot
-    // be fed back into by a redraw. This stack has no such guarantee.
     if (this.resizeFrame != null) return;
     this.resizeFrame = window.requestAnimationFrame(() => {
       this.resizeFrame = null;
-      const sizes = this.resolvePaneSizes();
-      if (sameSizes(sizes, this.currentSizes)) return;
-      this.mountCharts(sizes, false);
+      if (this.lineSize.hasChanged() || this.multiSize.hasChanged()
+        || this.rectSize.hasChanged()) {
+        this.mountCharts(false);
+      }
     });
   }
 
@@ -610,24 +603,6 @@ class ViewerLineRect extends React.Component {
   handleUvvisRedo() {
     const { uvvisRedoAct } = this.props;
     uvvisRedoAct();
-  }
-
-  setupResizeObserver() {
-    if (typeof ResizeObserver === 'undefined') return;
-    if (!this.stackRef.current || this.resizeObserver) return;
-    this.resizeObserver = new ResizeObserver(this.handleResize);
-    this.resizeObserver.observe(this.stackRef.current);
-  }
-
-  // Measure every pane, so a stack whose three panes differ in height (a host that has
-  // not equalised them) still gets a correct viewBox each.
-  resolvePaneSizes() {
-    const fallback = { width: W, height: H };
-    return {
-      line: measurePane(this.lineRef?.current) || fallback,
-      multi: measurePane(this.multiRef?.current) || fallback,
-      rect: measurePane(this.rectRef?.current) || fallback,
-    };
   }
 
   createFocuses(sizes) {
@@ -661,21 +636,9 @@ class ViewerLineRect extends React.Component {
     });
   }
 
-  teardownResizeObserver() {
-    if (this.resizeFrame != null) {
-      window.cancelAnimationFrame(this.resizeFrame);
-      this.resizeFrame = null;
-    }
-    if (this.resizeObserver) {
-      this.resizeObserver.disconnect();
-      this.resizeObserver = null;
-    }
-  }
-
-  // The whole draw sequence, parameterised by pane size so a resize can re-run it. Only
-  // the first run resets redux (`shouldReset`); a resize must not discard the user's zoom,
-  // threshold or selection.
-  mountCharts(sizes, shouldReset = false) {
+  // The whole draw sequence, re-run on a resize. Only the first run resets redux
+  // (`shouldReset`); a resize must not discard the user's zoom, threshold or selection.
+  mountCharts(shouldReset = false) {
     const {
       curveSt, feature, ticEntities, hplcMsSt,
       tTrEndPts, layoutSt,
@@ -685,10 +648,22 @@ class ViewerLineRect extends React.Component {
       resetAllAct, uiSt,
       editPeakSt,
     } = this.props;
-    this.currentSizes = sizes;
+    // Width before the destroy below (a page scrollbar can come and go with the content
+    // being removed); height after, via ContainerSize.target -- see its own comment for
+    // why an unbounded pane's height must come from that width and a fixed fallback
+    // aspect instead of a live clientHeight read.
+    const lineWidth = this.lineSize.measureWidth();
+    const multiWidth = this.multiSize.measureWidth();
+    const rectWidth = this.rectSize.measureWidth();
     drawDestroy(this.rootKlassMulti);
     drawDestroy(this.rootKlassLine);
     drawDestroy(this.rootKlassRect);
+    const sizes = {
+      line: clampPaneSize(this.lineSize.target(lineWidth)),
+      multi: clampPaneSize(this.multiSize.target(multiWidth)),
+      rect: clampPaneSize(this.rectSize.target(rectWidth)),
+    };
+    this.currentSizes = sizes;
     if (shouldReset) {
       resetAllAct(feature);
     }
@@ -958,7 +933,6 @@ class ViewerLineRect extends React.Component {
     return (
       <div
         className={`${LIST_HOST_HOOK_CLASS.LCMS_STACK} ${classes.lcMsStackRoot}`}
-        ref={this.stackRef}
       >
         {
           omitUvvisToolbarRow ? null : (

@@ -1,6 +1,7 @@
 /* eslint-disable prefer-object-spread, default-param-last */
 import { LAYOUT, MANAGER } from '../constants/action_type';
 import { LIST_LAYOUT } from '../constants/list_layout';
+import Format from '../helpers/format';
 
 const initialState = LIST_LAYOUT.C13;
 
@@ -9,7 +10,8 @@ const layoutReducer = (state = initialState, action) => {
     case LAYOUT.UPDATE:
       return action.payload;
     case MANAGER.RESETALL:
-      return action.payload?.operation?.layout || state;
+      // LayerInit.execReset sets PLAIN itself on an entity change.
+      return Format.resetAllLayout(action.payload) || state;
     default:
       return state;
   }

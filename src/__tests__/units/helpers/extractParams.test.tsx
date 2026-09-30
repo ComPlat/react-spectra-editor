@@ -60,6 +60,23 @@ describe('Test extract parameters helper', () => {
     });
   });
 
+  // An entity with no peak feature must still hand RESETALL its own layout, or a
+  // recognised entity with no peak table yet would lose it.
+  describe('Non-MS layout with no peak feature', () => {
+    it('still reports the entity\'s own layout via feature.operation.layout', () => {
+      const irEntity = {
+        layout: LIST_LAYOUT.IR,
+        features: {},
+        spectra: [{ data: [{ x: [1, 2], y: [10, 20] }] }],
+      };
+
+      const params: any = extractParams(irEntity as any, { isEdit: false } as any, {} as any);
+
+      expect(params.feature.operation.layout).toEqual(LIST_LAYOUT.IR);
+      expect(params.hasEdit).toEqual(false);
+    });
+  });
+
   describe('LC/MS layout', () => {
     it('extracts TIC x/y directly from first valid spectrum', () => {
       const lcmsEntity = {

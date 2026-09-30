@@ -869,7 +869,7 @@ class MultiFocus {
     ccp.enter().append('path').attr('d', lineSymbol).attr('class', 'enter-ref').attr('fill', 'green').attr('fill-opacity', 0.8).merge(ccp).attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y)})`);
   }
   reverseXAxis(layoutSt) {
-    return [_list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS, _list_layout.LIST_LAYOUT.TGA, _list_layout.LIST_LAYOUT.DSC, _list_layout.LIST_LAYOUT.XRD, _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY, _list_layout.LIST_LAYOUT.CDS, _list_layout.LIST_LAYOUT.SEC, _list_layout.LIST_LAYOUT.GC, _list_layout.LIST_LAYOUT.AIF].indexOf(layoutSt) < 0;
+    return !_format.default.isNonReversedXLayout(layoutSt);
   }
   create({
     curveSt,
@@ -887,7 +887,8 @@ class MultiFocus {
     cyclicvoltaSt,
     integrationSt,
     mtplySt,
-    uiSt
+    uiSt,
+    yInvertedSt = false
   }) {
     this.uiSt = uiSt;
     this.graphIndex = uiSt?.zoom?.graphIndex;
@@ -901,7 +902,7 @@ class MultiFocus {
     const jcampIdx = curveIdx;
     this.isShowAllCurves = isShowAllCurve;
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
-    this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt));
+    this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt), yInvertedSt);
     this.setTip();
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
     Object.assign(this, {
@@ -950,11 +951,12 @@ class MultiFocus {
     cyclicvoltaSt,
     integrationSt,
     mtplySt,
-    uiSt
+    uiSt,
+    yInvertedSt = false
   }) {
     this.uiSt = uiSt;
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
-    this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt));
+    this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt), yInvertedSt);
     this.graphIndex = uiSt?.zoom?.graphIndex;
     const {
       curveIdx,

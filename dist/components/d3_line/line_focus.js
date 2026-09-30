@@ -623,7 +623,7 @@ class LineFocus {
     return null;
   }
   reverseXAxis(layoutSt) {
-    return [_list_layout.LIST_LAYOUT.UVVIS, _list_layout.LIST_LAYOUT.HPLC_UVVIS, _list_layout.LIST_LAYOUT.TGA, _list_layout.LIST_LAYOUT.DSC, _list_layout.LIST_LAYOUT.XRD, _list_layout.LIST_LAYOUT.CYCLIC_VOLTAMMETRY, _list_layout.LIST_LAYOUT.CDS, _list_layout.LIST_LAYOUT.DLS_ACF, _list_layout.LIST_LAYOUT.SEC, _list_layout.LIST_LAYOUT.GC, _list_layout.LIST_LAYOUT.EMISSIONS, _list_layout.LIST_LAYOUT.DLS_INTENSITY].indexOf(layoutSt) < 0;
+    return !_format.default.isNonReversedXLayout(layoutSt);
   }
   create({
     filterSeed,
@@ -642,7 +642,8 @@ class LineFocus {
     isUiVisualSplitIntgSt,
     isUiNoBrushSt,
     wavelength,
-    uiSt
+    uiSt,
+    yInvertedSt = false
   }) {
     this.uiSt = uiSt;
     this.graphIndex = uiSt?.zoom?.graphIndex;
@@ -650,7 +651,7 @@ class LineFocus {
     (0, _mount.MountMainFrame)(this, 'focus');
     (0, _mount.MountClip)(this);
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
-    this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt));
+    this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt), yInvertedSt);
     this.setTip();
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt, wavelength);
     Object.assign(this, {
@@ -698,12 +699,13 @@ class LineFocus {
     isUiSplitIntgSt,
     isUiVisualSplitIntgSt,
     isUiNoBrushSt,
-    wavelength
+    wavelength,
+    yInvertedSt = false
   }) {
     this.uiSt = uiSt;
     this.graphIndex = uiSt?.zoom?.graphIndex;
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
-    this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt));
+    this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt), yInvertedSt);
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt, wavelength);
     Object.assign(this, {
       isUiSplitIntgSt,

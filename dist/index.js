@@ -56,6 +56,7 @@ var _gc_3_jcamp = _interopRequireDefault(require("./__tests__/fixtures/gc_3_jcam
 var _emissions_jcamp = _interopRequireDefault(require("./__tests__/fixtures/emissions_jcamp"));
 var _dls_acf_jcamp = _interopRequireDefault(require("./__tests__/fixtures/dls_acf_jcamp"));
 var _dls_intensity_jcamp = _interopRequireDefault(require("./__tests__/fixtures/dls_intensity_jcamp"));
+var _plain_layout_jcamp = _interopRequireDefault(require("./__tests__/fixtures/plain_layout_jcamp"));
 var _qDescValue = require("./__tests__/fixtures/qDescValue");
 require("./__tests__/style/svg.css");
 var _jsxRuntime = require("react/jsx-runtime");
@@ -124,6 +125,7 @@ const gcEntity3 = _app.FN.ExtractJcamp(_gc_3_jcamp.default);
 const emissionsEntity = _app.FN.ExtractJcamp(_emissions_jcamp.default);
 const dlsAcfEntity = _app.FN.ExtractJcamp(_dls_acf_jcamp.default);
 const dlsIntensityEntity = _app.FN.ExtractJcamp(_dls_intensity_jcamp.default);
+const plainEntity = _app.FN.ExtractJcamp(_plain_layout_jcamp.default);
 const cloneData = value => JSON.parse(JSON.stringify(value));
 const parseNumericPage = feature => {
   const candidates = [feature?.pageValue, feature?.page, feature?.pageSymbol];
@@ -431,6 +433,8 @@ class DemoWriteIr extends _react.default.Component {
         return lcmsEntity;
       case 'lcms chemstation':
         return hplcMsUvvisChemstationEntity;
+      case 'plain':
+        return plainEntity;
       default:
         return msEntity;
     }
@@ -1048,6 +1052,14 @@ class DemoWriteIr extends _react.default.Component {
           },
           onClick: this.onClick('lcms chemstation'),
           children: "LC/MS Chemstation"
+        }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
+          id: "btn-plain",
+          variant: "contained",
+          style: {
+            margin: '0 10px 0 10px'
+          },
+          onClick: this.onClick('plain'),
+          children: "PLAIN"
         }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Button, {
           variant: "contained",
           style: {

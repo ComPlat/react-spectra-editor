@@ -14,6 +14,8 @@ import emissionsJcamp from "../../fixtures/emissions_jcamp";
 import dlsAcfJcamp from "../../fixtures/dls_acf_jcamp";
 import lcMsTicChemstationJcamp from "../../fixtures/lc_ms_jcamp_tic_chemstation";
 import lcMsMzChemstationJcamp from "../../fixtures/lc_ms_jcamp_mz_chemstation";
+import plainJcamp from "../../fixtures/plain_layout_jcamp";
+import irJcamp from "../../fixtures/ir_jcamp";
 
 const buildTicJcamp = ({
   xUnits, unitsLine = '', xValues, yValues,
@@ -35,6 +37,61 @@ const buildTicJcamp = ({
   ];
   return `\n${lines.join('\n')}\n`;
 };
+
+// A minimal XYDATA file for a given ##DATA TYPE=, with an empty (0-point)
+// PEAKTABLE block like the PLAIN fixture's.
+const buildXyJcamp = (dataType: string) => `
+##TITLE=XY Demo
+##JCAMP-DX=5.0
+##DATA TYPE=LINK
+##BLOCKS=1
+
+
+$$ === CHEMSPECTRA SPECTRUM ORIG ===
+##TITLE=XY Demo
+##JCAMP-DX=5.00
+##DATA TYPE=${dataType}
+##DATA CLASS=XYDATA
+##XUNITS=MINUTES
+##YUNITS=ARBITRARY UNITS
+##XFACTOR=1.0
+##YFACTOR=1.0
+##FIRSTX=0.0
+##LASTX=9.0
+##MAXX=9.0
+##MAXY=81.0
+##MINX=0.0
+##MINY=0.0
+##NPOINTS=10
+##XYDATA= (XY..XY)
+0.0, 0.0
+1.0, 1.0
+2.0, 4.0
+3.0, 9.0
+4.0, 16.0
+5.0, 25.0
+6.0, 36.0
+7.0, 49.0
+8.0, 64.0
+9.0, 81.0
+##END=
+
+
+$$ === CHEMSPECTRA PEAK TABLE AUTO ===
+##TITLE=GPC Demo
+##JCAMP-DX=5.00
+##DATA TYPE=${dataType}PEAKTABLE
+##DATA CLASS=PEAKTABLE
+##MAXX=9.0
+##MAXY=81.0
+##MINX=0.0
+##MINY=0.0
+##NPOINTS=0
+##PEAKTABLE= (XY..XY)
+##END=
+
+##END=
+`;
 
 function checkExtractSucceed(extractedData: any, forLayout: string) {
   const { spectra, features, layout } = extractedData
@@ -135,7 +192,151 @@ describe('Test for chem helper', () => {
         checkSpectraInfo(extractedData, 'DLS intensity')
       })
     })
-    
+
+    // B2: an unrecognised datatype gets PLAIN on entity.layout, spectra[].layout and
+    // feature.operation.layout alike, for any host reading the entity directly.
+    describe('Extract unrecognized datatype (PLAIN)', () => {
+      let extractedData: { spectra: any, features: any, layout: any }
+
+      beforeAll(() => {
+        extractedData = ExtractJcamp(plainJcamp)
+      })
+
+      it('Extract succeed ', () => {
+        checkExtractSucceed(extractedData, LIST_LAYOUT.PLAIN)
+      })
+
+      it('Check spectra info ', () => {
+        checkSpectraInfo(extractedData, 'SQUID')
+      })
+
+      it('normalizes spectra[].layout and feature.operation.layout to PLAIN too', () => {
+        const { spectra, features } = extractedData
+        expect(spectra[0].layout).toEqual(LIST_LAYOUT.PLAIN)
+        expect(features.editPeak.operation.layout).toEqual(LIST_LAYOUT.PLAIN)
+        expect(features.autoPeak.operation.layout).toEqual(LIST_LAYOUT.PLAIN)
+      })
+    })
+
+    // The backend upper-cases both sides when matching data_type.json, so a
+    // non-shouted-case file it recognises must not become PLAIN here.
+    // Every datatype check is case-insensitive, like the backend's.
+    describe('Extract a datatype in non-shouted case', () => {
+      it('classifies Thermogravimetric analysis as TGA', () => {
+        const extractedData = ExtractJcamp(buildXyJcamp('Thermogravimetric analysis'))
+        checkExtractSucceed(extractedData, LIST_LAYOUT.TGA)
+      })
+
+      it('classifies an upper-cased EMISSIONS as Emissions', () => {
+        const extractedData = ExtractJcamp(buildXyJcamp('EMISSIONS'))
+        checkExtractSucceed(extractedData, LIST_LAYOUT.EMISSIONS)
+      })
+    })
+
+    // chem-spectra-app records what a client asked for: absorbance converted to %T, or
+    // y drawn inverted. Kept records reach a host only through the features built from them.
+    describe('Extract $CSTRANSMITTANCE / $CSINVERTY', () => {
+      const withRecords = (records: string, everyBlock = false) => {
+        const marker = '##$CSTHRESHOLD='
+        const source = everyBlock
+          ? irJcamp.split(marker).join(`${records}${marker}`)
+          : irJcamp.replace(marker, `${records}${marker}`)
+        expect(source).not.toEqual(irJcamp)
+        return ExtractJcamp(source)
+      }
+      const peakFeatures = ({ features }: any) => [features.editPeak, features.autoPeak].filter(Boolean)
+
+      it('exposes $CSTRANSMITTANCE on the peak features', () => {
+        const feats = peakFeatures(withRecords('##$CSTRANSMITTANCE=true\n'))
+        expect(feats.length).toBeGreaterThan(0)
+        feats.forEach((f: any) => {
+          expect(f.convertedToTransmittance).toBe(true)
+          expect(f.invertedY).toBe(false)
+        })
+      })
+
+      it('exposes $CSINVERTY on the peak features, also when repeated in every block', () => {
+        [false, true].forEach((everyBlock) => {
+          const feats = peakFeatures(withRecords('##$CSINVERTY=true\n', everyBlock))
+          expect(feats.length).toBeGreaterThan(0)
+          feats.forEach((f: any) => {
+            expect(f.invertedY).toBe(true)
+            expect(f.convertedToTransmittance).toBe(false)
+          })
+        })
+      })
+
+      // Since chem-spectra-app#304 inverting is a viewing preference, so it can
+      // accompany a %T conversion.
+      it('exposes both when the file carries both', () => {
+        const feats = peakFeatures(withRecords('##$CSTRANSMITTANCE=true\n##$CSINVERTY=true\n'))
+        expect(feats.length).toBeGreaterThan(0)
+        feats.forEach((f: any) => {
+          expect(f.convertedToTransmittance).toBe(true)
+          expect(f.invertedY).toBe(true)
+        })
+      })
+
+      it('reads both as false when the file does not declare them', () => {
+        const feats = peakFeatures(ExtractJcamp(irJcamp))
+        expect(feats.length).toBeGreaterThan(0)
+        feats.forEach((f: any) => {
+          expect(f.convertedToTransmittance).toBe(false)
+          expect(f.invertedY).toBe(false)
+        })
+      })
+
+      it('still keeps $CSTHRESHOLD alongside them', () => {
+        const plainRef = peakFeatures(ExtractJcamp(irJcamp)).map((f: any) => f.thresRef)
+        const withRef = peakFeatures(withRecords('##$CSTRANSMITTANCE=true\n'))
+          .map((f: any) => f.thresRef)
+        expect(withRef).toEqual(plainRef)
+        expect(plainRef.every((r: number) => r !== 5)).toBe(true) // 5 is the no-threshold fallback
+      })
+    })
+
+    // Single-crystal XRD must not fall into powder XRD's substring match.
+    describe('Extract SINGLE CRYSTAL X-RAY DIFFRACTION', () => {
+      it('classifies single-crystal XRD as PLAIN', () => {
+        const extractedData = ExtractJcamp(buildXyJcamp('SINGLE CRYSTAL X-RAY DIFFRACTION'))
+        checkExtractSucceed(extractedData, LIST_LAYOUT.PLAIN)
+      })
+
+      it('classifies a mixed-case form as PLAIN too', () => {
+        const extractedData = ExtractJcamp(buildXyJcamp('Single Crystal X-Ray Diffraction'))
+        checkExtractSucceed(extractedData, LIST_LAYOUT.PLAIN)
+      })
+
+      it('still classifies powder X-RAY DIFFRACTION as XRD', () => {
+        const extractedData = ExtractJcamp(buildXyJcamp('X-RAY DIFFRACTION'))
+        checkExtractSucceed(extractedData, LIST_LAYOUT.XRD)
+      })
+    })
+
+    describe('Extract GEL PERMEATION CHROMATOGRAPHY (GPC -> SEC alias)', () => {
+      it('classifies a mixed-case ##DATA TYPE= as SEC, same as the backend would', () => {
+        const extractedData = ExtractJcamp(buildXyJcamp('Gel Permeation Chromatography'))
+        checkExtractSucceed(extractedData, LIST_LAYOUT.SEC)
+      })
+
+      it('classifies the shouted-case form as SEC too', () => {
+        const extractedData = ExtractJcamp(buildXyJcamp('GEL PERMEATION CHROMATOGRAPHY'))
+        checkExtractSucceed(extractedData, LIST_LAYOUT.SEC)
+      })
+
+      // SEC maps getBoundary over every block, including the 0-point PEAKTABLE AUTO
+      // one -- Math.max/min of an empty array is -Infinity/+Infinity, not 0.
+      it('does not produce Infinity bounds from the empty PEAKTABLE AUTO block', () => {
+        const { features } = ExtractJcamp(buildXyJcamp('GEL PERMEATION CHROMATOGRAPHY'))
+        expect(Array.isArray(features)).toBe(true)
+        features.forEach((feature: any) => {
+          expect(Number.isFinite(feature.maxX)).toBe(true)
+          expect(Number.isFinite(feature.minX)).toBe(true)
+          expect(Number.isFinite(feature.maxY)).toBe(true)
+          expect(Number.isFinite(feature.minY)).toBe(true)
+        })
+      })
+    })
   })
 
   describe('Test convert to topic', () => {

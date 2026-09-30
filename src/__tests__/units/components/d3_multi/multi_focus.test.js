@@ -28,3 +28,30 @@ describe('MultiFocus.computeYTransformFactor — CV current density (B5)', () =>
     expect(compute({ useCurrentDensity: false })).toBeCloseTo(1.0);
   });
 });
+
+// S1: a multi-selection including an unrecognised-datatype entity draws here, so
+// this must use the shared Format.isNonReversedXLayout too.
+describe('MultiFocus.reverseXAxis (S1)', () => {
+  const mf = Object.create(MultiFocus.prototype);
+
+  it('does not reverse the axis for PLAIN', () => {
+    expect(mf.reverseXAxis(LIST_LAYOUT.PLAIN)).toBe(false);
+  });
+
+  it('still reverses the axis for NMR layouts', () => {
+    expect(mf.reverseXAxis(LIST_LAYOUT.C13)).toBe(true);
+  });
+
+  it('still does not reverse the axis for AIF', () => {
+    expect(mf.reverseXAxis(LIST_LAYOUT.AIF)).toBe(false);
+  });
+
+  // These were missing from this component's own list, so a multi-selection of
+  // them drew reversed while a single one drew ascending.
+  it.each([LIST_LAYOUT.EMISSIONS, LIST_LAYOUT.DLS_ACF, LIST_LAYOUT.DLS_INTENSITY])(
+    'does not reverse the axis for %s',
+    (layout) => {
+      expect(mf.reverseXAxis(layout)).toBe(false);
+    },
+  );
+});

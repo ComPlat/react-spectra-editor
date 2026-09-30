@@ -8,10 +8,10 @@ exports.InitTip = exports.InitScale = exports.InitPathCall = exports.InitAxisCal
 var _d3Tip = _interopRequireDefault(require("d3-tip"));
 var _format = _interopRequireDefault(require("./format"));
 const d3 = require('d3');
-const InitScale = (target, reverse = true) => {
+const InitScale = (target, reverse = true, reverseY = false) => {
   const xRange = reverse ? [target.w, 0] : [0, target.w];
   const x = d3.scaleLinear().range(xRange);
-  const y = d3.scaleLinear().range([target.h, 0]);
+  const y = d3.scaleLinear().range(reverseY ? [0, target.h] : [target.h, 0]);
   return {
     x,
     y

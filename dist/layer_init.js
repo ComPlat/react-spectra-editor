@@ -12,6 +12,7 @@ var _redux = require("redux");
 var _styles = require("@mui/styles");
 var _submit = require("./actions/submit");
 var _layout = require("./actions/layout");
+var _invert_y = require("./actions/invert_y");
 var _manager = require("./actions/manager");
 var _meta = require("./actions/meta");
 var _jcamp = require("./actions/jcamp");
@@ -24,10 +25,27 @@ var _multi_jcamps_viewer = _interopRequireDefault(require("./components/multi_jc
 var _hplc_viewer = _interopRequireDefault(require("./components/hplc_viewer"));
 var _curve = require("./actions/curve");
 var _hplc_ms = require("./actions/hplc_ms");
+var _list_layout = require("./constants/list_layout");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, default-param-last */
 
 const styles = () => ({});
+const isUnrecognized = entity => !entity?.layout || _format.default.isPlainLayout(entity.layout);
+const datasetIdOf = entity => entity?.idDt ?? entity?.id ?? entity?.datasetId;
+const sameDatasetAs = (prevEntity, entity) => {
+  const prevId = datasetIdOf(prevEntity);
+  const nextId = datasetIdOf(entity);
+  return prevId == null || nextId == null || prevId === nextId;
+};
+// Whether the file asks for y to be drawn inverted (##$CSINVERTY), in either feature
+// shape: { editPeak, autoPeak } or the array the CV/SEC/AIF/CDS/GC extractors return.
+const requestsInvertedY = entity => {
+  const {
+    features
+  } = entity || {};
+  const list = Array.isArray(features) ? features : [features?.editPeak, features?.autoPeak, features?.[0]];
+  return list.some(feature => feature?.invertedY === true);
+};
 class LayerInit extends _react.default.Component {
   constructor(props) {
     super(props);
@@ -79,12 +97,13 @@ class LayerInit extends _react.default.Component {
           clearHplcMsStateAct();
         }
       }
-      this.execReset();
+      this.execReset(prevProps.entity);
     }
   }
-  execReset() {
+  execReset(prevEntity = null) {
     const {
       entity,
+      layoutSt,
       updateMetaPeaksAct,
       resetInitCommonAct,
       resetInitMsAct,
@@ -93,16 +112,35 @@ class LayerInit extends _react.default.Component {
       resetDetectorAct,
       updateDSCMetaDataAct,
       resetMultiplicityAct,
-      updateLayoutAct
+      updateLayoutAct,
+      seedInvertYAct
     } = this.props;
-    if (!entity || !entity.layout) return;
+    if (!entity) return;
     resetInitCommonAct();
     resetDetectorAct();
     const {
-      layout,
       features = {}
     } = entity;
+    // An unrecognised entity (readLayout's PLAIN, or a host-constructed falsy layout)
+    // gets PLAIN, never whatever layout the previous entity left in state -- except
+    // when it replaces another unrecognised entity in this same mount, e.g. a host
+    // refreshing the dataset after a save. Then the current layout is either PLAIN or
+    // one the user picked by hand, and is kept. Different ids mean a different dataset.
+    const sameDataset = sameDatasetAs(prevEntity, entity);
+    let {
+      layout
+    } = entity;
+    if (isUnrecognized(entity)) {
+      const keepCurrent = prevEntity && isUnrecognized(prevEntity) && sameDataset;
+      layout = keepCurrent ? layoutSt : _list_layout.LIST_LAYOUT.PLAIN;
+    }
     updateLayoutAct(layout);
+    // The y-axis starts the way the file asks. A user's toggle is kept across a refresh
+    // of the same dataset, i.e. while the file's own request is unchanged; nothing is
+    // dispatched then, so the current value simply stays.
+    const invertY = requestsInvertedY(entity);
+    const keepInvertY = prevEntity && sameDataset && requestsInvertedY(prevEntity) === invertY;
+    if (!keepInvertY) seedInvertYAct(invertY);
     if (_format.default.isMsLayout(layout)) {
       // const { autoPeak, editPeak } = features; // TBD
       const autoPeak = features.autoPeak || features[0];
@@ -134,6 +172,23 @@ class LayerInit extends _react.default.Component {
         dscMetaData
       } = features;
       updateDSCMetaDataAct(dscMetaData);
+    } else if (_format.default.isPlainLayout(layout)) {
+      // The PLAIN chart hides integrals and multiplets, but a host's submit/export
+      // path still reads them: overwrite this curve's slices (the build* features
+      // are empty, never falsy, for PLAIN) and DSC metadata rather than keep
+      // whatever the previous spectrum left there.
+      const {
+        integration,
+        multiplicity,
+        simulation
+      } = features;
+      updateMetaPeaksAct(entity);
+      resetInitNmrAct({
+        integration,
+        multiplicity,
+        simulation
+      });
+      updateDSCMetaDataAct(undefined);
     } else {
       resetMultiplicityAct();
     }
@@ -162,7 +217,7 @@ class LayerInit extends _react.default.Component {
       setAllCurvesAct,
       entity
     } = this.props;
-    if (!entity || !entity.layout) return;
+    if (!entity) return;
     const lcmsCurveMeta = () => {
       const uvvisFromMulti = Array.isArray(multiEntities) ? multiEntities.find(e => (0, _extractEntityLCMS.getLcMsInfo)(e).kind === 'uvvis') : null;
       const mzFromMulti = Array.isArray(multiEntities) ? multiEntities.find(e => (0, _extractEntityLCMS.getLcMsInfo)(e).kind === 'mz') : null;
@@ -297,7 +352,9 @@ class LayerInit extends _react.default.Component {
 }
 const mapStateToProps = (state, props) => (
 // eslint-disable-line
-{});
+{
+  layoutSt: state.layout
+});
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   resetInitCommonAct: _manager.resetInitCommon,
   resetInitNmrAct: _manager.resetInitNmr,
@@ -307,6 +364,7 @@ const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   resetMultiplicityAct: _manager.resetMultiplicity,
   updateOperationAct: _submit.updateOperation,
   updateLayoutAct: _layout.updateLayout,
+  seedInvertYAct: _invert_y.seedInvertY,
   updateMetaPeaksAct: _meta.updateMetaPeaks,
   addOthersAct: _jcamp.addOthers,
   setAllCurvesAct: _curve.setAllCurves,
@@ -315,6 +373,7 @@ const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
 }, dispatch);
 LayerInit.propTypes = {
   entity: _propTypes.default.object.isRequired,
+  layoutSt: _propTypes.default.string.isRequired,
   multiEntities: _propTypes.default.array,
   // eslint-disable-line
   entityFileNames: _propTypes.default.array,
@@ -335,6 +394,7 @@ LayerInit.propTypes = {
   resetInitCommonWithIntergationAct: _propTypes.default.func.isRequired,
   updateOperationAct: _propTypes.default.func.isRequired,
   updateLayoutAct: _propTypes.default.func.isRequired,
+  seedInvertYAct: _propTypes.default.func.isRequired,
   updateMetaPeaksAct: _propTypes.default.func.isRequired,
   addOthersAct: _propTypes.default.func.isRequired,
   canChangeDescription: _propTypes.default.bool.isRequired,

@@ -600,4 +600,29 @@ describe('Test format helper', () => {
       expect(fromState).toMatch(/2 min \(A=/);
     })
   })
+
+  // S1: the single list every line/multi focus delegates to, so an entity's axis
+  // direction does not depend on how many curves are selected.
+  describe('isNonReversedXLayout', () => {
+    it('does not reverse the axis for PLAIN', () => {
+      expect(Format.isNonReversedXLayout(LIST_LAYOUT.PLAIN)).toBe(true)
+    })
+
+    it('still reverses the axis for NMR layouts', () => {
+      expect(Format.isNonReversedXLayout(LIST_LAYOUT.C13)).toBe(false)
+    })
+
+    it('does not reverse the axis for TGA, DSC and XRD', () => {
+      expect(Format.isNonReversedXLayout(LIST_LAYOUT.TGA)).toBe(true)
+      expect(Format.isNonReversedXLayout(LIST_LAYOUT.DSC)).toBe(true)
+      expect(Format.isNonReversedXLayout(LIST_LAYOUT.XRD)).toBe(true)
+    })
+
+    it('does not reverse the axis for AIF, EMISSIONS, DLS ACF and DLS intensity', () => {
+      expect(Format.isNonReversedXLayout(LIST_LAYOUT.AIF)).toBe(true)
+      expect(Format.isNonReversedXLayout(LIST_LAYOUT.EMISSIONS)).toBe(true)
+      expect(Format.isNonReversedXLayout(LIST_LAYOUT.DLS_ACF)).toBe(true)
+      expect(Format.isNonReversedXLayout(LIST_LAYOUT.DLS_INTENSITY)).toBe(true)
+    })
+  })
 })

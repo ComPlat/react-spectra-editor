@@ -8,6 +8,7 @@ import { withStyles } from '@mui/styles';
 
 import { updateOperation } from './actions/submit';
 import { updateLayout } from './actions/layout';
+import { seedInvertY } from './actions/invert_y';
 import {
   resetInitCommon, resetInitNmr, resetInitMs, resetInitCommonWithIntergation, resetDetector,
   resetMultiplicity,
@@ -23,9 +24,26 @@ import MultiJcampsViewer from './components/multi_jcamps_viewer';
 import HPLCViewer from './components/hplc_viewer';
 import { setAllCurves } from './actions/curve';
 import { clearHplcMsState } from './actions/hplc_ms';
+import { LIST_LAYOUT } from './constants/list_layout';
 
 const styles = () => ({
 });
+
+const isUnrecognized = (entity) => !entity?.layout || Format.isPlainLayout(entity.layout);
+const datasetIdOf = (entity) => entity?.idDt ?? entity?.id ?? entity?.datasetId;
+const sameDatasetAs = (prevEntity, entity) => {
+  const prevId = datasetIdOf(prevEntity);
+  const nextId = datasetIdOf(entity);
+  return prevId == null || nextId == null || prevId === nextId;
+};
+// Whether the file asks for y to be drawn inverted (##$CSINVERTY), in either feature
+// shape: { editPeak, autoPeak } or the array the CV/SEC/AIF/CDS/GC extractors return.
+const requestsInvertedY = (entity) => {
+  const { features } = entity || {};
+  const list = Array.isArray(features)
+    ? features : [features?.editPeak, features?.autoPeak, features?.[0]];
+  return list.some((feature) => feature?.invertedY === true);
+};
 
 class LayerInit extends React.Component {
   constructor(props) {
@@ -80,21 +98,39 @@ class LayerInit extends React.Component {
           clearHplcMsStateAct();
         }
       }
-      this.execReset();
+      this.execReset(prevProps.entity);
     }
   }
 
-  execReset() {
+  execReset(prevEntity = null) {
     const {
-      entity, updateMetaPeaksAct,
+      entity, layoutSt, updateMetaPeaksAct,
       resetInitCommonAct, resetInitMsAct, resetInitNmrAct, resetInitCommonWithIntergationAct,
       resetDetectorAct, updateDSCMetaDataAct, resetMultiplicityAct, updateLayoutAct,
+      seedInvertYAct,
     } = this.props;
-    if (!entity || !entity.layout) return;
+    if (!entity) return;
     resetInitCommonAct();
     resetDetectorAct();
-    const { layout, features = {} } = entity;
+    const { features = {} } = entity;
+    // An unrecognised entity (readLayout's PLAIN, or a host-constructed falsy layout)
+    // gets PLAIN, never whatever layout the previous entity left in state -- except
+    // when it replaces another unrecognised entity in this same mount, e.g. a host
+    // refreshing the dataset after a save. Then the current layout is either PLAIN or
+    // one the user picked by hand, and is kept. Different ids mean a different dataset.
+    const sameDataset = sameDatasetAs(prevEntity, entity);
+    let { layout } = entity;
+    if (isUnrecognized(entity)) {
+      const keepCurrent = prevEntity && isUnrecognized(prevEntity) && sameDataset;
+      layout = keepCurrent ? layoutSt : LIST_LAYOUT.PLAIN;
+    }
     updateLayoutAct(layout);
+    // The y-axis starts the way the file asks. A user's toggle is kept across a refresh
+    // of the same dataset, i.e. while the file's own request is unchanged; nothing is
+    // dispatched then, so the current value simply stays.
+    const invertY = requestsInvertedY(entity);
+    const keepInvertY = prevEntity && sameDataset && requestsInvertedY(prevEntity) === invertY;
+    if (!keepInvertY) seedInvertYAct(invertY);
     if (Format.isMsLayout(layout)) {
       // const { autoPeak, editPeak } = features; // TBD
       const autoPeak = features.autoPeak || features[0];
@@ -116,6 +152,17 @@ class LayerInit extends React.Component {
     } else if (Format.isDSCLayout(layout)) {
       const { dscMetaData } = features;
       updateDSCMetaDataAct(dscMetaData);
+    } else if (Format.isPlainLayout(layout)) {
+      // The PLAIN chart hides integrals and multiplets, but a host's submit/export
+      // path still reads them: overwrite this curve's slices (the build* features
+      // are empty, never falsy, for PLAIN) and DSC metadata rather than keep
+      // whatever the previous spectrum left there.
+      const { integration, multiplicity, simulation } = features;
+      updateMetaPeaksAct(entity);
+      resetInitNmrAct({
+        integration, multiplicity, simulation,
+      });
+      updateDSCMetaDataAct(undefined);
     } else {
       resetMultiplicityAct();
     }
@@ -137,7 +184,7 @@ class LayerInit extends React.Component {
 
   updateMultiEntities() {
     const { multiEntities, setAllCurvesAct, entity } = this.props;
-    if (!entity || !entity.layout) return;
+    if (!entity) return;
     const lcmsCurveMeta = () => {
       const uvvisFromMulti = Array.isArray(multiEntities)
         ? multiEntities.find((e) => getLcMsInfo(e).kind === 'uvvis')
@@ -290,7 +337,9 @@ class LayerInit extends React.Component {
 }
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
-  {}
+  {
+    layoutSt: state.layout,
+  }
 );
 
 const mapDispatchToProps = (dispatch) => (
@@ -303,6 +352,7 @@ const mapDispatchToProps = (dispatch) => (
     resetMultiplicityAct: resetMultiplicity,
     updateOperationAct: updateOperation,
     updateLayoutAct: updateLayout,
+    seedInvertYAct: seedInvertY,
     updateMetaPeaksAct: updateMetaPeaks,
     addOthersAct: addOthers,
     setAllCurvesAct: setAllCurves,
@@ -313,6 +363,7 @@ const mapDispatchToProps = (dispatch) => (
 
 LayerInit.propTypes = {
   entity: PropTypes.object.isRequired,
+  layoutSt: PropTypes.string.isRequired,
   multiEntities: PropTypes.array, // eslint-disable-line
   entityFileNames: PropTypes.array, // eslint-disable-line
   others: PropTypes.object.isRequired,
@@ -331,6 +382,7 @@ LayerInit.propTypes = {
   resetInitCommonWithIntergationAct: PropTypes.func.isRequired,
   updateOperationAct: PropTypes.func.isRequired,
   updateLayoutAct: PropTypes.func.isRequired,
+  seedInvertYAct: PropTypes.func.isRequired,
   updateMetaPeaksAct: PropTypes.func.isRequired,
   addOthersAct: PropTypes.func.isRequired,
   canChangeDescription: PropTypes.bool.isRequired,
