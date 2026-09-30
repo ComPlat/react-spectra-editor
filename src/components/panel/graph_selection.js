@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import { selectCurve, toggleShowAllCurves } from '../../actions/curve';
 import { LIST_LAYOUT } from '../../constants/list_layout';
+import curveDisplayName from '../../helpers/curve_name';
 
 const styles = () => ({
   panelSummary: {
@@ -53,21 +54,6 @@ const styles = () => ({
     alignSelf: 'center',
   },
 });
-
-const fallbackName = (entityFileNames, idx) => {
-  if (entityFileNames && idx < entityFileNames.length) {
-    return entityFileNames[idx];
-  }
-  return '';
-};
-
-const displayName = (spectra, idx, entityFileNames) => (
-  spectra?.title
-  || spectra?.feature?.title
-  || spectra?.spectrum?.title
-  || fallbackName(entityFileNames, idx)
-  || `Spectrum ${idx + 1}`
-);
 
 const renderCurveItem = (classes, item, curveIdx, onChange) => (
   <ListItem
@@ -139,7 +125,7 @@ const GraphSelectionPanel = ({
           name: `${idx + 1}.`,
           idx: spectraIdx,
           color,
-          label: displayName(spectra, spectraIdx, entityFileNames),
+          label: curveDisplayName(spectra, spectraIdx, entityFileNames),
         };
       }) : [];
     } catch (e) {
@@ -153,7 +139,7 @@ const GraphSelectionPanel = ({
       name: `${idx + 1}.`,
       idx,
       color,
-      label: displayName(spectra, idx, entityFileNames),
+      label: curveDisplayName(spectra, idx, entityFileNames),
     };
   });
 
