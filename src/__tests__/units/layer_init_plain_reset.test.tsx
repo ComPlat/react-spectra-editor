@@ -16,6 +16,7 @@ import Format from '../../helpers/format';
 import nmr1HJcamp from '../fixtures/nmr1h_jcamp';
 import dscJcamp from '../fixtures/dsc_jcamp';
 import plainJcamp from '../fixtures/plain_layout_jcamp';
+import hplcUvVisJcamp from '../fixtures/hplc_uvvis_jcamp';
 
 // Same harness as layer_prism_single_curve_loop.test.tsx: real reducers + real saga
 // middleware + the real (unmocked) LayerInit, only the D3/SVG painting layer stubbed.
@@ -206,16 +207,24 @@ describe('LayerInit — a hand-picked layout for an unrecognised entity', () => 
     expect(store.getState().layout).toEqual(LIST_LAYOUT.H1);
   });
 
+  // The toggle only swaps the feature (and so dispatches RESETALL) for an entity with
+  // edit peaks: an HPLC UV/VIS file whose datatype nobody recognises.
   it('survives a threshold edit toggle', () => {
     const store = buildStore();
+    const entity: any = ExtractJcamp(hplcUvVisJcamp.replace(
+      '##DATA TYPE=HPLC UV/VIS SPECTRUM\n', '##DATA TYPE=SQUID\n',
+    ));
+    expect(entity.layout).toEqual(LIST_LAYOUT.PLAIN);
+    expect(entity.features.editPeak.data[0].x.length).toBeGreaterThan(0);
     render(
-      <Provider store={store}><LayerInit {...baseProps} entity={buildPlainEntity()} /></Provider>,
+      <Provider store={store}><LayerInit {...baseProps} entity={entity} /></Provider>,
     );
-    pick(store, LIST_LAYOUT.H1);
+    // TGA keeps ViewerLine mounted, so only the threshold toggle can reset the pick.
+    pick(store, LIST_LAYOUT.TGA);
 
     act(() => { store.dispatch(toggleThresholdIsEdit()); });
 
-    expect(store.getState().layout).toEqual(LIST_LAYOUT.H1);
+    expect(store.getState().layout).toEqual(LIST_LAYOUT.TGA);
   });
 
   it('stays PLAIN on a refresh after the user picked PLAIN again', () => {

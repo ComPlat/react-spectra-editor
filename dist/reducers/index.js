@@ -11,6 +11,7 @@ var _reducer_edit_peak = _interopRequireDefault(require("./reducer_edit_peak"));
 var _reducer_status = _interopRequireDefault(require("./reducer_status"));
 var _reducer_manager = _interopRequireDefault(require("./reducer_manager"));
 var _reducer_layout = _interopRequireDefault(require("./reducer_layout"));
+var _reducer_invert_y = _interopRequireDefault(require("./reducer_invert_y"));
 var _reducer_shift = _interopRequireDefault(require("./reducer_shift"));
 var _reducer_scan = _interopRequireDefault(require("./reducer_scan"));
 var _reducer_forecast = _interopRequireDefault(require("./reducer_forecast"));
@@ -33,6 +34,7 @@ const rootReducer = (0, _redux.combineReducers)({
   status: _reducer_status.default,
   manager: _reducer_manager.default,
   layout: _reducer_layout.default,
+  yInverted: _reducer_invert_y.default,
   shift: _reducer_shift.default,
   scan: _reducer_scan.default,
   forecast: _reducer_forecast.default,

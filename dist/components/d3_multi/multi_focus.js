@@ -895,7 +895,8 @@ class MultiFocus {
     cyclicvoltaSt,
     integrationSt,
     mtplySt,
-    uiSt
+    uiSt,
+    yInvertedSt = false
   }) {
     this.uiSt = uiSt;
     this.graphIndex = uiSt?.zoom?.graphIndex;
@@ -909,7 +910,7 @@ class MultiFocus {
     const jcampIdx = curveIdx;
     this.isShowAllCurves = isShowAllCurve;
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
-    this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt));
+    this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt), yInvertedSt);
     this.setTip();
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, layoutSt, cyclicvoltaSt, jcampIdx);
     Object.assign(this, {
@@ -958,11 +959,12 @@ class MultiFocus {
     cyclicvoltaSt,
     integrationSt,
     mtplySt,
-    uiSt
+    uiSt,
+    yInvertedSt = false
   }) {
     this.uiSt = uiSt;
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
-    this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt));
+    this.scales = (0, _init.InitScale)(this, this.reverseXAxis(layoutSt), yInvertedSt);
     this.graphIndex = uiSt?.zoom?.graphIndex;
     const {
       curveIdx,

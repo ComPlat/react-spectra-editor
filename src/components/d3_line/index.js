@@ -56,7 +56,7 @@ class ViewerLine extends React.Component {
       seed, peak, cLabel, xLabel, yLabel, freq, comparisons,
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt, integrationSt, mtplySt,
       sweepExtentSt, isUiAddIntgSt, isUiSplitIntgSt, isUiVisualSplitIntgSt, isUiNoBrushSt,
-      isHidden, wavelength, axesUnitsSt, uiSt,
+      isHidden, wavelength, axesUnitsSt, uiSt, yInvertedSt,
     } = this.props;
     this.syncFocusActions();
     this.normChange(prevProps);
@@ -93,6 +93,7 @@ class ViewerLine extends React.Component {
       isUiNoBrushSt,
       wavelength,
       uiSt,
+      yInvertedSt,
     });
     drawLabel(this.rootKlass, cLabel, xxLabel, yyLabel);
     drawDisplay(this.rootKlass, isHidden);
@@ -134,7 +135,7 @@ class ViewerLine extends React.Component {
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt, integrationSt, mtplySt,
       sweepExtentSt, isUiAddIntgSt, isUiSplitIntgSt, isUiVisualSplitIntgSt, isUiNoBrushSt,
       isHidden, wavelength, axesUnitsSt,
-      resetAllAct, uiSt,
+      resetAllAct, uiSt, yInvertedSt,
     } = this.props;
     const width = this.size.measureWidth();
     drawDestroy(this.rootKlass);
@@ -173,6 +174,7 @@ class ViewerLine extends React.Component {
       isUiNoBrushSt,
       wavelength,
       uiSt,
+      yInvertedSt,
     });
     drawLabel(this.rootKlass, cLabel, xxLabel, yyLabel);
     drawDisplay(this.rootKlass, isHidden);
@@ -219,6 +221,7 @@ const mapStateToProps = (state, props) => (
     tSfPeaks: ToShiftPeaks(state, props),
     editPeakSt: state.editPeak.present,
     layoutSt: state.layout,
+    yInvertedSt: Cfg.showInvertY(state.layout) && state.yInverted,
     integrationSt: state.integration.present,
     mtplySt: state.multiplicity.present,
     sweepExtentSt: state.ui.sweepExtent,
@@ -266,6 +269,7 @@ ViewerLine.propTypes = {
   tSfPeaks: PropTypes.array.isRequired,
   editPeakSt: PropTypes.object.isRequired,
   layoutSt: PropTypes.string.isRequired,
+  yInvertedSt: PropTypes.bool.isRequired,
   integrationSt: PropTypes.object.isRequired,
   mtplySt: PropTypes.object.isRequired,
   sweepExtentSt: PropTypes.object.isRequired,

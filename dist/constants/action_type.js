@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.XRD = exports.UI = exports.THRESHOLD = exports.SUBMIT = exports.STATUS = exports.SIMULATION = exports.SHIFT = exports.SEC = exports.SCAN = exports.MULTIPLICITY = exports.META = exports.MANAGER = exports.LAYOUT = exports.JCAMP = exports.INTEGRATION = exports.HPLC_MS = exports.FORECAST = exports.EDITPEAK = exports.CYCLIC_VOLTA_METRY = exports.CURVE = exports.AXES = void 0;
+exports.XRD = exports.UI = exports.THRESHOLD = exports.SUBMIT = exports.STATUS = exports.SIMULATION = exports.SHIFT = exports.SEC = exports.SCAN = exports.MULTIPLICITY = exports.META = exports.MANAGER = exports.LAYOUT = exports.JCAMP = exports.INVERT_Y = exports.INTEGRATION = exports.HPLC_MS = exports.FORECAST = exports.EDITPEAK = exports.CYCLIC_VOLTA_METRY = exports.CURVE = exports.AXES = void 0;
 const THRESHOLD = exports.THRESHOLD = {
   UPDATE_VALUE: 'THRESHOLD_UPDATE_VALUE',
   RESET_VALUE: 'THRESHOLD_RESET_VALUE',
@@ -157,6 +157,10 @@ const AXES = exports.AXES = {
 };
 const SEC = exports.SEC = {
   UPDATE_DETECTOR: 'UPDATE_DETECTOR'
+};
+const INVERT_Y = exports.INVERT_Y = {
+  TOGGLE: 'INVERT_Y_TOGGLE',
+  SEED: 'INVERT_Y_SEED'
 };
 const HPLC_MS = exports.HPLC_MS = {
   SET_LCMS_INTEGRATIONS_EXPORT: 'HPLC_MS_SET_LCMS_INTEGRATIONS_EXPORT',

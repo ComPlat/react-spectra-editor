@@ -3,12 +3,12 @@ import FN from './format';
 
 const d3 = require('d3');
 
-const InitScale = (target, reverse = true) => {
+const InitScale = (target, reverse = true, reverseY = false) => {
   const xRange = reverse ? [target.w, 0] : [0, target.w];
   const x = d3.scaleLinear()
     .range(xRange);
   const y = d3.scaleLinear()
-    .range([target.h, 0]);
+    .range(reverseY ? [0, target.h] : [target.h, 0]);
   return { x, y };
 };
 

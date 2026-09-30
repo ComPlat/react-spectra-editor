@@ -72,7 +72,8 @@ class ViewerLine extends _react.default.Component {
       isHidden,
       wavelength,
       axesUnitsSt,
-      uiSt
+      uiSt,
+      yInvertedSt
     } = this.props;
     this.syncFocusActions();
     this.normChange(prevProps);
@@ -109,7 +110,8 @@ class ViewerLine extends _react.default.Component {
       isUiVisualSplitIntgSt,
       isUiNoBrushSt,
       wavelength,
-      uiSt
+      uiSt,
+      yInvertedSt
     });
     (0, _draw.drawLabel)(this.rootKlass, cLabel, xxLabel, yyLabel);
     (0, _draw.drawDisplay)(this.rootKlass, isHidden);
@@ -172,7 +174,8 @@ class ViewerLine extends _react.default.Component {
       wavelength,
       axesUnitsSt,
       resetAllAct,
-      uiSt
+      uiSt,
+      yInvertedSt
     } = this.props;
     const width = this.size.measureWidth();
     (0, _draw.drawDestroy)(this.rootKlass);
@@ -211,7 +214,8 @@ class ViewerLine extends _react.default.Component {
       isUiVisualSplitIntgSt,
       isUiNoBrushSt,
       wavelength,
-      uiSt
+      uiSt,
+      yInvertedSt
     });
     (0, _draw.drawLabel)(this.rootKlass, cLabel, xxLabel, yyLabel);
     (0, _draw.drawDisplay)(this.rootKlass, isHidden);
@@ -261,6 +265,7 @@ const mapStateToProps = (state, props) => ({
   tSfPeaks: (0, _chem.ToShiftPeaks)(state, props),
   editPeakSt: state.editPeak.present,
   layoutSt: state.layout,
+  yInvertedSt: _cfg.default.showInvertY(state.layout) && state.yInverted,
   integrationSt: state.integration.present,
   mtplySt: state.multiplicity.present,
   sweepExtentSt: state.ui.sweepExtent,
@@ -298,6 +303,7 @@ ViewerLine.propTypes = {
   tSfPeaks: _propTypes.default.array.isRequired,
   editPeakSt: _propTypes.default.object.isRequired,
   layoutSt: _propTypes.default.string.isRequired,
+  yInvertedSt: _propTypes.default.bool.isRequired,
   integrationSt: _propTypes.default.object.isRequired,
   mtplySt: _propTypes.default.object.isRequired,
   sweepExtentSt: _propTypes.default.object.isRequired,

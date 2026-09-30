@@ -811,7 +811,7 @@ class LineFocus {
     filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, comparisons,
     editPeakSt, layoutSt, integrationSt, mtplySt,
     sweepExtentSt, isUiAddIntgSt, isUiSplitIntgSt, isUiVisualSplitIntgSt, isUiNoBrushSt,
-    wavelength, uiSt,
+    wavelength, uiSt, yInvertedSt = false,
   }) {
     this.uiSt = uiSt;
     this.graphIndex = uiSt?.zoom?.graphIndex;
@@ -820,7 +820,7 @@ class LineFocus {
     MountClip(this);
 
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
-    this.scales = InitScale(this, this.reverseXAxis(layoutSt));
+    this.scales = InitScale(this, this.reverseXAxis(layoutSt), yInvertedSt);
     this.setTip();
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt, wavelength);
     Object.assign(this, { isUiSplitIntgSt, isUiVisualSplitIntgSt });
@@ -855,12 +855,12 @@ class LineFocus {
     filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, comparisons,
     editPeakSt, layoutSt, integrationSt, mtplySt, uiSt,
     sweepExtentSt, isUiAddIntgSt, isUiSplitIntgSt, isUiVisualSplitIntgSt, isUiNoBrushSt,
-    wavelength,
+    wavelength, yInvertedSt = false,
   }) {
     this.uiSt = uiSt;
     this.graphIndex = uiSt?.zoom?.graphIndex;
     this.root = d3.select(this.rootKlass).selectAll('.focus-main');
-    this.scales = InitScale(this, this.reverseXAxis(layoutSt));
+    this.scales = InitScale(this, this.reverseXAxis(layoutSt), yInvertedSt);
     this.setDataParams(filterSeed, filterPeak, tTrEndPts, tSfPeaks, freq, layoutSt, wavelength);
     Object.assign(this, { isUiSplitIntgSt, isUiVisualSplitIntgSt });
     if (!isUiSplitIntgSt && !isUiVisualSplitIntgSt) this.clearSplitPreview();
