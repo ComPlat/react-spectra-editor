@@ -4,6 +4,14 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.8.5] - 2026-10-04
+
+### Fixed
+- A JCAMP whose `##DATA TYPE` the editor doesn't recognise now opens in the neutral PLAIN layout, with a non-reversed x-axis, instead of keeping the previous spectrum's layout and its NMR controls. Gel permeation chromatography is now read as SEC. The MS bar chart no longer crashes when a threshold comes out empty, and LC/MS panes no longer grow without bound in an unsized host (#336)
+- NMR: opening a spectrum without multiplets right after one with multiplets no longer leaves the previous spectrum's multiplet bars and labels on the chart (#342)
+
+[1.8.5]: https://github.com/ComPlat/react-spectra-editor/releases/tag/v1.8.5
+
 ## [1.8.4] - 2026-09-25
 
 ### Fixed
