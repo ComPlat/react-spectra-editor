@@ -42,7 +42,7 @@
     "eject": "react-scripts eject",
     "e2e": "cypress open",
     "docs:diagrams": "bash docs/diagrams/generate.sh",
-    "lint": "eslint --ext .js,.jsx src --ignore-pattern 'src/__tests__/**'"
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx src --ignore-pattern 'src/__tests__/fixtures/**'"
   },
   "peerDependencies": {
     "react": "^17.0.2",
