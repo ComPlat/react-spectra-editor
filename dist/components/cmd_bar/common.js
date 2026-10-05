@@ -4,7 +4,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.focusStyle = exports.commonStyle = exports.MuButton = void 0;
+exports.focusStyle = exports.commonStyle = exports.TOOLBAR_GROUP_GAP = exports.MuButton = void 0;
 var _react = _interopRequireDefault(require("react"));
 var _styles = require("@mui/styles");
 var _Button = _interopRequireDefault(require("@mui/material/Button"));
@@ -131,5 +131,10 @@ const commonStyle = exports.commonStyle = {
 };
 const focusStyle = (criteria, cls) => criteria ? [cls.btnHt] : [];
 
-// eslint-disable-line
+// Gap between the buttons of a collapsible toolbar group. collapsible_toolbar_group.js has
+// imported this since 422f0ab, but it was never defined, so the style got `gap: undefined`
+// and the groups rendered with no gap. 0 keeps that rendering; choose a real gap separately.
 exports.focusStyle = focusStyle;
+const TOOLBAR_GROUP_GAP = exports.TOOLBAR_GROUP_GAP = 0;
+
+// eslint-disable-line
