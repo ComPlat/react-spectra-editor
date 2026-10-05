@@ -33,6 +33,18 @@ const warnUnknownState = {
   message: 'Server not available!',
 };
 
+// chem-spectra-app refuses a file it cannot process with { error } saying why (for
+// example a 2D NMR file); show that rather than only the generic notice.
+const withReason = (generic, prefix, action) => {
+  const reason = action.payload && action.payload.error;
+  return reason ? { status: 'error', message: `${prefix}: ${reason}` } : generic;
+};
+
+const errSaveState = {
+  status: 'error',
+  message: 'Save error!',
+};
+
 const buildPredictNotice = (state, action) => {
   if (!action.payload) return warnUnknownState;
   const { outline } = action.payload;
@@ -61,7 +73,9 @@ const noticeReducer = (state = initialState, action) => {
       return { ...state, ...sucConversionState };
     case FILE.CONVERT_FAIL:
     case MOL.CONVERT_FAIL:
-      return { ...state, ...errConversionState };
+      return { ...state, ...withReason(errConversionState, 'Conversion error', action) };
+    case FILE.SAVE_FAIL:
+      return { ...state, ...withReason(errSaveState, 'Save error', action) };
     case PREDICT.PREDICT_DONE:
     case PREDICT.PREDICT_FAIL:
     case PREDICT.ADD_PRED_JSON_INIT:

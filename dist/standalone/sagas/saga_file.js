@@ -94,7 +94,9 @@ function* convertFile(action) {
   } else {
     yield (0, _effects.put)({
       type: _action_type.FILE.CONVERT_FAIL,
-      payload
+      payload: {
+        error: rsp && rsp.error
+      }
     });
   }
 }
@@ -120,10 +122,19 @@ function* saveFile(action) {
     mol,
     dstList
   };
-  yield (0, _effects.call)(_fetcher_file.default.saveFile, target);
-  yield (0, _effects.put)({
-    type: _action_type.FILE.SAVE_DONE
-  });
+  const rsp = yield (0, _effects.call)(_fetcher_file.default.saveFile, target);
+  if (rsp && rsp.ok) {
+    yield (0, _effects.put)({
+      type: _action_type.FILE.SAVE_DONE
+    });
+  } else {
+    yield (0, _effects.put)({
+      type: _action_type.FILE.SAVE_FAIL,
+      payload: {
+        error: rsp && rsp.error
+      }
+    });
+  }
 }
 function* refreshFile(action) {
   // similar to saveFile
@@ -167,7 +178,9 @@ function* refreshFile(action) {
   } else {
     yield (0, _effects.put)({
       type: _action_type.FILE.CONVERT_FAIL,
-      payload
+      payload: {
+        error: rsp && rsp.error
+      }
     });
   }
 }

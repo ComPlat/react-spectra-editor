@@ -34,7 +34,9 @@ function* addOthers(action) {
     } else {
       yield (0, _effects.put)({
         type: _action_type.FILE.CONVERT_FAIL,
-        payload
+        payload: {
+          error: rsp && rsp.error
+        }
       });
     }
   } else {

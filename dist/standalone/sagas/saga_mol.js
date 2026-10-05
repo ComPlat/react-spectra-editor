@@ -57,7 +57,9 @@ function* convertMol(action) {
   } else {
     yield (0, _effects.put)({
       type: _action_type.MOL.CONVERT_FAIL,
-      payload
+      payload: {
+        error: rsp && rsp.error
+      }
     });
   }
 }

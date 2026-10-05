@@ -3,18 +3,26 @@
 
 const encodeJcamp = (source) => Buffer.from(source).toString('base64');
 
+// A route answer that refuses the request the way chem-spectra-app does: HTTP 422 with
+// { error } in the body.
+const refusal = (error) => ({ refusedWith: 422, body: { error } });
+
 // Replaces global.fetch with a plain function (CRA's jest config resets jest.fn
 // implementations before each test) that records every call and answers from `routes`,
-// a map of URL suffix -> JSON body.
+// a map of URL suffix -> JSON body (200) or refusal(...) (422).
 const installFetch = (routes = {}) => {
   const calls = [];
   global.fetch = (url, options) => {
     calls.push({ url, options });
     const suffix = Object.keys(routes).find((key) => url.endsWith(key));
-    const body = suffix ? routes[suffix] : {};
+    const answer = suffix ? routes[suffix] : {};
+    const refused = answer && answer.refusedWith;
+    const body = refused ? answer.body : answer;
     return Promise.resolve({
+      ok: !refused,
+      status: refused || 200,
       json: () => Promise.resolve(body),
-      blob: () => Promise.resolve(new Blob(['zip'])),
+      blob: () => Promise.resolve(new Blob([refused ? JSON.stringify(body) : 'zip'])),
     });
   };
   return calls;
@@ -28,4 +36,6 @@ const formEntries = (formData) => {
   return out;
 };
 
-export { encodeJcamp, installFetch, formEntries };
+export {
+  encodeJcamp, installFetch, formEntries, refusal,
+};

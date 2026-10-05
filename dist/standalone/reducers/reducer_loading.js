@@ -23,6 +23,7 @@ const loadingReducer = (state = initialState, action) => {
     case _action_type.FILE.CONVERT_DONE:
     case _action_type.FILE.CONVERT_FAIL:
     case _action_type.FILE.SAVE_DONE:
+    case _action_type.FILE.SAVE_FAIL:
     case _action_type.MOL.CONVERT_DONE:
     case _action_type.MOL.CONVERT_FAIL:
     case _action_type.MOL.ADD_FAIL:

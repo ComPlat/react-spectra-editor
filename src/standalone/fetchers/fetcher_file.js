@@ -63,8 +63,14 @@ const saveFile = (target) => {
       method: 'post',
       body: data,
     },
-  ).then((response) => response.blob())
-    .then((blob) => {
+  ).then((response) => {
+    // A refusal is { error } as JSON, not a zip: report it instead of downloading it.
+    if (!response.ok) {
+      return response.json()
+        .catch(() => ({}))
+        .then((body) => ({ ok: false, error: body && body.error }));
+    }
+    return response.blob().then((blob) => {
       const a = document.createElement('a');
       a.style = 'display: none';
       document.body.appendChild(a);
@@ -73,10 +79,12 @@ const saveFile = (target) => {
       a.download = `${filename}.zip`;
       a.click();
       window.URL.revokeObjectURL(url);
-    })
-    .catch((err) => {
-      console.log(err); // eslint-disable-line
+      return { ok: true };
     });
+  }).catch((err) => {
+    console.log(err); // eslint-disable-line
+    return { ok: false };
+  });
 
   return promise;
 };

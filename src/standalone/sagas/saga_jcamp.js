@@ -27,7 +27,7 @@ function* addOthers(action) {
     } else {
       yield put({
         type: FILE.CONVERT_FAIL,
-        payload,
+        payload: { error: rsp && rsp.error },
       });
     }
   } else {

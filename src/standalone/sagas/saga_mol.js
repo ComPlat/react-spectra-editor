@@ -43,7 +43,7 @@ function* convertMol(action) {
   } else {
     yield put({
       type: MOL.CONVERT_FAIL,
-      payload,
+      payload: { error: rsp && rsp.error },
     });
   }
 }

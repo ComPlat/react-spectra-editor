@@ -76,7 +76,7 @@ function* convertFile(action) {
   } else {
     yield put({
       type: FILE.CONVERT_FAIL,
-      payload,
+      payload: { error: rsp && rsp.error },
     });
   }
 }
@@ -99,10 +99,12 @@ function* saveFile(action) {
     ...payload, src, dst, filename, mol, dstList,
   };
 
-  yield call(FetcherFile.saveFile, target);
-  yield put({
-    type: FILE.SAVE_DONE,
-  });
+  const rsp = yield call(FetcherFile.saveFile, target);
+  if (rsp && rsp.ok) {
+    yield put({ type: FILE.SAVE_DONE });
+  } else {
+    yield put({ type: FILE.SAVE_FAIL, payload: { error: rsp && rsp.error } });
+  }
 }
 
 function* refreshFile(action) {
@@ -136,7 +138,7 @@ function* refreshFile(action) {
   } else {
     yield put({
       type: FILE.CONVERT_FAIL,
-      payload,
+      payload: { error: rsp && rsp.error },
     });
   }
 }
