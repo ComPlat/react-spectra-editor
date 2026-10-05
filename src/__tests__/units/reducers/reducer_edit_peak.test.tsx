@@ -76,7 +76,10 @@ describe('Test redux reducer for edit peak', () => {
     action.type = EDITPEAK.CLEAR_ALL;
     action.payload = { curveIdx: 0, dataPeaks: [{ x: 5, y: 6 }] };
     peaksState = { peaks: [{ pos: [{ x: 1, y: 2 }, { x: 3, y: 4 }] }], selectedIdx: 0 };
-    const expectedValue = { peaks: [{ neg: [{ x: 1, y: 2 }, { x: 3, y: 4 }, { x: 5, y: 6 }], pos: [] }], selectedIdx: 0 };
+    const expectedValue = {
+      peaks: [{ neg: [{ x: 1, y: 2 }, { x: 3, y: 4 }, { x: 5, y: 6 }], pos: [] }],
+      selectedIdx: 0,
+    };
     const newState = editPeakReducer(peaksState, action);
     expect(newState).toEqual(expectedValue);
   });

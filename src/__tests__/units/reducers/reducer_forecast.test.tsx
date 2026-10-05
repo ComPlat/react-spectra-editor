@@ -70,7 +70,8 @@ describe('Test redux reducer for forecast', () => {
   // TODO: need more tests implementation
   // describe('Set IR status', () => {
   //   it('Just a simple test', () => {
-  //     forecastState = { predictions: { outline: {}, output: { result: [{svgs: "", fgs: [{sma: 'd', identity: 'identity'}]}] }, } }
+  //     forecastState = { predictions: { outline: {}, output: {
+  //       result: [{svgs: "", fgs: [{sma: 'd', identity: 'identity'}]}] }, } }
   //     const payload = { predictions: { outline: {}, output: { result: [{sma: "d"}] }, } }
   //     action.type = FORECAST.SET_IR_STATUS
   //     action.payload = payload

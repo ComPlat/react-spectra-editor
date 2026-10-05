@@ -47,7 +47,10 @@ describe('Test Converter', () => {
 
     beforeEach(() => {
       dataPeaks = [{ x: 1, y: 1 }, { x: 2, y: 1 }, { x: 3.14, y: 1.15 }, { x: 2.14, y: -1.15 }];
-      editPeaks = { selectedIdx: 0, peaks: [{ pos: [{ x: 1, y: 1 }], neg: [{ x: 2.14, y: -1.15 }] }] };
+      editPeaks = {
+        selectedIdx: 0,
+        peaks: [{ pos: [{ x: 1, y: 1 }], neg: [{ x: 2.14, y: -1.15 }] }],
+      };
       expectedPeaks = [{ x: 1, y: 1 }, { x: 2, y: 1 }, { x: 3.14, y: 1.15 }];
     });
 
@@ -76,7 +79,9 @@ describe('Test Converter', () => {
       editPeaks.peaks = [{ pos: [{ x: 1, y: 1 }], neg: null }];
 
       const newEditPeaks = PksEdit(dataPeaks, editPeaks);
-      expect(newEditPeaks).toEqual([{ x: 1, y: 1 }, { x: 2, y: 1 }, { x: 2.14, y: -1.15 }, { x: 3.14, y: 1.15 }]);
+      expect(newEditPeaks).toEqual([
+        { x: 1, y: 1 }, { x: 2, y: 1 }, { x: 2.14, y: -1.15 }, { x: 3.14, y: 1.15 },
+      ]);
     });
 
     it('Get new edited peaks', () => {
@@ -89,7 +94,9 @@ describe('Test Converter', () => {
         { max: { x: 1.0, y: 2.0 }, min: { x: 3.0, y: -2.0 }, pecker: null },
         { max: { x: 2.0, y: 2.0 }, min: { x: 1.5, y: -2.0 }, pecker: null },
       ];
-      const expectedData = [{ x: 1.0, y: 2.0 }, { x: 1.5, y: -2.0 }, { x: 2.0, y: 2.0 }, { x: 3.0, y: -2.0 }];
+      const expectedData = [
+        { x: 1.0, y: 2.0 }, { x: 1.5, y: -2.0 }, { x: 2.0, y: 2.0 }, { x: 3.0, y: -2.0 },
+      ];
       const newEditPeaks = PksEdit(dataPeaks, editPeaks, voltammetryPeak);
       expect(newEditPeaks).toEqual(expectedData);
     });
@@ -103,7 +110,9 @@ describe('Test Converter', () => {
     });
 
     it('Get peckers list', () => {
-      const voltammetryPeak: VoltammetryPeaks[] = [{ max: null, min: null, pecker: { x: 1.0, y: 2.0 } }];
+      const voltammetryPeak: VoltammetryPeaks[] = [
+        { max: null, min: null, pecker: { x: 1.0, y: 2.0 } },
+      ];
       const expectedData = [{ x: 1.0, y: 2.0 }];
       const peckers = PeckersEdit(voltammetryPeak);
       expect(peckers).toEqual(expectedData);

@@ -82,6 +82,7 @@ describe('ForecastViewer — does not re-dispatch FORECAST.INIT_STATUS on host-c
       </Provider>,
     );
 
-    expect((store.dispatch as jest.Mock).mock.calls.length).toBeGreaterThan(dispatchCountAfterMount);
+    expect((store.dispatch as jest.Mock).mock.calls.length)
+      .toBeGreaterThan(dispatchCountAfterMount);
   });
 });

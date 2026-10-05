@@ -120,7 +120,10 @@ describe('lc-ms/submit peaks — backend payload shape', () => {
         },
         ms: { positive: { pageValues: [0.5], peaks: [[{ x: 100, y: 1 }]] } },
       };
-      expect(getLcmsMzPageData({ ...base, tic: { ...base.tic, currentPageValue: NaN } })).toBeNull();
+      expect(getLcmsMzPageData({
+        ...base,
+        tic: { ...base.tic, currentPageValue: NaN },
+      })).toBeNull();
     });
 
     it('returns null when RT does not match any TIC point or page value', () => {

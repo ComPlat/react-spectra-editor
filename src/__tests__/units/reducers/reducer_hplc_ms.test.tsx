@@ -164,7 +164,9 @@ describe('Test redux reducer_hplc_ms', () => {
     const clearedIntegrations = hplcMsReducer(withSelectedSpectrum, {
       type: HPLC_MS.CLEAR_INTEGRATION_ALL_HPLCMS,
     } as any);
-    expect(clearedIntegrations.uvvis.spectraList.every((sp: any) => sp.integrations.length === 0)).toEqual(true);
+    expect(clearedIntegrations.uvvis.spectraList.every((
+      sp: any,
+    ) => sp.integrations.length === 0)).toEqual(true);
 
     const clearedPeaks = hplcMsReducer(clearedIntegrations, {
       type: HPLC_MS.CLEAR_ALL_PEAKS_HPLCMS,

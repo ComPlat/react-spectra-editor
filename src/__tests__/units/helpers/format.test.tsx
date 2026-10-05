@@ -254,7 +254,13 @@ describe('Test format helper', () => {
     });
 
     it('Layout digit 2', () => {
-      const listLayout = [LIST_LAYOUT.H1, LIST_LAYOUT.F19, LIST_LAYOUT.P31, LIST_LAYOUT.N15, LIST_LAYOUT.Si29, LIST_LAYOUT.PLAIN,
+      const listLayout = [
+        LIST_LAYOUT.H1,
+        LIST_LAYOUT.F19,
+        LIST_LAYOUT.P31,
+        LIST_LAYOUT.N15,
+        LIST_LAYOUT.Si29,
+        LIST_LAYOUT.PLAIN,
         LIST_LAYOUT.CYCLIC_VOLTAMMETRY];
 
       listLayout.forEach((layout) => {
@@ -288,7 +294,14 @@ describe('Test format helper', () => {
 
   describe('Test check layouts', () => {
     describe('Check NMR layout', () => {
-      const nmrLayouts = [LIST_LAYOUT.H1, LIST_LAYOUT.C13, LIST_LAYOUT.F19, LIST_LAYOUT.P31, LIST_LAYOUT.N15, LIST_LAYOUT.Si29];
+      const nmrLayouts = [
+        LIST_LAYOUT.H1,
+        LIST_LAYOUT.C13,
+        LIST_LAYOUT.F19,
+        LIST_LAYOUT.P31,
+        LIST_LAYOUT.N15,
+        LIST_LAYOUT.Si29,
+      ];
       it('Is NMR layout', () => {
         nmrLayouts.forEach((layout) => {
           const isNMR = Format.isNmrLayout(layout);
@@ -382,7 +395,12 @@ describe('Test format helper', () => {
   });
 
   describe('Test layouts have multiple curves', () => {
-    const layouts = [LIST_LAYOUT.CYCLIC_VOLTAMMETRY, LIST_LAYOUT.SEC, LIST_LAYOUT.GC, LIST_LAYOUT.AIF];
+    const layouts = [
+      LIST_LAYOUT.CYCLIC_VOLTAMMETRY,
+      LIST_LAYOUT.SEC,
+      LIST_LAYOUT.GC,
+      LIST_LAYOUT.AIF,
+    ];
     it('Has multiple curves', () => {
       layouts.forEach((layout) => {
         const hasMultipleCurves = Format.hasMultiCurves(layout);
@@ -514,9 +532,20 @@ describe('Test format helper', () => {
         scanRate: 0.1,
         voltaData: {
           listPeaks: [{
-            min: { x: -1.5404, y: -0.00000307144 }, max: { x: 0.10003, y: 0.00000285434 }, isRef: true, e12: -0.720185, createdAt: 1716803991732, updatedAt: 1716803991733, pecker: { x: 0.380242, y: 0.00000164361 },
+            min: { x: -1.5404, y: -0.00000307144 },
+            max: { x: 0.10003, y: 0.00000285434 },
+            isRef: true,
+            e12: -0.720185,
+            createdAt: 1716803991732,
+            updatedAt: 1716803991733,
+            pecker: { x: 0.380242, y: 0.00000164361 },
           }, {
-            max: { x: 0.10002, y: 0.00000283434 }, e12: -0.72519, updatedAt: 1716803991733, min: { x: -1.5504, y: -0.00000317144 }, pecker: { x: 0.480242, y: 0.00000174361 }, isRef: false,
+            max: { x: 0.10002, y: 0.00000283434 },
+            e12: -0.72519,
+            updatedAt: 1716803991733,
+            min: { x: -1.5504, y: -0.00000317144 },
+            pecker: { x: 0.480242, y: 0.00000174361 },
+            isRef: false,
           }],
           xyData: {
             x: [1.49048, 1.48049],
