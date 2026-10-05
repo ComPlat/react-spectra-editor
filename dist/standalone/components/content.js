@@ -4,7 +4,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.default = exports.buildSavePayload = void 0;
 var _react = _interopRequireDefault(require("react"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
 var _reactRedux = require("react-redux");
@@ -83,6 +83,45 @@ const resolveOperationParams = params => {
     }
   };
 };
+
+// The save request for the selected curve. A curve the editor holds no shift, integration
+// or multiplicity entry for (its lists shorter than the curve list) is saved with its peaks
+// as they are and with '{}', which the backend reads as "none", rather than with another
+// curve's data or the string "undefined".
+const buildSavePayload = (params, mass) => {
+  const {
+    peaks,
+    shift,
+    scan,
+    thres,
+    analysis,
+    integration,
+    multiplicity,
+    waveLength,
+    cyclicvoltaSt,
+    curveSt,
+    dscMetaData
+  } = resolveOperationParams(params);
+  const {
+    curveIdx
+  } = curveSt;
+  const selectedShift = shift?.shifts?.[curveIdx];
+  const fPeaks = selectedShift ? _app.FN.rmRef(peaks, shift, curveIdx) : peaks;
+  return {
+    peakStr: _app.FN.toPeakStr(fPeaks),
+    shift: selectedShift,
+    mass,
+    scan,
+    thres,
+    predict: JSON.stringify(analysis),
+    integration: JSON.stringify(integration?.integrations?.[curveIdx] ?? {}),
+    multiplicity: JSON.stringify(multiplicity?.multiplicities?.[curveIdx] ?? {}),
+    waveLength: JSON.stringify(waveLength),
+    cyclicvolta: JSON.stringify(cyclicvoltaSt),
+    dscMetaData: JSON.stringify(dscMetaData)
+  };
+};
+exports.buildSavePayload = buildSavePayload;
 class Content extends _react.default.Component {
   constructor(props) {
     super(props);
@@ -361,45 +400,10 @@ class Content extends _react.default.Component {
   }
   saveOp(params) {
     const {
-      peaks,
-      shift,
-      scan,
-      thres,
-      analysis,
-      integration,
-      multiplicity,
-      waveLength,
-      cyclicvoltaSt,
-      curveSt,
-      dscMetaData
-    } = resolveOperationParams(params);
-    const {
       saveFileInitAct,
       molSt
     } = this.props;
-    const {
-      mass
-    } = molSt;
-    const {
-      curveIdx
-    } = curveSt;
-    const selectedShift = shift.shifts[curveIdx];
-    const fPeaks = _app.FN.rmRef(peaks, shift, curveIdx);
-    const peakStr = _app.FN.toPeakStr(fPeaks);
-    const predict = JSON.stringify(analysis);
-    saveFileInitAct({
-      peakStr,
-      shift: selectedShift,
-      mass,
-      scan,
-      thres,
-      predict,
-      integration: JSON.stringify(integration.integrations[curveIdx]),
-      multiplicity: JSON.stringify(multiplicity.multiplicities[curveIdx]),
-      waveLength: JSON.stringify(waveLength),
-      cyclicvolta: JSON.stringify(cyclicvoltaSt),
-      dscMetaData: JSON.stringify(dscMetaData)
-    });
+    saveFileInitAct(buildSavePayload(params, molSt.mass));
   }
   refreshOp({
     peaks,
@@ -624,4 +628,5 @@ Content.propTypes = {
   editorOnly: _propTypes.default.bool.isRequired,
   addOthersInitAct: _propTypes.default.func.isRequired
 };
+// exported for tests
 var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Content);
