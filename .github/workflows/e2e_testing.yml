@@ -7,11 +7,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22.23.1
       - name: Cypress run
         uses: cypress-io/github-action@v7
         with:
-          build: npm run --max_old_space_size=12288 build
-          start: npm run start:dev
+          build: yarn build
+          start: yarn start:dev
           wait-on: 'http://localhost:3000'
           wait-on-timeout: 300
           browser: chrome
