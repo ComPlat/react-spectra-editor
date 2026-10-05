@@ -30,7 +30,6 @@
     "redux": "^4.1.1",
     "redux-saga": "^1.1.3",
     "redux-undo": "^1.1.0",
-    "regenerator-runtime": "^0.14.1",
     "reselect": "^4.0.0"
   },
   "scripts": {
