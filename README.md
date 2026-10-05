@@ -46,12 +46,13 @@ import { ChemSpectraClient } from '@complat/react-spectra-editor/dist/standalone
 It talks to a [chem-spectra-app](https://github.com/ComPlat/chem-spectra-app) backend, served from the same origin, with these calls:
 `POST /api/v1/chemspectra/file/convert`, `file/save` and `file/refresh`, `molfile/convert`, and `predict/nmr_peaks_form` and `predict/infrared`.
 
-To try it locally, with chem-spectra-app running on port 3007 (override with `CHEM_SPECTRA_APP_URL`):
+To try it locally, one command serves the UI and proxies the backend calls above to a chem-spectra-app. Set `CHEM_SPECTRA_APP_URL` to point it at any backend, local or remote (default `http://0.0.0.0:3007`); `PORT` changes the UI port (default 3006):
 ```
 $ yarn install
 
-$ yarn start:standalone         # http://localhost:3006
-$ yarn start:standalone:editor  # the editorOnly variant
+$ yarn start:standalone                                   # backend on localhost:3007
+$ CHEM_SPECTRA_APP_URL=https://your-backend yarn start:standalone
+$ yarn start:standalone:editor                            # the editorOnly variant
 ```
 
 ### Demo & Manual
