@@ -95,7 +95,7 @@ function EditorVersion({
     }, "grid-form-input"), /*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
       item: true,
       xs: 1
-    }, "grid-drop-space")]
+    }, "grid-drop-space-end")]
   });
 }
 EditorVersion.propTypes = {

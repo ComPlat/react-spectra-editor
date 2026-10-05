@@ -15,7 +15,7 @@ function* predictByServer(action) {
     payload
   } = action;
   const rsp = yield (0, _effects.call)(_fetcher_predict.default.predict, payload);
-  if (rsp && rsp.outline.code) {
+  if (rsp?.outline?.code) {
     yield (0, _effects.put)({
       type: _action_type.PREDICT.PREDICT_DONE,
       payload: rsp
@@ -39,7 +39,7 @@ function* predictToWriteByServer(action) {
     decimal
   } = payload;
   const rsp = yield (0, _effects.call)(_fetcher_predict.default.predict, payload);
-  if (rsp && rsp.outline.code) {
+  if (rsp?.outline?.code) {
     yield (0, _effects.put)({
       type: _action_type.PREDICT.PREDICT_DONE,
       payload: rsp

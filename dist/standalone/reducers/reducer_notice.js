@@ -36,6 +36,7 @@ const buildPredictNotice = (state, action) => {
   const {
     outline
   } = action.payload;
+  if (!outline) return warnUnknownState;
   const {
     code,
     text

@@ -540,7 +540,7 @@ class Content extends _react.default.Component {
     let currEntity = entity;
     let currXLabel = xLabel;
     let currYLabel = yLabel;
-    let multiEntities = false;
+    let multiEntities = [];
     if (!isExist) {
       const {
         jcampList
