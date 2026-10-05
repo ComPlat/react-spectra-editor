@@ -35,6 +35,25 @@ $ yarn install
 $ yarn start
 ```
 
+#### Standalone ChemSpectra client
+The ChemSpectra upload page (spectrum, molfile and prediction-JSON inputs around the editor), formerly published as `@complat/chem-spectra-client`, ships with the editor as a separate entry point. The main entry does not load it.
+```
+import { ChemSpectraClient } from '@complat/react-spectra-editor/dist/standalone';
+
+<ChemSpectraClient />            // full page: molfile, spectrum and prediction inputs
+<ChemSpectraClient editorOnly /> // spectrum input only
+```
+It talks to a [chem-spectra-app](https://github.com/ComPlat/chem-spectra-app) backend, served from the same origin, with these calls:
+`POST /api/v1/chemspectra/file/convert`, `file/save` and `file/refresh`, `molfile/convert`, and `predict/nmr_peaks_form` and `predict/infrared`.
+
+To try it locally, with chem-spectra-app running on port 3007 (override with `CHEM_SPECTRA_APP_URL`):
+```
+$ yarn install
+
+$ yarn start:standalone         # http://localhost:3006
+$ yarn start:standalone:editor  # the editorOnly variant
+```
+
 ### Demo & Manual
 
 [demo & step-by-step manual](https://github.com/ComPlat/react-spectra-editor/blob/master/DEMO_MANUAL.md)
@@ -68,6 +87,8 @@ This project has been funded by the **[DFG]**.
 
 
 Funded by the [Deutsche Forschungsgemeinschaft (DFG, German Research Foundation)](https://www.dfg.de/) under the [National Research Data Infrastructure – NFDI4Chem](https://nfdi4chem.de/) – Projektnummer **441958208** since 2020.
+
+Funded by the [Helmholtz Association](https://www.helmholtz.de/en/) under the program Biointerfaces (BIF-TM); currently supported by the Helmholtz program Information (until 2027).
 
 
 [DFG]: https://www.dfg.de/en/
