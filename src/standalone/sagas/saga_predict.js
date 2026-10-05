@@ -1,7 +1,7 @@
 import {
   call, put, takeEvery,
 } from 'redux-saga/effects';
-import { FN } from '@complat/react-spectra-editor';
+import { FN } from '../../app';
 
 import { PREDICT, DESC } from '../constants/action_type';
 import FetcherPredict from '../fetchers/fetcher_predict';

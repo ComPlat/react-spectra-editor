@@ -3,12 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { SpectraEditor, FN } from '@complat/react-spectra-editor';
-// import { CopyToClipboard } from 'react-copy-to-clipboard';
-
-// import Tooltip from '@mui/material/Tooltip';
-// import Button from '@mui/material/Button';
-// import FileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined';
+import { SpectraEditor, FN } from '../../app';
 
 import { saveFileInit, refreshFileInit } from '../actions/action_file';
 import { predictInit, predictToWriteInit } from '../actions/action_predict';
@@ -42,14 +37,6 @@ const editorStyle = {
   margin: '0 0 0 60px',
   width: W - 80,
 };
-
-// const editorBtnStyle = {
-//   border: '1px solid gray',
-//   borderRadius: '0 8px 8px 0',
-//   margin: '0 0 0 0',
-//   width: 40,
-//   verticalAlign: 'top',
-// };
 
 const renderTitle = () => (
   <div style={titleStyle}>
@@ -402,16 +389,6 @@ class Content extends React.Component {
             value={descSt}
             readOnly
           />
-          {/* <Tooltip title="Copy to clipboard">
-            <CopyToClipboard text={descSt}>
-              <Button
-                style={editorBtnStyle}
-                variant="outlined"
-              >
-                <FileCopyOutlinedIcon />
-              </Button>
-            </CopyToClipboard>
-          </Tooltip> */}
         </div>
       </div>
     );

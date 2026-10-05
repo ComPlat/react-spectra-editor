@@ -2,7 +2,7 @@ import base64 from 'base-64';
 import {
   call, put, takeEvery, select,
 } from 'redux-saga/effects';
-import { FN } from '@complat/react-spectra-editor';
+import { FN } from '../../app';
 
 import { FILE, FORM } from '../constants/action_type';
 import { VerifyJcampExt, VerifyMsExt, VerifySize } from '../utils/util_file';
