@@ -8,17 +8,17 @@ import LayerInit from '../../layer_init';
 import { MANAGER } from '../../constants/action_type';
 import { LIST_LAYOUT } from '../../constants/list_layout';
 
-jest.mock('../../components/hplc_viewer', () => () => (
-  <div data-testid="hplc-viewer" />
-));
+jest.mock('../../components/hplc_viewer', () => function MockHplcViewer() {
+  return <div data-testid="hplc-viewer" />;
+});
 
-jest.mock('../../components/multi_jcamps_viewer', () => () => (
-  <div data-testid="multi-jcamps-viewer" />
-));
+jest.mock('../../components/multi_jcamps_viewer', () => function MockMultiJcampsViewer() {
+  return <div data-testid="multi-jcamps-viewer" />;
+});
 
-jest.mock('../../layer_prism', () => () => (
-  <div data-testid="layer-prism" />
-));
+jest.mock('../../layer_prism', () => function MockLayerPrism() {
+  return <div data-testid="layer-prism" />;
+});
 
 const mockStore = configureStore([]);
 

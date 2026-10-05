@@ -6,9 +6,15 @@ import configureStore from 'redux-mock-store';
 
 import ForecastViewer from '../../../components/forecast_viewer';
 
-jest.mock('../../../components/d3_line/index', () => () => <div data-testid="viewer-line" />);
-jest.mock('../../../components/forecast/nmr_viewer', () => () => <div />);
-jest.mock('../../../components/forecast/ir_viewer', () => () => <div />);
+jest.mock('../../../components/d3_line/index', () => function MockD3Line() {
+  return <div data-testid="viewer-line" />;
+});
+jest.mock('../../../components/forecast/nmr_viewer', () => function MockNmrViewer() {
+  return <div />;
+});
+jest.mock('../../../components/forecast/ir_viewer', () => function MockIrViewer() {
+  return <div />;
+});
 
 const mockStore = configureStore([]);
 
@@ -76,6 +82,7 @@ describe('ForecastViewer — does not re-dispatch FORECAST.INIT_STATUS on host-c
       </Provider>,
     );
 
-    expect((store.dispatch as jest.Mock).mock.calls.length).toBeGreaterThan(dispatchCountAfterMount);
+    expect((store.dispatch as jest.Mock).mock.calls.length)
+      .toBeGreaterThan(dispatchCountAfterMount);
   });
 });

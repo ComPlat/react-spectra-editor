@@ -122,4 +122,11 @@ const commonStyle = {
 
 const focusStyle = (criteria, cls) => (criteria ? [cls.btnHt] : []);
 
-export { MuButton, commonStyle, focusStyle } // eslint-disable-line
+// Gap between the buttons of a collapsible toolbar group. collapsible_toolbar_group.js has
+// imported this since 422f0ab, but it was never defined, so the style got `gap: undefined`
+// and the groups rendered with no gap. 0 keeps that rendering; choose a real gap separately.
+const TOOLBAR_GROUP_GAP = 0;
+
+export {
+  MuButton, commonStyle, focusStyle, TOOLBAR_GROUP_GAP,
+} // eslint-disable-line

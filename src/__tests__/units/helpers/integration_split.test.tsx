@@ -10,7 +10,7 @@ import {
   isMergedVisualSplitGroup,
   resolveSplitPreviewExtent,
   resolveSplitTarget,
-} from "../../../helpers/integration_split";
+} from '../../../helpers/integration_split';
 
 describe('Test helper for integration split preview', () => {
   const data = [
@@ -198,7 +198,9 @@ describe('Test helper for integration split preview', () => {
       integrationSplitTargets: {
         stack: [
           { xL: 0, xU: 4, area: 2 },
-          { xL: 4, xU: 10, area: 3, visualSplitGroupId: 'g1' },
+          {
+            xL: 4, xU: 10, area: 3, visualSplitGroupId: 'g1',
+          },
         ],
         shift: 0,
       },
@@ -218,7 +220,9 @@ describe('Test helper for integration split preview', () => {
     expect(resolveSplitTarget(focus, mergedGroup, 6)).toEqual({
       xL: 4, xU: 10, area: 3, visualSplitGroupId: 'g1',
     });
-    expect(resolveSplitTarget(focus, { xL: 1, xU: 5 }, 7)).toEqual({ xL: 4, xU: 10, area: 3, visualSplitGroupId: 'g1' });
+    expect(resolveSplitTarget(focus, { xL: 1, xU: 5 }, 7)).toEqual({
+      xL: 4, xU: 10, area: 3, visualSplitGroupId: 'g1',
+    });
   });
 
   it('drawIntegrationVisualSplitLines applies hover stroke and click handler when interactive', () => {

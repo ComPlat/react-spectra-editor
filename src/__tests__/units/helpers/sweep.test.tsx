@@ -1,4 +1,4 @@
-import { buildSweepPayloadFromXBounds } from "../../../helpers/sweep";
+import { buildSweepPayloadFromXBounds } from '../../../helpers/sweep';
 
 describe('Test helper for sweep payloads', () => {
   const data = [{ x: 0, y: 1, k: 0 }, { x: 2, y: 2, k: 1 }];
