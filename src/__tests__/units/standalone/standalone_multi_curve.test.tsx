@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  render, screen, fireEvent, waitFor, within, act,
+  render, screen, fireEvent, waitFor, within, act, configure,
 } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
@@ -16,6 +16,11 @@ import cv2 from '../../fixtures/cyclic_voltammetry_2';
 
 // A multi-spectrum upload with the second curve selected: the adapter must use the
 // selected curve's entries (index 1), not the first curve's.
+// These tests mount the real editor. Under a loaded full-suite run a single test can take
+// several seconds, so give them room rather than fail on Jest's and waitFor's defaults.
+jest.setTimeout(20000);
+configure({ asyncUtilTimeout: 5000 });
+
 jest.mock('../../../components/common/draw', () => ({
   drawMain: jest.fn(),
   drawLabel: jest.fn(),
