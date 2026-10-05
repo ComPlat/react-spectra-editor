@@ -98,7 +98,6 @@ describe('Test Converter', () => {
   describe('Get voltammetry peckers', () => {
     it('Get peckers list empty', () => {
       const voltammetryPeak: VoltammetryPeaks[] = [{ max: null, min: null, pecker: null }];
-      const expectedData = [{ x: 1.0, y: 2.0 }, { x: 1.5, y: -2.0 }, { x: 2.0, y: 2.0 }, { x: 3.0, y: -2.0 }];
       const peckers = PeckersEdit(voltammetryPeak);
       expect(peckers).toEqual([]);
     });

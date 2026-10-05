@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, cleanup } from '@testing-library/react';
+import { render, cleanup } from '@testing-library/react';
 import configureStore from 'redux-mock-store';
 import { Provider } from 'react-redux';
 import GraphSelectionPanel from '../../../../components/panel/graph_selection';
@@ -25,9 +25,9 @@ store.dispatch = jest.fn(dispatchMock);
 describe('GraphSelectionPanel', () => {
   let AppWrapper;
   beforeEach(() => {
-    AppWrapper = function ({ store, children }) {
+    AppWrapper = function ProviderWrapper({ store: providerStore, children }) {
       return (
-        <Provider store={store}>
+        <Provider store={providerStore}>
           {' '}
           {children}
           {' '}

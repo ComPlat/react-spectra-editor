@@ -17,8 +17,9 @@ describe('Test calculation helpers', () => {
     });
 
     it('Almost equal with almost equal numbers', () => {
-      const a = 1.0000000000000001;
-      const b = 1.00000000000000015;
+      // what the old literals 1.0000000000000001 and 1.00000000000000015 evaluate to
+      const a = 1;
+      const b = 1 + Number.EPSILON;
       const output = almostEqual(a, b);
       expect(output).toEqual(true);
     });

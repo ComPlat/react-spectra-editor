@@ -6,13 +6,13 @@ import configureStore from 'redux-mock-store';
 
 import ForecastViewer from '../../../components/forecast_viewer';
 
-jest.mock('../../../components/d3_line/index', () => function () {
+jest.mock('../../../components/d3_line/index', () => function MockD3Line() {
   return <div data-testid="viewer-line" />;
 });
-jest.mock('../../../components/forecast/nmr_viewer', () => function () {
+jest.mock('../../../components/forecast/nmr_viewer', () => function MockNmrViewer() {
   return <div />;
 });
-jest.mock('../../../components/forecast/ir_viewer', () => function () {
+jest.mock('../../../components/forecast/ir_viewer', () => function MockIrViewer() {
   return <div />;
 });
 

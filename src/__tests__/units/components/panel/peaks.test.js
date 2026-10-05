@@ -1,11 +1,11 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
-import Peaks from '../../../../components/panel/peaks';
+import { render } from '@testing-library/react';
 import configureStore from 'redux-mock-store';
 import { Provider } from 'react-redux';
 import '@testing-library/jest-dom';
 import { createTheme } from '@mui/material';
 import { ThemeProvider } from '@mui/styles';
+import Peaks from '../../../../components/panel/peaks';
 import { LIST_LAYOUT } from '../../../../constants/list_layout';
 
 const mockStore = configureStore([]);
@@ -59,9 +59,9 @@ const theme = createTheme({
 describe('<Peaks />', () => {
   let AppWrapper;
   beforeEach(() => {
-    AppWrapper = function ({ store, children }) {
+    AppWrapper = function ProviderWrapper({ store: providerStore, children }) {
       return (
-        <Provider store={store}>
+        <Provider store={providerStore}>
           {' '}
           {children}
           {' '}

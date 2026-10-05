@@ -18,9 +18,9 @@ store.dispatch = jest.fn(dispatchMock);
 describe('<Viewer />', () => {
   let AppWrapper;
   beforeEach(() => {
-    AppWrapper = function ({ store, children }) {
+    AppWrapper = function ProviderWrapper({ store: providerStore, children }) {
       return (
-        <Provider store={store}>
+        <Provider store={providerStore}>
           {' '}
           {children}
           {' '}

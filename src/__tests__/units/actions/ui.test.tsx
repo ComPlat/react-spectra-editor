@@ -9,7 +9,7 @@ import {
 import { UI } from '../../../constants/action_type';
 import { LIST_UI_SWEEP_TYPE } from '../../../constants/list_ui';
 
-import { confirmCancelPendingIntegration } from '../../../helpers/integration_draft.js';
+import { confirmCancelPendingIntegration } from '../../../helpers/integration_draft';
 
 jest.mock('../../../helpers/integration_draft.js', () => ({
   confirmCancelPendingIntegration: jest.fn(),

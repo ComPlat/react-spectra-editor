@@ -686,19 +686,19 @@ describe('Test for chem helper', () => {
 
   describe('Test get ratio for CV layout', () => {
     it('Get 2D value without radian', () => {
-      const y_max_peak = 2.0;
-      const y_min_peak = 1.0;
-      const y_pecker = 3.0;
-      const ratio = GetCyclicVoltaRatio(y_max_peak, y_min_peak, y_pecker).toFixed(4);
+      const yMaxPeak = 2.0;
+      const yMinPeak = 1.0;
+      const yPecker = 3.0;
+      const ratio = GetCyclicVoltaRatio(yMaxPeak, yMinPeak, yPecker).toFixed(4);
       expect(ratio).toEqual('1.3135');
     });
   });
 
   describe('Test get delta for CV layout', () => {
     it('Get 2D value without radian', () => {
-      const x_max_peak = 2.0;
-      const x_min_peak = -1.5;
-      const delta = GetCyclicVoltaPeakSeparate(x_max_peak, x_min_peak);
+      const xMaxPeak = 2.0;
+      const xMinPeak = -1.5;
+      const delta = GetCyclicVoltaPeakSeparate(xMaxPeak, xMinPeak);
       expect(delta).toEqual(3.5);
     });
   });

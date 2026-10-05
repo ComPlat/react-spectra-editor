@@ -9,33 +9,33 @@ import { ThemeProvider } from '@mui/styles';
 import HPLCViewer from '../../../components/hplc_viewer';
 import { LIST_LAYOUT } from '../../../constants/list_layout';
 
-jest.mock('../../../components/cmd_bar/index', () => function (props) {
+jest.mock('../../../components/cmd_bar/index', () => function MockCmdBar({ editorOnly, hideThreshold }) {
   return (
     <div data-testid="cmd-bar">
-      {props.editorOnly ? 'editorOnly' : 'editable'}
+      {editorOnly ? 'editorOnly' : 'editable'}
       -
-      {props.hideThreshold ? 'hideThreshold' : 'showThreshold'}
+      {hideThreshold ? 'hideThreshold' : 'showThreshold'}
     </div>
   );
 });
 
-jest.mock('../../../components/d3_line_rect/index', () => function (props) {
+jest.mock('../../../components/d3_line_rect/index', () => function MockD3LineRect({ ticEntities, uvvisEntities, mzEntities }) {
   return (
     <div data-testid="viewer-line-rect">
       tic:
-      {props.ticEntities?.length || 0}
+      {ticEntities?.length || 0}
       -uvvis:
-      {props.uvvisEntities?.length || 0}
+      {uvvisEntities?.length || 0}
       -mz:
-      {props.mzEntities?.length || 0}
+      {mzEntities?.length || 0}
     </div>
   );
 });
 
-jest.mock('../../../components/panel/index', () => function (props) {
+jest.mock('../../../components/panel/index', () => function MockPanel({ integration }) {
   return (
     <div data-testid="panel-viewer">
-      {props.integration ? 'hasIntegration' : 'noIntegration'}
+      {integration ? 'hasIntegration' : 'noIntegration'}
     </div>
   );
 });
