@@ -3,15 +3,25 @@ import { buildSavePayload } from '../../../standalone/components/content';
 // What the standalone client posts on save, built from the editor's Submit payload.
 const entry = {
   shift: { ref: { name: 'CDCl3', value: 7.26, label: 'CDCl3' }, peak: false, enable: true },
-  integration: { stack: [{ xL: 1, xU: 2, area: 1 }], refArea: 1, refFactor: 1, shift: 0 },
-  multiplicity: { stack: [], shift: 0, smExtext: false, edited: false },
+  integration: {
+    stack: [{ xL: 1, xU: 2, area: 1 }], refArea: 1, refFactor: 1, shift: 0,
+  },
+  multiplicity: {
+    stack: [], shift: 0, smExtext: false, edited: false,
+  },
 };
 const peaks = [{ x: 7.26, y: 1 }, { x: 3.5, y: 2 }];
 
 const payloadFor = (curveIdx: number, curve: object) => {
   const spectraList = [];
   spectraList[curveIdx] = {
-    peaks, scan: 1, thres: 10, analysis: {}, waveLength: {}, cyclicvoltaSt: {}, dscMetaData: {},
+    peaks,
+    scan: 1,
+    thres: 10,
+    analysis: {},
+    waveLength: {},
+    cyclicvoltaSt: {},
+    dscMetaData: {},
     ...curve,
   };
   return { spectra_list: spectraList, curveSt: { curveIdx } };

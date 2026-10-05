@@ -1,7 +1,9 @@
 import { waitFor } from '@testing-library/react';
 
 import createClientStore from '../../../standalone/store';
-import { FILE, FORM, MOL, PREDICT } from '../../../standalone/constants/action_type';
+import {
+  FILE, FORM, MOL, PREDICT,
+} from '../../../standalone/constants/action_type';
 import { encodeJcamp, installFetch, formEntries } from '../../fixtures/standalone_client';
 import nmr1HJcamp from '../../fixtures/nmr1h_jcamp';
 import irJcamp from '../../fixtures/ir_jcamp';
@@ -66,7 +68,7 @@ describe('standalone client sagas', () => {
     const calls = installFetch(convertRoute(nmr1HJcamp));
     (window.URL as any).createObjectURL = () => 'blob:zip';
     (window.URL as any).revokeObjectURL = () => {};
-    const click = HTMLAnchorElement.prototype.click;
+    const { click } = HTMLAnchorElement.prototype;
     HTMLAnchorElement.prototype.click = () => {};
     try {
       const store = createClientStore();
@@ -123,7 +125,7 @@ describe('standalone client sagas', () => {
     });
     (window.URL as any).createObjectURL = () => 'blob:zip';
     (window.URL as any).revokeObjectURL = () => {};
-    const click = HTMLAnchorElement.prototype.click;
+    const { click } = HTMLAnchorElement.prototype;
     HTMLAnchorElement.prototype.click = () => {};
     try {
       const store = createClientStore();
@@ -131,7 +133,9 @@ describe('standalone client sagas', () => {
       calls.length = 0;
       store.dispatch({
         type: FILE.SAVE_INIT,
-        payload: { peakStr: '', shift: false, scan: 1, thres: 1 },
+        payload: {
+          peakStr: '', shift: false, scan: 1, thres: 1,
+        },
       });
       await waitFor(() => expect(calls).toHaveLength(1));
       const body = formEntries(calls[0].options.body);
@@ -143,7 +147,9 @@ describe('standalone client sagas', () => {
 
   it('converts a molfile and keeps the returned svg', async () => {
     const calls = installFetch({
-      'molfile/convert': { status: true, smi: 'C', mass: 16.03, svg: '<svg/>' },
+      'molfile/convert': {
+        status: true, smi: 'C', mass: 16.03, svg: '<svg/>',
+      },
     });
     const store = createClientStore();
     store.dispatch({ type: MOL.ADD_INIT, payload: { mol: new File(['M  END'], 'a.mol') } });
@@ -170,7 +176,9 @@ describe('standalone client sagas', () => {
 
     store.dispatch({
       type: PREDICT.PREDICT_INIT,
-      payload: { layout: '1H', molfile, peaks: [{ x: 1, y: 2 }], shift: { ref: {} } },
+      payload: {
+        layout: '1H', molfile, peaks: [{ x: 1, y: 2 }], shift: { ref: {} },
+      },
     });
     await waitFor(() => expect(calls).toHaveLength(2));
     expect(calls[1].url).toBe('/api/v1/chemspectra/predict/nmr_peaks_form');
@@ -189,7 +197,9 @@ describe('standalone client sagas', () => {
 
     store.dispatch({
       type: PREDICT.PREDICT_INIT,
-      payload: { layout: '1H', molfile, peaks: [], shift: { ref: {} } },
+      payload: {
+        layout: '1H', molfile, peaks: [], shift: { ref: {} },
+      },
     });
     await waitFor(() => expect(calls).toHaveLength(1));
     await waitFor(() => expect(store.getState().notice.status).toBe('warning'));
