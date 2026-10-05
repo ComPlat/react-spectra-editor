@@ -36,7 +36,7 @@
   "scripts": {
     "start": "react-scripts --max_old_space_size=12288 start",
     "build": "react-scripts --max_old_space_size=12288 build",
-    "compile": "rm -rf dist && NODE_ENV=production babel --ignore tests,stories ./src --out-dir ./dist",
+    "compile": "rm -rf dist && NODE_ENV=production babel --ignore 'src/__tests__/**','src/setupTests.js','src/index.js' ./src --out-dir ./dist",
     "test": "react-scripts test --env=jsdom --verbose --testPathIgnorePatterns=./src/__tests__/fixtures/",
     "test:coverage": "CI=true react-scripts test --env=jsdom --verbose --testPathIgnorePatterns=./src/__tests__/fixtures/ --coverage",
     "eject": "react-scripts eject",
