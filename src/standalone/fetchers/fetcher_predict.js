@@ -38,8 +38,8 @@ const predict = (payload) => {
       method: 'post',
       body: data,
     },
-  ).then(response => response.json())
-    .then(json => json)
+  ).then((response) => response.json())
+    .then((json) => json)
     .catch((err) => {
       console.log(err); // eslint-disable-line
     });

@@ -1,6 +1,6 @@
 import { MOL } from '../constants/action_type';
 
-const addMolInit = payload => (
+const addMolInit = (payload) => (
   {
     type: MOL.ADD_INIT,
     payload,

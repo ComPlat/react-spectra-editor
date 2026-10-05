@@ -1,6 +1,6 @@
 import { FORM } from '../constants/action_type';
 
-const submitForm = payload => (
+const submitForm = (payload) => (
   {
     type: FORM.SUBMIT,
     payload,

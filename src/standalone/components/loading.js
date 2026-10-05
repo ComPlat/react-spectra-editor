@@ -5,7 +5,7 @@ import { bindActionCreators } from 'redux';
 import withStyles from '@mui/styles/withStyles';
 import { Dialog, CircularProgress } from '@mui/material';
 
-const styles = theme => ({
+const styles = (theme) => ({
   card: {
     overflow: 'hide',
   },
@@ -14,13 +14,15 @@ const styles = theme => ({
   },
 });
 
-const Loading = ({ loadingSt, classes }) => (
-  <Dialog open={loadingSt}>
-    <div className={classes.card}>
-      <CircularProgress className={classes.progress} />
-    </div>
-  </Dialog>
-);
+function Loading({ loadingSt, classes }) {
+  return (
+    <Dialog open={loadingSt}>
+      <div className={classes.card}>
+        <CircularProgress className={classes.progress} />
+      </div>
+    </Dialog>
+  );
+}
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
@@ -28,7 +30,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
   }, dispatch)
 );

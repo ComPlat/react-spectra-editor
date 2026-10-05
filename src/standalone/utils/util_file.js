@@ -7,7 +7,6 @@ const VerifyJcampExt = (file) => {
   return acceptables.indexOf(ext.toLowerCase()) >= 0;
 };
 
-
 const VerifyMsExt = (file) => {
   const filename = file && file.name;
   if (!filename) return false;
@@ -17,7 +16,6 @@ const VerifyMsExt = (file) => {
   return acceptables.indexOf(ext.toLowerCase()) >= 0;
 };
 
-
 const VerifyMolExt = (mol) => {
   const molName = mol && mol.name;
   if (!molName) return false;
@@ -25,7 +23,6 @@ const VerifyMolExt = (mol) => {
   const ext = molName.split('.')[last];
   return ext.toLowerCase() === 'mol';
 };
-
 
 const kb = 1024;
 const mb = 1024 * kb;
@@ -37,7 +34,6 @@ const VerifySize = (file) => {
 
   return filesize <= sizeLimit;
 };
-
 
 export {
   VerifyJcampExt, VerifyMsExt, VerifyMolExt, VerifySize,

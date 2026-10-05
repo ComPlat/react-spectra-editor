@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { compose, bindActionCreators } from 'redux';
@@ -20,7 +21,7 @@ import InfoIcon from '@mui/icons-material/Info';
 
 import { manualClear } from '../actions/action_notice';
 
-const stylesBar = theme => ({
+const stylesBar = (theme) => ({
   success: {
     backgroundColor: green[600],
   },
@@ -53,7 +54,7 @@ const variantIcon = {
   info: InfoIcon,
 };
 
-const BarContent = (props) => {
+function BarContent(props) {
   const {
     classes, className, message, onClose, variant, open, ...other
   } = props;
@@ -97,7 +98,7 @@ const BarContent = (props) => {
       />
     </Snackbar>
   );
-};
+}
 
 BarContent.propTypes = {
   classes: PropTypes.object.isRequired,
@@ -115,27 +116,27 @@ const BarContentWrapper = withStyles(stylesBar)(BarContent);
 // Notice
 //
 // - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const stylesNotice = theme => ({
+const stylesNotice = (theme) => ({
   margin: {
     margin: theme.spacing.unit,
   },
 });
 
-const BarContentMain = (
-  variant, className, message, open, onClose,
-) => (
-  <BarContentWrapper
-    variant={variant}
-    className={className}
-    message={message}
-    open={open}
-    onClose={onClose}
-  />
-);
+function BarContentMain(variant, className, message, open, onClose) {
+  return (
+    <BarContentWrapper
+      variant={variant}
+      className={className}
+      message={message}
+      open={open}
+      onClose={onClose}
+    />
+  );
+}
 
-const Notice = ({
+function Notice({
   classes, noticeSt, manualClearAct,
-}) => {
+}) {
   const { status, message } = noticeSt;
 
   return (
@@ -153,15 +154,15 @@ const Notice = ({
       }
     </div>
   );
-};
+}
 
-const mapStateToProps = state => (
+const mapStateToProps = (state) => (
   {
     noticeSt: state.notice,
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     manualClearAct: manualClear,
   }, dispatch)

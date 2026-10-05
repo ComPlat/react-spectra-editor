@@ -27,9 +27,7 @@ const styles = () => ({
   },
 });
 
-const btnSubmit = (
-  classes, isValidExt, submitFormAct,
-) => (
+const btnSubmit = (classes, isValidExt, submitFormAct) => (
   <Button
     disabled={!isValidExt}
     size="small"
@@ -44,10 +42,10 @@ const btnSubmit = (
   </Button>
 );
 
-const InputForm = ({
+function InputForm({
   classes, fileSt,
   submitFormAct,
-}) => {
+}) {
   const { src } = fileSt;
   const isValidMsExt = VerifyMsExt(src);
   const isValidJcampExt = VerifyJcampExt(src);
@@ -58,7 +56,7 @@ const InputForm = ({
       { btnSubmit(classes, isValidExt, submitFormAct) }
     </div>
   );
-};
+}
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
@@ -66,7 +64,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     submitFormAct: submitForm,
   }, dispatch)

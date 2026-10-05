@@ -1,3 +1,4 @@
+/* eslint-disable default-param-last */
 import {
   NOTICE, FILE, MOL, PREDICT,
 } from '../constants/action_type';
@@ -38,14 +39,12 @@ const buildPredictNotice = (state, action) => {
   const { code, text } = outline;
   const status = code <= 299 ? 'success' : 'error';
   if (code) {
-    return Object.assign(
-      {},
-      state,
-      {
-        status,
-        message: text,
-      },
-    );
+    return {
+
+      ...state,
+      status,
+      message: text,
+    };
   }
   return warnUnknownState;
 };
@@ -53,21 +52,21 @@ const buildPredictNotice = (state, action) => {
 const noticeReducer = (state = initialState, action) => {
   switch (action.type) {
     case FILE.ADD_FAIL:
-      return Object.assign({}, state, errFileState);
+      return { ...state, ...errFileState };
     case MOL.ADD_FAIL:
-      return Object.assign({}, state, errMolState);
+      return { ...state, ...errMolState };
     case FILE.CONVERT_DONE:
     case MOL.CONVERT_DONE:
-      return Object.assign({}, state, sucConversionState);
+      return { ...state, ...sucConversionState };
     case FILE.CONVERT_FAIL:
     case MOL.CONVERT_FAIL:
-      return Object.assign({}, state, errConversionState);
+      return { ...state, ...errConversionState };
     case PREDICT.PREDICT_DONE:
     case PREDICT.PREDICT_FAIL:
     case PREDICT.ADD_PRED_JSON_INIT:
       return buildPredictNotice(state, action);
     case NOTICE.MANUAL_CLEAR:
-      return Object.assign({}, state, initialState);
+      return { ...state, ...initialState };
     default:
       return state;
   }

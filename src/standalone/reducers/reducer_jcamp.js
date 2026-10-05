@@ -1,3 +1,4 @@
+/* eslint-disable default-param-last */
 /* eslint-disable no-unused-vars */
 import { JCAMP } from '../constants/action_type';
 

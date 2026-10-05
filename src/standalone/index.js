@@ -4,7 +4,6 @@ import { Provider } from 'react-redux';
 import createClientStore from './store';
 import Frame from './frame';
 
-
 // One store per page, created on first render rather than on import.
 let store = null;
 const getStore = () => {
@@ -12,13 +11,14 @@ const getStore = () => {
   return store;
 };
 
-
 // - - - React - - -
-const ChemSpectraClient = ({ editorOnly }) => (
-  <Provider store={getStore()}>
-    <Frame editorOnly={editorOnly} />
-  </Provider>
-);
+function ChemSpectraClient({ editorOnly }) {
+  return (
+    <Provider store={getStore()}>
+      <Frame editorOnly={editorOnly} />
+    </Provider>
+  );
+}
 
 ChemSpectraClient.propTypes = {
   editorOnly: PropTypes.bool,

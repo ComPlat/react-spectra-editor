@@ -1,3 +1,4 @@
+/* eslint-disable default-param-last */
 import { DESC, FILE } from '../constants/action_type';
 
 const initialState = '';

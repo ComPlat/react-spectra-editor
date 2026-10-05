@@ -12,8 +12,8 @@ const convertMol = (target) => {
       method: 'post',
       body: data,
     },
-  ).then(response => response.json())
-    .then(json => camelizeKeys(json))
+  ).then((response) => response.json())
+    .then((json) => camelizeKeys(json))
     .catch((err) => {
       console.log(err); // eslint-disable-line
     });

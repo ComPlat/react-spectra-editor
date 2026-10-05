@@ -1,3 +1,4 @@
+/* eslint-disable default-param-last */
 import {
   FILE, MOL, PREDICT, FORM, JCAMP,
 } from '../constants/action_type';

@@ -27,11 +27,11 @@ function* analysisFile(action) {
   }
 }
 
-const getFileSrc = state => state.file.src;
+const getFileSrc = (state) => state.file.src;
 
-const getMolMass = state => state.mol.mass;
+const getMolMass = (state) => state.mol.mass;
 
-const getMolSrc = state => state.mol.src;
+const getMolSrc = (state) => state.mol.src;
 
 function* convertFile(action) {
   const { payload } = action;
@@ -39,7 +39,6 @@ function* convertFile(action) {
   const mass = payload.file || (yield select(getMolMass));
   const mol = yield select(getMolSrc);
   const rsp = yield call(FetcherFile.convertFile, { file, mass, mol });
-
 
   if (rsp && rsp.status) {
     const { jcamp, img, listJcamps } = rsp;
@@ -49,9 +48,9 @@ function* convertFile(action) {
       const dst = new File([origData], 'dst.jcamp');
       yield put({
         type: FILE.CONVERT_DONE,
-        payload: Object.assign({}, {
+        payload: {
           file, img, jcamp: jcampData, dst,
-        }),
+        },
       });
     } else if (listJcamps) {
       const jcampList = listJcamps.map((itemJcamp) => {
@@ -66,9 +65,7 @@ function* convertFile(action) {
       });
       yield put({
         type: FILE.CONVERT_DONE,
-        payload: Object.assign({}, {
-          file, jcampList, dstList,
-        }),
+        payload: { file, jcampList, dstList },
       });
     } else {
       yield put({
@@ -84,9 +81,9 @@ function* convertFile(action) {
   }
 }
 
-const getFileDst = state => state.file.dst;
+const getFileDst = (state) => state.file.dst;
 
-const getListFileDst = state => state.file.dstList;
+const getListFileDst = (state) => state.file.dstList;
 
 function* saveFile(action) {
   const { payload } = action;
@@ -98,9 +95,9 @@ function* saveFile(action) {
 
   const { name } = src;
   const filename = name.split('.').slice(0, -1).join('.');
-  const target = Object.assign({}, payload, {
-    src, dst, filename, mol, dstList,
-  });
+  const target = {
+    ...payload, src, dst, filename, mol, dstList,
+  };
 
   yield call(FetcherFile.saveFile, target);
   yield put({
@@ -118,9 +115,9 @@ function* refreshFile(action) {
 
   const { name } = src;
   const filename = name.split('.').slice(0, -1).join('.');
-  const target = Object.assign({}, payload, {
-    src, dst, filename, mol,
-  });
+  const target = {
+    ...payload, src, dst, filename, mol,
+  };
 
   // similar to convertFile
   const rsp = yield call(FetcherFile.refreshFile, target);
@@ -132,9 +129,9 @@ function* refreshFile(action) {
     const refreshedDst = new File([origData], 'dst.jcamp');
     yield put({
       type: FILE.CONVERT_DONE,
-      payload: Object.assign({}, {
+      payload: {
         file: src, img, jcamp: jcampData, dst: refreshedDst,
-      }),
+      },
     });
   } else {
     yield put({

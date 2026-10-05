@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -31,7 +32,7 @@ const styles = () => ({
   },
 });
 
-const tpHint = classes => (
+const tpHint = (classes) => (
   <span className={classNames(classes.tpCard)}>
     <p className={classNames(classes.tpLabel, 'txt-sv-tp')}>
       - Accept *.mol
@@ -63,10 +64,10 @@ const content = (classes, desc) => (
   </Tooltip>
 );
 
-const InputMol = ({
+function InputMol({
   classes, molSt, addMolInitAct,
-}) => {
-  const onDrop = mols => addMolInitAct({ mol: mols[0] });
+}) {
+  const onDrop = (mols) => addMolInitAct({ mol: mols[0] });
 
   const desc = showByMolfile(molSt, classes);
 
@@ -88,7 +89,7 @@ const InputMol = ({
       }
     </Dropzone>
   );
-};
+}
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
@@ -96,7 +97,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     addMolInitAct: addMolInit,
   }, dispatch)

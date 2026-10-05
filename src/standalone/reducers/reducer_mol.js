@@ -1,3 +1,4 @@
+/* eslint-disable default-param-last */
 import { MOL } from '../constants/action_type';
 
 const initialState = {
@@ -12,16 +13,14 @@ const updateConversion = (state, action) => {
   const {
     mol, smi, mass, svg,
   } = payload;
-  return Object.assign(
-    {},
-    state,
-    {
-      src: mol,
-      smi,
-      mass,
-      svg: svg || '',
-    },
-  );
+  return {
+
+    ...state,
+    src: mol,
+    smi,
+    mass,
+    svg: svg || '',
+  };
 };
 
 const molReducer = (state = initialState, action) => {
@@ -30,7 +29,7 @@ const molReducer = (state = initialState, action) => {
       return updateConversion(state, action);
     case MOL.ADD_FAIL:
     case MOL.CONVERT_FAIL:
-      return Object.assign({}, state, initialState);
+      return { ...state, ...initialState };
     default:
       return state;
   }

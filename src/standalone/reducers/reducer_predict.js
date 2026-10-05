@@ -1,3 +1,4 @@
+/* eslint-disable default-param-last */
 import {
   PREDICT, FORM, FILE, MOL,
 } from '../constants/action_type';
@@ -9,22 +10,22 @@ const initialState = {
 
 const updatePredict = (state, action) => {
   const { payload } = action;
-  return Object.assign(
-    {},
-    state,
-    payload,
-  );
+  return {
+
+    ...state,
+    ...payload,
+  };
 };
 
 const predictReducer = (state = initialState, action) => {
   switch (action.type) {
     case PREDICT.PREDICT_INIT:
     case PREDICT.PREDICT_TO_WRITE_INIT:
-      return Object.assign({}, state, initialState);
+      return { ...state, ...initialState };
     case PREDICT.PREDICT_DONE:
-      return Object.assign({}, state, updatePredict(state, action));
+      return { ...state, ...updatePredict(state, action) };
     case PREDICT.ADD_PRED_JSON_INIT:
-      return Object.assign({}, state, action.payload);
+      return { ...state, ...action.payload };
     case FILE.ADD_FAIL:
     case FILE.CONVERT_FAIL:
     case MOL.ADD_FAIL:
@@ -32,7 +33,7 @@ const predictReducer = (state = initialState, action) => {
     case MOL.CONVERT_FAIL:
     case PREDICT.PREDICT_FAIL:
     case FORM.SUBMIT:
-      return Object.assign({}, state, initialState);
+      return { ...state, ...initialState };
     default:
       return state;
   }

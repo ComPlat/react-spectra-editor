@@ -7,7 +7,6 @@ import { PREDICT, DESC } from '../constants/action_type';
 import FetcherPredict from '../fetchers/fetcher_predict';
 import { RmDollarSign } from '../utils/helper';
 
-
 function* predictByServer(action) {
   const { payload } = action;
 
@@ -40,9 +39,7 @@ function* predictToWriteByServer(action) {
     });
 
     const predictions = rsp.output.result[0].shifts;
-    const body = FN.formatPeaksByPrediction(
-      peaks, layout, isAscend, decimal, predictions,
-    );
+    const body = FN.formatPeaksByPrediction(peaks, layout, isAscend, decimal, predictions);
     const wrapper = FN.peaksWrapper(layout, shift);
     const desc = RmDollarSign(wrapper.head) + body + wrapper.tail;
     yield put({

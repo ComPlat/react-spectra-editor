@@ -1,6 +1,6 @@
 import { DESC } from '../constants/action_type';
 
-const updateDesc = payload => (
+const updateDesc = (payload) => (
   {
     type: DESC.UPDATE,
     payload,

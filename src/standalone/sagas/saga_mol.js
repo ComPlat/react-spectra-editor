@@ -25,7 +25,7 @@ function* analysisMol(action) {
   }
 }
 
-const getMolSrc = state => state.mol.src;
+const getMolSrc = (state) => state.mol.src;
 
 function* convertMol(action) {
   const { payload } = action;
@@ -36,9 +36,9 @@ function* convertMol(action) {
     const { smi, mass, svg } = rsp;
     yield put({
       type: MOL.CONVERT_DONE,
-      payload: Object.assign({}, {
+      payload: {
         mol, smi, mass, svg,
-      }),
+      },
     });
   } else {
     yield put({

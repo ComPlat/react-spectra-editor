@@ -14,8 +14,8 @@ const convertFile = (target) => {
       method: 'post',
       body: data,
     },
-  ).then(response => response.json())
-    .then(json => camelizeKeys(json))
+  ).then((response) => response.json())
+    .then((json) => camelizeKeys(json))
     .catch((err) => {
       console.log(err); // eslint-disable-line
     });
@@ -63,7 +63,7 @@ const saveFile = (target) => {
       method: 'post',
       body: data,
     },
-  ).then(response => response.blob())
+  ).then((response) => response.blob())
     .then((blob) => {
       const a = document.createElement('a');
       a.style = 'display: none';
@@ -118,8 +118,8 @@ const refreshFile = (target) => {
       method: 'post',
       body: data,
     },
-  ).then(response => response.json())
-    .then(json => camelizeKeys(json))
+  ).then((response) => response.json())
+    .then((json) => camelizeKeys(json))
     .catch((err) => {
       console.log(err); // eslint-disable-line
     });

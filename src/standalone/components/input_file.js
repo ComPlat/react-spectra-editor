@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -41,7 +42,7 @@ const styles = () => ({
   },
 });
 
-const tpHint = classes => (
+const tpHint = (classes) => (
   <span className={classNames(classes.tpCard)}>
     <p className={classNames(classes.tpLabel, 'txt-sv-tp')}>
       - Accept *.dx, *.jdx, *.JCAMP,
@@ -69,11 +70,11 @@ const content = (classes, desc) => (
   </Tooltip>
 );
 
-const InputFile = ({
+function InputFile({
   classes, editorOnly, srcMolSt, srcFileSt, addFileInitAct,
-}) => {
+}) {
   const fileName = srcFileSt && srcFileSt.name;
-  const onDrop = files => addFileInitAct({ file: files[0] });
+  const onDrop = (files) => addFileInitAct({ file: files[0] });
   const enabled = editorOnly || srcMolSt;
   const addOnCls = enabled ? classes.enableDD : classes.disableDD;
   const desc = fileName || msgDefault;
@@ -102,7 +103,7 @@ const InputFile = ({
       }
     </Dropzone>
   );
-};
+}
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
@@ -111,7 +112,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     addFileInitAct: addFileInit,
   }, dispatch)

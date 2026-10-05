@@ -25,30 +25,32 @@ const styles = () => ({
   },
 });
 
-const FullVersion = ({ classes, editorOnly }) => (
-  <Grid container className={classes.root} spacing={10}>
-    <Grid key="grid-drop-space" item xs={1} />
-    <Grid key="grid-drop-mol" item xs={4}>
-      <InputMol />
+function FullVersion({ classes, editorOnly }) {
+  return (
+    <Grid container className={classes.root} spacing={10}>
+      <Grid key="grid-drop-space" item xs={1} />
+      <Grid key="grid-drop-mol" item xs={4}>
+        <InputMol />
+      </Grid>
+      <Grid key="grid-drop-file" item xs={4}>
+        <InputFile editorOnly={editorOnly} />
+      </Grid>
+      <Grid key="grid-drop-pred-json" item xs={2}>
+        <InputPredJson />
+      </Grid>
+      <Grid key="grid-form-input" item xs={1}>
+        <InputForm />
+      </Grid>
     </Grid>
-    <Grid key="grid-drop-file" item xs={4}>
-      <InputFile editorOnly={editorOnly} />
-    </Grid>
-    <Grid key="grid-drop-pred-json" item xs={2}>
-      <InputPredJson />
-    </Grid>
-    <Grid key="grid-form-input" item xs={1}>
-      <InputForm />
-    </Grid>
-  </Grid>
-);
+  );
+}
 
 FullVersion.propTypes = {
   classes: PropTypes.object.isRequired,
   editorOnly: PropTypes.bool.isRequired,
 };
 
-const editortext = classes => (
+const editortext = (classes) => (
   <span className={classNames(classes.etSpan, 'txt-sv-etext')}>
     (1) Upload a spectrum file to the dashed box on the right.
         Valid formats: *.dx, *.jdx, *.JCAMP, *.fid, *.zip (Bruker), *.RAW (ThermoFisher), *.mz(X)ML.
@@ -58,41 +60,45 @@ const editortext = classes => (
   </span>
 );
 
-const EditorVersion = ({ classes, editorOnly }) => (
-  <Grid container className={classes.root} spacing={24}>
-    <Grid key="grid-drop-space" item xs={1} />
-    <Grid key="grid-drop-mol" item xs={7}>
-      { editortext(classes) }
+function EditorVersion({ classes, editorOnly }) {
+  return (
+    <Grid container className={classes.root} spacing={24}>
+      <Grid key="grid-drop-space" item xs={1} />
+      <Grid key="grid-drop-mol" item xs={7}>
+        { editortext(classes) }
+      </Grid>
+      <Grid key="grid-drop-file" item xs={2}>
+        <InputFile editorOnly={editorOnly} />
+      </Grid>
+      <Grid key="grid-form-input" item xs={1}>
+        <InputForm />
+      </Grid>
+      <Grid key="grid-drop-space" item xs={1} />
     </Grid>
-    <Grid key="grid-drop-file" item xs={2}>
-      <InputFile editorOnly={editorOnly} />
-    </Grid>
-    <Grid key="grid-form-input" item xs={1}>
-      <InputForm />
-    </Grid>
-    <Grid key="grid-drop-space" item xs={1} />
-  </Grid>
-);
+  );
+}
 
 EditorVersion.propTypes = {
   classes: PropTypes.object.isRequired,
   editorOnly: PropTypes.bool.isRequired,
 };
 
-const Frame = ({ classes, editorOnly }) => (
-  <ThemeProvider theme={theme}>
-    <div>
-      {
-        editorOnly
-          ? <EditorVersion classes={classes} editorOnly={editorOnly} />
-          : <FullVersion classes={classes} editorOnly={editorOnly} />
-      }
-      <Content editorOnly={editorOnly} />
-      <Notice />
-      <Loading />
-    </div>
-  </ThemeProvider>
-);
+function Frame({ classes, editorOnly }) {
+  return (
+    <ThemeProvider theme={theme}>
+      <div>
+        {
+          editorOnly
+            ? <EditorVersion classes={classes} editorOnly={editorOnly} />
+            : <FullVersion classes={classes} editorOnly={editorOnly} />
+        }
+        <Content editorOnly={editorOnly} />
+        <Notice />
+        <Loading />
+      </div>
+    </ThemeProvider>
+  );
+}
 
 Frame.propTypes = {
   classes: PropTypes.object.isRequired,

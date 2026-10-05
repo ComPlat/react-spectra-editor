@@ -29,7 +29,7 @@ const containerStyle = {
   margin: '5px 0 0 0',
 };
 
-const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
+const W = Math.round((window.innerWidth * 0.90 * 9) / 12); // ROI
 
 const editorStyle = {
   border: '1px solid gray',
@@ -166,22 +166,22 @@ class Content extends React.Component {
     const macs = ms.map((m) => {
       const { peaks, mpyType, xExtent } = m;
       const { xL, xU } = xExtent;
-      const it = is.filter(i => i.xL === xL && i.xU === xU)[0] || { area: 0 };
-      const area = it.area * refFactor / refArea;
+      const it = is.filter((i) => i.xL === xL && i.xU === xU)[0] || { area: 0 };
+      const area = (it.area * refFactor) / refArea;
       const center = FN.calcMpyCenter(peaks, shiftVal, mpyType);
-      const xs = m.peaks.map(p => p.x).sort((a, b) => a - b);
+      const xs = m.peaks.map((p) => p.x).sort((a, b) => a - b);
       const [aIdx, bIdx] = isAscend ? [0, xs.length - 1] : [xs.length - 1, 0];
       const mxA = mpyType === 'm' ? (xs[aIdx] - shiftVal).toFixed(decimal) : 0;
       const mxB = mpyType === 'm' ? (xs[bIdx] - shiftVal).toFixed(decimal) : 0;
-      return Object.assign({}, m, {
-        area, center, mxA, mxB,
-      });
+      return {
+        ...m, area, center, mxA, mxB,
+      };
     }).sort((a, b) => (isAscend ? a.center - b.center : b.center - a.center));
     const str = macs.map((m) => {
       const c = m.center;
       const type = m.mpyType;
       const it = Math.round(m.area);
-      const js = m.js.map(j => `J = ${j.toFixed(1)} Hz`).join(', ');
+      const js = m.js.map((j) => `J = ${j.toFixed(1)} Hz`).join(', ');
       const atomCount = layout === '1H' ? `, ${it}H` : '';
       const location = type === 'm' ? `${m.mxA}–${m.mxB}` : `${c.toFixed(decimal)}`;
       return m.js.length === 0
@@ -434,7 +434,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     saveFileInitAct: saveFileInit,
     refreshFileInitAct: refreshFileInit,

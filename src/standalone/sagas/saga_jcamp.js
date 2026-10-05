@@ -22,7 +22,7 @@ function* addOthers(action) {
       const jcampData = FN.ExtractJcamp(origData);
       yield put({
         type: JCAMP.ADD_OTHERS_RDC,
-        payload: Object.assign({}, { jcamp: jcampData }),
+        payload: { jcamp: jcampData },
       });
     } else {
       yield put({

@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -34,7 +35,7 @@ const styles = () => ({
   },
 });
 
-const tpHint = classes => (
+const tpHint = (classes) => (
   <span className={classNames(classes.tpCard)}>
     <p className={classNames(classes.tpLabel, 'txt-sv-tp')}>
       - OPTIONAL
@@ -60,9 +61,9 @@ const content = (classes, desc) => (
   </Tooltip>
 );
 
-const InputPredJson = ({
+function InputPredJson({
   classes, addPredJsonInitAct, predictSt,
-}) => {
+}) {
   const hasPredict = predictSt.output.result.length !== 0;
   const desc = hasPredict ? msgExist : msgDefault;
 
@@ -94,7 +95,7 @@ const InputPredJson = ({
       }
     </Dropzone>
   );
-};
+}
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
@@ -102,7 +103,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
   }
 );
 
-const mapDispatchToProps = dispatch => (
+const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     addPredJsonInitAct: addPredJsonInit,
   }, dispatch)
