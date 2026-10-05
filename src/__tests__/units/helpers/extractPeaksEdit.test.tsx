@@ -106,7 +106,11 @@ describe('Test extract edited peaks and area under curve', () => {
     });
 
     it('Get AUC value', () => {
-      const auc = extractAreaUnderCurve(allIntegrationSt, presentIntegrationSt, LIST_LAYOUT.HPLC_UVVIS);
+      const auc = extractAreaUnderCurve(
+        allIntegrationSt,
+        presentIntegrationSt,
+        LIST_LAYOUT.HPLC_UVVIS,
+      );
       expect(auc).not.toBeNull();
       expect(auc?.length).toEqual(1);
     });

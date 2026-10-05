@@ -242,7 +242,9 @@ describe('Test for chem helper', () => {
         expect(source).not.toEqual(irJcamp);
         return ExtractJcamp(source);
       };
-      const peakFeatures = ({ features }: any) => [features.editPeak, features.autoPeak].filter(Boolean);
+      const peakFeatures = ({ features }: any) => (
+        [features.editPeak, features.autoPeak].filter(Boolean)
+      );
 
       it('exposes $CSTRANSMITTANCE on the peak features', () => {
         const feats = peakFeatures(withRecords('##$CSTRANSMITTANCE=true\n'));
@@ -388,7 +390,10 @@ describe('Test for chem helper', () => {
 
     it('Peaks above 1 threshold', () => {
       const feature = {
-        data: [{ x: [1, 2], y: [1, 2] }], operation: { layout: LIST_LAYOUT.H1 }, maxY: 2, peakUp: true,
+        data: [{ x: [1, 2], y: [1, 2] }],
+        operation: { layout: LIST_LAYOUT.H1 },
+        maxY: 2,
+        peakUp: true,
       };
       const threshold = 55;
       const offset = 0;
@@ -398,7 +403,10 @@ describe('Test for chem helper', () => {
 
     it('Peaks below 1 threshold', () => {
       const feature = {
-        data: [{ x: [1, 2], y: [1, 2] }], operation: { layout: LIST_LAYOUT.H1 }, maxY: 2, peakUp: false,
+        data: [{ x: [1, 2], y: [1, 2] }],
+        operation: { layout: LIST_LAYOUT.H1 },
+        maxY: 2,
+        peakUp: false,
       };
       const threshold = 50;
       const offset = 0;
@@ -408,7 +416,13 @@ describe('Test for chem helper', () => {
 
     it('Peaks with 2 threshold', () => {
       const feature = {
-        data: [{ x: [1, 2, -1, -2], y: [1, 2, -1, -2] }], operation: { layout: LIST_LAYOUT.CYCLIC_VOLTAMMETRY }, maxY: 2, minY: -2, peakUp: true, upperThres: 55, lowerThres: 55,
+        data: [{ x: [1, 2, -1, -2], y: [1, 2, -1, -2] }],
+        operation: { layout: LIST_LAYOUT.CYCLIC_VOLTAMMETRY },
+        maxY: 2,
+        minY: -2,
+        peakUp: true,
+        upperThres: 55,
+        lowerThres: 55,
       };
       const threshold = 50;
       const offset = 0;
@@ -418,7 +432,13 @@ describe('Test for chem helper', () => {
 
     it('Peaks with 2 threshold cds layout', () => {
       const feature = {
-        data: [{ x: [1, 2, -1, -2], y: [1, 2, -1, -2] }], operation: { layout: LIST_LAYOUT.CDS }, maxY: 2, minY: -2, peakUp: true, upperThres: 100, lowerThres: 100,
+        data: [{ x: [1, 2, -1, -2], y: [1, 2, -1, -2] }],
+        operation: { layout: LIST_LAYOUT.CDS },
+        maxY: 2,
+        minY: -2,
+        peakUp: true,
+        upperThres: 100,
+        lowerThres: 100,
       };
       const threshold = 100;
       const offset = 0;
@@ -463,7 +483,10 @@ describe('Test for chem helper', () => {
       }; // threshold at 55%
       const props = {
         feature: {
-          data: [{ x: [1, 2], y: [1, 2] }], operation: { layout: LIST_LAYOUT.H1 }, maxY: 2, peakUp: true,
+          data: [{ x: [1, 2], y: [1, 2] }],
+          operation: { layout: LIST_LAYOUT.H1 },
+          maxY: 2,
+          peakUp: true,
         },
       };
       const peaks = Feature2Peak(state, props);
@@ -626,7 +649,13 @@ describe('Test for chem helper', () => {
 
   describe('Test get comparison spectra', () => {
     const layoutShouldView = [LIST_LAYOUT.IR, LIST_LAYOUT.HPLC_UVVIS, LIST_LAYOUT.XRD];
-    const layoutShouldHide = [LIST_LAYOUT.C13, LIST_LAYOUT.H1, LIST_LAYOUT.F19, LIST_LAYOUT.P31, LIST_LAYOUT.N15, LIST_LAYOUT.Si29,
+    const layoutShouldHide = [
+      LIST_LAYOUT.C13,
+      LIST_LAYOUT.H1,
+      LIST_LAYOUT.F19,
+      LIST_LAYOUT.P31,
+      LIST_LAYOUT.N15,
+      LIST_LAYOUT.Si29,
       LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS,
       LIST_LAYOUT.MS,
       LIST_LAYOUT.TGA, LIST_LAYOUT.DSC, LIST_LAYOUT.CYCLIC_VOLTAMMETRY,
@@ -808,33 +837,50 @@ describe('Test for chem helper', () => {
     const voltaData = {
       spectraList: [{
         list: [{
-          min: { x: -1.5404, y: -0.00000307144 }, max: { x: 0.10003, y: 0.00000285434 }, isRef: true, e12: -0.720185, pecker: { x: 0.380242, y: 0.00000164361 },
+          min: { x: -1.5404, y: -0.00000307144 },
+          max: { x: 0.10003, y: 0.00000285434 },
+          isRef: true,
+          e12: -0.720185,
+          pecker: { x: 0.380242, y: 0.00000164361 },
         }],
         selectedIdx: 0,
         isWorkMaxPeak: true,
         jcampIdx: 0,
         shift: {
           ref: {
-            min: { x: -1.5404, y: -0.00000307144 }, max: { x: 0.10003, y: 0.00000285434 }, isRef: true, e12: -0.720185, pecker: { x: 0.380242, y: 0.00000164361 },
+            min: { x: -1.5404, y: -0.00000307144 },
+            max: { x: 0.10003, y: 0.00000285434 },
+            isRef: true,
+            e12: -0.720185,
+            pecker: { x: 0.380242, y: 0.00000164361 },
           },
           val: 0,
         },
       }, {
         list: [{
-          min: { x: -1.48904, y: -0.000033747399999999995 }, max: { x: 0.929483, y: 0.00023741 }, isRef: true, e12: -0.27977849999999993,
+          min: { x: -1.48904, y: -0.000033747399999999995 },
+          max: { x: 0.929483, y: 0.00023741 },
+          isRef: true,
+          e12: -0.27977849999999993,
         }],
         selectedIdx: 0,
         isWorkMaxPeak: true,
         jcampIdx: 1,
         shift: {
           ref: {
-            min: { x: -1.48904, y: -0.000033747399999999995 }, max: { x: 0.929483, y: 0.00023741 }, isRef: true, e12: -0.27977849999999993,
+            min: { x: -1.48904, y: -0.000033747399999999995 },
+            max: { x: 0.929483, y: 0.00023741 },
+            isRef: true,
+            e12: -0.27977849999999993,
           },
           val: 1.5,
         },
       }, {
         list: [{
-          min: { x: 0.45977, y: -0.000226347 }, max: { x: 1.00943, y: 0.000371349 }, isRef: false, e12: 0.7346,
+          min: { x: 0.45977, y: -0.000226347 },
+          max: { x: 1.00943, y: 0.000371349 },
+          isRef: false,
+          e12: 0.7346,
         }],
         selectedIdx: 0,
         isWorkMaxPeak: true,
@@ -866,7 +912,9 @@ describe('Test for chem helper', () => {
   });
 
   describe('Test build integration feature with persistent visualSplitGroupId', () => {
-    const linearSpectra = [{ data: [{ x: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], y: [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0] }] }];
+    const linearSpectra = [{
+      data: [{ x: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], y: [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0] }],
+    }];
     const buildJcamp = (records: Record<string, string>) => ({
       info: { ...records },
       spectra: [{}],
@@ -945,14 +993,22 @@ describe('Test for chem helper', () => {
     const voltaData = {
       spectraList: [{
         list: [{
-          min: { x: -1.5404, y: -0.00000307144 }, max: { x: 0.10003, y: 0.00000285434 }, isRef: true, e12: -0.720185, pecker: { x: 0.380242, y: 0.00000164361 },
+          min: { x: -1.5404, y: -0.00000307144 },
+          max: { x: 0.10003, y: 0.00000285434 },
+          isRef: true,
+          e12: -0.720185,
+          pecker: { x: 0.380242, y: 0.00000164361 },
         }],
         selectedIdx: 0,
         isWorkMaxPeak: true,
         jcampIdx: 0,
         shift: {
           ref: {
-            min: { x: -1.5404, y: -0.00000307144 }, max: { x: 0.10003, y: 0.00000285434 }, isRef: true, e12: -0.720185, pecker: { x: 0.380242, y: 0.00000164361 },
+            min: { x: -1.5404, y: -0.00000307144 },
+            max: { x: 0.10003, y: 0.00000285434 },
+            isRef: true,
+            e12: -0.720185,
+            pecker: { x: 0.380242, y: 0.00000164361 },
           },
           val: 0,
           prevValue: 0.5,
@@ -960,20 +1016,29 @@ describe('Test for chem helper', () => {
         hasRefPeak: true,
       }, {
         list: [{
-          min: { x: -1.48904, y: -0.000033747399999999995 }, max: { x: 0.929483, y: 0.00023741 }, isRef: true, e12: -0.27977849999999993,
+          min: { x: -1.48904, y: -0.000033747399999999995 },
+          max: { x: 0.929483, y: 0.00023741 },
+          isRef: true,
+          e12: -0.27977849999999993,
         }],
         selectedIdx: 0,
         isWorkMaxPeak: true,
         jcampIdx: 1,
         shift: {
           ref: {
-            min: { x: -1.48904, y: -0.000033747399999999995 }, max: { x: 0.929483, y: 0.00023741 }, isRef: true, e12: -0.27977849999999993,
+            min: { x: -1.48904, y: -0.000033747399999999995 },
+            max: { x: 0.929483, y: 0.00023741 },
+            isRef: true,
+            e12: -0.27977849999999993,
           },
           val: 1.5,
         },
       }, {
         list: [{
-          min: { x: 0.45977, y: -0.000226347 }, max: { x: 1.00943, y: 0.000371349 }, isRef: false, e12: 0.7346,
+          min: { x: 0.45977, y: -0.000226347 },
+          max: { x: 1.00943, y: 0.000371349 },
+          isRef: false,
+          e12: 0.7346,
         }],
         selectedIdx: 0,
         isWorkMaxPeak: true,
@@ -984,7 +1049,11 @@ describe('Test for chem helper', () => {
     const voltaDataNoRef = {
       spectraList: [{
         list: [{
-          min: { x: -1.5404, y: -0.00000307144 }, max: { x: 0.10003, y: 0.00000285434 }, isRef: false, e12: -0.720185, pecker: { x: 0.380242, y: 0.00000164361 },
+          min: { x: -1.5404, y: -0.00000307144 },
+          max: { x: 0.10003, y: 0.00000285434 },
+          isRef: false,
+          e12: -0.720185,
+          pecker: { x: 0.380242, y: 0.00000164361 },
         }],
         selectedIdx: 0,
         isWorkMaxPeak: true,
@@ -993,7 +1062,10 @@ describe('Test for chem helper', () => {
         hasRefPeak: false,
       }, {
         list: [{
-          min: { x: -1.48904, y: -0.000033747399999999995 }, max: { x: 0.929483, y: 0.00023741 }, isRef: true, e12: -0.27977849999999993,
+          min: { x: -1.48904, y: -0.000033747399999999995 },
+          max: { x: 0.929483, y: 0.00023741 },
+          isRef: true,
+          e12: -0.27977849999999993,
         }],
         selectedIdx: 0,
         isWorkMaxPeak: true,
@@ -1001,7 +1073,10 @@ describe('Test for chem helper', () => {
         shift: { ref: null, val: 1.5 },
       }, {
         list: [{
-          min: { x: 0.45977, y: -0.000226347 }, max: { x: 1.00943, y: 0.000371349 }, isRef: false, e12: 0.7346,
+          min: { x: 0.45977, y: -0.000226347 },
+          max: { x: 1.00943, y: 0.000371349 },
+          isRef: false,
+          e12: 0.7346,
         }],
         selectedIdx: 0,
         isWorkMaxPeak: true,

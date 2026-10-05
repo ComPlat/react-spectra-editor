@@ -23,7 +23,9 @@ describe('Test helper for multiplicity', () => {
 
     it('Get group interval', () => {
       const arrayInterval = [[1, 4], [2, 6], [3, 8]];
-      const expectedGroup = [{ c: [1, 4], es: [[1, 4]] }, { c: [2, 6], es: [[2, 6]] }, { c: [3, 8], es: [[3, 8]] }];
+      const expectedGroup = [
+        { c: [1, 4], es: [[1, 4]] }, { c: [2, 6], es: [[2, 6]] }, { c: [3, 8], es: [[3, 8]] },
+      ];
       const group = groupInterval(arrayInterval);
       expect(group).toEqual(expectedGroup);
     });

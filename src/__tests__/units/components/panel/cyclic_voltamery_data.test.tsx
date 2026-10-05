@@ -21,10 +21,18 @@ const store = mockStore({
       {
         list: [
           {
-            max: { x: 2.0, y: 2.0 }, min: { x: -2.0, y: 1.0 }, pecker: { x: 1.5, y: 1.6 }, isRef: true, e12: 0.0,
+            max: { x: 2.0, y: 2.0 },
+            min: { x: -2.0, y: 1.0 },
+            pecker: { x: 1.5, y: 1.6 },
+            isRef: true,
+            e12: 0.0,
           },
           {
-            max: { x: 2.0, y: 2.0 }, min: { x: 1.0, y: 1.0 }, pecker: { x: 1.5, y: 1.6 }, isRef: false, e12: 1.5,
+            max: { x: 2.0, y: 2.0 },
+            min: { x: 1.0, y: 1.0 },
+            pecker: { x: 1.5, y: 1.6 },
+            isRef: false,
+            e12: 1.5,
           },
           {
             max: null, min: null, pecker: { x: 1.5, y: 1.6 }, isRef: false, e12: null,
@@ -32,7 +40,11 @@ const store = mockStore({
         ],
         shift: {
           ref: {
-            max: { x: 2.0, y: 2.0 }, min: { x: -2.0, y: 1.0 }, pecker: { x: 1.5, y: 1.6 }, isRef: true, e12: 0.0,
+            max: { x: 2.0, y: 2.0 },
+            min: { x: -2.0, y: 1.0 },
+            pecker: { x: 1.5, y: 1.6 },
+            isRef: true,
+            e12: 0.0,
           },
           val: 0,
         },

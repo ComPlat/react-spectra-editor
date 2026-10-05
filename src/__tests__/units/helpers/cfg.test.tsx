@@ -74,7 +74,14 @@ describe('Test Config helper', () => {
 
   describe('Set ref button', () => {
     beforeEach(() => {
-      layoutShouldView = [LIST_LAYOUT.C13, LIST_LAYOUT.H1, LIST_LAYOUT.F19, LIST_LAYOUT.P31, LIST_LAYOUT.N15, LIST_LAYOUT.Si29];
+      layoutShouldView = [
+        LIST_LAYOUT.C13,
+        LIST_LAYOUT.H1,
+        LIST_LAYOUT.F19,
+        LIST_LAYOUT.P31,
+        LIST_LAYOUT.N15,
+        LIST_LAYOUT.Si29,
+      ];
       layoutShouldHide = [LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS, LIST_LAYOUT.IR,
         LIST_LAYOUT.MS, LIST_LAYOUT.CYCLIC_VOLTAMMETRY,
         LIST_LAYOUT.TGA, LIST_LAYOUT.DSC, LIST_LAYOUT.XRD, LIST_LAYOUT.HPLC_UVVIS,
@@ -99,7 +106,14 @@ describe('Test Config helper', () => {
 
   describe('Add and remove multiplicity button', () => {
     beforeEach(() => {
-      layoutShouldView = [LIST_LAYOUT.C13, LIST_LAYOUT.H1, LIST_LAYOUT.F19, LIST_LAYOUT.P31, LIST_LAYOUT.N15, LIST_LAYOUT.Si29];
+      layoutShouldView = [
+        LIST_LAYOUT.C13,
+        LIST_LAYOUT.H1,
+        LIST_LAYOUT.F19,
+        LIST_LAYOUT.P31,
+        LIST_LAYOUT.N15,
+        LIST_LAYOUT.Si29,
+      ];
       layoutShouldHide = [LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS, LIST_LAYOUT.IR,
         LIST_LAYOUT.MS, LIST_LAYOUT.TGA, LIST_LAYOUT.DSC, LIST_LAYOUT.XRD,
         LIST_LAYOUT.HPLC_UVVIS, LIST_LAYOUT.CYCLIC_VOLTAMMETRY,
@@ -123,7 +137,15 @@ describe('Test Config helper', () => {
 
   describe('Add and remove integration button', () => {
     beforeEach(() => {
-      layoutShouldView = [LIST_LAYOUT.C13, LIST_LAYOUT.H1, LIST_LAYOUT.F19, LIST_LAYOUT.P31, LIST_LAYOUT.N15, LIST_LAYOUT.Si29, LIST_LAYOUT.HPLC_UVVIS];
+      layoutShouldView = [
+        LIST_LAYOUT.C13,
+        LIST_LAYOUT.H1,
+        LIST_LAYOUT.F19,
+        LIST_LAYOUT.P31,
+        LIST_LAYOUT.N15,
+        LIST_LAYOUT.Si29,
+        LIST_LAYOUT.HPLC_UVVIS,
+      ];
       layoutShouldHide = [LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS, LIST_LAYOUT.IR,
         LIST_LAYOUT.MS, LIST_LAYOUT.TGA, LIST_LAYOUT.DSC,
         LIST_LAYOUT.XRD, LIST_LAYOUT.CYCLIC_VOLTAMMETRY,
@@ -164,7 +186,14 @@ describe('Test Config helper', () => {
     };
 
     beforeEach(() => {
-      layoutShouldView = [LIST_LAYOUT.C13, LIST_LAYOUT.H1, LIST_LAYOUT.F19, LIST_LAYOUT.P31, LIST_LAYOUT.N15, LIST_LAYOUT.Si29];
+      layoutShouldView = [
+        LIST_LAYOUT.C13,
+        LIST_LAYOUT.H1,
+        LIST_LAYOUT.F19,
+        LIST_LAYOUT.P31,
+        LIST_LAYOUT.N15,
+        LIST_LAYOUT.Si29,
+      ];
       layoutShouldHide = [LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS, LIST_LAYOUT.IR,
         LIST_LAYOUT.MS, LIST_LAYOUT.TGA, LIST_LAYOUT.DSC, LIST_LAYOUT.XRD,
         LIST_LAYOUT.HPLC_UVVIS, LIST_LAYOUT.CYCLIC_VOLTAMMETRY,
@@ -197,7 +226,13 @@ describe('Test Config helper', () => {
     beforeEach(() => {
       layoutShouldHide = [LIST_LAYOUT.MS];
       layoutShouldView = [LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS, LIST_LAYOUT.IR,
-        LIST_LAYOUT.C13, LIST_LAYOUT.H1, LIST_LAYOUT.F19, LIST_LAYOUT.P31, LIST_LAYOUT.N15, LIST_LAYOUT.Si29, LIST_LAYOUT.HPLC_UVVIS,
+        LIST_LAYOUT.C13,
+        LIST_LAYOUT.H1,
+        LIST_LAYOUT.F19,
+        LIST_LAYOUT.P31,
+        LIST_LAYOUT.N15,
+        LIST_LAYOUT.Si29,
+        LIST_LAYOUT.HPLC_UVVIS,
         LIST_LAYOUT.TGA, LIST_LAYOUT.DSC, LIST_LAYOUT.XRD, LIST_LAYOUT.CYCLIC_VOLTAMMETRY,
         LIST_LAYOUT.CDS, LIST_LAYOUT.SEC, LIST_LAYOUT.GC];
     });
@@ -233,7 +268,13 @@ describe('Test Config helper', () => {
     beforeEach(() => {
       layoutShouldView = [LIST_LAYOUT.SEC];
       layoutShouldHide = [LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS, LIST_LAYOUT.IR,
-        LIST_LAYOUT.C13, LIST_LAYOUT.H1, LIST_LAYOUT.F19, LIST_LAYOUT.P31, LIST_LAYOUT.N15, LIST_LAYOUT.Si29, LIST_LAYOUT.HPLC_UVVIS,
+        LIST_LAYOUT.C13,
+        LIST_LAYOUT.H1,
+        LIST_LAYOUT.F19,
+        LIST_LAYOUT.P31,
+        LIST_LAYOUT.N15,
+        LIST_LAYOUT.Si29,
+        LIST_LAYOUT.HPLC_UVVIS,
         LIST_LAYOUT.TGA, LIST_LAYOUT.DSC, LIST_LAYOUT.XRD,
         LIST_LAYOUT.CYCLIC_VOLTAMMETRY, LIST_LAYOUT.CDS, LIST_LAYOUT.MS];
     });
@@ -255,7 +296,14 @@ describe('Test Config helper', () => {
 
   describe('Panel multiplicity info view', () => {
     beforeEach(() => {
-      layoutShouldView = [LIST_LAYOUT.C13, LIST_LAYOUT.H1, LIST_LAYOUT.F19, LIST_LAYOUT.P31, LIST_LAYOUT.N15, LIST_LAYOUT.Si29];
+      layoutShouldView = [
+        LIST_LAYOUT.C13,
+        LIST_LAYOUT.H1,
+        LIST_LAYOUT.F19,
+        LIST_LAYOUT.P31,
+        LIST_LAYOUT.N15,
+        LIST_LAYOUT.Si29,
+      ];
       layoutShouldHide = [LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS, LIST_LAYOUT.IR,
         LIST_LAYOUT.SEC, LIST_LAYOUT.GC, LIST_LAYOUT.HPLC_UVVIS,
         LIST_LAYOUT.TGA, LIST_LAYOUT.DSC, LIST_LAYOUT.XRD, LIST_LAYOUT.CYCLIC_VOLTAMMETRY,
@@ -279,7 +327,14 @@ describe('Test Config helper', () => {
 
   describe('Solvent info view', () => {
     beforeEach(() => {
-      layoutShouldView = [LIST_LAYOUT.C13, LIST_LAYOUT.H1, LIST_LAYOUT.F19, LIST_LAYOUT.P31, LIST_LAYOUT.N15, LIST_LAYOUT.Si29];
+      layoutShouldView = [
+        LIST_LAYOUT.C13,
+        LIST_LAYOUT.H1,
+        LIST_LAYOUT.F19,
+        LIST_LAYOUT.P31,
+        LIST_LAYOUT.N15,
+        LIST_LAYOUT.Si29,
+      ];
       layoutShouldHide = [LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS, LIST_LAYOUT.IR,
         LIST_LAYOUT.SEC, LIST_LAYOUT.GC, LIST_LAYOUT.HPLC_UVVIS,
         LIST_LAYOUT.TGA, LIST_LAYOUT.DSC, LIST_LAYOUT.XRD, LIST_LAYOUT.CYCLIC_VOLTAMMETRY,
@@ -304,7 +359,13 @@ describe('Test Config helper', () => {
   describe('Panel comparison info view', () => {
     beforeEach(() => {
       layoutShouldView = [LIST_LAYOUT.IR, LIST_LAYOUT.HPLC_UVVIS, LIST_LAYOUT.XRD];
-      layoutShouldHide = [LIST_LAYOUT.C13, LIST_LAYOUT.H1, LIST_LAYOUT.F19, LIST_LAYOUT.P31, LIST_LAYOUT.N15, LIST_LAYOUT.Si29,
+      layoutShouldHide = [
+        LIST_LAYOUT.C13,
+        LIST_LAYOUT.H1,
+        LIST_LAYOUT.F19,
+        LIST_LAYOUT.P31,
+        LIST_LAYOUT.N15,
+        LIST_LAYOUT.Si29,
         LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS,
         LIST_LAYOUT.SEC, LIST_LAYOUT.GC,
         LIST_LAYOUT.TGA, LIST_LAYOUT.DSC, LIST_LAYOUT.CYCLIC_VOLTAMMETRY,
@@ -329,7 +390,13 @@ describe('Test Config helper', () => {
   describe('Show two threshold view', () => {
     beforeEach(() => {
       layoutShouldView = [LIST_LAYOUT.CYCLIC_VOLTAMMETRY];
-      layoutShouldHide = [LIST_LAYOUT.C13, LIST_LAYOUT.H1, LIST_LAYOUT.F19, LIST_LAYOUT.P31, LIST_LAYOUT.N15, LIST_LAYOUT.Si29,
+      layoutShouldHide = [
+        LIST_LAYOUT.C13,
+        LIST_LAYOUT.H1,
+        LIST_LAYOUT.F19,
+        LIST_LAYOUT.P31,
+        LIST_LAYOUT.N15,
+        LIST_LAYOUT.Si29,
         LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS, LIST_LAYOUT.IR,
         LIST_LAYOUT.SEC, LIST_LAYOUT.GC, LIST_LAYOUT.HPLC_UVVIS,
         LIST_LAYOUT.TGA, LIST_LAYOUT.DSC, LIST_LAYOUT.XRD,
@@ -354,7 +421,13 @@ describe('Test Config helper', () => {
   describe('Panel cyclic voltammetry info view', () => {
     beforeEach(() => {
       layoutShouldView = [LIST_LAYOUT.CYCLIC_VOLTAMMETRY];
-      layoutShouldHide = [LIST_LAYOUT.C13, LIST_LAYOUT.H1, LIST_LAYOUT.F19, LIST_LAYOUT.P31, LIST_LAYOUT.N15, LIST_LAYOUT.Si29,
+      layoutShouldHide = [
+        LIST_LAYOUT.C13,
+        LIST_LAYOUT.H1,
+        LIST_LAYOUT.F19,
+        LIST_LAYOUT.P31,
+        LIST_LAYOUT.N15,
+        LIST_LAYOUT.Si29,
         LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS, LIST_LAYOUT.IR,
         LIST_LAYOUT.SEC, LIST_LAYOUT.GC, LIST_LAYOUT.HPLC_UVVIS,
         LIST_LAYOUT.TGA, LIST_LAYOUT.DSC, LIST_LAYOUT.XRD,

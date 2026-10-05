@@ -692,9 +692,21 @@ describe('ViewerLineRect pane sizing (S7)', () => {
     instance.rectRef = { current: { clientWidth: 1000, clientHeight: paneClientHeight } };
     instance.handleResize = () => {};
     const fallback = { width: W, height: H };
-    instance.lineSize = new ContainerSize(() => instance.lineRef.current, fallback, instance.handleResize);
-    instance.multiSize = new ContainerSize(() => instance.multiRef.current, fallback, instance.handleResize);
-    instance.rectSize = new ContainerSize(() => instance.rectRef.current, fallback, instance.handleResize);
+    instance.lineSize = new ContainerSize(
+      () => instance.lineRef.current,
+      fallback,
+      instance.handleResize,
+    );
+    instance.multiSize = new ContainerSize(
+      () => instance.multiRef.current,
+      fallback,
+      instance.handleResize,
+    );
+    instance.rectSize = new ContainerSize(
+      () => instance.rectRef.current,
+      fallback,
+      instance.handleResize,
+    );
     instance.createFocuses = () => {
       instance.lineFocus = { create: jest.fn(), update: jest.fn() };
       instance.multiFocus = { create: jest.fn(), update: jest.fn() };
