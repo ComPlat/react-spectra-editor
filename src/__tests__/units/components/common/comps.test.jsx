@@ -1,5 +1,5 @@
-import { render } from '@testing-library/react'; 
-import { TabLabel } from "../../../../components/common/comps";
+import { render } from '@testing-library/react';
+import { TabLabel } from '../../../../components/common/comps';
 import '@testing-library/jest-dom';
 
 describe('common/comps', () => {
@@ -9,10 +9,10 @@ describe('common/comps', () => {
       return (
         <div data-testid="test-div">
           {
-            TabLabel({tabLabel: 'mytestclass'}, labelStr)
+            TabLabel({ tabLabel: 'mytestclass' }, labelStr)
           }
         </div>
-      )
+      );
     }
 
     const { queryByTestId, queryByText } = render(<TestComponent />);

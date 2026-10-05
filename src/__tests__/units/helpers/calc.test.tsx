@@ -26,15 +26,15 @@ describe('Test calculation helpers', () => {
 
   describe('Test calcSlope function', () => {
     it('No slop as same points', () => {
-      const a = {x: 0, y: 0};
-      const b = {x: 0, y: 0};
+      const a = { x: 0, y: 0 };
+      const b = { x: 0, y: 0 };
       const output = calcSlope(a.x, a.y, b.x, b.y);
       expect(output).toEqual(0);
     });
 
     it('Has slop', () => {
-      const a = {x: 0, y: -1};
-      const b = {x: 1, y: 2};
+      const a = { x: 0, y: -1 };
+      const b = { x: 1, y: 2 };
       const output = calcSlope(a.x, a.y, b.x, b.y);
       expect(output).toEqual(3);
     });
@@ -42,16 +42,16 @@ describe('Test calculation helpers', () => {
 
   describe('Test findClosest function', () => {
     it('Get closest number from array of interger', () => {
-      const arr = [ 1, 2, 4, 5, 6, 6, 8, 9 ];
+      const arr = [1, 2, 4, 5, 6, 6, 8, 9];
       const target = 2.7;
-      const output = findClosest(arr, target)
+      const output = findClosest(arr, target);
       expect(output).toEqual(2);
     });
 
     it('Get closest number from array of float', () => {
-      const arr = [ 1.0, 1.5, 1.9 ];
+      const arr = [1.0, 1.5, 1.9];
       const target = 1.2;
-      const output = findClosest(arr, target)
+      const output = findClosest(arr, target);
       expect(output).toEqual(1.0);
     });
   });

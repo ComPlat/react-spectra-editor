@@ -1,5 +1,5 @@
-import configureStore from 'redux-mock-store'
-import { Provider } from 'react-redux'
+import configureStore from 'redux-mock-store';
+import { Provider } from 'react-redux';
 import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Peak from '../../../../components/cmd_bar/03_peak';
@@ -13,7 +13,7 @@ jest.mock('../../../../helpers/extractPeaksEdit', () => ({
 
 const mockStore = configureStore([]);
 const store = mockStore({
-  ui:{ sweepType: LIST_UI_SWEEP_TYPE.ZOOMIN },
+  ui: { sweepType: LIST_UI_SWEEP_TYPE.ZOOMIN },
   layout: LIST_LAYOUT.MS,
   curve: { curveIdx: 0 },
   editPeak: {
@@ -26,7 +26,7 @@ const store = mockStore({
           neg: [],
         },
       ],
-    }
+    },
   },
   threshold: {
     selectedIdx: 0,
@@ -36,14 +36,14 @@ const store = mockStore({
         value: false,
         upper: false,
         lower: false,
-      }
+      },
     ],
   },
   shift: { shifts: [] },
-  cyclicvolta: {}
+  cyclicvolta: {},
 });
 const nmrStore = mockStore({
-  ui:{ sweepType: LIST_UI_SWEEP_TYPE.ZOOMIN },
+  ui: { sweepType: LIST_UI_SWEEP_TYPE.ZOOMIN },
   layout: LIST_LAYOUT.H1,
   curve: { curveIdx: 0 },
   editPeak: {
@@ -56,7 +56,7 @@ const nmrStore = mockStore({
           neg: [],
         },
       ],
-    }
+    },
   },
   threshold: {
     selectedIdx: 0,
@@ -66,11 +66,11 @@ const nmrStore = mockStore({
         value: false,
         upper: false,
         lower: false,
-      }
+      },
     ],
   },
   shift: { shifts: [] },
-  cyclicvolta: {}
+  cyclicvolta: {},
 });
 
 const dispatchMock = () => Promise.resolve({});
@@ -80,17 +80,23 @@ nmrStore.dispatch = jest.fn(dispatchMock);
 describe('<Peak />', () => {
   let AppWrapper;
   beforeEach(() => {
-    AppWrapper = ({ store, children}) => {
-      return <Provider store={store}> {children} </Provider>
-    }
+    AppWrapper = function ({ store, children }) {
+      return (
+        <Provider store={store}>
+          {' '}
+          {children}
+          {' '}
+        </Provider>
+      );
+    };
   });
 
   it('render when has Set reference button', async () => {
-    const renderer = 
+    const renderer = (
       <AppWrapper store={nmrStore}>
         <Peak feature={{}} />
       </AppWrapper>
-    ;
+    );
     const { queryByTestId } = render(renderer);
     const renderResult = queryByTestId('Peak');
     expect(renderResult).toBeInTheDocument();
@@ -98,11 +104,11 @@ describe('<Peak />', () => {
   });
 
   it('render when does not hav Set reference button', async () => {
-    const renderer = 
+    const renderer = (
       <AppWrapper store={store}>
         <Peak feature={{}} />
       </AppWrapper>
-    ;
+    );
     const { queryByTestId } = render(renderer);
     const renderResult = queryByTestId('Peak');
     expect(renderResult).toBeInTheDocument();
@@ -125,9 +131,15 @@ describe('<Peak />', () => {
       threshold: {
         selectedIdx: 0,
         list: [
-          { isEdit: true, value: false, upper: false, lower: false },
-          { isEdit: true, value: false, upper: false, lower: false },
-          { isEdit: true, value: false, upper: false, lower: false },
+          {
+            isEdit: true, value: false, upper: false, lower: false,
+          },
+          {
+            isEdit: true, value: false, upper: false, lower: false,
+          },
+          {
+            isEdit: true, value: false, upper: false, lower: false,
+          },
         ],
       },
       shift: { shifts: [] },
@@ -147,4 +159,4 @@ describe('<Peak />', () => {
     expect(extractAutoPeaks).toHaveBeenCalledTimes(1);
     expect(extractAutoPeaks.mock.calls[0][4]).toEqual(curveIdx);
   });
-})
+});

@@ -1,8 +1,8 @@
-import { carbonFeatures } from "../../../helpers/carbonFeatures";
+import { carbonFeatures } from '../../../helpers/carbonFeatures';
 
 describe('Test extract carbon fetures', () => {
-  //TODO: Need to be implemented
+  // TODO: Need to be implemented
   it('TODO', () => {
-    expect(1).toEqual(1)
-  })
-})
+    expect(1).toEqual(1);
+  });
+});

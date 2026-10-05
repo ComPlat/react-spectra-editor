@@ -29,7 +29,9 @@ describe('lc-ms/submit peaks — backend payload shape', () => {
       };
       const out = formatLcmsPeaksForBackend(hplcMsSt);
       expect(out).toEqual([
-        { x: 1.2, y: 10, _meta: 'a', wavelength: 254 },
+        {
+          x: 1.2, y: 10, _meta: 'a', wavelength: 254,
+        },
         { x: 3.4, y: 20, wavelength: 254 },
       ]);
     });
@@ -79,16 +81,24 @@ describe('lc-ms/submit peaks — backend payload shape', () => {
             {
               pageValue: 254,
               integrations: [
-                { xL: 1, xU: 2, area: 100, absoluteArea: 1000 },
-                { xL: 3, xU: 4, area: 50, absoluteArea: 500 },
+                {
+                  xL: 1, xU: 2, area: 100, absoluteArea: 1000,
+                },
+                {
+                  xL: 3, xU: 4, area: 50, absoluteArea: 500,
+                },
               ],
             },
           ],
         },
       };
       expect(formatLcmsIntegralsForBackend(hplcMsSt)).toEqual([
-        { from: 1, to: 2, value: 100, integral: 1000, wavelength: 254 },
-        { from: 3, to: 4, value: 50, integral: 500, wavelength: 254 },
+        {
+          from: 1, to: 2, value: 100, integral: 1000, wavelength: 254,
+        },
+        {
+          from: 3, to: 4, value: 50, integral: 500, wavelength: 254,
+        },
       ]);
     });
   });

@@ -17,7 +17,11 @@ const mockStore = configureStore([]);
 
 const buildBaseState = (overrides = {}) => ({
   editPeak: { present: { selectedIdx: 0, peaks: [{ pos: [], neg: [] }] } },
-  threshold: { list: [{ isEdit: true, value: 10, upper: false, lower: false }] },
+  threshold: {
+    list: [{
+      isEdit: true, value: 10, upper: false, lower: false,
+    }],
+  },
   layout: '1H',
   shift: { shifts: [] },
   scan: { target: 5, isAuto: false },
@@ -37,7 +41,9 @@ const buildBaseState = (overrides = {}) => ({
 
 const renderBtnSubmit = (state, operationValue) => {
   const store = mockStore(state);
-  const feature = { xUnit: 'ppm', yUnit: 'intensity', scanAutoTarget: 1, thresRef: 3 };
+  const feature = {
+    xUnit: 'ppm', yUnit: 'intensity', scanAutoTarget: 1, thresRef: 3,
+  };
   const view = render(
     <Provider store={store}>
       <BtnSubmit
@@ -76,9 +82,21 @@ describe('<BtnSubmit payload contract />', () => {
       curve: {
         curveIdx: 1,
         listCurves: [
-          { feature: { xUnit: 'ppm', yUnit: 'intensity', scanAutoTarget: 1, thresRef: 3 } },
-          { feature: { xUnit: 'ppm', yUnit: 'intensity', scanAutoTarget: 2, thresRef: 4 } },
-          { feature: { xUnit: 'ppm', yUnit: 'intensity', scanAutoTarget: 3, thresRef: 5 } },
+          {
+            feature: {
+              xUnit: 'ppm', yUnit: 'intensity', scanAutoTarget: 1, thresRef: 3,
+            },
+          },
+          {
+            feature: {
+              xUnit: 'ppm', yUnit: 'intensity', scanAutoTarget: 2, thresRef: 4,
+            },
+          },
+          {
+            feature: {
+              xUnit: 'ppm', yUnit: 'intensity', scanAutoTarget: 3, thresRef: 5,
+            },
+          },
         ],
       },
       threshold: { list: [{ value: 10 }, { value: 20 }, { value: 30 }] },
@@ -116,7 +134,9 @@ describe('<BtnSubmit payload contract />', () => {
   });
 
   describe('layout LC/MS', () => {
-    const uvvisFeature = { xUnit: 'min', yUnit: 'mAU', scanAutoTarget: 1, thresRef: 3 };
+    const uvvisFeature = {
+      xUnit: 'min', yUnit: 'mAU', scanAutoTarget: 1, thresRef: 3,
+    };
     let formatedLcmsSpy;
 
     beforeEach(() => {

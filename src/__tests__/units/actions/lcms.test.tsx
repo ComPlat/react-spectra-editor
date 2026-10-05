@@ -4,20 +4,20 @@ import {
   updateCurrentPageValue,
   clearIntegrationAllHplcMs,
   clearAllPeaksHplcMs,
-} from "../../../actions/hplc_ms";
-import { clickUiTarget } from "../../../actions/ui";
-import { HPLC_MS } from "../../../constants/action_type";
-import { ExtractJcamp, buildLcmsMsPageJcamp } from "../../../helpers/chem";
-import { LIST_LAYOUT } from "../../../constants/list_layout";
-import { getLcMsInfo, splitAndReindexEntities } from "../../../helpers/extractEntityLCMS";
-import { shouldDisplayLcmsSubViewerAt } from "../../../sagas/saga_ui";
-import hplcMsTicPosJcamp from "../../fixtures/lc_ms_jcamp_tic_pos";
-import hplcMsTicNegJcamp from "../../fixtures/lc_ms_jcamp_tic_neg";
-import hplcMsUvvisJcamp from "../../fixtures/lc_ms_jcamp_uvvis";
-import lcMsMzChemstationJcamp from "../../fixtures/lc_ms_jcamp_mz_chemstation";
-import msJcamp from "../../fixtures/ms_jcamp";
-import gcJcamp from "../../fixtures/gc_1_jcamp";
-import hplcUvvisJcamp from "../../fixtures/hplc_uvvis_jcamp";
+} from '../../../actions/hplc_ms';
+import { clickUiTarget } from '../../../actions/ui';
+import { HPLC_MS } from '../../../constants/action_type';
+import { ExtractJcamp, buildLcmsMsPageJcamp } from '../../../helpers/chem';
+import { LIST_LAYOUT } from '../../../constants/list_layout';
+import { getLcMsInfo, splitAndReindexEntities } from '../../../helpers/extractEntityLCMS';
+import { shouldDisplayLcmsSubViewerAt } from '../../../sagas/saga_ui';
+import hplcMsTicPosJcamp from '../../fixtures/lc_ms_jcamp_tic_pos';
+import hplcMsTicNegJcamp from '../../fixtures/lc_ms_jcamp_tic_neg';
+import hplcMsUvvisJcamp from '../../fixtures/lc_ms_jcamp_uvvis';
+import lcMsMzChemstationJcamp from '../../fixtures/lc_ms_jcamp_mz_chemstation';
+import msJcamp from '../../fixtures/ms_jcamp';
+import gcJcamp from '../../fixtures/gc_1_jcamp';
+import hplcUvvisJcamp from '../../fixtures/hplc_uvvis_jcamp';
 
 const hasSpectrumData = (entity: any) => {
   const data = entity?.spectra?.[0]?.data?.[0];

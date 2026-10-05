@@ -11,18 +11,26 @@ import { LIST_UI_VIEWER_TYPE } from '../../constants/list_ui';
 // Capture whatever `feature`/`topic` LayerPrism actually hands down, without
 // exercising the real D3/panel rendering machinery.
 const captured: any[] = [];
-jest.mock('../../layer_content', () => (props: any) => {
+jest.mock('../../layer_content', () => function (props: any) {
   captured.push({ topic: props.topic, feature: props.feature });
   return <div data-testid="layer-content" />;
 });
-jest.mock('../../components/cmd_bar/index', () => () => <div />);
-jest.mock('../../components/panel/index', () => () => <div />);
+jest.mock('../../components/cmd_bar/index', () => function () {
+  return <div />;
+});
+jest.mock('../../components/panel/index', () => function () {
+  return <div />;
+});
 
 const mockStore = configureStore([]);
 
 const storeState = {
   scan: {},
-  threshold: { list: [{ isEdit: true, value: false, upper: false, lower: false }] },
+  threshold: {
+    list: [{
+      isEdit: true, value: false, upper: false, lower: false,
+    }],
+  },
   ui: { viewer: LIST_UI_VIEWER_TYPE.SPECTRUM },
   curve: { curveIdx: 0 },
   integration: { present: { integrations: [] } },

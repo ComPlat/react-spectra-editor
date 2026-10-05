@@ -1,8 +1,8 @@
-import MountZoom from "../../../helpers/zoom";
+import MountZoom from '../../../helpers/zoom';
 
 describe('Test mount zoom', () => {
-  //TODO: need more test
+  // TODO: need more test
   it('just a dump test', () => {
-    expect(1).toEqual(1)
-  })
-})
+    expect(1).toEqual(1);
+  });
+});

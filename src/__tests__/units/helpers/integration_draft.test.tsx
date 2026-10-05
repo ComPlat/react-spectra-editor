@@ -4,7 +4,7 @@ import {
   forgetPendingIntegrationDraft,
   hasPendingIntegrationDraft,
   setPendingIntegrationDraft,
-} from "../../../helpers/integration_draft";
+} from '../../../helpers/integration_draft';
 
 describe('Test helper for pending integration draft', () => {
   afterEach(() => {
