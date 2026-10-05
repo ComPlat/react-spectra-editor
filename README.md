@@ -55,6 +55,8 @@ $ CHEM_SPECTRA_APP_URL=https://your-backend yarn start:standalone
 $ yarn start:standalone:editor                            # the editorOnly variant
 ```
 
+See [the standalone client docs](docs/standalone-client.md) for its backend calls, its contract with the editor, and its known limitations.
+
 ### Demo & Manual
 
 [demo & step-by-step manual](https://github.com/ComPlat/react-spectra-editor/blob/master/DEMO_MANUAL.md)
