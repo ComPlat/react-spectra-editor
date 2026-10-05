@@ -1,7 +1,7 @@
-import hplcMsReducer from "../../../reducers/reducer_hplc_ms";
-import { CURVE, HPLC_MS } from "../../../constants/action_type";
-import { ExtractJcamp } from "../../../helpers/chem";
-import lcMsMzChemstationJcamp from "../../fixtures/lc_ms_jcamp_mz_chemstation";
+import hplcMsReducer from '../../../reducers/reducer_hplc_ms';
+import { CURVE, HPLC_MS } from '../../../constants/action_type';
+import { ExtractJcamp } from '../../../helpers/chem';
+import lcMsMzChemstationJcamp from '../../fixtures/lc_ms_jcamp_mz_chemstation';
 
 const createTicCurve = (polarity: 'positive' | 'negative' | 'neutral', x = [1, 2], y = [10, 20]) => ({
   csCategory: ['tic', polarity],
@@ -483,7 +483,7 @@ $$ === CHEMSPECTRA UVVIS PEAK TABLE ===
       } as any);
 
       expect(state.tic.polarity).toEqual('neutral');
-      const x = state.tic.neutral.data.x;
+      const { x } = state.tic.neutral.data;
       [1.1228166666666666, 7.5, 13.982933333333333].forEach((expected, i) => {
         expect(x[i]).toBeCloseTo(expected);
       });
