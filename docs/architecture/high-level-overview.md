@@ -60,9 +60,10 @@ The package provides these main technical responsibilities:
 | Material UI | [`src/app.js`](../../src/app.js), [`src/components/cmd_bar/index.js`](../../src/components/cmd_bar/index.js), [`src/components/panel/index.js`](../../src/components/panel/index.js) | Provides UI structure for grids, buttons, tooltips, accordions, panel styling, and theme integration. |
 | `jcampconverter` | [`src/helpers/chem.js`](../../src/helpers/chem.js), [`package.json`](../../package.json) | Converts JCAMP input into the internal `entity` shape consumed by initialization, selectors, and viewers. |
 | `reselect` | [`src/helpers/chem.js`](../../src/helpers/chem.js) | Memoizes derived rendering data such as seed points, peaks, thresholds, comparisons, and frequency values. |
-| Create React App / `react-scripts` | [`package.json`](../../package.json) | Supports local development and the demo application workflow through `start`, `build`, and `test`. |
-| Babel compile | [`package.json`](../../package.json) | Builds distributable package output into `dist/` through the `compile` script. |
-| Storybook / Cypress | [`package.json`](../../package.json), [`cypress.config.ts`](../../cypress.config.ts) | Supports component exploration and end-to-end testing workflows around the editor. |
+| Create React App / `react-scripts` | [`package.json`](../../package.json) | Supports local development and the demo application workflow through `start`, `build`, and `test` (Jest 27). |
+| Babel compile | [`package.json`](../../package.json) | Builds distributable package output into `dist/` through the `compile` script. Tests, `setupTests.js` and the demo entry `src/index.js` are not compiled, so they are not published. |
+| ESLint | [`.eslintrc.js`](../../.eslintrc.js) | `yarn lint` checks all of `src/` against the airbnb config, tests included; `.ts`/`.tsx` files are parsed with `@typescript-eslint`. CI runs it before the tests. |
+| Cypress | [`cypress.config.ts`](../../cypress.config.ts) | End-to-end tests against the demo (`yarn e2e`). |
 
 ## System Boundaries
 

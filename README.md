@@ -65,6 +65,12 @@ See [the standalone client docs](docs/standalone-client.md) for its backend call
 - [Developer documentation](docs/README.md): architecture and diagrams
 
 ### Testing
+#### Lint
+```
+$ yarn lint
+```
+Checks all of `src/`, tests included. CI runs it before the unit tests.
+
 #### Unit test
 ```
 $ yarn test
