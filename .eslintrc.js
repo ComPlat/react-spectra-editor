@@ -1,5 +1,9 @@
 module.exports = {
   "extends": "airbnb",
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "module"
+  },
   "env": {
     "browser": true,
     "node": true,

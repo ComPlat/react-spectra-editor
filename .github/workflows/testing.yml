@@ -11,4 +11,5 @@ jobs:
         with:
           node-version: 22.23.1
       - run: yarn install --frozen-lockfile
+      - run: yarn lint
       - run: yarn test
