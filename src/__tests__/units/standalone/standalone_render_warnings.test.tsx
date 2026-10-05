@@ -41,7 +41,7 @@ describe('standalone client render warnings', () => {
     expect(messages.filter((m) => /same key|unique "key"/.test(m))).toEqual([]);
   });
 
-  it('gives the editor the prop types it declares', async () => {
+  it('passes multiEntities to the editor as an array', async () => {
     const messages = collectErrors();
     installFetch({ 'file/convert': { status: true, jcamp: encodeJcamp(irJcamp), img: 'p' } });
     const store = createClientStore();
