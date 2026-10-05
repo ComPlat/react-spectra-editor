@@ -78,6 +78,35 @@ const resolveOperationParams = (params) => {
   };
 };
 
+// The save request for the selected curve. A curve the editor holds no shift, integration
+// or multiplicity entry for (its lists shorter than the curve list) is saved with its peaks
+// as they are and with '{}', which the backend reads as "none", rather than with another
+// curve's data or the string "undefined".
+const buildSavePayload = (params, mass) => {
+  const {
+    peaks, shift, scan, thres, analysis, integration,
+    multiplicity, waveLength, cyclicvoltaSt, curveSt,
+    dscMetaData,
+  } = resolveOperationParams(params);
+  const { curveIdx } = curveSt;
+  const selectedShift = shift?.shifts?.[curveIdx];
+  const fPeaks = selectedShift ? FN.rmRef(peaks, shift, curveIdx) : peaks;
+
+  return {
+    peakStr: FN.toPeakStr(fPeaks),
+    shift: selectedShift,
+    mass,
+    scan,
+    thres,
+    predict: JSON.stringify(analysis),
+    integration: JSON.stringify(integration?.integrations?.[curveIdx] ?? {}),
+    multiplicity: JSON.stringify(multiplicity?.multiplicities?.[curveIdx] ?? {}),
+    waveLength: JSON.stringify(waveLength),
+    cyclicvolta: JSON.stringify(cyclicvoltaSt),
+    dscMetaData: JSON.stringify(dscMetaData),
+  };
+};
+
 class Content extends React.Component {
   constructor(props) {
     super(props);
@@ -240,34 +269,8 @@ class Content extends React.Component {
   }
 
   saveOp(params) {
-    const {
-      peaks, shift, scan, thres, analysis, integration,
-      multiplicity, waveLength, cyclicvoltaSt, curveSt,
-      dscMetaData,
-    } = resolveOperationParams(params);
-    const {
-      saveFileInitAct, molSt,
-    } = this.props;
-    const { mass } = molSt;
-    const { curveIdx } = curveSt;
-    const selectedShift = shift.shifts[curveIdx];
-    const fPeaks = FN.rmRef(peaks, shift, curveIdx);
-    const peakStr = FN.toPeakStr(fPeaks);
-    const predict = JSON.stringify(analysis);
-
-    saveFileInitAct({
-      peakStr,
-      shift: selectedShift,
-      mass,
-      scan,
-      thres,
-      predict,
-      integration: JSON.stringify(integration.integrations[curveIdx]),
-      multiplicity: JSON.stringify(multiplicity.multiplicities[curveIdx]),
-      waveLength: JSON.stringify(waveLength),
-      cyclicvolta: JSON.stringify(cyclicvoltaSt),
-      dscMetaData: JSON.stringify(dscMetaData),
-    });
+    const { saveFileInitAct, molSt } = this.props;
+    saveFileInitAct(buildSavePayload(params, molSt.mass));
   }
 
   refreshOp({
@@ -463,6 +466,8 @@ Content.propTypes = {
   editorOnly: PropTypes.bool.isRequired,
   addOthersInitAct: PropTypes.func.isRequired,
 };
+
+export { buildSavePayload }; // exported for tests
 
 export default connect(
   mapStateToProps,
