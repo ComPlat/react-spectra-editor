@@ -23,7 +23,7 @@ describe('Manual Multiplicity', () => {
         const output = calcMpyManual(k, manualType, metaSt);
         expect(output.mpyType).toEqual(manualType);
         expect(output.js.length).toEqual(1);
-        expect(output.js[0].toFixed(3)).toEqual((freq * (d1 + d2) / 2).toFixed(3));
+        expect(output.js[0].toFixed(3)).toEqual(((freq * (d1 + d2)) / 2).toFixed(3));
       });
     });
 
@@ -42,7 +42,7 @@ describe('Manual Multiplicity', () => {
         const output = calcMpyManual(k, manualType, metaSt);
         expect(output.mpyType).toEqual(manualType);
         expect(output.js.length).toEqual(1);
-        expect(output.js[0].toFixed(3)).toEqual((freq * (d1 + d2 + d3 + d4) / 4).toFixed(3));
+        expect(output.js[0].toFixed(3)).toEqual(((freq * (d1 + d2 + d3 + d4)) / 4).toFixed(3));
       });
     });
 

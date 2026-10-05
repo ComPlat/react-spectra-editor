@@ -5,7 +5,7 @@ import '@testing-library/jest-dom';
 describe('common/comps', () => {
   it('.TabLabel()', () => {
     const labelStr = 'test label';
-    function TestComponent({}) {
+    function TestComponent() {
       return (
         <div data-testid="test-div">
           {

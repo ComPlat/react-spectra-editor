@@ -11,14 +11,14 @@ import { LIST_UI_VIEWER_TYPE } from '../../constants/list_ui';
 // Capture whatever `feature`/`topic` LayerPrism actually hands down, without
 // exercising the real D3/panel rendering machinery.
 const captured: any[] = [];
-jest.mock('../../layer_content', () => function (props: any) {
-  captured.push({ topic: props.topic, feature: props.feature });
+jest.mock('../../layer_content', () => function MockLayerContent({ topic, feature }: any) {
+  captured.push({ topic, feature });
   return <div data-testid="layer-content" />;
 });
-jest.mock('../../components/cmd_bar/index', () => function () {
+jest.mock('../../components/cmd_bar/index', () => function MockCmdBar() {
   return <div />;
 });
-jest.mock('../../components/panel/index', () => function () {
+jest.mock('../../components/panel/index', () => function MockPanel() {
   return <div />;
 });
 

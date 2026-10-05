@@ -47,10 +47,10 @@ const dispatchMock = () => Promise.resolve({});
 store.dispatch = jest.fn(dispatchMock);
 
 describe('<CyclicVoltammetryPanel />', () => {
-  function TestComponent({ store }) {
+  function TestComponent({ store: providerStore }) {
     const { features } = cyclicVoltaEntity1;
     return (
-      <Provider store={store}>
+      <Provider store={providerStore}>
         <CyclicVoltammetryPanel expand={false} onExapnd={() => {}} molSvg="" feature={features[0]} />
       </Provider>
     );

@@ -10,7 +10,7 @@ const d3 = require('d3');
 describe('common/draw', () => {
   describe('.drawMain()', () => {
     it('d3 draw main svg view box', () => {
-      function TestComponent({}) {
+      function TestComponent() {
         useEffect(() => {
           drawMain('.testsvg', 100, 100);
         }, []);
@@ -45,7 +45,7 @@ describe('common/draw', () => {
     }
 
     it('d3 draw only axes label', () => {
-      function TestComponent({}) {
+      function TestComponent() {
         useEffect(() => {
           drawMyText(false);
           drawLabel(rootClass, null, xLabelText, yLabelText);
@@ -65,7 +65,7 @@ describe('common/draw', () => {
     });
 
     it('d3 draw labels witg c label', () => {
-      function TestComponent({}) {
+      function TestComponent() {
         useEffect(() => {
           drawMyText(true);
           drawLabel(rootClass, cLabelText, xLabelText, yLabelText);
@@ -90,7 +90,7 @@ describe('common/draw', () => {
 
   describe('.drawDisplay()', () => {
     it('set display as hidden', () => {
-      function TestComponent({}) {
+      function TestComponent() {
         useEffect(() => {
           drawMain('.testsvg', 100, 100);
           drawDisplay('.testsvg', true);
@@ -106,7 +106,7 @@ describe('common/draw', () => {
     });
 
     it('set display to show', () => {
-      function TestComponent({}) {
+      function TestComponent() {
         useEffect(() => {
           drawMain('.testsvg', 100, 100);
           drawDisplay('.testsvg', false);
@@ -124,7 +124,7 @@ describe('common/draw', () => {
 
   describe('.drawDestroy()', () => {
     it('d3 remove all svg', () => {
-      function TestComponent({}) {
+      function TestComponent() {
         useEffect(() => {
           drawMain('.testsvg', 100, 100);
           drawDestroy('.testsvg');
@@ -142,7 +142,7 @@ describe('common/draw', () => {
 
   describe('.drawArrowOnCurve()', () => {
     it('d3 remove all arrows on curves', () => {
-      function TestComponent({}) {
+      function TestComponent() {
         useEffect(() => {
           drawMain('.testsvg', 100, 100);
           d3.select('.d3Svg').append('defs').append('marker');
@@ -159,7 +159,7 @@ describe('common/draw', () => {
     });
 
     it('d3 draw arrows on curves', () => {
-      function TestComponent({}) {
+      function TestComponent() {
         useEffect(() => {
           drawMain('.testsvg', 100, 100);
           d3.select('.d3Svg').append('defs').append('marker');

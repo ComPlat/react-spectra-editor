@@ -1,11 +1,11 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import InfoPanel from '../../../../components/panel/info';
 import configureStore from 'redux-mock-store';
 import { Provider } from 'react-redux';
 import '@testing-library/jest-dom';
 import { createTheme } from '@mui/material';
 import { ThemeProvider } from '@mui/styles';
+import InfoPanel from '../../../../components/panel/info';
 import { LIST_LAYOUT } from '../../../../constants/list_layout';
 
 const mockStore = configureStore([]);
@@ -58,9 +58,9 @@ const baseProps = {
 describe('<InfoPanel />', () => {
   let AppWrapper;
   beforeEach(() => {
-    AppWrapper = function ({ store, children }) {
+    AppWrapper = function ProviderWrapper({ store: providerStore, children }) {
       return (
-        <Provider store={store}>
+        <Provider store={providerStore}>
           {' '}
           {children}
           {' '}

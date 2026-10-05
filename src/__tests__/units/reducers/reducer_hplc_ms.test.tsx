@@ -179,12 +179,13 @@ describe('Test redux reducer_hplc_ms', () => {
       createUvvisCurve(),
       createMzCurve('positive'),
     ];
-    let state = hplcMsReducer(undefined, {
+    const state = hplcMsReducer(undefined, {
       type: CURVE.SET_ALL_CURVES,
       payload,
       meta: { idDt: 'persist-rt-1' },
     } as any);
-    state = hplcMsReducer(state, {
+    // The reducer keeps this choice per idDt; the state it returns is not needed.
+    hplcMsReducer(state, {
       type: HPLC_MS.UPDATE_CURRENT_PAGE_VALUE,
       payload: { currentPageValue: 2 },
     } as any);
@@ -328,12 +329,13 @@ describe('Test redux reducer_hplc_ms', () => {
       createUvvisCurve(),
       createMzCurve('positive'),
     ];
-    let state = hplcMsReducer(undefined, {
+    const state = hplcMsReducer(undefined, {
       type: CURVE.SET_ALL_CURVES,
       payload,
       meta: { idDt: 'before-save' },
     } as any);
-    state = hplcMsReducer(state, {
+    // The reducer keeps this choice per idDt; the state it returns is not needed.
+    hplcMsReducer(state, {
       type: HPLC_MS.UPDATE_UVVIS_WAVE_LENGTH,
       payload: { target: { value: 220 } },
     } as any);

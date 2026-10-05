@@ -80,9 +80,9 @@ nmrStore.dispatch = jest.fn(dispatchMock);
 describe('<Peak />', () => {
   let AppWrapper;
   beforeEach(() => {
-    AppWrapper = function ({ store, children }) {
+    AppWrapper = function ProviderWrapper({ store: providerStore, children }) {
       return (
-        <Provider store={store}>
+        <Provider store={providerStore}>
           {' '}
           {children}
           {' '}
