@@ -53,6 +53,31 @@ const renderTitle = () => (
   </div>
 );
 
+// The editor's submit button calls an operation with
+// { spectra_list: [perCurvePayload, ...], curveSt: { curveIdx } }. Each per-curve
+// payload already holds the selected shift, integration and multiplicity as single
+// entries. Pick the selected curve's payload and rebuild the index-keyed slices
+// ({ shifts: [] } etc.) that formatPks, formatMpy and the FN helpers read.
+const toSlice = (entry, key, curveIdx) => {
+  if (!entry || Array.isArray(entry[key])) return entry;
+  const list = [];
+  list[curveIdx] = entry;
+  return { [key]: list };
+};
+
+const resolveOperationParams = (params) => {
+  const spectraList = Array.isArray(params?.spectra_list) ? params.spectra_list : [];
+  const curveIdx = params?.curveSt?.curveIdx ?? 0;
+  const spectrum = spectraList[curveIdx] || spectraList[0] || {};
+  return {
+    ...spectrum,
+    shift: toSlice(spectrum.shift, 'shifts', curveIdx),
+    integration: toSlice(spectrum.integration, 'integrations', curveIdx),
+    multiplicity: toSlice(spectrum.multiplicity, 'multiplicities', curveIdx),
+    curveSt: { curveIdx },
+  };
+};
+
 class Content extends React.Component {
   constructor(props) {
     super(props);
@@ -108,8 +133,9 @@ class Content extends React.Component {
     const { temperature } = entity;
     const { maxY, minY } = Array.isArray(features) ? {} : (features.editPeak || features.autoPeak);
     const boundary = { maxY, minY };
-    const body = FN.peaksBody({ peaks, layout, decimal, shift, isAscend, isIntensity, boundary, integration, waveLength, temperature,}); //eslint-disable-line
-    const wrapper = FN.peaksWrapper(layout, shift);
+    const { curveIdx: atIndex = 0 } = curveSt || {};
+    const body = FN.peaksBody({ peaks, layout, decimal, shift, isAscend, isIntensity, boundary, integration, atIndex, waveLength, temperature,}); //eslint-disable-line
+    const wrapper = FN.peaksWrapper(layout, shift, atIndex);
     const desc = RmDollarSign(wrapper.head) + body + wrapper.tail;
     return desc;
   }
@@ -170,10 +196,11 @@ class Content extends React.Component {
     return `${layout} NMR (${freqStr}${solvent}ppm) δ = ${str}.`;
   }
 
-  writeMpy({
-    layout, shift, isAscend, decimal,
-    multiplicity, integration, curveSt,
-  }) {
+  writeMpy(params) {
+    const {
+      layout, shift, isAscend, decimal,
+      multiplicity, integration, curveSt,
+    } = resolveOperationParams(params);
     if (['1H', '13C', '19F'].indexOf(layout) < 0) return;
     const desc = this.formatMpy({
       multiplicity, integration, shift, isAscend, decimal, layout, curveSt,
@@ -182,9 +209,10 @@ class Content extends React.Component {
     updateDescAct(desc);
   }
 
-  writePeak({
-    peaks, layout, shift, isAscend, decimal, isIntensity, integration, curveSt, waveLength,
-  }) {
+  writePeak(params) {
+    const {
+      peaks, layout, shift, isAscend, decimal, isIntensity, integration, curveSt, waveLength,
+    } = resolveOperationParams(params);
     const desc = this.formatPks({
       peaks, layout, shift, isAscend, decimal, isIntensity, integration, curveSt, waveLength,
     });
@@ -211,18 +239,19 @@ class Content extends React.Component {
     });
   }
 
-  saveOp({
-    peaks, shift, scan, thres, analysis, integration,
-    multiplicity, waveLength, cyclicvoltaSt, curveSt,
-    dscMetaData,
-  }) {
+  saveOp(params) {
+    const {
+      peaks, shift, scan, thres, analysis, integration,
+      multiplicity, waveLength, cyclicvoltaSt, curveSt,
+      dscMetaData,
+    } = resolveOperationParams(params);
     const {
       saveFileInitAct, molSt,
     } = this.props;
     const { mass } = molSt;
     const { curveIdx } = curveSt;
     const selectedShift = shift.shifts[curveIdx];
-    const fPeaks = FN.rmRef(peaks, shift);
+    const fPeaks = FN.rmRef(peaks, shift, curveIdx);
     const peakStr = FN.toPeakStr(fPeaks);
     const predict = JSON.stringify(analysis);
 
@@ -233,8 +262,8 @@ class Content extends React.Component {
       scan,
       thres,
       predict,
-      integration: JSON.stringify(integration),
-      multiplicity: JSON.stringify(multiplicity),
+      integration: JSON.stringify(integration.integrations[curveIdx]),
+      multiplicity: JSON.stringify(multiplicity.multiplicities[curveIdx]),
       waveLength: JSON.stringify(waveLength),
       cyclicvolta: JSON.stringify(cyclicvoltaSt),
       dscMetaData: JSON.stringify(dscMetaData),
