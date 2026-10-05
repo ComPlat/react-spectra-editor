@@ -624,7 +624,6 @@ Content.propTypes = {
   predictInitAct: _propTypes.default.func.isRequired,
   predictToWriteInitAct: _propTypes.default.func.isRequired,
   updateDescAct: _propTypes.default.func.isRequired,
-  addOthersAct: _propTypes.default.func.isRequired,
   editorOnly: _propTypes.default.bool.isRequired,
   addOthersInitAct: _propTypes.default.func.isRequired
 };

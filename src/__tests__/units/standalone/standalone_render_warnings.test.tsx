@@ -34,11 +34,14 @@ describe('standalone client render warnings', () => {
     delete (global as any).fetch;
   });
 
-  it('renders both page layouts without duplicate-key warnings', () => {
+  it('renders both page layouts without duplicate-key or prop-type warnings', () => {
     const messages = collectErrors();
     render(<ChemSpectraClient editorOnly />);
     render(<ChemSpectraClient />);
     expect(messages.filter((m) => /same key|unique "key"/.test(m))).toEqual([]);
+    // Content first renders here. It required addOthersAct, which it is never given (the
+    // action is addOthersInitAct).
+    expect(messages.filter((m) => /addOthersAct/.test(m))).toEqual([]);
   });
 
   it('passes multiEntities to the editor as an array', async () => {
