@@ -374,7 +374,7 @@ class Content extends React.Component {
     let currXLabel = xLabel;
     let currYLabel = yLabel;
 
-    let multiEntities = false;
+    let multiEntities = [];
     if (!isExist) {
       const { jcampList } = fileSt;
       if (!jcampList || jcampList.length === 0) return renderTitle();

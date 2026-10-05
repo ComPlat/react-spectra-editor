@@ -73,7 +73,7 @@ function EditorVersion({ classes, editorOnly }) {
       <Grid key="grid-form-input" item xs={1}>
         <InputForm />
       </Grid>
-      <Grid key="grid-drop-space" item xs={1} />
+      <Grid key="grid-drop-space-end" item xs={1} />
     </Grid>
   );
 }
