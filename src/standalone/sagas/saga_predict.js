@@ -12,7 +12,7 @@ function* predictByServer(action) {
 
   const rsp = yield call(FetcherPredict.predict, payload);
 
-  if (rsp && rsp.outline.code) {
+  if (rsp?.outline?.code) {
     yield put({
       type: PREDICT.PREDICT_DONE,
       payload: rsp,
@@ -32,7 +32,7 @@ function* predictToWriteByServer(action) {
   } = payload;
   const rsp = yield call(FetcherPredict.predict, payload);
 
-  if (rsp && rsp.outline.code) {
+  if (rsp?.outline?.code) {
     yield put({
       type: PREDICT.PREDICT_DONE,
       payload: rsp,

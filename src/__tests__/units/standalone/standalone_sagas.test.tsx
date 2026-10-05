@@ -175,4 +175,31 @@ describe('standalone client sagas', () => {
     await waitFor(() => expect(calls).toHaveLength(2));
     expect(calls[1].url).toBe('/api/v1/chemspectra/predict/nmr_peaks_form');
   });
+
+  it('survives a prediction response without an outline', async () => {
+    // e.g. an error body from the backend; this used to throw inside the saga and
+    // cancel every client saga, so nothing worked afterwards
+    const calls = installFetch({
+      'predict/nmr_peaks_form': { error: 'boom' },
+      'predict/infrared': { outline: { code: 200 }, output: { result: [] } },
+    });
+    const store = createClientStore();
+    const molfile = new File(['M  END'], 'a.mol');
+    const spectrum = new File(['raw'], 'a.jdx');
+
+    store.dispatch({
+      type: PREDICT.PREDICT_INIT,
+      payload: { layout: '1H', molfile, peaks: [], shift: { ref: {} } },
+    });
+    await waitFor(() => expect(calls).toHaveLength(1));
+    await waitFor(() => expect(store.getState().notice.status).toBe('warning'));
+    expect(store.getState().notice.message).toBe('Server not available!');
+
+    store.dispatch({
+      type: PREDICT.PREDICT_INIT,
+      payload: { layout: 'IR', molfile, spectrum },
+    });
+    await waitFor(() => expect(calls).toHaveLength(2));
+    expect(calls[1].url).toBe('/api/v1/chemspectra/predict/infrared');
+  });
 });
