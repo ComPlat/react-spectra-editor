@@ -1,13 +1,16 @@
 import React from 'react';
 import classNames from 'classnames';
 
-const TabLabel = (classes, label, extClsName = 'txt-tab-label') => (
-  <span
-    className={classNames(classes.tabLabel, extClsName)}
-  >
-    { label }
-  </span>
-);
+function TabLabel(classes, label, extClsName = 'txt-tab-label') {
+  const { tabLabel } = classes;
+  return (
+    <span
+      className={classNames(tabLabel, extClsName)}
+    >
+      { label }
+    </span>
+  );
+}
 
 export {
   TabLabel, // eslint-disable-line

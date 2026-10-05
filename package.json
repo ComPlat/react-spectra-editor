@@ -41,7 +41,8 @@
     "test:coverage": "CI=true react-scripts test --env=jsdom --verbose --testPathIgnorePatterns=./src/__tests__/fixtures/ --coverage",
     "eject": "react-scripts eject",
     "e2e": "cypress open",
-    "docs:diagrams": "bash docs/diagrams/generate.sh"
+    "docs:diagrams": "bash docs/diagrams/generate.sh",
+    "lint": "eslint --ext .js,.jsx src --ignore-pattern 'src/__tests__/**'"
   },
   "peerDependencies": {
     "react": "^17.0.2",
@@ -65,6 +66,7 @@
     "cypress": "^13.6.2",
     "enzyme": "^3.11.0",
     "enzyme-to-json": "^3.6.2",
+    "eslint": "^8.57.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-plugin-import": "^2.25.0",
     "eslint-plugin-jsx-a11y": "^6.5.1",
