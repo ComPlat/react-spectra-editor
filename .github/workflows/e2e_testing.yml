@@ -7,9 +7,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22.23.1
       - name: Cypress run
         uses: cypress-io/github-action@v7
         with:
-          build: npm run --max_old_space_size=12288 build
-          start: npm --max_old_space_size=12288 start
+          build: yarn build
+          start: yarn start
           browser: chrome
