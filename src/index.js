@@ -61,6 +61,7 @@ import dlsAcfJcamp from './__tests__/fixtures/dls_acf_jcamp';
 import dlsIntensityJcamp from './__tests__/fixtures/dls_intensity_jcamp';
 import plainJcamp from './__tests__/fixtures/plain_layout_jcamp';
 import { q1H, qIR, q13C } from './__tests__/fixtures/qDescValue';
+import { ChemSpectraClient } from './standalone/index';
 import './__tests__/style/svg.css';
 
 const pickSelectedSpectrumFromPayload = (payload) => {
@@ -1066,10 +1067,19 @@ class DemoWriteIr extends React.Component {
 }
 
 // - - - DOM - - -
-ReactDOM.render(
-  <DemoWriteIr />,
-  document.getElementById('root'),
-);
+// yarn start:standalone serves the ChemSpectra client against a running chem-spectra-app
+// (see src/setupProxy.js); every other start serves the demo below.
+if (process.env.REACT_APP_DEMO === 'standalone') {
+  ReactDOM.render(
+    <ChemSpectraClient editorOnly={process.env.REACT_APP_STANDALONE_EDITOR_ONLY === 'true'} />,
+    document.getElementById('root'),
+  );
+} else {
+  ReactDOM.render(
+    <DemoWriteIr />,
+    document.getElementById('root'),
+  );
+}
 
 if (typeof window !== 'undefined') {
   window.__spectraStore = store;

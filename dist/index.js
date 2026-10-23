@@ -58,6 +58,7 @@ var _dls_acf_jcamp = _interopRequireDefault(require("./__tests__/fixtures/dls_ac
 var _dls_intensity_jcamp = _interopRequireDefault(require("./__tests__/fixtures/dls_intensity_jcamp"));
 var _plain_layout_jcamp = _interopRequireDefault(require("./__tests__/fixtures/plain_layout_jcamp"));
 var _qDescValue = require("./__tests__/fixtures/qDescValue");
+var _index = require("./standalone/index");
 require("./__tests__/style/svg.css");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, default-param-last, no-nested-ternary */
@@ -1139,7 +1140,15 @@ class DemoWriteIr extends _react.default.Component {
 }
 
 // - - - DOM - - -
-_reactDom.default.render(/*#__PURE__*/(0, _jsxRuntime.jsx)(DemoWriteIr, {}), document.getElementById('root'));
+// yarn start:standalone serves the ChemSpectra client against a running chem-spectra-app
+// (see src/setupProxy.js); every other start serves the demo below.
+if (process.env.REACT_APP_DEMO === 'standalone') {
+  _reactDom.default.render(/*#__PURE__*/(0, _jsxRuntime.jsx)(_index.ChemSpectraClient, {
+    editorOnly: process.env.REACT_APP_STANDALONE_EDITOR_ONLY === 'true'
+  }), document.getElementById('root'));
+} else {
+  _reactDom.default.render(/*#__PURE__*/(0, _jsxRuntime.jsx)(DemoWriteIr, {}), document.getElementById('root'));
+}
 if (typeof window !== 'undefined') {
   window.__spectraStore = _app.store;
   // eslint-disable-next-line no-underscore-dangle
