@@ -54,7 +54,7 @@ const tpHint = (classes) => (
       *.zip (Bruker FID folder)
     </p>
     <p className={classNames(classes.tpLabel, 'txt-sv-tp')}>
-      - Max 30Mb
+      - Max 200MB
     </p>
   </span>
 );

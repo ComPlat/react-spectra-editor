@@ -17,8 +17,8 @@ import { ChemSpectraClient } from '@complat/react-spectra-editor/dist/standalone
 - It is a separate entry point. The main entry (`dist/app.js`) loads nothing from
   `standalone/`, so hosts that embed only the editor are unaffected.
 - It talks to a [chem-spectra-app](https://github.com/ComPlat/chem-spectra-app) backend on the
-  same origin. In chemotion_ELN, the `/chemspectra` and `/chemspectra-editor` pages serve it, and
-  the ELN's public `/api/v1/chemspectra/*` routes forward to chem-spectra-app.
+  same origin: run it with `yarn start:standalone` (below), which proxies the backend calls.
+- It accepts files up to 200 MB.
 - It ships no CSS: nothing under `src/standalone/` may import a stylesheet, because babel does
   not copy `.css` into `dist/` and the import would break a host's build.
 

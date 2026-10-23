@@ -44,7 +44,7 @@ const tpHint = (classes) => (
       - Accept *.json
     </p>
     <p className={classNames(classes.tpLabel, 'txt-sv-tp')}>
-      - Max 30Mb
+      - Max 200MB
     </p>
   </span>
 );

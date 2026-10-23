@@ -38,7 +38,7 @@ const tpHint = (classes) => (
       - Accept *.mol
     </p>
     <p className={classNames(classes.tpLabel, 'txt-sv-tp')}>
-      - Max 30Mb
+      - Max 200MB
     </p>
   </span>
 );
