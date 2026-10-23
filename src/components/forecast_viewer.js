@@ -7,6 +7,7 @@ import { bindActionCreators, compose } from 'redux';
 import { withStyles } from '@mui/styles';
 
 import ViewerLine from './d3_line/index';
+import ViewerMulti from './d3_multi/index';
 import NmrViewer from './forecast/nmr_viewer';
 import IrViewer from './forecast/ir_viewer';
 import { initForecastStatus } from '../actions/forecast';
@@ -77,19 +78,33 @@ class ForecastViewer extends React.Component {
     const {
       classes, topic, feature, cLabel, xLabel, yLabel, forecast,
       isNmr, isIr, uiSt, isXRD, wavelength, curveSt,
-      jcampSt,
+      jcampSt, entities,
     } = this.props;
     const { viewer } = uiSt;
     const {
       inputCb, molecule,
     } = forecast;
 
-    const { curveIdx } = curveSt;
-    const { jcamps } = jcampSt;
-    const comparisons = jcamps[curveIdx] && jcamps[curveIdx].others;
-
-    return (
-      <div className={classes.root}>
+    const isHidden = viewer !== LIST_UI_VIEWER_TYPE.SPECTRUM;
+    // The chart stays mounted, only hidden, while the analysis is shown: mounting it again
+    // would reset the user's edits.
+    let chart;
+    if (entities) {
+      chart = (
+        <ViewerMulti
+          entities={entities}
+          topic={topic}
+          xLabel={xLabel}
+          yLabel={yLabel}
+          feature={feature}
+          isHidden={isHidden}
+        />
+      );
+    } else {
+      const { curveIdx } = curveSt;
+      const { jcamps } = jcampSt;
+      const comparisons = jcamps[curveIdx] && jcamps[curveIdx].others;
+      chart = (
         <ViewerLine
           topic={topic}
           feature={feature}
@@ -97,8 +112,14 @@ class ForecastViewer extends React.Component {
           xLabel={(isXRD && wavelength) ? (`${xLabel}, WL=${wavelength.value} ${wavelength.unit}`) : xLabel}
           yLabel={yLabel}
           comparisons={comparisons}
-          isHidden={viewer !== LIST_UI_VIEWER_TYPE.SPECTRUM}
+          isHidden={isHidden}
         />
+      );
+    }
+
+    return (
+      <div className={classes.root}>
+        { chart }
         {
           (viewer === LIST_UI_VIEWER_TYPE.ANALYSIS) && isNmr && (
             <NmrViewer
@@ -154,6 +175,12 @@ ForecastViewer.propTypes = {
   setUiViewerTypeAct: PropTypes.func.isRequired,
   wavelength: PropTypes.object.isRequired,
   curveSt: PropTypes.object.isRequired,
+  // The curves of a multi-spectrum view; draws them all instead of the single spectrum.
+  entities: PropTypes.array,
+};
+
+ForecastViewer.defaultProps = {
+  entities: null,
 };
 
 export default compose(
