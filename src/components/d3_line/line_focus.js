@@ -367,6 +367,9 @@ class LineFocus {
         .text((d) => d.x.toFixed(2))
         .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(d.y) - 25})`)
         .on('click', (event, d) => this.onClickTarget(event, d));
+    } else {
+      // Only HPLC labels its peaks: clear what an HPLC spectrum before this one drew.
+      this.tags.bpTxt.selectAll('text').remove();
     }
   }
 
@@ -407,18 +410,20 @@ class LineFocus {
 
     if (itgs.length === 0 || isDisable) {
       // remove drawn area under curve
-      const auc = this.tags.aucPath.selectAll('path').data(stack);
-      auc.exit()
-        .attr('class', 'exit')
-        .remove();
-      auc.merge(auc);
+      this.tags.aucPath.selectAll('path').remove();
       this.drawVisualSplitLines(showIntegSplit ? itgs : [], shift, ignoreRef);
       return;
     }
 
+    // HPLC shows areas under the curve and NMR shows integral bars: clear the other kind,
+    // which a spectrum of the other layout may have drawn.
     if (ignoreRef) {
+      this.tags.igbPath.selectAll('path').remove();
+      this.tags.igcPath.selectAll('path').remove();
+      this.tags.igtPath.selectAll('text').remove();
       this.drawAUC(stack, shift);
     } else {
+      this.tags.aucPath.selectAll('path').remove();
       // rescale for zoom
       const { xt } = TfRescale(this);
 
