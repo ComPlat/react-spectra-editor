@@ -92,6 +92,58 @@ describe('<BtnSubmit payload contract />', () => {
     expect(payload.curveSt).toEqual({ curveIdx: 1 });
   });
 
+  it('sends each spectrum its own predictions when the host tagged them per curve', () => {
+    const operationValue = jest.fn();
+    const own = { outline: { code: 200 }, output: { result: [{ own: true }] }, curveIdx: 1 };
+    const curveFeature = {
+      xUnit: 'ppm', yUnit: 'intensity', scanAutoTarget: 1, thresRef: 3,
+    };
+    const state = buildBaseState({
+      curve: {
+        curveIdx: 1,
+        listCurves: [{ feature: curveFeature }, { feature: curveFeature }],
+      },
+      threshold: { list: [{ value: 10 }, { value: 20 }] },
+      axesUnits: { axes: [{ xUnit: '', yUnit: '' }, { xUnit: '', yUnit: '' }] },
+      forecast: { predictions: own, predictionsByCurve: { 1: own } },
+    });
+
+    renderBtnSubmit(state, operationValue);
+
+    const { spectra_list: spectraList } = operationValue.mock.calls[0][0];
+    expect(spectraList[0].analysis).toEqual({ outline: {}, output: { result: [] } });
+    expect(spectraList[1].analysis).toBe(own);
+  });
+
+  // A host saves each entry's analysis with that spectrum. Untagged predictions belong to
+  // no particular one of several spectra, so none of them gets them.
+  it('sends untagged predictions with no spectrum when there are several', () => {
+    const operationValue = jest.fn();
+    const shared = {
+      outline: { code: 200 }, output: { result: [{ shared: true }] }, keepPred: true,
+    };
+    const curveFeature = {
+      xUnit: 'ppm', yUnit: 'intensity', scanAutoTarget: 1, thresRef: 3,
+    };
+    const state = buildBaseState({
+      curve: {
+        curveIdx: 1,
+        listCurves: [{ feature: curveFeature }, { feature: curveFeature }],
+      },
+      threshold: { list: [{ value: 10 }, { value: 20 }] },
+      axesUnits: { axes: [{ xUnit: '', yUnit: '' }, { xUnit: '', yUnit: '' }] },
+      forecast: { predictions: shared, predictionsByCurve: {} },
+    });
+
+    renderBtnSubmit(state, operationValue);
+
+    const { spectra_list: spectraList } = operationValue.mock.calls[0][0];
+    spectraList.forEach((entry) => {
+      expect(entry.analysis).toEqual({ outline: {}, output: { result: [] } });
+      expect(entry).not.toHaveProperty('keepPred');
+    });
+  });
+
   it('controls presence/absence of keepPred and simulatenmr', () => {
     const withFlagsCb = jest.fn();
     const noFlagsCb = jest.fn();
