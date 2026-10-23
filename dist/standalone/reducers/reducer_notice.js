@@ -21,11 +21,11 @@ const errConversionState = {
 };
 const errFileState = {
   status: 'error',
-  message: 'Invalid File: accept only [.dx, .jdx, .JCAMP, .RAW, .mz(X)ML, .cdf, .zip (Bruker FID folder)], [<30MB]'
+  message: 'Invalid File: accept only [.dx, .jdx, .JCAMP, .RAW, .mz(X)ML, .cdf, .zip (Bruker FID folder)], [<200MB]'
 };
 const errMolState = {
   status: 'error',
-  message: 'Invalid File: accept only [.mol], [<30MB]'
+  message: 'Invalid File: accept only [.mol], [<200MB]'
 };
 const warnUnknownState = {
   status: 'warning',

@@ -49,7 +49,7 @@ const tpHint = classes => /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
     children: "- Accept *.json"
   }), /*#__PURE__*/(0, _jsxRuntime.jsx)("p", {
     className: (0, _classnames.default)(classes.tpLabel, 'txt-sv-tp'),
-    children: "- Max 30Mb"
+    children: "- Max 200MB"
   })]
 });
 const msgDefault = '(Optional) Add Prediction';
