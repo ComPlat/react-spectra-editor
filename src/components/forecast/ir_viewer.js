@@ -60,7 +60,7 @@ const sectionTable = (classes, pds) => {
   const renderMsg = notToRenderAnalysis(pds);
   if (renderMsg) return renderMsg;
 
-  if (!pds.output.result || !pds.output.result[0]) return null;
+  if (!pds.output || !pds.output.result || !pds.output.result[0]) return null;
 
   const { fgs } = pds.output.result[0];
   if (!fgs) return null;

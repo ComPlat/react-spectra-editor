@@ -86,7 +86,7 @@ class ForecastViewer extends React.Component {
 
     const { curveIdx } = curveSt;
     const { jcamps } = jcampSt;
-    const comparisons = jcamps[curveIdx].others;
+    const comparisons = jcamps[curveIdx] && jcamps[curveIdx].others;
 
     return (
       <div className={classes.root}>

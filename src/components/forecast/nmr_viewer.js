@@ -62,7 +62,7 @@ const sectionTable = (classes, pds) => {
   const renderMsg = notToRenderAnalysis(pds);
   if (renderMsg) return renderMsg;
 
-  const dict = pds.output.result[0];
+  const dict = pds.output && pds.output.result && pds.output.result[0];
   if (!dict) return <div />;
   return (
     <Paper className={classes.tableRoot}>
