@@ -102,6 +102,10 @@ const Threshold = ({
   } else {
     thresVal = thresValSt || (feature ? feature.thresRef : hplcMsSt?.threshold?.value);
   }
+  // Both buttons act on the curve the toolbar shows.
+  const { curveIdx } = curveSt;
+  const onResetThreshold = () => resetThresholdValueAct({ value: false, curveIdx });
+  const onToggleThresholdIsEdit = () => toggleThresholdIsEditAct({ curveIdx });
 
   return (
     <span className={classes.groupRight}>
@@ -115,7 +119,7 @@ const Threshold = ({
               )
             }
             disabled={Cfg.btnCmdThres(thresVal)}
-            onClick={resetThresholdValueAct}
+            onClick={onResetThreshold}
           >
             <RefreshOutlinedIcon className={classes.icon} />
           </MuButton>
@@ -134,7 +138,7 @@ const Threshold = ({
                     )
                   }
                   disabled={Cfg.btnCmdThres(thresVal)}
-                  onClick={toggleThresholdIsEditAct}
+                  onClick={onToggleThresholdIsEdit}
                 >
                   { restoreIcon(classes, hasEdit, isEditSt) }
                 </MuButton>
