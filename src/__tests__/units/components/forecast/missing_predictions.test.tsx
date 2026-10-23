@@ -25,7 +25,7 @@ describe('analysis viewers with incomplete predictions', () => {
   [['NmrViewer', NmrViewer], ['IrViewer', IrViewer]].forEach(([name, Viewer]: [string, any]) => {
     incomplete.forEach(([label, predictions]) => {
       it(`${name} renders with ${label}`, () => {
-        const store = mockStore({ forecast: { predictions } });
+        const store = mockStore({ forecast: { predictions }, curve: { curveIdx: 0 } });
         render(
           <Provider store={store}>
             <Viewer molecule="" inputCb={false} />

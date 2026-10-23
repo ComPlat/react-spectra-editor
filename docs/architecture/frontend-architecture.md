@@ -183,13 +183,15 @@ Forecast workflows are callback-driven and render through the same spectrum infr
 
 `BtnPredict` in [`src/components/cmd_bar/r06_predict_btn.js`](../../src/components/cmd_bar/r06_predict_btn.js) prepares prediction payloads from current peaks, layout, scan, shift, threshold, forecast analysis state, integration state, multiplicity state, and curve state. When prediction is ready, it switches the UI viewer to `analysis` and calls `forecast.btnCb(payload)`. When NMR simulation data is missing, it calls `forecast.refreshCb(payload)`.
 
-`ForecastViewer` in [`src/components/forecast_viewer.js`](../../src/components/forecast_viewer.js) initializes the `forecast` reducer from the incoming `forecast` prop. If forecast predictions are running or refreshed, it switches the UI viewer to analysis mode. It always mounts a `ViewerLine`, passing comparison spectra from `jcamp` state for the active curve. The line chart is hidden when the active viewer mode is analysis, but it remains part of the rendered structure.
+`ForecastViewer` in [`src/components/forecast_viewer.js`](../../src/components/forecast_viewer.js) initializes the `forecast` reducer from the incoming `forecast` prop. If forecast predictions are running or refreshed, it switches the UI viewer to analysis mode. It mounts a `ViewerLine`, passing comparison spectra from `jcamp` state for the active curve; in a multi-spectrum NMR or IR view (`MultiJcampsViewer` with a non-empty `forecast`) it mounts `ViewerMulti` with all curves instead. The chart is hidden when the active viewer mode is analysis, but it stays mounted, because mounting it again would reset the user's edits.
 
 Analysis rendering is layout-specific:
 
 - NMR analysis uses `NmrViewer` when `ui.viewer` is `analysis` and the layout is NMR.
 - IR analysis uses `IrViewer` when `ui.viewer` is `analysis` and the layout is IR.
 - Forecast input callbacks are passed into the analysis viewers through `inputCb`.
+
+Predictions can be kept per curve. A host that sets `forecast.predictions.curveIdx` gets each curve's predictions kept in `forecast.predictionsByCurve`: the analysis viewers, `BtnPredict` and each `spectra_list` entry of `BtnSubmit` then use the active (or that entry's) curve's predictions, and a curve without predictions shows none. A host that does not set `curveIdx` gets its one set of predictions shown whichever curve is selected; `BtnSubmit` sends them with a single spectrum only, and with several sends none, since it cannot tell which spectrum they belong to. With several NMR curves, `simulation` follows the selected curve.
 
 Forecast state integrates in two directions: command-bar actions send prediction requests through host callbacks; incoming `forecast` props update the local forecast reducer and set spectrum versus analysis viewer mode.
 
