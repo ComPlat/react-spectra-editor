@@ -18,9 +18,10 @@ The root reducer combines these state domains:
 
 | Domain | Reducers | Runtime responsibility |
 |---|---|---|
-| Rendering and navigation | `layout`, `ui`, `scan`, `threshold`, `wavelength`, `axesUnits`, `detector` | Determines active layout, viewer mode, sweep mode, zoom extent, scan target, thresholds, axes, wavelength, and detector display state. |
+| Rendering and navigation | `layout`, `ui`, `scan`, `threshold`, `wavelength`, `axesUnits`, `detector`, `yInverted` | Determines active layout, viewer mode, sweep mode, zoom extent, scan target, thresholds, axes, wavelength, detector display state, and whether the y-axis is drawn inverted. |
 | Spectrum editing | `editPeak`, `shift`, `integration`, `multiplicity`, `simulation` | Tracks user edits and NMR-specific derived editing state. |
 | Multi-curve and CV | `curve`, `cyclicvolta` | Tracks active curve, curve list, CV peak pairs, reference state, current-density mode, and per-curve CV edits. |
+| LC/MS | `hplcMs` | Tracks an LC/MS group: the UV/VIS chart (selected wavelength, peaks, integrations and their edit history), the TIC (polarity, current m/z page) and the m/z spectrum. |
 | Host integration | `submit`, `forecast`, `jcamp` | Tracks selected submit operation, forecast state, and comparison spectra/callbacks. |
 | Metadata and orchestration | `meta`, `status`, `manager` | Stores derived metadata and provides action namespaces used by sagas and reducers. |
 
@@ -57,6 +58,7 @@ The saga modules have distinct runtime roles:
 | [`saga_multiplicity.js`](../../src/sagas/saga_multiplicity.js) | Coordinates multiplicity-specific mutations and reducer payloads. |
 | [`saga_edit_peak.js`](../../src/sagas/saga_edit_peak.js) | Synchronizes edited peaks with shift updates. |
 | [`saga_multi_entities.js`](../../src/sagas/saga_multi_entities.js) | Initializes per-curve integrations, multiplicities, simulations, and cyclic voltammetry state from `curve.listCurves`. |
+| [`saga_lcms_ui.js`](../../src/sagas/saga_lcms_ui.js) | LC/MS click and brush handlers. Not registered on its own: `saga_ui.js` calls them when the layout is LC/MS. |
 
 Manager flows start with initialization or viewer resets. `LayerInit` dispatches layout-specific manager actions during `execReset()`. Viewers dispatch `resetAll(feature)` during mount and when their active feature changes. `saga_manager.js` listens to `MANAGER.RESETALL`, reads the current layout and curve state, and emits `MANAGER.RESETSHIFT` with curve metadata. That enriches downstream reducers with layout and multi-curve context.
 

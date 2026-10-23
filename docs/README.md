@@ -19,5 +19,5 @@ yarn docs:diagrams
 
 ## User-Facing Guides
 
-- [Demo & step-by-step manual](../DEMO_MANUAL.md): interactive demo usage
+- [User manual](user-manual.md): try the editor and use it step by step
 - [README](../README.md): installation and quick start
