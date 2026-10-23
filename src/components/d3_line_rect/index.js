@@ -38,7 +38,7 @@ import { LIST_UI_SWEEP_TYPE, LIST_NON_BRUSH_TYPES } from '../../constants/list_u
 import renderWavelengthSelect from '../../features/lc-ms/ui/wavelengthSelect';
 import { parseFeaturePageValue as parsePageValue } from '../../features/lc-ms/parsing/pageValue';
 import {
-  LIST_ROOT_SVG_GRAPH, LIST_BRUSH_SVG_GRAPH, LIST_HOST_HOOK_CLASS,
+  LIST_ROOT_SVG_GRAPH, LIST_BRUSH_SVG_GRAPH, LIST_HOST_HOOK_CLASS, LIST_TIC_POLARITY_LABEL,
 } from '../../constants/list_graph';
 import PeakGroup from '../cmd_bar/08_peak_group';
 import Threshold from '../cmd_bar/r03_threshold';
@@ -334,9 +334,9 @@ const ticSelect = (classes, hplcMsSt, handleTicChanged) => {
   const { tic = {} } = hplcMsSt || {};
   const { polarity, available } = tic;
   const listTIC = [
-    { name: 'PLUS', value: 'positive', enabled: available?.positive },
-    { name: 'MINUS', value: 'negative', enabled: available?.negative },
-    { name: 'NEUTRAL', value: 'neutral', enabled: available?.neutral },
+    { name: LIST_TIC_POLARITY_LABEL.positive, value: 'positive', enabled: available?.positive },
+    { name: LIST_TIC_POLARITY_LABEL.negative, value: 'negative', enabled: available?.negative },
+    { name: LIST_TIC_POLARITY_LABEL.neutral, value: 'neutral', enabled: available?.neutral },
   ];
   const filtered = listTIC.filter((d) => d.enabled);
   if (filtered.length <= 1) {
@@ -510,12 +510,7 @@ class ViewerLineRect extends React.Component {
     const ticPolarityCount = countAvailableTicPolarities(hplcMsSt);
     let ticLabel = null;
     if (ticPolarityCount > 1) {
-      ticLabel = 'NEUTRAL';
-      if (polarity === 'negative') {
-        ticLabel = 'MINUS';
-      } else if (polarity === 'positive') {
-        ticLabel = 'PLUS';
-      }
+      ticLabel = LIST_TIC_POLARITY_LABEL[polarity] || LIST_TIC_POLARITY_LABEL.neutral;
     }
     drawLabel(this.rootKlassMulti, ticLabel, 'Minutes', 'Intensity');
     drawDisplay(this.rootKlassMulti, isHidden);

@@ -17,6 +17,7 @@ var _chem = require("../../helpers/chem");
 var _common = require("./common");
 var _extractPeaksEdit = require("../../helpers/extractPeaksEdit");
 var _format = _interopRequireDefault(require("../../helpers/format"));
+var _shift = require("../../helpers/shift");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, function-paren-newline,
 react/function-component-definition, function-call-argument-newline,
@@ -89,7 +90,19 @@ const resolveLcmsIntegrationsExportForSubmit = (analysis, hplcMsSt) => {
   }
   return 'percent';
 };
-const pickFromList = (list, index, fallback = null) => Array.isArray(list) && list[index] !== undefined ? list[index] : fallback;
+const emptyIntegration = {
+  stack: [],
+  refArea: 1,
+  refFactor: 1,
+  shift: 0,
+  edited: false
+};
+const emptyMultiplicity = {
+  stack: [],
+  shift: 0,
+  smExtext: false,
+  edited: false
+};
 const hasBoolean = value => typeof value === 'boolean';
 const resolveOptionalBooleanFlags = analysis => {
   const flags = {};
@@ -124,9 +137,9 @@ const buildSpectrumPayload = ({
   const peaksEdit = (0, _extractPeaksEdit.extractPeaksEdit)(feature, editPeakAtIndex, threshold, shiftSt, layoutSt, curveIdx);
   const scan = (0, _chem.Convert2Scan)(feature, scanSt);
   const thres = (0, _chem.Convert2Thres)(feature, threshold);
-  const shift = pickFromList(shiftSt?.shifts, curveIdx, shiftSt);
-  const integration = pickFromList(integrationSt?.integrations, curveIdx, integrationSt);
-  const multiplicity = pickFromList(multiplicitySt?.multiplicities, curveIdx, multiplicitySt);
+  const shift = (0, _shift.shiftEntryAtIndex)(shiftSt, curveIdx);
+  const integration = (0, _shift.listEntryAtIndex)(integrationSt?.integrations, curveIdx, emptyIntegration);
+  const multiplicity = (0, _shift.listEntryAtIndex)(multiplicitySt?.multiplicities, curveIdx, emptyMultiplicity);
   const {
     xLabel,
     yLabel
@@ -149,6 +162,7 @@ const buildSpectrumPayload = ({
   return {
     peaks: peaksEdit,
     layout: layoutSt,
+    xUnit: xLabel,
     shift,
     scan,
     thres,
@@ -166,10 +180,11 @@ const buildSpectrumPayload = ({
     axesUnitsSt,
     detectorSt,
     dscMetaData,
+    feature,
     ...optionalBooleanFlags
   };
 };
-const onClickCb = (operationValue, isAscend, isIntensity, layoutSt, shiftSt, analysis, decimalSt, integrationSt, multiplicitySt, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData, curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt) => () => {
+const onClickCb = (operationValue, isAscend, isIntensity, layoutSt, shiftSt, analysis, decimalSt, integrationSt, multiplicitySt, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData, curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt, sweepExtentSt) => () => {
   const defaultCurves = feature ? [{
     feature
   }] : [];
@@ -226,7 +241,10 @@ const onClickCb = (operationValue, isAscend, isIntensity, layoutSt, shiftSt, ana
     }
     return spectrumPayload;
   });
+  const selectedIdx = Number.isFinite(curveSt?.curveIdx) ? curveSt.curveIdx : 0;
+  const selectedSpectrumPayload = spectraList[selectedIdx] || spectraList[0] || {};
   const payload = {
+    ...selectedSpectrumPayload,
     spectra_list: spectraList
   };
   if (lcmsGlobalFields) {
@@ -236,6 +254,9 @@ const onClickCb = (operationValue, isAscend, isIntensity, layoutSt, shiftSt, ana
     payload.curveSt = {
       curveIdx: curveSt.curveIdx
     };
+  }
+  if (sweepExtentSt?.xExtent || sweepExtentSt?.yExtent) {
+    payload.sweepExtent = sweepExtentSt;
   }
   operationValue(payload);
 };
@@ -261,7 +282,11 @@ const BtnSubmit = ({
   axesUnitsSt,
   detectorSt,
   metaSt,
-  hplcMsSt
+  hplcMsSt,
+  sweepExtentSt,
+  disabled,
+  className,
+  children
 }) => {
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
   const {
@@ -290,13 +315,14 @@ const BtnSubmit = ({
   return /*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
     title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
       className: "txt-sv-tp",
-      children: "Submit"
+      children: operation.name || 'Submit'
     }),
     children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
-      className: (0, _classnames.default)('btn-sv-bar-submit'),
+      className: (0, _classnames.default)('btn-sv-bar-submit', className),
       color: "primary",
-      onClick: onClickCb(operation.value, isAscend, isIntensity, layoutSt, shiftSt, forecastSt.predictions, decimalSt, integrationSt, multiplicitySt, waveLengthSt, cyclicvoltaPayload, curveSt, axesUnitsSt, detectorSt, dscMetaData, curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt),
-      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_PlayCircleOutline.default, {
+      disabled: disabled,
+      onClick: onClickCb(operation.value, isAscend, isIntensity, layoutSt, shiftSt, forecastSt.predictions, decimalSt, integrationSt, multiplicitySt, waveLengthSt, cyclicvoltaPayload, curveSt, axesUnitsSt, detectorSt, dscMetaData, curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt, sweepExtentSt),
+      children: children || /*#__PURE__*/(0, _jsxRuntime.jsx)(_PlayCircleOutline.default, {
         className: classes.icon
       })
     })
@@ -321,7 +347,8 @@ const mapStateToProps = (state, props) => (
   axesUnitsSt: state.axesUnits,
   detectorSt: state.detector,
   metaSt: state.meta,
-  hplcMsSt: state.hplcMs
+  hplcMsSt: state.hplcMs,
+  sweepExtentSt: state.ui.sweepExtent
 });
 BtnSubmit.propTypes = {
   classes: _propTypes.default.object.isRequired,
@@ -345,7 +372,11 @@ BtnSubmit.propTypes = {
   axesUnitsSt: _propTypes.default.object.isRequired,
   detectorSt: _propTypes.default.object.isRequired,
   metaSt: _propTypes.default.object.isRequired,
-  hplcMsSt: _propTypes.default.object
+  hplcMsSt: _propTypes.default.object,
+  sweepExtentSt: _propTypes.default.object,
+  disabled: _propTypes.default.bool,
+  className: _propTypes.default.string,
+  children: _propTypes.default.node
 };
 BtnSubmit.defaultProps = {
   hplcMsSt: {}
