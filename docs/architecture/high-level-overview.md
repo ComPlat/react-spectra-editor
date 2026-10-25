@@ -157,6 +157,10 @@ Redux and Redux Saga coordinate editor-wide state from [`src/reducers/index.js`]
 
 See [Frontend Architecture](frontend-architecture.md) for reducer domains, saga modules, the data transformation pipeline, multi-curve/CV behavior, and runtime synchronization flows.
 
+## Second Entry Point: the Standalone Client
+
+The package also ships `ChemSpectraClient` at `@complat/react-spectra-editor/dist/standalone`: the ChemSpectra upload page, which hosts `SpectraEditor` itself and calls a chem-spectra-app backend. It is a separate entry point, so the main entry does not load it. See [Standalone ChemSpectra Client](../standalone-client.md).
+
 ## Related Documentation
 
 - [Frontend Architecture](frontend-architecture.md): Redux, sagas, pipelines, host contracts, and synchronization
