@@ -22,6 +22,7 @@ import {
   getLcmsMzPageData,
 } from '../../helpers/extractPeaksEdit';
 import Format from '../../helpers/format';
+import { submittedPredictions } from '../../helpers/forecast';
 
 const styles = () => (
   Object.assign(
@@ -193,12 +194,13 @@ const buildSpectrumPayload = ({
 
 const onClickCb = (
   operationValue, isAscend, isIntensity,
-  layoutSt, shiftSt, analysis, decimalSt,
+  layoutSt, shiftSt, forecastSt, decimalSt,
   integrationSt, multiplicitySt, waveLengthSt,
   cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData,
   curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt,
 ) => (
   () => {
+    const analysis = forecastSt.predictions;
     const defaultCurves = feature ? [{ feature }] : [];
     let curves = Array.isArray(curveList) && curveList.length > 0 ? curveList : defaultCurves;
     if (layoutSt === 'LC/MS') {
@@ -247,7 +249,7 @@ const onClickCb = (
         dscMetaData,
         isAscend,
         isIntensity,
-        analysis,
+        analysis: submittedPredictions(forecastSt, curveIdx, indicesToSend.length),
         decimalSt,
       });
       if (lcmsGlobalFields && curve.lcmsKind === 'uvvis') {
@@ -313,7 +315,7 @@ const BtnSubmit = ({
         color="primary"
         onClick={onClickCb(
           operation.value, isAscend, isIntensity,
-          layoutSt, shiftSt, forecastSt.predictions, decimalSt,
+          layoutSt, shiftSt, forecastSt, decimalSt,
           integrationSt, multiplicitySt, waveLengthSt,
           cyclicvoltaPayload, curveSt, axesUnitsSt, detectorSt, dscMetaData,
           curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt,

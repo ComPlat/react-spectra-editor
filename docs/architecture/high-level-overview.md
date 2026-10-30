@@ -110,6 +110,7 @@ Edited data exits the editor through callbacks:
 - `operation.value(payload)` receives the submit payload built by [`src/components/cmd_bar/r05_submit_btn.js`](../../src/components/cmd_bar/r05_submit_btn.js).
 - `forecast.btnCb(payload)` receives prediction requests.
 - `forecast.refreshCb(payload)` receives simulation refresh requests.
+- `forecast.predictions.curveIdx`, when a host sets it, ties those predictions to one curve of a multi-spectrum view.
 - `forecast.inputCb(...)` is passed into forecast viewers for analysis interactions.
 - `others.addOthersCb({ jcamps })` receives dropped comparison files from [`src/components/panel/compare.js`](../../src/components/panel/compare.js).
 - `onDescriptionChanged(delta)` receives user-authored rich description changes from the info panel flow.

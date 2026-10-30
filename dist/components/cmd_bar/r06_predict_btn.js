@@ -21,6 +21,7 @@ var _extractPeaksEdit = require("../../helpers/extractPeaksEdit");
 var _ui = require("../../actions/ui");
 var _list_ui = require("../../constants/list_ui");
 var _chem = require("../../helpers/chem");
+var _forecast = require("../../helpers/forecast");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, function-paren-newline,
 max-len, react/function-component-definition,
@@ -162,6 +163,7 @@ const BtnPredict = ({
   thresSt,
   integrationSt,
   multiplicitySt,
+  forecastSt,
   setUiViewerTypeAct,
   curveSt
 }) => {
@@ -174,6 +176,7 @@ const BtnPredict = ({
   const thres = (0, _chem.Convert2Thres)(feature, thresSt);
   const simuCount = simulationSt.nmrSimPeaks.length;
   const uniqCount = [...new Set(simulationSt.nmrSimPeaks)].length;
+  const analysis = (0, _forecast.hasCurvePredictions)(forecastSt) ? (0, _forecast.curvePredictions)(forecastSt, curveSt.curveIdx) : forecast.predictions;
   let realCount = 0;
   if (_format.default.is13CLayout(layoutSt)) {
     realCount = (0, _carbonFeatures.carbonFeatures)(peaksEdit, multiplicitySt).length;
@@ -191,12 +194,12 @@ const BtnPredict = ({
     realCount = stack.length;
   }
   if (is13Cor1H && simuCount === 0) {
-    const onClickUnknownCb = onClickUnknown(feature, forecast, peaksEdit, layoutSt, scan, shiftSt, thres, forecast.predictions, integrationSt, multiplicitySt, curveSt);
+    const onClickUnknownCb = onClickUnknown(feature, forecast, peaksEdit, layoutSt, scan, shiftSt, thres, analysis, integrationSt, multiplicitySt, curveSt);
     return renderBtnUnknown(classes, onClickUnknownCb);
   }
   const predictable = isIr || simuCount >= realCount && realCount > 0;
   const color = predictable ? 'green' : 'red';
-  const onClick = predictable ? onClickReady(forecast, peaksEdit, layoutSt, scan, shiftSt, thres, forecast.predictions, integrationSt, multiplicitySt, setUiViewerTypeAct, curveSt) : onClickFail(layoutSt, simuCount, realCount);
+  const onClick = predictable ? onClickReady(forecast, peaksEdit, layoutSt, scan, shiftSt, thres, analysis, integrationSt, multiplicitySt, setUiViewerTypeAct, curveSt) : onClickFail(layoutSt, simuCount, realCount);
   const btnWidthCls = isIr ? classes.btnWidthIr : classes.btnWidthNmr;
   return renderBtnPredict(classes, isIr, realCount, uniqCount, simuCount, color, btnWidthCls, onClick);
 };
@@ -211,7 +214,8 @@ const mapStateToProps = (state, props) => (
   thresSt: state.threshold.list[state.curve.curveIdx],
   integrationSt: state.integration.present,
   multiplicitySt: state.multiplicity.present,
-  curveSt: state.curve
+  curveSt: state.curve,
+  forecastSt: state.forecast
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   setUiViewerTypeAct: _ui.setUiViewerType
@@ -228,6 +232,7 @@ BtnPredict.propTypes = {
   thresSt: _propTypes.default.object.isRequired,
   integrationSt: _propTypes.default.object.isRequired,
   multiplicitySt: _propTypes.default.object.isRequired,
+  forecastSt: _propTypes.default.object.isRequired,
   setUiViewerTypeAct: _propTypes.default.func.isRequired,
   curveSt: _propTypes.default.object
 };
