@@ -42,7 +42,7 @@ const CvDensityControls = ({
   classes, layoutSt, areaValue, areaUnit, useCurrentDensity,
   setAreaValueAct, setAreaUnitAct, toggleDensityAct,
 }) => {
-  if (layoutSt !== LIST_LAYOUT.CYCLIC_VOLTAMMETRY) return <i />;
+  if (layoutSt !== LIST_LAYOUT.CYCLIC_VOLTAMMETRY) return null;
 
   const handleAreaChange = (e) => {
     const raw = e.target.value;

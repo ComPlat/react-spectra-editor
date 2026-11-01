@@ -5,6 +5,7 @@ import '@testing-library/jest-dom';
 
 import BtnSubmit, { computeCvYScaleFactor } from '../../../../components/cmd_bar/r05_submit_btn';
 import Format from '../../../../helpers/format';
+import { defaultEmptyShift } from '../../../../helpers/shift';
 
 jest.mock('../../../../helpers/extractPeaksEdit', () => ({
   extractPeaksEdit: () => [{ x: 1, y: 2 }],
@@ -32,6 +33,7 @@ const buildBaseState = (overrides = {}) => ({
   detector: {},
   meta: { dscMetaData: {} },
   hplcMs: {},
+  ui: { sweepExtent: { xExtent: false, yExtent: false } },
   ...overrides,
 });
 
@@ -90,6 +92,29 @@ describe('<BtnSubmit payload contract />', () => {
     const payload = operationValue.mock.calls[0][0];
     expect(payload.spectra_list).toHaveLength(3);
     expect(payload.curveSt).toEqual({ curveIdx: 1 });
+  });
+
+  it('sends a default shift entry when the curve index is missing', () => {
+    const operationValue = jest.fn();
+    const state = buildBaseState({
+      layout: 'HPLC_UVVIS',
+      shift: { shifts: [defaultEmptyShift] },
+      curve: {
+        curveIdx: 1,
+        listCurves: [
+          { feature: { xUnit: 'min', yUnit: 'mAU', scanAutoTarget: 1, thresRef: 3 } },
+          { feature: { xUnit: 'min', yUnit: 'mAU', scanAutoTarget: 2, thresRef: 4 } },
+        ],
+      },
+      threshold: { list: [{ value: 10 }, { value: 20 }] },
+      axesUnits: { axes: [{ xUnit: '', yUnit: '' }, { xUnit: '', yUnit: '' }] },
+    });
+
+    renderBtnSubmit(state, operationValue);
+
+    const { shift } = operationValue.mock.calls[0][0].spectra_list[1];
+    expect(shift).toEqual(defaultEmptyShift);
+    expect(shift).not.toHaveProperty('shifts');
   });
 
   it('controls presence/absence of keepPred and simulatenmr', () => {
