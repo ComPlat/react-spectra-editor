@@ -119,6 +119,9 @@ const refreshFile = (target) => {
   appendDefined(data, 'multiplicity', multiplicity);
   appendDefined(data, 'wave_length', waveLength);
   appendDefined(data, 'cyclic_volta', cyclicvolta);
+  // Refresh Simulation: chem-spectra-app simulates the NMR spectrum from the molfile only
+  // when asked, and compares the value with exactly 'true'.
+  data.append('simulatenmr', 'true');
 
   if (dstList) {
     dstList.forEach((dstFile) => {

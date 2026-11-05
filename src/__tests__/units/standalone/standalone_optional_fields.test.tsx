@@ -32,7 +32,7 @@ describe('standalone client: optional fields', () => {
     delete (global as any).fetch;
   });
 
-  it('refresh sends no field as "undefined"', async () => {
+  it('refresh asks for the simulation, and sends no field as "undefined"', async () => {
     const calls = installFetch({
       'file/convert': { status: true, jcamp: encodeJcamp(irJcamp), img: 'p' },
       'file/refresh': { status: true, jcamp: encodeJcamp(irJcamp), img: 'p' },
@@ -46,6 +46,8 @@ describe('standalone client: optional fields', () => {
     await waitFor(() => expect(calls.some((c) => c.url.endsWith('file/refresh'))).toBe(true));
     const values = sentValues(calls, 'file/refresh');
     expect(values.filter(([, v]) => v === 'undefined').map(([k]) => k)).toEqual([]);
+    // chem-spectra-app simulates the NMR spectrum only when asked, with exactly 'true'.
+    expect(Object.fromEntries(values).simulatenmr).toBe('true');
   });
 
   it('save sends no field as "undefined" when the layout has no DSC metadata', async () => {
