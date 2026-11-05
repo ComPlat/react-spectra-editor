@@ -1069,6 +1069,7 @@ class DemoWriteIr extends React.Component {
 }
 
 // - - - DOM - - -
+document.title = 'Spectra editor (dev page)';
 ReactDOM.render(
   <DemoWriteIr />,
   document.getElementById('root'),
