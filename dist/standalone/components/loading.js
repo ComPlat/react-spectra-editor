@@ -12,25 +12,37 @@ var _redux = require("redux");
 var _withStyles = _interopRequireDefault(require("@mui/styles/withStyles"));
 var _material = require("@mui/material");
 var _jsxRuntime = require("react/jsx-runtime");
-const styles = theme => ({
+const styles = () => ({
   card: {
-    overflow: 'hide'
-  },
-  progress: {
-    margin: theme.spacing.unit * 2
+    alignItems: 'center',
+    display: 'flex',
+    gap: 16,
+    padding: '20px 28px'
   }
 });
+
+// A steady spinner: the default one grows and shrinks its arc, which reads as starting over
+// during a long conversion.
 function Loading({
   loadingSt,
   classes
 }) {
   return /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Dialog, {
     open: loadingSt,
-    children: /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+    children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
       className: classes.card,
-      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.CircularProgress, {
-        className: classes.progress
-      })
+      role: "status",
+      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.CircularProgress, {
+        disableShrink: true,
+        size: 32,
+        thickness: 4
+      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Typography, {
+        sx: {
+          color: '#3e4c59',
+          fontSize: 15
+        },
+        children: "Processing\u2026"
+      })]
     })
   });
 }
