@@ -8,7 +8,7 @@ exports.default = void 0;
 var _react = _interopRequireDefault(require("react"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
 var _classnames = _interopRequireDefault(require("classnames"));
-var _Grid = _interopRequireDefault(require("@mui/material/Grid"));
+var _ScopedCssBaseline = _interopRequireDefault(require("@mui/material/ScopedCssBaseline"));
 var _withStyles = _interopRequireDefault(require("@mui/styles/withStyles"));
 var _styles = require("@mui/material/styles");
 var _content = _interopRequireDefault(require("./components/content"));
@@ -21,86 +21,78 @@ var _notice = _interopRequireDefault(require("./components/notice"));
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable react/jsx-indent */
 
-const theme = (0, _styles.createTheme)();
+// A sans-serif system font for the page. ScopedCssBaseline applies it, and MUI's baseline,
+// to this page's own subtree only, never to a host page.
+const theme = (0, _styles.createTheme)({
+  typography: {
+    fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
+  }
+});
 const styles = () => ({
-  root: {
-    flexGrow: 1
+  page: {
+    backgroundColor: '#fff',
+    padding: '16px 24px'
+  },
+  // The inputs and Submit in one row that wraps on narrow windows.
+  inputBar: {
+    alignItems: 'center',
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: 12
+  },
+  slotWide: {
+    flex: '2 1 240px',
+    minWidth: 0
+  },
+  slotNarrow: {
+    flex: '1 1 200px',
+    minWidth: 0
+  },
+  slotText: {
+    color: '#52606d',
+    flex: '3 1 320px',
+    fontSize: 14,
+    lineHeight: 1.5,
+    margin: 0
   }
 });
 function FullVersion({
-  classes,
-  editorOnly
+  classes
 }) {
-  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_Grid.default, {
-    container: true,
-    className: classes.root,
-    spacing: 10,
-    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
-      item: true,
-      xs: 1
-    }, "grid-drop-space"), /*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
-      item: true,
-      xs: 4,
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+    className: classes.inputBar,
+    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+      className: classes.slotWide,
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_input_mol.default, {})
-    }, "grid-drop-mol"), /*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
-      item: true,
-      xs: 4,
-      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_input_file.default, {
-        editorOnly: editorOnly
-      })
-    }, "grid-drop-file"), /*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
-      item: true,
-      xs: 2,
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+      className: classes.slotWide,
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_input_file.default, {})
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+      className: classes.slotNarrow,
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_input_pred_json.default, {})
-    }, "grid-drop-pred-json"), /*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
-      item: true,
-      xs: 1,
-      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_input_form.default, {})
-    }, "grid-form-input")]
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_input_form.default, {})]
   });
 }
 FullVersion.propTypes = {
-  classes: _propTypes.default.object.isRequired,
-  editorOnly: _propTypes.default.bool.isRequired
+  classes: _propTypes.default.object.isRequired
 };
-const editortext = classes => /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
-  className: (0, _classnames.default)(classes.etSpan, 'txt-sv-etext'),
-  children: "(1) Upload a spectrum file to the dashed box on the right. Valid formats: *.dx, *.jdx, *.JCAMP, *.fid, *.zip (Bruker), *.RAW (ThermoFisher), *.mz(X)ML. A 2D spectrum is NOT available. One spectrum only, not several in parallel. (2) Click the submit button"
+const editortext = classes => /*#__PURE__*/(0, _jsxRuntime.jsx)("p", {
+  className: (0, _classnames.default)(classes.slotText, 'txt-sv-etext'),
+  children: "Add a spectrum file (*.dx, *.jdx, *.JCAMP, *.zip from Bruker, *.RAW from Thermo Fisher, *.mz(X)ML) and click Submit. One 1D spectrum at a time; 2D spectra are not supported."
 });
 function EditorVersion({
-  classes,
-  editorOnly
+  classes
 }) {
-  return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_Grid.default, {
-    container: true,
-    className: classes.root,
-    spacing: 24,
-    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
-      item: true,
-      xs: 1
-    }, "grid-drop-space"), /*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
-      item: true,
-      xs: 7,
-      children: editortext(classes)
-    }, "grid-drop-mol"), /*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
-      item: true,
-      xs: 2,
-      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_input_file.default, {
-        editorOnly: editorOnly
-      })
-    }, "grid-drop-file"), /*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
-      item: true,
-      xs: 1,
-      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_input_form.default, {})
-    }, "grid-form-input"), /*#__PURE__*/(0, _jsxRuntime.jsx)(_Grid.default, {
-      item: true,
-      xs: 1
-    }, "grid-drop-space-end")]
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+    className: classes.inputBar,
+    children: [editortext(classes), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+      className: classes.slotWide,
+      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_input_file.default, {})
+    }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_input_form.default, {})]
   });
 }
 EditorVersion.propTypes = {
-  classes: _propTypes.default.object.isRequired,
-  editorOnly: _propTypes.default.bool.isRequired
+  classes: _propTypes.default.object.isRequired
 };
 function Frame({
   classes,
@@ -108,13 +100,12 @@ function Frame({
 }) {
   return /*#__PURE__*/(0, _jsxRuntime.jsx)(_styles.ThemeProvider, {
     theme: theme,
-    children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+    children: /*#__PURE__*/(0, _jsxRuntime.jsxs)(_ScopedCssBaseline.default, {
+      className: classes.page,
       children: [editorOnly ? /*#__PURE__*/(0, _jsxRuntime.jsx)(EditorVersion, {
-        classes: classes,
-        editorOnly: editorOnly
+        classes: classes
       }) : /*#__PURE__*/(0, _jsxRuntime.jsx)(FullVersion, {
-        classes: classes,
-        editorOnly: editorOnly
+        classes: classes
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_content.default, {
         editorOnly: editorOnly
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_notice.default, {}), /*#__PURE__*/(0, _jsxRuntime.jsx)(_loading.default, {})]

@@ -13,44 +13,27 @@ var _reactDropzone = _interopRequireDefault(require("react-dropzone"));
 var _classnames = _interopRequireDefault(require("classnames"));
 var _withStyles = _interopRequireDefault(require("@mui/styles/withStyles"));
 var _Tooltip = _interopRequireDefault(require("@mui/material/Tooltip"));
+var _styles = require("./styles");
 var _action_predict = require("../actions/action_predict");
 var _util_predict = require("../utils/util_predict");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable react/jsx-props-no-spreading */
 
 const styles = () => ({
-  root: {
-    flexGrow: 1
-  },
   baseDD: {
-    border: '2px dashed #aaa',
-    borderRadius: 5,
-    height: 30,
-    lineHeight: '30px',
-    margin: '0 0 10px 0',
-    textAlign: 'center',
-    verticalAlign: 'middle',
-    width: '90%'
+    ..._styles.dropBox,
+    ..._styles.dropBoxMuted
   },
-  tpCard: {},
-  tpLabel: {
-    fontSize: 16
-  },
-  tpContent: {
-    color: '#aaa'
-  }
+  hint: _styles.hint
 });
-const tpHint = classes => /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
-  className: (0, _classnames.default)(classes.tpCard),
-  children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("p", {
-    className: (0, _classnames.default)(classes.tpLabel, 'txt-sv-tp'),
-    children: "- OPTIONAL"
-  }), /*#__PURE__*/(0, _jsxRuntime.jsx)("p", {
-    className: (0, _classnames.default)(classes.tpLabel, 'txt-sv-tp'),
-    children: "- Accept *.json"
-  }), /*#__PURE__*/(0, _jsxRuntime.jsx)("p", {
-    className: (0, _classnames.default)(classes.tpLabel, 'txt-sv-tp'),
-    children: "- Max 200MB"
+const tpHint = classes => /*#__PURE__*/(0, _jsxRuntime.jsxs)("ul", {
+  className: (0, _classnames.default)(classes.hint, 'txt-sv-tp'),
+  children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("li", {
+    children: "optional"
+  }), /*#__PURE__*/(0, _jsxRuntime.jsx)("li", {
+    children: "a prediction *.json saved by ChemSpectra"
+  }), /*#__PURE__*/(0, _jsxRuntime.jsx)("li", {
+    children: "up to 200 MB"
   })]
 });
 const msgDefault = '(Optional) Add Prediction';
@@ -59,7 +42,6 @@ const content = (classes, desc) => /*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.de
   title: tpHint(classes),
   placement: "bottom",
   children: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
-    className: (0, _classnames.default)(classes.tpContent),
     children: desc
   })
 });

@@ -19,41 +19,57 @@ var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable no-shadow, react/no-unused-prop-types */
 
 const titleStyle = {
-  backgroundColor: '#f5f5f5',
-  border: '2px solid #e3e3e3',
-  borderRadius: '10px',
-  height: 250,
-  lineHeight: '250px',
-  marginTop: 100,
+  backgroundColor: '#f5f7fa',
+  border: '1px solid #e4e7eb',
+  borderRadius: 12,
+  margin: '24px 0',
+  padding: '48px 24px',
   textAlign: 'center'
 };
-const txtStyle = {
-  lineHeight: '200px'
+const headingStyle = {
+  color: '#1f2933',
+  fontSize: '1.75rem',
+  fontWeight: 600,
+  margin: '0 0 12px'
+};
+const leadStyle = {
+  color: '#52606d',
+  fontSize: 16,
+  lineHeight: 1.5,
+  margin: '0 auto 16px',
+  maxWidth: 640
 };
 const containerStyle = {
-  margin: '5px 0 0 0'
+  margin: '16px 0 0'
 };
-const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
-
 const editorStyle = {
-  border: '1px solid gray',
-  borderRadius: '8px 0 0 8px',
-  margin: '0 0 0 60px',
-  width: W - 80
+  border: '1px solid #cbd2d9',
+  borderRadius: 8,
+  boxSizing: 'border-box',
+  color: '#1f2933',
+  display: 'block',
+  font: 'inherit',
+  fontSize: 14,
+  margin: '12px 0 0',
+  minHeight: 64,
+  padding: '8px 12px',
+  resize: 'vertical',
+  width: '100%'
 };
-const renderTitle = () => /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
+const renderTitle = editorOnly => /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
   style: titleStyle,
-  children: /*#__PURE__*/(0, _jsxRuntime.jsxs)("h1", {
-    style: txtStyle,
-    children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("p", {
-      children: "Welcome to ChemSpectra"
-    }), /*#__PURE__*/(0, _jsxRuntime.jsx)("a", {
-      target: "_blank",
-      rel: "noopener noreferrer",
-      href: "https://github.com/ComPlat/react-spectra-editor/blob/master/DEMO_MANUAL.md",
-      children: "User manual"
-    })]
-  })
+  children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("h1", {
+    style: headingStyle,
+    children: "Welcome to ChemSpectra"
+  }), /*#__PURE__*/(0, _jsxRuntime.jsx)("p", {
+    style: leadStyle,
+    children: editorOnly ? 'Add a spectrum file and click Submit to view and edit it.' : 'Add a spectrum file, optionally with a molfile for predictions, and click Submit to view and edit it.'
+  }), /*#__PURE__*/(0, _jsxRuntime.jsx)("a", {
+    target: "_blank",
+    rel: "noopener noreferrer",
+    href: "https://github.com/ComPlat/react-spectra-editor/blob/master/DEMO_MANUAL.md",
+    children: "User manual"
+  })]
 });
 
 // The editor's submit button calls an operation with
@@ -534,7 +550,7 @@ class Content extends _react.default.Component {
       editorOnly,
       molSt
     } = this.props;
-    if (!fileSt) return renderTitle();
+    if (!fileSt) return renderTitle(editorOnly);
     const {
       entity,
       xLabel,
@@ -549,7 +565,7 @@ class Content extends _react.default.Component {
       const {
         jcampList
       } = fileSt;
-      if (!jcampList || jcampList.length === 0) return renderTitle();
+      if (!jcampList || jcampList.length === 0) return renderTitle(editorOnly);
       multiEntities = jcampList.map(jcamp => {
         const {
           entity,
@@ -563,7 +579,7 @@ class Content extends _react.default.Component {
       });
     }
 
-    // if (!isExist) return renderTitle();
+    // if (!isExist) return renderTitle(editorOnly);
 
     const {
       svg
@@ -586,8 +602,8 @@ class Content extends _react.default.Component {
       }), /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
         children: /*#__PURE__*/(0, _jsxRuntime.jsx)("textarea", {
           rows: "2",
-          cols: "180",
-          placeholder: "peaks",
+          "aria-label": "Written peaks",
+          placeholder: "Written peaks and multiplicities appear here",
           style: editorStyle,
           value: descSt,
           readOnly: true
