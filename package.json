@@ -44,11 +44,10 @@
     "typescript": "^5.0.4"
   },
   "scripts": {
-    "start": "react-scripts --max_old_space_size=12288 start",
-    "start:standalone": "REACT_APP_DEMO=standalone PORT=${PORT:-3006} react-scripts --max_old_space_size=12288 start",
-    "start:standalone:editor": "REACT_APP_DEMO=standalone REACT_APP_STANDALONE_EDITOR_ONLY=true PORT=${PORT:-3006} react-scripts --max_old_space_size=12288 start",
+    "start": "node scripts/start.js",
+    "start:dev": "node scripts/start.js --dev",
     "build": "react-scripts --max_old_space_size=12288 build",
-    "compile": "rm -rf dist && NODE_ENV=production babel --ignore tests,stories,src/setupProxy.js ./src --out-dir ./dist",
+    "compile": "rm -rf dist && NODE_ENV=production babel --ignore tests,stories,src/setupProxy.js,src/index.js,src/standalone_page.js,src/dev ./src --out-dir ./dist",
     "test": "react-scripts test --env=jsdom --verbose --testPathIgnorePatterns=./src/__tests__/fixtures/",
     "test:coverage": "CI=true react-scripts test --env=jsdom --verbose --testPathIgnorePatterns=./src/__tests__/fixtures/ --coverage",
     "eject": "react-scripts eject",

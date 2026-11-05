@@ -5,7 +5,7 @@ describe('LC/MS layouts', () => {
 
   const openLayout = (buttonText: string) => {
     cy.viewport(2000, 2000)
-    cy.visit('http://localhost:3000/')
+    cy.visit('/')
     cy.contains('button', buttonText).click()
   }
 

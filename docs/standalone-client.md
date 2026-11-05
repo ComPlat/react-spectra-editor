@@ -17,26 +17,38 @@ import { ChemSpectraClient } from '@complat/react-spectra-editor/dist/standalone
 - It is a separate entry point. The main entry (`dist/app.js`) loads nothing from
   `standalone/`, so hosts that embed only the editor are unaffected.
 - It talks to a [chem-spectra-app](https://github.com/ComPlat/chem-spectra-app) backend on the
-  same origin: run it with `yarn start:standalone` (below), which proxies the backend calls.
+  same origin: run it with `yarn start` (below), which proxies the backend calls.
 - It accepts files up to 200 MB.
 - It ships no CSS: nothing under `src/standalone/` may import a stylesheet, because babel does
   not copy `.css` into `dist/` and the import would break a host's build.
 
 ## Running it locally
 
-One command serves the page and proxies the backend calls to a chem-spectra-app:
+`yarn start` serves the page against the chem-spectra-app at `CHEM_SPECTRA_APP_URL`, and proxies
+the backend calls to it. The URL is required: without it, `yarn start` stops and says so.
 
 ```bash
-yarn start:standalone                                    # backend on http://0.0.0.0:3007
-CHEM_SPECTRA_APP_URL=https://your-backend yarn start:standalone
-PORT=3010 yarn start:standalone                          # UI port (default 3006)
-yarn start:standalone:editor                             # the editorOnly variant
+CHEM_SPECTRA_APP_URL=http://localhost:3007 yarn start
+CHEM_SPECTRA_APP_URL=https://your-backend PORT=4010 yarn start
+CHEM_SPECTRA_APP_URL=http://localhost:3007 CHEM_SPECTRA_EDITOR_ONLY=true yarn start
 ```
 
-`src/index.js` renders the client when `REACT_APP_DEMO=standalone`, and the editor demo otherwise.
-[`src/setupProxy.js`](../src/setupProxy.js) forwards `/api/v1/chemspectra` to
-`CHEM_SPECTRA_APP_URL`, and only for the standalone start; it is dev-server only and never
-compiled into `dist/`.
+The page is on port 4000 unless `PORT` is set (chem-spectra-app's `just serve` also uses 4000,
+so set `PORT` when running both that way). `CHEM_SPECTRA_EDITOR_ONLY=true` serves the
+`editorOnly` variant.
+
+`yarn start:dev` serves the editor dev page instead: the editor with the test fixtures as sample
+spectra and host callbacks that only log, for developing the editor and for the Cypress specs.
+
+How it fits together, all dev-server only and never compiled into `dist/`:
+
+- [`scripts/start.js`](../scripts/start.js) picks the page. react-scripts only passes `REACT_APP_*`
+  variables to the page, so it sets `REACT_APP_PAGE`.
+- [`src/index.js`](../src/index.js) loads [`src/standalone_page.js`](../src/standalone_page.js) or
+  [`src/dev/index.js`](../src/dev/index.js) with a dynamic `import()`, so each page's bundle holds only
+  its own code; the client's has none of the sample spectra.
+- [`src/setupProxy.js`](../src/setupProxy.js) forwards `/api/v1/chemspectra` to
+  `CHEM_SPECTRA_APP_URL`, for the client's start only.
 
 ## How it is built
 
