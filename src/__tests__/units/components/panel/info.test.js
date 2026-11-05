@@ -114,4 +114,19 @@ describe("<InfoPanel />", () => {
 
     expect(screen.getByText('121.064751 g/mol')).toBeInTheDocument();
   });
+
+  test('Shows the simulated signals sorted, to two decimals', () => {
+    const simStore = mockStore({
+      ...store.getState(),
+      simulation: { nmrSimPeaks: [7.264, 1.23, 7.261] },
+    });
+    render(
+      <AppWrapper store={simStore}>
+        <ThemeProvider theme={theme}>
+          <InfoPanel expand onExpand={() => {}} {...baseProps} />
+        </ThemeProvider>
+      </AppWrapper>,
+    );
+    expect(screen.getByText('1.23, 7.26, 7.26')).toBeInTheDocument();
+  });
 });

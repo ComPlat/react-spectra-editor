@@ -121,7 +121,7 @@ const simTitle = () => (
 
 const simContent = (nmrSimPeaks) => {
   if (!Array.isArray(nmrSimPeaks) || nmrSimPeaks.length === 0) return '';
-  return [...nmrSimPeaks].sort((a, b) => a - b).join(', ');
+  return [...nmrSimPeaks].sort((a, b) => a - b).map((x) => Number(x).toFixed(2)).join(', ');
 };
 
 const simPlaceholder = () => (
