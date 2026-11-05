@@ -1,6 +1,6 @@
 # react-spectra-editor
 
-An editor to View and Edit Chemical Spectra data (NMR, IR, MS, UV, CV and XRD).
+An editor to view and edit chemical spectra: NMR, IR, Raman, UV/VIS, MS, LC/MS, HPLC, GC, SEC, XRD, cyclic voltammetry, DSC, TGA and more. JCAMP-DX files whose data type it does not recognise open in a neutral plain layout.
 
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/ComPlat/react-spectra-editor)
 ![Testing](https://github.com/ComPlat/react-spectra-editor/actions/workflows/testing.yml/badge.svg)
@@ -37,7 +37,7 @@ $ yarn start
 
 ### Demo & Manual
 
-[demo & step-by-step manual](https://github.com/ComPlat/react-spectra-editor/blob/master/DEMO_MANUAL.md)
+[User manual](docs/user-manual.md): try the editor, then a step-by-step guide to every toolbar action.
 
 ### Documentation
 
