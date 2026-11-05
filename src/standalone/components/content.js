@@ -45,9 +45,9 @@ const renderTitle = () => (
       <a
         target="_blank"
         rel="noopener noreferrer"
-        href="https://github.com/ComPlat/react-spectra-editor/blob/master/DEMO_MANUAL.md"
+        href="https://github.com/ComPlat/react-spectra-editor/blob/master/docs/user-manual.md"
       >
-        Step by step demo
+        User manual
       </a>
     </h1>
   </div>

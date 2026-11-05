@@ -34,6 +34,14 @@ describe('standalone ChemSpectraClient', () => {
     expect(screen.getByText('Welcome to ChemSpectra')).toBeInTheDocument();
   });
 
+  it('links the user manual', () => {
+    render(<ChemSpectraClient />);
+    expect(screen.getByText('User manual').closest('a')).toHaveAttribute(
+      'href',
+      'https://github.com/ComPlat/react-spectra-editor/blob/master/docs/user-manual.md',
+    );
+  });
+
   it('shows the welcome title in editorOnly mode too', () => {
     render(<ChemSpectraClient editorOnly />);
     expect(screen.getByText('Welcome to ChemSpectra')).toBeInTheDocument();
