@@ -24,7 +24,7 @@ const cActicAcidD4S = {
 };
 const cAcetoneD6Sep = {
   name: 'Acetone-d6 (sep)',
-  value: 29.640,
+  value: 29.84,
   label: 'Acetone-d6',
   nsdb: 'Acetone-D6 ((CD3)2CO)'
 };
