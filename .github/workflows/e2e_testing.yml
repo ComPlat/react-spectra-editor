@@ -11,5 +11,7 @@ jobs:
         uses: cypress-io/github-action@v7
         with:
           build: npm run --max_old_space_size=12288 build
-          start: npm --max_old_space_size=12288 start
+          start: npm run start:dev
+          wait-on: 'http://localhost:3000'
+          wait-on-timeout: 300
           browser: chrome

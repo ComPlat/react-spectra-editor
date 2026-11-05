@@ -6,6 +6,7 @@ Developer documentation for `@complat/react-spectra-editor` (`react-spectra-edit
 
 - [High-Level Overview](architecture/high-level-overview.md): package purpose, system boundaries, layers, and rendering branches
 - [Frontend Architecture](architecture/frontend-architecture.md): Redux, sagas, data pipeline, multi-curve/CV, forecast, and runtime synchronization
+- [Standalone ChemSpectra Client](standalone-client.md): the upload page shipped as `dist/standalone`, its backend calls, and its contract with the editor
 
 ## Diagrams
 

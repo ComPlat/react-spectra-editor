@@ -1,7 +1,7 @@
 describe('UV/VIS', () => {
   beforeEach(() => {
     cy.viewport(2000, 2000)
-    cy.visit('http://localhost:3000/')
+    cy.visit('/')
     cy.get('#btn-uv-vis').click()
   })
 
