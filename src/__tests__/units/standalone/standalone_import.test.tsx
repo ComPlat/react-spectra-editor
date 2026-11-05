@@ -34,11 +34,13 @@ describe('standalone ChemSpectraClient', () => {
     expect(screen.getByText('Welcome to ChemSpectra')).toBeInTheDocument();
   });
 
+  // DEMO_MANUAL.md exists on master today and stays as a stub pointing at docs/user-manual.md
+  // after the docs move, so the link works before and after.
   it('links the user manual', () => {
     render(<ChemSpectraClient />);
     expect(screen.getByText('User manual').closest('a')).toHaveAttribute(
       'href',
-      'https://github.com/ComPlat/react-spectra-editor/blob/master/docs/user-manual.md',
+      'https://github.com/ComPlat/react-spectra-editor/blob/master/DEMO_MANUAL.md',
     );
   });
 
