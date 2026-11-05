@@ -68,7 +68,7 @@ const clickPredictOrRefresh = (container: HTMLElement) => {
 };
 
 const peaksTextarea = (container: HTMLElement) => (
-  container.querySelector('textarea[placeholder="peaks"]') as HTMLTextAreaElement
+  container.querySelector('textarea[aria-label="Written peaks"]') as HTMLTextAreaElement
 );
 
 describe('standalone Content against the real editor', () => {

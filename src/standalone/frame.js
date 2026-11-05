@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import Grid from '@mui/material/Grid';
+import ScopedCssBaseline from '@mui/material/ScopedCssBaseline';
 import withStyles from '@mui/styles/withStyles';
 import {
   createTheme, ThemeProvider,
@@ -17,85 +17,100 @@ import InputPredJson from './components/input_pred_json';
 import Loading from './components/loading';
 import Notice from './components/notice';
 
-const theme = createTheme();
-
-const styles = () => ({
-  root: {
-    flexGrow: 1,
+// A sans-serif system font for the page. ScopedCssBaseline applies it, and MUI's baseline,
+// to this page's own subtree only, never to a host page.
+const theme = createTheme({
+  typography: {
+    fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
   },
 });
 
-function FullVersion({ classes, editorOnly }) {
+const styles = () => ({
+  page: {
+    backgroundColor: '#fff',
+    padding: '16px 24px',
+  },
+  // The inputs and Submit in one row that wraps on narrow windows.
+  inputBar: {
+    alignItems: 'center',
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  slotWide: {
+    flex: '2 1 240px',
+    minWidth: 0,
+  },
+  slotNarrow: {
+    flex: '1 1 200px',
+    minWidth: 0,
+  },
+  slotText: {
+    color: '#52606d',
+    flex: '3 1 320px',
+    fontSize: 14,
+    lineHeight: 1.5,
+    margin: 0,
+  },
+});
+
+function FullVersion({ classes }) {
   return (
-    <Grid container className={classes.root} spacing={10}>
-      <Grid key="grid-drop-space" item xs={1} />
-      <Grid key="grid-drop-mol" item xs={4}>
+    <div className={classes.inputBar}>
+      <div className={classes.slotWide}>
         <InputMol />
-      </Grid>
-      <Grid key="grid-drop-file" item xs={4}>
-        <InputFile editorOnly={editorOnly} />
-      </Grid>
-      <Grid key="grid-drop-pred-json" item xs={2}>
+      </div>
+      <div className={classes.slotWide}>
+        <InputFile />
+      </div>
+      <div className={classes.slotNarrow}>
         <InputPredJson />
-      </Grid>
-      <Grid key="grid-form-input" item xs={1}>
-        <InputForm />
-      </Grid>
-    </Grid>
+      </div>
+      <InputForm />
+    </div>
   );
 }
 
 FullVersion.propTypes = {
   classes: PropTypes.object.isRequired,
-  editorOnly: PropTypes.bool.isRequired,
 };
 
 const editortext = (classes) => (
-  <span className={classNames(classes.etSpan, 'txt-sv-etext')}>
-    (1) Upload a spectrum file to the dashed box on the right.
-        Valid formats: *.dx, *.jdx, *.JCAMP, *.fid, *.zip (Bruker), *.RAW (ThermoFisher), *.mz(X)ML.
-        A 2D spectrum is NOT available.
-        One spectrum only, not several in parallel.
-    (2) Click the submit button
-  </span>
+  <p className={classNames(classes.slotText, 'txt-sv-etext')}>
+    Add a spectrum file (*.dx, *.jdx, *.JCAMP, *.zip from Bruker, *.RAW from Thermo Fisher,
+    *.mz(X)ML) and click Submit. One 1D spectrum at a time; 2D spectra are not supported.
+  </p>
 );
 
-function EditorVersion({ classes, editorOnly }) {
+function EditorVersion({ classes }) {
   return (
-    <Grid container className={classes.root} spacing={24}>
-      <Grid key="grid-drop-space" item xs={1} />
-      <Grid key="grid-drop-mol" item xs={7}>
-        { editortext(classes) }
-      </Grid>
-      <Grid key="grid-drop-file" item xs={2}>
-        <InputFile editorOnly={editorOnly} />
-      </Grid>
-      <Grid key="grid-form-input" item xs={1}>
-        <InputForm />
-      </Grid>
-      <Grid key="grid-drop-space-end" item xs={1} />
-    </Grid>
+    <div className={classes.inputBar}>
+      { editortext(classes) }
+      <div className={classes.slotWide}>
+        <InputFile />
+      </div>
+      <InputForm />
+    </div>
   );
 }
 
 EditorVersion.propTypes = {
   classes: PropTypes.object.isRequired,
-  editorOnly: PropTypes.bool.isRequired,
 };
 
 function Frame({ classes, editorOnly }) {
   return (
     <ThemeProvider theme={theme}>
-      <div>
+      <ScopedCssBaseline className={classes.page}>
         {
           editorOnly
-            ? <EditorVersion classes={classes} editorOnly={editorOnly} />
-            : <FullVersion classes={classes} editorOnly={editorOnly} />
+            ? <EditorVersion classes={classes} />
+            : <FullVersion classes={classes} />
         }
         <Content editorOnly={editorOnly} />
         <Notice />
         <Loading />
-      </div>
+      </ScopedCssBaseline>
     </ThemeProvider>
   );
 }

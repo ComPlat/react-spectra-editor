@@ -9,45 +9,22 @@ import classNames from 'classnames';
 import withStyles from '@mui/styles/withStyles';
 import Tooltip from '@mui/material/Tooltip';
 
+import { dropBox, dropBoxMuted, hint } from './styles';
+
 import { addPredJsonInit, addPredJsonFail } from '../actions/action_predict';
 import { parsePredictionJson } from '../utils/util_predict';
 
 const styles = () => ({
-  root: {
-    flexGrow: 1,
-  },
-  baseDD: {
-    border: '2px dashed #aaa',
-    borderRadius: 5,
-    height: 30,
-    lineHeight: '30px',
-    margin: '0 0 10px 0',
-    textAlign: 'center',
-    verticalAlign: 'middle',
-    width: '90%',
-  },
-  tpCard: {
-  },
-  tpLabel: {
-    fontSize: 16,
-  },
-  tpContent: {
-    color: '#aaa',
-  },
+  baseDD: { ...dropBox, ...dropBoxMuted },
+  hint,
 });
 
 const tpHint = (classes) => (
-  <span className={classNames(classes.tpCard)}>
-    <p className={classNames(classes.tpLabel, 'txt-sv-tp')}>
-      - OPTIONAL
-    </p>
-    <p className={classNames(classes.tpLabel, 'txt-sv-tp')}>
-      - Accept *.json
-    </p>
-    <p className={classNames(classes.tpLabel, 'txt-sv-tp')}>
-      - Max 200MB
-    </p>
-  </span>
+  <ul className={classNames(classes.hint, 'txt-sv-tp')}>
+    <li>optional</li>
+    <li>a prediction *.json saved by ChemSpectra</li>
+    <li>up to 200 MB</li>
+  </ul>
 );
 
 const msgDefault = '(Optional) Add Prediction';
@@ -58,7 +35,7 @@ const content = (classes, desc) => (
     title={tpHint(classes)}
     placement="bottom"
   >
-    <span className={classNames(classes.tpContent)}>{desc}</span>
+    <span>{desc}</span>
   </Tooltip>
 );
 

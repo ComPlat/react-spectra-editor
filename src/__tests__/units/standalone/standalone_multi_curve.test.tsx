@@ -74,7 +74,7 @@ describe('standalone Content with the second of two curves selected', () => {
     const { view } = await mountCv();
     chooseOperation(view.container, 'write peaks');
     clickSubmit(view.container);
-    const textarea = view.container.querySelector('textarea[placeholder="peaks"]') as HTMLTextAreaElement;
+    const textarea = view.container.querySelector('textarea[aria-label="Written peaks"]') as HTMLTextAreaElement;
     await waitFor(() => expect(textarea.value).not.toBe(''));
   });
 
