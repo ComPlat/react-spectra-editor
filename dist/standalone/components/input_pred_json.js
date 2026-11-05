@@ -14,6 +14,7 @@ var _classnames = _interopRequireDefault(require("classnames"));
 var _withStyles = _interopRequireDefault(require("@mui/styles/withStyles"));
 var _Tooltip = _interopRequireDefault(require("@mui/material/Tooltip"));
 var _action_predict = require("../actions/action_predict");
+var _util_predict = require("../utils/util_predict");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable react/jsx-props-no-spreading */
 
@@ -65,6 +66,7 @@ const content = (classes, desc) => /*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.de
 function InputPredJson({
   classes,
   addPredJsonInitAct,
+  addPredJsonFailAct,
   predictSt
 }) {
   const hasPredict = predictSt.output.result.length !== 0;
@@ -74,7 +76,12 @@ function InputPredJson({
     const reader = new FileReader();
     reader.onload = () => {
       const str = reader.result;
-      addPredJsonInitAct(JSON.parse(str));
+      const prediction = (0, _util_predict.parsePredictionJson)(str);
+      if (prediction) {
+        addPredJsonInitAct(prediction);
+      } else {
+        addPredJsonFailAct();
+      }
     };
     reader.readAsBinaryString(file);
   };
@@ -99,11 +106,13 @@ const mapStateToProps = (state, props) => (
   predictSt: state.predict
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
-  addPredJsonInitAct: _action_predict.addPredJsonInit
+  addPredJsonInitAct: _action_predict.addPredJsonInit,
+  addPredJsonFailAct: _action_predict.addPredJsonFail
 }, dispatch);
 InputPredJson.propTypes = {
   classes: _propTypes.default.object.isRequired,
   predictSt: _propTypes.default.object.isRequired,
-  addPredJsonInitAct: _propTypes.default.func.isRequired
+  addPredJsonInitAct: _propTypes.default.func.isRequired,
+  addPredJsonFailAct: _propTypes.default.func.isRequired
 };
 var _default = exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _withStyles.default)(styles)(InputPredJson));
