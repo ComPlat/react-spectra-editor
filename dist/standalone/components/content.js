@@ -50,7 +50,7 @@ const renderTitle = () => /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
     }), /*#__PURE__*/(0, _jsxRuntime.jsx)("a", {
       target: "_blank",
       rel: "noopener noreferrer",
-      href: "https://github.com/ComPlat/react-spectra-editor/blob/master/docs/user-manual.md",
+      href: "https://github.com/ComPlat/react-spectra-editor/blob/master/DEMO_MANUAL.md",
       children: "User manual"
     })]
   })
