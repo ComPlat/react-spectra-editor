@@ -9,7 +9,8 @@ import classNames from 'classnames';
 import withStyles from '@mui/styles/withStyles';
 import Tooltip from '@mui/material/Tooltip';
 
-import { addPredJsonInit } from '../actions/action_predict';
+import { addPredJsonInit, addPredJsonFail } from '../actions/action_predict';
+import { parsePredictionJson } from '../utils/util_predict';
 
 const styles = () => ({
   root: {
@@ -62,7 +63,7 @@ const content = (classes, desc) => (
 );
 
 function InputPredJson({
-  classes, addPredJsonInitAct, predictSt,
+  classes, addPredJsonInitAct, addPredJsonFailAct, predictSt,
 }) {
   const hasPredict = predictSt.output.result.length !== 0;
   const desc = hasPredict ? msgExist : msgDefault;
@@ -72,7 +73,12 @@ function InputPredJson({
     const reader = new FileReader();
     reader.onload = () => {
       const str = reader.result;
-      addPredJsonInitAct(JSON.parse(str));
+      const prediction = parsePredictionJson(str);
+      if (prediction) {
+        addPredJsonInitAct(prediction);
+      } else {
+        addPredJsonFailAct();
+      }
     };
     reader.readAsBinaryString(file);
   };
@@ -106,6 +112,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
 const mapDispatchToProps = (dispatch) => (
   bindActionCreators({
     addPredJsonInitAct: addPredJsonInit,
+    addPredJsonFailAct: addPredJsonFail,
   }, dispatch)
 );
 
@@ -113,6 +120,7 @@ InputPredJson.propTypes = {
   classes: PropTypes.object.isRequired,
   predictSt: PropTypes.object.isRequired,
   addPredJsonInitAct: PropTypes.func.isRequired,
+  addPredJsonFailAct: PropTypes.func.isRequired,
 };
 
 export default connect(

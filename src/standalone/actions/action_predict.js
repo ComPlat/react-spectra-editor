@@ -14,6 +14,12 @@ const addPredJsonInit = (payload) => (
   }
 );
 
+const addPredJsonFail = () => (
+  {
+    type: PREDICT.ADD_PRED_JSON_FAIL,
+  }
+);
+
 const predictToWriteInit = (payload) => (
   {
     type: PREDICT.PREDICT_TO_WRITE_INIT,
@@ -22,5 +28,5 @@ const predictToWriteInit = (payload) => (
 );
 
 export {
-  predictInit, addPredJsonInit, predictToWriteInit,
+  predictInit, addPredJsonInit, addPredJsonFail, predictToWriteInit,
 };

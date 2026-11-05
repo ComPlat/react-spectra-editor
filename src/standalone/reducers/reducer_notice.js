@@ -28,6 +28,11 @@ const errMolState = {
   message: 'Invalid File: accept only [.mol], [<200MB]',
 };
 
+const errPredJsonState = {
+  status: 'error',
+  message: 'Invalid File: accept only a prediction JSON saved by ChemSpectra',
+};
+
 const warnUnknownState = {
   status: 'warning',
   message: 'Server not available!',
@@ -80,6 +85,8 @@ const noticeReducer = (state = initialState, action) => {
     case PREDICT.PREDICT_FAIL:
     case PREDICT.ADD_PRED_JSON_INIT:
       return buildPredictNotice(state, action);
+    case PREDICT.ADD_PRED_JSON_FAIL:
+      return { ...state, ...errPredJsonState };
     case NOTICE.MANUAL_CLEAR:
       return { ...state, ...initialState };
     default:
