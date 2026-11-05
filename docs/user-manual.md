@@ -17,11 +17,11 @@ renamed or added since the recordings: the text describes the current editor.
    git clone https://github.com/ComPlat/react-spectra-editor.git
    cd react-spectra-editor
    yarn install
-   CHEM_SPECTRA_APP_URL=http://localhost:3007 yarn start:standalone
+   CHEM_SPECTRA_APP_URL=http://localhost:3007 yarn start
    ```
 
-   Then open <http://localhost:3006>. `CHEM_SPECTRA_APP_URL` is the backend's address
-   (default `http://0.0.0.0:3007`), and `PORT` changes the page's port.
+   Then open <http://localhost:4000>. `CHEM_SPECTRA_APP_URL` is the backend's address, and
+   `PORT` changes the page's port.
 3. Follow the steps in [3. Using the editor](#3-using-the-editor).
 
 ### Inside Chemotion ELN
