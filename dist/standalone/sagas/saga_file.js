@@ -40,7 +40,7 @@ function* convertFile(action) {
     payload
   } = action;
   const file = payload.file || (yield (0, _effects.select)(getFileSrc));
-  const mass = payload.file || (yield (0, _effects.select)(getMolMass));
+  const mass = payload.mass || (yield (0, _effects.select)(getMolMass));
   const mol = yield (0, _effects.select)(getMolSrc);
   const rsp = yield (0, _effects.call)(_fetcher_file.default.convertFile, {
     file,
