@@ -36,7 +36,7 @@ const getMolSrc = (state) => state.mol.src;
 function* convertFile(action) {
   const { payload } = action;
   const file = payload.file || (yield select(getFileSrc));
-  const mass = payload.file || (yield select(getMolMass));
+  const mass = payload.mass || (yield select(getMolMass));
   const mol = yield select(getMolSrc);
   const rsp = yield call(FetcherFile.convertFile, { file, mass, mol });
 

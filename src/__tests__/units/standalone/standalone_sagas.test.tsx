@@ -145,6 +145,27 @@ describe('standalone client sagas', () => {
     }
   });
 
+  // The mass sent with a spectrum is the molfile's: a payload carrying the file to convert must
+  // not have that File sent as the mass.
+  it('sends the molfile mass with the spectrum, whatever the submit payload holds', async () => {
+    const calls = installFetch({
+      'molfile/convert': {
+        status: true, smi: 'C', mass: 16.03, svg: '<svg/>',
+      },
+      ...convertRoute(nmr1HJcamp),
+    });
+    const store = createClientStore();
+    store.dispatch({ type: MOL.ADD_INIT, payload: { mol: new File(['M  END'], 'a.mol') } });
+    await waitFor(() => expect(store.getState().mol.mass).toBe(16.03));
+    const file = new File(['raw'], 'sample.jdx');
+    store.dispatch({ type: FORM.SUBMIT, payload: { file } });
+    const isConvert = (c) => c.url.endsWith('/chemspectra/file/convert');
+    await waitFor(() => expect(calls.some(isConvert)).toBe(true));
+    const form = formEntries(calls.find(isConvert).options.body);
+    expect(form.mass).toBe('16.03');
+    expect(form.file).toBeInstanceOf(File);
+  });
+
   it('converts a molfile and keeps the returned svg', async () => {
     const calls = installFetch({
       'molfile/convert': {
