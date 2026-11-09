@@ -28,12 +28,33 @@ $ yarn add https://github.com/ComPlat/react-spectra-editor
 1. Set *canChangeDescription* to be ***true***
 2. Handle changed value on function *onDescriptionChanged*. The content is formatted with [Delta Object](https://quilljs.com/docs/delta/)
 
-#### Running Demo
+#### Editor dev page
+For developing the editor: the editor with built-in sample spectra, and host callbacks that only log. No backend needed. It is what the E2E tests open.
 ```
 $ yarn install
 
-$ yarn start
+$ yarn start:dev                                          # http://localhost:3000
 ```
+
+#### Standalone ChemSpectra client
+The ChemSpectra upload page (spectrum, molfile and prediction-JSON inputs around the editor), formerly published as `@complat/chem-spectra-client`, ships with the editor as a separate entry point. The main entry does not load it.
+```
+import { ChemSpectraClient } from '@complat/react-spectra-editor/dist/standalone';
+
+<ChemSpectraClient />            // full page: molfile, spectrum and prediction inputs
+<ChemSpectraClient editorOnly /> // spectrum input only
+```
+It talks to a [chem-spectra-app](https://github.com/ComPlat/chem-spectra-app) backend, served from the same origin, with these calls:
+`POST /api/v1/chemspectra/file/convert`, `file/save` and `file/refresh`, `molfile/convert`, and `predict/nmr_peaks_form` and `predict/infrared`.
+
+To run it, `yarn start` serves it against the chem-spectra-app at `CHEM_SPECTRA_APP_URL` (local or remote; required), and proxies the backend calls above to it. The page is on port 4000 unless `PORT` is set; `CHEM_SPECTRA_EDITOR_ONLY=true` serves the `editorOnly` variant:
+```
+$ yarn install
+
+$ CHEM_SPECTRA_APP_URL=http://localhost:3007 yarn start
+```
+
+See [the standalone client docs](docs/standalone-client.md) for its backend calls, its contract with the editor, and its known limitations.
 
 ### Demo & Manual
 
@@ -51,7 +72,7 @@ $ yarn test
 
 #### E2E test
 ```
-$ yarn start
+$ yarn start:dev
 ```
 
 Open another terminal
@@ -68,6 +89,8 @@ This project has been funded by the **[DFG]**.
 
 
 Funded by the [Deutsche Forschungsgemeinschaft (DFG, German Research Foundation)](https://www.dfg.de/) under the [National Research Data Infrastructure – NFDI4Chem](https://nfdi4chem.de/) – Projektnummer **441958208** since 2020.
+
+Funded by the [Helmholtz Association](https://www.helmholtz.de/en/) under the program Biointerfaces (BIF-TM); currently supported by the Helmholtz program Information (until 2027).
 
 
 [DFG]: https://www.dfg.de/en/
