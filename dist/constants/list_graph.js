@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.LIST_ROOT_SVG_GRAPH = exports.LIST_HOST_HOOK_CLASS = exports.LIST_BRUSH_SVG_GRAPH = void 0;
+exports.LIST_TIC_POLARITY_LABEL = exports.LIST_ROOT_SVG_GRAPH = exports.LIST_HOST_HOOK_CLASS = exports.LIST_BRUSH_SVG_GRAPH = void 0;
 const LIST_ROOT_SVG_GRAPH = exports.LIST_ROOT_SVG_GRAPH = {
   LINE: 'd3Line',
   RECT: 'd3Rect',
@@ -33,4 +33,11 @@ const LIST_HOST_HOOK_CLASS = exports.LIST_HOST_HOOK_CLASS = {
   CMD_BAR: 'rse-cmd-bar',
   LCMS_STACK: 'rse-lcms-stack',
   LCMS_GRAPH_PANEL: 'rse-lcms-graph-panel'
+};
+
+// Display names of the LC/MS TIC polarities (TIC select, chart label, legend).
+const LIST_TIC_POLARITY_LABEL = exports.LIST_TIC_POLARITY_LABEL = {
+  positive: 'Positive',
+  negative: 'Negative',
+  neutral: 'Neutral'
 };

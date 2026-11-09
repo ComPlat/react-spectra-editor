@@ -22,6 +22,13 @@ const toggleShowAllCurves = (payload) => (
   }
 );
 
+const setCurvesNormalized = (payload) => (
+  {
+    type: CURVE.SET_NORMALIZED,
+    payload,
+  }
+);
+
 export {
-  selectCurve, setAllCurves, toggleShowAllCurves,
+  selectCurve, setAllCurves, toggleShowAllCurves, setCurvesNormalized,
 };

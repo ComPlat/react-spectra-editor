@@ -110,7 +110,11 @@ const Pecker = ({
     } = spectra;
     hasRefPeaks = hasRefPeak;
   }
-  return !_cfg.default.hidePanelCyclicVolta(layoutSt) ? /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+  if (_cfg.default.hidePanelCyclicVolta(layoutSt)) {
+    return null;
+  }
+  return /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
+    className: classes.group,
     "data-testid": "Pecker",
     children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_Tooltip.default, {
       title: /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
@@ -161,7 +165,7 @@ const Pecker = ({
         })
       })
     })]
-  }) : /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {});
+  });
 };
 const mapStateToProps = (state, _) => (
 // eslint-disable-line

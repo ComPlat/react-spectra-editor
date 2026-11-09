@@ -31,9 +31,7 @@ const styles = () => (
 
 const wavelengthSelect = (classes, waveLengthSt, layoutSt, updateWavelengthAct) => {
   if (!Format.isXRDLayout(layoutSt)) {
-    return (
-      <i />
-    );
+    return null;
   }
 
   const onChange = (e) => updateWavelengthAct(e.target.value);
@@ -72,11 +70,14 @@ const wavelengthSelect = (classes, waveLengthSt, layoutSt, updateWavelengthAct) 
 
 const Wavelength = ({
   classes, waveLengthSt, layoutSt, updateWavelengthAct,
-}) => (
-  <span className={classes.groupRight}>
-    { wavelengthSelect(classes, waveLengthSt, layoutSt, updateWavelengthAct) }
-  </span>
-);
+}) => {
+  if (!Format.isXRDLayout(layoutSt)) return null;
+  return (
+    <span className={classes.groupRight}>
+      { wavelengthSelect(classes, waveLengthSt, layoutSt, updateWavelengthAct) }
+    </span>
+  );
+};
 
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {

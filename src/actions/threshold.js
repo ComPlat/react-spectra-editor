@@ -7,10 +7,10 @@ const updateThresholdValue = (payload) => (
   }
 );
 
-const resetThresholdValue = () => (
+const resetThresholdValue = (payload = false) => (
   {
     type: THRESHOLD.RESET_VALUE,
-    payload: false,
+    payload,
   }
 );
 

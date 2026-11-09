@@ -26,19 +26,26 @@ const defaultEmptyMultiplicity = {
   edited: false
 };
 const setShift = (state, action) => {
-  const shift = action.payload.prevOffset;
   const {
-    selectedIdx,
+    prevOffset,
+    curveIdx
+  } = action.payload;
+  const targetIdx = Number.isFinite(curveIdx) ? curveIdx : state.selectedIdx;
+  const {
     multiplicities
   } = state;
-  const selectedMulti = multiplicities[selectedIdx];
+  let selectedMulti = multiplicities[targetIdx];
+  if (selectedMulti === false || selectedMulti === undefined) {
+    selectedMulti = defaultEmptyMultiplicity;
+  }
   const newSelectedMulti = Object.assign({}, selectedMulti, {
-    shift
+    shift: prevOffset
   });
   const newMultiplicities = [...multiplicities];
-  newMultiplicities[selectedIdx] = newSelectedMulti;
+  newMultiplicities[targetIdx] = newSelectedMulti;
   return Object.assign({}, state, {
-    multiplicities: newMultiplicities
+    multiplicities: newMultiplicities,
+    selectedIdx: targetIdx
   });
 };
 const rmFromStack = (state, action) => {
@@ -168,6 +175,10 @@ const multiplicityReducer = (state = initialState, action) => {
   switch (action.type) {
     case _action_type.EDITPEAK.SHIFT:
       return setShift(state, action);
+    case _action_type.CURVE.SELECT_WORKING_CURVE:
+      return Object.assign({}, state, {
+        selectedIdx: action.payload
+      });
     case _action_type.INTEGRATION.RM_ONE:
       return rmFromStack(state, action);
     case _action_type.UI.SWEEP.SELECT_MULTIPLICITY_RDC:

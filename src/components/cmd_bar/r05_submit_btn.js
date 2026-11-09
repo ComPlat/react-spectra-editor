@@ -22,6 +22,7 @@ import {
   getLcmsMzPageData,
 } from '../../helpers/extractPeaksEdit';
 import Format from '../../helpers/format';
+import { shiftEntryAtIndex, listEntryAtIndex } from '../../helpers/shift';
 
 const styles = () => (
   Object.assign(
@@ -97,9 +98,20 @@ const resolveLcmsIntegrationsExportForSubmit = (analysis, hplcMsSt) => {
   return 'percent';
 };
 
-const pickFromList = (list, index, fallback = null) => (
-  Array.isArray(list) && list[index] !== undefined ? list[index] : fallback
-);
+const emptyIntegration = {
+  stack: [],
+  refArea: 1,
+  refFactor: 1,
+  shift: 0,
+  edited: false,
+};
+
+const emptyMultiplicity = {
+  stack: [],
+  shift: 0,
+  smExtext: false,
+  edited: false,
+};
 
 const hasBoolean = (value) => typeof value === 'boolean';
 
@@ -142,9 +154,13 @@ const buildSpectrumPayload = ({
   );
   const scan = Convert2Scan(feature, scanSt);
   const thres = Convert2Thres(feature, threshold);
-  const shift = pickFromList(shiftSt?.shifts, curveIdx, shiftSt);
-  const integration = pickFromList(integrationSt?.integrations, curveIdx, integrationSt);
-  const multiplicity = pickFromList(multiplicitySt?.multiplicities, curveIdx, multiplicitySt);
+  const shift = shiftEntryAtIndex(shiftSt, curveIdx);
+  const integration = listEntryAtIndex(
+    integrationSt?.integrations, curveIdx, emptyIntegration,
+  );
+  const multiplicity = listEntryAtIndex(
+    multiplicitySt?.multiplicities, curveIdx, emptyMultiplicity,
+  );
   const { xLabel, yLabel } = resolveAxisLabels(
     feature?.xUnit,
     feature?.yUnit,
@@ -172,6 +188,7 @@ const buildSpectrumPayload = ({
   return {
     peaks: peaksEdit,
     layout: layoutSt,
+    xUnit: xLabel,
     shift,
     scan,
     thres,
@@ -187,6 +204,7 @@ const buildSpectrumPayload = ({
     axesUnitsSt,
     detectorSt,
     dscMetaData,
+    feature,
     ...optionalBooleanFlags,
   };
 };
@@ -196,7 +214,7 @@ const onClickCb = (
   layoutSt, shiftSt, analysis, decimalSt,
   integrationSt, multiplicitySt, waveLengthSt,
   cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData,
-  curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt,
+  curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt, sweepExtentSt,
 ) => (
   () => {
     const defaultCurves = feature ? [{ feature }] : [];
@@ -255,7 +273,10 @@ const onClickCb = (
       }
       return spectrumPayload;
     });
+    const selectedIdx = Number.isFinite(curveSt?.curveIdx) ? curveSt.curveIdx : 0;
+    const selectedSpectrumPayload = spectraList[selectedIdx] || spectraList[0] || {};
     const payload = {
+      ...selectedSpectrumPayload,
       spectra_list: spectraList,
     };
     if (lcmsGlobalFields) {
@@ -263,6 +284,9 @@ const onClickCb = (
     }
     if (Number.isFinite(curveSt?.curveIdx)) {
       payload.curveSt = { curveIdx: curveSt.curveIdx };
+    }
+    if (sweepExtentSt?.xExtent || sweepExtentSt?.yExtent) {
+      payload.sweepExtent = sweepExtentSt;
     }
     operationValue(payload);
   }
@@ -275,6 +299,8 @@ const BtnSubmit = ({
   waveLengthSt, cyclicvoltaSt, curveSt, curveList, axesUnitsSt, detectorSt,
   metaSt,
   hplcMsSt,
+  sweepExtentSt,
+  disabled, className, children,
 }) => {
   // const disBtn = peaksEdit.length === 0 || statusSt.btnSubmit || disabled;
   const { dscMetaData } = metaSt;
@@ -303,23 +329,25 @@ const BtnSubmit = ({
   if (!operation) return null;
 
   return (
-    <Tooltip title={<span className="txt-sv-tp">Submit</span>}>
+    <Tooltip title={<span className="txt-sv-tp">{operation.name || 'Submit'}</span>}>
       <MuButton
         className={
           classNames(
             'btn-sv-bar-submit',
+            className,
           )
         }
         color="primary"
+        disabled={disabled}
         onClick={onClickCb(
           operation.value, isAscend, isIntensity,
           layoutSt, shiftSt, forecastSt.predictions, decimalSt,
           integrationSt, multiplicitySt, waveLengthSt,
           cyclicvoltaPayload, curveSt, axesUnitsSt, detectorSt, dscMetaData,
-          curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt,
+          curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt, sweepExtentSt,
         )}
       >
-        <PlayCircleOutlineIcon className={classes.icon} />
+        {children || <PlayCircleOutlineIcon className={classes.icon} />}
       </MuButton>
     </Tooltip>
   );
@@ -344,6 +372,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     detectorSt: state.detector,
     metaSt: state.meta,
     hplcMsSt: state.hplcMs,
+    sweepExtentSt: state.ui.sweepExtent,
   }
 );
 
@@ -375,6 +404,10 @@ BtnSubmit.propTypes = {
   detectorSt: PropTypes.object.isRequired,
   metaSt: PropTypes.object.isRequired,
   hplcMsSt: PropTypes.object,
+  sweepExtentSt: PropTypes.object,
+  disabled: PropTypes.bool,
+  className: PropTypes.string,
+  children: PropTypes.node,
 };
 
 BtnSubmit.defaultProps = {

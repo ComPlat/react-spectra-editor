@@ -104,13 +104,13 @@ class MultiFocus {
     const selected = hplcMsSt?.tic?.polarity;
     const baseEntries = [{
       key: 'positive',
-      label: 'PLUS'
+      label: _list_graph.LIST_TIC_POLARITY_LABEL.positive
     }, {
       key: 'negative',
-      label: 'MINUS'
+      label: _list_graph.LIST_TIC_POLARITY_LABEL.negative
     }, {
       key: 'neutral',
-      label: 'NEUTRAL'
+      label: _list_graph.LIST_TIC_POLARITY_LABEL.neutral
     }];
     let entries = [];
     if (available && typeof available === 'object') {

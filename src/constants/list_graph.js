@@ -30,6 +30,13 @@ const LIST_HOST_HOOK_CLASS = {
   LCMS_GRAPH_PANEL: 'rse-lcms-graph-panel',
 };
 
+// Display names of the LC/MS TIC polarities (TIC select, chart label, legend).
+const LIST_TIC_POLARITY_LABEL = {
+  positive: 'Positive',
+  negative: 'Negative',
+  neutral: 'Neutral',
+};
+
 export {
-  LIST_ROOT_SVG_GRAPH, LIST_BRUSH_SVG_GRAPH, LIST_HOST_HOOK_CLASS,
+  LIST_ROOT_SVG_GRAPH, LIST_BRUSH_SVG_GRAPH, LIST_HOST_HOOK_CLASS, LIST_TIC_POLARITY_LABEL,
 };

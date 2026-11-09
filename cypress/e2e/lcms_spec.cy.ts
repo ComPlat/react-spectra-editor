@@ -149,9 +149,9 @@ describe('LC/MS layouts', () => {
       if (!nextPolarity) return
 
       const uiLabelByPolarity: Record<string, string> = {
-        positive: 'PLUS',
-        negative: 'MINUS',
-        neutral: 'NEUTRAL',
+        positive: 'Positive',
+        negative: 'Negative',
+        neutral: 'Neutral',
       }
       const nextLabel = uiLabelByPolarity[nextPolarity]
 

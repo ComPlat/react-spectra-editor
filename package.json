@@ -45,6 +45,7 @@
     "start": "react-scripts --max_old_space_size=12288 start",
     "build": "react-scripts --max_old_space_size=12288 build",
     "compile": "rm -rf dist && NODE_ENV=production babel --ignore tests,stories ./src --out-dir ./dist",
+    "verify:dist": "yarn compile && git diff --exit-code --stat -- dist || (echo 'dist/ is out of date with src/ - run \"yarn compile\" and commit the result' && exit 1)",
     "test": "react-scripts test --env=jsdom --verbose --testPathIgnorePatterns=./src/__tests__/fixtures/",
     "test:coverage": "CI=true react-scripts test --env=jsdom --verbose --testPathIgnorePatterns=./src/__tests__/fixtures/ --coverage",
     "eject": "react-scripts eject",

@@ -1,7 +1,7 @@
 /* eslint-disable prefer-object-spread, default-param-last */
 import undoable from 'redux-undo';
 import {
-  UI, INTEGRATION, EDITPEAK, MANAGER,
+  UI, INTEGRATION, EDITPEAK, MANAGER, CURVE, MULTIPLICITY,
 } from '../constants/action_type';
 import {
   generateVisualSplitGroupId,
@@ -455,15 +455,18 @@ const setFkr = (state, action) => {
 };
 
 const setShift = (state, action) => {
-  const { selectedIdx, integrations } = state;
-  const selectedIntegration = integrations[selectedIdx];
+  const { integrations } = state;
+  const { prevOffset, curveIdx } = action.payload;
+  const targetIdx = Number.isFinite(curveIdx) ? curveIdx : state.selectedIdx;
+  let selectedIntegration = integrations[targetIdx];
+  if (selectedIntegration === false || selectedIntegration === undefined) {
+    selectedIntegration = defaultEmptyIntegration;
+  }
 
-  const shift = action.payload.prevOffset;
-
-  const newIntegration = Object.assign({}, selectedIntegration, { shift });
+  const newIntegration = Object.assign({}, selectedIntegration, { shift: prevOffset });
   const newArrIntegration = [...integrations];
-  newArrIntegration[selectedIdx] = newIntegration;
-  return Object.assign({}, state, { integrations: newArrIntegration });
+  newArrIntegration[targetIdx] = newIntegration;
+  return Object.assign({}, state, { integrations: newArrIntegration, selectedIdx: targetIdx });
 };
 
 const resetAll = (state, action) => {
@@ -480,6 +483,33 @@ const clearAll = (state, action) => {
   const newArrIntegration = [...integrations];
   newArrIntegration[curveIdx] = newIntegration;
   return Object.assign({}, state, { integrations: newArrIntegration, selectedIdx: curveIdx });
+};
+
+// Clearing all multiplets also removes the integrations that belong to them
+// (same matching as INTEGRATION.RM_ONE, which J- uses for one multiplet).
+// Integrations added on their own are kept.
+const rmMultipletIntegrations = (state, action) => {
+  const { curveIdx, xExtents } = action.payload || {};
+  if (!Array.isArray(xExtents) || xExtents.length === 0) return state;
+
+  const { integrations } = state;
+  const selectedIntegration = integrations[curveIdx];
+  if (!selectedIntegration || !Array.isArray(selectedIntegration.stack)) return state;
+
+  const { stack } = selectedIntegration;
+  const filteredStack = stack.filter((k) => (
+    xExtents.every((e) => k.xL !== e.xL && k.xU !== e.xU)
+  ));
+  if (filteredStack.length === stack.length) return state;
+
+  const newIntegration = Object.assign(
+    {},
+    selectedIntegration,
+    { stack: dropOrphanVisualSplitGroupIds(filteredStack), edited: true },
+  );
+  const newArrIntegration = [...integrations];
+  newArrIntegration[curveIdx] = newIntegration;
+  return Object.assign({}, state, { integrations: newArrIntegration });
 };
 
 const integrationReducer = (state = initialState, action) => {
@@ -502,8 +532,12 @@ const integrationReducer = (state = initialState, action) => {
       return resetAll(state, action);
     case INTEGRATION.CLEAR_ALL:
       return clearAll(state, action);
+    case MULTIPLICITY.CLEAR_ALL:
+      return rmMultipletIntegrations(state, action);
     case EDITPEAK.SHIFT:
       return setShift(state, action);
+    case CURVE.SELECT_WORKING_CURVE:
+      return Object.assign({}, state, { selectedIdx: action.payload });
     case MANAGER.RESETALL:
       return state;
     default:

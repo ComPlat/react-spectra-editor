@@ -11,7 +11,9 @@ import MountBrush from '../../helpers/brush';
 import { TfRescale, MountCompass } from '../../helpers/compass';
 import { LIST_LAYOUT } from '../../constants/list_layout';
 import Format from '../../helpers/format';
-import { LIST_ROOT_SVG_GRAPH, LIST_BRUSH_SVG_GRAPH } from '../../constants/list_graph';
+import {
+  LIST_ROOT_SVG_GRAPH, LIST_BRUSH_SVG_GRAPH, LIST_TIC_POLARITY_LABEL,
+} from '../../constants/list_graph';
 import {
   convertTopic,
 } from '../../helpers/chem';
@@ -101,9 +103,9 @@ class MultiFocus {
     const available = hplcMsSt?.tic?.available;
     const selected = hplcMsSt?.tic?.polarity;
     const baseEntries = [
-      { key: 'positive', label: 'PLUS' },
-      { key: 'negative', label: 'MINUS' },
-      { key: 'neutral', label: 'NEUTRAL' },
+      { key: 'positive', label: LIST_TIC_POLARITY_LABEL.positive },
+      { key: 'negative', label: LIST_TIC_POLARITY_LABEL.negative },
+      { key: 'neutral', label: LIST_TIC_POLARITY_LABEL.neutral },
     ];
 
     let entries = [];

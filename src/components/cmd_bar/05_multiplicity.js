@@ -27,16 +27,26 @@ const styles = () => (
 );
 
 const Multiplicity = ({
-  classes, isFocusAddMpySt, disableAddMpySt, isFocusRmMpySt, disableRmMpySt,
-  isFocusAddPeakSt, isFocusRmPeakSt, disableMpyPeakSt,
-  setUiSweepTypeAct, clearMpyAllAct, curveSt,
+  classes, isFocusAddMpySt, disableAddMpySt, isFocusRmMpySt,
+  isFocusAddPeakSt, isFocusRmPeakSt,
+  setUiSweepTypeAct, clearMpyAllAct, curveSt, multiplicitySt,
 }) => {
   const onSweepMutAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_SWEEP_ADD);
   const onOneMutAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_ONE_RM);
   const onPeakMutAdd = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_ADD);
   const onPeakMutRm = () => setUiSweepTypeAct(LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_RM);
   const { curveIdx } = curveSt;
-  const onClearAll = () => clearMpyAllAct({ curveIdx });
+  // Send the cleared multiplets' ranges so their integrations (added together
+  // with them by J+) are removed too, like J- does for a single multiplet.
+  const onClearAll = () => {
+    const stack = multiplicitySt?.multiplicities?.[curveIdx]?.stack || [];
+    const xExtents = stack.map((m) => m.xExtent).filter(Boolean);
+    clearMpyAllAct({ curveIdx, xExtents });
+  };
+
+  if (disableAddMpySt) {
+    return null;
+  }
 
   return (
     <span className={classes.group}>
@@ -49,7 +59,6 @@ const Multiplicity = ({
                 'btn-sv-bar-addmpy',
               )
             }
-            disabled={disableAddMpySt}
             onClick={onSweepMutAdd}
           >
             <span className={classNames(classes.txt, 'txt-sv-bar-addmpy')}>J+</span>
@@ -65,7 +74,6 @@ const Multiplicity = ({
                 'btn-sv-bar-rmmpy',
               )
             }
-            disabled={disableRmMpySt}
             onClick={onOneMutAdd}
           >
             <span className={classNames(classes.txt, 'txt-sv-bar-rmmpy')}>J-</span>
@@ -81,7 +89,6 @@ const Multiplicity = ({
                 'btn-sv-bar-addpeakmpy',
               )
             }
-            disabled={disableMpyPeakSt}
             onClick={onPeakMutAdd}
           >
             <span className={classNames(classes.txt, 'txt-sv-bar-addpeakmpy')}>JP+</span>
@@ -97,25 +104,19 @@ const Multiplicity = ({
                 'btn-sv-bar-rmpeakmpy',
               )
             }
-            disabled={disableMpyPeakSt}
             onClick={onPeakMutRm}
           >
             <span className={classNames(classes.txt, 'txt-sv-bar-rmpeakmpy')}>JP-</span>
           </MuButton>
         </span>
       </Tooltip>
-      {
-        disableAddMpySt ? null
-          :  // eslint-disable-line
-          (
-            <TriBtn
-              content={{ tp: 'Clear All Multiplicity' }}
-              cb={onClearAll}
-            >
-              <span className={classNames(classes.txt, 'txt-sv-bar-rmallmpy')}>Jx</span>
-            </TriBtn>
-          )
-      }
+      <TriBtn
+        content={{ tp: 'Clear All Multiplicity' }}
+        cb={onClearAll}
+        isClearAllDisabled={false}
+      >
+        <span className={classNames(classes.txt, 'txt-sv-bar-rmallmpy')}>Jx</span>
+      </TriBtn>
     </span>
   );
 };
@@ -130,6 +131,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     isFocusRmPeakSt: state.ui.sweepType === LIST_UI_SWEEP_TYPE.MULTIPLICITY_PEAK_RM,
     disableMpyPeakSt: Cfg.btnCmdMpyPeak(state.layout, state.multiplicity.present, state.curve.curveIdx),
     curveSt: state.curve,
+    multiplicitySt: state.multiplicity.present,
   }
 );
 
@@ -152,6 +154,7 @@ Multiplicity.propTypes = {
   setUiSweepTypeAct: PropTypes.func.isRequired,
   clearMpyAllAct: PropTypes.func.isRequired,
   curveSt: PropTypes.object.isRequired,
+  multiplicitySt: PropTypes.object.isRequired,
 };
 
 export default connect(
