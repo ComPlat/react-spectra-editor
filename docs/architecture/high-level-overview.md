@@ -28,11 +28,14 @@ Supported layout identifiers include:
 - `DLS intensity`
 - `DIFFERENTIAL SCANNING CALORIMETRY`
 - `GAS CHROMATOGRAPHY`
+- `LC/MS`
+
+`PLAIN` is the fallback: a JCAMP-DX file whose `##DATA TYPE` the editor does not recognise opens in it, with neutral controls and a non-reversed x-axis, and the user can pick a layout by hand.
 
 The editor supports these main user-facing responsibilities:
 
 - Display spectrum data as line charts, MS bar charts, or multi-spectrum overlays.
-- Navigate spectra through zooming, brushing, scan selection, and curve selection.
+- Navigate spectra through zooming, brushing, scan selection, and curve selection, and invert the y-axis as a viewing preference (seeded from a file's `##$CSINVERTY` record).
 - Edit peak data, thresholds, shifts, integrations, multiplicities, and cyclic voltammetry peaks.
 - Compare compatible spectra through the comparison panel.
 - Submit edited spectrum payloads through host-provided operations.
@@ -127,10 +130,11 @@ The application composition starts in [`src/app.js`](../../src/app.js). `Spectra
 | Layer | File | Responsibility |
 |---|---|---|
 | `SpectraEditor` | [`src/app.js`](../../src/app.js) | Public component boundary, Redux provider setup, saga startup, helper export through `FN`. |
-| `LayerInit` | [`src/layer_init.js`](../../src/layer_init.js) | Converts host props into Redux initialization actions and chooses between the single-spectrum and multi-spectrum branches. |
+| `LayerInit` | [`src/layer_init.js`](../../src/layer_init.js) | Converts host props into Redux initialization actions and chooses the workspace: `HPLCViewer` for an LC/MS group, `MultiJcampsViewer` for several entities or cyclic voltammetry, otherwise `LayerPrism`. |
 | `LayerPrism` | [`src/layer_prism.js`](../../src/layer_prism.js) | Main single-entity workspace. It composes the command bar, content viewer, and side panels. |
-| `LayerContent` | [`src/layer_content.js`](../../src/layer_content.js) | Selects `ForecastViewer` when `forecast` is non-empty and the layout supports prediction (NMR, IR, UV/VIS, XRD); otherwise `ViewerRect` for MS or `ViewerLine` for other layouts. |
+| `LayerContent` | [`src/layer_content.js`](../../src/layer_content.js) | Selects `ForecastViewer` when `forecast` is non-empty and the layout supports prediction (NMR, IR, UV/VIS including HPLC UV/VIS, XRD); otherwise `ViewerRect` for MS and LC/MS, or `ViewerLine` for other layouts. |
 | `MultiJcampsViewer` | [`src/components/multi_jcamps_viewer.js`](../../src/components/multi_jcamps_viewer.js) | Multi-entity and cyclic voltammetry workspace. It composes the command bar, `ViewerMulti`, cyclic voltammetry panel, and side panels. |
+| `HPLCViewer` | [`src/components/hplc_viewer.js`](../../src/components/hplc_viewer.js) | LC/MS workspace for a group of TIC, UV/VIS and m/z entities. It composes the command bar, the stacked `ViewerLineRect` charts, and side panels; m/z pages can be requested from the host through `onLcmsPageRequest`. |
 | `CmdBar` | [`src/components/cmd_bar/index.js`](../../src/components/cmd_bar/index.js) | Central command surface for editing and display actions. |
 | `PanelViewer` | [`src/components/panel/index.js`](../../src/components/panel/index.js) | Side-panel system for metadata, peaks, multiplicity, comparisons, graph selection, and CV data. |
 | D3 viewers | [`src/components/d3_line`](../../src/components/d3_line), [`src/components/d3_rect`](../../src/components/d3_rect), [`src/components/d3_multi`](../../src/components/d3_multi) | Rendering branches for line spectra, MS spectra, and multi-spectrum/CV views. |
@@ -148,6 +152,7 @@ Rendering is split between React composition and D3-managed SVG drawing. [`src/l
 | Line | [`ViewerLine`](../../src/components/d3_line/index.js) | Line-chart layouts (NMR, IR, UV/VIS, XRD, Raman, and related types) |
 | MS | [`ViewerRect`](../../src/components/d3_rect/index.js) | Mass spectrometry bar charts |
 | Multi | [`ViewerMulti`](../../src/components/d3_multi/index.js) | `multiEntities` overlays and cyclic voltammetry |
+| LC/MS | [`ViewerLineRect`](../../src/components/d3_line_rect/index.js) | LC/MS groups: the UV/VIS line chart, the TIC (positive and negative traces), and the m/z bar chart, stacked |
 
 React mounts containers and passes Redux-derived inputs; D3 focus classes own the SVG lifecycle (`create` / `update`, brush, overlays). See [Frontend Architecture: Rendering Pipeline](frontend-architecture.md#rendering-pipeline-architecture) for the full pipeline, helpers, and debugging notes.
 
