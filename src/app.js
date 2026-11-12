@@ -5,7 +5,6 @@ import { createStore, compose, applyMiddleware } from 'redux';
 import PropTypes from 'prop-types';
 import { StyledEngineProvider } from '@mui/material';
 
-import 'regenerator-runtime/runtime'; // eslint-disable-line
 import createSagaMiddleware from 'redux-saga';
 // import { logger } from 'redux-logger';
 

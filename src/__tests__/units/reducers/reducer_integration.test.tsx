@@ -1,6 +1,6 @@
-import { INTEGRATION } from "../../../constants/action_type";
-import undoableIntegrationReducer, { integrationReducer } from "../../../reducers/reducer_integration";
-import { ActionCreators, newHistory } from "redux-undo";
+import { ActionCreators, newHistory } from 'redux-undo';
+import { INTEGRATION } from '../../../constants/action_type';
+import undoableIntegrationReducer, { integrationReducer } from '../../../reducers/reducer_integration';
 
 describe('Test redux reducer for integrations', () => {
   const data = [
@@ -16,7 +16,9 @@ describe('Test redux reducer for integrations', () => {
     const state: any = {
       selectedIdx: 0,
       integrations: [{
-        stack: [{ xL: 0, xU: 10, area: 10, absoluteArea: 0 }],
+        stack: [{
+          xL: 0, xU: 10, area: 10, absoluteArea: 0,
+        }],
         refArea: 10,
         refFactor: 2,
         shift: 0,
@@ -45,7 +47,9 @@ describe('Test redux reducer for integrations', () => {
     const state: any = {
       selectedIdx: 0,
       integrations: [{
-        stack: [{ xL: 1, xU: 11, area: 10, absoluteArea: 0 }],
+        stack: [{
+          xL: 1, xU: 11, area: 10, absoluteArea: 0,
+        }],
         refArea: 10,
         refFactor: 1,
         shift: 1,
@@ -71,7 +75,9 @@ describe('Test redux reducer for integrations', () => {
     const state: any = {
       selectedIdx: 0,
       integrations: [{
-        stack: [{ xL: 0, xU: 10, area: 10, absoluteArea: 0 }],
+        stack: [{
+          xL: 0, xU: 10, area: 10, absoluteArea: 0,
+        }],
         refArea: 10,
         refFactor: 1,
         shift: 0,
@@ -97,8 +103,12 @@ describe('Test redux reducer for integrations', () => {
       selectedIdx: 0,
       integrations: [{
         stack: [
-          { xL: 0, xU: 10, area: 10, absoluteArea: 0 },
-          { xL: 12, xU: 14, area: 2, absoluteArea: 0 },
+          {
+            xL: 0, xU: 10, area: 10, absoluteArea: 0,
+          },
+          {
+            xL: 12, xU: 14, area: 2, absoluteArea: 0,
+          },
         ],
         refArea: 10,
         refFactor: 1,
@@ -115,14 +125,18 @@ describe('Test redux reducer for integrations', () => {
       },
     });
 
-    expect(newState.integrations[0].stack).toEqual([{ xL: 12, xU: 14, area: 2, absoluteArea: 0 }]);
+    expect(newState.integrations[0].stack).toEqual([{
+      xL: 12, xU: 14, area: 2, absoluteArea: 0,
+    }]);
   });
 
   it('undoes a split in one step', () => {
     const state: any = {
       selectedIdx: 0,
       integrations: [{
-        stack: [{ xL: 0, xU: 10, area: 10, absoluteArea: 0 }],
+        stack: [{
+          xL: 0, xU: 10, area: 10, absoluteArea: 0,
+        }],
         refArea: 10,
         refFactor: 1,
         shift: 0,
@@ -180,7 +194,9 @@ describe('Test redux reducer for integrations', () => {
     const seed: any = {
       selectedIdx: 0,
       integrations: [{
-        stack: [{ xL: 0, xU: 10, area: 10, absoluteArea: 0 }],
+        stack: [{
+          xL: 0, xU: 10, area: 10, absoluteArea: 0,
+        }],
         refArea: 10,
         refFactor: 1,
         shift: 0,
@@ -213,7 +229,9 @@ describe('Test redux reducer for integrations', () => {
     const state: any = {
       selectedIdx: 0,
       integrations: [{
-        stack: [{ xL: 0, xU: 10, area: 10, absoluteArea: 0 }],
+        stack: [{
+          xL: 0, xU: 10, area: 10, absoluteArea: 0,
+        }],
         refArea: 10,
         refFactor: 1,
         shift: 0,
@@ -243,7 +261,9 @@ describe('Test redux reducer for integrations', () => {
     const state: any = {
       selectedIdx: 0,
       integrations: [{
-        stack: [{ xL: 1, xU: 11, area: 10, absoluteArea: 0 }],
+        stack: [{
+          xL: 1, xU: 11, area: 10, absoluteArea: 0,
+        }],
         refArea: 10,
         refFactor: 1,
         shift: 1,
@@ -272,8 +292,12 @@ describe('Test redux reducer for integrations', () => {
       selectedIdx: 0,
       integrations: [{
         stack: [
-          { xL: 0, xU: 6, area: 6, absoluteArea: 0, visualSplitGroupId: 'g1' },
-          { xL: 6, xU: 10, area: 4, absoluteArea: 0, visualSplitGroupId: 'g1' },
+          {
+            xL: 0, xU: 6, area: 6, absoluteArea: 0, visualSplitGroupId: 'g1',
+          },
+          {
+            xL: 6, xU: 10, area: 4, absoluteArea: 0, visualSplitGroupId: 'g1',
+          },
         ],
         refArea: 10,
         refFactor: 1,
@@ -300,8 +324,12 @@ describe('Test redux reducer for integrations', () => {
       selectedIdx: 0,
       integrations: [{
         stack: [
-          { xL: 0, xU: 4, area: 4, absoluteArea: 0, visualSplitGroupId: 'persisted-vsg' },
-          { xL: 4, xU: 10, area: 6, absoluteArea: 0, visualSplitGroupId: 'persisted-vsg' },
+          {
+            xL: 0, xU: 4, area: 4, absoluteArea: 0, visualSplitGroupId: 'persisted-vsg',
+          },
+          {
+            xL: 4, xU: 10, area: 6, absoluteArea: 0, visualSplitGroupId: 'persisted-vsg',
+          },
         ],
         refArea: 10,
         refFactor: 1,
@@ -327,7 +355,9 @@ describe('Test redux reducer for integrations', () => {
     const state: any = {
       selectedIdx: 0,
       integrations: [{
-        stack: [{ xL: 0, xU: 10, area: 300, absoluteArea: 60 }],
+        stack: [{
+          xL: 0, xU: 10, area: 300, absoluteArea: 60,
+        }],
         refArea: 300,
         refFactor: 1,
         shift: 0,
@@ -356,7 +386,9 @@ describe('Test redux reducer for integrations', () => {
     const state: any = {
       selectedIdx: 0,
       integrations: [{
-        stack: [{ xL: 0, xU: 10, area: 300, absoluteArea: 60 }],
+        stack: [{
+          xL: 0, xU: 10, area: 300, absoluteArea: 60,
+        }],
         refArea: 300,
         refFactor: 1,
         shift: 0,
@@ -384,7 +416,9 @@ describe('Test redux reducer for integrations', () => {
     const state: any = {
       selectedIdx: 0,
       integrations: [{
-        stack: [{ xL: 0, xU: 10, area: 300, absoluteArea: 60 }],
+        stack: [{
+          xL: 0, xU: 10, area: 300, absoluteArea: 60,
+        }],
         refArea: 300,
         refFactor: 1,
         shift: 0,
@@ -415,8 +449,12 @@ describe('Test redux reducer for integrations', () => {
       selectedIdx: 0,
       integrations: [{
         stack: [
-          { xL: 0, xU: 4, area: 4, absoluteArea: 0, visualSplitGroupId: 'g1' },
-          { xL: 4, xU: 10, area: 6, absoluteArea: 0, visualSplitGroupId: 'g1' },
+          {
+            xL: 0, xU: 4, area: 4, absoluteArea: 0, visualSplitGroupId: 'g1',
+          },
+          {
+            xL: 4, xU: 10, area: 6, absoluteArea: 0, visualSplitGroupId: 'g1',
+          },
         ],
         refArea: 10,
         refFactor: 1,
@@ -455,9 +493,15 @@ describe('Test redux reducer for integrations', () => {
       selectedIdx: 0,
       integrations: [{
         stack: [
-          { xL: 0, xU: 4, area: 4, absoluteArea: 0, visualSplitGroupId: 'g1' },
-          { xL: 4, xU: 6, area: 2, absoluteArea: 0, visualSplitGroupId: 'g1' },
-          { xL: 6, xU: 10, area: 4, absoluteArea: 0, visualSplitGroupId: 'g1' },
+          {
+            xL: 0, xU: 4, area: 4, absoluteArea: 0, visualSplitGroupId: 'g1',
+          },
+          {
+            xL: 4, xU: 6, area: 2, absoluteArea: 0, visualSplitGroupId: 'g1',
+          },
+          {
+            xL: 6, xU: 10, area: 4, absoluteArea: 0, visualSplitGroupId: 'g1',
+          },
         ],
         refArea: 10,
         refFactor: 1,
@@ -481,8 +525,12 @@ describe('Test redux reducer for integrations', () => {
       selectedIdx: 0,
       integrations: [{
         stack: [
-          { xL: 0, xU: 4, area: 4, absoluteArea: 0, visualSplitGroupId: 'g1' },
-          { xL: 4, xU: 10, area: 6, absoluteArea: 0, visualSplitGroupId: 'g1' },
+          {
+            xL: 0, xU: 4, area: 4, absoluteArea: 0, visualSplitGroupId: 'g1',
+          },
+          {
+            xL: 4, xU: 10, area: 6, absoluteArea: 0, visualSplitGroupId: 'g1',
+          },
         ],
         refArea: 10,
         refFactor: 1,
@@ -520,8 +568,12 @@ describe('Test redux reducer for integrations', () => {
       selectedIdx: 0,
       integrations: [{
         stack: [
-          { xL: 0, xU: 4, area: 4, absoluteArea: 40, visualSplitGroupId: 'g1' },
-          { xL: 4, xU: 10, area: 6, absoluteArea: 60, visualSplitGroupId: 'g1' },
+          {
+            xL: 0, xU: 4, area: 4, absoluteArea: 40, visualSplitGroupId: 'g1',
+          },
+          {
+            xL: 4, xU: 10, area: 6, absoluteArea: 60, visualSplitGroupId: 'g1',
+          },
         ],
         refArea: 10,
         refFactor: 1,
@@ -558,8 +610,12 @@ describe('Test redux reducer for integrations', () => {
       selectedIdx: 0,
       integrations: [{
         stack: [
-          { xL: 0, xU: 4, area: 4, absoluteArea: 40, visualSplitGroupId: 'g1' },
-          { xL: 4, xU: 10, area: 6, absoluteArea: 60, visualSplitGroupId: 'g1' },
+          {
+            xL: 0, xU: 4, area: 4, absoluteArea: 40, visualSplitGroupId: 'g1',
+          },
+          {
+            xL: 4, xU: 10, area: 6, absoluteArea: 60, visualSplitGroupId: 'g1',
+          },
         ],
         refArea: 10,
         refFactor: 1,
@@ -595,9 +651,15 @@ describe('Test redux reducer for integrations', () => {
       selectedIdx: 0,
       integrations: [{
         stack: [
-          { xL: 0, xU: 2, area: 2, absoluteArea: 20, visualSplitGroupId: 'g1' },
-          { xL: 2, xU: 8, area: 6, absoluteArea: 60, visualSplitGroupId: 'g1' },
-          { xL: 8, xU: 10, area: 2, absoluteArea: 20, visualSplitGroupId: 'g1' },
+          {
+            xL: 0, xU: 2, area: 2, absoluteArea: 20, visualSplitGroupId: 'g1',
+          },
+          {
+            xL: 2, xU: 8, area: 6, absoluteArea: 60, visualSplitGroupId: 'g1',
+          },
+          {
+            xL: 8, xU: 10, area: 2, absoluteArea: 20, visualSplitGroupId: 'g1',
+          },
         ],
         refArea: 10,
         refFactor: 1,
@@ -625,8 +687,12 @@ describe('Test redux reducer for integrations', () => {
       selectedIdx: 0,
       integrations: [{
         stack: [
-          { xL: 0, xU: 4, area: 4, absoluteArea: 0, visualSplitGroupId: 'g1' },
-          { xL: 4, xU: 10, area: 6, absoluteArea: 0, visualSplitGroupId: 'g1' },
+          {
+            xL: 0, xU: 4, area: 4, absoluteArea: 0, visualSplitGroupId: 'g1',
+          },
+          {
+            xL: 4, xU: 10, area: 6, absoluteArea: 0, visualSplitGroupId: 'g1',
+          },
         ],
         refArea: 10,
         refFactor: 1,
@@ -649,7 +715,9 @@ describe('Test redux reducer for integrations', () => {
     const state: any = {
       selectedIdx: 0,
       integrations: [{
-        stack: [{ xL: 0, xU: 10, area: 10, absoluteArea: 0 }],
+        stack: [{
+          xL: 0, xU: 10, area: 10, absoluteArea: 0,
+        }],
         refArea: 10,
         refFactor: 1,
         shift: 0,
@@ -677,8 +745,12 @@ describe('Test redux reducer for integrations', () => {
       selectedIdx: 0,
       integrations: [{
         stack: [
-          { xL: 0, xU: 4, area: 4, absoluteArea: 40, visualSplitGroupId: 'g1' },
-          { xL: 4, xU: 10, area: 6, absoluteArea: 60, visualSplitGroupId: 'g1' },
+          {
+            xL: 0, xU: 4, area: 4, absoluteArea: 40, visualSplitGroupId: 'g1',
+          },
+          {
+            xL: 4, xU: 10, area: 6, absoluteArea: 60, visualSplitGroupId: 'g1',
+          },
         ],
         refArea: 10,
         refFactor: 1,
@@ -716,8 +788,12 @@ describe('Test redux reducer for integrations', () => {
       selectedIdx: 0,
       integrations: [{
         stack: [
-          { xL: 0, xU: 4, area: 4, absoluteArea: 0, visualSplitGroupId: 'g1' },
-          { xL: 4, xU: 10, area: 6, absoluteArea: 0, visualSplitGroupId: 'g1' },
+          {
+            xL: 0, xU: 4, area: 4, absoluteArea: 0, visualSplitGroupId: 'g1',
+          },
+          {
+            xL: 4, xU: 10, area: 6, absoluteArea: 0, visualSplitGroupId: 'g1',
+          },
         ],
         refArea: 10,
         refFactor: 1,
@@ -754,8 +830,12 @@ describe('Test redux reducer for integrations', () => {
         integrations: [
           {
             stack: [
-              { xL: 0, xU: 3, area: 3, absoluteArea: 1, visualSplitGroupId: 'g1' },
-              { xL: 3, xU: 10, area: 7, absoluteArea: 4, visualSplitGroupId: 'g1' },
+              {
+                xL: 0, xU: 3, area: 3, absoluteArea: 1, visualSplitGroupId: 'g1',
+              },
+              {
+                xL: 3, xU: 10, area: 7, absoluteArea: 4, visualSplitGroupId: 'g1',
+              },
             ],
             refArea: 10,
             refFactor: 1,
@@ -778,8 +858,12 @@ describe('Test redux reducer for integrations', () => {
     const initial: any = {
       selectedIdx: 0,
       integrations: [
-        { stack: [], refArea: 1, refFactor: 1, shift: 0, edited: false },
-        { stack: [], refArea: 1, refFactor: 1, shift: 0, edited: false },
+        {
+          stack: [], refArea: 1, refFactor: 1, shift: 0, edited: false,
+        },
+        {
+          stack: [], refArea: 1, refFactor: 1, shift: 0, edited: false,
+        },
       ],
     };
     const restored = integrationReducer(initial, {
@@ -788,7 +872,9 @@ describe('Test redux reducer for integrations', () => {
         selectedIdx: 1,
         integrations: [
           {
-            stack: [{ xL: 0, xU: 4, area: 4, absoluteArea: 2 }],
+            stack: [{
+              xL: 0, xU: 4, area: 4, absoluteArea: 2,
+            }],
             refArea: 4,
             refFactor: 1,
             shift: 0,
@@ -796,8 +882,12 @@ describe('Test redux reducer for integrations', () => {
           },
           {
             stack: [
-              { xL: 5, xU: 7, area: 2, absoluteArea: 1, visualSplitGroupId: 'g2' },
-              { xL: 7, xU: 9, area: 2, absoluteArea: 1, visualSplitGroupId: 'g2' },
+              {
+                xL: 5, xU: 7, area: 2, absoluteArea: 1, visualSplitGroupId: 'g2',
+              },
+              {
+                xL: 7, xU: 9, area: 2, absoluteArea: 1, visualSplitGroupId: 'g2',
+              },
             ],
             refArea: 4,
             refFactor: 1,
@@ -817,7 +907,9 @@ describe('Test redux reducer for integrations', () => {
     const state: any = {
       selectedIdx: 0,
       integrations: [{
-        stack: [{ xL: 0, xU: 10, area: 10, absoluteArea: 0 }],
+        stack: [{
+          xL: 0, xU: 10, area: 10, absoluteArea: 0,
+        }],
         refArea: 10,
         refFactor: 1,
         shift: 0,

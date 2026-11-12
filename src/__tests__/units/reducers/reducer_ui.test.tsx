@@ -1,7 +1,7 @@
-import uiReducer from "../../../reducers/reducer_ui";
-import { UI } from "../../../constants/action_type";
-import { LIST_UI_SWEEP_TYPE } from "../../../constants/list_ui";
-import { seedLcmsUnionExtent } from "../../../actions/ui";
+import uiReducer from '../../../reducers/reducer_ui';
+import { UI } from '../../../constants/action_type';
+import { LIST_UI_SWEEP_TYPE } from '../../../constants/list_ui';
+import { seedLcmsUnionExtent } from '../../../actions/ui';
 
 describe('Test redux reducer_ui', () => {
   it('keeps only the selected graph in zoom mode', () => {

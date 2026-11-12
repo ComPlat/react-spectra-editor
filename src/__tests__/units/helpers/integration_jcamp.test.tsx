@@ -13,7 +13,9 @@ describe('serializeIntegrationRecords', () => {
 
   it('serializes a simple HPLC integration without groups', () => {
     const records = serializeIntegrationRecords({
-      stack: [{ xL: 0, xU: 10, area: 5, absoluteArea: 5 }],
+      stack: [{
+        xL: 0, xU: 10, area: 5, absoluteArea: 5,
+      }],
       refArea: 1,
       refFactor: 1,
     }, LIST_LAYOUT.HPLC_UVVIS);
@@ -26,8 +28,12 @@ describe('serializeIntegrationRecords', () => {
   it('serializes visual split groups for HPLC', () => {
     const records = serializeIntegrationRecords({
       stack: [
-        { xL: 0, xU: 4, area: 2, absoluteArea: 2, visualSplitGroupId: 'vsg-1' },
-        { xL: 4, xU: 10, area: 3, absoluteArea: 3, visualSplitGroupId: 'vsg-1' },
+        {
+          xL: 0, xU: 4, area: 2, absoluteArea: 2, visualSplitGroupId: 'vsg-1',
+        },
+        {
+          xL: 4, xU: 10, area: 3, absoluteArea: 3, visualSplitGroupId: 'vsg-1',
+        },
       ],
       refArea: 1,
       refFactor: 1,
@@ -39,7 +45,9 @@ describe('serializeIntegrationRecords', () => {
 
   it('does not emit GROUPS for NMR layouts', () => {
     const records = serializeIntegrationRecords({
-      stack: [{ xL: 0, xU: 10, area: 5, absoluteArea: 5, visualSplitGroupId: 'vsg-orphan' }],
+      stack: [{
+        xL: 0, xU: 10, area: 5, absoluteArea: 5, visualSplitGroupId: 'vsg-orphan',
+      }],
       refArea: 1,
       refFactor: 1,
     }, LIST_LAYOUT.H1);
@@ -51,8 +59,12 @@ describe('serializeIntegrationRecords', () => {
   it('round-trips through buildIntegFeature with group ids', () => {
     const integration = {
       stack: [
-        { xL: 0, xU: 4, area: 2, absoluteArea: 2, visualSplitGroupId: 'vsg-roundtrip' },
-        { xL: 4, xU: 10, area: 3, absoluteArea: 3, visualSplitGroupId: 'vsg-roundtrip' },
+        {
+          xL: 0, xU: 4, area: 2, absoluteArea: 2, visualSplitGroupId: 'vsg-roundtrip',
+        },
+        {
+          xL: 4, xU: 10, area: 3, absoluteArea: 3, visualSplitGroupId: 'vsg-roundtrip',
+        },
       ],
       refArea: 1,
       refFactor: 1,

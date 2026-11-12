@@ -1,7 +1,7 @@
-import hplcMsReducer from "../../../reducers/reducer_hplc_ms";
-import { CURVE, HPLC_MS } from "../../../constants/action_type";
-import { ExtractJcamp } from "../../../helpers/chem";
-import lcMsMzChemstationJcamp from "../../fixtures/lc_ms_jcamp_mz_chemstation";
+import hplcMsReducer from '../../../reducers/reducer_hplc_ms';
+import { CURVE, HPLC_MS } from '../../../constants/action_type';
+import { ExtractJcamp } from '../../../helpers/chem';
+import lcMsMzChemstationJcamp from '../../fixtures/lc_ms_jcamp_mz_chemstation';
 
 const createTicCurve = (polarity: 'positive' | 'negative' | 'neutral', x = [1, 2], y = [10, 20]) => ({
   csCategory: ['tic', polarity],
@@ -164,7 +164,9 @@ describe('Test redux reducer_hplc_ms', () => {
     const clearedIntegrations = hplcMsReducer(withSelectedSpectrum, {
       type: HPLC_MS.CLEAR_INTEGRATION_ALL_HPLCMS,
     } as any);
-    expect(clearedIntegrations.uvvis.spectraList.every((sp: any) => sp.integrations.length === 0)).toEqual(true);
+    expect(clearedIntegrations.uvvis.spectraList.every((
+      sp: any,
+    ) => sp.integrations.length === 0)).toEqual(true);
 
     const clearedPeaks = hplcMsReducer(clearedIntegrations, {
       type: HPLC_MS.CLEAR_ALL_PEAKS_HPLCMS,
@@ -179,12 +181,13 @@ describe('Test redux reducer_hplc_ms', () => {
       createUvvisCurve(),
       createMzCurve('positive'),
     ];
-    let state = hplcMsReducer(undefined, {
+    const state = hplcMsReducer(undefined, {
       type: CURVE.SET_ALL_CURVES,
       payload,
       meta: { idDt: 'persist-rt-1' },
     } as any);
-    state = hplcMsReducer(state, {
+    // The reducer keeps this choice per idDt; the state it returns is not needed.
+    hplcMsReducer(state, {
       type: HPLC_MS.UPDATE_CURRENT_PAGE_VALUE,
       payload: { currentPageValue: 2 },
     } as any);
@@ -328,12 +331,13 @@ describe('Test redux reducer_hplc_ms', () => {
       createUvvisCurve(),
       createMzCurve('positive'),
     ];
-    let state = hplcMsReducer(undefined, {
+    const state = hplcMsReducer(undefined, {
       type: CURVE.SET_ALL_CURVES,
       payload,
       meta: { idDt: 'before-save' },
     } as any);
-    state = hplcMsReducer(state, {
+    // The reducer keeps this choice per idDt; the state it returns is not needed.
+    hplcMsReducer(state, {
       type: HPLC_MS.UPDATE_UVVIS_WAVE_LENGTH,
       payload: { target: { value: 220 } },
     } as any);
@@ -483,7 +487,7 @@ $$ === CHEMSPECTRA UVVIS PEAK TABLE ===
       } as any);
 
       expect(state.tic.polarity).toEqual('neutral');
-      const x = state.tic.neutral.data.x;
+      const { x } = state.tic.neutral.data;
       [1.1228166666666666, 7.5, 13.982933333333333].forEach((expected, i) => {
         expect(x[i]).toBeCloseTo(expected);
       });

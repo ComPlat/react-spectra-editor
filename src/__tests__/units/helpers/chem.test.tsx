@@ -4,18 +4,18 @@ import {
   GetCyclicVoltaRatio, GetCyclicVoltaPeakSeparate, convertTopic,
   Convert2MaxMinPeak, Feature2MaxMinPeak, GetCyclicVoltaShiftOffset, GetCyclicVoltaPreviousShift,
   buildIntegFeature, convertThresEndPts,
-} from "../../../helpers/chem";
-import nmr1HJcamp from "../../fixtures/nmr1h_jcamp";
-import aifJcamp1 from "../../fixtures/aif_jcamp_1";
+} from '../../../helpers/chem';
+import nmr1HJcamp from '../../fixtures/nmr1h_jcamp';
+import aifJcamp1 from '../../fixtures/aif_jcamp_1';
 import dlsIntensityJcamp from '../../fixtures/dls_intensity_jcamp';
-import { LIST_SHIFT_1H } from "../../../constants/list_shift";
-import { LIST_LAYOUT } from "../../../constants/list_layout";
-import emissionsJcamp from "../../fixtures/emissions_jcamp";
-import dlsAcfJcamp from "../../fixtures/dls_acf_jcamp";
-import lcMsTicChemstationJcamp from "../../fixtures/lc_ms_jcamp_tic_chemstation";
-import lcMsMzChemstationJcamp from "../../fixtures/lc_ms_jcamp_mz_chemstation";
-import plainJcamp from "../../fixtures/plain_layout_jcamp";
-import irJcamp from "../../fixtures/ir_jcamp";
+import { LIST_SHIFT_1H } from '../../../constants/list_shift';
+import { LIST_LAYOUT } from '../../../constants/list_layout';
+import emissionsJcamp from '../../fixtures/emissions_jcamp';
+import dlsAcfJcamp from '../../fixtures/dls_acf_jcamp';
+import lcMsTicChemstationJcamp from '../../fixtures/lc_ms_jcamp_tic_chemstation';
+import lcMsMzChemstationJcamp from '../../fixtures/lc_ms_jcamp_mz_chemstation';
+import plainJcamp from '../../fixtures/plain_layout_jcamp';
+import irJcamp from '../../fixtures/ir_jcamp';
 
 const buildTicJcamp = ({
   xUnits, unitsLine = '', xValues, yValues,
@@ -94,330 +94,357 @@ $$ === CHEMSPECTRA PEAK TABLE AUTO ===
 `;
 
 function checkExtractSucceed(extractedData: any, forLayout: string) {
-  const { spectra, features, layout } = extractedData
-  expect(spectra).not.toBeNull()
-  expect(features).not.toBeNull()
-  expect(layout).toEqual(forLayout)
+  const { spectra, features, layout } = extractedData;
+  expect(spectra).not.toBeNull();
+  expect(features).not.toBeNull();
+  expect(layout).toEqual(forLayout);
 }
 
 function checkSpectraInfo(extractedData: any, forLayout: string) {
-  const { spectra} = extractedData
-  expect(spectra).toHaveLength(1)
+  const { spectra } = extractedData;
+  expect(spectra).toHaveLength(1);
 
-  const spectrum = spectra[0]
-  expect(spectrum.dataType).toEqual(forLayout)
+  const spectrum = spectra[0];
+  expect(spectrum.dataType).toEqual(forLayout);
 }
 
 describe('Test for chem helper', () => {
   describe('Test extract jcamp file', () => {
-    //TODO: need more implementation
+    // TODO: need more implementation
     describe('Extract NMR', () => {
-      let extractedData: { spectra: any, features: any, layout: any }
+      let extractedData: { spectra: any, features: any, layout: any };
 
       beforeAll(() => {
-        extractedData = ExtractJcamp(nmr1HJcamp)
-      })
+        extractedData = ExtractJcamp(nmr1HJcamp);
+      });
 
       it('Extract succeed ', () => {
-        checkExtractSucceed(extractedData, LIST_LAYOUT.H1)
-      })
+        checkExtractSucceed(extractedData, LIST_LAYOUT.H1);
+      });
 
       it('Check spectra info ', () => {
-        checkSpectraInfo(extractedData, 'NMR SPECTRUM')
-      })
-    })
+        checkSpectraInfo(extractedData, 'NMR SPECTRUM');
+      });
+    });
 
     describe('Extract SDM', () => {
-      let extractedData: { spectra: any, features: any, layout: any }
+      let extractedData: { spectra: any, features: any, layout: any };
 
       beforeAll(() => {
-        extractedData = ExtractJcamp(aifJcamp1)
-      })
+        extractedData = ExtractJcamp(aifJcamp1);
+      });
 
       it('Extract succeed ', () => {
-        checkExtractSucceed(extractedData, LIST_LAYOUT.AIF)
-      })
+        checkExtractSucceed(extractedData, LIST_LAYOUT.AIF);
+      });
 
       it('Check spectra info ', () => {
-        checkSpectraInfo(extractedData, 'SORPTION-DESORPTION MEASUREMENT')
-      })
-    })
+        checkSpectraInfo(extractedData, 'SORPTION-DESORPTION MEASUREMENT');
+      });
+    });
 
     describe('Extract Emission Spec', () => {
-      let extractedData: { spectra: any, features: any, layout: any }
+      let extractedData: { spectra: any, features: any, layout: any };
 
       beforeAll(() => {
-        extractedData = ExtractJcamp(emissionsJcamp)
-      })
+        extractedData = ExtractJcamp(emissionsJcamp);
+      });
 
       it('Extract succeed ', () => {
-        checkExtractSucceed(extractedData, LIST_LAYOUT.EMISSIONS)
-      })
+        checkExtractSucceed(extractedData, LIST_LAYOUT.EMISSIONS);
+      });
 
       it('Check spectra info ', () => {
-        checkSpectraInfo(extractedData, 'Emissions')
-      })
-    })
-    
+        checkSpectraInfo(extractedData, 'Emissions');
+      });
+    });
 
     describe('Extract DLS ACF', () => {
-      let extractedData: { spectra: any, features: any, layout: any }
+      let extractedData: { spectra: any, features: any, layout: any };
 
       beforeAll(() => {
-        extractedData = ExtractJcamp(dlsAcfJcamp)
-      })
+        extractedData = ExtractJcamp(dlsAcfJcamp);
+      });
 
       it('Extract succeed ', () => {
-        checkExtractSucceed(extractedData, LIST_LAYOUT.DLS_ACF)
-      })
+        checkExtractSucceed(extractedData, LIST_LAYOUT.DLS_ACF);
+      });
 
       it('Check spectra info ', () => {
-        checkSpectraInfo(extractedData, 'DLS ACF')
-      })
-    })
-    
+        checkSpectraInfo(extractedData, 'DLS ACF');
+      });
+    });
 
     describe('Extract DLS Intensity', () => {
-      let extractedData: { spectra: any, features: any, layout: any }
+      let extractedData: { spectra: any, features: any, layout: any };
 
       beforeAll(() => {
-        extractedData = ExtractJcamp(dlsIntensityJcamp)
-      })
+        extractedData = ExtractJcamp(dlsIntensityJcamp);
+      });
 
       it('Extract succeed ', () => {
-        checkExtractSucceed(extractedData, LIST_LAYOUT.DLS_INTENSITY)
-      })
+        checkExtractSucceed(extractedData, LIST_LAYOUT.DLS_INTENSITY);
+      });
 
       it('Check spectra info ', () => {
-        checkSpectraInfo(extractedData, 'DLS intensity')
-      })
-    })
+        checkSpectraInfo(extractedData, 'DLS intensity');
+      });
+    });
 
     // B2: an unrecognised datatype gets PLAIN on entity.layout, spectra[].layout and
     // feature.operation.layout alike, for any host reading the entity directly.
     describe('Extract unrecognized datatype (PLAIN)', () => {
-      let extractedData: { spectra: any, features: any, layout: any }
+      let extractedData: { spectra: any, features: any, layout: any };
 
       beforeAll(() => {
-        extractedData = ExtractJcamp(plainJcamp)
-      })
+        extractedData = ExtractJcamp(plainJcamp);
+      });
 
       it('Extract succeed ', () => {
-        checkExtractSucceed(extractedData, LIST_LAYOUT.PLAIN)
-      })
+        checkExtractSucceed(extractedData, LIST_LAYOUT.PLAIN);
+      });
 
       it('Check spectra info ', () => {
-        checkSpectraInfo(extractedData, 'SQUID')
-      })
+        checkSpectraInfo(extractedData, 'SQUID');
+      });
 
       it('normalizes spectra[].layout and feature.operation.layout to PLAIN too', () => {
-        const { spectra, features } = extractedData
-        expect(spectra[0].layout).toEqual(LIST_LAYOUT.PLAIN)
-        expect(features.editPeak.operation.layout).toEqual(LIST_LAYOUT.PLAIN)
-        expect(features.autoPeak.operation.layout).toEqual(LIST_LAYOUT.PLAIN)
-      })
-    })
+        const { spectra, features } = extractedData;
+        expect(spectra[0].layout).toEqual(LIST_LAYOUT.PLAIN);
+        expect(features.editPeak.operation.layout).toEqual(LIST_LAYOUT.PLAIN);
+        expect(features.autoPeak.operation.layout).toEqual(LIST_LAYOUT.PLAIN);
+      });
+    });
 
     // The backend upper-cases both sides when matching data_type.json, so a
     // non-shouted-case file it recognises must not become PLAIN here.
     // Every datatype check is case-insensitive, like the backend's.
     describe('Extract a datatype in non-shouted case', () => {
       it('classifies Thermogravimetric analysis as TGA', () => {
-        const extractedData = ExtractJcamp(buildXyJcamp('Thermogravimetric analysis'))
-        checkExtractSucceed(extractedData, LIST_LAYOUT.TGA)
-      })
+        const extractedData = ExtractJcamp(buildXyJcamp('Thermogravimetric analysis'));
+        checkExtractSucceed(extractedData, LIST_LAYOUT.TGA);
+      });
 
       it('classifies an upper-cased EMISSIONS as Emissions', () => {
-        const extractedData = ExtractJcamp(buildXyJcamp('EMISSIONS'))
-        checkExtractSucceed(extractedData, LIST_LAYOUT.EMISSIONS)
-      })
-    })
+        const extractedData = ExtractJcamp(buildXyJcamp('EMISSIONS'));
+        checkExtractSucceed(extractedData, LIST_LAYOUT.EMISSIONS);
+      });
+    });
 
     // chem-spectra-app records what a client asked for: absorbance converted to %T, or
     // y drawn inverted. Kept records reach a host only through the features built from them.
     describe('Extract $CSTRANSMITTANCE / $CSINVERTY', () => {
       const withRecords = (records: string, everyBlock = false) => {
-        const marker = '##$CSTHRESHOLD='
+        const marker = '##$CSTHRESHOLD=';
         const source = everyBlock
           ? irJcamp.split(marker).join(`${records}${marker}`)
-          : irJcamp.replace(marker, `${records}${marker}`)
-        expect(source).not.toEqual(irJcamp)
-        return ExtractJcamp(source)
-      }
-      const peakFeatures = ({ features }: any) => [features.editPeak, features.autoPeak].filter(Boolean)
+          : irJcamp.replace(marker, `${records}${marker}`);
+        expect(source).not.toEqual(irJcamp);
+        return ExtractJcamp(source);
+      };
+      const peakFeatures = ({ features }: any) => (
+        [features.editPeak, features.autoPeak].filter(Boolean)
+      );
 
       it('exposes $CSTRANSMITTANCE on the peak features', () => {
-        const feats = peakFeatures(withRecords('##$CSTRANSMITTANCE=true\n'))
-        expect(feats.length).toBeGreaterThan(0)
+        const feats = peakFeatures(withRecords('##$CSTRANSMITTANCE=true\n'));
+        expect(feats.length).toBeGreaterThan(0);
         feats.forEach((f: any) => {
-          expect(f.convertedToTransmittance).toBe(true)
-          expect(f.invertedY).toBe(false)
-        })
-      })
+          expect(f.convertedToTransmittance).toBe(true);
+          expect(f.invertedY).toBe(false);
+        });
+      });
 
       it('exposes $CSINVERTY on the peak features, also when repeated in every block', () => {
         [false, true].forEach((everyBlock) => {
-          const feats = peakFeatures(withRecords('##$CSINVERTY=true\n', everyBlock))
-          expect(feats.length).toBeGreaterThan(0)
+          const feats = peakFeatures(withRecords('##$CSINVERTY=true\n', everyBlock));
+          expect(feats.length).toBeGreaterThan(0);
           feats.forEach((f: any) => {
-            expect(f.invertedY).toBe(true)
-            expect(f.convertedToTransmittance).toBe(false)
-          })
-        })
-      })
+            expect(f.invertedY).toBe(true);
+            expect(f.convertedToTransmittance).toBe(false);
+          });
+        });
+      });
 
       // Since chem-spectra-app#304 inverting is a viewing preference, so it can
       // accompany a %T conversion.
       it('exposes both when the file carries both', () => {
-        const feats = peakFeatures(withRecords('##$CSTRANSMITTANCE=true\n##$CSINVERTY=true\n'))
-        expect(feats.length).toBeGreaterThan(0)
+        const feats = peakFeatures(withRecords('##$CSTRANSMITTANCE=true\n##$CSINVERTY=true\n'));
+        expect(feats.length).toBeGreaterThan(0);
         feats.forEach((f: any) => {
-          expect(f.convertedToTransmittance).toBe(true)
-          expect(f.invertedY).toBe(true)
-        })
-      })
+          expect(f.convertedToTransmittance).toBe(true);
+          expect(f.invertedY).toBe(true);
+        });
+      });
 
       it('reads both as false when the file does not declare them', () => {
-        const feats = peakFeatures(ExtractJcamp(irJcamp))
-        expect(feats.length).toBeGreaterThan(0)
+        const feats = peakFeatures(ExtractJcamp(irJcamp));
+        expect(feats.length).toBeGreaterThan(0);
         feats.forEach((f: any) => {
-          expect(f.convertedToTransmittance).toBe(false)
-          expect(f.invertedY).toBe(false)
-        })
-      })
+          expect(f.convertedToTransmittance).toBe(false);
+          expect(f.invertedY).toBe(false);
+        });
+      });
 
       it('still keeps $CSTHRESHOLD alongside them', () => {
-        const plainRef = peakFeatures(ExtractJcamp(irJcamp)).map((f: any) => f.thresRef)
+        const plainRef = peakFeatures(ExtractJcamp(irJcamp)).map((f: any) => f.thresRef);
         const withRef = peakFeatures(withRecords('##$CSTRANSMITTANCE=true\n'))
-          .map((f: any) => f.thresRef)
-        expect(withRef).toEqual(plainRef)
-        expect(plainRef.every((r: number) => r !== 5)).toBe(true) // 5 is the no-threshold fallback
-      })
-    })
+          .map((f: any) => f.thresRef);
+        expect(withRef).toEqual(plainRef);
+        expect(plainRef.every((r: number) => r !== 5)).toBe(true); // 5 is the no-threshold fallback
+      });
+    });
 
     // Single-crystal XRD must not fall into powder XRD's substring match.
     describe('Extract SINGLE CRYSTAL X-RAY DIFFRACTION', () => {
       it('classifies single-crystal XRD as PLAIN', () => {
-        const extractedData = ExtractJcamp(buildXyJcamp('SINGLE CRYSTAL X-RAY DIFFRACTION'))
-        checkExtractSucceed(extractedData, LIST_LAYOUT.PLAIN)
-      })
+        const extractedData = ExtractJcamp(buildXyJcamp('SINGLE CRYSTAL X-RAY DIFFRACTION'));
+        checkExtractSucceed(extractedData, LIST_LAYOUT.PLAIN);
+      });
 
       it('classifies a mixed-case form as PLAIN too', () => {
-        const extractedData = ExtractJcamp(buildXyJcamp('Single Crystal X-Ray Diffraction'))
-        checkExtractSucceed(extractedData, LIST_LAYOUT.PLAIN)
-      })
+        const extractedData = ExtractJcamp(buildXyJcamp('Single Crystal X-Ray Diffraction'));
+        checkExtractSucceed(extractedData, LIST_LAYOUT.PLAIN);
+      });
 
       it('still classifies powder X-RAY DIFFRACTION as XRD', () => {
-        const extractedData = ExtractJcamp(buildXyJcamp('X-RAY DIFFRACTION'))
-        checkExtractSucceed(extractedData, LIST_LAYOUT.XRD)
-      })
-    })
+        const extractedData = ExtractJcamp(buildXyJcamp('X-RAY DIFFRACTION'));
+        checkExtractSucceed(extractedData, LIST_LAYOUT.XRD);
+      });
+    });
 
     describe('Extract GEL PERMEATION CHROMATOGRAPHY (GPC -> SEC alias)', () => {
       it('classifies a mixed-case ##DATA TYPE= as SEC, same as the backend would', () => {
-        const extractedData = ExtractJcamp(buildXyJcamp('Gel Permeation Chromatography'))
-        checkExtractSucceed(extractedData, LIST_LAYOUT.SEC)
-      })
+        const extractedData = ExtractJcamp(buildXyJcamp('Gel Permeation Chromatography'));
+        checkExtractSucceed(extractedData, LIST_LAYOUT.SEC);
+      });
 
       it('classifies the shouted-case form as SEC too', () => {
-        const extractedData = ExtractJcamp(buildXyJcamp('GEL PERMEATION CHROMATOGRAPHY'))
-        checkExtractSucceed(extractedData, LIST_LAYOUT.SEC)
-      })
+        const extractedData = ExtractJcamp(buildXyJcamp('GEL PERMEATION CHROMATOGRAPHY'));
+        checkExtractSucceed(extractedData, LIST_LAYOUT.SEC);
+      });
 
       // SEC maps getBoundary over every block, including the 0-point PEAKTABLE AUTO
       // one -- Math.max/min of an empty array is -Infinity/+Infinity, not 0.
       it('does not produce Infinity bounds from the empty PEAKTABLE AUTO block', () => {
-        const { features } = ExtractJcamp(buildXyJcamp('GEL PERMEATION CHROMATOGRAPHY'))
-        expect(Array.isArray(features)).toBe(true)
+        const { features } = ExtractJcamp(buildXyJcamp('GEL PERMEATION CHROMATOGRAPHY'));
+        expect(Array.isArray(features)).toBe(true);
         features.forEach((feature: any) => {
-          expect(Number.isFinite(feature.maxX)).toBe(true)
-          expect(Number.isFinite(feature.minX)).toBe(true)
-          expect(Number.isFinite(feature.maxY)).toBe(true)
-          expect(Number.isFinite(feature.minY)).toBe(true)
-        })
-      })
-    })
-  })
+          expect(Number.isFinite(feature.maxX)).toBe(true);
+          expect(Number.isFinite(feature.minX)).toBe(true);
+          expect(Number.isFinite(feature.maxY)).toBe(true);
+          expect(Number.isFinite(feature.minY)).toBe(true);
+        });
+      });
+    });
+  });
 
   describe('Test convert to topic', () => {
     it('Get topic without integration info', () => {
-      const topic = { x: [1, 2], y: [1, 2] }
-      const feature = { maxY: 2 }
-      const convertedTopic = convertTopic(topic, 'IR', feature, 0)
-      expect(convertedTopic).toEqual([{"x": 1, "y": 1}, {"x": 2, "y": 2}])
-    })
+      const topic = { x: [1, 2], y: [1, 2] };
+      const feature = { maxY: 2 };
+      const convertedTopic = convertTopic(topic, 'IR', feature, 0);
+      expect(convertedTopic).toEqual([{ x: 1, y: 1 }, { x: 2, y: 2 }]);
+    });
 
     it('Get topic with integration info', () => {
-      const topic = { x: [1, 2], y: [1, 2] }
-      const feature = { maxY: 2 }
-      const convertedTopic = convertTopic(topic, '1H', feature, 0)
-      expect(convertedTopic).toEqual([{"k": 0.5, "x": 1, "y": 1}, {"k": 1.5, "x": 2, "y": 2}])
-    })
-  })
+      const topic = { x: [1, 2], y: [1, 2] };
+      const feature = { maxY: 2 };
+      const convertedTopic = convertTopic(topic, '1H', feature, 0);
+      expect(convertedTopic).toEqual([{ k: 0.5, x: 1, y: 1 }, { k: 1.5, x: 2, y: 2 }]);
+    });
+  });
 
   describe('Test topic to seed', () => {
-    //TODO: need more implementation
+    // TODO: need more implementation
     it('Get seed from topic without integration info', () => {
       const state = {
         curve: { curveIdx: 0 },
-        shift: { shifts: [] }
-      }
-      const props = { topic: { x: [1, 2], y: [1, 2] }, feature: { maxY: 2 } }
-      const seed = Topic2Seed(state, props)
-      expect(seed).toEqual([{"x": 1, "y": 1}, {"x": 2, "y": 2}])
-    })
+        shift: { shifts: [] },
+      };
+      const props = { topic: { x: [1, 2], y: [1, 2] }, feature: { maxY: 2 } };
+      const seed = Topic2Seed(state, props);
+      expect(seed).toEqual([{ x: 1, y: 1 }, { x: 2, y: 2 }]);
+    });
 
     it('Get seed from topic with integration info', () => {
       const state = {
         curve: { curveIdx: 0 },
-        shift: { shifts: [{ ref: LIST_SHIFT_1H[1], peak: [{x: 2, y: 2}] }] },
-        layout: '1H' }
-      const props = { topic: { x: [1, 2], y: [1, 2] }, feature: { maxY: 2 } }
-      const seed = Topic2Seed(state, props)
-      expect(seed).toEqual([{"k": 0.5, "x": 1, "y": 1}, {"k": 1.5, "x": 2, "y": 2}])
-    })
-  })
+        shift: { shifts: [{ ref: LIST_SHIFT_1H[1], peak: [{ x: 2, y: 2 }] }] },
+        layout: '1H',
+      };
+      const props = { topic: { x: [1, 2], y: [1, 2] }, feature: { maxY: 2 } };
+      const seed = Topic2Seed(state, props);
+      expect(seed).toEqual([{ k: 0.5, x: 1, y: 1 }, { k: 1.5, x: 2, y: 2 }]);
+    });
+  });
 
   describe('Convert2Peak', () => {
     it('Convert without feature data', () => {
-      const peaksList1 = Convert2Peak(null)
-      expect(peaksList1).toEqual([])
+      const peaksList1 = Convert2Peak(null);
+      expect(peaksList1).toEqual([]);
 
-      const peaksList2 = Convert2Peak({ data: null })
-      expect(peaksList2).toEqual([])
-    })
+      const peaksList2 = Convert2Peak({ data: null });
+      expect(peaksList2).toEqual([]);
+    });
 
     it('Peaks above 1 threshold', () => {
-      const feature = { data: [{ x: [1, 2], y: [1, 2] }],  operation: { layout: LIST_LAYOUT.H1 }, maxY: 2, peakUp: true }
-      const threshold = 55
-      const offset = 0
-      const peaks = Convert2Peak(feature, threshold, offset)
-      expect(peaks).toEqual([{x: 2, y: 2}])
-    })
+      const feature = {
+        data: [{ x: [1, 2], y: [1, 2] }],
+        operation: { layout: LIST_LAYOUT.H1 },
+        maxY: 2,
+        peakUp: true,
+      };
+      const threshold = 55;
+      const offset = 0;
+      const peaks = Convert2Peak(feature, threshold, offset);
+      expect(peaks).toEqual([{ x: 2, y: 2 }]);
+    });
 
     it('Peaks below 1 threshold', () => {
-      const feature = { data: [{ x: [1, 2], y: [1, 2] }],  operation: { layout: LIST_LAYOUT.H1 }, maxY: 2, peakUp: false }
-      const threshold = 50
-      const offset = 0
-      const peaks = Convert2Peak(feature, threshold, offset)
-      expect(peaks).toEqual([{x: 1, y: 1}])
-    })
+      const feature = {
+        data: [{ x: [1, 2], y: [1, 2] }],
+        operation: { layout: LIST_LAYOUT.H1 },
+        maxY: 2,
+        peakUp: false,
+      };
+      const threshold = 50;
+      const offset = 0;
+      const peaks = Convert2Peak(feature, threshold, offset);
+      expect(peaks).toEqual([{ x: 1, y: 1 }]);
+    });
 
     it('Peaks with 2 threshold', () => {
-      const feature = { data: [{ x: [1, 2, -1, -2], y: [1, 2, -1, -2] }],  operation: { layout: LIST_LAYOUT.CYCLIC_VOLTAMMETRY }, maxY: 2, minY: -2, peakUp: true, upperThres: 55, lowerThres: 55 }
-      const threshold = 50
-      const offset = 0
-      const peaks = Convert2Peak(feature, threshold, offset)
-      expect(peaks).toEqual([{x: 2, y: 2}, {x: -2, y: -2}])
-    })
+      const feature = {
+        data: [{ x: [1, 2, -1, -2], y: [1, 2, -1, -2] }],
+        operation: { layout: LIST_LAYOUT.CYCLIC_VOLTAMMETRY },
+        maxY: 2,
+        minY: -2,
+        peakUp: true,
+        upperThres: 55,
+        lowerThres: 55,
+      };
+      const threshold = 50;
+      const offset = 0;
+      const peaks = Convert2Peak(feature, threshold, offset);
+      expect(peaks).toEqual([{ x: 2, y: 2 }, { x: -2, y: -2 }]);
+    });
 
     it('Peaks with 2 threshold cds layout', () => {
-      const feature = { data: [{ x: [1, 2, -1, -2], y: [1, 2, -1, -2] }],  operation: { layout: LIST_LAYOUT.CDS }, maxY: 2, minY: -2, peakUp: true, upperThres: 100, lowerThres: 100 }
-      const threshold = 100
-      const offset = 0
-      const peaks = Convert2Peak(feature, threshold, offset)
-      expect(peaks).toEqual([{x: 2, y: 2}, {x: -2, y: -2}])
-    })
+      const feature = {
+        data: [{ x: [1, 2, -1, -2], y: [1, 2, -1, -2] }],
+        operation: { layout: LIST_LAYOUT.CDS },
+        maxY: 2,
+        minY: -2,
+        peakUp: true,
+        upperThres: 100,
+        lowerThres: 100,
+      };
+      const threshold = 100;
+      const offset = 0;
+      const peaks = Convert2Peak(feature, threshold, offset);
+      expect(peaks).toEqual([{ x: 2, y: 2 }, { x: -2, y: -2 }]);
+    });
 
     // Review finding B4 (#232): for an LC/MS feature carrying edited/stored
     // peaks, Convert2Peak must return those peaks with the offset applied,
@@ -427,440 +454,651 @@ describe('Test for chem helper', () => {
         operation: { layout: 'LC/MS' },
         data: [{ x: [10, 11, 12], y: [1, 5, 1] }],
         peaks: [{ x: 5, y: 100 }], // user-edited / stored peaks
-      }
-      const peaks = Convert2Peak(feature, 0, 2)
-      expect(peaks).toEqual([{ x: 3, y: 100 }])
-    })
-  })
+      };
+      const peaks = Convert2Peak(feature, 0, 2);
+      expect(peaks).toEqual([{ x: 3, y: 100 }]);
+    });
+  });
 
   // Review finding B7 (#232) precondition: clearing the threshold input yields
   // an empty endpoint list (the state that made drawBar crash — the drawBar
   // guard itself is covered in components/d3_line_rect.test.js).
   describe('convertThresEndPts', () => {
     it('returns [] when the threshold is cleared', () => {
-      const feature = { maxY: 100, maxX: 10, minX: 0, data: [{ x: [1, 2], y: [3, 4] }] }
-      expect(convertThresEndPts(feature, '')).toEqual([])
-    })
-  })
+      const feature = {
+        maxY: 100, maxX: 10, minX: 0, data: [{ x: [1, 2], y: [3, 4] }],
+      };
+      expect(convertThresEndPts(feature, '')).toEqual([]);
+    });
+  });
 
   describe('Feature2Peak', () => {
-    //TODO: need more implementation
+    // TODO: need more implementation
     it('Get peaks from feature', () => {
       const state = {
         curve: { curveIdx: 0 },
         shift: { shifts: [] },
-        layout: LIST_LAYOUT.H1, threshold: { selectedIdx: 0, list: [{ value: 55 }]} } // threshold at 55%
-      const props = { feature: { data: [{ x: [1, 2], y: [1, 2] }],  operation: { layout: LIST_LAYOUT.H1 }, maxY: 2, peakUp: true }}
-      const peaks = Feature2Peak(state, props)
-      expect(peaks).toEqual([{x: 2, y: 2}])
-    })
+        layout: LIST_LAYOUT.H1,
+        threshold: { selectedIdx: 0, list: [{ value: 55 }] },
+      }; // threshold at 55%
+      const props = {
+        feature: {
+          data: [{ x: [1, 2], y: [1, 2] }],
+          operation: { layout: LIST_LAYOUT.H1 },
+          maxY: 2,
+          peakUp: true,
+        },
+      };
+      const peaks = Feature2Peak(state, props);
+      expect(peaks).toEqual([{ x: 2, y: 2 }]);
+    });
 
     it('Get peaks from feature with 2 thresholds', () => {
       const state = {
         curve: { curveIdx: 0 },
         shift: { shifts: [] },
-        layout: LIST_LAYOUT.CYCLIC_VOLTAMMETRY } // threshold at 55%
-      const props = { 
-        feature: { data: [{ x: [1, 2, -1, -2], y: [1, 2, -1, -2] }],
-        operation: { layout: LIST_LAYOUT.CYCLIC_VOLTAMMETRY },
-        maxY: 2, minY: -2, peakUp: true, upperThres: 55, lowerThres: 55 }}
-      const peaks = Feature2Peak(state, props)
-      expect(peaks).toEqual([{x: 2, y: 2}, {x: -2, y: -2}])
-    })
-  })
+        layout: LIST_LAYOUT.CYCLIC_VOLTAMMETRY,
+      }; // threshold at 55%
+      const props = {
+        feature: {
+          data: [{ x: [1, 2, -1, -2], y: [1, 2, -1, -2] }],
+          operation: { layout: LIST_LAYOUT.CYCLIC_VOLTAMMETRY },
+          maxY: 2,
+          minY: -2,
+          peakUp: true,
+          upperThres: 55,
+          lowerThres: 55,
+        },
+      };
+      const peaks = Feature2Peak(state, props);
+      expect(peaks).toEqual([{ x: 2, y: 2 }, { x: -2, y: -2 }]);
+    });
+  });
 
   describe('Test get threshold position in the render view', () => {
     it('Get threshold position', () => {
       const state = {
-        shift: { ref: null }, layout: '1H',
+        shift: { ref: null },
+        layout: '1H',
         curve: { curveIdx: 0 },
-        threshold: { selectedIdx: 0, list: [{ value: 55 }]} } // threshold at 55%
-      const props = { feature: { data: [{ x: [1, 2], y: [1, 2] }],  operation: { layout: '1H'}, maxY: 2, maxX: 2, minX: 1, peakUp: true }}
-      const thresholdsAt = ToThresEndPts(state, props)
-      expect(thresholdsAt).toEqual([{"x": -199, "y": 1.1}, {"x": 202, "y": 1.1}])
-    })
-  })
+        threshold: { selectedIdx: 0, list: [{ value: 55 }] },
+      }; // threshold at 55%
+      const props = {
+        feature: {
+          data: [{ x: [1, 2], y: [1, 2] }], operation: { layout: '1H' }, maxY: 2, maxX: 2, minX: 1, peakUp: true,
+        },
+      };
+      const thresholdsAt = ToThresEndPts(state, props);
+      expect(thresholdsAt).toEqual([{ x: -199, y: 1.1 }, { x: 202, y: 1.1 }]);
+    });
+  });
 
   describe('Test get shifted peaks', () => {
-    //TODO: need more implementation
+    // TODO: need more implementation
     describe('Get shifted peaks from single curve', () => {
-      const props = { feature: { data: [{ x: [1, 2, 3], y: [1, 2, 3] }],  operation: { layout: '1H'}, maxY: 2, peakUp: true }}
+      const props = {
+        feature: {
+          data: [{ x: [1, 2, 3], y: [1, 2, 3] }], operation: { layout: '1H' }, maxY: 2, peakUp: true,
+        },
+      };
 
       it('No shifted peaks', () => {
         const state = {
           curve: { curveIdx: 0 },
-          shift: { shifts: [] }, layout: LIST_LAYOUT.H1, threshold: {value: 55} 
-        } // threshold at 55%
-        
-        const peaks = ToShiftPeaks(state, props)
-        expect(peaks).toEqual([])
-      })
+          shift: { shifts: [] },
+          layout: LIST_LAYOUT.H1,
+          threshold: { value: 55 },
+        }; // threshold at 55%
+
+        const peaks = ToShiftPeaks(state, props);
+        expect(peaks).toEqual([]);
+      });
 
       it('Has shifted peaks', () => {
         const state = {
           curve: { curveIdx: 0 },
-          shift: { shifts: [{ ref: LIST_SHIFT_1H[1], peak: {x: 2, y: 2 }}] }, layout: '1H', threshold: {value: 55} 
-        } // threshold at 55%
-        
-        const peaks = ToShiftPeaks(state, props)
-        expect(peaks).toEqual([{x: 2.04, y: 2}])
-      })
-    })
-  })
+          shift: { shifts: [{ ref: LIST_SHIFT_1H[1], peak: { x: 2, y: 2 } }] },
+          layout: '1H',
+          threshold: { value: 55 },
+        }; // threshold at 55%
+
+        const peaks = ToShiftPeaks(state, props);
+        expect(peaks).toEqual([{ x: 2.04, y: 2 }]);
+      });
+    });
+  });
 
   describe('Test get frequency', () => {
-    const listNMRLayout = ['1H', '13C', '19F', '31P', '15N', '29Si']
+    const listNMRLayout = ['1H', '13C', '19F', '31P', '15N', '29Si'];
     describe('Cannot get freqency', () => {
       it('Not the NMR layout', () => {
-        const state = { layout: 'IR' }
-        const props = { feature: null }
-        const freq = ToFrequency(state, props)
-        expect(freq).toEqual(false)
-      })
+        const state = { layout: 'IR' };
+        const props = { feature: null };
+        const freq = ToFrequency(state, props);
+        expect(freq).toEqual(false);
+      });
 
       it('Is the NMR layout', () => {
-        const props = { feature: {} }
-        listNMRLayout.forEach(layout => {
-          const state = { layout: layout }
-          const freq = ToFrequency(state, props)
-          expect(freq).toEqual(false)
+        const props = { feature: {} };
+        listNMRLayout.forEach((layout) => {
+          const state = { layout };
+          const freq = ToFrequency(state, props);
+          expect(freq).toEqual(false);
         });
-      })
+      });
 
       it('Invalid observered frequency', () => {
-        const props = { feature: { observeFrequency: null }}
-        listNMRLayout.forEach(layout => {
-          const state = { layout: layout }
-          const freq = ToFrequency(state, props)
-          expect(freq).toEqual(false)
+        const props = { feature: { observeFrequency: null } };
+        listNMRLayout.forEach((layout) => {
+          const state = { layout };
+          const freq = ToFrequency(state, props);
+          expect(freq).toEqual(false);
         });
-      })
-    })
+      });
+    });
 
     describe('Get the frequency', () => {
-      const props = { feature: { observeFrequency: 10.5 }}
-      listNMRLayout.forEach(layout => {
-        const state = { layout: layout }
-        const freq = ToFrequency(state, props)
-        expect(freq).toEqual(10.5)
+      const props = { feature: { observeFrequency: 10.5 } };
+      listNMRLayout.forEach((layout) => {
+        const state = { layout };
+        const freq = ToFrequency(state, props);
+        expect(freq).toEqual(10.5);
       });
-    })
-  })
+    });
+  });
 
   describe('Test get scan', () => {
     it('Get defaut scan auto index', () => {
-      const feature = { scanAutoTarget: 0, scanEditTarget: 1 }
-      const scanState = { isAuto: true }
-      const scanIdx = Convert2Scan(feature, scanState)
-      expect(scanIdx).toEqual(0)
-    })
+      const feature = { scanAutoTarget: 0, scanEditTarget: 1 };
+      const scanState = { isAuto: true };
+      const scanIdx = Convert2Scan(feature, scanState);
+      expect(scanIdx).toEqual(0);
+    });
 
     it('Get scan index from target', () => {
-      const feature = { scanAutoTarget: 0, scanEditTarget: 1 }
-      const scanState = { target: 1, isAuto: true }
-      const scanIdx = Convert2Scan(feature, scanState)
-      expect(scanIdx).toEqual(1)
-    })
+      const feature = { scanAutoTarget: 0, scanEditTarget: 1 };
+      const scanState = { target: 1, isAuto: true };
+      const scanIdx = Convert2Scan(feature, scanState);
+      expect(scanIdx).toEqual(1);
+    });
 
     it('Get edited scan index', () => {
-      const feature = { scanAutoTarget: 0, scanEditTarget: 2 }
-      const scanState = { target: 2, isAuto: false }
-      const scanIdx = Convert2Scan(feature, scanState)
-      expect(scanIdx).toEqual(2)
-    })
-  })
+      const feature = { scanAutoTarget: 0, scanEditTarget: 2 };
+      const scanState = { target: 2, isAuto: false };
+      const scanIdx = Convert2Scan(feature, scanState);
+      expect(scanIdx).toEqual(2);
+    });
+  });
 
   describe('Test convert to threshold', () => {
     it('Convert with threshold state data', () => {
-      const threshold = Convert2Thres({}, { value: 50.1 })
-      expect(threshold).toEqual(50.1)
-    })
+      const threshold = Convert2Thres({}, { value: 50.1 });
+      expect(threshold).toEqual(50.1);
+    });
 
     it('Convert with feature data', () => {
-      const threshold = Convert2Thres({thresRef: 40.1}, { value: null})
-      expect(threshold).toEqual(40.1)
-    })
+      const threshold = Convert2Thres({ thresRef: 40.1 }, { value: null });
+      expect(threshold).toEqual(40.1);
+    });
 
     it('Convert with feature data and threshold state', () => {
-      const threshold = Convert2Thres({thresRef: 40.1}, { value: 50.1})
-      expect(threshold).toEqual(50.1)
-    })
-  })
+      const threshold = Convert2Thres({ thresRef: 40.1 }, { value: 50.1 });
+      expect(threshold).toEqual(50.1);
+    });
+  });
 
   describe('Test get comparison spectra', () => {
-    const layoutShouldView = [LIST_LAYOUT.IR, LIST_LAYOUT.HPLC_UVVIS, LIST_LAYOUT.XRD,]
-    const layoutShouldHide = [LIST_LAYOUT.C13, LIST_LAYOUT.H1, LIST_LAYOUT.F19, LIST_LAYOUT.P31, LIST_LAYOUT.N15, LIST_LAYOUT.Si29,
-      LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS, 
+    const layoutShouldView = [LIST_LAYOUT.IR, LIST_LAYOUT.HPLC_UVVIS, LIST_LAYOUT.XRD];
+    const layoutShouldHide = [
+      LIST_LAYOUT.C13,
+      LIST_LAYOUT.H1,
+      LIST_LAYOUT.F19,
+      LIST_LAYOUT.P31,
+      LIST_LAYOUT.N15,
+      LIST_LAYOUT.Si29,
+      LIST_LAYOUT.RAMAN, LIST_LAYOUT.UVVIS,
       LIST_LAYOUT.MS,
       LIST_LAYOUT.TGA, LIST_LAYOUT.DSC, LIST_LAYOUT.CYCLIC_VOLTAMMETRY,
-      LIST_LAYOUT.CDS, LIST_LAYOUT.SEC, LIST_LAYOUT.GC]
+      LIST_LAYOUT.CDS, LIST_LAYOUT.SEC, LIST_LAYOUT.GC];
 
     describe('Layouts do not have comparison', () => {
       it('No other spectra', () => {
-        const state = {}
-        const props = { feature: {} }
-        const comparison = GetComparisons(state, props)
-        expect(comparison).toEqual([])
-      })
+        const state = {};
+        const props = { feature: {} };
+        const comparison = GetComparisons(state, props);
+        expect(comparison).toEqual([]);
+      });
 
       it('Is not layout has comparison function', () => {
-        const props = { feature: {}, comparisons: ['compare1'] }
-        layoutShouldHide.forEach(layout => {
-          const state = { layout: layout }
-          const comparison = GetComparisons(state, props)
-          expect(comparison).toEqual([])
-        })
-      })
-    })
+        const props = { feature: {}, comparisons: ['compare1'] };
+        layoutShouldHide.forEach((layout) => {
+          const state = { layout };
+          const comparison = GetComparisons(state, props);
+          expect(comparison).toEqual([]);
+        });
+      });
+    });
 
     describe('Layouts has comparison', () => {
       it('Get comparisons', () => {
         const comparisons = [
-          {spectra: [{data: [{x: [1, 2], y: [1, 2]}]}], show: true},
-          {spectra: [{data: [{x: [3, 4], y: [3, 4]}]}], show: false}
-        ]
+          { spectra: [{ data: [{ x: [1, 2], y: [1, 2] }] }], show: true },
+          { spectra: [{ data: [{ x: [3, 4], y: [3, 4] }] }], show: false },
+        ];
         const expectedData = [
-          {data: [{x: 1, y: 1}], show: true},
-          {data: [{x: 3, y: 1}], show: false}
-        ]
-        const props = { feature: { minY: 1, maxY: 2 }, comparisons: comparisons }
-        layoutShouldView.forEach(layout => {
-          const state = { layout: layout }
-          const comparison = GetComparisons(state, props)
-          expect(comparison).toEqual(expectedData)
-        })
-      })
-    })
-  })
+          { data: [{ x: 1, y: 1 }], show: true },
+          { data: [{ x: 3, y: 1 }], show: false },
+        ];
+        const props = { feature: { minY: 1, maxY: 2 }, comparisons };
+        layoutShouldView.forEach((layout) => {
+          const state = { layout };
+          const comparison = GetComparisons(state, props);
+          expect(comparison).toEqual(expectedData);
+        });
+      });
+    });
+  });
 
   describe('Test get 2d value for XRD layout', () => {
-    const doubleTheta = 4.0
-    const lambda = 0.15406
+    const doubleTheta = 4.0;
+    const lambda = 0.15406;
     it('Get 2D value without radian', () => {
-      const dValue = Convert2DValue(doubleTheta, lambda, false)
-      expect(dValue.toFixed(3)).toEqual('0.085')
-    })
+      const dValue = Convert2DValue(doubleTheta, lambda, false);
+      expect(dValue.toFixed(3)).toEqual('0.085');
+    });
 
     it('Get 2D value with radian', () => {
-      const dValue = Convert2DValue(doubleTheta, lambda, true)
-      expect(dValue.toFixed(3)).toEqual('2.207')
-    })
-  })
+      const dValue = Convert2DValue(doubleTheta, lambda, true);
+      expect(dValue.toFixed(3)).toEqual('2.207');
+    });
+  });
 
   describe('Test get ratio for CV layout', () => {
     it('Get 2D value without radian', () => {
-      const y_max_peak = 2.0
-      const y_min_peak = 1.0
-      const y_pecker = 3.0
-      const ratio = GetCyclicVoltaRatio(y_max_peak, y_min_peak, y_pecker).toFixed(4)
-      expect(ratio).toEqual('1.3135')
-    })
-  })
+      const yMaxPeak = 2.0;
+      const yMinPeak = 1.0;
+      const yPecker = 3.0;
+      const ratio = GetCyclicVoltaRatio(yMaxPeak, yMinPeak, yPecker).toFixed(4);
+      expect(ratio).toEqual('1.3135');
+    });
+  });
 
   describe('Test get delta for CV layout', () => {
     it('Get 2D value without radian', () => {
-      const x_max_peak = 2.0
-      const x_min_peak = -1.5
-      const delta = GetCyclicVoltaPeakSeparate(x_max_peak, x_min_peak)
-      expect(delta).toEqual(3.5)
-    })
-  })
+      const xMaxPeak = 2.0;
+      const xMinPeak = -1.5;
+      const delta = GetCyclicVoltaPeakSeparate(xMaxPeak, xMinPeak);
+      expect(delta).toEqual(3.5);
+    });
+  });
 
   describe('Test convert to max and min peak for CV layout', () => {
     describe('Do not have max min peaks', () => {
       it('Layout is not CV', () => {
-        const peaksList = Convert2MaxMinPeak(LIST_LAYOUT.H1)
-        expect(peaksList).toBeNull()
-      })
+        const peaksList = Convert2MaxMinPeak(LIST_LAYOUT.H1);
+        expect(peaksList).toBeNull();
+      });
 
       it('Layout is CV but does not have feature', () => {
-        const peaksList = Convert2MaxMinPeak(LIST_LAYOUT.CYCLIC_VOLTAMMETRY)
-        expect(peaksList).toBeNull()
-      })
+        const peaksList = Convert2MaxMinPeak(LIST_LAYOUT.CYCLIC_VOLTAMMETRY);
+        expect(peaksList).toBeNull();
+      });
 
       it('Layout is CV but does not have feature data', () => {
-        const feature = { data: null }
-        const peaksList = Convert2MaxMinPeak(LIST_LAYOUT.CYCLIC_VOLTAMMETRY, feature)
-        expect(peaksList).toBeNull()
-      })
-    })
+        const feature = { data: null };
+        const peaksList = Convert2MaxMinPeak(LIST_LAYOUT.CYCLIC_VOLTAMMETRY, feature);
+        expect(peaksList).toBeNull();
+      });
+    });
 
     describe('Have max min peaks', () => {
       it('Feature does not have voltammetry data', () => {
-        const feature = { 
+        const feature = {
           data: [
-            { x: [1, 2, -1], y: [1, 2, -1]}
+            { x: [1, 2, -1], y: [1, 2, -1] },
           ],
-          upperThres: 90.0, lowerThres: 90.0, maxY: 2, minY: -1
-        }
-        const peaksList = Convert2MaxMinPeak(LIST_LAYOUT.CYCLIC_VOLTAMMETRY, feature, 0)
-        expect(peaksList).toEqual({max: [], min: [], pecker: [], refIndex: -1})
-      })
+          upperThres: 90.0,
+          lowerThres: 90.0,
+          maxY: 2,
+          minY: -1,
+        };
+        const peaksList = Convert2MaxMinPeak(LIST_LAYOUT.CYCLIC_VOLTAMMETRY, feature, 0);
+        expect(peaksList).toEqual({
+          max: [], min: [], pecker: [], refIndex: -1,
+        });
+      });
 
       it('Feature has voltammetry data but no ref info', () => {
-        const feature = { 
+        const feature = {
           data: [
-            { x: [1, 2, -1], y: [1, 2, -1]}
+            { x: [1, 2, -1], y: [1, 2, -1] },
           ],
-          upperThres: 90.0, lowerThres: 90.0, maxY: 2, minY: -1,
-          volammetryData: [{ max: { x: 1, y: 1 }, min: { x: -1, y: -1 }, pecker: { x: 3, y: 3 } }]
-        }
-        const peaksList = Convert2MaxMinPeak(LIST_LAYOUT.CYCLIC_VOLTAMMETRY, feature, 0)
-        expect(peaksList).toEqual({max: [{x: 1, y: 1}], min: [{x: -1, y: -1}], pecker: [{ x: 3, y: 3 }], refIndex: -1})
-      })
+          upperThres: 90.0,
+          lowerThres: 90.0,
+          maxY: 2,
+          minY: -1,
+          volammetryData: [{ max: { x: 1, y: 1 }, min: { x: -1, y: -1 }, pecker: { x: 3, y: 3 } }],
+        };
+        const peaksList = Convert2MaxMinPeak(LIST_LAYOUT.CYCLIC_VOLTAMMETRY, feature, 0);
+        expect(peaksList).toEqual({
+          max: [{ x: 1, y: 1 }], min: [{ x: -1, y: -1 }], pecker: [{ x: 3, y: 3 }], refIndex: -1,
+        });
+      });
 
       it('Feature has voltammetry data with ref info', () => {
-        const feature = { 
+        const feature = {
           data: [
-            { x: [1, 2, -1], y: [1, 2, -1]}
+            { x: [1, 2, -1], y: [1, 2, -1] },
           ],
-          upperThres: 90.0, lowerThres: 90.0, maxY: 2, minY: -1,
-          volammetryData: [{ max: { x: 1, y: 1 }, min: { x: -1, y: -1 }, pecker: { x: 3, y: 3 }, isRef: true }]
-        }
-        const peaksList = Convert2MaxMinPeak(LIST_LAYOUT.CYCLIC_VOLTAMMETRY, feature, 0)
-        expect(peaksList).toEqual({max: [{x: 1, y: 1}], min: [{x: -1, y: -1}], pecker: [{ x: 3, y: 3 }], refIndex: 0})
-      })
-    })
-  })
+          upperThres: 90.0,
+          lowerThres: 90.0,
+          maxY: 2,
+          minY: -1,
+          volammetryData: [{
+            max: { x: 1, y: 1 }, min: { x: -1, y: -1 }, pecker: { x: 3, y: 3 }, isRef: true,
+          }],
+        };
+        const peaksList = Convert2MaxMinPeak(LIST_LAYOUT.CYCLIC_VOLTAMMETRY, feature, 0);
+        expect(peaksList).toEqual({
+          max: [{ x: 1, y: 1 }], min: [{ x: -1, y: -1 }], pecker: [{ x: 3, y: 3 }], refIndex: 0,
+        });
+      });
+    });
+  });
 
   describe('Test convert feature to max and min peak for CV layout', () => {
     it('Get max min peaks from feature', () => {
       const state = {
         curve: { curveIdx: 0 },
-        shift: { shifts: [] }, layout: LIST_LAYOUT.CYCLIC_VOLTAMMETRY,
-      }
-      const feature = { 
+        shift: { shifts: [] },
+        layout: LIST_LAYOUT.CYCLIC_VOLTAMMETRY,
+      };
+      const feature = {
         data: [
-          { x: [1, 2, -1], y: [1, 2, -1]}
+          { x: [1, 2, -1], y: [1, 2, -1] },
         ],
-        upperThres: 90.0, lowerThres: 90.0, maxY: 2, minY: -1,
-        volammetryData: [{ max: { x: 1, y: 1 }, min: { x: -1, y: -1 }, pecker: { x: 3, y: 3 }, isRef: true }]
-      }
-      const props = { feature: feature}
-      const peaksList = Feature2MaxMinPeak(state, props)
-      expect(peaksList).toEqual({max: [{x: 1, y: 1}], min: [{x: -1, y: -1}], pecker: [{ x: 3, y: 3 }], refIndex: 0})
-    })
-  })
+        upperThres: 90.0,
+        lowerThres: 90.0,
+        maxY: 2,
+        minY: -1,
+        volammetryData: [{
+          max: { x: 1, y: 1 }, min: { x: -1, y: -1 }, pecker: { x: 3, y: 3 }, isRef: true,
+        }],
+      };
+      const props = { feature };
+      const peaksList = Feature2MaxMinPeak(state, props);
+      expect(peaksList).toEqual({
+        max: [{ x: 1, y: 1 }], min: [{ x: -1, y: -1 }], pecker: [{ x: 3, y: 3 }], refIndex: 0,
+      });
+    });
+  });
 
   describe('Test get offset CV layout', () => {
-    const voltaData = {"spectraList":[{"list":[{"min":{"x":-1.5404,"y":-0.00000307144},"max":{"x":0.10003,"y":0.00000285434},"isRef":true,"e12":-0.720185,"pecker":{"x":0.380242,"y":0.00000164361}}],"selectedIdx":0,"isWorkMaxPeak":true,"jcampIdx":0,"shift":{"ref":{"min":{"x":-1.5404,"y":-0.00000307144},"max":{"x":0.10003,"y":0.00000285434},"isRef":true,"e12":-0.720185,"pecker":{"x":0.380242,"y":0.00000164361}},"val":0}},{"list":[{"min":{"x":-1.48904,"y":-0.000033747399999999995},"max":{"x":0.929483,"y":0.00023741},"isRef":true,"e12":-0.27977849999999993}],"selectedIdx":0,"isWorkMaxPeak":true,"jcampIdx":1,"shift":{"ref":{"min":{"x":-1.48904,"y":-0.000033747399999999995},"max":{"x":0.929483,"y":0.00023741},"isRef":true,"e12":-0.27977849999999993},"val":1.5}},{"list":[{"min":{"x":0.45977,"y":-0.000226347},"max":{"x":1.00943,"y":0.000371349},"isRef":false,"e12":0.7346}],"selectedIdx":0,"isWorkMaxPeak":true,"jcampIdx":2,"shift":{"ref":null,"val":0}}]}
+    const voltaData = {
+      spectraList: [{
+        list: [{
+          min: { x: -1.5404, y: -0.00000307144 },
+          max: { x: 0.10003, y: 0.00000285434 },
+          isRef: true,
+          e12: -0.720185,
+          pecker: { x: 0.380242, y: 0.00000164361 },
+        }],
+        selectedIdx: 0,
+        isWorkMaxPeak: true,
+        jcampIdx: 0,
+        shift: {
+          ref: {
+            min: { x: -1.5404, y: -0.00000307144 },
+            max: { x: 0.10003, y: 0.00000285434 },
+            isRef: true,
+            e12: -0.720185,
+            pecker: { x: 0.380242, y: 0.00000164361 },
+          },
+          val: 0,
+        },
+      }, {
+        list: [{
+          min: { x: -1.48904, y: -0.000033747399999999995 },
+          max: { x: 0.929483, y: 0.00023741 },
+          isRef: true,
+          e12: -0.27977849999999993,
+        }],
+        selectedIdx: 0,
+        isWorkMaxPeak: true,
+        jcampIdx: 1,
+        shift: {
+          ref: {
+            min: { x: -1.48904, y: -0.000033747399999999995 },
+            max: { x: 0.929483, y: 0.00023741 },
+            isRef: true,
+            e12: -0.27977849999999993,
+          },
+          val: 1.5,
+        },
+      }, {
+        list: [{
+          min: { x: 0.45977, y: -0.000226347 },
+          max: { x: 1.00943, y: 0.000371349 },
+          isRef: false,
+          e12: 0.7346,
+        }],
+        selectedIdx: 0,
+        isWorkMaxPeak: true,
+        jcampIdx: 2,
+        shift: { ref: null, val: 0 },
+      }],
+    };
     it('When it does not have volta data', () => {
-      const offset = GetCyclicVoltaShiftOffset(null)
-      expect(offset).toEqual(0.0)
-    })
+      const offset = GetCyclicVoltaShiftOffset(null);
+      expect(offset).toEqual(0.0);
+    });
 
     it('When it has ref with Ref0V == 0', () => {
-      const offset = GetCyclicVoltaShiftOffset(voltaData, 0)
-      expect(offset).toEqual(-0.720185)
-      expect(offset.toFixed(3)).toEqual("-0.720")
-    })
+      const offset = GetCyclicVoltaShiftOffset(voltaData, 0);
+      expect(offset).toEqual(-0.720185);
+      expect(offset.toFixed(3)).toEqual('-0.720');
+    });
 
     it('When it has ref with Ref0V == 1.5', () => {
-      const offset = GetCyclicVoltaShiftOffset(voltaData, 1)
-      expect(offset).toEqual(-1.7797785)
-      expect(offset.toFixed(3)).toEqual("-1.780")
-    })
+      const offset = GetCyclicVoltaShiftOffset(voltaData, 1);
+      expect(offset).toEqual(-1.7797785);
+      expect(offset.toFixed(3)).toEqual('-1.780');
+    });
 
     it('When it does not have ref value', () => {
-      const offset = GetCyclicVoltaShiftOffset(voltaData, 2)
-      expect(offset).toEqual(0.0)
-    })
-  })
+      const offset = GetCyclicVoltaShiftOffset(voltaData, 2);
+      expect(offset).toEqual(0.0);
+    });
+  });
 
   describe('Test build integration feature with persistent visualSplitGroupId', () => {
-    const linearSpectra = [{ data: [{ x: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], y: [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0] }] }]
+    const linearSpectra = [{
+      data: [{ x: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], y: [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0] }],
+    }];
     const buildJcamp = (records: Record<string, string>) => ({
       info: { ...records },
       spectra: [{}],
-    })
+    });
 
     it('returns integrations without groupId for legacy JCAMPs', () => {
       const jcamp: any = buildJcamp({
         $OBSERVEDINTEGRALS: '\n0, 10, 5, 5',
-      })
-      const feature = buildIntegFeature(jcamp, linearSpectra)
-      expect(feature.stack).toHaveLength(1)
-      expect(feature.stack[0]).toMatchObject({ xL: 0, xU: 10 })
-      expect(feature.stack[0].visualSplitGroupId).toBeUndefined()
-    })
+      });
+      const feature = buildIntegFeature(jcamp, linearSpectra);
+      expect(feature.stack).toHaveLength(1);
+      expect(feature.stack[0]).toMatchObject({ xL: 0, xU: 10 });
+      expect(feature.stack[0].visualSplitGroupId).toBeUndefined();
+    });
 
     it('attaches a visualSplitGroupId from the JCAMP record', () => {
       const jcamp: any = buildJcamp({
         $OBSERVEDINTEGRALS: '\n0, 4, 2, 2\n4, 10, 3, 3',
         $OBSERVEDINTEGRALSGROUPS: '\n0, vsg-abc-1\n1, vsg-abc-1',
-      })
-      const feature = buildIntegFeature(jcamp, linearSpectra)
-      expect(feature.stack[0].visualSplitGroupId).toBe('vsg-abc-1')
-      expect(feature.stack[1].visualSplitGroupId).toBe('vsg-abc-1')
-    })
+      });
+      const feature = buildIntegFeature(jcamp, linearSpectra);
+      expect(feature.stack[0].visualSplitGroupId).toBe('vsg-abc-1');
+      expect(feature.stack[1].visualSplitGroupId).toBe('vsg-abc-1');
+    });
 
     it('preserves alphanumeric and dash characters in the groupId token', () => {
       const jcamp: any = buildJcamp({
         $OBSERVEDINTEGRALS: '\n0, 10, 5, 5',
         $OBSERVEDINTEGRALSGROUPS: '\n0, vsg-token_42-XYZ',
-      })
-      const feature = buildIntegFeature(jcamp, linearSpectra)
-      expect(feature.stack[0].visualSplitGroupId).toBe('vsg-token_42-XYZ')
-    })
+      });
+      const feature = buildIntegFeature(jcamp, linearSpectra);
+      expect(feature.stack[0].visualSplitGroupId).toBe('vsg-token_42-XYZ');
+    });
 
     it('ignores groupId rows pointing to non existing integrations', () => {
       const jcamp: any = buildJcamp({
         $OBSERVEDINTEGRALS: '\n0, 10, 5, 5',
         $OBSERVEDINTEGRALSGROUPS: '\n5, vsg-orphan',
-      })
-      const feature = buildIntegFeature(jcamp, linearSpectra)
-      expect(feature.stack[0].visualSplitGroupId).toBeUndefined()
-    })
+      });
+      const feature = buildIntegFeature(jcamp, linearSpectra);
+      expect(feature.stack[0].visualSplitGroupId).toBeUndefined();
+    });
 
     it('keeps the groupId after the area normalisation pass', () => {
       const jcamp: any = buildJcamp({
         $OBSERVEDINTEGRALS: '\n0, 10, 5, 5',
         $OBSERVEDINTEGRALSGROUPS: '\n0, vsg-abc',
-      })
-      const feature = buildIntegFeature(jcamp, linearSpectra)
-      expect(feature.stack[0].visualSplitGroupId).toBe('vsg-abc')
-      expect(feature.stack[0].area).toBeDefined()
-    })
+      });
+      const feature = buildIntegFeature(jcamp, linearSpectra);
+      expect(feature.stack[0].visualSplitGroupId).toBe('vsg-abc');
+      expect(feature.stack[0].area).toBeDefined();
+    });
 
     it('parses GROUPS records that have no leading newline (header-less convention)', () => {
       const jcamp: any = buildJcamp({
         $OBSERVEDINTEGRALS: '\n0, 4, 2, 2\n4, 10, 3, 3',
         $OBSERVEDINTEGRALSGROUPS: '0, vsg-headerless\n1, vsg-headerless',
-      })
-      const feature = buildIntegFeature(jcamp, linearSpectra)
-      expect(feature.stack[0].visualSplitGroupId).toBe('vsg-headerless')
-      expect(feature.stack[1].visualSplitGroupId).toBe('vsg-headerless')
-    })
+      });
+      const feature = buildIntegFeature(jcamp, linearSpectra);
+      expect(feature.stack[0].visualSplitGroupId).toBe('vsg-headerless');
+      expect(feature.stack[1].visualSplitGroupId).toBe('vsg-headerless');
+    });
 
     it('ignores an arbitrary header line and still maps all valid rows', () => {
       const jcamp: any = buildJcamp({
         $OBSERVEDINTEGRALS: '\n0, 4, 2, 2\n4, 10, 3, 3',
         $OBSERVEDINTEGRALSGROUPS: ' (X Y)\n0, vsg-hdr\n1, vsg-hdr',
-      })
-      const feature = buildIntegFeature(jcamp, linearSpectra)
-      expect(feature.stack[0].visualSplitGroupId).toBe('vsg-hdr')
-      expect(feature.stack[1].visualSplitGroupId).toBe('vsg-hdr')
-    })
-  })
+      });
+      const feature = buildIntegFeature(jcamp, linearSpectra);
+      expect(feature.stack[0].visualSplitGroupId).toBe('vsg-hdr');
+      expect(feature.stack[1].visualSplitGroupId).toBe('vsg-hdr');
+    });
+  });
 
   describe('Test get previous offset CV layout', () => {
-    const voltaData = {"spectraList":[{"list":[{"min":{"x":-1.5404,"y":-0.00000307144},"max":{"x":0.10003,"y":0.00000285434},"isRef":true,"e12":-0.720185,"pecker":{"x":0.380242,"y":0.00000164361}}],"selectedIdx":0,"isWorkMaxPeak":true,"jcampIdx":0,"shift":{"ref":{"min":{"x":-1.5404,"y":-0.00000307144},"max":{"x":0.10003,"y":0.00000285434},"isRef":true,"e12":-0.720185,"pecker":{"x":0.380242,"y":0.00000164361}},"val":0, "prevValue":0.5},"hasRefPeak":true},{"list":[{"min":{"x":-1.48904,"y":-0.000033747399999999995},"max":{"x":0.929483,"y":0.00023741},"isRef":true,"e12":-0.27977849999999993}],"selectedIdx":0,"isWorkMaxPeak":true,"jcampIdx":1,"shift":{"ref":{"min":{"x":-1.48904,"y":-0.000033747399999999995},"max":{"x":0.929483,"y":0.00023741},"isRef":true,"e12":-0.27977849999999993},"val":1.5}},{"list":[{"min":{"x":0.45977,"y":-0.000226347},"max":{"x":1.00943,"y":0.000371349},"isRef":false,"e12":0.7346}],"selectedIdx":0,"isWorkMaxPeak":true,"jcampIdx":2,"shift":{"ref":null,"val":0}}]}
-    const voltaDataNoRef = {"spectraList":[{"list":[{"min":{"x":-1.5404,"y":-0.00000307144},"max":{"x":0.10003,"y":0.00000285434},"isRef":false,"e12":-0.720185,"pecker":{"x":0.380242,"y":0.00000164361}}],"selectedIdx":0,"isWorkMaxPeak":true,"jcampIdx":0,"shift":{"ref":null,"val":0, "prevValue":0.5},"hasRefPeak":false},{"list":[{"min":{"x":-1.48904,"y":-0.000033747399999999995},"max":{"x":0.929483,"y":0.00023741},"isRef":true,"e12":-0.27977849999999993}],"selectedIdx":0,"isWorkMaxPeak":true,"jcampIdx":1,"shift":{"ref":null,"val":1.5}},{"list":[{"min":{"x":0.45977,"y":-0.000226347},"max":{"x":1.00943,"y":0.000371349},"isRef":false,"e12":0.7346}],"selectedIdx":0,"isWorkMaxPeak":true,"jcampIdx":2,"shift":{"ref":null,"val":0}}]}
+    const voltaData = {
+      spectraList: [{
+        list: [{
+          min: { x: -1.5404, y: -0.00000307144 },
+          max: { x: 0.10003, y: 0.00000285434 },
+          isRef: true,
+          e12: -0.720185,
+          pecker: { x: 0.380242, y: 0.00000164361 },
+        }],
+        selectedIdx: 0,
+        isWorkMaxPeak: true,
+        jcampIdx: 0,
+        shift: {
+          ref: {
+            min: { x: -1.5404, y: -0.00000307144 },
+            max: { x: 0.10003, y: 0.00000285434 },
+            isRef: true,
+            e12: -0.720185,
+            pecker: { x: 0.380242, y: 0.00000164361 },
+          },
+          val: 0,
+          prevValue: 0.5,
+        },
+        hasRefPeak: true,
+      }, {
+        list: [{
+          min: { x: -1.48904, y: -0.000033747399999999995 },
+          max: { x: 0.929483, y: 0.00023741 },
+          isRef: true,
+          e12: -0.27977849999999993,
+        }],
+        selectedIdx: 0,
+        isWorkMaxPeak: true,
+        jcampIdx: 1,
+        shift: {
+          ref: {
+            min: { x: -1.48904, y: -0.000033747399999999995 },
+            max: { x: 0.929483, y: 0.00023741 },
+            isRef: true,
+            e12: -0.27977849999999993,
+          },
+          val: 1.5,
+        },
+      }, {
+        list: [{
+          min: { x: 0.45977, y: -0.000226347 },
+          max: { x: 1.00943, y: 0.000371349 },
+          isRef: false,
+          e12: 0.7346,
+        }],
+        selectedIdx: 0,
+        isWorkMaxPeak: true,
+        jcampIdx: 2,
+        shift: { ref: null, val: 0 },
+      }],
+    };
+    const voltaDataNoRef = {
+      spectraList: [{
+        list: [{
+          min: { x: -1.5404, y: -0.00000307144 },
+          max: { x: 0.10003, y: 0.00000285434 },
+          isRef: false,
+          e12: -0.720185,
+          pecker: { x: 0.380242, y: 0.00000164361 },
+        }],
+        selectedIdx: 0,
+        isWorkMaxPeak: true,
+        jcampIdx: 0,
+        shift: { ref: null, val: 0, prevValue: 0.5 },
+        hasRefPeak: false,
+      }, {
+        list: [{
+          min: { x: -1.48904, y: -0.000033747399999999995 },
+          max: { x: 0.929483, y: 0.00023741 },
+          isRef: true,
+          e12: -0.27977849999999993,
+        }],
+        selectedIdx: 0,
+        isWorkMaxPeak: true,
+        jcampIdx: 1,
+        shift: { ref: null, val: 1.5 },
+      }, {
+        list: [{
+          min: { x: 0.45977, y: -0.000226347 },
+          max: { x: 1.00943, y: 0.000371349 },
+          isRef: false,
+          e12: 0.7346,
+        }],
+        selectedIdx: 0,
+        isWorkMaxPeak: true,
+        jcampIdx: 2,
+        shift: { ref: null, val: 0 },
+      }],
+    };
     it('When it does not have volta data', () => {
-      const offset = GetCyclicVoltaPreviousShift(null)
-      expect(offset).toEqual(0.0)
-    })
+      const offset = GetCyclicVoltaPreviousShift(null);
+      expect(offset).toEqual(0.0);
+    });
 
     it('When it has prev data', () => {
-      const offset = GetCyclicVoltaPreviousShift(voltaData, 0)
-      expect(offset).toEqual(0.5)
-    })
+      const offset = GetCyclicVoltaPreviousShift(voltaData, 0);
+      expect(offset).toEqual(0.5);
+    });
 
     it('When it has prev data but volta data does not have any ref peaks', () => {
-      const offset = GetCyclicVoltaPreviousShift(voltaDataNoRef, 0)
-      expect(offset).toEqual(-0.5)
-    })
-  })
+      const offset = GetCyclicVoltaPreviousShift(voltaDataNoRef, 0);
+      expect(offset).toEqual(-0.5);
+    });
+  });
 
   describe('Test TIC seconds-to-minutes normalization (issue #619)', () => {
     it('leaves TIC x unchanged when XUNITS is explicit MINUTES, even past 60', () => {
@@ -880,7 +1118,7 @@ describe('Test for chem helper', () => {
         yValues: [1, 2, 3],
       });
       const entity: any = ExtractJcamp(jcamp);
-      const x = entity.features[0].data[0].x;
+      const { x } = entity.features[0].data[0];
       [0.1, 0.2, 0.3].forEach((expected, i) => expect(x[i]).toBeCloseTo(expected));
     });
 
@@ -901,7 +1139,7 @@ describe('Test for chem helper', () => {
         yValues: [1, 2, 3],
       });
       const entity: any = ExtractJcamp(jcamp);
-      const x = entity.features[0].data[0].x;
+      const { x } = entity.features[0].data[0];
       [1, 5, 10].forEach((expected, i) => expect(x[i]).toBeCloseTo(expected));
     });
 
@@ -930,7 +1168,7 @@ describe('Test for chem helper', () => {
         yValues: [1, 2, 3],
       });
       const entity: any = ExtractJcamp(jcamp);
-      const x = entity.features[0].data[0].x;
+      const { x } = entity.features[0].data[0];
       [0.1, 0.2, 0.3].forEach((expected, i) => expect(x[i]).toBeCloseTo(expected));
     });
 
@@ -941,11 +1179,11 @@ describe('Test for chem helper', () => {
         .replace(/##XUNITS=MINUTES/g, '##XUNITS=RETENTION TIME')
         .replace('##DATA CLASS=XYPOINTS', '##DATA CLASS=XYPOINTS\n##UNITS=, MINUTES, ARBITRARY UNITS');
       const entity: any = ExtractJcamp(retagged);
-      const x = entity.features[0].data[0].x;
+      const { x } = entity.features[0].data[0];
       expect(x[0]).toBeCloseTo(1.1228, 3);
       expect(x[x.length - 1]).toBeCloseTo(13.9829, 3);
     });
-  })
+  });
 
   // Review finding B3: resolveSecToMinScale only rescaled a TIC/UVVIS
   // spectrum's data[0].x. An m/z entity's ##PAGE=T=... retention-time marker
@@ -970,5 +1208,5 @@ describe('Test for chem helper', () => {
       expect(entity.features[0].pageValue).toBeCloseTo(1.1228166666666666);
       expect(entity.features[1].pageValue).toBeCloseTo(1.1384333333333334);
     });
-  })
-})
+  });
+});

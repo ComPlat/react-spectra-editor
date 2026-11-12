@@ -7,7 +7,7 @@ import LineFocus from '../../../components/d3_line_rect/line_focus';
 import MultiFocus, { pickTicIndex } from '../../../components/d3_line_rect/multi_focus';
 import RectFocus from '../../../components/d3_line_rect/rect_focus';
 import { resolveXExtent, resolveYExtent } from '../../../helpers/resolve_extent';
-import { ExtractJcamp, convertTopic } from '../../../helpers/chem';
+import { ExtractJcamp } from '../../../helpers/chem';
 import { extractParams } from '../../../helpers/extractParams';
 import { LIST_LAYOUT } from '../../../constants/list_layout';
 import ContainerSize from '../../../helpers/container_size';
@@ -659,8 +659,8 @@ describe('ViewerLineRect componentDidMount/componentDidUpdate wiring (S5)', () =
 describe('ViewerLineRect pane sizing (S7)', () => {
   // Mirrors d3_line_rect/index.js's own fallback (not exported) so the fallback-aspect
   // math below can be checked without duplicating a magic number.
-  const W = Math.round(window.innerWidth * 0.90 * 9 / 12);
-  const H = Math.round(window.innerHeight * 0.90 * 0.8 / 3);
+  const W = Math.round((window.innerWidth * 0.90 * 9) / 12);
+  const H = Math.round((window.innerHeight * 0.90 * 0.8) / 3);
 
   const buildInstance = (paneClientHeight) => {
     const instance = Object.create(UnconnectedViewerLineRect.prototype);
@@ -692,9 +692,21 @@ describe('ViewerLineRect pane sizing (S7)', () => {
     instance.rectRef = { current: { clientWidth: 1000, clientHeight: paneClientHeight } };
     instance.handleResize = () => {};
     const fallback = { width: W, height: H };
-    instance.lineSize = new ContainerSize(() => instance.lineRef.current, fallback, instance.handleResize);
-    instance.multiSize = new ContainerSize(() => instance.multiRef.current, fallback, instance.handleResize);
-    instance.rectSize = new ContainerSize(() => instance.rectRef.current, fallback, instance.handleResize);
+    instance.lineSize = new ContainerSize(
+      () => instance.lineRef.current,
+      fallback,
+      instance.handleResize,
+    );
+    instance.multiSize = new ContainerSize(
+      () => instance.multiRef.current,
+      fallback,
+      instance.handleResize,
+    );
+    instance.rectSize = new ContainerSize(
+      () => instance.rectRef.current,
+      fallback,
+      instance.handleResize,
+    );
     instance.createFocuses = () => {
       instance.lineFocus = { create: jest.fn(), update: jest.fn() };
       instance.multiFocus = { create: jest.fn(), update: jest.fn() };

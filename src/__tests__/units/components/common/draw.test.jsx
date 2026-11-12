@@ -1,21 +1,24 @@
-import { render } from '@testing-library/react'; 
+import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { drawArrowOnCurve, drawDestroy, drawDisplay, drawLabel, drawMain } from '../../../../components/common/draw';
 import { useEffect } from 'react';
+import {
+  drawArrowOnCurve, drawDestroy, drawDisplay, drawLabel, drawMain,
+} from '../../../../components/common/draw';
+
 const d3 = require('d3');
 
 describe('common/draw', () => {
   describe('.drawMain()', () => {
     it('d3 draw main svg view box', () => {
-      function TestComponent({}) {
+      function TestComponent() {
         useEffect(() => {
-          drawMain('.testsvg', 100, 100)
+          drawMain('.testsvg', 100, 100);
         }, []);
         return (
-          <div className='testsvg' data-testid="testsvg"></div>
-        )
+          <div className="testsvg" data-testid="testsvg" />
+        );
       }
-  
+
       const { queryByTestId } = render(<TestComponent />);
       const renderResult = queryByTestId('testsvg');
       expect(renderResult).toBeInTheDocument();
@@ -42,16 +45,16 @@ describe('common/draw', () => {
     }
 
     it('d3 draw only axes label', () => {
-      function TestComponent({}) {
+      function TestComponent() {
         useEffect(() => {
           drawMyText(false);
           drawLabel(rootClass, null, xLabelText, yLabelText);
         }, []);
         return (
-          <div className='testsvg' data-testid="testsvg"></div>
-        )
+          <div className="testsvg" data-testid="testsvg" />
+        );
       }
-  
+
       const { queryByText } = render(<TestComponent />);
       const xLabel = queryByText(xLabelText);
       expect(xLabel).toBeInTheDocument();
@@ -62,16 +65,16 @@ describe('common/draw', () => {
     });
 
     it('d3 draw labels witg c label', () => {
-      function TestComponent({}) {
+      function TestComponent() {
         useEffect(() => {
           drawMyText(true);
           drawLabel(rootClass, cLabelText, xLabelText, yLabelText);
         }, []);
         return (
-          <div className='testsvg' data-testid="testsvg"></div>
-        )
+          <div className="testsvg" data-testid="testsvg" />
+        );
       }
-  
+
       const { queryByText } = render(<TestComponent />);
       const xLabel = queryByText(xLabelText);
       expect(xLabel).toBeInTheDocument();
@@ -87,32 +90,32 @@ describe('common/draw', () => {
 
   describe('.drawDisplay()', () => {
     it('set display as hidden', () => {
-      function TestComponent({}) {
+      function TestComponent() {
         useEffect(() => {
           drawMain('.testsvg', 100, 100);
           drawDisplay('.testsvg', true);
         }, []);
         return (
-          <div className='testsvg' data-testid="testsvg"></div>
-        )
+          <div className="testsvg" data-testid="testsvg" />
+        );
       }
-  
+
       render(<TestComponent />);
       const svgElement = document.querySelector('svg');
       expect(svgElement).toHaveStyle('width: 0');
     });
 
     it('set display to show', () => {
-      function TestComponent({}) {
+      function TestComponent() {
         useEffect(() => {
           drawMain('.testsvg', 100, 100);
           drawDisplay('.testsvg', false);
         }, []);
         return (
-          <div className='testsvg' data-testid="testsvg"></div>
-        )
+          <div className="testsvg" data-testid="testsvg" />
+        );
       }
-  
+
       render(<TestComponent />);
       const svgElement = document.querySelector('svg');
       expect(svgElement).toHaveStyle('width: 100%');
@@ -121,16 +124,16 @@ describe('common/draw', () => {
 
   describe('.drawDestroy()', () => {
     it('d3 remove all svg', () => {
-      function TestComponent({}) {
+      function TestComponent() {
         useEffect(() => {
           drawMain('.testsvg', 100, 100);
           drawDestroy('.testsvg');
         }, []);
         return (
-          <div className='testsvg' data-testid="testsvg"></div>
-        )
+          <div className="testsvg" data-testid="testsvg" />
+        );
       }
-  
+
       render(<TestComponent />);
       const svgElement = document.querySelector('svg');
       expect(svgElement).not.toBeInTheDocument();
@@ -139,38 +142,38 @@ describe('common/draw', () => {
 
   describe('.drawArrowOnCurve()', () => {
     it('d3 remove all arrows on curves', () => {
-      function TestComponent({}) {
+      function TestComponent() {
         useEffect(() => {
           drawMain('.testsvg', 100, 100);
           d3.select('.d3Svg').append('defs').append('marker');
           drawArrowOnCurve('.testsvg', true);
         }, []);
         return (
-          <div className='testsvg' data-testid="testsvg"></div>
-        )
+          <div className="testsvg" data-testid="testsvg" />
+        );
       }
-  
+
       render(<TestComponent />);
       const svgElement = document.querySelector('marker');
       expect(svgElement).not.toBeInTheDocument();
     });
 
     it('d3 draw arrows on curves', () => {
-      function TestComponent({}) {
+      function TestComponent() {
         useEffect(() => {
           drawMain('.testsvg', 100, 100);
           d3.select('.d3Svg').append('defs').append('marker');
           drawArrowOnCurve('.testsvg', false);
         }, []);
         return (
-          <div className='testsvg' data-testid="testsvg"></div>
-        )
+          <div className="testsvg" data-testid="testsvg" />
+        );
       }
-  
+
       render(<TestComponent />);
       const arrowLeft = document.querySelector('marker');
       expect(arrowLeft).toBeInTheDocument();
-      expect(arrowLeft).toHaveAttribute('id', 'arrow-left');   
+      expect(arrowLeft).toHaveAttribute('id', 'arrow-left');
       expect(arrowLeft).toHaveAttribute('viewBox', '0 0 10 10');
       expect(arrowLeft).toHaveAttribute('refX', '5');
       expect(arrowLeft).toHaveAttribute('refY', '5');

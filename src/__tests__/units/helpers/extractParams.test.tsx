@@ -1,5 +1,5 @@
-import { LIST_LAYOUT } from "../../../constants/list_layout";
-import { extractParams } from "../../../helpers/extractParams";
+import { LIST_LAYOUT } from '../../../constants/list_layout';
+import { extractParams } from '../../../helpers/extractParams';
 
 describe('Test extract parameters helper', () => {
   describe('MS layout', () => {
