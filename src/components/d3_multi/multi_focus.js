@@ -125,7 +125,7 @@ class MultiFocus {
   getShouldUpdate(nextEpSt) {
     const {
       prevXt, prevYt, prevEpSt, prevLySt,
-      prevTePt, prevDtPk, prevSfPk, prevData, prevYFactor,
+      prevTePt, prevDtPk, prevSfPk, prevData, prevYFactor, prevJcampIdx,
     } = this.shouldUpdate;
     const { xt, yt } = TfRescale(this);
     const sameXY = xt(1.1) === prevXt && prevYt === yt(1.1);
@@ -142,12 +142,13 @@ class MultiFocus {
       );
     const sameData = prevData === this.data.length;
     const sameYFactor = prevYFactor === this.yTransformFactor;
+    const sameJcampIdx = prevJcampIdx === this.jcampIdx;
     this.shouldUpdate = Object.assign(
       {},
       this.shouldUpdate,
       {
         sameXY, sameEpSt, sameLySt, // eslint-disable-line
-        sameTePt, sameDtPk, sameSfPk, sameData, sameYFactor, // eslint-disable-line
+        sameTePt, sameDtPk, sameSfPk, sameData, sameYFactor, sameJcampIdx, // eslint-disable-line
       },
     );
   }
@@ -162,12 +163,13 @@ class MultiFocus {
     const prevData = this.data.length;
     const prevLySt = this.layout;
     const prevYFactor = this.yTransformFactor;
+    const prevJcampIdx = this.jcampIdx;
     this.shouldUpdate = Object.assign(
       {},
       this.shouldUpdate,
       {
         prevXt, prevYt, prevEpSt, prevLySt, // eslint-disable-line
-        prevTePt, prevDtPk, prevSfPk, prevData, prevYFactor, // eslint-disable-line
+        prevTePt, prevDtPk, prevSfPk, prevData, prevYFactor, prevJcampIdx, // eslint-disable-line
       },
     );
   }
@@ -426,11 +428,12 @@ class MultiFocus {
 
   drawPeaks(editPeakSt) {
     const {
-      sameXY, sameEpSt, sameDtPk, sameSfPk,
+      sameXY, sameEpSt, sameDtPk, sameSfPk, sameJcampIdx,
     } = this.shouldUpdate;
 
+    // The peak count alone does not tell two curves apart.
     if (!Format.isCyclicVoltaLayout(this.layout)
-    && sameXY && sameEpSt && sameDtPk && sameSfPk) return;
+    && sameXY && sameEpSt && sameDtPk && sameSfPk && sameJcampIdx) return;
 
     // rescale for zoom
     const { xt, yt } = TfRescale(this);
@@ -528,6 +531,9 @@ class MultiFocus {
         .text((d) => d.x.toFixed(2))
         .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(d.y) - 25})`)
         .on('click', (event, d) => this.onClickTarget(event, d));
+    } else {
+      // Only HPLC labels its peaks: clear what an HPLC spectrum before this one drew.
+      this.tags.bpTxt.selectAll('text').remove();
     }
 
     mpp.attr('fill', (_, index) => {
@@ -654,18 +660,20 @@ class MultiFocus {
 
     if (itgs.length === 0 || isDisable) {
       // remove drawn area under curve
-      const auc = this.tags.aucPath.selectAll('path').data(stack);
-      auc.exit()
-        .attr('class', 'exit')
-        .remove();
-      auc.merge(auc);
+      this.tags.aucPath.selectAll('path').remove();
       this.drawVisualSplitLines(showIntegSplit ? itgs : [], shift, ignoreRef);
       return;
     }
 
+    // HPLC shows areas under the curve and NMR shows integral bars: clear the other kind,
+    // which a spectrum of the other layout may have drawn.
     if (ignoreRef) {
+      this.tags.igbPath.selectAll('path').remove();
+      this.tags.igcPath.selectAll('path').remove();
+      this.tags.igtPath.selectAll('text').remove();
       this.drawAUC(stack, shift);
     } else {
+      this.tags.aucPath.selectAll('path').remove();
       // rescale for zoom
       const { xt } = TfRescale(this);
 

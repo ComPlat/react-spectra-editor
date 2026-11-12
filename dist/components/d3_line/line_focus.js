@@ -351,6 +351,9 @@ class LineFocus {
       const bpTxt = this.tags.bpTxt.selectAll('text').data(dPks);
       bpTxt.exit().attr('class', 'exit').remove();
       bpTxt.enter().append('text').attr('class', 'peak-text').attr('font-family', 'Helvetica').style('font-size', '12px').attr('fill', '#228B22').style('text-anchor', 'middle').merge(bpTxt).attr('id', d => `mpp${Math.round(1000 * d.x)}`).text(d => d.x.toFixed(2)).attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y) - 25})`).on('click', (event, d) => this.onClickTarget(event, d));
+    } else {
+      // Only HPLC labels its peaks: clear what an HPLC spectrum before this one drew.
+      this.tags.bpTxt.selectAll('text').remove();
     }
   }
   drawInteg(integrationState) {
@@ -394,15 +397,20 @@ class LineFocus {
     igtp.exit().attr('class', 'exit').remove();
     if (itgs.length === 0 || isDisable) {
       // remove drawn area under curve
-      const auc = this.tags.aucPath.selectAll('path').data(stack);
-      auc.exit().attr('class', 'exit').remove();
-      auc.merge(auc);
+      this.tags.aucPath.selectAll('path').remove();
       this.drawVisualSplitLines(showIntegSplit ? itgs : [], shift, ignoreRef);
       return;
     }
+
+    // HPLC shows areas under the curve and NMR shows integral bars: clear the other kind,
+    // which a spectrum of the other layout may have drawn.
     if (ignoreRef) {
+      this.tags.igbPath.selectAll('path').remove();
+      this.tags.igcPath.selectAll('path').remove();
+      this.tags.igtPath.selectAll('text').remove();
       this.drawAUC(stack, shift);
     } else {
+      this.tags.aucPath.selectAll('path').remove();
       // rescale for zoom
       const {
         xt
