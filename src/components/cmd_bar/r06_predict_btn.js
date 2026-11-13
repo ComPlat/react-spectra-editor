@@ -21,6 +21,7 @@ import { extractPeaksEdit } from '../../helpers/extractPeaksEdit';
 import { setUiViewerType } from '../../actions/ui';
 import { LIST_UI_VIEWER_TYPE } from '../../constants/list_ui';
 import { Convert2Scan, Convert2Thres } from '../../helpers/chem';
+import { curvePredictions, hasCurvePredictions } from '../../helpers/forecast';
 
 const styles = () => (
   Object.assign(
@@ -199,7 +200,7 @@ const renderBtnUnknown = (
 const BtnPredict = ({
   classes, feature, forecast,
   layoutSt, simulationSt, editPeakSt, scanSt, shiftSt, thresSt,
-  integrationSt, multiplicitySt,
+  integrationSt, multiplicitySt, forecastSt,
   setUiViewerTypeAct, curveSt,
 }) => {
   const is13Cor1H = Format.is13CLayout(layoutSt) || Format.is1HLayout(layoutSt);
@@ -212,6 +213,9 @@ const BtnPredict = ({
   const thres = Convert2Thres(feature, thresSt);
   const simuCount = simulationSt.nmrSimPeaks.length;
   const uniqCount = [...new Set(simulationSt.nmrSimPeaks)].length;
+  const analysis = hasCurvePredictions(forecastSt)
+    ? curvePredictions(forecastSt, curveSt.curveIdx)
+    : forecast.predictions;
   let realCount = 0;
   if (Format.is13CLayout(layoutSt)) {
     realCount = carbonFeatures(peaksEdit, multiplicitySt).length;
@@ -226,7 +230,7 @@ const BtnPredict = ({
   if (is13Cor1H && simuCount === 0) {
     const onClickUnknownCb = onClickUnknown(
       feature, forecast, peaksEdit, layoutSt, scan, shiftSt, thres,
-      forecast.predictions, integrationSt, multiplicitySt, curveSt,
+      analysis, integrationSt, multiplicitySt, curveSt,
     );
     return renderBtnUnknown(classes, onClickUnknownCb);
   }
@@ -238,7 +242,7 @@ const BtnPredict = ({
     ? (
       onClickReady(
         forecast, peaksEdit, layoutSt, scan, shiftSt, thres,
-        forecast.predictions, integrationSt, multiplicitySt, setUiViewerTypeAct, curveSt,
+        analysis, integrationSt, multiplicitySt, setUiViewerTypeAct, curveSt,
       )
     )
     : onClickFail(layoutSt, simuCount, realCount);
@@ -263,6 +267,7 @@ const mapStateToProps = (state, props) => ( // eslint-disable-line
     integrationSt: state.integration.present,
     multiplicitySt: state.multiplicity.present,
     curveSt: state.curve,
+    forecastSt: state.forecast,
   }
 );
 
@@ -284,6 +289,7 @@ BtnPredict.propTypes = {
   thresSt: PropTypes.object.isRequired,
   integrationSt: PropTypes.object.isRequired,
   multiplicitySt: PropTypes.object.isRequired,
+  forecastSt: PropTypes.object.isRequired,
   setUiViewerTypeAct: PropTypes.func.isRequired,
   curveSt: PropTypes.object,
 };

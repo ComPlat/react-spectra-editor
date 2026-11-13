@@ -13,7 +13,55 @@ const initialState = {
     output: {
       result: []
     }
-  }
+  },
+  // Predictions a host tagged with the curve they belong to (`predictions.curveIdx`),
+  // keyed by that index. Empty for hosts that do not tag them.
+  predictionsByCurve: {}
+};
+const isTaggedCurve = (state, curveIdx) => Number.isInteger(curveIdx) && Object.prototype.hasOwnProperty.call(state.predictionsByCurve || {}, curveIdx);
+
+// An accept/reject edits the predictions of the curve it was made on when the host
+// tagged them, and the shared predictions otherwise.
+const updateStatus = (state, action, updateResl) => {
+  const {
+    predictions,
+    curveIdx
+  } = action.payload;
+  const tagged = isTaggedCurve(state, curveIdx);
+  const target = tagged ? state.predictionsByCurve[curveIdx] : state.predictions;
+  const {
+    outline,
+    output
+  } = target;
+  const nextPredictions = {
+    outline,
+    output: {
+      result: [updateResl(output.result[0], predictions)]
+    }
+  };
+  if (!tagged) return Object.assign({}, state, {
+    predictions: nextPredictions
+  });
+  return Object.assign({}, state, {
+    predictionsByCurve: Object.assign({}, state.predictionsByCurve, {
+      [curveIdx]: nextPredictions
+    })
+  });
+};
+
+// The host's forecast replaces the state, but predictions tagged for one curve are kept
+// while the host sends another curve's.
+const initStatus = (state, payload) => {
+  const {
+    predictions
+  } = payload;
+  const curveIdx = predictions && predictions.curveIdx;
+  const predictionsByCurve = Number.isInteger(curveIdx) ? Object.assign({}, state.predictionsByCurve, {
+    [curveIdx]: predictions
+  }) : state.predictionsByCurve || {};
+  return Object.assign({}, payload, {
+    predictionsByCurve
+  });
 };
 const updateIrResl = (stResl, plPred) => {
   const {
@@ -41,25 +89,7 @@ const updateIrResl = (stResl, plPred) => {
   };
   return nextResult;
 };
-const updateIrStatus = (state, action) => {
-  const {
-    predictions
-  } = action.payload;
-  const {
-    outline,
-    output
-  } = state.predictions;
-  const stResl = output.result[0];
-  const nextResl = updateIrResl(stResl, predictions);
-  return Object.assign({}, state, {
-    predictions: {
-      outline,
-      output: {
-        result: [nextResl]
-      }
-    }
-  });
-};
+const updateIrStatus = (state, action) => updateStatus(state, action, updateIrResl);
 const updateNmrResl = (stResl, plPred) => {
   const {
     idx,
@@ -81,31 +111,12 @@ const updateNmrResl = (stResl, plPred) => {
   });
   return nextResult;
 };
-const updateNmrStatus = (state, action) => {
-  const {
-    predictions
-  } = action.payload;
-  const {
-    outline,
-    output
-  } = state.predictions;
-  const stResl = output.result[0];
-  const nextResl = updateNmrResl(stResl, predictions);
-  const newSt = Object.assign({}, state, {
-    predictions: {
-      outline,
-      output: {
-        result: [nextResl]
-      }
-    }
-  });
-  return newSt;
-};
+const updateNmrStatus = (state, action) => updateStatus(state, action, updateNmrResl);
 const forecastReducer = (state = initialState, action) => {
   switch (action.type) {
     case _action_type.FORECAST.INIT_STATUS:
       if (!action.payload) return state;
-      return Object.assign({}, action.payload);
+      return initStatus(state, action.payload);
     case _action_type.FORECAST.SET_IR_STATUS:
       return updateIrStatus(state, action);
     case _action_type.FORECAST.SET_NMR_STATUS:

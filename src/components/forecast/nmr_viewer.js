@@ -16,6 +16,7 @@ import {
 import {
   NmrTableHeader, NmrTableBodyRow, SectionReference,
 } from './nmr_comps';
+import { curvePredictions } from '../../helpers/forecast';
 
 const Styles = () => ({
   root: {
@@ -62,7 +63,7 @@ const sectionTable = (classes, pds) => {
   const renderMsg = notToRenderAnalysis(pds);
   if (renderMsg) return renderMsg;
 
-  const dict = pds.output.result[0];
+  const dict = pds.output && pds.output.result && pds.output.result[0];
   if (!dict) return <div />;
   return (
     <Paper className={classes.tableRoot}>
@@ -81,17 +82,17 @@ const sectionTable = (classes, pds) => {
 };
 
 const NmrViewer = ({  // eslint-disable-line
-  classes, molecule, inputCb, forecastSt,
+  classes, molecule, inputCb, forecastSt, curveIdx,
 }) => (
   <div className={classNames(classes.root, 'card-forecast-viewer')}>
     <Grid className={classNames(classes.container)} container>
       <Grid item xs={4}>
         <Paper className={classes.svgRoot}>
-          { sectionSvg(classes, forecastSt.predictions) }
+          { sectionSvg(classes, curvePredictions(forecastSt, curveIdx)) }
         </Paper>
       </Grid>
       <Grid item xs={8}>
-        { sectionTable(classes, forecastSt.predictions) }
+        { sectionTable(classes, curvePredictions(forecastSt, curveIdx)) }
       </Grid>
     </Grid>
     { sectionInput(classes, molecule, inputCb) }
@@ -102,6 +103,7 @@ const NmrViewer = ({  // eslint-disable-line
 const mapStateToProps = (state, props) => ( // eslint-disable-line
   {
     forecastSt: state.forecast,
+    curveIdx: state.curve.curveIdx,
   }
 );
 
@@ -118,6 +120,7 @@ NmrViewer.propTypes = {
     PropTypes.bool,
   ]),
   forecastSt: PropTypes.object.isRequired,
+  curveIdx: PropTypes.number.isRequired,
 };
 
 NmrViewer.defaultProps = {

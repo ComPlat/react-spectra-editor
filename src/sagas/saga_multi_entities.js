@@ -6,6 +6,7 @@ import {
 } from '../constants/action_type';
 
 import { LIST_LAYOUT } from '../constants/list_layout';
+import Format from '../helpers/format';
 
 const getLayoutSt = (state) => state.layout;
 const getCurveSt = (state) => state.curve;
@@ -129,7 +130,7 @@ function* setInitIntegrations(action) { // eslint-disable-line
       const integationSt = yield select(getIntegrationSt);
       const multiplicitySt = yield select(getMultiplicitySt);
       const curve = listCurves[index];
-      const { integration, multiplicity, simulation } = curve;
+      const { integration, multiplicity } = curve;
 
       if (integration) {
         const { integrations } = integationSt;
@@ -160,20 +161,31 @@ function* setInitIntegrations(action) { // eslint-disable-line
           payload,
         });
       }
-
-      if (simulation) {
-        yield put({
-          type: SIMULATION.RESET_ALL_RDC,
-          payload: simulation,
-        });
-      }
     }
   }
+}
+
+// With several NMR spectra, the simulation (and so the Predict button's counts) follows
+// the selected curve. A curve without one clears the previous curve's.
+function* setCurveSimulation(action) { // eslint-disable-line
+  const layoutSt = yield select(getLayoutSt);
+  if (!Format.isNmrLayout(layoutSt)) return;
+
+  const { listCurves, curveIdx } = yield select(getCurveSt);
+  if (!Array.isArray(listCurves) || listCurves.length < 2) return;
+
+  const curve = listCurves[curveIdx];
+  yield put({
+    type: SIMULATION.RESET_ALL_RDC,
+    payload: (curve && curve.simulation) || { nmrSimPeaks: [] },
+  });
 }
 
 const multiEntitiesSagas = [
   takeEvery(CURVE.SET_ALL_CURVES, setCyclicVoltametry),
   takeEvery(CURVE.SET_ALL_CURVES, setInitIntegrations),
+  takeEvery(CURVE.SET_ALL_CURVES, setCurveSimulation),
+  takeEvery(CURVE.SELECT_WORKING_CURVE, setCurveSimulation),
   takeEvery(CYCLIC_VOLTA_METRY.SET_FACTOR, setCyclicVoltametryRef),
 ];
 

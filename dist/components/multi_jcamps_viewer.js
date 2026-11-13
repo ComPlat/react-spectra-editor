@@ -16,6 +16,7 @@ var _index = _interopRequireDefault(require("./panel/index"));
 var _cyclic_voltamery_data = _interopRequireDefault(require("./panel/cyclic_voltamery_data"));
 var _index2 = _interopRequireDefault(require("./cmd_bar/index"));
 var _index3 = _interopRequireDefault(require("./d3_multi/index"));
+var _forecast_viewer = _interopRequireDefault(require("./forecast_viewer"));
 var _curve = require("../actions/curve");
 var _cyclic_voltammetry = require("../actions/cyclic_voltammetry");
 var _list_layout = require("../constants/list_layout");
@@ -127,6 +128,10 @@ class MultiJcampsViewer extends _react.default.Component {
     const xLabel = feature?.xUnit || '';
     const yLabel = feature?.yUnit || '';
     const isCyclicVolta = _format.default.isCyclicVoltaLayout(layoutSt);
+    const isNmr = _format.default.isNmrLayout(layoutSt);
+    const isIr = _format.default.isIrLayout(layoutSt);
+    // As for a single spectrum: a host that gives a forecast gets the analysis view.
+    const showForecast = !!forecast && Object.keys(forecast).length > 0 && (isNmr || isIr);
     return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
       className: classes.root,
       children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_index2.default, {
@@ -147,7 +152,19 @@ class MultiJcampsViewer extends _react.default.Component {
             className: isCyclicVolta ? classes.cvViewerCol : undefined,
             children: [/*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
               className: isCyclicVolta ? classes.cvViewerWrap : undefined,
-              children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_index3.default, {
+              children: showForecast ? /*#__PURE__*/(0, _jsxRuntime.jsx)(_forecast_viewer.default, {
+                entities: entities,
+                topic: topic,
+                cLabel: "",
+                xLabel: xLabel,
+                yLabel: yLabel,
+                feature: feature,
+                forecast: forecast,
+                isNmr: isNmr,
+                isIr: isIr,
+                isUvvis: false,
+                isXRD: false
+              }) : /*#__PURE__*/(0, _jsxRuntime.jsx)(_index3.default, {
                 entities: entities,
                 topic: topic,
                 xLabel: xLabel,

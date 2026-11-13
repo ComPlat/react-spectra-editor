@@ -24,6 +24,7 @@ const baseSelectNmrStatus = ({
   atom,
   status,
   identity,
+  curveIdx,
   setNmrStatusAct
 }) => {
   const theStatus = ['accept', 'reject'].includes(status) ? status : '';
@@ -38,7 +39,8 @@ const baseSelectNmrStatus = ({
             identity,
             value: e.target.value
           },
-          svgs: []
+          svgs: [],
+          curveIdx
         });
       },
       children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
@@ -64,7 +66,9 @@ const baseSelectNmrStatus = ({
 };
 const bssMapStateToProps = (state, props) => (
 // eslint-disable-line
-{});
+{
+  curveIdx: state.curve.curveIdx
+});
 const bssMapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   setNmrStatusAct: _forecast.setNmrStatus
 }, dispatch);
@@ -73,6 +77,7 @@ baseSelectNmrStatus.propTypes = {
   atom: _propTypes.default.number.isRequired,
   status: _propTypes.default.string,
   identity: _propTypes.default.string.isRequired,
+  curveIdx: _propTypes.default.number.isRequired,
   setNmrStatusAct: _propTypes.default.func.isRequired
 };
 baseSelectNmrStatus.defaultProps = {

@@ -1,5 +1,6 @@
 "use strict";
 
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -7,6 +8,7 @@ exports.default = void 0;
 var _effects = require("redux-saga/effects");
 var _action_type = require("../constants/action_type");
 var _list_layout = require("../constants/list_layout");
+var _format = _interopRequireDefault(require("../helpers/format"));
 /* eslint-disable no-plusplus */
 
 const getLayoutSt = state => state.layout;
@@ -180,8 +182,7 @@ function* setInitIntegrations(action) {
       const curve = listCurves[index];
       const {
         integration,
-        multiplicity,
-        simulation
+        multiplicity
       } = curve;
       if (integration) {
         const {
@@ -221,14 +222,28 @@ function* setInitIntegrations(action) {
           payload
         });
       }
-      if (simulation) {
-        yield (0, _effects.put)({
-          type: _action_type.SIMULATION.RESET_ALL_RDC,
-          payload: simulation
-        });
-      }
     }
   }
 }
-const multiEntitiesSagas = [(0, _effects.takeEvery)(_action_type.CURVE.SET_ALL_CURVES, setCyclicVoltametry), (0, _effects.takeEvery)(_action_type.CURVE.SET_ALL_CURVES, setInitIntegrations), (0, _effects.takeEvery)(_action_type.CYCLIC_VOLTA_METRY.SET_FACTOR, setCyclicVoltametryRef)];
+
+// With several NMR spectra, the simulation (and so the Predict button's counts) follows
+// the selected curve. A curve without one clears the previous curve's.
+function* setCurveSimulation(action) {
+  // eslint-disable-line
+  const layoutSt = yield (0, _effects.select)(getLayoutSt);
+  if (!_format.default.isNmrLayout(layoutSt)) return;
+  const {
+    listCurves,
+    curveIdx
+  } = yield (0, _effects.select)(getCurveSt);
+  if (!Array.isArray(listCurves) || listCurves.length < 2) return;
+  const curve = listCurves[curveIdx];
+  yield (0, _effects.put)({
+    type: _action_type.SIMULATION.RESET_ALL_RDC,
+    payload: curve && curve.simulation || {
+      nmrSimPeaks: []
+    }
+  });
+}
+const multiEntitiesSagas = [(0, _effects.takeEvery)(_action_type.CURVE.SET_ALL_CURVES, setCyclicVoltametry), (0, _effects.takeEvery)(_action_type.CURVE.SET_ALL_CURVES, setInitIntegrations), (0, _effects.takeEvery)(_action_type.CURVE.SET_ALL_CURVES, setCurveSimulation), (0, _effects.takeEvery)(_action_type.CURVE.SELECT_WORKING_CURVE, setCurveSimulation), (0, _effects.takeEvery)(_action_type.CYCLIC_VOLTA_METRY.SET_FACTOR, setCyclicVoltametryRef)];
 var _default = exports.default = multiEntitiesSagas;
