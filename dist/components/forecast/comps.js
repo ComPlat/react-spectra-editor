@@ -216,6 +216,7 @@ const SectionUnknown = () => /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {
   })
 });
 const notToRenderAnalysis = pds => {
+  if (!pds) return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {});
   if (pds.running) return /*#__PURE__*/(0, _jsxRuntime.jsx)(SectionRunning, {});
   if (!pds.outline || !pds.outline.code) return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {});
   if (pds.outline.code >= 500) return /*#__PURE__*/(0, _jsxRuntime.jsx)(SectionNoService, {});
@@ -228,7 +229,10 @@ const sectionSvg = (classes, predictions) => {
   const renderMsg = notToRenderAnalysis(predictions);
   if (renderMsg) return null;
   if (!predictions.output) return null;
-  const targetSvg = predictions.output.result[0].svgs[0];
+  const {
+    result
+  } = predictions.output;
+  const targetSvg = result && result[0] && result[0].svgs && result[0].svgs[0];
   if (!targetSvg) return /*#__PURE__*/(0, _jsxRuntime.jsx)(_section_loading.default, {});
   return /*#__PURE__*/(0, _jsxRuntime.jsx)(_reactSvgFileZoomPan.default, {
     svg: targetSvg,
