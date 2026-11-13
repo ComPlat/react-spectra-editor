@@ -964,8 +964,9 @@ const buildSimFeature = jcamp => {
   const {
     $CSSIMULATIONPEAKS
   } = jcamp.info;
-  let nmrSimPeaks = $CSSIMULATIONPEAKS ? $CSSIMULATIONPEAKS.split('\n') : [];
-  nmrSimPeaks = nmrSimPeaks.map(x => parseFloat(x).toFixed(2));
+  // Kept unrounded: equivalent atoms share a predicted value, so the distinct values are the
+  // signals NMRshiftDB expects, and rounding would merge different signals that are close.
+  const nmrSimPeaks = ($CSSIMULATIONPEAKS ? $CSSIMULATIONPEAKS.split('\n') : []).map(x => parseFloat(x)).filter(x => Number.isFinite(x));
   return {
     nmrSimPeaks
   };
