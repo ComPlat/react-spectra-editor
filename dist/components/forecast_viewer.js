@@ -11,6 +11,7 @@ var _reactRedux = require("react-redux");
 var _redux = require("redux");
 var _styles = require("@mui/styles");
 var _index = _interopRequireDefault(require("./d3_line/index"));
+var _index2 = _interopRequireDefault(require("./d3_multi/index"));
 var _nmr_viewer = _interopRequireDefault(require("./forecast/nmr_viewer"));
 var _ir_viewer = _interopRequireDefault(require("./forecast/ir_viewer"));
 var _forecast = require("../actions/forecast");
@@ -102,7 +103,8 @@ class ForecastViewer extends _react.default.Component {
       isXRD,
       wavelength,
       curveSt,
-      jcampSt
+      jcampSt,
+      entities
     } = this.props;
     const {
       viewer
@@ -111,24 +113,40 @@ class ForecastViewer extends _react.default.Component {
       inputCb,
       molecule
     } = forecast;
-    const {
-      curveIdx
-    } = curveSt;
-    const {
-      jcamps
-    } = jcampSt;
-    const comparisons = jcamps[curveIdx].others;
-    return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
-      className: classes.root,
-      children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_index.default, {
+    const isHidden = viewer !== _list_ui.LIST_UI_VIEWER_TYPE.SPECTRUM;
+    // The chart stays mounted, only hidden, while the analysis is shown: mounting it again
+    // would reset the user's edits.
+    let chart;
+    if (entities) {
+      chart = /*#__PURE__*/(0, _jsxRuntime.jsx)(_index2.default, {
+        entities: entities,
+        topic: topic,
+        xLabel: xLabel,
+        yLabel: yLabel,
+        feature: feature,
+        isHidden: isHidden
+      });
+    } else {
+      const {
+        curveIdx
+      } = curveSt;
+      const {
+        jcamps
+      } = jcampSt;
+      const comparisons = jcamps[curveIdx] && jcamps[curveIdx].others;
+      chart = /*#__PURE__*/(0, _jsxRuntime.jsx)(_index.default, {
         topic: topic,
         feature: feature,
         cLabel: cLabel,
         xLabel: isXRD && wavelength ? `${xLabel}, WL=${wavelength.value} ${wavelength.unit}` : xLabel,
         yLabel: yLabel,
         comparisons: comparisons,
-        isHidden: viewer !== _list_ui.LIST_UI_VIEWER_TYPE.SPECTRUM
-      }), viewer === _list_ui.LIST_UI_VIEWER_TYPE.ANALYSIS && isNmr && /*#__PURE__*/(0, _jsxRuntime.jsx)(_nmr_viewer.default, {
+        isHidden: isHidden
+      });
+    }
+    return /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
+      className: classes.root,
+      children: [chart, viewer === _list_ui.LIST_UI_VIEWER_TYPE.ANALYSIS && isNmr && /*#__PURE__*/(0, _jsxRuntime.jsx)(_nmr_viewer.default, {
         molecule: molecule,
         inputCb: inputCb
       }), viewer === _list_ui.LIST_UI_VIEWER_TYPE.ANALYSIS && isIr && /*#__PURE__*/(0, _jsxRuntime.jsx)(_ir_viewer.default, {
@@ -167,6 +185,11 @@ ForecastViewer.propTypes = {
   initForecastStatusAct: _propTypes.default.func.isRequired,
   setUiViewerTypeAct: _propTypes.default.func.isRequired,
   wavelength: _propTypes.default.object.isRequired,
-  curveSt: _propTypes.default.object.isRequired
+  curveSt: _propTypes.default.object.isRequired,
+  // The curves of a multi-spectrum view; draws them all instead of the single spectrum.
+  entities: _propTypes.default.array
+};
+ForecastViewer.defaultProps = {
+  entities: null
 };
 var _default = exports.default = (0, _redux.compose)((0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps), (0, _styles.withStyles)(styles))(ForecastViewer);

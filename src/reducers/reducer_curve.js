@@ -37,6 +37,8 @@ const setAllCurves = (state, action) => {
 
     const maxminPeak = Convert2MaxMinPeak(layout, feature, 0);
     const color = Format.mutiEntitiesColors(idx);
+    const finalEntity = entityFromExtract || entity;
+    const simulation = finalEntity.features && finalEntity.features.simulation;
     return {
       layout,
       lcmsKind: lcmsInfo.kind,
@@ -46,11 +48,12 @@ const setAllCurves = (state, action) => {
       hasEdit,
       integration,
       multiplicity,
+      simulation,
       maxminPeak,
       color,
       curveIdx: idx,
       features: finalFeatures,
-      entity: entityFromExtract || entity,
+      entity: finalEntity,
       spectra: spectra || entity.spectra,
     };
   });

@@ -20,7 +20,7 @@ import { setIrStatus } from '../../actions/forecast';
 // import SmaToSvg from '../common/chem';
 
 const baseSelectIrStatus = ({
-  sma, status, identity,
+  sma, status, identity, curveIdx,
   setIrStatusAct,
 }) => {
   const theStatus = ['accept', 'reject'].includes(status) ? status : '';
@@ -35,6 +35,7 @@ const baseSelectIrStatus = ({
               sma, identity, value: e.target.value,
             },
             svgs: [],
+            curveIdx,
           });
         }}
       >
@@ -53,7 +54,9 @@ const baseSelectIrStatus = ({
 };
 
 const bssMapStateToProps = (state, props) => ( // eslint-disable-line
-  {}
+  {
+    curveIdx: state.curve.curveIdx,
+  }
 );
 
 const bssMapDispatchToProps = (dispatch) => (
@@ -66,6 +69,7 @@ baseSelectIrStatus.propTypes = {
   sma: PropTypes.string.isRequired,
   status: PropTypes.string,
   identity: PropTypes.string.isRequired,
+  curveIdx: PropTypes.number.isRequired,
   setIrStatusAct: PropTypes.func.isRequired,
 };
 

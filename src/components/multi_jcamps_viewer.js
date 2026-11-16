@@ -14,6 +14,7 @@ import PanelViewer from './panel/index';
 import CyclicVoltammetryPanel from './panel/cyclic_voltamery_data';
 import CmdBar from './cmd_bar/index';
 import ViewerMulti from './d3_multi/index';
+import ForecastViewer from './forecast_viewer';
 
 import { setAllCurves } from '../actions/curve';
 import {
@@ -107,6 +108,10 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
     const yLabel = feature?.yUnit || '';
 
     const isCyclicVolta = Format.isCyclicVoltaLayout(layoutSt);
+    const isNmr = Format.isNmrLayout(layoutSt);
+    const isIr = Format.isIrLayout(layoutSt);
+    // As for a single spectrum: a host that gives a forecast gets the analysis view.
+    const showForecast = !!forecast && Object.keys(forecast).length > 0 && (isNmr || isIr);
 
     return (
       <div className={classes.root}>
@@ -127,13 +132,29 @@ class MultiJcampsViewer extends React.Component { // eslint-disable-line
           <Grid container className={isCyclicVolta ? classes.cvTopRow : undefined}>
             <Grid item xs={9} className={isCyclicVolta ? classes.cvViewerCol : undefined}>
               <div className={isCyclicVolta ? classes.cvViewerWrap : undefined}>
-                <ViewerMulti
-                  entities={entities}
-                  topic={topic}
-                  xLabel={xLabel}
-                  yLabel={yLabel}
-                  feature={feature}
-                />
+                {showForecast ? (
+                  <ForecastViewer
+                    entities={entities}
+                    topic={topic}
+                    cLabel=""
+                    xLabel={xLabel}
+                    yLabel={yLabel}
+                    feature={feature}
+                    forecast={forecast}
+                    isNmr={isNmr}
+                    isIr={isIr}
+                    isUvvis={false}
+                    isXRD={false}
+                  />
+                ) : (
+                  <ViewerMulti
+                    entities={entities}
+                    topic={topic}
+                    xLabel={xLabel}
+                    yLabel={yLabel}
+                    feature={feature}
+                  />
+                )}
               </div>
               {isCyclicVolta ? (
                 <div className={classes.cvPanelBelow}>
