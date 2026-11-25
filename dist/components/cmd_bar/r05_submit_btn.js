@@ -18,6 +18,7 @@ var _common = require("./common");
 var _extractPeaksEdit = require("../../helpers/extractPeaksEdit");
 var _format = _interopRequireDefault(require("../../helpers/format"));
 var _shift = require("../../helpers/shift");
+var _forecast = require("../../helpers/forecast");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable prefer-object-spread, function-paren-newline,
 react/function-component-definition, function-call-argument-newline,
@@ -184,7 +185,8 @@ const buildSpectrumPayload = ({
     ...optionalBooleanFlags
   };
 };
-const onClickCb = (operationValue, isAscend, isIntensity, layoutSt, shiftSt, analysis, decimalSt, integrationSt, multiplicitySt, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData, curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt, sweepExtentSt) => () => {
+const onClickCb = (operationValue, isAscend, isIntensity, layoutSt, shiftSt, forecastSt, decimalSt, integrationSt, multiplicitySt, waveLengthSt, cyclicvoltaSt, curveSt, axesUnitsSt, detectorSt, dscMetaData, curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt, sweepExtentSt) => () => {
+  const analysis = forecastSt.predictions;
   const defaultCurves = feature ? [{
     feature
   }] : [];
@@ -230,7 +232,7 @@ const onClickCb = (operationValue, isAscend, isIntensity, layoutSt, shiftSt, ana
       dscMetaData,
       isAscend,
       isIntensity,
-      analysis,
+      analysis: (0, _forecast.submittedPredictions)(forecastSt, curveIdx, indicesToSend.length),
       decimalSt
     });
     if (lcmsGlobalFields && curve.lcmsKind === 'uvvis') {
@@ -321,7 +323,7 @@ const BtnSubmit = ({
       className: (0, _classnames.default)('btn-sv-bar-submit', className),
       color: "primary",
       disabled: disabled,
-      onClick: onClickCb(operation.value, isAscend, isIntensity, layoutSt, shiftSt, forecastSt.predictions, decimalSt, integrationSt, multiplicitySt, waveLengthSt, cyclicvoltaPayload, curveSt, axesUnitsSt, detectorSt, dscMetaData, curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt, sweepExtentSt),
+      onClick: onClickCb(operation.value, isAscend, isIntensity, layoutSt, shiftSt, forecastSt, decimalSt, integrationSt, multiplicitySt, waveLengthSt, cyclicvoltaPayload, curveSt, axesUnitsSt, detectorSt, dscMetaData, curveList, editPeakSt, thresList, scanSt, feature, hplcMsSt, sweepExtentSt),
       children: children || /*#__PURE__*/(0, _jsxRuntime.jsx)(_PlayCircleOutline.default, {
         className: classes.icon
       })

@@ -1,4 +1,4 @@
-import { put, select } from 'redux-saga/effects';
+import { put } from 'redux-saga/effects';
 
 import managerSagas, { shouldDisplayLcmsSubViewerAt } from '../../../sagas/saga_ui';
 import {

@@ -14,6 +14,7 @@ var _styles = require("@mui/styles");
 var _material = require("@mui/material");
 var _comps = require("./comps");
 var _nmr_comps = require("./nmr_comps");
+var _forecast = require("../../helpers/forecast");
 var _jsxRuntime = require("react/jsx-runtime");
 const Styles = () => ({
   root: {
@@ -58,7 +59,7 @@ const Styles = () => ({
 const sectionTable = (classes, pds) => {
   const renderMsg = (0, _comps.notToRenderAnalysis)(pds);
   if (renderMsg) return renderMsg;
-  const dict = pds.output.result[0];
+  const dict = pds.output && pds.output.result && pds.output.result[0];
   if (!dict) return /*#__PURE__*/(0, _jsxRuntime.jsx)("div", {});
   return /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Paper, {
     className: classes.tableRoot,
@@ -76,7 +77,8 @@ const NmrViewer = ({
   classes,
   molecule,
   inputCb,
-  forecastSt
+  forecastSt,
+  curveIdx
 }) => /*#__PURE__*/(0, _jsxRuntime.jsxs)("div", {
   className: (0, _classnames.default)(classes.root, 'card-forecast-viewer'),
   children: [/*#__PURE__*/(0, _jsxRuntime.jsxs)(_material.Grid, {
@@ -87,26 +89,28 @@ const NmrViewer = ({
       xs: 4,
       children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Paper, {
         className: classes.svgRoot,
-        children: (0, _comps.sectionSvg)(classes, forecastSt.predictions)
+        children: (0, _comps.sectionSvg)(classes, (0, _forecast.curvePredictions)(forecastSt, curveIdx))
       })
     }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_material.Grid, {
       item: true,
       xs: 8,
-      children: sectionTable(classes, forecastSt.predictions)
+      children: sectionTable(classes, (0, _forecast.curvePredictions)(forecastSt, curveIdx))
     })]
   }), (0, _comps.sectionInput)(classes, molecule, inputCb), (0, _nmr_comps.SectionReference)(classes)]
 });
 const mapStateToProps = (state, props) => (
 // eslint-disable-line
 {
-  forecastSt: state.forecast
+  forecastSt: state.forecast,
+  curveIdx: state.curve.curveIdx
 });
 const mapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({}, dispatch);
 NmrViewer.propTypes = {
   classes: _propTypes.default.object.isRequired,
   molecule: _propTypes.default.string.isRequired,
   inputCb: _propTypes.default.oneOfType([_propTypes.default.func, _propTypes.default.bool]),
-  forecastSt: _propTypes.default.object.isRequired
+  forecastSt: _propTypes.default.object.isRequired,
+  curveIdx: _propTypes.default.number.isRequired
 };
 NmrViewer.defaultProps = {
   inputCb: false

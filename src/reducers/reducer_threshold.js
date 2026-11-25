@@ -80,7 +80,7 @@ const setThresHoldLower = (state, action) => {
 const setThresHoldIsEdit = (state, action) => {
   const { payload } = action;
   const { list, selectedIdx } = state;
-  const curveIdx = payload && payload.curveIdx !== undefined ? payload.curveIdx : selectedIdx;
+  const curveIdx = payload && Number.isInteger(payload.curveIdx) ? payload.curveIdx : selectedIdx;
   const selectedThres = list[curveIdx] || defaultThresHold;
   const { isEdit } = selectedThres;
   const newSelectedThres = Object.assign({}, selectedThres, { isEdit: !isEdit });
@@ -92,7 +92,7 @@ const setThresHoldIsEdit = (state, action) => {
 const resetAll = (state, action) => {
   const { payload } = action;
   const { list } = state;
-  if (payload && payload.curveIdx !== undefined) {
+  if (payload && Number.isInteger(payload.curveIdx)) {
     const { curveIdx } = payload;
     const selectedThres = list[curveIdx] || defaultThresHold;
     const newSelectedThres = Object.assign(
@@ -105,10 +105,13 @@ const resetAll = (state, action) => {
     return Object.assign({}, state, { selectedIdx: curveIdx, list: newListThres });
   }
 
+  // The payload is one spectrum's feature. With several curves, clear the values instead,
+  // so that each curve falls back to its own `feature.thresRef`.
+  const value = list.length > 1 ? false : (payload && payload.thresRef);
   const newList = list.map((item) => (
     {
       isEdit: item.isEdit,
-      value: payload && payload.thresRef,
+      value,
       upper: item.upper,
       lower: item.lower,
     }

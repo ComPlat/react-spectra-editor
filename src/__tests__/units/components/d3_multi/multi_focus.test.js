@@ -8,9 +8,7 @@ import { LIST_LAYOUT } from '../../../../constants/list_layout';
 // (computeYTransformFactor is pure — it ignores `this` — so it is called via
 //  the prototype.)
 describe('MultiFocus.computeYTransformFactor — CV current density (B5)', () => {
-  const compute = (cvSt) => MultiFocus.prototype.computeYTransformFactor.call(
-    {}, LIST_LAYOUT.CYCLIC_VOLTAMMETRY, cvSt, { yUnit: 'A' },
-  );
+  const compute = (cvSt) => MultiFocus.prototype.computeYTransformFactor.call({}, LIST_LAYOUT.CYCLIC_VOLTAMMETRY, cvSt, { yUnit: 'A' });
 
   it('treats 100 mm² the same as 1 cm²', () => {
     const fMm2 = compute({ useCurrentDensity: true, areaValue: 100, areaUnit: 'mm²' });

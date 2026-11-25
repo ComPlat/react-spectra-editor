@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "ChemSpectra",
+  "name": "ChemSpectra (standalone)",
   "icons": [
     {
       "src": "favicon.ico",

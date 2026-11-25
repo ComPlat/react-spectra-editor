@@ -109,6 +109,7 @@ const Threshold = ({
   } else {
     thresVal = thresValSt || (feature ? feature.thresRef : hplcMsSt?.threshold?.value);
   }
+  // Both buttons act on the curve the toolbar shows.
   const {
     curveIdx
   } = curveSt;
@@ -116,7 +117,7 @@ const Threshold = ({
     value: false,
     curveIdx
   });
-  const onToggleThreshold = () => toggleThresholdIsEditAct({
+  const onToggleThresholdIsEdit = () => toggleThresholdIsEditAct({
     curveIdx
   });
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
@@ -145,7 +146,7 @@ const Threshold = ({
         children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_common.MuButton, {
           className: (0, _classnames.default)('btn-sv-bar-thresrst'),
           disabled: _cfg.default.btnCmdThres(thresVal),
-          onClick: onToggleThreshold,
+          onClick: onToggleThresholdIsEdit,
           children: restoreIcon(classes, hasEdit, isEditSt)
         })
       })

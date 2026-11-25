@@ -28,11 +28,14 @@ Supported layout identifiers include:
 - `DLS intensity`
 - `DIFFERENTIAL SCANNING CALORIMETRY`
 - `GAS CHROMATOGRAPHY`
+- `LC/MS`
+
+`PLAIN` is the fallback: a JCAMP-DX file whose `##DATA TYPE` the editor does not recognise opens in it, with neutral controls and a non-reversed x-axis, and the user can pick a layout by hand.
 
 The editor supports these main user-facing responsibilities:
 
 - Display spectrum data as line charts, MS bar charts, or multi-spectrum overlays.
-- Navigate spectra through zooming, brushing, scan selection, and curve selection.
+- Navigate spectra through zooming, brushing, scan selection, and curve selection, and invert the y-axis as a viewing preference (seeded from a file's `##$CSINVERTY` record).
 - Edit peak data, thresholds, shifts, integrations, multiplicities, and cyclic voltammetry peaks.
 - Compare compatible spectra through the comparison panel.
 - Submit edited spectrum payloads through host-provided operations.
@@ -60,9 +63,10 @@ The package provides these main technical responsibilities:
 | Material UI | [`src/app.js`](../../src/app.js), [`src/components/cmd_bar/index.js`](../../src/components/cmd_bar/index.js), [`src/components/panel/index.js`](../../src/components/panel/index.js) | Provides UI structure for grids, buttons, tooltips, accordions, panel styling, and theme integration. |
 | `jcampconverter` | [`src/helpers/chem.js`](../../src/helpers/chem.js), [`package.json`](../../package.json) | Converts JCAMP input into the internal `entity` shape consumed by initialization, selectors, and viewers. |
 | `reselect` | [`src/helpers/chem.js`](../../src/helpers/chem.js) | Memoizes derived rendering data such as seed points, peaks, thresholds, comparisons, and frequency values. |
-| Create React App / `react-scripts` | [`package.json`](../../package.json) | Supports local development and the demo application workflow through `start`, `build`, and `test`. |
-| Babel compile | [`package.json`](../../package.json) | Builds distributable package output into `dist/` through the `compile` script. |
-| Storybook / Cypress | [`package.json`](../../package.json), [`cypress.config.ts`](../../cypress.config.ts) | Supports component exploration and end-to-end testing workflows around the editor. |
+| Create React App / `react-scripts` | [`package.json`](../../package.json) | Runs the dev server (`start` for the standalone client, `start:dev` for the editor dev page), `build`, and `test` (Jest 27). |
+| Babel compile | [`package.json`](../../package.json) | Builds distributable package output into `dist/` through the `compile` script. Tests, `setupTests.js` and the dev-server pages (`src/index.js`, `src/dev/`, `src/standalone_page.js`, `src/setupProxy.js`) are not compiled, so they are not published. |
+| ESLint | [`.eslintrc.js`](../../.eslintrc.js) | `yarn lint` checks all of `src/` against the airbnb config, tests included; `.ts`/`.tsx` files are parsed with `@typescript-eslint`. CI runs it before the tests. |
+| Cypress | [`cypress.config.ts`](../../cypress.config.ts) | End-to-end tests against the editor dev page (`yarn start:dev`, then `yarn e2e`). |
 
 ## System Boundaries
 
@@ -110,6 +114,7 @@ Edited data exits the editor through callbacks:
 - `operation.value(payload)` receives the submit payload built by [`src/components/cmd_bar/r05_submit_btn.js`](../../src/components/cmd_bar/r05_submit_btn.js).
 - `forecast.btnCb(payload)` receives prediction requests.
 - `forecast.refreshCb(payload)` receives simulation refresh requests.
+- `forecast.predictions.curveIdx`, when a host sets it, ties those predictions to one curve of a multi-spectrum view.
 - `forecast.inputCb(...)` is passed into forecast viewers for analysis interactions.
 - `others.addOthersCb({ jcamps })` receives dropped comparison files from [`src/components/panel/compare.js`](../../src/components/panel/compare.js).
 - `onDescriptionChanged(delta)` receives user-authored rich description changes from the info panel flow.
@@ -127,10 +132,11 @@ The application composition starts in [`src/app.js`](../../src/app.js). `Spectra
 | Layer | File | Responsibility |
 |---|---|---|
 | `SpectraEditor` | [`src/app.js`](../../src/app.js) | Public component boundary, Redux provider setup, saga startup, helper export through `FN`. |
-| `LayerInit` | [`src/layer_init.js`](../../src/layer_init.js) | Converts host props into Redux initialization actions and chooses between the single-spectrum and multi-spectrum branches. |
+| `LayerInit` | [`src/layer_init.js`](../../src/layer_init.js) | Converts host props into Redux initialization actions and chooses the workspace: `HPLCViewer` for an LC/MS group, `MultiJcampsViewer` for several entities or cyclic voltammetry, otherwise `LayerPrism`. |
 | `LayerPrism` | [`src/layer_prism.js`](../../src/layer_prism.js) | Main single-entity workspace. It composes the command bar, content viewer, and side panels. |
-| `LayerContent` | [`src/layer_content.js`](../../src/layer_content.js) | Selects `ForecastViewer` when `forecast` is non-empty and the layout supports prediction (NMR, IR, UV/VIS, XRD); otherwise `ViewerRect` for MS or `ViewerLine` for other layouts. |
+| `LayerContent` | [`src/layer_content.js`](../../src/layer_content.js) | Selects `ForecastViewer` when `forecast` is non-empty and the layout supports prediction (NMR, IR, UV/VIS including HPLC UV/VIS, XRD); otherwise `ViewerRect` for MS and LC/MS, or `ViewerLine` for other layouts. |
 | `MultiJcampsViewer` | [`src/components/multi_jcamps_viewer.js`](../../src/components/multi_jcamps_viewer.js) | Multi-entity and cyclic voltammetry workspace. It composes the command bar, `ViewerMulti`, cyclic voltammetry panel, and side panels. |
+| `HPLCViewer` | [`src/components/hplc_viewer.js`](../../src/components/hplc_viewer.js) | LC/MS workspace for a group of TIC, UV/VIS and m/z entities. It composes the command bar, the stacked `ViewerLineRect` charts, and side panels; m/z pages can be requested from the host through `onLcmsPageRequest`. |
 | `CmdBar` | [`src/components/cmd_bar/index.js`](../../src/components/cmd_bar/index.js) | Central command surface for editing and display actions. |
 | `PanelViewer` | [`src/components/panel/index.js`](../../src/components/panel/index.js) | Side-panel system for metadata, peaks, multiplicity, comparisons, graph selection, and CV data. |
 | D3 viewers | [`src/components/d3_line`](../../src/components/d3_line), [`src/components/d3_rect`](../../src/components/d3_rect), [`src/components/d3_multi`](../../src/components/d3_multi) | Rendering branches for line spectra, MS spectra, and multi-spectrum/CV views. |
@@ -148,6 +154,7 @@ Rendering is split between React composition and D3-managed SVG drawing. [`src/l
 | Line | [`ViewerLine`](../../src/components/d3_line/index.js) | Line-chart layouts (NMR, IR, UV/VIS, XRD, Raman, and related types) |
 | MS | [`ViewerRect`](../../src/components/d3_rect/index.js) | Mass spectrometry bar charts |
 | Multi | [`ViewerMulti`](../../src/components/d3_multi/index.js) | `multiEntities` overlays and cyclic voltammetry |
+| LC/MS | [`ViewerLineRect`](../../src/components/d3_line_rect/index.js) | LC/MS groups: the UV/VIS line chart, the TIC (positive and negative traces), and the m/z bar chart, stacked |
 
 React mounts containers and passes Redux-derived inputs; D3 focus classes own the SVG lifecycle (`create` / `update`, brush, overlays). See [Frontend Architecture: Rendering Pipeline](frontend-architecture.md#rendering-pipeline-architecture) for the full pipeline, helpers, and debugging notes.
 
@@ -156,6 +163,10 @@ React mounts containers and passes Redux-derived inputs; D3 focus classes own th
 Redux and Redux Saga coordinate editor-wide state from [`src/reducers/index.js`](../../src/reducers/index.js) and [`src/sagas/index.js`](../../src/sagas/index.js). Undoable editing applies to peaks, integrations, and multiplicities. `LayerInit` initializes state from host props; D3 viewers dispatch `resetAll(feature)` to stay aligned with the active feature.
 
 See [Frontend Architecture](frontend-architecture.md) for reducer domains, saga modules, the data transformation pipeline, multi-curve/CV behavior, and runtime synchronization flows.
+
+## Second Entry Point: the Standalone Client
+
+The package also ships `ChemSpectraClient` at `@complat/react-spectra-editor/dist/standalone`: the ChemSpectra upload page, which hosts `SpectraEditor` itself and calls a chem-spectra-app backend. It is a separate entry point, so the main entry does not load it. See [Standalone ChemSpectra Client](../standalone-client.md).
 
 ## Related Documentation
 

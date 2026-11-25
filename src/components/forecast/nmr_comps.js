@@ -18,7 +18,7 @@ import {
 import { setNmrStatus } from '../../actions/forecast';
 
 const baseSelectNmrStatus = ({  // eslint-disable-line
-  idx, atom, status, identity,
+  idx, atom, status, identity, curveIdx,
   setNmrStatusAct,
 }) => {
   const theStatus = ['accept', 'reject'].includes(status) ? status : '';
@@ -33,6 +33,7 @@ const baseSelectNmrStatus = ({  // eslint-disable-line
               idx, atom, identity, value: e.target.value,
             },
             svgs: [],
+            curveIdx,
           });
         }}
       >
@@ -51,7 +52,9 @@ const baseSelectNmrStatus = ({  // eslint-disable-line
 };
 
 const bssMapStateToProps = (state, props) => ( // eslint-disable-line
-  {}
+  {
+    curveIdx: state.curve.curveIdx,
+  }
 );
 
 const bssMapDispatchToProps = (dispatch) => (
@@ -65,6 +68,7 @@ baseSelectNmrStatus.propTypes = {
   atom: PropTypes.number.isRequired,
   status: PropTypes.string,
   identity: PropTypes.string.isRequired,
+  curveIdx: PropTypes.number.isRequired,
   setNmrStatusAct: PropTypes.func.isRequired,
 };
 

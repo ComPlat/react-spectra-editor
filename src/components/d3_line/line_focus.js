@@ -374,6 +374,7 @@ class LineFocus {
         .attr('transform', (d) => `translate(${xt(d.x)}, ${yt(d.y) - 25})`)
         .on('click', (event, d) => this.onClickTarget(event, d));
     } else {
+      // Only HPLC labels its peaks: clear what an HPLC spectrum before this one drew.
       clearPeakLabels();
     }
   }
@@ -443,9 +444,12 @@ class LineFocus {
     if (itgs.length === 0 || isDisable) {
       clearIntegralPaths();
       clearAUC();
+      this.drawVisualSplitLines(showIntegSplit ? itgs : [], shift, ignoreRef);
       return;
     }
 
+    // HPLC shows areas under the curve and NMR shows integral bars: clear the other kind,
+    // which a spectrum of the other layout may have drawn.
     if (ignoreRef) {
       clearIntegralPaths();
       this.drawAUC(stack, shift);

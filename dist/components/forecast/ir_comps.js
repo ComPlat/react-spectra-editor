@@ -24,6 +24,7 @@ const baseSelectIrStatus = ({
   sma,
   status,
   identity,
+  curveIdx,
   setIrStatusAct
 }) => {
   const theStatus = ['accept', 'reject'].includes(status) ? status : '';
@@ -37,7 +38,8 @@ const baseSelectIrStatus = ({
             identity,
             value: e.target.value
           },
-          svgs: []
+          svgs: [],
+          curveIdx
         });
       },
       children: [/*#__PURE__*/(0, _jsxRuntime.jsx)(_material.MenuItem, {
@@ -63,7 +65,9 @@ const baseSelectIrStatus = ({
 };
 const bssMapStateToProps = (state, props) => (
 // eslint-disable-line
-{});
+{
+  curveIdx: state.curve.curveIdx
+});
 const bssMapDispatchToProps = dispatch => (0, _redux.bindActionCreators)({
   setIrStatusAct: _forecast.setIrStatus
 }, dispatch);
@@ -71,6 +75,7 @@ baseSelectIrStatus.propTypes = {
   sma: _propTypes.default.string.isRequired,
   status: _propTypes.default.string,
   identity: _propTypes.default.string.isRequired,
+  curveIdx: _propTypes.default.number.isRequired,
   setIrStatusAct: _propTypes.default.func.isRequired
 };
 baseSelectIrStatus.defaultProps = {

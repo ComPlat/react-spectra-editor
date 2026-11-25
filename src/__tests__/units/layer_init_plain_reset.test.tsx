@@ -211,9 +211,7 @@ describe('LayerInit — a hand-picked layout for an unrecognised entity', () => 
   // edit peaks: an HPLC UV/VIS file whose datatype nobody recognises.
   it('survives a threshold edit toggle', () => {
     const store = buildStore();
-    const entity: any = ExtractJcamp(hplcUvVisJcamp.replace(
-      '##DATA TYPE=HPLC UV/VIS SPECTRUM\n', '##DATA TYPE=SQUID\n',
-    ));
+    const entity: any = ExtractJcamp(hplcUvVisJcamp.replace('##DATA TYPE=HPLC UV/VIS SPECTRUM\n', '##DATA TYPE=SQUID\n'));
     expect(entity.layout).toEqual(LIST_LAYOUT.PLAIN);
     expect(entity.features.editPeak.data[0].x.length).toBeGreaterThan(0);
     render(

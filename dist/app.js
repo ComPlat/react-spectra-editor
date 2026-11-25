@@ -22,7 +22,6 @@ var _reactRedux = require("react-redux");
 var _redux = require("redux");
 var _propTypes = _interopRequireDefault(require("prop-types"));
 var _material = require("@mui/material");
-require("regenerator-runtime/runtime");
 var _reduxSaga = _interopRequireDefault(require("redux-saga"));
 var _index = _interopRequireDefault(require("./reducers/index"));
 var _index2 = _interopRequireDefault(require("./sagas/index"));
@@ -31,8 +30,6 @@ var _fn = _interopRequireDefault(require("./fn"));
 var _list_graph = require("./constants/list_graph");
 var _jsxRuntime = require("react/jsx-runtime");
 /* eslint-disable react/function-component-definition, react/require-default-props */
-
-// eslint-disable-line
 
 // import { logger } from 'redux-logger';
 

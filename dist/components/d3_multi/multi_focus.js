@@ -474,6 +474,8 @@ class MultiFocus {
       sameSfPk,
       sameJcampIdx
     } = this.shouldUpdate;
+
+    // The peak count alone does not tell two curves apart.
     if (!_format.default.isCyclicVoltaLayout(this.layout) && sameXY && sameEpSt && sameDtPk && sameSfPk && sameJcampIdx) return;
 
     // rescale for zoom
@@ -568,6 +570,7 @@ class MultiFocus {
       bpTxt.exit().attr('class', 'exit').remove();
       bpTxt.enter().append('text').attr('class', 'peak-text').attr('font-family', 'Helvetica').style('font-size', '12px').attr('fill', '#228B22').style('text-anchor', 'middle').merge(bpTxt).attr('id', d => `mpp${Math.round(1000 * d.x)}`).text(d => d.x.toFixed(2)).attr('transform', d => `translate(${xt(d.x)}, ${yt(d.y) - 25})`).on('click', (event, d) => this.onClickTarget(event, d));
     } else {
+      // Only HPLC labels its peaks: clear what an HPLC spectrum before this one drew.
       clearPeakLabels();
     }
     mpp.attr('fill', (_, index) => {
@@ -689,8 +692,12 @@ class MultiFocus {
     if (itgs.length === 0 || isDisable) {
       clearIntegralPaths();
       clearAUC();
+      this.drawVisualSplitLines(showIntegSplit ? itgs : [], shift, ignoreRef);
       return;
     }
+
+    // HPLC shows areas under the curve and NMR shows integral bars: clear the other kind,
+    // which a spectrum of the other layout may have drawn.
     if (ignoreRef) {
       clearIntegralPaths();
       this.drawAUC(stack, shift);

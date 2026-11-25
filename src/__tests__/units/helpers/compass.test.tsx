@@ -2,7 +2,9 @@ import { LIST_LAYOUT } from '../../../constants/list_layout';
 
 const mockGetIntegrationSplitTargetFromEvent = jest.fn(() => ({
   splitX: 5,
-  target: { xL: 0, xU: 10, area: 5, absoluteArea: 5 },
+  target: {
+    xL: 0, xU: 10, area: 5, absoluteArea: 5,
+  },
 }));
 
 jest.mock('../../../helpers/integration_split', () => ({
@@ -64,7 +66,9 @@ const makeFocus = (overrides = {}) => {
       y: Object.assign((v: number) => v * 10, { invert: (v: number) => v / 10 }),
     },
     integrationSplitTargets: {
-      stack: [{ xL: 0, xU: 10, area: 5, absoluteArea: 5 }],
+      stack: [{
+        xL: 0, xU: 10, area: 5, absoluteArea: 5,
+      }],
       shift: 0,
       ignoreRef: true,
     },
@@ -83,7 +87,9 @@ describe('ClickCompass', () => {
     mockGetIntegrationSplitTargetFromEvent.mockClear();
     mockGetIntegrationSplitTargetFromEvent.mockReturnValue({
       splitX: 5,
-      target: { xL: 0, xU: 10, area: 5, absoluteArea: 5 },
+      target: {
+        xL: 0, xU: 10, area: 5, absoluteArea: 5,
+      },
     });
   });
 
@@ -99,7 +105,9 @@ describe('ClickCompass', () => {
   it('confirms two-click integration on second distinct click', () => {
     const focus = makeFocus({
       isUiAddIntgSt: true,
-      firstIntegrationPoint: { x: 0, y: 0, jcampIdx: 0, dataLength: 3 },
+      firstIntegrationPoint: {
+        x: 0, y: 0, jcampIdx: 0, dataLength: 3,
+      },
     });
 
     ClickCompass(makeEvent(), focus);

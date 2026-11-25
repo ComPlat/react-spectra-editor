@@ -1,7 +1,7 @@
 describe('NMR 13C', () => {
   beforeEach(() => {
     cy.viewport(2000, 2000)
-    cy.visit('http://localhost:3000/')
+    cy.visit('/')
     cy.get('button').contains('NMR 13C').click()
   })
 
