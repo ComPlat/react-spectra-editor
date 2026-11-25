@@ -31,10 +31,6 @@ react/no-unused-prop-types */
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.85); // ROI
 
-const buildResetPayload = (feature, curveSt) => ({
-  ...feature,
-  curveIdx: curveSt.curveIdx
-});
 const hasActiveZoom = sweepExtentSt => {
   if (!sweepExtentSt) return false;
   return !!(sweepExtentSt.xExtent || sweepExtentSt.yExtent);
@@ -210,12 +206,11 @@ class ViewerMulti extends _react.default.Component {
     const {
       feature,
       resetAllAct,
-      entities,
-      curveSt
+      entities
     } = this.props;
     const oldEntities = prevProps.entities;
     if (oldEntities !== entities && !isSameMultiComparison(oldEntities, entities)) {
-      resetAllAct(buildResetPayload(feature, curveSt));
+      resetAllAct(feature);
     }
   }
   createMultiFocus(size, props) {
@@ -269,7 +264,7 @@ class ViewerMulti extends _react.default.Component {
     (0, _draw.drawDestroy)(this.rootKlass);
     const size = this.size.target(width);
     if (shouldReset && !canSkipReset(sweepExtentSt, layoutSt, feature)) {
-      resetAllAct(buildResetPayload(feature, curveSt));
+      resetAllAct(feature);
     }
     const {
       xxLabel,

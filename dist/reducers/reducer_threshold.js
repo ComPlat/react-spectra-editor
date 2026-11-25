@@ -154,22 +154,6 @@ const resetAll = (state, action) => {
   const {
     list
   } = state;
-  if (payload && Number.isInteger(payload.curveIdx)) {
-    const {
-      curveIdx
-    } = payload;
-    const selectedThres = list[curveIdx] || defaultThresHold;
-    const newSelectedThres = Object.assign({}, selectedThres, {
-      value: payload.thresRef
-    });
-    const newListThres = [...list];
-    newListThres[curveIdx] = newSelectedThres;
-    return Object.assign({}, state, {
-      selectedIdx: curveIdx,
-      list: newListThres
-    });
-  }
-
   // The payload is one spectrum's feature. With several curves, clear the values instead,
   // so that each curve falls back to its own `feature.thresRef`.
   const value = list.length > 1 ? false : payload && payload.thresRef;

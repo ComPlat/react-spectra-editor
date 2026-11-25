@@ -33,10 +33,6 @@ import {
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.85); // ROI
 
-const buildResetPayload = (feature, curveSt) => (
-  { ...feature, curveIdx: curveSt.curveIdx }
-);
-
 const hasActiveZoom = (sweepExtentSt) => {
   if (!sweepExtentSt) return false;
   return !!(sweepExtentSt.xExtent || sweepExtentSt.yExtent);
@@ -208,13 +204,11 @@ class ViewerMulti extends React.Component {
   }
 
   normChange(prevProps) {
-    const {
-      feature, resetAllAct, entities, curveSt,
-    } = this.props;
+    const { feature, resetAllAct, entities } = this.props;
     const oldEntities = prevProps.entities;
     if (oldEntities !== entities
       && !isSameMultiComparison(oldEntities, entities)) {
-      resetAllAct(buildResetPayload(feature, curveSt));
+      resetAllAct(feature);
     }
   }
 
@@ -251,7 +245,7 @@ class ViewerMulti extends React.Component {
     const size = this.size.target(width);
 
     if (shouldReset && !canSkipReset(sweepExtentSt, layoutSt, feature)) {
-      resetAllAct(buildResetPayload(feature, curveSt));
+      resetAllAct(feature);
     }
 
     const { xxLabel, yyLabel } = this.resolveAxisLabels(props);

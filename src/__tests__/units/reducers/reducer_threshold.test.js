@@ -24,4 +24,15 @@ describe('threshold reducer: reset to the reference', () => {
     );
     expect(state.list).toEqual([thres(false), thres(false)]);
   });
+
+  // Opening another pair of spectra after editing curve 2's threshold: the old values
+  // must not survive, whatever curve index the reset carries.
+  it('clears every curve when the reset names a curve', () => {
+    const state = thresholdReducer(
+      { selectedIdx: 1, list: [thres(0.99), thres(42)] },
+      { type: MANAGER.RESETALL, payload: { thresRef: 16.51, curveIdx: 1 } },
+    );
+    expect(state.list).toEqual([thres(false), thres(false)]);
+    expect(state.selectedIdx).toEqual(0);
+  });
 });
