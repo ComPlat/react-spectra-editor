@@ -1,5 +1,7 @@
 import { ActionCreators, newHistory } from 'redux-undo';
-import { INTEGRATION, MULTIPLICITY } from '../../../constants/action_type';
+import {
+  INTEGRATION, MULTIPLICITY, EDITPEAK, CURVE,
+} from '../../../constants/action_type';
 import undoableIntegrationReducer, { integrationReducer } from '../../../reducers/reducer_integration';
 
 describe('Test redux reducer for integrations', () => {
@@ -931,11 +933,11 @@ describe('Test redux reducer for integrations', () => {
   });
 });
 
-import { EDITPEAK, CURVE } from '../../../constants/action_type';
-
 describe('Test redux integration reducer (per-curve)', () => {
   const baseIntegration = {
-    stack: [{ xL: 1, xU: 2, area: 1, absoluteArea: 1 }],
+    stack: [{
+      xL: 1, xU: 2, area: 1, absoluteArea: 1,
+    }],
     refArea: 1,
     refFactor: 1,
     shift: 0,
@@ -979,9 +981,14 @@ describe('Test redux integration reducer (per-curve)', () => {
             { xL: 3, xU: 4, area: 1 },
             { xL: 5, xU: 6, area: 1 },
           ],
-          refArea: 1, refFactor: 1, shift: 0, edited: false,
+          refArea: 1,
+          refFactor: 1,
+          shift: 0,
+          edited: false,
         },
-        { stack: [{ xL: 1, xU: 2, area: 1 }], refArea: 1, refFactor: 1, shift: 0, edited: false },
+        {
+          stack: [{ xL: 1, xU: 2, area: 1 }], refArea: 1, refFactor: 1, shift: 0, edited: false,
+        },
       ],
     };
 

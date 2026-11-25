@@ -120,8 +120,16 @@ describe('<BtnSubmit payload contract />', () => {
       curve: {
         curveIdx: 1,
         listCurves: [
-          { feature: { xUnit: 'min', yUnit: 'mAU', scanAutoTarget: 1, thresRef: 3 } },
-          { feature: { xUnit: 'min', yUnit: 'mAU', scanAutoTarget: 2, thresRef: 4 } },
+          {
+            feature: {
+              xUnit: 'min', yUnit: 'mAU', scanAutoTarget: 1, thresRef: 3,
+            },
+          },
+          {
+            feature: {
+              xUnit: 'min', yUnit: 'mAU', scanAutoTarget: 2, thresRef: 4,
+            },
+          },
         ],
       },
       threshold: { list: [{ value: 10 }, { value: 20 }] },
