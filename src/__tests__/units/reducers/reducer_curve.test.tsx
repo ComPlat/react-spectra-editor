@@ -79,8 +79,11 @@ describe('Test redux curve reducer', () => {
     action.type = CURVE.SET_ALL_CURVES;
     const entity = ExtractJcamp(nmr1HJcamp);
     curveState = { listCurves: [], curveIdx: 0 };
-    action.payload = { entities: [entity, entity, entity], curveIdx: 1 };
-    const { curveIdx } = curveReducer(curveState, action);
+    const { curveIdx } = curveReducer(curveState, {
+      type: CURVE.SET_ALL_CURVES,
+      payload: [entity, entity, entity],
+      meta: { curveIdx: 1 },
+    });
     expect(curveIdx).toEqual(1);
   });
 

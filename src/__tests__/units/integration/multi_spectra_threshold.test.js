@@ -55,4 +55,21 @@ describe('multi-spectrum: thresholds when another pair of spectra is opened', ()
 
     expect(thresholdValues()).toEqual([false, false]);
   });
+
+  // A host can open the editor on a given curve. That index travels next to the curve
+  // list, which every reducer of SET_ALL_CURVES still receives as an array.
+  it('opens on the host\'s curve with one threshold per curve', async () => {
+    render(
+      <SpectraEditor
+        entity={secondPair[0]}
+        multiEntities={secondPair}
+        entityFileNames={['c.jdx', 'd.jdx']}
+        curveIdx={1}
+        operations={[{ name: 'save', value: () => {} }]}
+      />,
+    );
+    await waitFor(() => expect(store.getState().curve.listCurves).toHaveLength(2));
+    expect(store.getState().curve.curveIdx).toBe(1);
+    expect(store.getState().threshold.list).toHaveLength(2);
+  });
 });

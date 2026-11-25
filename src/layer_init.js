@@ -197,12 +197,13 @@ class LayerInit extends React.Component {
     }
   }
 
-  buildSetAllCurvesPayload(entities, isInitial) {
+  // SET_ALL_CURVES's payload is always the array of entities: several reducers read it as
+  // one. On mount, the host's `curveIdx` prop rides along in `meta`, next to the LC/MS hints.
+  buildSetAllCurvesMeta(isInitial, extraMeta) {
     const { curveIdx } = this.props;
-    if (isInitial && Number.isFinite(curveIdx)) {
-      return { entities, curveIdx };
-    }
-    return entities;
+    const meta = { ...(extraMeta || {}) };
+    if (isInitial && Number.isFinite(curveIdx)) meta.curveIdx = curveIdx;
+    return Object.keys(meta).length ? meta : undefined;
   }
 
   updateMultiEntities(isInitial = false) {
@@ -243,8 +244,8 @@ class LayerInit extends React.Component {
     if (isMultiSpectra) {
       const meta = Format.isLCMsLayout(entity.layout) ? lcmsCurveMeta() : undefined;
       setAllCurvesAct(
-        this.buildSetAllCurvesPayload(reconcileLcMsTimeAxes(multiEntities), isInitial),
-        meta,
+        reconcileLcMsTimeAxes(multiEntities),
+        this.buildSetAllCurvesMeta(isInitial, meta),
       );
       return;
     }
@@ -254,8 +255,8 @@ class LayerInit extends React.Component {
         ? multiEntities
         : [entity];
       setAllCurvesAct(
-        this.buildSetAllCurvesPayload(reconcileLcMsTimeAxes(entities), isInitial),
-        lcmsCurveMeta(),
+        reconcileLcMsTimeAxes(entities),
+        this.buildSetAllCurvesMeta(isInitial, lcmsCurveMeta()),
       );
       return;
     }
@@ -264,7 +265,7 @@ class LayerInit extends React.Component {
       const entities = (Array.isArray(multiEntities) && multiEntities.length > 0)
         ? multiEntities
         : [entity];
-      setAllCurvesAct(this.buildSetAllCurvesPayload(entities, isInitial));
+      setAllCurvesAct(entities, this.buildSetAllCurvesMeta(isInitial));
       return;
     }
 

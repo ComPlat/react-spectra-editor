@@ -14,16 +14,6 @@ const initialState = {
   isNormalized: false,
 };
 
-const normalizeSetAllCurvesPayload = (payload) => {
-  if (Array.isArray(payload)) {
-    return { entities: payload, curveIdx: undefined };
-  }
-  if (payload && Array.isArray(payload.entities)) {
-    return { entities: payload.entities, curveIdx: payload.curveIdx };
-  }
-  return { entities: null, curveIdx: undefined };
-};
-
 const resolveCurveIdx = (entitiesLength, state, explicitIdx) => {
   if (Number.isFinite(explicitIdx)) {
     const maxIdx = Math.max(0, entitiesLength - 1);
@@ -36,9 +26,10 @@ const resolveCurveIdx = (entitiesLength, state, explicitIdx) => {
 };
 
 const setAllCurves = (state, action) => {
-  const { entities: payloadEntities, curveIdx: explicitIdx } = normalizeSetAllCurvesPayload(action.payload);
-  const payload = payloadEntities ?? action.payload;
-  if (!payload) return { ...state, curveIdx: 0, listCurves: [] };
+  // The payload is the array of entities; a host's initial curve index comes in `meta`.
+  const { payload } = action;
+  const explicitIdx = action.meta?.curveIdx;
+  if (!Array.isArray(payload)) return { ...state, curveIdx: 0, listCurves: [] };
 
   const isLcmsGroup = isLcMsGroup(payload);
   const entities = payload.map((entity, idx) => {

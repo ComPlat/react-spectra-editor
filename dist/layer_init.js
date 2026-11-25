@@ -230,17 +230,18 @@ class LayerInit extends _react.default.Component {
       addOthersAct(others);
     }
   }
-  buildSetAllCurvesPayload(entities, isInitial) {
+
+  // SET_ALL_CURVES's payload is always the array of entities: several reducers read it as
+  // one. On mount, the host's `curveIdx` prop rides along in `meta`, next to the LC/MS hints.
+  buildSetAllCurvesMeta(isInitial, extraMeta) {
     const {
       curveIdx
     } = this.props;
-    if (isInitial && Number.isFinite(curveIdx)) {
-      return {
-        entities,
-        curveIdx
-      };
-    }
-    return entities;
+    const meta = {
+      ...(extraMeta || {})
+    };
+    if (isInitial && Number.isFinite(curveIdx)) meta.curveIdx = curveIdx;
+    return Object.keys(meta).length ? meta : undefined;
   }
   updateMultiEntities(isInitial = false) {
     const {
@@ -273,17 +274,17 @@ class LayerInit extends _react.default.Component {
     const isMultiSpectra = Array.isArray(multiEntities) && multiEntities.length > 1;
     if (isMultiSpectra) {
       const meta = _format.default.isLCMsLayout(entity.layout) ? lcmsCurveMeta() : undefined;
-      setAllCurvesAct(this.buildSetAllCurvesPayload((0, _timeAxis.reconcileLcMsTimeAxes)(multiEntities), isInitial), meta);
+      setAllCurvesAct((0, _timeAxis.reconcileLcMsTimeAxes)(multiEntities), this.buildSetAllCurvesMeta(isInitial, meta));
       return;
     }
     if (_format.default.isLCMsLayout(entity.layout)) {
       const entities = Array.isArray(multiEntities) && multiEntities.length > 0 ? multiEntities : [entity];
-      setAllCurvesAct(this.buildSetAllCurvesPayload((0, _timeAxis.reconcileLcMsTimeAxes)(entities), isInitial), lcmsCurveMeta());
+      setAllCurvesAct((0, _timeAxis.reconcileLcMsTimeAxes)(entities), this.buildSetAllCurvesMeta(isInitial, lcmsCurveMeta()));
       return;
     }
     if (_format.default.isCyclicVoltaLayout(entity.layout)) {
       const entities = Array.isArray(multiEntities) && multiEntities.length > 0 ? multiEntities : [entity];
-      setAllCurvesAct(this.buildSetAllCurvesPayload(entities, isInitial));
+      setAllCurvesAct(entities, this.buildSetAllCurvesMeta(isInitial));
       return;
     }
     setAllCurvesAct(false);
