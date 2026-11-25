@@ -87,11 +87,12 @@ describe('standalone Content with the second of two curves selected', () => {
     const body = formEntries(calls.find((c) => c.url.endsWith('file/save')).options.body);
     // For CV the editor keeps a shift per curve but a single integration and multiplicity
     // entry, so the second curve has none of its own. The backend json.loads these fields:
-    // they must be valid JSON ('{}' = none), never another curve's entry or "undefined".
+    // they must be valid JSON (an entry with an empty stack = none), never another curve's
+    // entry or "undefined".
     const { integrations } = editorStore.getState().integration.present;
     expect(integrations[1]).toBeUndefined();
-    expect(body.integration).toBe('{}');
-    expect(body.multiplicity).toBe('{}');
+    expect(JSON.parse(body.integration).stack).toEqual([]);
+    expect(JSON.parse(body.multiplicity).stack).toEqual([]);
     expect(body.shift_ref_name).toBe(editorStore.getState().shift.shifts[1].ref.name);
     expect(body.dst_list.map((f) => f.name)).toEqual(['dst_0.jcamp', 'dst_1.jcamp']);
   });

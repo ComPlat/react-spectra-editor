@@ -30,7 +30,7 @@ const styles = () => Object.assign({
 }, _common.commonStyle);
 const detectorSelect = (classes, detectorSt, curveSt, layoutSt, updateDetectorAct) => {
   if (!_format.default.isSECLayout(layoutSt)) {
-    return /*#__PURE__*/(0, _jsxRuntime.jsx)("i", {});
+    return null;
   }
   const {
     curveIdx
@@ -80,10 +80,13 @@ const Detector = ({
   curveSt,
   layoutSt,
   updateDetectorAct
-}) => /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
-  className: classes.groupRight,
-  children: detectorSelect(classes, detectorSt, curveSt, layoutSt, updateDetectorAct)
-});
+}) => {
+  if (!_format.default.isSECLayout(layoutSt)) return null;
+  return /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
+    className: classes.groupRight,
+    children: detectorSelect(classes, detectorSt, curveSt, layoutSt, updateDetectorAct)
+  });
+};
 const mapStateToProps = (state, _props) => (
 // eslint-disable-line
 {

@@ -307,6 +307,12 @@ class LineFocus {
     mpp.exit()
       .attr('class', 'exit')
       .remove();
+    const clearPeakLabels = () => {
+      const bpTxt = this.tags.bpTxt.selectAll('text').data([]);
+      bpTxt.exit()
+        .attr('class', 'exit')
+        .remove();
+    };
 
     const linePath = [
       { x: -0.5, y: 10 },
@@ -369,7 +375,7 @@ class LineFocus {
         .on('click', (event, d) => this.onClickTarget(event, d));
     } else {
       // Only HPLC labels its peaks: clear what an HPLC spectrum before this one drew.
-      this.tags.bpTxt.selectAll('text').remove();
+      clearPeakLabels();
     }
   }
 
@@ -379,8 +385,35 @@ class LineFocus {
     } = this.shouldUpdate;
     if (sameXY && sameLySt && sameItSt && sameData) return;
 
+    const clearIntegralPaths = () => {
+      const empty = [];
+      const igbp = this.tags.igbPath.selectAll('path').data(empty);
+      igbp.exit()
+        .attr('class', 'exit')
+        .remove();
+      const igcp = this.tags.igcPath.selectAll('path').data(empty);
+      igcp.exit()
+        .attr('class', 'exit')
+        .remove();
+      const igtp = this.tags.igtPath.selectAll('text').data(empty);
+      igtp.exit()
+        .attr('class', 'exit')
+        .remove();
+    };
+    const clearAUC = () => {
+      const auc = this.tags.aucPath.selectAll('path').data([]);
+      auc.exit()
+        .attr('class', 'exit')
+        .remove();
+    };
+
     const { selectedIdx, integrations } = integrationState;
     const selectedIntegration = integrations[selectedIdx];
+    if (selectedIntegration === false || selectedIntegration === undefined) {
+      clearIntegralPaths();
+      clearAUC();
+      return;
+    }
 
     const {
       stack, refArea, refFactor, shift,
@@ -409,8 +442,8 @@ class LineFocus {
       .remove();
 
     if (itgs.length === 0 || isDisable) {
-      // remove drawn area under curve
-      this.tags.aucPath.selectAll('path').remove();
+      clearIntegralPaths();
+      clearAUC();
       this.drawVisualSplitLines(showIntegSplit ? itgs : [], shift, ignoreRef);
       return;
     }
@@ -418,12 +451,10 @@ class LineFocus {
     // HPLC shows areas under the curve and NMR shows integral bars: clear the other kind,
     // which a spectrum of the other layout may have drawn.
     if (ignoreRef) {
-      this.tags.igbPath.selectAll('path').remove();
-      this.tags.igcPath.selectAll('path').remove();
-      this.tags.igtPath.selectAll('text').remove();
+      clearIntegralPaths();
       this.drawAUC(stack, shift);
     } else {
-      this.tags.aucPath.selectAll('path').remove();
+      clearAUC();
       // rescale for zoom
       const { xt } = TfRescale(this);
 
@@ -569,16 +600,17 @@ class LineFocus {
     const { selectedIdx, multiplicities = [] } = mtplySt || {};
     const selectedMulti = multiplicities[selectedIdx] || {};
 
-    const {
-      stack = [], smExtext = false, shift = 0,
-    } = selectedMulti;
+    const isDisable = Cfg.btnCmdMpy(this.layout);
+    const hasMpy = !isDisable && selectedMulti?.stack?.length > 0;
+    const stack = hasMpy ? selectedMulti.stack : [];
+    const smExtext = hasMpy ? selectedMulti.smExtext : false;
+    const shift = hasMpy ? selectedMulti.shift : 0;
     const hasValidExtent = (extent) => (
       extent
       && Number.isFinite(extent.xL)
       && Number.isFinite(extent.xU)
     );
     const mpys = stack.filter((m) => hasValidExtent(m?.xExtent));
-    const isDisable = Cfg.btnCmdMpy(this.layout);
     if (mpys.length === 0 || isDisable) {
       this.clearMtply();
       return;

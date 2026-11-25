@@ -44,7 +44,7 @@ const SpectraEditor = ({
   entity, others, cLabel, xLabel, yLabel,
   operations, forecast, molSvg, editorOnly, descriptions, exactMass,
   canChangeDescription, onDescriptionChanged,
-  multiEntities, multiMolSvgs, entityFileNames, userManualLink,
+  multiEntities, multiMolSvgs, entityFileNames, userManualLink, curveIdx, sweepExtent,
   onLcmsPageRequest,
 }) => (
   <Provider store={store}>
@@ -52,6 +52,8 @@ const SpectraEditor = ({
       <LayerInit
         entity={entity}
         multiEntities={multiEntities}
+        curveIdx={curveIdx}
+        sweepExtent={sweepExtent}
         entityFileNames={entityFileNames}
         userManualLink={userManualLink}
         others={others}
@@ -76,6 +78,8 @@ const SpectraEditor = ({
 SpectraEditor.propTypes = {
   entity: PropTypes.object.isRequired,
   multiEntities: PropTypes.array,
+  curveIdx: PropTypes.number,
+  sweepExtent: PropTypes.object,
   entityFileNames: PropTypes.array,
   others: PropTypes.object,
   cLabel: PropTypes.string,

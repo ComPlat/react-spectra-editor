@@ -131,7 +131,7 @@ const axisY = (classes, layoutSt, axesUnitsSt, updateYAxisAct, curveSt) => {
 };
 const showSelect = (classes, layoutSt, curveSt, axesUnitsSt, updateXAxisAct, updateYAxisAct) => {
   if (!listLayoutToShow.includes(layoutSt)) {
-    return /*#__PURE__*/(0, _jsxRuntime.jsx)("i", {});
+    return null;
   }
   return /*#__PURE__*/(0, _jsxRuntime.jsxs)("span", {
     children: [axisX(classes, layoutSt, axesUnitsSt, updateXAxisAct, curveSt), axisY(classes, layoutSt, axesUnitsSt, updateYAxisAct, curveSt)]
@@ -161,6 +161,7 @@ const ChangeAxes = ({
       });
     }
   }, [layoutSt, axes, curveIdx, updateYAxisAct]);
+  if (!listLayoutToShow.includes(layoutSt)) return null;
   return /*#__PURE__*/(0, _jsxRuntime.jsx)("span", {
     className: classes.groupRight,
     "data-testid": "ChangeAxes",

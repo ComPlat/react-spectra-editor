@@ -33,6 +33,15 @@ import {
 const W = Math.round(window.innerWidth * 0.90 * 9 / 12); // ROI
 const H = Math.round(window.innerHeight * 0.90 * 0.85); // ROI
 
+const hasActiveZoom = (sweepExtentSt) => {
+  if (!sweepExtentSt) return false;
+  return !!(sweepExtentSt.xExtent || sweepExtentSt.yExtent);
+};
+
+const canSkipReset = (sweepExtentSt, layoutSt, feature) => (
+  hasActiveZoom(sweepExtentSt) && layoutSt === feature?.operation?.layout
+);
+
 class ViewerMulti extends React.Component {
   constructor(props) {
     super(props);
@@ -77,7 +86,7 @@ class ViewerMulti extends React.Component {
       seed, peak, cLabel, xLabel, yLabel,
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt,
       sweepExtentSt, isUiAddIntgSt, isUiSplitIntgSt, isUiVisualSplitIntgSt, isUiNoBrushSt,
-      isHidden, cyclicvoltaSt,
+      isHidden, cyclicvoltaSt, shiftSt,
       integrationSt, mtplySt, axesUnitsSt,
       uiSt, yInvertedSt,
     } = this.props;
@@ -124,6 +133,7 @@ class ViewerMulti extends React.Component {
       isUiVisualSplitIntgSt,
       isUiNoBrushSt,
       cyclicvoltaSt,
+      shiftSt,
       integrationSt,
       mtplySt,
       uiSt,
@@ -180,12 +190,17 @@ class ViewerMulti extends React.Component {
       const baseUnit = /mA/i.test(String(yyLabel)) ? 'mA' : 'A';
       yyLabel = `Current density in ${baseUnit}/${areaUnit}`;
     }
+    if (curveSt && curveSt.isNormalized && !Format.isCyclicVoltaLayout(props.layoutSt)) {
+      yyLabel = 'Normalized intensity in %';
+    }
     return { xxLabel, yyLabel };
   }
 
   normChange(prevProps) {
     const { feature, resetAllAct, entities } = this.props;
     const oldEntities = prevProps.entities;
+    // `entities` is the store's curve list, which layer_init rebuilds only when the
+    // spectra's content changes: a new list is always new data, even of the same size.
     if (oldEntities !== entities) {
       resetAllAct(feature);
     }
@@ -215,7 +230,7 @@ class ViewerMulti extends React.Component {
       seed, peak, cLabel, feature,
       tTrEndPts, tSfPeaks, editPeakSt, layoutSt,
       sweepExtentSt, isUiAddIntgSt, isUiSplitIntgSt, isUiVisualSplitIntgSt, isUiNoBrushSt,
-      isHidden, resetAllAct, cyclicvoltaSt,
+      isHidden, resetAllAct, cyclicvoltaSt, shiftSt,
       integrationSt, mtplySt, uiSt, yInvertedSt,
     } = props;
 
@@ -223,7 +238,7 @@ class ViewerMulti extends React.Component {
     drawDestroy(this.rootKlass);
     const size = this.size.target(width);
 
-    if (shouldReset) {
+    if (shouldReset && !canSkipReset(sweepExtentSt, layoutSt, feature)) {
       resetAllAct(feature);
     }
 
@@ -247,6 +262,7 @@ class ViewerMulti extends React.Component {
       isUiVisualSplitIntgSt,
       isUiNoBrushSt,
       cyclicvoltaSt,
+      shiftSt,
       integrationSt,
       mtplySt,
       uiSt,
@@ -289,6 +305,7 @@ const mapStateToProps = (state, props) => (
       && state.ui.sweepType === LIST_UI_SWEEP_TYPE.INTEGRATION_VISUAL_SPLIT,
     isUiNoBrushSt: LIST_NON_BRUSH_TYPES.indexOf(state.ui.sweepType) < 0,
     cyclicvoltaSt: state.cyclicvolta,
+    shiftSt: state.shift,
     maxminPeakSt: Feature2MaxMinPeak(state, props),
     integrationSt: state.integration.present,
     mtplySt: state.multiplicity.present,
@@ -341,6 +358,7 @@ ViewerMulti.propTypes = {
   removeVisualSplitLineAct: PropTypes.func.isRequired,
   isHidden: PropTypes.bool,
   cyclicvoltaSt: PropTypes.object.isRequired,
+  shiftSt: PropTypes.object.isRequired,
   maxminPeakSt: PropTypes.object,
   addNewCylicVoltaPairPeakAct: PropTypes.func.isRequired,
   addCylicVoltaMaxPeakAct: PropTypes.func.isRequired,

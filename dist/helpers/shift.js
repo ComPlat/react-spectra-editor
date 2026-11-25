@@ -3,11 +3,35 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.VirtalPts = exports.RealPts = exports.FromManualToOffset = exports.CalcResidualX = void 0;
+exports.shiftOffsetAtIndex = exports.shiftEntryAtIndex = exports.normalizeShiftForFormatting = exports.listEntryAtIndex = exports.defaultEmptyShift = exports.VirtalPts = exports.RealPts = exports.FromManualToOffset = exports.CalcResidualX = void 0;
 var _list_shift = require("../constants/list_shift");
 /* eslint-disable prefer-object-spread, default-param-last */
 
-const shiftNone = _list_shift.LIST_SHIFT_13C[0];
+const shiftNone = _list_shift.LIST_SHIFT_1H[0];
+const defaultEmptyShift = exports.defaultEmptyShift = {
+  ref: shiftNone,
+  peak: false,
+  enable: true
+};
+const listEntryAtIndex = (list, index, fallback) => Array.isArray(list) && list[index] !== undefined ? list[index] : fallback;
+exports.listEntryAtIndex = listEntryAtIndex;
+const shiftEntryAtIndex = (shiftSt, atIndex = 0) => listEntryAtIndex(shiftSt?.shifts, atIndex, defaultEmptyShift);
+exports.shiftEntryAtIndex = shiftEntryAtIndex;
+const normalizeShiftForFormatting = (shift, atIndex = 0) => {
+  if (shift?.shifts) {
+    return {
+      shift,
+      atIndex
+    };
+  }
+  return {
+    shift: {
+      shifts: [shift || defaultEmptyShift]
+    },
+    atIndex: 0
+  };
+};
+exports.normalizeShiftForFormatting = normalizeShiftForFormatting;
 const FromManualToOffset = (ref, peak) => {
   if (!peak || ref.name === shiftNone.name) return 0;
   const offset = peak.x - ref.value;
@@ -33,3 +57,11 @@ const RealPts = (pts, resX) => pts.map(pt => Object.assign({
   y: pt.y
 }));
 exports.RealPts = RealPts;
+const shiftOffsetAtIndex = (shiftSt, atIndex = 0) => {
+  const {
+    ref,
+    peak
+  } = shiftEntryAtIndex(shiftSt, atIndex);
+  return FromManualToOffset(ref, peak);
+};
+exports.shiftOffsetAtIndex = shiftOffsetAtIndex;

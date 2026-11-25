@@ -13,12 +13,12 @@ const initialState = {
   ],
 };
 
-// const defaultThresHold = {
-//   isEdit: true,
-//   value: false,
-//   upper: false,
-//   lower: false,
-// };
+const defaultThresHold = {
+  isEdit: true,
+  value: false,
+  upper: false,
+  lower: false,
+};
 
 const setThresHoldValue = (state, action) => {
   const { payload } = action;
@@ -81,7 +81,7 @@ const setThresHoldIsEdit = (state, action) => {
   const { payload } = action;
   const { list, selectedIdx } = state;
   const curveIdx = payload && Number.isInteger(payload.curveIdx) ? payload.curveIdx : selectedIdx;
-  const selectedThres = list[curveIdx];
+  const selectedThres = list[curveIdx] || defaultThresHold;
   const { isEdit } = selectedThres;
   const newSelectedThres = Object.assign({}, selectedThres, { isEdit: !isEdit });
   const newListThres = [...list];
@@ -154,6 +154,8 @@ const thresholdReducer = (state = initialState, action) => {
   switch (action.type) {
     case CURVE.SET_ALL_CURVES:
       return setListThreshold(state, action);
+    case CURVE.SELECT_WORKING_CURVE:
+      return Object.assign({}, state, { selectedIdx: action.payload });
     case THRESHOLD.UPDATE_VALUE:
       return setThresHoldValue(state, action);
     case THRESHOLD.UPDATE_UPPER_VALUE:

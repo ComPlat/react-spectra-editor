@@ -16,13 +16,26 @@ var _format = _interopRequireDefault(require("../helpers/format"));
 const initialState = {
   listCurves: [],
   curveIdx: 0,
-  isShowAllCurve: false
+  isShowAllCurve: false,
+  isNormalized: false
+};
+const resolveCurveIdx = (entitiesLength, state, explicitIdx) => {
+  if (Number.isFinite(explicitIdx)) {
+    const maxIdx = Math.max(0, entitiesLength - 1);
+    return Math.min(Math.max(0, explicitIdx), maxIdx);
+  }
+  if (state.curveIdx >= 0 && state.curveIdx < entitiesLength) {
+    return state.curveIdx;
+  }
+  return 0;
 };
 const setAllCurves = (state, action) => {
+  // The payload is the array of entities; a host's initial curve index comes in `meta`.
   const {
     payload
   } = action;
-  if (!payload) return {
+  const explicitIdx = action.meta?.curveIdx;
+  if (!Array.isArray(payload)) return {
     ...state,
     curveIdx: 0,
     listCurves: []
@@ -72,11 +85,10 @@ const setAllCurves = (state, action) => {
       spectra: spectra || entity.spectra
     };
   });
-  const maxIdx = entities.length - 1;
-  const safeCurveIdx = Math.min(state.curveIdx || 0, maxIdx);
+  const curveIdx = resolveCurveIdx(entities.length, state, explicitIdx);
   return {
     ...state,
-    curveIdx: safeCurveIdx,
+    curveIdx,
     listCurves: entities
   };
 };
@@ -91,6 +103,10 @@ const curveReducer = (state = initialState, action) => {
     case _action_type.CURVE.SET_SHOULD_SHOW_ALL_CURVES:
       return Object.assign({}, state, {
         isShowAllCurve: action.payload
+      });
+    case _action_type.CURVE.SET_NORMALIZED:
+      return Object.assign({}, state, {
+        isNormalized: !!action.payload
       });
     default:
       return state;

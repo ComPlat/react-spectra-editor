@@ -318,15 +318,15 @@ const ticSelect = (classes, hplcMsSt, handleTicChanged) => {
     available
   } = tic;
   const listTIC = [{
-    name: 'PLUS',
+    name: _list_graph.LIST_TIC_POLARITY_LABEL.positive,
     value: 'positive',
     enabled: available?.positive
   }, {
-    name: 'MINUS',
+    name: _list_graph.LIST_TIC_POLARITY_LABEL.negative,
     value: 'negative',
     enabled: available?.negative
   }, {
-    name: 'NEUTRAL',
+    name: _list_graph.LIST_TIC_POLARITY_LABEL.neutral,
     value: 'neutral',
     enabled: available?.neutral
   }];
@@ -498,12 +498,7 @@ class ViewerLineRect extends _react.default.Component {
     const ticPolarityCount = countAvailableTicPolarities(hplcMsSt);
     let ticLabel = null;
     if (ticPolarityCount > 1) {
-      ticLabel = 'NEUTRAL';
-      if (polarity === 'negative') {
-        ticLabel = 'MINUS';
-      } else if (polarity === 'positive') {
-        ticLabel = 'PLUS';
-      }
+      ticLabel = _list_graph.LIST_TIC_POLARITY_LABEL[polarity] || _list_graph.LIST_TIC_POLARITY_LABEL.neutral;
     }
     (0, _draw.drawLabel)(this.rootKlassMulti, ticLabel, 'Minutes', 'Intensity');
     (0, _draw.drawDisplay)(this.rootKlassMulti, isHidden);

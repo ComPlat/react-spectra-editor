@@ -8,6 +8,14 @@ const getLayout = (state) => state.layout;
 const getCurveSt = (state) => state.curve;
 const getIntegrationSt = (state) => state.integration.present;
 
+const defaultEmptyIntegration = {
+  stack: [],
+  refArea: 1,
+  refFactor: 1,
+  shift: 0,
+  edited: false,
+};
+
 function* resetShift(action) {
   const curveSt = yield select(getCurveSt);
   const layout = yield select(getLayout);
@@ -16,7 +24,7 @@ function* resetShift(action) {
 
   const { curveIdx, listCurves } = curveSt;
 
-  const numberOfCurve = listCurves.length;
+  const numberOfCurve = Array.isArray(listCurves) ? listCurves.length : 0;
 
   yield put({
     type: MANAGER.RESETSHIFT,
@@ -41,18 +49,17 @@ function* resetInitNmr(action) {
   const { curveIdx } = curveSt;
 
   const { integration, simulation } = action.payload;
-  const { integrations } = integationSt;
-  const newArrIntegration = [...integrations];
-  newArrIntegration[curveIdx] = integration;
+  // Always reset: keeping the previous spectrum's integrations would
+  // display stale data when the new entity has none saved.
+  const newArrIntegration = new Array(curveIdx + 1).fill(defaultEmptyIntegration);
+  newArrIntegration[curveIdx] = integration || defaultEmptyIntegration;
 
   const payload = Object.assign({}, integationSt, { integrations: newArrIntegration, selectedIdx: curveIdx }); // eslint-disable-line
 
-  if (integration) {
-    yield put({
-      type: INTEGRATION.RESET_ALL_RDC,
-      payload,
-    });
-  }
+  yield put({
+    type: INTEGRATION.RESET_ALL_RDC,
+    payload,
+  });
   if (simulation) {
     yield put({
       type: SIMULATION.RESET_ALL_RDC,
@@ -68,18 +75,15 @@ function* resetInitCommonWithIntergation(action) {
 
   const { integration } = action.payload;
 
-  const { integrations } = integationSt;
-  const newArrIntegration = [...integrations];
-  newArrIntegration[curveIdx] = integration;
+  const newArrIntegration = new Array(curveIdx + 1).fill(defaultEmptyIntegration);
+  newArrIntegration[curveIdx] = integration || defaultEmptyIntegration;
 
   const payload = Object.assign({}, integationSt, { integrations: newArrIntegration, selectedIdx: curveIdx }); // eslint-disable-line
 
-  if (integration) {
-    yield put({
-      type: INTEGRATION.RESET_ALL_RDC,
-      payload,
-    });
-  }
+  yield put({
+    type: INTEGRATION.RESET_ALL_RDC,
+    payload,
+  });
 }
 
 const managerSagas = [
