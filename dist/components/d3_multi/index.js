@@ -36,7 +36,6 @@ const hasActiveZoom = sweepExtentSt => {
   return !!(sweepExtentSt.xExtent || sweepExtentSt.yExtent);
 };
 const canSkipReset = (sweepExtentSt, layoutSt, feature) => hasActiveZoom(sweepExtentSt) && layoutSt === feature?.operation?.layout;
-const isSameMultiComparison = (oldEntities, newEntities) => Array.isArray(oldEntities) && Array.isArray(newEntities) && oldEntities.length > 0 && oldEntities.length === newEntities.length;
 class ViewerMulti extends _react.default.Component {
   constructor(props) {
     super(props);
@@ -209,7 +208,9 @@ class ViewerMulti extends _react.default.Component {
       entities
     } = this.props;
     const oldEntities = prevProps.entities;
-    if (oldEntities !== entities && !isSameMultiComparison(oldEntities, entities)) {
+    // `entities` is the store's curve list, which layer_init rebuilds only when the
+    // spectra's content changes: a new list is always new data, even of the same size.
+    if (oldEntities !== entities) {
       resetAllAct(feature);
     }
   }
